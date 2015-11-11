@@ -107,6 +107,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert teamSynAlert;
 	public VerificationSubmissionModal verificationModal;
 	public UserBundle currentUserBundle;
+	public boolean isACTMember;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -248,7 +249,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void getUserProfile(final ProfileArea initialTab) {
 		//ask for everything in the user bundle
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED | IS_ACT_MEMBER;
+		currentUserBundle = null;
+		isACTMember = false;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED;
 		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
 		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		view.setOrcIdVisible(false);
@@ -332,7 +335,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		} else {
 			//The UI is depends on the current state
 			VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
-			boolean isACTMember = currentUserBundle.getIsACTMember();
 			
 			if (submission == null) {
 				//no submission.  if the owner, provide way to submit
@@ -352,19 +354,38 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			} else {
 				//there's a submission in a state other than approved.  Show UI if owner or act member
-				if (isOwner || isACTMember) {
-					VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
-					if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
-						view.setVerificationSuspendedButtonVisible(true);
-					} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
-						view.setVerificationSubmittedButtonVisible(true);
-					}
-					
-				}
+				getIsACTMemberAndShowVerificationUI(submission);
 			}
-			
-			
 		}
+	}
+	
+	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
+		if (authenticationController.isLoggedIn()) {
+			int mask = IS_ACT_MEMBER;
+			userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
+				@Override
+				public void onSuccess(UserBundle result) {
+					isACTMember = result.getIsACTMember();
+					if (isOwner || isACTMember) {
+						VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+						if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
+							view.setVerificationSuspendedButtonVisible(true);
+						} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
+							view.setVerificationSubmittedButtonVisible(true);
+						}
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.hideLoading();
+					profileSynAlert.handleException(caught);
+				}
+				
+			});	
+		}
+		
+		
 	}
 	
 	@Override
@@ -1031,7 +1052,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				public void onSuccess(UserProfile linkedInProfile) {
 					// Give the user a chance to edit the profile.
 					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
-
 						@Override
 						public void invoke() {
 							profileUpdated();
@@ -1048,7 +1068,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void showVerificationSubmissionModal() {
-		verificationModal.configure(currentUserBundle)
+		verificationModal.configure(currentUserBundle, isACTMember)
 			.show();
 	}
 }

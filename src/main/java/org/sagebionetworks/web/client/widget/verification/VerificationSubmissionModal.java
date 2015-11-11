@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -47,6 +48,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
 	private VerificationStateEnum actRejectState;
+	private boolean isACTMember;
 	
 	@Inject
 	public VerificationSubmissionModal(
@@ -97,8 +99,9 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		view.setPresenter(this);
 	}
 	
-	public VerificationSubmissionModal configure(UserBundle userBundle) {
+	public VerificationSubmissionModal configure(UserBundle userBundle, boolean isACTMember) {
 		this.userBundle = userBundle;
+		this.isACTMember = isACTMember;
 		return this;
 	}
 	
@@ -162,7 +165,6 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			
 			view.setDeleteButtonVisible(DisplayUtils.isInTestWebsite(cookies));
 			
-			boolean isACTMember = userBundle.getIsACTMember();
 			view.setOKButtonVisible(true);
 			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
 			if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
