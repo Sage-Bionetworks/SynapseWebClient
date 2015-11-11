@@ -73,6 +73,7 @@
 								<b:Button ui:field="verifiedBadge" dataTarget="#validatedModal" dataToggle="MODAL" type="PRIMARY" size="EXTRA_SMALL">Profile Validated</b:Button>
 				        		<b:Button ui:field="verificationSubmittedButton" type="INFO" size="EXTRA_SMALL">Profile Validation Pending</b:Button>
 				        		<b:Button ui:field="verificationSuspendedButton" type="WARNING" size="EXTRA_SMALL">Profile Validation Suspended</b:Button>
+				        		<b:Button ui:field="verificationApprovedButton" type="DEFAULT" size="EXTRA_SMALL">Profile Validation Details</b:Button>
 					        	
 								<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />	
 					        	<bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
