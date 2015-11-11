@@ -325,10 +325,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void initializeVerificationUI() {
-		view.setVerificationAlertVisible(false);
-		view.setVerificationButtonVisible(false);
-		view.setVerificationSuspendedButtonVisible(false);
-		view.setVerificationSubmittedButtonVisible(false);
+		//verification UI is hidden by default (in view.clear())
 		boolean isVerified = currentUserBundle.getIsVerified();
 		if (isVerified) {
 			view.addVerifiedBadge();

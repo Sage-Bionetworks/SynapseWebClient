@@ -781,6 +781,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certificationBadge.setVisible(false);
 		verifiedBadge.setVisible(false);
 		submitProfileValidationButton.setVisible(false);
+		verificationSubmittedButton.setVisible(false);
+		verificationSuspendedButton.setVisible(false);
 		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
