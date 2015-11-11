@@ -2,30 +2,20 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -56,7 +46,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Div emailAddresses;
 	@UiField
-	Div filesContainer;
+	Panel filesContainer;
 	
 	@UiField
 	Button submitButton;
@@ -75,6 +65,8 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Div synAlertContainer;
 	@UiField
+	Div promptModalContainer;
+	@UiField
 	Div wikiPageContainer;
 	
 	@UiField
@@ -88,6 +80,32 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Inject
 	public VerificationSubmissionModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		
+		//click handlers
+		submitButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.submitVerification();
+			}
+		});
+		approveButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.approveVerification();
+			}
+		});
+		rejectButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.rejectVerification();
+			}
+		});
+		suspendButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.suspendVerification();
+			}
+		});
 	}
 
 	@Override
@@ -120,6 +138,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		approveButton.setVisible(false);
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
+		dialog.setTitle("");
 	}
 
 	@Override
@@ -241,4 +260,9 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		DisplayUtils.newWindow(url, "", "");
 	}
 	
+	@Override
+	public void setPromptModal(Widget w) {
+		promptModalContainer.clear();
+		promptModalContainer.add(w);
+	}
 }

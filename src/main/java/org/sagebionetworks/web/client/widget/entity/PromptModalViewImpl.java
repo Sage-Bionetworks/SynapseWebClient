@@ -38,25 +38,31 @@ public class PromptModalViewImpl implements PromptModalView {
 	Alert alert;
 	@UiField
 	Button primaryButton;
-	
-	Modal createTableModal;
+	@UiField
+	Button defaultButton;
+	Widget widget;
 
 	@Inject
 	public PromptModalViewImpl(Binder binder){
-		createTableModal = binder.createAndBindUi(this);
+		widget = binder.createAndBindUi(this);
 		modal.addShownHandler(new ModalShownHandler() {
-			
 			@Override
 			public void onShown(ModalShownEvent evt) {
 				nameField.setFocus(true);
 				nameField.selectAll();
 			}
 		});
+		defaultButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				modal.hide();
+			}
+		});
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return createTableModal;
+		return widget;
 	}
 
 	@Override
@@ -90,12 +96,12 @@ public class PromptModalViewImpl implements PromptModalView {
 
 	@Override
 	public void hide() {
-		createTableModal.hide();
+		modal.hide();
 	}
 
 	@Override
 	public void show() {
-		createTableModal.show();
+		modal.show();
 		nameField.setFocus(true);
 	}
 

@@ -67,16 +67,13 @@
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
-				<b:Row>
-					<b:Column size="SM_12">
-						<b:FormGroup>
-							<b:FormLabel>Evidence (e.g. a letter from a signing official at your institution using your institution's letterhead)</b:FormLabel>
-							<bh:Div ui:field="filesContainer"/>
-						</b:FormGroup>
-					</b:Column>
-				</b:Row>
+				<b:FormGroup>
+					<b:FormLabel>Evidence (e.g. a letter from a signing official at your institution using your institution's letterhead)</b:FormLabel>
+					<b:Panel ui:field="filesContainer" addStyleNames="padding-10"/>
+				</b:FormGroup>
 			</bh:Div>
-			<bh:Div ui:field="synAlertContainer"/>		
+			<bh:Div ui:field="synAlertContainer"/>
+			<bh:Div ui:field="promptModalContainer"/>		
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" dataDismiss="MODAL">Cancel</b:Button>

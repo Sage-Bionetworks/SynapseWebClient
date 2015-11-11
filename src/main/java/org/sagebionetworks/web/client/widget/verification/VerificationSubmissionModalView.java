@@ -32,6 +32,7 @@ public interface VerificationSubmissionModalView extends SynapseView {
 	void setSuspendedReason(String reason);
 	void popupError(String message);
 	void openWindow(String url);
+	void setPromptModal(Widget w);
 	/**
 	 * Presenter interface
 	 */

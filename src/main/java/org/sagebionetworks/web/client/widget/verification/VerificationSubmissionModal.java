@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.verification;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -16,6 +18,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -34,8 +37,12 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	private UserBundle userBundle;
 	private VerificationSubmissionModalView view;
 	private SynapseJSNIUtils jsniUtils;
+	private PromptModalView promptModal;
+	
 	CallbackP<String> fileHandleClickedCallback;
 	CallbackP<String> rawFileHandleClickedCallback;
+	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
+	private VerificationStateEnum actRejectState;
 	
 	@Inject
 	public VerificationSubmissionModal(
@@ -45,7 +52,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
-			SynapseJSNIUtils jsniUtils
+			SynapseJSNIUtils jsniUtils,
+			PromptModalView promptModalView
 			) {
 		this.view = view;
 		this.userProfileClient = userProfileClient;
@@ -54,8 +62,17 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
 		this.jsniUtils = jsniUtils;
+		this.promptModal = promptModalView;
+		promptModal.configure("", "Reason", "OK", "");
+		promptModal.setPresenter(new PromptModalView.Presenter() {
+			@Override
+			public void onPrimary() {
+				updateVerificationState(actRejectState, promptModal.getName());
+			}
+		});
 		view.setFileHandleList(fileHandleList.asWidget());
 		view.setWikiPage(helpWikiPage.asWidget());
+		view.setPromptModal(promptModal.asWidget());
 		fileHandleClickedCallback = new CallbackP<String>(){
 			@Override
 			public void invoke(String fileHandleId) {
@@ -118,6 +135,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				view.setOrganization(profile.getCompany());
 				view.setOrcID(userBundle.getORCID());
 				view.setEmails(profile.getEmails());
+				view.setTitle("Profile Validation");
 			} else {
 				//view an existing verification submission
 				VerificationSubmission submission = userBundle.getVerificationSubmission();
@@ -128,12 +146,13 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 					//pending
 					view.setApproveButtonVisible(isACTMember);
 					view.setRejectButtonVisible(isACTMember);
+					view.setTitle("Profile Validation");
 				} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
 					//approved
 					view.setSuspendButtonVisible(isACTMember);
-				} else if (VerificationStateEnum.REJECTED.equals(currentState.getState())) {
-					//rejected
-					//show reason
+					view.setTitle("Validated");
+				} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
+					view.setTitle("Validation Suspended");
 					view.setSuspendedReason(currentState.getReason());
 				}
 				if (isACTMember) {
@@ -143,12 +162,12 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 					for (AttachmentMetadata metadata : submission.getAttachments()) {
 						fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
 					}
+					
 					view.setOrcID(userBundle.getORCID());
 					view.setEmails(userBundle.getUserProfile().getEmails());
 				}
-				
-				
 			}
+			fileHandleList.refreshLinkUI();
 			view.show();
 		}
 	}
@@ -203,22 +222,70 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	
 	@Override
 	public void approveVerification() {
-		// TODO Auto-generated method stub
-		view.showInfo("TODO","");
+		updateVerificationState(VerificationStateEnum.APPROVED, null);
 	}
+	
+	private void updateVerificationState(VerificationStateEnum state, String reason) {
+		long verificationId = Long.parseLong(userBundle.getVerificationSubmission().getId());
+		VerificationState newState = new VerificationState();
+		newState.setState(state);
+		newState.setReason(reason);
+		userProfileClient.updateVerificationState(verificationId, newState, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Submission state has been updated.", "");
+				view.hide();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+
+	}
+	
 	@Override
 	public void rejectVerification() {
-		// TODO Auto-generated method stub
-		view.showInfo("TODO","");
+		//get reason, and update state
+		promptModal.clear();
+		actRejectState = VerificationStateEnum.REJECTED;
+		promptModal.show();
 	}
 	@Override
 	public void submitVerification() {
-		// TODO Auto-generated method stub
-		view.showInfo("TODO","");
+		//create a new verification submission
+		UserProfile profile = userBundle.getUserProfile();
+		VerificationSubmission sub = new VerificationSubmission();
+		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
+		for (String fileHandleId : fileHandleList.getFileHandleIds()) {
+			AttachmentMetadata meta = new AttachmentMetadata();
+			meta.setId(fileHandleId);
+		}
+		sub.setAttachments(attachments);
+		sub.setCompany(profile.getCompany());
+		sub.setEmails(profile.getEmails());
+		sub.setFirstName(profile.getFirstName());
+		sub.setLastName(profile.getLastName());
+		sub.setLocation(profile.getLocation());
+		sub.setOrcid(userBundle.getORCID());
+		userProfileClient.createVerificationSubmission(sub, new AsyncCallback<VerificationSubmission>() {
+			@Override
+			public void onSuccess(VerificationSubmission result) {
+				//submitted, hide modal
+				view.showInfo("Successfully submitted profile for validation.", "");
+				view.hide();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 	@Override
 	public void suspendVerification() {
-		// TODO Auto-generated method stub
-		view.showInfo("TODO","");
+		promptModal.clear();
+		actRejectState = VerificationStateEnum.SUSPENDED;
+		promptModal.show();
+
 	}
 }
