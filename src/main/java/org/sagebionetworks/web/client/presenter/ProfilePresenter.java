@@ -369,6 +369,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
 						if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
 							view.setVerificationSuspendedButtonVisible(true);
+							if (isOwner) {
+								view.setVerificationButtonVisible(true);
+							}
 						} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
 							view.setVerificationSubmittedButtonVisible(true);
 						} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
@@ -1068,8 +1071,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void showVerificationSubmissionModal() {
-		verificationModal.configure(currentUserBundle, isACTMember)
+	public void editVerificationSubmissionClicked() {
+		//edit the existing submission
+		verificationModal.configure(
+				currentUserBundle.getUserProfile(), 
+				currentUserBundle.getVerificationSubmission(), 
+				currentUserBundle.getORCID(), 
+				isACTMember)
+			.show();
+	}
+	
+	@Override
+	public void newVerificationSubmissionClicked() {
+		//create a new submission
+		verificationModal.configure(
+				currentUserBundle.getUserProfile(), 
+				null, //verification submission
+				currentUserBundle.getORCID(), 
+				isACTMember)
 			.show();
 	}
 }

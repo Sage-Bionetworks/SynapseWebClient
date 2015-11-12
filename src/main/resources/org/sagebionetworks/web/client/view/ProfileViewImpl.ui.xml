@@ -60,21 +60,33 @@
 										</bh:Div>
 									</g:FocusPanel>
 								</b:Alert>
-								<b:Button ui:field="submitProfileValidationButton" type="INFO" size="EXTRA_SMALL" >Validate My Profile</b:Button>
-								<b:Modal title="Validated" closable="true" fade="true"
-									dataBackdrop="STATIC" dataKeyboard="true" b:id="validatedModal">
-									<b:ModalBody>
-										<g:HTML>TODO: contain verification submission fields</g:HTML>
-									</b:ModalBody>
-									<b:ModalFooter>
-										<b:Button type="PRIMARY" dataDismiss="MODAL">Close</b:Button>
-									</b:ModalFooter>
-								</b:Modal>
-								<b:Button ui:field="verifiedBadge" dataTarget="#validatedModal" dataToggle="MODAL" type="PRIMARY" size="EXTRA_SMALL">Profile Validated</b:Button>
-				        		<b:Button ui:field="verificationSubmittedButton" type="INFO" size="EXTRA_SMALL">Profile Validation Pending</b:Button>
-				        		<b:Button ui:field="verificationSuspendedButton" type="WARNING" size="EXTRA_SMALL">Profile Validation Suspended</b:Button>
-				        		<b:Button ui:field="verificationApprovedButton" type="DEFAULT" size="EXTRA_SMALL">Profile Validation Details</b:Button>
-					        	
+								<bh:Div>
+									<b:Modal title="Validated" closable="true" fade="true"
+										dataBackdrop="STATIC" dataKeyboard="true" b:id="validatedModal">
+										<b:ModalBody>
+											<g:HTML>TODO: contain verification submission fields</g:HTML>
+										</b:ModalBody>
+										<b:ModalFooter>
+											<b:Button type="PRIMARY" dataDismiss="MODAL">Close</b:Button>
+										</b:ModalFooter>
+									</b:Modal>
+									
+									<b:Button ui:field="verifiedBadge" dataTarget="#validatedModal"
+										dataToggle="MODAL" type="PRIMARY" size="EXTRA_SMALL">Profile Validated</b:Button>
+								</bh:Div>
+								<bh:Div>
+									<b:Button ui:field="verificationSubmittedButton" type="INFO"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Profile Validation Pending</b:Button>
+									<b:Button ui:field="verificationSuspendedButton" type="WARNING"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Validated Profile Suspended</b:Button>
+									<b:Button ui:field="verificationApprovedButton" type="DEFAULT"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Profile Validation Details</b:Button>
+								</bh:Div>
+					        	<bh:Div>
+									<b:Button ui:field="submitProfileValidationButton" type="INFO"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Validate My Profile</b:Button>
+								</bh:Div>
+								
 								<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />	
 					        	<bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
 					        	<bh:Div>

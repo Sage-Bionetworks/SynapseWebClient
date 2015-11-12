@@ -97,7 +97,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 		void refreshTeamInvites();
-		void showVerificationSubmissionModal();
+		void newVerificationSubmissionClicked();
+		void editVerificationSubmissionClicked();
 		void setVerifyDismissed();
 	}
 

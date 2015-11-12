@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -10,6 +11,7 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -72,8 +74,9 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	Div wikiPageContainer;
 	
 	@UiField
-	Heading reasonHeading;
-	
+	Alert reasonAlert;
+	@UiField
+	Text reasonAlertText;
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -133,7 +136,6 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 
 	@Override
 	public void clear() {
-		reasonHeading.setText("");
 		firstName.setText("");
 		lastName.setText("");
 		currentAffiliation.setText("");
@@ -147,6 +149,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
 		deleteButton.setVisible(false);
+		reasonAlert.setVisible(false);
 		dialog.setTitle("");
 	}
 
@@ -255,10 +258,14 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	}
 
 	@Override
-	public void setSuspendedReason(String reason) {
-		reasonHeading.setText(reason);
+	public void setSuspendedAlertVisible(boolean visible) {
+		reasonAlert.setVisible(visible);
 	}
-
+	@Override
+	public void setSuspendedReason(String reason) {
+		reasonAlertText.setText(reason);
+	}
+	
 	@Override
 	public void popupError(String message) {
 		DisplayUtils.showErrorMessage(message);

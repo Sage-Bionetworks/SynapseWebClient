@@ -338,17 +338,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Quiz("Certification"));
 			}
 		});
-		ClickHandler showVerificationSubmissionModalCallback = new ClickHandler() {
+		ClickHandler newVerificationSubmissionCallback = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.showVerificationSubmissionModal();
+				presenter.newVerificationSubmissionClicked();
 			}
 		};
-		verifyFocusPanel.addClickHandler(showVerificationSubmissionModalCallback);
-		verificationApprovedButton.addClickHandler(showVerificationSubmissionModalCallback);
-		submitProfileValidationButton.addClickHandler(showVerificationSubmissionModalCallback);
-		verificationSubmittedButton.addClickHandler(showVerificationSubmissionModalCallback);
-		verificationSuspendedButton.addClickHandler(showVerificationSubmissionModalCallback);
+		ClickHandler editVerificationSubmissionCallback = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.editVerificationSubmissionClicked();
+			}
+		};
+		
+		verifyFocusPanel.addClickHandler(newVerificationSubmissionCallback);
+		verificationApprovedButton.addClickHandler(editVerificationSubmissionCallback);
+		submitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
+		verificationSubmittedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
 		
 		initCertificationBadge();
 

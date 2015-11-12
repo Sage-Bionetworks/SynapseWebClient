@@ -6,8 +6,11 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<b:Modal ui:field="dialog" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 		<b:ModalBody>
+			<b:Alert ui:field="reasonAlert" type="DANGER" addStyleNames="margin-bottom-10 margin-top-10">
+				<bh:Strong addStyleNames="margin-10">Reason</bh:Strong>
+				<bh:Text ui:field="reasonAlertText" />
+			</b:Alert>
 			<bh:Div ui:field="wikiPageContainer" />
-			<b:Heading size="H4" ui:field="reasonHeading" addStyleNames="color-white"/>
 			<bh:Div ui:field="publicallyVisible" addStyleNames="bg-primary padding-10 rounded">
 				<b:Heading size="H4" text="Publicly visible" addStyleNames="color-white"/>
 				<b:Row>
@@ -72,17 +75,17 @@
 					<b:Panel ui:field="filesContainer" addStyleNames="padding-10"/>
 				</b:FormGroup>
 			</bh:Div>
-			<bh:Div ui:field="synAlertContainer"/>
+			<bh:Div ui:field="synAlertContainer" addStyleNames="margin-top-10"/>
 			<bh:Div ui:field="promptModalContainer"/>		
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="cancelButton" dataDismiss="MODAL">Cancel</b:Button>
 			<b:Button ui:field="submitButton" type="PRIMARY">Submit</b:Button>
 			<b:Button ui:field="okButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
 			<b:Button ui:field="approveButton" type="SUCCESS">Approve</b:Button>
 			<b:Button ui:field="rejectButton" type="DANGER">Reject</b:Button>
 			<b:Button ui:field="suspendButton" type="DANGER">Suspend</b:Button>
 			<b:Button ui:field="deleteButton" type="DANGER">Delete (for testing)</b:Button>
+			<b:Button ui:field="cancelButton" dataDismiss="MODAL">Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 

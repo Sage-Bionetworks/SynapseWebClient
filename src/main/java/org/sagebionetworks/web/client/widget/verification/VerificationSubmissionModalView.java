@@ -31,6 +31,7 @@ public interface VerificationSubmissionModalView extends SynapseView {
 	void setRejectButtonVisible(boolean visible);
 	void setSuspendButtonVisible(boolean visible);
 	void setSuspendedReason(String reason);
+	void setSuspendedAlertVisible(boolean visible);
 	void popupError(String message);
 	void openWindow(String url);
 	void setPromptModal(Widget w);

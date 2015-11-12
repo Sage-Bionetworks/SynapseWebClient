@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -26,7 +25,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -37,7 +35,9 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	private SynapseAlert synAlert;
 	private FileHandleList fileHandleList;
 	private static WikiPageKey validationPageKey;
-	private UserBundle userBundle;
+	private UserProfile profile;
+	private VerificationSubmission submission;
+	private String orcId;
 	private VerificationSubmissionModalView view;
 	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
@@ -73,6 +73,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		this.promptModal = promptModalView;
 		this.cookies = cookies;
 		this.globalAppState = globalAppState;
+		
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -83,6 +84,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		view.setFileHandleList(fileHandleList.asWidget());
 		view.setWikiPage(helpWikiPage.asWidget());
 		view.setPromptModal(promptModal.asWidget());
+		view.setSynAlert(synAlert.asWidget());
 		fileHandleClickedCallback = new CallbackP<String>(){
 			@Override
 			public void invoke(String fileHandleId) {
@@ -99,15 +101,17 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		view.setPresenter(this);
 	}
 	
-	public VerificationSubmissionModal configure(UserBundle userBundle, boolean isACTMember) {
-		this.userBundle = userBundle;
+	public VerificationSubmissionModal configure(UserProfile userProfile, VerificationSubmission verificationSubmission, String orcId, boolean isACTMember) {
+		this.profile = userProfile;
+		this.submission = verificationSubmission;
 		this.isACTMember = isACTMember;
+		this.orcId = orcId;
 		return this;
 	}
 	
 	public void getVerificationSubmissionHandleUrlAndOpen(String fileHandleId) {
 		FileHandleAssociation fha = new FileHandleAssociation();
-		fha.setAssociateObjectId(userBundle.getVerificationSubmission().getId());
+		fha.setAssociateObjectId(submission.getId());
 		fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
 		fha.setFileHandleId(fileHandleId);
 		userProfileClient.getFileURL(fha, new AsyncCallback<String>() {
@@ -129,7 +133,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	
 	public void show() {
 		view.clear();
-		if (userBundle.getVerificationSubmission() == null) {
+		synAlert.clear();
+		if (submission == null) {
 			if (isPreconditionsMet()) {
 				//show wiki on validation process
 				view.setWikiPageVisible(true);
@@ -140,12 +145,11 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 					.setUploadButtonText("Upload evidence...")
 					.setCanDelete(true)
 					.setCanUpload(true);
-				UserProfile profile = userBundle.getUserProfile();
 				view.setFirstName(profile.getFirstName());
 				view.setLastName(profile.getLastName());
 				view.setLocation(profile.getLocation());
 				view.setOrganization(profile.getCompany());
-				view.setOrcID(userBundle.getORCID());
+				view.setOrcID(orcId);
 				view.setEmails(profile.getEmails());
 				view.setTitle("Profile Validation");
 				
@@ -154,7 +158,6 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			}
 		} else {
 			//view an existing verification submission
-			VerificationSubmission submission = userBundle.getVerificationSubmission();
 			view.setWikiPageVisible(false);
 			view.setFirstName(submission.getFirstName());
 			view.setLastName(submission.getLastName());
@@ -179,6 +182,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
 				view.setTitle("Profile Validation Suspended");
 				view.setSuspendedReason(currentState.getReason());
+				view.setSuspendedAlertVisible(true);
 			}
 			fileHandleList.configure(fileHandleClickedCallback)
 				.setCanDelete(false)
@@ -192,13 +196,12 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	}
 	
 	public boolean isPreconditionsMet() {
-		if (userBundle.getVerificationSubmission() == null) {
+		if (submission == null) {
 			//new submission.  make sure orc id is set and profile is populated.
-			if (!DisplayUtils.isDefined(userBundle.getORCID())) {
+			if (!DisplayUtils.isDefined(orcId)) {
 				view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
 				return false;
 			}
-			UserProfile profile = userBundle.getUserProfile();
 			if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName())) {
 				view.showErrorMessage("Please fill in your first and last name before requesting profile validation.");
 				return false;
@@ -245,7 +248,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	}
 	
 	private void updateVerificationState(VerificationStateEnum state, String reason) {
-		long verificationId = Long.parseLong(userBundle.getVerificationSubmission().getId());
+		long verificationId = Long.parseLong(submission.getId());
 		VerificationState newState = new VerificationState();
 		newState.setState(state);
 		newState.setReason(reason);
@@ -278,7 +281,6 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	@Override
 	public void submitVerification() {
 		//create a new verification submission
-		UserProfile profile = userBundle.getUserProfile();
 		VerificationSubmission sub = new VerificationSubmission();
 		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
 		for (String fileHandleId : fileHandleList.getFileHandleIds()) {
@@ -292,7 +294,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		sub.setFirstName(profile.getFirstName());
 		sub.setLastName(profile.getLastName());
 		sub.setLocation(profile.getLocation());
-		sub.setOrcid(userBundle.getORCID());
+		sub.setOrcid(orcId);
 		userProfileClient.createVerificationSubmission(sub, new AsyncCallback<VerificationSubmission>() {
 			@Override
 			public void onSuccess(VerificationSubmission result) {
@@ -313,7 +315,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	
 	@Override
 	public void deleteVerification() {
-		long verificationId = Long.parseLong(userBundle.getVerificationSubmission().getId());
+		long verificationId = Long.parseLong(submission.getId());
 		userProfileClient.deleteVerificationSubmission(verificationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
