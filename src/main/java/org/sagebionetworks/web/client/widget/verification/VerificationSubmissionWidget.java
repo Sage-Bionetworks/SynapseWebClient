@@ -299,7 +299,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public void handleSuccess(String message) {
 		view.showInfo(message, "");
 		view.hide();
-
 		globalAppState.refreshPage();
 	}
 	

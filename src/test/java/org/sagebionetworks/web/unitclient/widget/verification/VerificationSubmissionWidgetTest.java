@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class VerificationSubmissionWidgetTest {
 	String submissionOrcId = "http://orcid.org/983";
 	List<String> submissionEmails = Collections.singletonList("doc@spacemail.org");
 	List<AttachmentMetadata> submissionAttachments;
-	
+	List<String> fileHandleIds;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -109,6 +110,10 @@ public class VerificationSubmissionWidgetTest {
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
+		fileHandleIds = new ArrayList<String>();
+		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
 	}
 	private void configureWithMockSubmission(){
 		boolean isACTMember = false;
@@ -334,6 +339,74 @@ public class VerificationSubmissionWidgetTest {
 		configureWithMockSubmission();
 		String reason = "suspending submission for this reason";
 		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).hide();
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	@Test
+	public void testUpdateVerificationStateFailure() {
+		configureWithMockSubmission();
+		String reason = "suspending submission for this reason";
+		Exception ex =new Exception("something went wrong");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), any(AsyncCallback.class));
 		
+		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
+		verify(mockSynapseAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testRejectVerification() {
+		widget.rejectVerification();
+		verify(mockPromptModalView).clear();
+		verify(mockPromptModalView).show();
+	}
+	@Test
+	public void testSubmitVerification() {
+		String orcId = "http://orcid.org/123";
+		UserProfile profile = getPopulatedProfile();
+		boolean isACTMember = false;
+		boolean isModal = true;
+		widget.configure(profile, orcId, isACTMember, isModal);
+		
+		//attach evidence
+		fileHandleIds.add("999");
+		widget.submitVerification();
+		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), any(AsyncCallback.class));
+		
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).hide();
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	
+	@Test
+	public void testSubmitVerificationNoEvidence() {
+		String orcId = "http://orcid.org/123";
+		UserProfile profile = getPopulatedProfile();
+		boolean isACTMember = false;
+		boolean isModal = true;
+		widget.configure(profile, orcId, isACTMember, isModal);
+		
+		//no evidence
+		widget.submitVerification();
+		verify(mockSynapseAlert).showError(anyString());
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testDeleteVerificationState() {
+		configureWithMockSubmission();
+		widget.deleteVerification();
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).hide();
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	@Test
+	public void testDeleteVerificationStateFailure() {
+		configureWithMockSubmission();
+		Exception ex =new Exception("something went wrong");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
+		
+		widget.deleteVerification();
+		verify(mockSynapseAlert).handleException(ex);
 	}
 }
