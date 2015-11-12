@@ -53,7 +53,6 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -338,23 +337,27 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 		if (submission == null) {
 			//no submission.  if the owner, provide way to submit
-			if (isOwner) {
-				boolean isVerificationAlertVisible = false;
-				try {
-					String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
-					if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
-						isVerificationAlertVisible = true;	
-					}
-				} catch (Exception e) {
-					//if there are any problems getting the certification message visibility state, ignore and use default (hide)
-				}
-				view.setVerificationAlertVisible(isVerificationAlertVisible);
-				//show the submit verification button if the full alert isn't visible
-				view.setVerificationButtonVisible(!isVerificationAlertVisible);
-			}
+			initializeShowHideVerification(isOwner);
 		} else {
 			//there's a submission in a state other than approved.  Show UI if owner or act member
 			getIsACTMemberAndShowVerificationUI(submission);
+		}
+	}
+	
+	public void initializeShowHideVerification(boolean isOwner){
+		if (isOwner) {
+			boolean isVerificationAlertVisible = false;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+					isVerificationAlertVisible = true;	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
+			}
+			view.setVerificationAlertVisible(isVerificationAlertVisible);
+			//show the submit verification button if the full alert isn't visible
+			view.setVerificationButtonVisible(!isVerificationAlertVisible);
 		}
 	}
 	

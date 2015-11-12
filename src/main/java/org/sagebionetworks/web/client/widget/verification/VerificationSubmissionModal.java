@@ -166,7 +166,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			view.setOrcID(submission.getOrcid());
 			view.setEmails(submission.getEmails());
 			
-			view.setDeleteButtonVisible(DisplayUtils.isInTestWebsite(cookies));
+			//show delete button if not act (is the owner), and in alpha website mode
+			view.setDeleteButtonVisible(!isACTMember && DisplayUtils.isInTestWebsite(cookies));
 			
 			view.setOKButtonVisible(true);
 			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
