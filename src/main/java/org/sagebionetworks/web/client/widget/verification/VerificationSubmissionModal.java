@@ -49,6 +49,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
 	private VerificationStateEnum actRejectState;
 	private boolean isACTMember;
+	private boolean isNewSubmission;
 	
 	@Inject
 	public VerificationSubmissionModal(
@@ -101,11 +102,21 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		view.setPresenter(this);
 	}
 	
-	public VerificationSubmissionModal configure(UserProfile userProfile, VerificationSubmission verificationSubmission, String orcId, boolean isACTMember) {
-		this.profile = userProfile;
+	public VerificationSubmissionModal configure(VerificationSubmission verificationSubmission, boolean isACTMember) {
+		isNewSubmission = false;
 		this.submission = verificationSubmission;
 		this.isACTMember = isACTMember;
+		this.orcId = null;
+		this.profile = null;
+		return this;
+	}
+	
+	public VerificationSubmissionModal configure(UserProfile userProfile, String orcId, boolean isACTMember) {
+		isNewSubmission = true;
+		this.profile = userProfile;
+		this.isACTMember = isACTMember;
 		this.orcId = orcId;
+		this.submission = null;
 		return this;
 	}
 	
@@ -134,87 +145,93 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	public void show() {
 		view.clear();
 		synAlert.clear();
-		if (submission == null) {
-			if (isPreconditionsMet()) {
-				//show wiki on validation process
-				view.setWikiPageVisible(true);
-				loadWikiHelpContent();
-				view.setCancelButtonVisible(true);
-				view.setSubmitButtonVisible(true);
-				fileHandleList.configure(rawFileHandleClickedCallback)
-					.setUploadButtonText("Upload evidence...")
-					.setCanDelete(true)
-					.setCanUpload(true);
-				view.setFirstName(profile.getFirstName());
-				view.setLastName(profile.getLastName());
-				view.setLocation(profile.getLocation());
-				view.setOrganization(profile.getCompany());
-				view.setOrcID(orcId);
-				view.setEmails(profile.getEmails());
-				view.setTitle("Profile Validation");
-				
-				fileHandleList.refreshLinkUI();
-				view.show();
-			}
+		if (isNewSubmission) {
+			showNewVerificationSubmission();
 		} else {
-			//view an existing verification submission
-			view.setWikiPageVisible(false);
-			view.setFirstName(submission.getFirstName());
-			view.setLastName(submission.getLastName());
-			view.setLocation(submission.getLocation());
-			view.setOrganization(submission.getCompany());
-			view.setOrcID(submission.getOrcid());
-			view.setEmails(submission.getEmails());
+			showExistingVerificationSubmission();
+		}
+	}
+	
+	public void showNewVerificationSubmission() {
+		if (isPreconditionsForNewSubmissionMet()) {
+			//show wiki on validation process
+			view.setWikiPageVisible(true);
+			loadWikiHelpContent();
+			view.setCancelButtonVisible(true);
+			view.setSubmitButtonVisible(true);
+			fileHandleList.configure(rawFileHandleClickedCallback)
+				.setUploadButtonText("Upload evidence...")
+				.setCanDelete(true)
+				.setCanUpload(true);
+			view.setFirstName(profile.getFirstName());
+			view.setLastName(profile.getLastName());
+			view.setLocation(profile.getLocation());
+			view.setOrganization(profile.getCompany());
+			view.setOrcID(orcId);
+			view.setEmails(profile.getEmails());
+			view.setTitle("Profile Validation");
 			
-			//show delete button if not act (is the owner), and in alpha website mode
-			view.setDeleteButtonVisible(!isACTMember && DisplayUtils.isInTestWebsite(cookies));
-			
-			view.setOKButtonVisible(true);
-			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
-			if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
-				//pending
-				view.setApproveButtonVisible(isACTMember);
-				view.setRejectButtonVisible(isACTMember);
-				view.setTitle("Profile Validation Pending");
-			} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
-				//approved
-				view.setSuspendButtonVisible(isACTMember);
-				view.setTitle("Profile Validated");
-			} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
-				view.setTitle("Profile Validation Suspended");
-				view.setSuspendedReason(currentState.getReason());
-				view.setSuspendedAlertVisible(true);
-			}
-			fileHandleList.configure(fileHandleClickedCallback)
-				.setCanDelete(false)
-				.setCanUpload(false);
-			for (AttachmentMetadata metadata : submission.getAttachments()) {
-				fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
-			}
 			fileHandleList.refreshLinkUI();
 			view.show();
 		}
 	}
 	
-	public boolean isPreconditionsMet() {
-		if (submission == null) {
-			//new submission.  make sure orc id is set and profile is populated.
-			if (!DisplayUtils.isDefined(orcId)) {
-				view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
-				return false;
-			}
-			if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName())) {
-				view.showErrorMessage("Please fill in your first and last name before requesting profile validation.");
-				return false;
-			}
-			if (!DisplayUtils.isDefined(profile.getCompany())) {
-				view.showErrorMessage("Please fill in your affiliation before requesting profile validation.");
-				return false;
-			}
-			if (!DisplayUtils.isDefined(profile.getLocation())) {
-				view.showErrorMessage("Please fill in your city and country before requesting profile validation.");
-				return false;
-			}
+	public void showExistingVerificationSubmission() {
+		//view an existing verification submission
+		view.setWikiPageVisible(false);
+		view.setFirstName(submission.getFirstName());
+		view.setLastName(submission.getLastName());
+		view.setLocation(submission.getLocation());
+		view.setOrganization(submission.getCompany());
+		view.setOrcID(submission.getOrcid());
+		view.setEmails(submission.getEmails());
+		
+		//show delete button if not act (is the owner), and in alpha website mode
+		view.setDeleteButtonVisible(!isACTMember && DisplayUtils.isInTestWebsite(cookies));
+		
+		view.setOKButtonVisible(true);
+		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+		if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
+			//pending
+			view.setApproveButtonVisible(isACTMember);
+			view.setRejectButtonVisible(isACTMember);
+			view.setTitle("Profile Validation Pending");
+		} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
+			//approved
+			view.setSuspendButtonVisible(isACTMember);
+			view.setTitle("Profile Validated");
+		} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
+			view.setTitle("Profile Validation Suspended");
+			view.setSuspendedReason(currentState.getReason());
+			view.setSuspendedAlertVisible(true);
+		}
+		fileHandleList.configure(fileHandleClickedCallback)
+			.setCanDelete(false)
+			.setCanUpload(false);
+		for (AttachmentMetadata metadata : submission.getAttachments()) {
+			fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
+		}
+		fileHandleList.refreshLinkUI();
+		view.show();
+	}
+	
+	public boolean isPreconditionsForNewSubmissionMet() {
+		//new submission.  make sure orc id is set and profile is populated.
+		if (!DisplayUtils.isDefined(orcId)) {
+			view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
+			return false;
+		}
+		if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName())) {
+			view.showErrorMessage("Please fill in your first and last name before requesting profile validation.");
+			return false;
+		}
+		if (!DisplayUtils.isDefined(profile.getCompany())) {
+			view.showErrorMessage("Please fill in your affiliation before requesting profile validation.");
+			return false;
+		}
+		if (!DisplayUtils.isDefined(profile.getLocation())) {
+			view.showErrorMessage("Please fill in your city and country before requesting profile validation.");
+			return false;
 		}
 		return true;
 	}
@@ -282,12 +299,17 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	@Override
 	public void submitVerification() {
 		//create a new verification submission
+		synAlert.clear();
 		VerificationSubmission sub = new VerificationSubmission();
 		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
 		for (String fileHandleId : fileHandleList.getFileHandleIds()) {
 			AttachmentMetadata meta = new AttachmentMetadata();
 			meta.setId(fileHandleId);
 			attachments.add(meta);
+		}
+		if (attachments.size() == 0) {
+			synAlert.showError("Please upload evidence and re-submit.");
+			return;
 		}
 		sub.setAttachments(attachments);
 		sub.setCompany(profile.getCompany());

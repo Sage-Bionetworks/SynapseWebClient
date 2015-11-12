@@ -1077,9 +1077,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void editVerificationSubmissionClicked() {
 		//edit the existing submission
 		verificationModal.configure(
-				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getVerificationSubmission(), 
-				currentUserBundle.getORCID(), 
 				isACTMember)
 			.show();
 	}
@@ -1089,7 +1087,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//create a new submission
 		verificationModal.configure(
 				currentUserBundle.getUserProfile(), 
-				null, //verification submission
 				currentUserBundle.getORCID(), 
 				isACTMember)
 			.show();
