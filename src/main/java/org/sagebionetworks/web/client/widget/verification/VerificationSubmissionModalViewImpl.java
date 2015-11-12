@@ -21,11 +21,11 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class VerificationSubmissionModalViewImpl implements VerificationSubmissionModalView {
+public class VerificationSubmissionModalViewImpl implements VerificationSubmissionWidgetView {
 
 	public interface Binder extends UiBinder<Widget, VerificationSubmissionModalViewImpl> {}
 	
-	VerificationSubmissionModalView.Presenter presenter;
+	VerificationSubmissionWidgetView.Presenter presenter;
 	
 	Widget widget;
 
@@ -284,5 +284,10 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Override
 	public void setDeleteButtonVisible(boolean visible) {
 		deleteButton.setVisible(visible);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 }

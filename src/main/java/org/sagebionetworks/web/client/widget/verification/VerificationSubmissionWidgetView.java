@@ -5,9 +5,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface VerificationSubmissionModalView extends SynapseView {
+public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget {
 	void clear();
 	void show();
 	void hide();

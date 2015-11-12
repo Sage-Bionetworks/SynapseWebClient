@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -26,9 +27,11 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class VerificationSubmissionModal implements VerificationSubmissionModalView.Presenter{
+public class VerificationSubmissionWidget implements VerificationSubmissionWidgetView.Presenter, IsWidget {
 	private UserProfileClientAsync userProfileClient;
 	private SynapseClientAsync synapseClient;
 	private MarkdownWidget helpWikiPage;
@@ -38,12 +41,12 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	private UserProfile profile;
 	private VerificationSubmission submission;
 	private String orcId;
-	private VerificationSubmissionModalView view;
+	private VerificationSubmissionWidgetView view;
 	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
-	
+	private PortalGinInjector ginInjector;
 	CallbackP<String> fileHandleClickedCallback;
 	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
@@ -52,8 +55,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	private boolean isNewSubmission;
 	
 	@Inject
-	public VerificationSubmissionModal(
-			VerificationSubmissionModalView view,
+	public VerificationSubmissionWidget(
+			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
 			MarkdownWidget helpWikiPage,
 			SynapseClientAsync synapseClient,
@@ -64,7 +67,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			CookieProvider cookies,
 			GlobalApplicationState globalAppState
 			) {
-		this.view = view;
+		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
 		this.helpWikiPage = helpWikiPage;
 		this.synapseClient = synapseClient;
@@ -82,10 +85,6 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				updateVerificationState(actRejectState, promptModal.getName());
 			}
 		});
-		view.setFileHandleList(fileHandleList.asWidget());
-		view.setWikiPage(helpWikiPage.asWidget());
-		view.setPromptModal(promptModal.asWidget());
-		view.setSynAlert(synAlert.asWidget());
 		fileHandleClickedCallback = new CallbackP<String>(){
 			@Override
 			public void invoke(String fileHandleId) {
@@ -99,24 +98,37 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				getRawFileHandleUrlAndOpen(fileHandleId);
 			}
 		};
+		
+	}
+	
+	public void initView(boolean isModal) {
+		if (isModal) {
+			view = ginInjector.getVerificationSubmissionModalViewImpl();
+		}
+		view.setFileHandleList(fileHandleList.asWidget());
+		view.setWikiPage(helpWikiPage.asWidget());
+		view.setPromptModal(promptModal.asWidget());
+		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
 	
-	public VerificationSubmissionModal configure(VerificationSubmission verificationSubmission, boolean isACTMember) {
+	public VerificationSubmissionWidget configure(VerificationSubmission verificationSubmission, boolean isACTMember, boolean isModal) {
 		isNewSubmission = false;
 		this.submission = verificationSubmission;
 		this.isACTMember = isACTMember;
 		this.orcId = null;
 		this.profile = null;
+		initView(isModal);
 		return this;
 	}
 	
-	public VerificationSubmissionModal configure(UserProfile userProfile, String orcId, boolean isACTMember) {
+	public VerificationSubmissionWidget configure(UserProfile userProfile, String orcId, boolean isACTMember, boolean isModal) {
 		isNewSubmission = true;
 		this.profile = userProfile;
 		this.isACTMember = isACTMember;
 		this.orcId = orcId;
 		this.submission = null;
+		initView(isModal);
 		return this;
 	}
 	
@@ -349,5 +361,9 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }

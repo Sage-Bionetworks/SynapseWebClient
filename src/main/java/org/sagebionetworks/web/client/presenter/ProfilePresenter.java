@@ -44,7 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModal;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
@@ -104,7 +104,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
-	public VerificationSubmissionModal verificationModal;
+	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
 	public boolean isACTMember;
 	
@@ -123,7 +123,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionModal verificationModal) {
+			VerificationSubmissionWidget verificationModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -1078,8 +1078,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//edit the existing submission
 		verificationModal.configure(
 				currentUserBundle.getVerificationSubmission(), 
-				isACTMember)
-			.show();
+				isACTMember, 
+				true) //isModal
+			.show();		
 	}
 	
 	@Override
@@ -1088,7 +1089,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		verificationModal.configure(
 				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getORCID(), 
-				isACTMember)
+				isACTMember,
+				true) //isModal
 			.show();
 	}
 }
