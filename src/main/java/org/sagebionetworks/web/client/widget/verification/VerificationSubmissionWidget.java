@@ -368,4 +368,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+
+	public boolean isNewSubmission() {
+		return isNewSubmission;
+	}
+	
 }
