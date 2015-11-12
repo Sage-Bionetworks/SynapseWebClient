@@ -167,7 +167,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	public void showNewVerificationSubmission() {
-		if (isPreconditionsForNewSubmissionMet()) {
+		if (isPreconditionsForNewSubmissionMet(profile, orcId)) {
 			//show wiki on validation process
 			view.setWikiPageVisible(true);
 			loadWikiHelpContent();
@@ -229,7 +229,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		view.show();
 	}
 	
-	public boolean isPreconditionsForNewSubmissionMet() {
+	public boolean isPreconditionsForNewSubmissionMet(UserProfile profile, String orcId) {
 		//new submission.  make sure orc id is set and profile is populated.
 		if (!DisplayUtils.isDefined(orcId)) {
 			view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
@@ -279,7 +279,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		updateVerificationState(VerificationStateEnum.APPROVED, null);
 	}
 	
-	private void updateVerificationState(VerificationStateEnum state, String reason) {
+	public void updateVerificationState(VerificationStateEnum state, String reason) {
 		long verificationId = Long.parseLong(submission.getId());
 		VerificationState newState = new VerificationState();
 		newState.setState(state);
