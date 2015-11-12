@@ -104,6 +104,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public void initView(boolean isModal) {
 		if (isModal) {
 			view = ginInjector.getVerificationSubmissionModalViewImpl();
+		} else {
+			//TODO: widget view for the ACT table
 		}
 		view.setFileHandleList(fileHandleList.asWidget());
 		view.setWikiPage(helpWikiPage.asWidget());
