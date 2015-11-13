@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
@@ -102,6 +103,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	@Override
 	public String getBaseProfileAttachmentUrl() {
 		return GWT.getModuleBaseURL() + "profileAttachment";
+	}
+	
+	@Override
+	public String getBaseFileHandleAssociationUrl() {
+		return GWT.getModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET;
 	}
 
 	@Override

@@ -273,7 +273,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 
 	@Override
 	public void openWindow(String url) {
-		DisplayUtils.newWindow(url, "", "");
+		DisplayUtils.newWindow(url, "_self", "");
 	}
 	
 	@Override

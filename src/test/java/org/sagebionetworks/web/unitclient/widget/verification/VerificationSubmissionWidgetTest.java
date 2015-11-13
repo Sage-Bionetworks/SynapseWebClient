@@ -90,7 +90,6 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockPromptModalView).setPresenter(captor.capture());
 		reasonPromptCallback = captor.getValue();
 		
-		AsyncMockStubber.callSuccessWith(fileUrl).when(mockUserProfileClient).getFileURL(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		when(mockSubmission.getId()).thenReturn(submissionId);
 		when(mockSubmission.getFirstName()).thenReturn(submissionFirstName);
 		when(mockSubmission.getLastName()).thenReturn(submissionLastName);
@@ -165,24 +164,13 @@ public class VerificationSubmissionWidgetTest {
 		
 		String fileHandleId = "8888";
 		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-		ArgumentCaptor<FileHandleAssociation> captor = ArgumentCaptor.forClass(FileHandleAssociation.class);
-		verify(mockUserProfileClient).getFileURL(captor.capture(), any(AsyncCallback.class));
-		verify(mockView).openWindow(fileUrl);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).openWindow(captor.capture());
 		
-		FileHandleAssociation fha = captor.getValue();
-		assertEquals(submissionId, fha.getAssociateObjectId());
-		assertEquals(fileHandleId, fha.getFileHandleId());
-		assertEquals(FileHandleAssociateType.VerificationSubmission, fha.getAssociateObjectType());
-	}
-	@Test
-	public void testGetVerificationSubmissionHandleUrlOpenFailure() {
-		Exception ex =new Exception("something went wrong");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getFileURL(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		configureWithMockSubmission();
-		
-		String fileHandleId = "8888";
-		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-		verify(mockSynapseAlert).handleException(ex);
+		String url = captor.getValue();
+		assertTrue(url.contains(submissionId));
+		assertTrue(url.contains(fileHandleId));
+		assertTrue(url.contains(FileHandleAssociateType.VerificationSubmission.toString()));
 	}
 	
 	@Test

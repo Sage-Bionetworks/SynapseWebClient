@@ -516,6 +516,11 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
+			@Override
+			public String getBaseFileHandleAssociationUrl() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 	}
 

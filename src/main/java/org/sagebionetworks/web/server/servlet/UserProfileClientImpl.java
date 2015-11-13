@@ -76,16 +76,4 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override
-	public String getFileURL(FileHandleAssociation fileHandleAssociation) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			//java.net.URL not serializable over GWT rpc, send back the url in string form...
-			URL url = synapseClient.getFileURL(fileHandleAssociation);
-			return url.toString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 }

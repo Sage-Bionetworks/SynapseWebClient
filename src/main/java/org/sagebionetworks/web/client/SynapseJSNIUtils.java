@@ -32,6 +32,8 @@ public interface SynapseJSNIUtils {
 	public String getBaseFileHandleUrl();
 	
 	public String getBaseProfileAttachmentUrl();
+	
+	public String getBaseFileHandleAssociationUrl();
 
 	public int randomNextInt();
 	
