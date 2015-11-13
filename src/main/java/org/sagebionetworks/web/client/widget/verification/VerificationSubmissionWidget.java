@@ -135,10 +135,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	public void getVerificationSubmissionHandleUrlAndOpen(String fileHandleId) {
-		String url = jsniUtils.getBaseFileHandleAssociationUrl() + "?" + 
-				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + submission.getId() + "&" +
-				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + FileHandleAssociateType.VerificationSubmission.toString() + "&" + 
-				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
+		String url = jsniUtils.getFileHandleAssociationUrl(submission.getId(), FileHandleAssociateType.VerificationSubmission, fileHandleId);
 		view.openWindow(url);
 	}
 	

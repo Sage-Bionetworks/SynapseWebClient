@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -33,7 +34,7 @@ public interface SynapseJSNIUtils {
 	
 	public String getBaseProfileAttachmentUrl();
 	
-	public String getBaseFileHandleAssociationUrl();
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId);
 
 	public int randomNextInt();
 	
