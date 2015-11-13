@@ -82,7 +82,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
 			public void onPrimary() {
-				updateVerificationState(actRejectState, promptModal.getName());
+				updateVerificationState(actRejectState, promptModal.getValue());
 			}
 		});
 		fileHandleClickedCallback = new CallbackP<String>(){

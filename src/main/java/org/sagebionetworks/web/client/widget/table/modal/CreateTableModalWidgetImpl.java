@@ -80,7 +80,7 @@ public class CreateTableModalWidgetImpl implements PromptModalView.Presenter, Cr
 	 */
 	@Override
 	public void onPrimary() {
-		String tableName = view.getName();
+		String tableName = view.getValue();
 		if(tableName == null || "".equals(tableName)){
 			view.showError(TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		}else{

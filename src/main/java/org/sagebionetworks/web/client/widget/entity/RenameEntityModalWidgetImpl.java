@@ -70,7 +70,7 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	 */
 	@Override
 	public void onPrimary() {
-		String name = StringUtils.trimWithEmptyAsNull(view.getName());
+		String name = StringUtils.trimWithEmptyAsNull(view.getValue());
 		if(name == null){
 			view.showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		}else if(this.startingName.equals(name)){

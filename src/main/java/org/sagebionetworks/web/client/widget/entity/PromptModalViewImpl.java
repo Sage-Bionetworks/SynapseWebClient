@@ -66,7 +66,7 @@ public class PromptModalViewImpl implements PromptModalView {
 	}
 
 	@Override
-	public String getName() {
+	public String getValue() {
 		return nameField.getText();
 	}
 
