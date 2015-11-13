@@ -165,12 +165,8 @@ public class VerificationSubmissionWidgetTest {
 		String fileHandleId = "8888";
 		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseJSNIUtils).getFileHandleAssociationUrl(submissionId, FileHandleAssociateType.VerificationSubmission, fileHandleId);
 		verify(mockView).openWindow(captor.capture());
-		
-		String url = captor.getValue();
-		assertTrue(url.contains(submissionId));
-		assertTrue(url.contains(fileHandleId));
-		assertTrue(url.contains(FileHandleAssociateType.VerificationSubmission.toString()));
 	}
 	
 	@Test
