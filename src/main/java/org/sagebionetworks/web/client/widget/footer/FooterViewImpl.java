@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -36,11 +37,12 @@ public class FooterViewImpl extends Composite implements FooterView {
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
-	
+	private GlobalApplicationState globalAppState;
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies) {
+	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.cookies = cookies;
+		this.globalAppState = globalAppState;
 		initDebugModeLink();		
 		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
 	}
@@ -60,13 +62,13 @@ public class FooterViewImpl extends Composite implements FooterView {
 									//switch to pre-release test website mode
 									DisplayUtils.setTestWebsite(true, cookies);
 									Window.scrollTo(0, 0);
-									Window.Location.reload();
+									globalAppState.refreshPage();
 								}
 							});
 				} else {
 					//switch back to standard mode
 					DisplayUtils.setTestWebsite(false, cookies);
-					Window.Location.reload();
+					globalAppState.refreshPage();
 				}
 				
 			}

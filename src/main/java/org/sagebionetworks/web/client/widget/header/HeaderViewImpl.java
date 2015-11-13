@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
@@ -107,6 +108,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private SearchBox searchBox;
 	private CookieProvider cookies;
 	SageImageBundle sageImageBundle;
+	private GlobalApplicationState globalAppState;
 	UserBadge userBadge;
 	Span userBadgeText;
 	HorizontalPanel myDashboardButtonContents;
@@ -116,12 +118,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			SageImageBundle sageImageBundle,
 			SearchBox searchBox,
 			CookieProvider cookies,
-			UserBadge userBadge) {
+			UserBadge userBadge,
+			GlobalApplicationState globalAppState) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.searchBox = searchBox;
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
+		this.globalAppState = globalAppState;
 		userBadge.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		// add search panel first
 		searchBox.setVisible(true);
@@ -208,7 +212,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			@Override
 			public void onClick(ClickEvent event) {
 				DisplayUtils.setTestWebsite(false, cookies);
-				Window.Location.reload();
+				globalAppState.refreshPage();
 			}
 		});
 		trashLink.addClickHandler(new ClickHandler() {
