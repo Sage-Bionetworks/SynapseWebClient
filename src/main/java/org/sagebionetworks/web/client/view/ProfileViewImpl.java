@@ -245,7 +245,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button verifiedBadge;
 	@UiField
+	Button verificationSubmittedButton;
+	@UiField
+	Button verificationSuspendedButton;
+	@UiField
 	Button submitProfileValidationButton;
+	@UiField
+	Button verificationApprovedButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -332,21 +338,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Quiz("Certification"));
 			}
 		});
-		
-		verifyFocusPanel.addClickHandler(new ClickHandler() {
+		ClickHandler newVerificationSubmissionCallback = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.verificationAlertClicked();
+				presenter.newVerificationSubmissionClicked();
 			}
-		});
-		
-		submitProfileValidationButton.addClickHandler(new ClickHandler() {
+		};
+		ClickHandler editVerificationSubmissionCallback = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.verificationAlertClicked();
+				presenter.editVerificationSubmissionClicked();
 			}
-		});
-
+		};
+		
+		verifyFocusPanel.addClickHandler(newVerificationSubmissionCallback);
+		verificationApprovedButton.addClickHandler(editVerificationSubmissionCallback);
+		submitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
+		verificationSubmittedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
+		
 		initCertificationBadge();
 
 		moreProjectsButton.addClickHandler(new ClickHandler() {
@@ -764,7 +774,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void clear() {
 		certificationBadge.setVisible(false);
 		verifiedBadge.setVisible(false);
+		verificationApprovedButton.setVisible(false);
 		submitProfileValidationButton.setVisible(false);
+		verificationSubmittedButton.setVisible(false);
+		verificationSuspendedButton.setVisible(false);
 		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
@@ -970,5 +983,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setVerificationButtonVisible(boolean isVisible) {
 		submitProfileValidationButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSubmittedButtonVisible(boolean isVisible) {
+		verificationSubmittedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSuspendedButtonVisible(boolean isVisible) {
+		verificationSuspendedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationDetailsButtonVisible(boolean isVisible) {
+		verificationApprovedButton.setVisible(isVisible);
 	}
 }

@@ -45,18 +45,7 @@
 				        	
 				        	<!-- View Profile Panel -->
 				        	<bh:Div ui:field="viewProfilePanel" addStyleNames="margin-bottom-10">
-								<b:Modal title="Validated" closable="true" fade="true"
-									dataBackdrop="STATIC" dataKeyboard="true" b:id="validatedModal">
-									<b:ModalBody>
-										<g:HTML>TODO: contain verification submission fields</g:HTML>
-									</b:ModalBody>
-									<b:ModalFooter>
-										<b:Button type="PRIMARY" dataDismiss="MODAL">Close</b:Button>
-									</b:ModalFooter>
-								</b:Modal>
-								<b:Button ui:field="verifiedBadge" dataTarget="#validatedModal" dataToggle="MODAL" type="PRIMARY">validated</b:Button>
-				        	
-					        	<g:Image ui:field="certificationBadge" resource='{sageImageBundle.certificate}' addStyleNames="displayInline imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10" height="32px" width="25px"/>
+								<g:Image ui:field="certificationBadge" resource='{sageImageBundle.certificate}' addStyleNames="displayInline imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10" height="32px" width="25px"/>
 					        	<b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
 					        	<b:Heading ui:field="headlineField" addStyleNames="user-profile-headline" size="H4" />
 					        	<b:Alert type="INFO" ui:field="verifyAlert" dismissable="true">
@@ -71,7 +60,33 @@
 										</bh:Div>
 									</g:FocusPanel>
 								</b:Alert>
-								<b:Button ui:field="submitProfileValidationButton" type="INFO" size="EXTRA_SMALL" >Validate my profile</b:Button>
+								<bh:Div>
+									<b:Modal title="Validated" closable="true" fade="true"
+										dataBackdrop="STATIC" dataKeyboard="true" b:id="validatedModal">
+										<b:ModalBody>
+											<g:HTML>TODO: contain verification submission fields</g:HTML>
+										</b:ModalBody>
+										<b:ModalFooter>
+											<b:Button type="PRIMARY" dataDismiss="MODAL">Close</b:Button>
+										</b:ModalFooter>
+									</b:Modal>
+									
+									<b:Button ui:field="verifiedBadge" dataTarget="#validatedModal"
+										dataToggle="MODAL" type="PRIMARY" size="EXTRA_SMALL">Profile Validated</b:Button>
+								</bh:Div>
+								<bh:Div>
+									<b:Button ui:field="verificationSubmittedButton" type="INFO"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Profile Validation Pending</b:Button>
+									<b:Button ui:field="verificationSuspendedButton" type="WARNING"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Validated Profile Suspended</b:Button>
+									<b:Button ui:field="verificationApprovedButton" type="DEFAULT"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Profile Validation Details</b:Button>
+								</bh:Div>
+					        	<bh:Div>
+									<b:Button ui:field="submitProfileValidationButton" type="INFO"
+										size="EXTRA_SMALL" addStyleNames="margin-top-10">Validate My Profile</b:Button>
+								</bh:Div>
+								
 								<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />	
 					        	<bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
 					        	<bh:Div>

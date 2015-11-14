@@ -546,6 +546,8 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidgetView;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
