@@ -73,6 +73,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setOrcId(String href);
 	void setVerificationAlertVisible(boolean isVisible);
 	void setVerificationButtonVisible(boolean isVisible);
+	void setVerificationSuspendedButtonVisible(boolean isVisible);
+	void setVerificationSubmittedButtonVisible(boolean isVisible);
+	void setVerificationDetailsButtonVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -94,7 +97,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 		void refreshTeamInvites();
-		void verificationAlertClicked();
+		void newVerificationSubmissionClicked();
+		void editVerificationSubmissionClicked();
 		void setVerifyDismissed();
 	}
 

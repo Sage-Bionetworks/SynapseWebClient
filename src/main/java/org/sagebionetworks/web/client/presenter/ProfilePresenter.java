@@ -10,6 +10,9 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.verification.VerificationState;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -41,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
@@ -49,7 +53,6 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -101,7 +104,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
-
+	public VerificationSubmissionWidget verificationModal;
+	public UserBundle currentUserBundle;
+	public boolean isACTMember;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -117,7 +122,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
-			UserProfileClientAsync userProfileClient) {
+			UserProfileClientAsync userProfileClient,
+			VerificationSubmissionWidget verificationModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -133,6 +139,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
+		this.verificationModal = verificationModal;
+		
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -240,7 +248,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void getUserProfile(final ProfileArea initialTab) {
 		//ask for everything in the user bundle
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED | IS_ACT_MEMBER;
+		currentUserBundle = null;
+		isACTMember = false;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED;
 		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
 		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		view.setOrcIdVisible(false);
@@ -248,6 +258,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
+				currentUserBundle = bundle;
 				initializeShowHideProfile(isOwner);
 				boolean isCertified = bundle.getIsCertified();
 				if (isCertified) {
@@ -257,12 +268,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 				//TODO: profile verification should not be in alpha mode only
 				if (DisplayUtils.isInTestWebsite(cookies)) {
-					boolean isVerified = bundle.getIsVerified();
-					if (isVerified) {
-						view.addVerifiedBadge();
-					} else {
-						initializeShowHideVerification(isOwner);
-					}
+					initializeVerificationUI();
 				}
 				
 				view.setProfile(bundle.getUserProfile(), isOwner);
@@ -320,7 +326,25 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void initializeShowHideVerification(boolean isOwner) {
+	public void initializeVerificationUI() {
+		//verification UI is hidden by default (in view.clear())
+		boolean isVerified = currentUserBundle.getIsVerified();
+		if (isVerified) {
+			view.addVerifiedBadge();
+		}
+		//The UI is depends on the current state
+		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+		
+		if (submission == null) {
+			//no submission.  if the owner, provide way to submit
+			initializeShowHideVerification(isOwner);
+		} else {
+			//there's a submission in a state other than approved.  Show UI if owner or act member
+			getIsACTMemberAndShowVerificationUI(submission);
+		}
+	}
+	
+	public void initializeShowHideVerification(boolean isOwner){
 		if (isOwner) {
 			boolean isVerificationAlertVisible = false;
 			try {
@@ -334,12 +358,41 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			view.setVerificationAlertVisible(isVerificationAlertVisible);
 			//show the submit verification button if the full alert isn't visible
 			view.setVerificationButtonVisible(!isVerificationAlertVisible);
-		} else {
-			//not the owner
-			//hide message
-			view.setVerificationAlertVisible(false);
-			view.setVerificationButtonVisible(false);
 		}
+	}
+	
+	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
+		if (authenticationController.isLoggedIn()) {
+			int mask = IS_ACT_MEMBER;
+			userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
+				@Override
+				public void onSuccess(UserBundle result) {
+					isACTMember = result.getIsACTMember();
+					if (isOwner || isACTMember) {
+						VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+						if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
+							view.setVerificationSuspendedButtonVisible(true);
+							if (isOwner) {
+								view.setVerificationButtonVisible(true);
+							}
+						} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
+							view.setVerificationSubmittedButtonVisible(true);
+						} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
+							view.setVerificationDetailsButtonVisible(true);
+						}
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.hideLoading();
+					profileSynAlert.handleException(caught);
+				}
+				
+			});	
+		}
+		
+		
 	}
 	
 	@Override
@@ -1006,7 +1059,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				public void onSuccess(UserProfile linkedInProfile) {
 					// Give the user a chance to edit the profile.
 					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
-
 						@Override
 						public void invoke() {
 							profileUpdated();
@@ -1022,8 +1074,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void verificationAlertClicked() {
-		view.showInfo("TODO", "pop up validation submission dialog");
+	public void editVerificationSubmissionClicked() {
+		//edit the existing submission
+		verificationModal.configure(
+				currentUserBundle.getVerificationSubmission(), 
+				isACTMember, 
+				true) //isModal
+			.show();		
+	}
+	
+	@Override
+	public void newVerificationSubmissionClicked() {
+		//create a new submission
+		verificationModal.configure(
+				currentUserBundle.getUserProfile(), 
+				currentUserBundle.getORCID(), 
+				isACTMember,
+				true) //isModal
+			.show();
 	}
 }
 

@@ -56,7 +56,7 @@ public class RenameEntityModalWidgetTest {
 	@Test
 	public void testNullName(){
 		widget.onRename(entity, mockCallback);
-		when(mockView.getName()).thenReturn(null);
+		when(mockView.getValue()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockView).showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), any(AsyncCallback.class));
@@ -67,7 +67,7 @@ public class RenameEntityModalWidgetTest {
 	@Test
 	public void testNameNotChanged(){
 		widget.onRename(entity, mockCallback);
-		when(mockView.getName()).thenReturn(startName);
+		when(mockView.getValue()).thenReturn(startName);
 		// Calling save with no real change just closes the dialog.
 		widget.onPrimary();
 		verify(mockView, never()).setLoading(true);
@@ -81,7 +81,7 @@ public class RenameEntityModalWidgetTest {
 	public void testRenameHappy(){
 		String newName = "a new name";
 		widget.onRename(entity, mockCallback);
-		when(mockView.getName()).thenReturn(newName);
+		when(mockView.getValue()).thenReturn(newName);
 		AsyncMockStubber.callSuccessWith(new TableEntity()).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
@@ -95,7 +95,7 @@ public class RenameEntityModalWidgetTest {
 		Exception error = new Exception("an object already exists with that name");
 		String newName = "a new name";
 		widget.onRename(entity, mockCallback);
-		when(mockView.getName()).thenReturn(newName);
+		when(mockView.getValue()).thenReturn(newName);
 		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();

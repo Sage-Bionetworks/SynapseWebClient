@@ -55,6 +55,15 @@ public interface ActionMenuWidget extends IsWidget {
 	public void addActionListener(Action action, ActionListener listner);
 	
 	/**
+	 * Set the listener for an action.
+	 * 
+	 * All listeners are cleared each time the widget is configured.
+	 * @param action
+	 * @param listner
+	 */
+	public void setActionListener(Action action, ActionListener listner);
+	
+	/**
 	 * Listen to action events.
 	 */
 	public interface ActionListener{
