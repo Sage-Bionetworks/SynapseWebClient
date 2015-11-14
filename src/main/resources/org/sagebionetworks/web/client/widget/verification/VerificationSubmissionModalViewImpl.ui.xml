@@ -85,7 +85,7 @@
 			<b:Button ui:field="rejectButton" type="DANGER">Reject</b:Button>
 			<b:Button ui:field="suspendButton" type="DANGER">Suspend</b:Button>
 			<b:Button ui:field="deleteButton" type="DANGER">Delete</b:Button>
-			<b:Button ui:field="cancelButton" dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="cancelButton" >Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 

@@ -117,6 +117,12 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 				presenter.deleteVerification();
 			}
 		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+			}
+		});
 	}
 
 	@Override

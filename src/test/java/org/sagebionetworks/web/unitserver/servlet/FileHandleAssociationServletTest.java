@@ -95,7 +95,7 @@ public class FileHandleAssociationServletTest {
 	}
 	
 	@Test
-	public void testDoGetLoggedInFileEntityPreview() throws Exception {
+	public void testDoGet() throws Exception {
 		String sessionToken = "fake";
 
 		//set up general synapse client configuration test

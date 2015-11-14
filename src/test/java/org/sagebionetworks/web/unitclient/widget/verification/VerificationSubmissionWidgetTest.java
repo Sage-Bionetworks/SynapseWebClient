@@ -164,9 +164,8 @@ public class VerificationSubmissionWidgetTest {
 		
 		String fileHandleId = "8888";
 		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseJSNIUtils).getFileHandleAssociationUrl(submissionId, FileHandleAssociateType.VerificationSubmission, fileHandleId);
-		verify(mockView).openWindow(captor.capture());
+		verify(mockView).openWindow(anyString());
 	}
 	
 	@Test
@@ -217,6 +216,7 @@ public class VerificationSubmissionWidgetTest {
 		boolean isModal = true;
 		widget.configure(profile, orcId, isACTMember, isModal);
 		widget.show();
+		verify(mockView).clear();
 		verify(mockView).setWikiPageVisible(true);
 		verify(mockView).setCancelButtonVisible(true);
 		verify(mockView).setSubmitButtonVisible(true);
