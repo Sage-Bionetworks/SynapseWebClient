@@ -106,7 +106,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		} else {
 			view = ginInjector.getVerificationSubmissionRowViewImpl();
 		}
-		view.clear();
 		view.setFileHandleList(fileHandleList.asWidget());
 		view.setWikiPage(helpWikiPage.asWidget());
 		view.setPromptModal(promptModal.asWidget());

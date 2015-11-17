@@ -7,7 +7,7 @@
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
 		<bh:Div ui:field="synAlertContainer" />
-		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400">
+		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
 			<b:Heading ui:field="title" size="H2" text="Access and Compliance Team" />
 			<b:Row>
 				<b:Column size="SM_12">
