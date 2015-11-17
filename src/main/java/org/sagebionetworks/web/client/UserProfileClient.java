@@ -2,6 +2,7 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -31,6 +32,9 @@ public interface UserProfileClient extends RemoteService {
 	UserBundle getMyOwnUserBundle(int mask) throws RestServiceException;
 
 	UserBundle getUserBundle(Long principalId, int mask)
+			throws RestServiceException;
+
+	void unbindOAuthProvidersUserId(OAuthProvider provider, String alias)
 			throws RestServiceException;
 
 }

@@ -9,10 +9,13 @@ import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -84,6 +87,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 org.gwtbootstrap3.client.ui.Anchor urlField;
 	 @UiField
 	 org.gwtbootstrap3.client.ui.Anchor orcIdField;
+	 @UiField
+	 Icon unbindButton;
+	 @UiField
+	 Span unbindButtonUI;
 	 @UiField
 	 TextBox synapseEmailField;
 	@UiField
@@ -449,6 +456,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		
+		unbindButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.unbindOrcId();
+			}
+		});
+		
 		verifyAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {
@@ -740,6 +754,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setOrcIdVisible(boolean isVisible) {
 		orcIdField.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setUnbindOrcIdVisible(boolean isVisible) {
+		unbindButtonUI.setVisible(isVisible);
 	}
 	
 	@Override
