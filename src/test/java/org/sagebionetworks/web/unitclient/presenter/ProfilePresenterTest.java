@@ -352,6 +352,12 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
+		
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		
+		verify(mockView, never()).setOrcIdVisible(true);
+		verify(mockView, never()).setUnbindOrcIdVisible(true);
 	} 
 	
 
@@ -395,6 +401,12 @@ public class ProfilePresenterTest {
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
+		
+		//also verify that when orc id is not set in the user bundle (for the owner), then orc id is not visible
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		verify(mockView, never()).setOrcIdVisible(true);
+		verify(mockView, never()).setUnbindOrcIdVisible(true);
 	}
 	
 	@Test
@@ -404,9 +416,16 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
+		when(mockUserBundle.getORCID()).thenReturn("an orc id");
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
+		
+		//also verify that when orc id is set in the user bundle (for the owner), then orc id is visible (and can be unbound)
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		verify(mockView).setOrcIdVisible(true);
+		verify(mockView).setUnbindOrcIdVisible(true);
 	}
 	
 	
