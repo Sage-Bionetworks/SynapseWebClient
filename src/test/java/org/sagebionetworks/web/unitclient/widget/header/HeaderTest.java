@@ -104,6 +104,8 @@ public class HeaderTest {
 	@Test
 	public void testOnLogoutClick() {
 		header.onLogoutClick();
+		verify(mockGlobalApplicationState).clearCurrentPlace();
+		verify(mockGlobalApplicationState).clearLastPlace();
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Place place = captor.getValue();
