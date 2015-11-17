@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -41,7 +42,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class VerificationSubmissionWidgetTest {
 	@Mock
-	VerificationSubmissionModalViewImpl mockView; 
+	VerificationSubmissionModalViewImpl mockView;
+	@Mock
+	VerificationSubmissionRowViewImpl mockRowView;
 	@Mock
 	UserProfileClientAsync mockUserProfileClient;
 	@Mock
@@ -84,6 +87,7 @@ public class VerificationSubmissionWidgetTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
+		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
 		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockCookieProvider, mockGlobalApplicationState);
 		
 		ArgumentCaptor<PromptModalView.Presenter> captor = ArgumentCaptor.forClass(PromptModalView.Presenter.class);
@@ -155,7 +159,18 @@ public class VerificationSubmissionWidgetTest {
 	
 	@Test
 	public void testConfigureAsTableRow() {
-		//TODO: for ACT place
+		boolean isACTMember = true;
+		boolean isModal = false;
+		widget.configure(mockSubmission, isACTMember, isModal);
+		verify(mockGinInjector).getVerificationSubmissionRowViewImpl();
+		verify(mockRowView).setFileHandleList(any(Widget.class));
+		verify(mockRowView).setWikiPage(any(Widget.class));
+		verify(mockRowView).setPromptModal(any(Widget.class));
+		verify(mockRowView).setSynAlert(any(Widget.class));
+		verify(mockRowView).setPresenter(widget);
+		
+		widget.asWidget();
+		verify(mockRowView).asWidget();
 	}
 
 	@Test
@@ -164,9 +179,8 @@ public class VerificationSubmissionWidgetTest {
 		
 		String fileHandleId = "8888";
 		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseJSNIUtils).getFileHandleAssociationUrl(submissionId, FileHandleAssociateType.VerificationSubmission, fileHandleId);
-		verify(mockView).openWindow(captor.capture());
+		verify(mockView).openWindow(anyString());
 	}
 	
 	@Test
@@ -217,6 +231,7 @@ public class VerificationSubmissionWidgetTest {
 		boolean isModal = true;
 		widget.configure(profile, orcId, isACTMember, isModal);
 		widget.show();
+		verify(mockView).clear();
 		verify(mockView).setWikiPageVisible(true);
 		verify(mockView).setCancelButtonVisible(true);
 		verify(mockView).setSubmitButtonVisible(true);

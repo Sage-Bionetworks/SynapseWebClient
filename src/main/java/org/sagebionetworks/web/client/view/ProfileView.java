@@ -117,7 +117,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 
 	void addCertifiedBadge();
-	void addVerifiedBadge();
+	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref);
 
 	void showTabs(boolean isOwner);
 
