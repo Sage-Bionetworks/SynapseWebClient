@@ -297,7 +297,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(Void result) {
 				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date
-				view.showInfo("Success", "ORC ID has been unbound to this profile.");
+				view.showInfo("Success", "ORC ID has been unbound.");
 				globalApplicationState.refreshPage();
 			}
 			@Override
