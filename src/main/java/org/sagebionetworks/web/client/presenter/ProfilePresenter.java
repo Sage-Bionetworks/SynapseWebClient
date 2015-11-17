@@ -330,11 +330,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void initializeVerificationUI() {
 		//verification UI is hidden by default (in view.clear())
 		boolean isVerified = currentUserBundle.getIsVerified();
-		if (isVerified) {
-			view.addVerifiedBadge();
-		}
 		//The UI is depends on the current state
 		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+		if (isVerified) {
+			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid());
+		}
 		
 		if (submission == null) {
 			//no submission.  if the owner, provide way to submit

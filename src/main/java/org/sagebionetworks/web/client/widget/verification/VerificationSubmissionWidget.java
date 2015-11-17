@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -105,7 +104,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		if (isModal) {
 			view = ginInjector.getVerificationSubmissionModalViewImpl();
 		} else {
-			//TODO: widget view for the ACT table
+			view = ginInjector.getVerificationSubmissionRowViewImpl();
 		}
 		view.setFileHandleList(fileHandleList.asWidget());
 		view.setWikiPage(helpWikiPage.asWidget());
@@ -121,6 +120,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.orcId = null;
 		this.profile = null;
 		initView(isModal);
+		view.setProfileLink(verificationSubmission.getCreatedBy(), "#!Profile:" + verificationSubmission.getCreatedBy());
 		return this;
 	}
 	
