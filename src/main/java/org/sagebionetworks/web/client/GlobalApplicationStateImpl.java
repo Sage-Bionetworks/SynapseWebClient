@@ -135,6 +135,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void clearLastPlace() {
 		cookieProvider.removeCookie(CookieKeys.LAST_PLACE);
 	}
+	@Override
+	public void clearCurrentPlace() {
+		cookieProvider.removeCookie(CookieKeys.CURRENT_PLACE);
+	}
 	
 	@Override
 	public void gotoLastPlace() {

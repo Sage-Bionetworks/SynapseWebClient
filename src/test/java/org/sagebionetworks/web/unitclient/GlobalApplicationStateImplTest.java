@@ -236,6 +236,12 @@ public class GlobalApplicationStateImplTest {
 	}
 	
 	@Test
+	public void testClearCurrentPlace() {
+		globalApplicationState.clearCurrentPlace();
+		verify(mockCookieProvider).removeCookie(CookieKeys.CURRENT_PLACE);
+	}
+	
+	@Test
 	public void testPushCurrentPlace(){
 		String newToken = "/some/new/token";
 		Place mockPlace = mock(Place.class);
