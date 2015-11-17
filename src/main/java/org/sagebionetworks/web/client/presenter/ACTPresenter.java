@@ -28,8 +28,6 @@ import com.google.inject.Inject;
 
 public class ACTPresenter extends AbstractActivity implements ACTView.Presenter, Presenter<ACTPlace> {
 	private static final String NO_STATE_FILTER = "-No filter-";
-	private static final String SUBMITTER_ID_FILTER_PARAM = "submitterID";
-	private static final String STATE_FILTER_PARAM = "state";
 	private ACTPlace place;
 	private ACTView view;
 	private UserProfileClientAsync userProfileClient;
@@ -113,12 +111,12 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	public void setPlace(ACTPlace place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		String stateFilterParam = place.getParam(STATE_FILTER_PARAM);
+		String stateFilterParam = place.getParam(ACTPlace.STATE_FILTER_PARAM);
 		if (stateFilterParam != null) {
 			stateFilter = VerificationStateEnum.valueOf(stateFilterParam);
 			view.setSelectedState(states.indexOf(stateFilterParam));
 		}
-		String submitterIdFilterParam =  place.getParam(SUBMITTER_ID_FILTER_PARAM);
+		String submitterIdFilterParam =  place.getParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
 		if (submitterIdFilterParam != null) {
 			submitterIdFilter = Long.parseLong(submitterIdFilterParam);
 			peopleSuggestWidget.setText(submitterIdFilterParam);
@@ -130,10 +128,10 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		String selectedState = view.getSelectedState();
 		if (NO_STATE_FILTER.equals(selectedState)) {
 			stateFilter = null;
-			place.removeParam(STATE_FILTER_PARAM);
+			place.removeParam(ACTPlace.STATE_FILTER_PARAM);
 		} else {
 			stateFilter = VerificationStateEnum.valueOf(selectedState);
-			place.putParam(STATE_FILTER_PARAM, selectedState);	
+			place.putParam(ACTPlace.STATE_FILTER_PARAM, selectedState);	
 		}
 		loadData();
 	}
@@ -144,10 +142,10 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		if(suggestion != null) {
 			UserGroupHeader header = suggestion.getHeader();
 			submitterIdFilter = Long.parseLong(header.getOwnerId());
-			place.putParam(SUBMITTER_ID_FILTER_PARAM, header.getOwnerId());
+			place.putParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM, header.getOwnerId());
 		} else {
 			submitterIdFilter = null;
-			place.removeParam(SUBMITTER_ID_FILTER_PARAM);
+			place.removeParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
 		}
 		loadData();
 	}
@@ -157,7 +155,5 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
         view.clear();
         return null;
     }
-	
-	
 	
 }
