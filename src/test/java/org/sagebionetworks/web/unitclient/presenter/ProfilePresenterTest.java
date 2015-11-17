@@ -1393,7 +1393,7 @@ public class ProfilePresenterTest {
 		viewProfile("123", "456");
 		
 		//user bundle reported that target user is not verified, should show badge
-		verify(mockView, never()).addVerifiedBadge();
+		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationSuspendedButtonVisible(true);
 		//since this is ACT, should not see a way to submit a new validation request
@@ -1410,7 +1410,7 @@ public class ProfilePresenterTest {
 		viewProfile("123", "456");
 		
 		//user bundle reported that target user is not verified
-		verify(mockView, never()).addVerifiedBadge();
+		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationSubmittedButtonVisible(true);
 	}	
@@ -1424,7 +1424,7 @@ public class ProfilePresenterTest {
 		viewProfile("123", "456");
 				
 		//user bundle reported that target user is verified
-		verify(mockView).addVerifiedBadge();
+		verify(mockView).showVerifiedBadge(null, null, null, null, null);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationDetailsButtonVisible(true);
 	}
@@ -1437,7 +1437,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		viewProfile("123", null);
 
-		verify(mockView).addVerifiedBadge();
+		verify(mockView).showVerifiedBadge(null, null, null, null, null);
 		//no need to check for act membership for anonymous
 		verify(mockUserProfileClient, never()).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		//validation details button is not visible to anonymous
@@ -1451,7 +1451,7 @@ public class ProfilePresenterTest {
 		when(mockCurrentUserBundle.getIsACTMember()).thenReturn(false);
 		viewProfile("123", "456");
 
-		verify(mockView).addVerifiedBadge();
+		verify(mockView).showVerifiedBadge(null, null, null, null, null);
 		//no need to check for act membership for anonymous
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		//validation details button is not visible to a person who is not the owner and not part of the ACT
