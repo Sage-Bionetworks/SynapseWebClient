@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -177,6 +178,7 @@ public class ProfilePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
@@ -1551,5 +1553,23 @@ public class ProfilePresenterTest {
 		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
 	}
 
+	@Test
+	public void testUnbindOrcId() {
+		viewProfile("123", "456");
+		profilePresenter.unbindOrcId();
+		//success message and page refresh
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	
+	@Test
+	public void testUnbindOrcIdFailure() {
+		Exception ex = new Exception("bad things happened");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		viewProfile("123", "456");
+		profilePresenter.unbindOrcId();
+		//error is shown
+		verify(mockSynAlert).handleException(ex);
+	}
 
 }
