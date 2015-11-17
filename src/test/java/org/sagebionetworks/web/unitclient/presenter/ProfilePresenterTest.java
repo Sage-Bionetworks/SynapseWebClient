@@ -1419,12 +1419,22 @@ public class ProfilePresenterTest {
 	public void testVerificationUIInitApproved() {
 		setupVerificationState(VerificationStateEnum.APPROVED, null);
 		when(mockUserBundle.getIsVerified()).thenReturn(true);
+		String fName = "Luke";
+		String lName = "Skywalker";
+		String company = "Rebel Alliance";
+		String orcId = "http://orcid/address";
+		String location= "Jundland Wastes, Tatooine";
+		when(mockVerificationSubmission.getFirstName()).thenReturn(fName);
+		when(mockVerificationSubmission.getLastName()).thenReturn(lName);
+		when(mockVerificationSubmission.getCompany()).thenReturn(company);
+		when(mockVerificationSubmission.getOrcid()).thenReturn(orcId);
+		when(mockVerificationSubmission.getLocation()).thenReturn(location);
 		
 		//not the owner of this profile, but is ACT
 		viewProfile("123", "456");
-				
+		
 		//user bundle reported that target user is verified
-		verify(mockView).showVerifiedBadge(null, null, null, null, null);
+		verify(mockView).showVerifiedBadge(fName, lName, location, company, orcId);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationDetailsButtonVisible(true);
 	}
