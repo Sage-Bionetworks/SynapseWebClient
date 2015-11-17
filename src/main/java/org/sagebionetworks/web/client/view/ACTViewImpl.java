@@ -178,4 +178,8 @@ public class ACTViewImpl implements ACTView {
 	public String getSelectedState() {
 		return stateComboBox.getSelectedValue();
 	}
+	@Override
+	public void setSelectedState(int index) {
+		stateComboBox.setSelectedIndex(index);
+	}
 }

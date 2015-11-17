@@ -8,27 +8,27 @@
 		<g:SimplePanel ui:field="header" />
 		<bh:Div ui:field="synAlertContainer" />
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400">
-			<b:Heading ui:field="title" size="H1" text="Welcome ACT" />
+			<b:Heading ui:field="title" size="H2" text="Access and Compliance Team" />
 			<b:Row>
 				<b:Column size="SM_12">
 					<b:FormGroup>
 						<b:FormLabel>State</b:FormLabel>
 						<g:ListBox ui:field="stateComboBox" styleName="form-control" />
-						<b:Button ui:field="applyStateFilter" >Apply filter</b:Button>
+						<b:Button ui:field="applyStateFilter" type="PRIMARY" addStyleNames="margin-top-5" >Apply filter</b:Button>
 					</b:FormGroup>
 				</b:Column>
 				<b:Column size="SM_12">
 					<b:FormGroup>
 						<b:FormLabel>User</b:FormLabel>
 						<bh:Div ui:field="userSelectContainer" />
-						<b:Button ui:field="applyUserFilter" >Apply filter</b:Button>
+						<b:Button ui:field="applyUserFilter" type="PRIMARY" addStyleNames="margin-top-5" >Apply filter</b:Button>
 					</b:FormGroup>
 				</b:Column>
 			</b:Row>
 		    <!-- table header -->
 		    <t:Table width="100%">
 				<t:TableRow>
-					<t:TableHeader>
+					<t:TableHeader width="100px" >
 						<bh:Span text="User ID" />
 					</t:TableHeader>
 					<t:TableHeader width="150px" addStyleNames="visible-lg">

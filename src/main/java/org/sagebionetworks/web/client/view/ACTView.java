@@ -15,8 +15,10 @@ public interface ACTView extends IsWidget, SynapseView {
 	void clearRows();
 	void addRow(Widget w);
 	void setStates(List<String> states);
+	
 	void setSynAlert(Widget w);
 	void updatePagination(List<PaginationEntry> entries);
+	void setSelectedState(int index);
 	String getSelectedState();
 	
 	public interface Presenter extends SynapsePresenter {

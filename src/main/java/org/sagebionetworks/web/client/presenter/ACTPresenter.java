@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.place.ACTPlace;
@@ -27,16 +28,20 @@ import com.google.inject.Inject;
 
 public class ACTPresenter extends AbstractActivity implements ACTView.Presenter, Presenter<ACTPlace> {
 	private static final String NO_STATE_FILTER = "-No filter-";
+	private static final String SUBMITTER_ID_FILTER_PARAM = "submitterID";
+	private static final String STATE_FILTER_PARAM = "state";
 	private ACTPlace place;
 	private ACTView view;
 	private UserProfileClientAsync userProfileClient;
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
+	private GlobalApplicationState globalAppState;
 	SynapseSuggestBox peopleSuggestWidget;
 	private VerificationStateEnum stateFilter;
 	private Long submitterIdFilter;
 	
 	public static Long LIMIT = 100L;
+	List<String> states;
 	
 	@Inject
 	public ACTPresenter(ACTView view,
@@ -44,17 +49,19 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 			SynapseAlert synAlert,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.userProfileClient = userProfileClient;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.ginInjector = ginInjector;
+		this.globalAppState = globalAppState;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
-		List<String> states = new ArrayList<String>();
+		states = new ArrayList<String>();
 		states.add(NO_STATE_FILTER);
 		for (VerificationStateEnum state : VerificationStateEnum.values()) {
 			states.add(state.toString());
@@ -68,9 +75,6 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		// Install the view
 		panel.setWidget(view);
 		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
-		//initial load
-		submitterIdFilter = null;
-		stateFilter = null;
 		loadData();
 	}
 	
@@ -82,14 +86,17 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	public void loadData(final Long offset) {
 		view.clearRows();
 		synAlert.clear();
+		globalAppState.pushCurrentPlace(place);
 		userProfileClient.listVerificationSubmissions(stateFilter, submitterIdFilter, LIMIT, offset, new AsyncCallback<VerificationPagedResults>() {
 			@Override
 			public void onSuccess(VerificationPagedResults results) {
-				
+				boolean isACT = true;
+				boolean isModal = false;
 				for (VerificationSubmission submission : results.getResults()) {
 					VerificationSubmissionWidget w = ginInjector.getVerificationSubmissionWidget();
-					w.configure(submission, true, false);
+					w.configure(submission, isACT, isModal);
 					view.addRow(w.asWidget());
+					w.show();
 				}
 				List<PaginationEntry> entries = PaginationUtil.getPagination(results.getTotalNumberOfResults().intValue(), offset.intValue(), ACTPresenter.LIMIT.intValue(), 10);
 				view.updatePagination(entries);
@@ -106,7 +113,16 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	public void setPlace(ACTPlace place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		final String token = place.toToken();
+		String stateFilterParam = place.getParam(STATE_FILTER_PARAM);
+		if (stateFilterParam != null) {
+			stateFilter = VerificationStateEnum.valueOf(stateFilterParam);
+			view.setSelectedState(states.indexOf(stateFilterParam));
+		}
+		String submitterIdFilterParam =  place.getParam(SUBMITTER_ID_FILTER_PARAM);
+		if (submitterIdFilterParam != null) {
+			submitterIdFilter = Long.parseLong(submitterIdFilterParam);
+			peopleSuggestWidget.setText(submitterIdFilterParam);
+		}
 	}
 
 	@Override
@@ -114,8 +130,10 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		String selectedState = view.getSelectedState();
 		if (NO_STATE_FILTER.equals(selectedState)) {
 			stateFilter = null;
+			place.removeParam(STATE_FILTER_PARAM);
 		} else {
-			stateFilter = VerificationStateEnum.valueOf(selectedState);	
+			stateFilter = VerificationStateEnum.valueOf(selectedState);
+			place.putParam(STATE_FILTER_PARAM, selectedState);	
 		}
 		loadData();
 	}
@@ -126,8 +144,10 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		if(suggestion != null) {
 			UserGroupHeader header = suggestion.getHeader();
 			submitterIdFilter = Long.parseLong(header.getOwnerId());
+			place.putParam(SUBMITTER_ID_FILTER_PARAM, header.getOwnerId());
 		} else {
 			submitterIdFilter = null;
+			place.removeParam(SUBMITTER_ID_FILTER_PARAM);
 		}
 		loadData();
 	}

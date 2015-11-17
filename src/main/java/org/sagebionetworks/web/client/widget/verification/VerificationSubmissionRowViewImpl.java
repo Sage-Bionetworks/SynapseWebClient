@@ -55,9 +55,7 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	Button deleteButton;
 	
 	@UiField
-	Alert reasonAlert;
-	@UiField
-	Text reasonAlertText;
+	Span reasonAlertText;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -126,7 +124,7 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
 		deleteButton.setVisible(false);
-		reasonAlert.setVisible(false);
+		reasonAlertText.setText("");
 	}
 
 	@Override
@@ -234,7 +232,6 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 
 	@Override
 	public void setSuspendedAlertVisible(boolean visible) {
-		reasonAlert.setVisible(visible);
 	}
 	@Override
 	public void setSuspendedReason(String reason) {
@@ -267,7 +264,7 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	}
 	@Override
 	public void setProfileLink(String profileId, String href) {
-		orcIdAnchor.setText(profileId);
-		orcIdAnchor.setHref(href);
+		profileAnchor.setText(profileId);
+		profileAnchor.setHref(href);
 	}
 }
