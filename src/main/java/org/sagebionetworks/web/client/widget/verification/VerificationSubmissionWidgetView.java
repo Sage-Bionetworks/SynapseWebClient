@@ -24,6 +24,7 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void setOrganization(String organization);
 	void setLocation(String location);
 	void setOrcID(String href);
+	void setProfileLink(String profileId, String href);
 	void setSubmitButtonVisible(boolean visible);
 	void setCancelButtonVisible(boolean visible);
 	void setOKButtonVisible(boolean visible);

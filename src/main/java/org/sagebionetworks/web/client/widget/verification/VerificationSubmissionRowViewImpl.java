@@ -5,12 +5,9 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -21,37 +18,33 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class VerificationSubmissionModalViewImpl implements VerificationSubmissionWidgetView {
+public class VerificationSubmissionRowViewImpl implements VerificationSubmissionWidgetView {
 
-	public interface Binder extends UiBinder<Widget, VerificationSubmissionModalViewImpl> {}
+	public interface Binder extends UiBinder<Widget, VerificationSubmissionRowViewImpl> {}
 	
 	VerificationSubmissionWidgetView.Presenter presenter;
 	
 	Widget widget;
-
-	@UiField
-	Div publicallyVisible;
 	
 	@UiField
-	TextBox firstName;
+	Span firstName;
 	@UiField
-	TextBox lastName;
+	Span lastName;
 	@UiField
-	TextBox currentAffiliation;
+	Span currentAffiliation;
 	@UiField
-	TextBox location;
+	Span location;
 	@UiField
 	Anchor orcIdAnchor;
-	
 	@UiField
-	Div actOnly;
+	Anchor profileAnchor;
+	
+	
 	@UiField
 	Div emailAddresses;
 	@UiField
-	Panel filesContainer;
+	Div filesContainer;
 	
-	@UiField
-	Button submitButton;
 	@UiField
 	Button approveButton;
 	@UiField
@@ -59,40 +52,24 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Button suspendButton;
 	@UiField
-	Button cancelButton;
-	@UiField
 	Button deleteButton;
+	
 	@UiField
-	Button okButton;
-	@UiField
-	Modal dialog;
+	Span reasonAlertText;
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div promptModalContainer;
-	@UiField
-	Div wikiPageContainer;
 	
-	@UiField
-	Alert reasonAlert;
-	@UiField
-	Text reasonAlertText;
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
 
 	@Inject
-	public VerificationSubmissionModalViewImpl(Binder binder) {
+	public VerificationSubmissionRowViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		
-		//click handlers
-		submitButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.submitVerification();
-			}
-		});
 		approveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -117,12 +94,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 				presenter.deleteVerification();
 			}
 		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dialog.hide();
-			}
-		});
+		
 	}
 
 	@Override
@@ -148,25 +120,21 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		location.setText("");
 		orcIdAnchor.setText("");
 		emailAddresses.clear();
-		cancelButton.setVisible(false);
-		submitButton.setVisible(false);
-		okButton.setVisible(false);
 		approveButton.setVisible(false);
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
 		deleteButton.setVisible(false);
-		reasonAlert.setVisible(false);
-		dialog.setTitle("");
+		reasonAlertText.setText("");
 	}
 
 	@Override
 	public void show() {
-		dialog.show();
+		//Not used in this view implementation
 	}
 
 	@Override
 	public void hide() {
-		dialog.hide();
+		//Not used in this view implementation
 	}
 
 	@Override
@@ -183,18 +151,17 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 
 	@Override
 	public void setWikiPage(Widget w) {
-		wikiPageContainer.clear();
-		wikiPageContainer.add(w);
+		//Not used in this view implementation
 	}
 
 	@Override
 	public void setWikiPageVisible(boolean visible) {
-		wikiPageContainer.setVisible(visible);
+		//Not used in this view implementation
 	}
 
 	@Override
 	public void setTitle(String title) {
-		dialog.setTitle(title);
+		//Not used in this view implementation
 	}
 
 	@Override
@@ -209,22 +176,22 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 
 	@Override
 	public void setFirstName(String fname) {
-		firstName.setValue(fname);
+		firstName.setText(fname);
 	}
 
 	@Override
 	public void setLastName(String lname) {
-		lastName.setValue(lname);
+		lastName.setText(lname);
 	}
 
 	@Override
 	public void setOrganization(String organization) {
-		currentAffiliation.setValue(organization);
+		currentAffiliation.setText(organization);
 	}
 
 	@Override
 	public void setLocation(String l) {
-		location.setValue(l);
+		location.setText(l);
 	}
 
 	@Override
@@ -235,17 +202,17 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 
 	@Override
 	public void setSubmitButtonVisible(boolean visible) {
-		submitButton.setVisible(visible);
+		//Not used in this view implementation
 	}
 
 	@Override
 	public void setCancelButtonVisible(boolean visible) {
-		cancelButton.setVisible(visible);
+		//Not used in this view implementation
 	}
 
 	@Override
 	public void setOKButtonVisible(boolean visible) {
-		okButton.setVisible(visible);
+		//Not used in this view implementation
 	}
 
 	@Override
@@ -265,7 +232,6 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 
 	@Override
 	public void setSuspendedAlertVisible(boolean visible) {
-		reasonAlert.setVisible(visible);
 	}
 	@Override
 	public void setSuspendedReason(String reason) {
@@ -298,6 +264,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	}
 	@Override
 	public void setProfileLink(String profileId, String href) {
-		//Not used in this view implementation
+		profileAnchor.setText(profileId);
+		profileAnchor.setHref(href);
 	}
 }

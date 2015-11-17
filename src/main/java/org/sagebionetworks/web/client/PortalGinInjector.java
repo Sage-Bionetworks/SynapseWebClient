@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
@@ -141,6 +142,8 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -220,7 +223,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ActionMenuWidget createActionMenuWidget();
 	
 	public EntityActionController createEntityActionController();
-		
+	public ACTPresenter getACTPresenter();
 	/*
 	 *  Markdown Widgets
 	 */
@@ -354,5 +357,7 @@ public interface PortalGinInjector extends Ginjector {
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 	public ModifiedCreatedByWidget getModifiedCreatedByWidget();
 	public FileHandleLink getFileHandleLink();
+	public VerificationSubmissionWidget getVerificationSubmissionWidget();
 	public VerificationSubmissionModalViewImpl getVerificationSubmissionModalViewImpl();
+	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 }

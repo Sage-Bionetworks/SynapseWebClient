@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -106,7 +108,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert teamSynAlert;
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
-	public boolean isACTMember;
+	public Map<String, Boolean> isACTMemberMap;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -140,7 +142,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
-		
+		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -249,7 +251,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void getUserProfile(final ProfileArea initialTab) {
 		//ask for everything in the user bundle
 		currentUserBundle = null;
-		isACTMember = false;
 		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED;
 		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
 		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
@@ -329,11 +330,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void initializeVerificationUI() {
 		//verification UI is hidden by default (in view.clear())
 		boolean isVerified = currentUserBundle.getIsVerified();
-		if (isVerified) {
-			view.addVerifiedBadge();
-		}
 		//The UI is depends on the current state
 		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+		if (isVerified) {
+			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid());
+		}
 		
 		if (submission == null) {
 			//no submission.  if the owner, provide way to submit
@@ -363,36 +364,44 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
 		if (authenticationController.isLoggedIn()) {
-			int mask = IS_ACT_MEMBER;
-			userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
-				@Override
-				public void onSuccess(UserBundle result) {
-					isACTMember = result.getIsACTMember();
-					if (isOwner || isACTMember) {
-						VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
-						if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
-							view.setVerificationSuspendedButtonVisible(true);
-							if (isOwner) {
-								view.setVerificationButtonVisible(true);
-							}
-						} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
-							view.setVerificationSubmittedButtonVisible(true);
-						} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
-							view.setVerificationDetailsButtonVisible(true);
-						}
+			//do we know if the current user is an act member?
+			Boolean isActMember = isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId());
+			if (isActMember == null) {
+				//we don't know, find out.
+				int mask = IS_ACT_MEMBER;
+				userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
+					@Override
+					public void onSuccess(UserBundle userBundle) {
+						isACTMemberMap.put(authenticationController.getCurrentUserPrincipalId(), userBundle.getIsACTMember());
+						showVerificationUI(submission, userBundle.getIsACTMember());
 					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.hideLoading();
-					profileSynAlert.handleException(caught);
-				}
-				
-			});	
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						view.hideLoading();
+						profileSynAlert.handleException(caught);
+					}
+				});	
+			} else {
+				showVerificationUI(submission, isActMember);
+			}
 		}
-		
-		
+	}
+	
+	public void showVerificationUI(VerificationSubmission submission, Boolean isACTMember) {
+		if (isOwner || isACTMember) {
+			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+			if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
+				view.setVerificationSuspendedButtonVisible(true);
+				if (isOwner) {
+					view.setVerificationButtonVisible(true);
+				}
+			} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
+				view.setVerificationSubmittedButtonVisible(true);
+			} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
+				view.setVerificationDetailsButtonVisible(true);
+			}
+		}
 	}
 	
 	@Override
@@ -1078,7 +1087,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//edit the existing submission
 		verificationModal.configure(
 				currentUserBundle.getVerificationSubmission(), 
-				isACTMember, 
+				isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId()), 
 				true) //isModal
 			.show();		
 	}
@@ -1089,7 +1098,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		verificationModal.configure(
 				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getORCID(), 
-				isACTMember,
+				isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId()),
 				true) //isModal
 			.show();
 	}

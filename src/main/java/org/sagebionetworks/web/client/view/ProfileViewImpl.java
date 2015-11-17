@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -96,6 +97,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	SimplePanel picturePanel;
+	@UiField
+	VerificationIDCardViewImpl idCard;
 	
 	//////Tabs
 	@UiField
@@ -453,7 +456,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		
-
+		verifiedBadge.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				idCard.show();
+			}
+		});
 	}
 	
 	@Override
@@ -977,8 +985,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifyAlert.setVisible(isVisible);
 	}
 	@Override
-	public void addVerifiedBadge() {
+	public void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref) {
 		verifiedBadge.setVisible(true);
+		idCard.setFirstName(firstName);
+		idCard.setLastName(lastName);
+		idCard.setLocation(location);
+		idCard.setOrganization(affiliation);
+		idCard.setOrcID(orcIdHref);
 	}
 	@Override
 	public void setVerificationButtonVisible(boolean isVisible) {
