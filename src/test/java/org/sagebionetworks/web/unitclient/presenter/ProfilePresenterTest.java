@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -177,6 +178,7 @@ public class ProfilePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
@@ -352,6 +354,12 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
+		
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		
+		verify(mockView, never()).setOrcIdVisible(true);
+		verify(mockView, never()).setUnbindOrcIdVisible(true);
 	} 
 	
 
@@ -395,6 +403,12 @@ public class ProfilePresenterTest {
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
+		
+		//also verify that when orc id is not set in the user bundle (for the owner), then orc id is not visible
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		verify(mockView, never()).setOrcIdVisible(true);
+		verify(mockView, never()).setUnbindOrcIdVisible(true);
 	}
 	
 	@Test
@@ -404,9 +418,16 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
+		when(mockUserBundle.getORCID()).thenReturn("an orc id");
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
+		
+		//also verify that when orc id is set in the user bundle (for the owner), then orc id is visible (and can be unbound)
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		verify(mockView).setOrcIdVisible(true);
+		verify(mockView).setUnbindOrcIdVisible(true);
 	}
 	
 	
@@ -1532,5 +1553,23 @@ public class ProfilePresenterTest {
 		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
 	}
 
+	@Test
+	public void testUnbindOrcId() {
+		viewProfile("123", "456");
+		profilePresenter.unbindOrcId();
+		//success message and page refresh
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	
+	@Test
+	public void testUnbindOrcIdFailure() {
+		Exception ex = new Exception("bad things happened");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		viewProfile("123", "456");
+		profilePresenter.unbindOrcId();
+		//error is shown
+		verify(mockSynAlert).handleException(ex);
+	}
 
 }

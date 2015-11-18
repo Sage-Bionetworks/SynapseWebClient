@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
@@ -255,6 +256,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
 		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		view.setOrcIdVisible(false);
+		view.setUnbindOrcIdVisible(false);
 		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
@@ -278,6 +280,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if (orcId != null && orcId.length() > 0) {
 					view.setOrcId(orcId);
 					view.setOrcIdVisible(true);
+					view.setUnbindOrcIdVisible(true);
 				}
 			}
 			@Override
@@ -286,6 +289,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				profileSynAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void unbindOrcId() {
+		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date
+				view.showInfo("Success", "ORC ID has been unbound.");
+				globalApplicationState.refreshPage();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				profileSynAlert.handleException(caught);
+			}
+		});	
 	}
 	
 	public void initializeShowHideProfile(boolean isOwner) {

@@ -70,6 +70,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setEmptyProjectUIVisible(boolean b);
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
+	void setUnbindOrcIdVisible(boolean isVisible);
 	void setOrcId(String href);
 	void setVerificationAlertVisible(boolean isVisible);
 	void setVerificationButtonVisible(boolean isVisible);
@@ -88,6 +89,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
+		void unbindOrcId();
 		void certificationBadgeClicked();
 		void getMoreProjects();
 		void getMoreChallenges();

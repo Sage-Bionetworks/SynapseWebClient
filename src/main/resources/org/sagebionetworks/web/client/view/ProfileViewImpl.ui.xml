@@ -85,7 +85,12 @@
 					        		<b:Anchor ui:field="urlField" target="_blank" />
 					        	</bh:Div>
 					        	<bh:Div>
-					        		<b:Anchor ui:field="orcIdField" target="_blank" />
+					        		<b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
+					        		<bh:Span  ui:field="unbindButtonUI">
+						        		<b:Tooltip title="Unbind ORC ID from your Synapse profile.">
+						        			<b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
+						        		</b:Tooltip>
+					        		</bh:Span>
 					        	</bh:Div>
 					        	<g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 				        	</bh:Div>
