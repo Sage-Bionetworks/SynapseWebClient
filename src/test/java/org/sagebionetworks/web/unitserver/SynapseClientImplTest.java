@@ -15,15 +15,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -350,9 +342,10 @@ public class SynapseClientImplTest {
 		bundle.setHasChildren(false);
 		bundle.setAccessRequirements(accessRequirements);
 		bundle.setUnmetAccessRequirements(accessRequirements);
+		bundle.setBenefactorAcl(acl);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS)))
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL)))
 				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
@@ -1964,6 +1957,7 @@ public class SynapseClientImplTest {
 		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
 		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
 		assertEquals(eup, entityBundlePlus.getEntityBundle().getPermissions());
+		assertEquals(acl, entityBundlePlus.getEntityBundle().getBenefactorAcl());
 		assertEquals(testUserProfile, entityBundlePlus.getProfile());
 	}
 	

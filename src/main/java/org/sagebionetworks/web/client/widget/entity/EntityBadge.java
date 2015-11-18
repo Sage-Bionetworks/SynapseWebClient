@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -38,6 +39,7 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPresenter {
 	
+	public static final String HAS_LOCAL_SHARING_SETTINGS = "Has local sharing settings";
 	private EntityBadgeView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
@@ -124,6 +126,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				addAnnotations(keyValueDisplay, annotations);
 				addContentSize(keyValueDisplay, handles);
 				addPublicPrivate(keyValueDisplay, eb.getPermissions());
+				addHasLocalSharingSettings(keyValueDisplay, entity.getId(), eb.getBenefactorAcl());
 				addWikiStatus(keyValueDisplay, rootWikiId);
 				callback.onSuccess(keyValueDisplay);		
 			}
@@ -159,6 +162,15 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		} else {
 			order.add("Private");
 			map.put("Private", "");	
+		}
+	}
+	
+	public void addHasLocalSharingSettings(KeyValueDisplay<String> keyValueDisplay, String entityId, AccessControlList benefactorAcl) {
+		Map<String,String> map = keyValueDisplay.getMap();
+		List<String> order = keyValueDisplay.getKeyDisplayOrder();
+		if (benefactorAcl.getId().equals(entityId)) {
+			order.add(HAS_LOCAL_SHARING_SETTINGS);
+			map.put(HAS_LOCAL_SHARING_SETTINGS, "");
 		}
 	}
 	

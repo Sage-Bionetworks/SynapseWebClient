@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -72,6 +73,7 @@ public class EntityBadgeTest {
 	UserBadge mockUserBadge;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	UserEntityPermissions mockPermissions;
+	AccessControlList mockBenefactorAcl;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -86,6 +88,8 @@ public class EntityBadgeTest {
 		mockPermissions = mock(UserEntityPermissions.class);
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		mockBenefactorAcl = mock(AccessControlList.class);
+		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
 		
@@ -110,6 +114,8 @@ public class EntityBadgeTest {
 		when(bundle.getEntity()).thenReturn(entity);
 //		when(bundle.getAnnotations()).thenReturn(value);
 		when(bundle.getPermissions()).thenReturn(mockPermissions);
+		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
+		
 		EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
 		entityBundlePlus.setEntityBundle(bundle);
 		entityBundlePlus.setProfile(userProfile);
@@ -259,6 +265,22 @@ public class EntityBadgeTest {
 		assertEquals(1, order.size());
 		assertEquals("Private", map.keySet().iterator().next());
 	}
+	
+	@Test
+	public void testAddLocalSharingSettingsInherited() throws Exception {
+		widget.addHasLocalSharingSettings(keyValueDisplay, entityId, mockBenefactorAcl);
+		assertEquals(0, map.size());
+		assertEquals(0, order.size());
+	}
+	@Test
+	public void testAddLocalSharingSettingsHasLocal() throws Exception {
+		when(mockBenefactorAcl.getId()).thenReturn(entityId);
+		widget.addHasLocalSharingSettings(keyValueDisplay, entityId, mockBenefactorAcl);
+		assertEquals(1, map.size());
+		assertEquals(1, order.size());
+		assertEquals(EntityBadge.HAS_LOCAL_SHARING_SETTINGS, map.keySet().iterator().next());
+	}
+
 
 	
 	@Test
