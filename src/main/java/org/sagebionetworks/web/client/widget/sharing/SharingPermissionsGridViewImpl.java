@@ -115,9 +115,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 			button.setSize(ButtonSize.SMALL);
 			button.addStyleName("glyphicon glyphicon-remove");
 			Icon icon = new Icon();
-			if (aclEntry.isOwner()) {
-				button.setEnabled(false);
-			}
 			button.setType(ButtonType.DANGER);
 			data.add(button);
 			row.add(data);
@@ -132,12 +129,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
 		
 		final ListBox listBox = new ListBox();
-		
-		if (aclEntry.isOwner()) {
-			listBox.addItem(DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
-			listBox.setEnabled(false);
-			return listBox;
-		}
 		
 		PermissionLevel permLevel = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
 		boolean foundMatchingPermissionLevel = false;
