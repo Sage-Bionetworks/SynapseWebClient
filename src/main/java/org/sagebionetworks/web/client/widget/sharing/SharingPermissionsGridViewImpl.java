@@ -4,12 +4,10 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -114,7 +112,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 			});
 			button.setSize(ButtonSize.SMALL);
 			button.addStyleName("glyphicon glyphicon-remove");
-			Icon icon = new Icon();
 			button.setType(ButtonType.DANGER);
 			data.add(button);
 			row.add(data);
