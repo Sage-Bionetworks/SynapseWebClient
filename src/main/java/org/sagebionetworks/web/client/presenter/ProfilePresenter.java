@@ -1095,13 +1095,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void newVerificationSubmissionClicked() {
-		String currentUserId = authenticationController.getCurrentUserPrincipalId();
-		boolean isACTMember = isACTMemberMap.containsKey(currentUserId) ? isACTMemberMap.get(currentUserId) : false;
 		//create a new submission
 		verificationModal.configure(
 				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getORCID(), 
-				isACTMember,
 				true) //isModal
 			.show();
 	}

@@ -1537,10 +1537,10 @@ public class ProfilePresenterTest {
 		String currentUserId = "94837";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(mockVerificationSubmissionModal);
+		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean())).thenReturn(mockVerificationSubmissionModal);
 		viewProfile(currentUserId, currentUserId);
 		profilePresenter.newVerificationSubmissionClicked();
-		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(false), eq(true));
+		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true));
 		verify(mockVerificationSubmissionModal).show();
 	}
 
