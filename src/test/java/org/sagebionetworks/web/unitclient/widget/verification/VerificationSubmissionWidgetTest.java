@@ -142,10 +142,9 @@ public class VerificationSubmissionWidgetTest {
 	
 	@Test
 	public void testConfigureNewAsModal() {
-		boolean isACTMember = false;
 		boolean isModal = true;
 		String orcId = "http://orcid.org/123";
-		widget.configure(mockProfile, orcId, isACTMember, isModal);
+		widget.configure(mockProfile, orcId, isModal);
 		
 		assertTrue(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
@@ -227,9 +226,8 @@ public class VerificationSubmissionWidgetTest {
 	public void testShowNewVerificationSubmission() {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
-		boolean isACTMember = false;
 		boolean isModal = true;
-		widget.configure(profile, orcId, isACTMember, isModal);
+		widget.configure(profile, orcId, isModal);
 		widget.show();
 		verify(mockView).clear();
 		verify(mockView).setWikiPageVisible(true);
@@ -363,9 +361,8 @@ public class VerificationSubmissionWidgetTest {
 	public void testSubmitVerification() {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
-		boolean isACTMember = false;
 		boolean isModal = true;
-		widget.configure(profile, orcId, isACTMember, isModal);
+		widget.configure(profile, orcId, isModal);
 		
 		//attach evidence
 		fileHandleIds.add("999");
@@ -381,9 +378,8 @@ public class VerificationSubmissionWidgetTest {
 	public void testSubmitVerificationNoEvidence() {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
-		boolean isACTMember = false;
 		boolean isModal = true;
-		widget.configure(profile, orcId, isACTMember, isModal);
+		widget.configure(profile, orcId, isModal);
 		
 		//no evidence
 		widget.submitVerification();

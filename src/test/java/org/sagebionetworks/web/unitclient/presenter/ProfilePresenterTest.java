@@ -1552,7 +1552,18 @@ public class ProfilePresenterTest {
 		assertEquals(currentUserId, capturedPlace.getUserId());
 		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
 	}
-
+	@Test
+	public void testNewVerificationSubmissionClicked() {
+		//view my own profile.  submit a new verification submission, verify that modal is shown
+		String currentUserId = "94837";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean())).thenReturn(mockVerificationSubmissionModal);
+		viewProfile(currentUserId, currentUserId);
+		profilePresenter.newVerificationSubmissionClicked();
+		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true));
+		verify(mockVerificationSubmissionModal).show();
+	}
 	@Test
 	public void testUnbindOrcId() {
 		viewProfile("123", "456");
