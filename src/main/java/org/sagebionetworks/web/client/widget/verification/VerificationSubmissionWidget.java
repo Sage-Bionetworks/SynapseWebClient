@@ -113,6 +113,13 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		view.setPresenter(this);
 	}
 	
+	/**
+	 * Configuration used to view an existing verification submission
+	 * @param verificationSubmission
+	 * @param isACTMember
+	 * @param isModal
+	 * @return
+	 */
 	public VerificationSubmissionWidget configure(VerificationSubmission verificationSubmission, boolean isACTMember, boolean isModal) {
 		isNewSubmission = false;
 		this.submission = verificationSubmission;
@@ -124,10 +131,17 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		return this;
 	}
 	
-	public VerificationSubmissionWidget configure(UserProfile userProfile, String orcId, boolean isACTMember, boolean isModal) {
+	/**
+	 * Configuration used to create a new verification submission.
+	 * @param userProfile
+	 * @param orcId
+	 * @param isModal
+	 * @return
+	 */
+	public VerificationSubmissionWidget configure(UserProfile userProfile, String orcId, boolean isModal) {
 		isNewSubmission = true;
 		this.profile = userProfile;
-		this.isACTMember = isACTMember;
+		this.isACTMember = false;
 		this.orcId = orcId;
 		this.submission = null;
 		initView(isModal);
