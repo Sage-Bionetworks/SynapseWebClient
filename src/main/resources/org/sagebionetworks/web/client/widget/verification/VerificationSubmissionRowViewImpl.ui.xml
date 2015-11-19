@@ -6,37 +6,37 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-  	<bh:Div>
+  	<bh:Div addStyleNames="margin-left-10 margin-right-10">
 	  	<t:Table width="100%" height="30px" addStyleNames="markdowntable">
 			<t:TableRow>
 				<t:TableData width="100px" >
 					<b:Anchor ui:field="profileAnchor" target="_blank" />
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px" addStyleNames="hidden-xs">
 					<bh:Span ui:field="firstName"/>
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px" addStyleNames="hidden-xs">
 					<bh:Span ui:field="lastName"/>
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px" addStyleNames="hidden-xs">
 					<bh:Span ui:field="currentAffiliation"/>
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px" addStyleNames="hidden-xs">
 					<bh:Span ui:field="location"/>
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px" addStyleNames="hidden-xs">
 					<b:Anchor ui:field="orcIdAnchor" target="_blank" />
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px">
 					<bh:Div ui:field="emailAddresses"/>
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px">
 					<bh:Div ui:field="filesContainer"/>
 				</t:TableData>
-				<t:TableData width="150px" addStyleNames="visible-lg">
+				<t:TableData width="120px">
 					<bh:Span ui:field="reasonAlertText" addStyleNames="bg-danger" />
 				</t:TableData>
-				<t:TableData width="100px" >
+				<t:TableData width="100px">
 					<b:Button ui:field="approveButton" size="EXTRA_SMALL" type="SUCCESS">Approve</b:Button>
 					<b:Button ui:field="rejectButton" size="EXTRA_SMALL" type="DANGER">Reject</b:Button>
 					<b:Button ui:field="suspendButton" size="EXTRA_SMALL" type="DANGER">Suspend</b:Button>

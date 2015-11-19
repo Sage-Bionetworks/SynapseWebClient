@@ -1416,7 +1416,7 @@ public class ProfilePresenterTest {
 		//user bundle reported that target user is not verified, should show badge
 		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
-		verify(mockView).setVerificationSuspendedButtonVisible(true);
+		verify(mockView).setVerificationRejectedButtonVisible(true);
 		//since this is ACT, should not see a way to submit a new validation request
 		verify(mockView, never()).setVerificationButtonVisible(anyBoolean());
 	}

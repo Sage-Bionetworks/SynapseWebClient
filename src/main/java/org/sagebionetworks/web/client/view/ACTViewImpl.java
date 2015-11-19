@@ -46,7 +46,11 @@ public class ACTViewImpl implements ACTView {
 	@UiField
 	Button applyStateFilter;
 	@UiField
+	Button clearStateFilter;
+	@UiField
 	Button applyUserFilter;
+	@UiField
+	Button clearUserFilter;
 	@UiField
 	Div paginationContainer;
 	private Presenter presenter;
@@ -72,13 +76,25 @@ public class ACTViewImpl implements ACTView {
 				presenter.onApplyStateFilter();
 			}
 		});
-
+		clearStateFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClearStateFilter();
+			}
+		});
 		applyUserFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onApplyUserFilter();
 			}
 		});
+		clearUserFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClearUserFilter();
+			}
+		});
+
 
 	}
 	
