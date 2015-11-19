@@ -21,13 +21,13 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class ACTPresenter extends AbstractActivity implements ACTView.Presenter, Presenter<ACTPlace> {
-	private static final String NO_STATE_FILTER = "-No filter-";
 	private ACTPlace place;
 	private ACTView view;
 	private UserProfileClientAsync userProfileClient;
@@ -60,7 +60,6 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 		states = new ArrayList<String>();
-		states.add(NO_STATE_FILTER);
 		for (VerificationStateEnum state : VerificationStateEnum.values()) {
 			states.add(state.toString());
 		}
@@ -126,13 +125,15 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	@Override
 	public void onApplyStateFilter() {
 		String selectedState = view.getSelectedState();
-		if (NO_STATE_FILTER.equals(selectedState)) {
-			stateFilter = null;
-			place.removeParam(ACTPlace.STATE_FILTER_PARAM);
-		} else {
-			stateFilter = VerificationStateEnum.valueOf(selectedState);
-			place.putParam(ACTPlace.STATE_FILTER_PARAM, selectedState);	
-		}
+		stateFilter = VerificationStateEnum.valueOf(selectedState);
+		place.putParam(ACTPlace.STATE_FILTER_PARAM, selectedState);	
+		loadData();
+	}
+	
+	@Override
+	public void onClearStateFilter() {
+		stateFilter = null;
+		place.removeParam(ACTPlace.STATE_FILTER_PARAM);
 		loadData();
 	}
 	
@@ -143,13 +144,18 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 			UserGroupHeader header = suggestion.getHeader();
 			submitterIdFilter = Long.parseLong(header.getOwnerId());
 			place.putParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM, header.getOwnerId());
+			loadData();
 		} else {
-			submitterIdFilter = null;
-			place.removeParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
+			onClearUserFilter();
 		}
-		loadData();
 	}
 	
+	@Override
+	public void onClearUserFilter() {
+		submitterIdFilter = null;
+		place.removeParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
+		loadData();
+	}
 	@Override
     public String mayStop() {
         view.clear();

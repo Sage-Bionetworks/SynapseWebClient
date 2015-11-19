@@ -259,6 +259,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button verificationSuspendedButton;
 	@UiField
+	Button verificationRejectedButton;
+	@UiField
 	Button submitProfileValidationButton;
 	@UiField
 	Button verificationApprovedButton;
@@ -366,6 +368,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		submitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
 		verificationSubmittedButton.addClickHandler(editVerificationSubmissionCallback);
 		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationRejectedButton.addClickHandler(editVerificationSubmissionCallback);
 		
 		initCertificationBadge();
 
@@ -805,6 +808,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		submitProfileValidationButton.setVisible(false);
 		verificationSubmittedButton.setVisible(false);
 		verificationSuspendedButton.setVisible(false);
+		verificationRejectedButton.setVisible(false);
 		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
@@ -1023,6 +1027,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setVerificationSuspendedButtonVisible(boolean isVisible) {
 		verificationSuspendedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationRejectedButtonVisible(boolean isVisible) {
+		verificationRejectedButton.setVisible(isVisible);
 	}
 	@Override
 	public void setVerificationDetailsButtonVisible(boolean isVisible) {

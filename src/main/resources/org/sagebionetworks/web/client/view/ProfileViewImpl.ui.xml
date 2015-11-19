@@ -61,22 +61,24 @@
 										</bh:Div>
 									</g:FocusPanel>
 								</b:Alert>
-								<bh:Div>
-									<v:VerificationIDCardViewImpl ui:field="idCard"/>
-									<b:Button ui:field="verifiedBadge" icon="CHECK_SQUARE_O"
-										type="PRIMARY" size="EXTRA_SMALL">Profile Validated</b:Button>
-								</bh:Div>
-								<bh:Div>
-									<b:Button ui:field="verificationSubmittedButton" type="INFO"
-										size="EXTRA_SMALL" addStyleNames="margin-top-10">Profile Validation Pending</b:Button>
-									<b:Button ui:field="verificationSuspendedButton" type="WARNING"
-										size="EXTRA_SMALL" addStyleNames="margin-top-10">Validated Profile Suspended</b:Button>
-									<b:Button ui:field="verificationApprovedButton" type="DEFAULT"
-										size="EXTRA_SMALL" addStyleNames="margin-top-10">Profile Validation Details</b:Button>
-								</bh:Div>
-					        	<bh:Div>
-									<b:Button ui:field="submitProfileValidationButton" type="INFO"
-										size="EXTRA_SMALL" addStyleNames="margin-top-10">Validate My Profile</b:Button>
+								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
+									<bh:Div>
+										<v:VerificationIDCardViewImpl ui:field="idCard"/>
+										<b:Button ui:field="verifiedBadge" icon="CHECK_SQUARE_O"
+											type="PRIMARY" size="SMALL">Profile Validated</b:Button>
+									</bh:Div>
+									<bh:Div>
+										<b:Button ui:field="verificationSubmittedButton" type="INFO"
+											size="SMALL" addStyleNames="margin-right-5">Profile Validation Pending</b:Button>
+										<b:Button ui:field="verificationRejectedButton" type="WARNING"
+											size="SMALL" addStyleNames="margin-right-5">Profile Validation Rejected</b:Button>
+										<b:Button ui:field="verificationSuspendedButton" type="WARNING"
+											size="SMALL" addStyleNames="margin-right-5">Validated Profile Suspended</b:Button>
+										<b:Button ui:field="verificationApprovedButton" type="DEFAULT"
+											size="SMALL" addStyleNames="margin-right-5">Profile Validation Details</b:Button>
+										<b:Button ui:field="submitProfileValidationButton" type="INFO"
+											size="SMALL">Validate My Profile</b:Button>
+									</bh:Div>
 								</bh:Div>
 								
 								<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />	

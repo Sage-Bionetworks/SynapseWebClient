@@ -24,6 +24,9 @@ public interface ACTView extends IsWidget, SynapseView {
 	public interface Presenter extends SynapsePresenter {
 		void onApplyUserFilter();
 		void onApplyStateFilter();
+		void onClearUserFilter();
+		void onClearStateFilter();
+
 		void loadData(Long offset);
 	}
 }
