@@ -3,7 +3,10 @@ package org.sagebionetworks.web.client.cookie;
 import java.util.Collection;
 import java.util.Date;
 
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 
 /**
  * A simple wrapper of the GWT cookie implementation.
@@ -30,15 +33,15 @@ public class GWTCookieImpl implements CookieProvider {
 
 	@Override
 	public void setCookie(String name, String value) {
-		Cookies.setCookie(name, value);
-
+		setCookie(name, value, null);
 	}
 
 	@Override
 	public void setCookie(String name, String value, Date expires) {
-		Cookies.setCookie(name, value, expires);
+		String domain = CookieUtils.getDomain(Window.Location.getHostName());
+		Cookies.setCookie(name, value, expires, domain, null, false);
 	}
-
+	
 	@Override
 	public void setCookie(String name, String value, Date expires,
 			String domain, String path, boolean secure) {
