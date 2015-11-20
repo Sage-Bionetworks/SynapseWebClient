@@ -13,14 +13,14 @@ public interface UserProfileClientAsync {
 
 	void createVerificationSubmission(
 			VerificationSubmission verificationSubmission,
-			AsyncCallback<VerificationSubmission> callback);
+			String hostPageBaseURL, AsyncCallback<VerificationSubmission> callback);
 
 	void listVerificationSubmissions(VerificationStateEnum currentState,
 			Long submitterId, Long limit, Long offset,
 			AsyncCallback<VerificationPagedResults> callback);
 
 	void updateVerificationState(long verificationId,
-			VerificationState verificationState, AsyncCallback<Void> callback);
+			VerificationState verificationState, String hostPageBaseURL, AsyncCallback<Void> callback);
 
 	void deleteVerificationSubmission(long verificationId,
 			AsyncCallback<Void> callback);

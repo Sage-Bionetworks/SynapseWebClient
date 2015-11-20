@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface UserProfileClient extends RemoteService {
 
 	VerificationSubmission createVerificationSubmission(
-			VerificationSubmission verificationSubmission)
+			VerificationSubmission verificationSubmission, String hostPageBaseURL)
 			throws RestServiceException;
 
 	VerificationPagedResults listVerificationSubmissions(
@@ -24,7 +24,7 @@ public interface UserProfileClient extends RemoteService {
 			Long offset) throws RestServiceException;
 
 	void updateVerificationState(long verificationId,
-			VerificationState verificationState) throws RestServiceException;
+			VerificationState verificationState, String hostPageBaseURL) throws RestServiceException;
 
 	void deleteVerificationSubmission(long verificationId)
 			throws RestServiceException;
