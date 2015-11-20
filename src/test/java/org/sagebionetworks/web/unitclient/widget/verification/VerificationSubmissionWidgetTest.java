@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -69,7 +70,8 @@ public class VerificationSubmissionWidgetTest {
 	VerificationSubmission mockSubmission;
 	@Mock
 	UserProfile mockProfile;
-	
+	@Mock
+	GWTWrapper mockGWT;
 	PromptModalView.Presenter reasonPromptCallback;
 	
 	VerificationSubmissionWidget widget;
@@ -80,6 +82,7 @@ public class VerificationSubmissionWidgetTest {
 	String submissionLocation = "Cloud Arc";
 	String submissionCompany = "Various";
 	String submissionOrcId = "http://orcid.org/983";
+	String hostPageURL = "https://www.synapse.org/";
 	List<String> submissionEmails = Collections.singletonList("doc@spacemail.org");
 	List<AttachmentMetadata> submissionAttachments;
 	List<String> fileHandleIds;
@@ -88,12 +91,12 @@ public class VerificationSubmissionWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockCookieProvider, mockGlobalApplicationState);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockCookieProvider, mockGlobalApplicationState, mockGWT);
 		
 		ArgumentCaptor<PromptModalView.Presenter> captor = ArgumentCaptor.forClass(PromptModalView.Presenter.class);
 		verify(mockPromptModalView).setPresenter(captor.capture());
 		reasonPromptCallback = captor.getValue();
-		
+		when(mockGWT.getHostPageBaseURL()).thenReturn(hostPageURL);
 		when(mockSubmission.getId()).thenReturn(submissionId);
 		when(mockSubmission.getFirstName()).thenReturn(submissionFirstName);
 		when(mockSubmission.getLastName()).thenReturn(submissionLastName);
@@ -112,8 +115,8 @@ public class VerificationSubmissionWidgetTest {
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), null, any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), null, any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
 		fileHandleIds = new ArrayList<String>();
 		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
@@ -345,7 +348,7 @@ public class VerificationSubmissionWidgetTest {
 		configureWithMockSubmission();
 		String reason = "suspending submission for this reason";
 		Exception ex =new Exception("something went wrong");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), null, any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), anyString(), any(AsyncCallback.class));
 		
 		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
 		verify(mockSynapseAlert).handleException(ex);
@@ -367,7 +370,7 @@ public class VerificationSubmissionWidgetTest {
 		//attach evidence
 		fileHandleIds.add("999");
 		widget.submitVerification();
-		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), null, any(AsyncCallback.class));
+		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), eq(hostPageURL), any(AsyncCallback.class));
 		
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockView).hide();
@@ -384,7 +387,7 @@ public class VerificationSubmissionWidgetTest {
 		//no evidence
 		widget.submitVerification();
 		verify(mockSynapseAlert).showError(anyString());
-		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), null, any(AsyncCallback.class));
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
