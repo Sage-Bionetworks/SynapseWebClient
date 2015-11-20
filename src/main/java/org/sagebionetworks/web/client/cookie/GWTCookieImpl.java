@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 
@@ -28,7 +29,7 @@ public class GWTCookieImpl implements CookieProvider {
 
 	@Override
 	public void removeCookie(String key) {
-		Cookies.removeCookie(key);
+		setCookie(key, "", new Date());
 	}
 
 	@Override
