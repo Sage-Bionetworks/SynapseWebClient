@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -46,6 +47,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
+	private GWTWrapper gwt;
 	CallbackP<String> fileHandleClickedCallback;
 	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
@@ -64,7 +66,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			SynapseJSNIUtils jsniUtils,
 			PromptModalView promptModalView,
 			CookieProvider cookies,
-			GlobalApplicationState globalAppState
+			GlobalApplicationState globalAppState,
+			GWTWrapper gwt
 			) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
@@ -76,7 +79,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.promptModal = promptModalView;
 		this.cookies = cookies;
 		this.globalAppState = globalAppState;
-		
+		this.gwt = gwt;
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -286,7 +289,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		VerificationState newState = new VerificationState();
 		newState.setState(state);
 		newState.setReason(reason);
-		userProfileClient.updateVerificationState(verificationId, newState, new AsyncCallback<Void>() {
+		userProfileClient.updateVerificationState(verificationId, newState, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				handleSuccess("Submission state has been updated.");
@@ -333,7 +336,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		sub.setLastName(profile.getLastName());
 		sub.setLocation(profile.getLocation());
 		sub.setOrcid(orcId);
-		userProfileClient.createVerificationSubmission(sub, new AsyncCallback<VerificationSubmission>() {
+		userProfileClient.createVerificationSubmission(sub, gwt.getHostPageBaseURL(), new AsyncCallback<VerificationSubmission>() {
 			@Override
 			public void onSuccess(VerificationSubmission result) {
 				handleSuccess("Successfully submitted profile for validation.");

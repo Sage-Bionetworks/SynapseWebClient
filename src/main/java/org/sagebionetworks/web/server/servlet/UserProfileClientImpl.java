@@ -19,10 +19,11 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 		UserProfileClient {
 	
 	@Override
-	public VerificationSubmission createVerificationSubmission(VerificationSubmission verificationSubmission) throws RestServiceException {
+	public VerificationSubmission createVerificationSubmission(VerificationSubmission verificationSubmission, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createVerificationSubmission(verificationSubmission);
+			String notificationEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			return synapseClient.createVerificationSubmission(verificationSubmission, notificationEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -50,10 +51,11 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 	
 	
 	@Override
-	public void updateVerificationState(long verificationId, VerificationState verificationState) throws RestServiceException {
+	public void updateVerificationState(long verificationId, VerificationState verificationState, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.updateVerificationState(verificationId, verificationState);
+			String notificationEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			synapseClient.updateVerificationState(verificationId, verificationState, notificationEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

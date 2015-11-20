@@ -112,8 +112,8 @@ public class VerificationSubmissionWidgetTest {
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), null, any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), null, any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
 		fileHandleIds = new ArrayList<String>();
 		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
@@ -345,7 +345,7 @@ public class VerificationSubmissionWidgetTest {
 		configureWithMockSubmission();
 		String reason = "suspending submission for this reason";
 		Exception ex =new Exception("something went wrong");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), null, any(AsyncCallback.class));
 		
 		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
 		verify(mockSynapseAlert).handleException(ex);
@@ -367,7 +367,7 @@ public class VerificationSubmissionWidgetTest {
 		//attach evidence
 		fileHandleIds.add("999");
 		widget.submitVerification();
-		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), any(AsyncCallback.class));
+		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), null, any(AsyncCallback.class));
 		
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockView).hide();
@@ -384,7 +384,7 @@ public class VerificationSubmissionWidgetTest {
 		//no evidence
 		widget.submitVerification();
 		verify(mockSynapseAlert).showError(anyString());
-		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), any(AsyncCallback.class));
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), null, any(AsyncCallback.class));
 	}
 	
 	@Test
