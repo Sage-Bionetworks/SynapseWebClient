@@ -1308,12 +1308,20 @@ public class SynapseClientImplTest {
 	public void testRequestMemberOpenRequests() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenRequest(true);
+		Date expiresOn = new Date();
+		String teamId = "a team";
+		String message = "let me join";
 		// verify it does not create a new request since one is already open
-		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
 				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
-				any(MembershipRqstSubmission.class), anyString(), anyString());
+				captor.capture(), anyString(), anyString());
+		MembershipRqstSubmission request = captor.getValue();
+		assertEquals(expiresOn, request.getExpiresOn());
+		assertEquals(teamId, request.getTeamId());
+		assertEquals(message, request.getMessage());
 	}
 
 	@Test
@@ -1328,7 +1336,7 @@ public class SynapseClientImplTest {
 	public void testRequestMembershipCanJoin() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
-		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE, new Date());
 		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
@@ -1343,9 +1351,20 @@ public class SynapseClientImplTest {
 	@Test
 	public void testRequestMembership() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
+				captor.capture(), anyString(), anyString());
+		String teamId = "a team";
+		String message=  "let me join";
+		Date expiresOn = null;
+		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse).createMembershipRequest(
-				any(MembershipRqstSubmission.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		MembershipRqstSubmission request = captor.getValue();
+		assertEquals(expiresOn, request.getExpiresOn());
+		assertEquals(teamId, request.getTeamId());
+		assertEquals(message, request.getMessage());
+		
 	}
 
 	@Test

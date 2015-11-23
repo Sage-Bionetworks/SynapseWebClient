@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -355,7 +356,7 @@ public interface SynapseClient extends RemoteService {
 	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
-	public void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
+	public void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 	
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
