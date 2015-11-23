@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public interface GWTWrapper {
@@ -40,4 +41,6 @@ public interface GWTWrapper {
 	int nextRandomInt();
 
 	String getFormattedDateString(Date date);
+	
+	void addDaysToDate(Date date, int days);
 }

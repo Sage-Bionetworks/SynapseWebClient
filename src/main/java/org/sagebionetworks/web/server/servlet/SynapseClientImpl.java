@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -1853,7 +1854,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Override
 	public void requestMembership(String currentUserId, String teamId,
-			String message, String hostPageBaseURL) throws RestServiceException {
+			String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
@@ -1870,6 +1871,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				membershipRequest.setMessage(message);
 				membershipRequest.setTeamId(teamId);
 				membershipRequest.setUserId(currentUserId);
+				if (expiresOn != null) {
+					membershipRequest.setExpiresOn(expiresOn);	
+				}
 
 				// make new Synapse call
 				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
