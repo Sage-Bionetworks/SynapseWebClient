@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +110,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.configure(teamId, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), "", any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
 		when(mockGwt.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
@@ -212,7 +213,7 @@ public class JoinTeamWidgetTest {
 		verify(mockView).hideJoinWizard();
 		//no accessRequirements, so else should not be executed
 		verify(mockWizardProgress, never()).configure(Mockito.anyInt(), Mockito.anyInt());
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), "", any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), eq((Date)null), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -264,7 +265,7 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testJoinRequestStep3() throws Exception {
 		joinWidget.sendJoinRequestStep3();
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), "", any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), eq((Date)null), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		//verify that team updated callback is invoked
 		verify(mockTeamUpdatedCallback).invoke();
@@ -274,10 +275,10 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep3Failure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), anyString(), "", any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 		joinWidget.sendJoinRequest("");
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), "", any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), eq((Date)null), any(AsyncCallback.class));
 		verify(mockView, times(2)).showErrorMessage(anyString());
 	}
 	
@@ -285,16 +286,26 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testJoinRequestStep3WikiRefresh() throws Exception {
 		//configure using wiki widget renderer version
+		Date now = new Date();
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamId);
 		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.TRUE.toString());
+		Integer requestExpiresInXDays = 5;
+		descriptor.put(WidgetConstants.JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY, requestExpiresInXDays.toString());
 		Callback mockWidgetRefreshRequired = mock(Callback.class);
 		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
 		joinWidget.sendJoinRequestStep3();
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), "", any(AsyncCallback.class));
+		ArgumentCaptor<Date> dateCaptor = ArgumentCaptor.forClass(Date.class);
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), dateCaptor.capture(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		//verify that wiki page refresh is invoked
 		verify(mockWidgetRefreshRequired).invoke();
+		
+		//since the gwtWrapper.addDaysToDate() does nothing, the date will be unchanged.
+		verify(mockGwt).addDaysToDate(any(Date.class), eq(requestExpiresInXDays));
+		Date expireDate = dateCaptor.getValue();
+		assertTrue(expireDate.getTime() > now.getTime());
+		assertTrue(expireDate.getTime() < new Date().getTime());
 	}
 	
 	

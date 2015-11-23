@@ -1308,20 +1308,13 @@ public class SynapseClientImplTest {
 	public void testRequestMemberOpenRequests() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenRequest(true);
-		Date expiresOn = new Date();
-		String teamId = "a team";
-		String message = "let me join";
 		// verify it does not create a new request since one is already open
-		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
+		synapseClient.requestMembership("123", "a team", "let me join", TEST_HOME_PAGE_BASE, null);
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
 				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
 				captor.capture(), anyString(), anyString());
-		MembershipRqstSubmission request = captor.getValue();
-		assertEquals(expiresOn, request.getExpiresOn());
-		assertEquals(teamId, request.getTeamId());
-		assertEquals(message, request.getMessage());
 	}
 
 	@Test
@@ -1364,8 +1357,26 @@ public class SynapseClientImplTest {
 		assertEquals(expiresOn, request.getExpiresOn());
 		assertEquals(teamId, request.getTeamId());
 		assertEquals(message, request.getMessage());
-		
 	}
+	
+	@Test
+	public void testRequestMembershipWithExpiresOn() throws SynapseException,
+			RestServiceException, JSONObjectAdapterException {
+		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
+				captor.capture(), anyString(), anyString());
+		String teamId = "a team";
+		String message=  "let me join";
+		Date expiresOn = new Date();
+		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
+		verify(mockSynapse).createMembershipRequest(
+				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		MembershipRqstSubmission request = captor.getValue();
+		assertEquals(expiresOn, request.getExpiresOn());
+		assertEquals(teamId, request.getTeamId());
+		assertEquals(message, request.getMessage());
+	}
+
 
 	@Test
 	public void testGetOpenRequestCountUnauthorized() throws SynapseException,
