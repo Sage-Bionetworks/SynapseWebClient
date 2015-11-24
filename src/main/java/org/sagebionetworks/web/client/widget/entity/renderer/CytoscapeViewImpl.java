@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph242;
+import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph25;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -60,7 +60,7 @@ public class CytoscapeViewImpl implements CytoscapeView {
 			visualizationContainer.clear();
 			String id = Document.get().createUniqueId();
 			visualizationContainer.getElement().setId(id);
-			new CytoscapeGraph242().show(id,  cyJS, styleJson);
+			new CytoscapeGraph25().show(id,  cyJS, styleJson);
 		}
 	}
 	
