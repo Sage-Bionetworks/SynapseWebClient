@@ -90,7 +90,8 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 	public void getFileContents(String entityId, final CallbackP<String> fileContentCallback) {
 		Long version = null;
 		synAlert.clear();
-		requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), entityId, version, false, true));
+		String url = DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), entityId, version, false, true);
+		requestBuilder.configure(RequestBuilder.GET, url);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {
