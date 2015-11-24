@@ -28,6 +28,10 @@ public class WidgetConstants {
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
+	
+	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs";
+	public static final String CYTOSCAPE_FRIENDLY_NAME ="Cytoscape JS";
+
 
 	public static final String SYNAPSE_TABLE_CONTENT_TYPE = "synapsetable";
 	public static final String SYNAPSE_TABLE_FRIENDLY_NAME = "Synapse Table";
@@ -95,6 +99,9 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
+	
+	public static final String SYNAPSE_ID_KEY = "synapseId";
+	public static final String STYLE_SYNAPSE_ID_KEY = "styleSynapseId";
 	
 	public static final String VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY = "mp4SynapseId";
 	public static final String VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY = "oggSynapseId";
