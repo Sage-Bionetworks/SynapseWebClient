@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -264,6 +265,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button submitProfileValidationButton;
 	@UiField
 	Button verificationApprovedButton;
+	@UiField
+	Button bridgeDataAccessButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -343,7 +346,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Search(""));
 			}
 		});
-		
+		bridgeDataAccessButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("#!Help:BridgeDataAccess", "_blank", "");
+			}
+		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
