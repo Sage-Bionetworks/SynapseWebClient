@@ -36,7 +36,7 @@
 		<b:Row addStyleNames="margin-10">
 			<b:Column size="XS_6">
 					<b:FormGroup>
-						<b:FormLabel>Display Height (px)</b:FormLabel>
+						<b:FormLabel>Display height (px)</b:FormLabel>
 						<b:TextBox placeholder="500 (Default)" ui:field="displayHeightField" />
 					</b:FormGroup>
 			</b:Column>
