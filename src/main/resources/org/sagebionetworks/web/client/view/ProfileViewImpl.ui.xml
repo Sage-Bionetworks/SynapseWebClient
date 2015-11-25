@@ -60,6 +60,7 @@
 											</bh:Paragraph>
 										</bh:Div>
 									</g:FocusPanel>
+									<b:Button ui:field="whyGetValidatedButton" type="DEFAULT" icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="More info..."/>
 								</b:Alert>
 								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
 									<bh:Div>
