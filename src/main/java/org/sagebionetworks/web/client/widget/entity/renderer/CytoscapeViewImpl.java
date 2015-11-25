@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph25;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,9 +48,10 @@ public class CytoscapeViewImpl implements CytoscapeView {
 	}
 	
 	@Override
-	public void configure(String cyJs, String styleJson) {
+	public void configure(String cyJs, String styleJson, String height) {
 		this.cyJS = cyJs;
 		this.styleJson = styleJson;
+		visualizationContainer.setHeight(height + "px");
 		isConfigured = true;
 		showIfAttachedAndConfigured();
 	}

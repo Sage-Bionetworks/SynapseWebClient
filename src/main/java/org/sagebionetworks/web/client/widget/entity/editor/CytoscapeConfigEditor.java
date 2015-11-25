@@ -19,7 +19,7 @@ public class CytoscapeConfigEditor implements CytoscapeConfigView.Presenter, Wid
 		this.view = view;
 		view.setPresenter(this);
 		view.initView();
-	}		
+	}
 
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
@@ -29,6 +29,9 @@ public class CytoscapeConfigEditor implements CytoscapeConfigView.Presenter, Wid
 		
 		if (descriptor.get(WidgetConstants.STYLE_SYNAPSE_ID_KEY) != null){
 			view.setStyleEntity(descriptor.get(WidgetConstants.STYLE_SYNAPSE_ID_KEY));
+		}
+		if (descriptor.get(WidgetConstants.HEIGHT_KEY) != null){
+			view.setHeight(descriptor.get(WidgetConstants.HEIGHT_KEY));
 		}
 	}
 	
@@ -49,6 +52,8 @@ public class CytoscapeConfigEditor implements CytoscapeConfigView.Presenter, Wid
 			descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, view.getEntity());
 		if (!"".equals(view.getStyleEntity()))
 			descriptor.put(WidgetConstants.STYLE_SYNAPSE_ID_KEY, view.getStyleEntity());
+		if (!"".equals(view.getHeight()))
+			descriptor.put(WidgetConstants.HEIGHT_KEY, view.getHeight());
 	}
 	
 	@Override

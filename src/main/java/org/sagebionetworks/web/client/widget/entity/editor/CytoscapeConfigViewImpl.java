@@ -26,6 +26,8 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 	Button button;
 	@UiField
 	Button styleButton;
+	@UiField
+	TextBox displayHeightField;
 	
 	EntityFinder entityFinder;
 	
@@ -118,6 +120,15 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 	public void clear() {
 		entity.setValue("");
 		styleEntity.setValue("");
+		displayHeightField.setValue("");
 	}
 	
+	@Override
+	public String getHeight() {
+		return displayHeightField.getValue();
+	}
+	@Override
+	public void setHeight(String height) {
+		displayHeightField.setValue(height);
+	}
 }

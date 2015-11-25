@@ -107,7 +107,6 @@ public class WidgetConstants {
 	public static final String VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY = "oggSynapseId";
 	public static final String VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY = "webmSynapseId";
 	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
-	public static final String VIDEO_WIDGET_HEIGHT_KEY = "height";
 	
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
 	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
@@ -168,7 +167,7 @@ public class WidgetConstants {
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
 	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
-	public static final String SHINYSITE_HEIGHT_KEY = "height";
+	public static final String HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	public static final String LINK_URL_KEY = "url";

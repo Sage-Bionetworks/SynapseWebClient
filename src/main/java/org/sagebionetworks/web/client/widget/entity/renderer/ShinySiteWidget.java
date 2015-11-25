@@ -66,9 +66,9 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 
 	public static int getHeightFromDescriptor(Map<String, String> descriptor) {
 		int height = WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX; // default
-		if(descriptor.containsKey(WidgetConstants.SHINYSITE_HEIGHT_KEY)) {
+		if(descriptor.containsKey(WidgetConstants.HEIGHT_KEY)) {
 			try {
-				height = Integer.parseInt(descriptor.get(WidgetConstants.SHINYSITE_HEIGHT_KEY));
+				height = Integer.parseInt(descriptor.get(WidgetConstants.HEIGHT_KEY));
 			} catch (NumberFormatException e) {
 				// fall back to default
 			}

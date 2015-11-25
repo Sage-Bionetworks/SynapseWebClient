@@ -72,21 +72,23 @@ public class CytoscapeWidgetTest {
 		descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
 		widget.configure(wikiKey, descriptor, null, null);
 		
-		verify(mockView).configure(CYTOSCAPE_JS_JSON_TEST, null);
+		verify(mockView).configure(CYTOSCAPE_JS_JSON_TEST, null, CytoscapeWidget.DEFAULT_HEIGHT);
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), contains(CYTOSCAPE_JS_ENTITY_ID));
 		verify(mockView).setGraphVisible(true);
 	}
 	
 	@Test
 	public void testConfigureWithStyle() {
+		String height = "1234";
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SYNAPSE_ID_KEY, CYTOSCAPE_JS_ENTITY_ID);
 		descriptor.put(WidgetConstants.STYLE_SYNAPSE_ID_KEY, CYTOSCAPE_JS_STYLE_ENTITY_ID);
+		descriptor.put(WidgetConstants.HEIGHT_KEY, height);
 		
 		widget.configure(wikiKey, descriptor, null, null);
 		
 		verify(mockRequestBuilder, times(2)).configure(eq(RequestBuilder.GET), anyString());
-		verify(mockView).configure(CYTOSCAPE_JS_JSON_TEST, CYTOSCAPE_JS_JSON_TEST);
+		verify(mockView).configure(CYTOSCAPE_JS_JSON_TEST, CYTOSCAPE_JS_JSON_TEST, height);
 		verify(mockView).setGraphVisible(true);
 	}
 	

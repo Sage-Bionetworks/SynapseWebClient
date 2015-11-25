@@ -72,7 +72,7 @@ public class ShinySiteWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		assertEquals(WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX,ShinySiteWidget.getHeightFromDescriptor(descriptor));
 				
-		descriptor.put(WidgetConstants.SHINYSITE_HEIGHT_KEY, "500");
+		descriptor.put(WidgetConstants.HEIGHT_KEY, "500");
 		assertEquals(500, ShinySiteWidget.getHeightFromDescriptor(descriptor));
 	}
 	

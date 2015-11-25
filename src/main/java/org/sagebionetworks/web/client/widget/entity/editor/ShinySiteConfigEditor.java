@@ -46,7 +46,7 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		view.checkParams();
 		try{			
 			descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, view.getSiteUrl());
-			if(view.getSiteHeight() != null) descriptor.put(WidgetConstants.SHINYSITE_HEIGHT_KEY, String.valueOf(view.getSiteHeight()));			
+			if(view.getSiteHeight() != null) descriptor.put(WidgetConstants.HEIGHT_KEY, String.valueOf(view.getSiteHeight()));			
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(e.getMessage());
 		}

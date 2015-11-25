@@ -12,7 +12,7 @@ public interface CytoscapeView extends IsWidget {
 	 * @param cyJs
 	 * @param styleJson
 	 */
-	void configure(String cyJs, String styleJson);
+	void configure(String cyJs, String styleJson, String height);
 	void setPresenter(Presenter presenter);
 	void setSynAlert(Widget w);
 	void setLoading(boolean loading);

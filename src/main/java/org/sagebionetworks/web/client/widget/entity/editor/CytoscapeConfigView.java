@@ -16,6 +16,8 @@ public interface CytoscapeConfigView extends IsWidget, WidgetEditorView {
 	String getEntity();
 	void setStyleEntity(String entityId);
 	String getStyleEntity();
+	void setHeight(String height);
+	String getHeight();
 	
 	/**
 	 * Presenter interface

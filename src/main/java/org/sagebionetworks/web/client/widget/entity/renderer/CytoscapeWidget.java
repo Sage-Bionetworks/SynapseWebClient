@@ -28,8 +28,9 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
 	SynapseJSNIUtils synapseJsniUtils;
-	String entityId, styleEntityId;
+	String entityId, styleEntityId, height;
 	String mainFileContents, styleFileContents;
+	public static final String DEFAULT_HEIGHT = "500";
 	
 	@Inject
 	public CytoscapeWidget(CytoscapeView view, 
@@ -52,6 +53,10 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 		this.descriptor = widgetDescriptor;
 		entityId = descriptor.get(WidgetConstants.SYNAPSE_ID_KEY);
 		styleEntityId = descriptor.get(WidgetConstants.STYLE_SYNAPSE_ID_KEY);
+		height = DEFAULT_HEIGHT;
+		if (descriptor.containsKey(WidgetConstants.HEIGHT_KEY)) {
+			height = descriptor.get(WidgetConstants.HEIGHT_KEY);
+		}
 		mainFileContents = null;
 		styleFileContents = null;
 		getMainFileContents();
@@ -84,7 +89,7 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 	
 	public void showGraph() {
 		view.setGraphVisible(true);
-		view.configure(mainFileContents, styleFileContents);
+		view.configure(mainFileContents, styleFileContents, height);
 	}
 	
 	public void getFileContents(String entityId, final CallbackP<String> fileContentCallback) {
