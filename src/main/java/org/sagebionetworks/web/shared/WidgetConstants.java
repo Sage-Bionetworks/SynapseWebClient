@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 
 public class WidgetConstants {
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
@@ -29,7 +28,7 @@ public class WidgetConstants {
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
 	
-	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs";
+	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs25";
 	public static final String CYTOSCAPE_FRIENDLY_NAME ="Cytoscape JS";
 
 
