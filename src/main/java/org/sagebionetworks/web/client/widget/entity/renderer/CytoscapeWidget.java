@@ -92,7 +92,7 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 		view.configure(mainFileContents, styleFileContents, height);
 	}
 	
-	public void getFileContents(String entityId, final CallbackP<String> fileContentCallback) {
+	public void getFileContents(final String entityId, final CallbackP<String> fileContentCallback) {
 		Long version = null;
 		synAlert.clear();
 		String url = DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), entityId, version, false, true);
@@ -104,10 +104,14 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 				}
 				public void onResponseReceived(final Request request, final Response response) {
 					//add the response text
-				int statusCode = response.getStatusCode();
+					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						String responseText = response.getText();
-						fileContentCallback.invoke(responseText);
+						if (responseText != null && responseText.length() > 0) {
+							fileContentCallback.invoke(responseText);
+						} else {
+							onError(null, new IllegalArgumentException("Unable to retrieve Cytoscape JS data file entity " + entityId));
+						}
 					}
 				}
 			});
