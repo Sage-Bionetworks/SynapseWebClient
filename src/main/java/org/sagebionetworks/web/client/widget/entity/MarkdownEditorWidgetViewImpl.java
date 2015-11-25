@@ -59,6 +59,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem genomeBrowserLink;
 	@UiField
+	public AnchorListItem cytoscapeJsLink;
+	@UiField
 	public AnchorListItem buttonLink;
 	@UiField
 	public AnchorListItem entityListLink;
@@ -234,6 +236,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
+		cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
 		heading3Link.addStyleName("font-size-24");

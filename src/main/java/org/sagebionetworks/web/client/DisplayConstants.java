@@ -565,6 +565,8 @@ public class DisplayConstants {
 	public static final String FIND_ENTITIES = "Find Entities";
 	public static final String FIND_ENTITY = "Find Entity";
 	
+	public static final String ERROR_SELECT_CYTOSCAPE_FILE = "Please select a Synapse file representing the Cytoscape JS (JSON).";
+	
 	public static final String API_TABLE_COLUMN_COUNT_MISMATCH = "SuperTable: The number of columns must be the same as the number of renderers and column header titles.";
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
 	

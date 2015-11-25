@@ -44,6 +44,7 @@
 						    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="challengeParticipantsLink">Challenge Participants List</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="challengeTeamsLink">Challenge Teams List</b:AnchorListItem>
+						    <b:AnchorListItem ui:field="cytoscapeJsLink">Cytoscape JS Graph</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="genomeBrowserLink">Genome Browser</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="registerChallengeTeamLink">Register Challenge Team Button</b:AnchorListItem>

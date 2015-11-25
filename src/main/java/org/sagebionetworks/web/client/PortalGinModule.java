@@ -244,6 +244,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
@@ -294,6 +296,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipan
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeView;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
@@ -1169,5 +1173,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
 		bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
 		bind(ACTView.class).to(ACTViewImpl.class);
+		bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
+		bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
 	}
 }

@@ -62,6 +62,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -91,6 +92,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
@@ -250,6 +252,7 @@ public interface PortalGinInjector extends Ginjector {
 	public PreviewConfigEditor getPreviewConfigEditor();
 	public BiodallianceEditor getBiodallianceEditor();
 	public BiodallianceSourceEditor getBiodallianceSourceEditor();
+	public CytoscapeConfigEditor getCytoscapeConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -277,6 +280,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeTeamsWidget getChallengeTeamsWidget();
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	public BiodallianceWidget getBiodallianceRenderer();
+	public CytoscapeWidget getCytoscapeRenderer();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
