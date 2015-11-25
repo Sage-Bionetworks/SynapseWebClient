@@ -7,27 +7,29 @@
 	<bh:Div>
 		<b:Row addStyleNames="margin-10">
 			<b:Column size="XS_6">
-				<b:Tooltip title="Cytoscape JS file (JSON)">
+				<b:FormGroup>
+					<b:FormLabel>Cytoscape JS network file</b:FormLabel>
 					<b:InputGroup>
 						<b:TextBox ui:field="entity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>
-							<b:Button text="Find Cytoscape JS file" ui:field="button" icon="SEARCH" width="225px"/>
+							<b:Button text="Find cyjs file" ui:field="button" icon="SEARCH" width="125px"/>
 						</b:InputGroupButton>
 					</b:InputGroup>
-				</b:Tooltip>
+				</b:FormGroup>
 			</b:Column>
 			<b:Column size="XS_6" />
 		</b:Row>
 		<b:Row addStyleNames="margin-10">
 			<b:Column size="XS_6">
-				<b:Tooltip title="Cytoscape JS style file (JSON)">
+				<b:FormGroup>
+					<b:FormLabel>Cytoscape JS style file</b:FormLabel>
 					<b:InputGroup>
 						<b:TextBox ui:field="styleEntity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>
-							<b:Button text="Find Cytoscape JS style file" ui:field="styleButton" icon="SEARCH" width="225px"/>
+							<b:Button text="Find json file" ui:field="styleButton" icon="SEARCH" width="125px"/>
 						</b:InputGroupButton>
 					</b:InputGroup>
-				</b:Tooltip>
+				</b:FormGroup>
 			</b:Column>
 			<b:Column size="XS_6" />
 		</b:Row>
