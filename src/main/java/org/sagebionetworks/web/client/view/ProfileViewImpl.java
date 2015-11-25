@@ -266,7 +266,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button verificationApprovedButton;
 	@UiField
-	Button bridgeDataAccessButton;
+	Button whyGetValidatedButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -346,10 +346,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Search(""));
 			}
 		});
-		bridgeDataAccessButton.addClickHandler(new ClickHandler() {
+		whyGetValidatedButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("#!Help:BridgeDataAccess", "_blank", "");
+				DisplayUtils.newWindow("#!Help:WhyGetValidated", "_blank", "");
 			}
 		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
