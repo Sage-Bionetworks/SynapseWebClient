@@ -79,6 +79,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 	FocusPanel collaborateBox;
 	
 	@UiField
+	FocusPanel collaboratoriumBox;
+	@UiField
+	FocusPanel gettingStartedBox;
+	
+	@UiField
 	Heading organizeDigitalResearchAssetsHeading;
 	@UiField
 	Heading getCreditHeading;
@@ -191,6 +196,20 @@ public class HomeViewImpl extends Composite implements HomeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new Help("Governance"));
+			}
+		});
+		
+		collaboratoriumBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Help("Collaboratorium"));
+			}
+		});
+		
+		gettingStartedBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Help("GettingStarted"));
 			}
 		});
 		
