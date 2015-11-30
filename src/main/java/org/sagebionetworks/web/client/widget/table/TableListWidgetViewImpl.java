@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.LinkedGroup;
+import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -31,7 +32,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 
 	@UiField
-	LinkedGroup tablesList;
+	ListGroup tablesList;
 	@UiField
 	Button addTable;
 	@UiField
@@ -55,7 +56,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
 		for(final EntityQueryResult header: tables){
-			tablesList.add(new EntityLinkedGroupItem(HeadingSize.H3, header, new ClickHandler() {
+			tablesList.add(new EntityListGroupItem(HeadingSize.H3, header, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.onTableClicked(header.getId());
