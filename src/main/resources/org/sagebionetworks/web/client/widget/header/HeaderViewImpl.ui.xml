@@ -22,7 +22,7 @@
 				<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px">Help</b:Button>
 					<b:DropDownMenu addStyleNames="dropdown-menu-right">
-						<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Getting started</b:AnchorListItem>
+						<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Synapse tutorial</b:AnchorListItem>
 						<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
 						<b:AnchorListItem ui:field="rLink">R client</b:AnchorListItem>
 						<b:AnchorListItem ui:field="pythonLink">Python client</b:AnchorListItem>
