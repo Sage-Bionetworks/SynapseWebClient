@@ -53,10 +53,17 @@
 									<g:FocusPanel ui:field="verifyFocusPanel" addStyleNames="imageButton">
 										<bh:Div>
 										    <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
-											<bh:Paragraph text="Certified users with validated profiles can access Bridge, Controlled Use data derived from ResearchKit apps."/>
 											<bh:Paragraph>
-												<bh:Text>Fill out your user profile and link to your ORCID, then </bh:Text>
-												<bh:Strong>validate your profile today!</bh:Strong>
+												<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
+												<bh:Strong>Validate your profile today!</bh:Strong>
+											</bh:Paragraph>
+											<bh:Paragraph>
+												<bh:OrderedList>
+													<b:ListItem text="Review/Complete your profile."/>
+													<b:ListItem text="Create an ORCID or link to your existing one."/>
+													<b:ListItem text="Upload one form of Identity verification."/>
+													<b:ListItem text="Request Profile validation."/>
+												</bh:OrderedList>
 											</bh:Paragraph>
 										</bh:Div>
 									</g:FocusPanel>
