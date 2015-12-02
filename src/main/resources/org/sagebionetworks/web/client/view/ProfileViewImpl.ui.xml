@@ -53,13 +53,21 @@
 									<g:FocusPanel ui:field="verifyFocusPanel" addStyleNames="imageButton">
 										<bh:Div>
 										    <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
-											<bh:Paragraph text="Certified users with validated profiles can access Bridge, Controlled Use data derived from ResearchKit apps."/>
 											<bh:Paragraph>
-												<bh:Text>Fill out your user profile and link to your ORCID, then </bh:Text>
-												<bh:Strong>validate your profile today!</bh:Strong>
+												<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
+												<bh:Strong>Validate your profile today!</bh:Strong>
+											</bh:Paragraph>
+											<bh:Paragraph>
+												<bh:OrderedList>
+													<b:ListItem text="Review/Complete your profile."/>
+													<b:ListItem text="Create an ORCID or link to your existing one."/>
+													<b:ListItem text="Upload one form of Identity verification."/>
+													<b:ListItem text="Request Profile validation."/>
+												</bh:OrderedList>
 											</bh:Paragraph>
 										</bh:Div>
 									</g:FocusPanel>
+									<b:Button ui:field="whyGetValidatedButton" type="DEFAULT" icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="More info..."/>
 								</b:Alert>
 								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
 									<bh:Div>
@@ -89,7 +97,7 @@
 					        	<bh:Div>
 					        		<b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
 					        		<bh:Span  ui:field="unbindButtonUI">
-						        		<b:Tooltip title="Unbind ORC ID from your Synapse profile.">
+						        		<b:Tooltip title="Unlink this ORC ID from your Synapse profile.">
 						        			<b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
 						        		</b:Tooltip>
 					        		</bh:Span>

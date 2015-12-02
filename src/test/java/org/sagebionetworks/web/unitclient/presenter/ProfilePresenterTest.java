@@ -409,6 +409,9 @@ public class ProfilePresenterTest {
 		verify(mockView).setUnbindOrcIdVisible(false);
 		verify(mockView, never()).setOrcIdVisible(true);
 		verify(mockView, never()).setUnbindOrcIdVisible(true);
+		verify(mockView).setOrcIDLinkButtonVisible(true); 
+		verify(mockView, never()).setOrcIDLinkButtonVisible(false); 
+
 	}
 	
 	@Test
@@ -428,6 +431,9 @@ public class ProfilePresenterTest {
 		verify(mockView).setUnbindOrcIdVisible(false);
 		verify(mockView).setOrcIdVisible(true);
 		verify(mockView).setUnbindOrcIdVisible(true);
+		//link ORC ID button initially visible because this is the owner, but hidden because orc id is set
+		verify(mockView).setOrcIDLinkButtonVisible(true); 
+		verify(mockView).setOrcIDLinkButtonVisible(false); 
 	}
 	
 	
