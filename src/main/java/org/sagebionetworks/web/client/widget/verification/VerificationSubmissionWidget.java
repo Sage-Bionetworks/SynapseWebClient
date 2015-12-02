@@ -240,16 +240,10 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
 			return false;
 		}
-		if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName())) {
-			view.showErrorMessage("Please fill in your first and last name before requesting profile validation.");
-			return false;
-		}
-		if (!DisplayUtils.isDefined(profile.getCompany())) {
-			view.showErrorMessage("Please fill in your affiliation before requesting profile validation.");
-			return false;
-		}
-		if (!DisplayUtils.isDefined(profile.getLocation())) {
-			view.showErrorMessage("Please fill in your city and country before requesting profile validation.");
+		if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName()) ||
+			!DisplayUtils.isDefined(profile.getCompany()) ||
+			!DisplayUtils.isDefined(profile.getLocation())) {
+			view.showErrorMessage("Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.");
 			return false;
 		}
 		return true;
