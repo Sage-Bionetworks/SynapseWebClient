@@ -457,6 +457,56 @@ public class EntityActionControllerImplTest {
 		verify(mockProvenanceEditorWidget).show();
 	}
 	
+	@Test
+	public void testOnDeleteWikiConfirmCancel(){
+		/*
+		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
+		 *  in this case we do not want to confirm.
+		 */
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// the call under tests
+		controller.onAction(Action.DELETE_WIKI_PAGE);
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		// should not make it to the delete wiki page call
+		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testOnDeleteWikiPageConfirmedDeleteFailed(){
+		// confirm the delete
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		String error = "some error";
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		/*
+		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
+		 */
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// the call under test
+		controller.onAction(Action.DELETE_WIKI_PAGE);
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(error);
+	}
+	
+	@Test
+	public void testOnDeleteWikiPageConfirmedDeleteSuccess(){
+		// confirm the delete
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		/*
+		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
+		 */
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// the call under test
+		controller.onAction(Action.DELETE_WIKI_PAGE);
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockView).showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+		verify(mockPlaceChanger).goTo(new Synapse(entityId) );
+	}
 	
 	@Test
 	public void testOnDeleteConfirmCancel(){
