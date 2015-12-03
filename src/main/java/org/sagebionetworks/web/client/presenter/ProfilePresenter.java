@@ -269,13 +269,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				} else {
 					initializeShowHideCertification(isOwner);
 				}
-				//TODO: profile verification should not be in alpha mode only
-				if (DisplayUtils.isInTestWebsite(cookies)) {
-					initializeVerificationUI();
-				}
-				
+				initializeVerificationUI();
 				view.setProfile(bundle.getUserProfile(), isOwner);
-				
 				String orcId = bundle.getORCID();
 				if (orcId != null && orcId.length() > 0) {
 					view.setOrcId(orcId);
