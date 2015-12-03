@@ -335,7 +335,6 @@ public class EntityActionControllerImplTest {
 	public void testConfigureDeleteWikiFolder(){
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
-		permissions.setCanDelete(false);
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_WIKI_PAGE, false);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
