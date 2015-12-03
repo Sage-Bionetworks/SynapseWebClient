@@ -304,7 +304,7 @@ public class JoinTeamWidgetTest {
 		//since the gwtWrapper.addDaysToDate() does nothing, the date will be unchanged.
 		verify(mockGwt).addDaysToDate(any(Date.class), eq(requestExpiresInXDays));
 		Date expireDate = dateCaptor.getValue();
-		assertTrue(expireDate.getTime() > now.getTime());
+		assertTrue(expireDate.getTime() >= now.getTime());
 		assertTrue(expireDate.getTime() < new Date().getTime());
 	}
 	

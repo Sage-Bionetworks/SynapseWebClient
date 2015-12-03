@@ -400,7 +400,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
 			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
-			actionMenu.setActionText(Action.DELETE_WIKI_PAGE, DELETE_PREFIX+enityTypeDisplay+WIKI);
 			actionMenu.setActionListener(Action.DELETE_WIKI_PAGE, this);
 		} else {
 			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, false);

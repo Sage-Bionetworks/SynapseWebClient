@@ -318,7 +318,6 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.DELETE_WIKI_PAGE, controller);
-		verify(mockActionMenu).setActionText(Action.DELETE_WIKI_PAGE, DELETE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+WIKI);
 	}
 	
 	@Test

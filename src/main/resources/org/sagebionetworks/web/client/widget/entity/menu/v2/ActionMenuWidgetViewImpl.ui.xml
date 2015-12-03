@@ -36,7 +36,7 @@
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_NEW_FILE">Upload a New Version of the File</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>
-						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_WIKI_PAGE">Delete Wiki</a:ActionMenuItem>
+						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_WIKI_PAGE">Delete Wiki Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_WIKI_SUBPAGE">Add Wiki Subpage</a:ActionMenuItem>
 						<a:ActionMenuItem icon="CODE_FORK" iconFixedWidth="true" action="EDIT_PROVENANCE">Edit Provenance</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>
