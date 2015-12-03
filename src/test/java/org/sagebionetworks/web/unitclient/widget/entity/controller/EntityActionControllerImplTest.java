@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_SUFFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
@@ -285,7 +285,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
-		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+EDIT_WIKI_SUFFIX);
+		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+WIKI);
 	}
 	
 	@Test
@@ -296,7 +296,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
-		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder)+EDIT_WIKI_SUFFIX);
+		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder)+WIKI);
 	}
 	
 	@Test

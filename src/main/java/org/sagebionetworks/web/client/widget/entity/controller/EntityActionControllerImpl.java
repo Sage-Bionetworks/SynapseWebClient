@@ -54,7 +54,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String MOVE_PREFIX = "Move ";
 
 	public static final String EDIT_WIKI_PREFIX = "Edit ";
-	public static final String EDIT_WIKI_SUFFIX = " Wiki";
+	public static final String WIKI = " Wiki";
 	
 	public static final String THE = "The ";
 
@@ -163,6 +163,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureEditWiki();
 			configureViewWikiSource();
 			configureAddWikiSubpage();
+			configureDeleteWikiAction();
 			configureMove();
 			configureLink();
 			configureSubmit();
@@ -253,7 +254,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
-			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+enityTypeDisplay+EDIT_WIKI_SUFFIX);
+			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+enityTypeDisplay+WIKI);
 		}else{
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
@@ -395,6 +396,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+enityTypeDisplay);
 		actionMenu.setActionListener(Action.DELETE_ENTITY, this);
 	}
+	private void configureDeleteWikiAction(){
+		if(entityBundle.getEntity() instanceof Project){
+			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
+			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
+			actionMenu.setActionText(Action.DELETE_WIKI_PAGE, DELETE_PREFIX+enityTypeDisplay+WIKI);
+			actionMenu.setActionListener(Action.DELETE_WIKI_PAGE, this);
+		} else {
+			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, false);
+			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, false);
+		}
+	}
+	
 	
 	private void configureShareAction(){
 		actionMenu.setActionEnabled(Action.SHARE, true);
@@ -497,6 +510,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case VIEW_WIKI_SOURCE:
 			onViewWikiSource();
+			break;
+		case DELETE_WIKI_PAGE:
+			onDeleteWiki();
 			break;
 		case ADD_WIKI_SUBPAGE:
 			onAddWikiSubpage();
@@ -835,6 +851,36 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}
 		});
 	}
+	
+	public void onDeleteWiki() {
+		// Confirm the delete with the user.
+		view.showConfirmDialog(CONFIRM_DELETE_TITLE,ARE_YOU_SURE_YOU_WANT_TO_DELETE+" this wiki page and all subpages?", new Callback() {
+			@Override
+			public void invoke() {
+				postConfirmedDeleteWiki();
+			}
+		});
+	}
+
+	/**
+	 * Called after the user has confirmed the delete of the entity.
+	 */
+	public void postConfirmedDeleteWiki() {
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		synapseClient.deleteV2WikiPage(key, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId()));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+
 	
 	@Override
 	public void onDeleteEntity() {
