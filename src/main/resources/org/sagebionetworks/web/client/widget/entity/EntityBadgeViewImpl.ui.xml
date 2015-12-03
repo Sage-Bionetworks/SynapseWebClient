@@ -14,15 +14,33 @@
 				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden">
-				<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
-		    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
-				</b:Tooltip>
+				<bh:Div>
+					<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
+					<b:Tooltip title="Public">
+						<b:Icon ui:field="publicIcon" fixedWidth="true" type="GLOBE" visible="false"/>
+					</b:Tooltip>
+					<b:Tooltip title="Private">
+						<b:Icon ui:field="privateIcon" fixedWidth="true" type="LOCK" visible="false"/>
+					</b:Tooltip>
+					<b:Tooltip title="Has a wiki">
+						<b:Icon ui:field="wikiIcon" fixedWidth="true" type="NEWSPAPER_O" visible="false"/>
+					</b:Tooltip>
+					<b:Tooltip title="Sharing Settings have been set on this entity">
+						<b:Icon ui:field="sharingSetIcon" fixedWidth="true" type="CHECK" visible="false"/>
+					</b:Tooltip>
+				</bh:Div>
 			</t:TableData>
-			<t:TableData width="275px" addStyleNames="visible-lg">
+			<t:TableData width="275px" addStyleNames="visible-lg overflow-x-hidden">
 				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg">
+			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="modifiedOnField"/>
+			</t:TableData>
+			<t:TableData width="140px" addStyleNames="visible-lg overflow-x-auto">
+				<g:HTML width="140px" ui:field="annotationsField"/>
+			</t:TableData>
+			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden">
+				<g:Label ui:field="sizeField"/>
 			</t:TableData>
 			<t:TableData width="100px" >
 				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />

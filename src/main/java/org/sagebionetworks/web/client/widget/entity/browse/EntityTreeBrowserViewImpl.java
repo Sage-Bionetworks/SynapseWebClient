@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -79,6 +78,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		hideEmptyUI();
 	}
 
+	@Override
+	protected void onDetach() {
+		super.onDetach();
+		presenter.viewDetached();
+	}
 	@Override
 	public void hideEmptyUI() {
 		emptyUI.setVisible(false);
@@ -281,5 +285,4 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public void showLoading() {
 		setLoadingVisible(true);
 	}
-
 }
