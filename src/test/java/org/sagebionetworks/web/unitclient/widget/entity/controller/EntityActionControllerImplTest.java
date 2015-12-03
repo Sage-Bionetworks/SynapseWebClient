@@ -311,6 +311,38 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testConfigureDeleteWiki(){
+		entityBundle.setEntity(new Project());
+		entityBundle.setRootWikiId("7890");
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.DELETE_WIKI_PAGE, true);
+		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, true);
+		verify(mockActionMenu).setActionListener(Action.DELETE_WIKI_PAGE, controller);
+		verify(mockActionMenu).setActionText(Action.DELETE_WIKI_PAGE, DELETE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+WIKI);
+	}
+	
+	@Test
+	public void testConfigureDeleteWikiCannotDelete(){
+		entityBundle.setEntity(new Project());
+		entityBundle.setRootWikiId("7890");
+		permissions.setCanDelete(false);
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.DELETE_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionListener(Action.DELETE_WIKI_PAGE, controller);
+	}
+	
+	@Test
+	public void testConfigureDeleteWikiFolder(){
+		entityBundle.setEntity(new Folder());
+		entityBundle.setRootWikiId("7890");
+		permissions.setCanDelete(false);
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.DELETE_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
+	}
+	
+	@Test
 	public void testConfigureWikiNoWikiTable(){
 		entityBundle.setEntity(new TableEntity());
 		entityBundle.setRootWikiId(null);
