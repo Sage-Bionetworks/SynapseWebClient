@@ -1402,6 +1402,8 @@ public class ProfilePresenterTest {
 		state.setState(s);
 		state.setReason(reason);
 		verificationStateList.add(state);
+		//TODO: remove alpha mode website mock below after Validation has been exposed
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
 	
 	private void viewProfile(String targetUserId, String currentUserId) {
