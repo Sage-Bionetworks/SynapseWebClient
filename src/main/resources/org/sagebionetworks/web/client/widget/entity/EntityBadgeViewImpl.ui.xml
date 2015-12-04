@@ -25,7 +25,7 @@
 					<b:Tooltip title="Has a wiki">
 						<b:Icon ui:field="wikiIcon" fixedWidth="true" type="NEWSPAPER_O" visible="false" pull="RIGHT"/>
 					</b:Tooltip>
-					<b:Tooltip title="Sharing Settings have been set on this entity">
+					<b:Tooltip title="Sharing Settings have been set">
 						<b:Icon ui:field="sharingSetIcon" fixedWidth="true" type="CHECK" visible="false" pull="RIGHT"/>
 					</b:Tooltip>
 					<b:Tooltip ui:field="annotationsField">

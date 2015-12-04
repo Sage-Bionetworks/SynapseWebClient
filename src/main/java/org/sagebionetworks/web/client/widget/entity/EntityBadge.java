@@ -40,6 +40,7 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPresenter {
 	
+	public static final int DELAY_UNTIL_IN_VIEW = 2000;
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityQueryResult entityHeader;
@@ -83,7 +84,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			getEntityBundle();
 		} else {
 			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, 2000);
+			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DELAY_UNTIL_IN_VIEW);
 		}
 	}
 	
