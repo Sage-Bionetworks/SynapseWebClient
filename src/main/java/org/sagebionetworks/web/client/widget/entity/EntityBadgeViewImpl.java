@@ -67,6 +67,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Icon wikiIcon;
 	@UiField
 	Icon annotationsIcon;
+	@UiField
+	Tooltip errorField;
+	@UiField
+	Icon errorIcon;
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -202,6 +206,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void showAnnotationsIcon() {
 		annotationsIcon.setVisible(true);
+	}
+	
+	@Override
+	public void setError(String error) {
+		errorField.setTitle(error);
+		errorField.reconfigure();
+	}
+	@Override
+	public void showErrorIcon() {
+		errorIcon.setVisible(true);
 	}
 	
 	@Override

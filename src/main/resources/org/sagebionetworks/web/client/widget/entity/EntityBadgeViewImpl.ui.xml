@@ -31,6 +31,9 @@
 					<b:Tooltip ui:field="annotationsField">
 					  <b:Icon ui:field="annotationsIcon" fixedWidth="true" type="TAGS" visible="false" pull="RIGHT"/>
 					</b:Tooltip>
+					<b:Tooltip ui:field="errorField">
+					  <b:Icon ui:field="errorIcon" fixedWidth="true" type="EXCLAMATION_CIRCLE" visible="false" pull="RIGHT" addStyleNames="text-danger"/>
+					</b:Tooltip>
 				</bh:Div>
 			</t:TableData>
 			<t:TableData width="275px" addStyleNames="visible-lg overflow-x-hidden">

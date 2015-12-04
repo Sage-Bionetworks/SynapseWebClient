@@ -41,6 +41,9 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void showAnnotationsIcon();
 	boolean isInViewport();
 	boolean isAttached();
+	void setError(String error);
+	void showErrorIcon();
+	
 	/**
 	 * Presenter interface
 	 */
