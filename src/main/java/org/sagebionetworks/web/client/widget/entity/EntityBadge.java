@@ -1,5 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -15,17 +22,22 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -37,23 +49,57 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	private CallbackP<String> customEntityClickHandler;
-	private boolean hasData, hasRequestedData;
+	private Callback invokeCheckForInViewAndLoadData;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			SynapseClientAsync synapseClient,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseClient = synapseClient;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
-		hasData = false;
-		hasRequestedData = false;
+		invokeCheckForInViewAndLoadData = new Callback() {
+			@Override
+			public void invoke() {
+				checkForInViewAndLoadData();
+			}
+		};
+	}
+	
+	public void checkForInViewAndLoadData() {
+		if (!view.isAttached()) {
+			gwt.scheduleDeferred(invokeCheckForInViewAndLoadData);
+		} else if (view.isInViewport()) {
+			//try to load data!
+			getEntityBundle();
+		} else {
+			//wait for a few seconds and see if we should load data
+			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, 2000);
+		}
+	}
+	
+	public void getEntityBundle() {
+		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
+		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+			public void onSuccess(EntityBundle eb) {
+				setEntityBundle(eb);
+			};
+		});
 	}
 	
 	public void configure(EntityQueryResult header) {
@@ -73,6 +119,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		} else {
 			view.setModifiedOn("");
 		}
+		checkForInViewAndLoadData();
 	}
 	
 
@@ -107,7 +154,12 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
-		view.setAnnotations(getAnnotationsHTML(annotations));
+		List<Annotation> annotationList = transformer.annotationsToList(annotations);
+		if (!annotationList.isEmpty()) {
+			view.showAnnotationsIcon();
+			view.setAnnotations(getAnnotationsHTML(annotationList));
+		}
+		
 		view.setSize(getContentSize(handles));
 		if(eb.getPermissions().getCanPublicRead()) {
 			view.showPublicIcon();
@@ -143,10 +195,9 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	 * @param keyValueDisplay
 	 * @param annotations
 	 */
-	public String getAnnotationsHTML(Annotations annotations) {
+	public String getAnnotationsHTML(List<Annotation> annotations) {
 		StringBuilder sb = new StringBuilder();
-		List<Annotation> annotationList = transformer.annotationsToList(annotations);
-		for (Annotation annotation : annotationList) {
+		for (Annotation annotation : annotations) {
 			String key = annotation.getKey();
 			sb.append("<strong>");
 			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(key));
@@ -191,16 +242,5 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	
 	public String getEntityId() {
 		return entityHeader.getId();
-	}
-	
-	/**
-	 * Returns true if widget is in view, does not already have data, and has not previously asked for data.
-	 */
-	public boolean isRequestingData() {
-		if (!view.isInViewport() || hasData || hasRequestedData) {
-			return false;
-		}
-		hasRequestedData = true;
-		return true;
 	}
 }

@@ -38,7 +38,9 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void showPrivateIcon();
 	void showSharingSetIcon();
 	void showHasWikiIcon();
+	void showAnnotationsIcon();
 	boolean isInViewport();
+	boolean isAttached();
 	/**
 	 * Presenter interface
 	 */

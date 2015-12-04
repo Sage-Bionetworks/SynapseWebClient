@@ -25,9 +25,6 @@
 				<t:TableHeader width="165px" addStyleNames="visible-sm visible-md visible-lg">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<t:TableHeader width="140px" addStyleNames="visible-lg">
-					<bh:Span text="Annotations"/>
-				</t:TableHeader>
 				<t:TableHeader width="100px" addStyleNames="visible-lg">
 					<bh:Span text="Size"/>
 				</t:TableHeader>

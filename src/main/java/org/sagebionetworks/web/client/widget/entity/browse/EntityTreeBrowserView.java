@@ -36,7 +36,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 				EntityTreeItem parent, long offset);
 
 		void getChildren(String parentId, EntityTreeItem parent, long offset);
-		void viewDetached();
 	}
 
 	void appendRootEntityTreeItem(EntityTreeItem childToAdd);
@@ -60,6 +59,5 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void hideEmptyUI();
 	
 	void setLoadingVisible(boolean isShown);
-
 
 }

@@ -79,11 +79,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	}
 
 	@Override
-	protected void onDetach() {
-		super.onDetach();
-		presenter.viewDetached();
-	}
-	@Override
 	public void hideEmptyUI() {
 		emptyUI.setVisible(false);
 		entityTreeHeader.setVisible(true);

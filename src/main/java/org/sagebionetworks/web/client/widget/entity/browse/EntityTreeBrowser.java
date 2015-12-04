@@ -1,19 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
@@ -26,7 +18,6 @@ import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -34,13 +25,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -60,9 +49,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private final int MAX_FOLDER_LIMIT = 100;
 	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
-	private Set<EntityTreeItem> allTreeItems = new HashSet<EntityTreeItem>();
-	GWTWrapper gwt;
-	boolean isAttached;
+	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -70,61 +57,19 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle, 
-			AdapterFactory adapterFactory, 
-			GWTWrapper gwt) {
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
-		this.gwt = gwt;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		view.setPresenter(this);
-		//set to false when view informs presenter that it's detached from dom
-		isAttached = true;
-		getMoreTreeItemsInfo();
-	}
-
-	public void getMoreTreeItemsInfo() {
-		//try to load, and schedule reload (iff still attached)
-		if (isAttached){
-			//TODO: reduce to a single servlet request (in batch)
-			for (EntityTreeItem entityTreeItem : allTreeItems) {
-				if (entityTreeItem.isRequestingData()) {
-					//request entity bundle for the entity
-					getEntityBundle(entityTreeItem);
-				}
-			}
-			gwt.scheduleExecution(new Callback() {
-				@Override
-				public void invoke() {
-					getMoreTreeItemsInfo();
-				}
-			}, 2000);
-		}
-	}
-	
-	public void getEntityBundle(final EntityTreeItem treeItem) {
-		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
-		synapseClient.getEntityBundle(treeItem.getEntityId(), partsMask, new AsyncCallback<EntityBundle>() {
-			@Override
-			public void onFailure(Throwable caught) {
-			}
-			public void onSuccess(EntityBundle eb) {
-				treeItem.setEntityBundle(eb);
-			};
-		});
-	}
-	
-	@Override
-	public void viewDetached() {
-		isAttached = false;
 	}
 	
 	public void clearState() {
 		view.clear();
-		allTreeItems = new HashSet<EntityTreeItem>();
 		// remove handlers
 		entitySelectedHandler = null;
 		entityClickedHandler = null;
@@ -143,7 +88,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void configure(String searchId) {
 		view.clear();
 		view.setLoadingVisible(true);
-		allTreeItems = new HashSet<EntityTreeItem>();
 		getChildren(searchId, null, 0);
 	}
 
@@ -325,7 +269,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			boolean isRootItem, boolean isExpandable) {
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
-		allTreeItems.add(childItem);
 		if (entityClickedHandler != null) {
 			childItem.setEntityClickedHandler(entityClickedHandler);
 		}

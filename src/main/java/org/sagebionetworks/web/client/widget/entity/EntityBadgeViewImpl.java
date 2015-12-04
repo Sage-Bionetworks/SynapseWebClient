@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -9,8 +11,10 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -50,7 +54,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	ClickHandler nonDefaultClickHandler;
 	
 	@UiField
-	HTML annotationsField;
+	Tooltip annotationsField;
 	@UiField
 	Label sizeField;
 	@UiField
@@ -61,6 +65,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Icon sharingSetIcon;
 	@UiField
 	Icon wikiIcon;
+	@UiField
+	Icon annotationsIcon;
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -190,7 +196,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void setAnnotations(String html) {
-		annotationsField.setHTML(html);
+		annotationsField.setHtml(SafeHtmlUtils.fromTrustedString(html));
+		annotationsField.reconfigure();
+	}
+	@Override
+	public void showAnnotationsIcon() {
+		annotationsIcon.setVisible(true);
 	}
 	
 	@Override
