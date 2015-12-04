@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -148,7 +146,6 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -2980,24 +2977,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		// This method does nothing?
 		
-	}
-	
-	@Override
-	public EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException{
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			//first, get the entity bundle with all information that we want
-			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
-			EntityBundle bundle = synapseClient.getEntityBundle(entityId, partsMask);
-			//now get the profile for the last modified by
-			UserProfile modifiedByProfile = synapseClient.getUserProfile(bundle.getEntity().getModifiedBy());
-			EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
-			entityBundlePlus.setEntityBundle(bundle);
-			entityBundlePlus.setProfile(modifiedByProfile);
-			return entityBundlePlus;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 
 	@Override

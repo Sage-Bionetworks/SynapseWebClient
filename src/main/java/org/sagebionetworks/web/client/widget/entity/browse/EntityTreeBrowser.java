@@ -49,12 +49,15 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private final int MAX_FOLDER_LIMIT = 100;
 	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
+	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
-			EntityTreeBrowserView view, SynapseClientAsync synapseClient,
+			EntityTreeBrowserView view, 
+			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			IconsImageBundle iconsImageBundle, AdapterFactory adapterFactory) {
+			IconsImageBundle iconsImageBundle, 
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
@@ -64,7 +67,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		view.setPresenter(this);
 	}
-
+	
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -136,7 +139,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 					@Override
 					public void onSuccess(EntityQueryResults results) {
 						if (!results.getEntities().isEmpty()) {
-							addResultsToParent(parent, results,	offset, true);
+							addResultsToParent(parent, results);
 							// More total entities than able to be displayed, so
 							// must add a "More Folders" button
 							if (results.getTotalEntityCount() > offset
@@ -272,24 +275,18 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		return childItem;
 	}
 
-	public void addResultsToParent(final EntityTreeItem parent,	EntityQueryResults results, long offset, boolean isExpandable) {
+	public void addResultsToParent(final EntityTreeItem parent,	EntityQueryResults results) {
 		if (parent == null) {
 			for (EntityQueryResult header : results.getEntities()) {
 				String entityType = header.getEntityType();
-				if (entityType.equals("folder")) {
-					view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, true));
-				} else {
-					view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, false));
-				}
+				boolean isFolder = entityType.equals("folder");
+				view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, isFolder));
 			}
 		} else {
 			for (EntityQueryResult header : results.getEntities()) {
 				String entityType = header.getEntityType();
-				if (entityType.equals("folder")) {
-					view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, true), parent);
-				} else {
-					view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, false), parent);
-				}
+				boolean isFolder = entityType.equals("folder");
+				view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, isFolder), parent);
 			}
 
 		}

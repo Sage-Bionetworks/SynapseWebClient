@@ -1,29 +1,27 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -32,12 +30,14 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
@@ -45,7 +45,6 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -54,6 +53,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityBadgeTest {
 
+	private static final String TRANSFORMED_FRIENDLY_VALUE = "friendly value";
+	private static final String VALUE3 = "42";
+	private static final String VALUE2 = "foo";
+	private static final String KEY3 = "key3";
+	private static final String KEY1 = "key1";
+	private static final String KEY2 = "key2";
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
@@ -65,18 +70,18 @@ public class EntityBadgeTest {
 	EntityBadge widget;
 	AnnotationTransformer mockTransformer;
 	String rootWikiKeyId;
-	KeyValueDisplay<String> keyValueDisplay;
-	Map<String,String> map;
-	List<String> order;
 	List<Annotation> annotationList;
 	Annotations annotations;
 	UserBadge mockUserBadge;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
+	@Mock
+	GWTWrapper mockGWT;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityBadgeView.class);
@@ -91,43 +96,39 @@ public class EntityBadgeTest {
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT);
 		
 		annotationList = new ArrayList<Annotation>();
-		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key1", Collections.EMPTY_LIST));
-		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key2", Collections.singletonList("foo")));
-		annotationList.add(new Annotation(ANNOTATION_TYPE.LONG, "key3", Collections.singletonList("42")));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY2, Collections.singletonList(VALUE2)));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.LONG, KEY3, Collections.singletonList(VALUE3)));
 		when(mockTransformer.annotationsToList(any(Annotations.class))).thenReturn(annotationList);
-		when(mockTransformer.getFriendlyValues(any(Annotation.class))).thenReturn("friendly value");
+		when(mockTransformer.getFriendlyValues(any(Annotation.class))).thenReturn(TRANSFORMED_FRIENDLY_VALUE);
 		rootWikiKeyId = "123";
-		map = new HashMap<String, String>();
-		order = new ArrayList<String>();
-		keyValueDisplay = new KeyValueDisplay<String>(map, order);
+		when(mockView.isAttached()).thenReturn(true);
 	}
 	
-	private void setupEntity(Entity entity) throws JSONObjectAdapterException {
-		UserProfile userProfile =  new UserProfile();
-		userProfile.setOwnerId("4444");
-		userProfile.setUserName("Bilbo");
-		
+	private EntityBundle setupEntity(Entity entity) {
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
 //		when(bundle.getAnnotations()).thenReturn(value);
 		when(bundle.getPermissions()).thenReturn(mockPermissions);
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
-		
-		EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
-		entityBundlePlus.setEntityBundle(bundle);
-		entityBundlePlus.setProfile(userProfile);
-		
-		AsyncMockStubber.callSuccessWith(entityBundlePlus).when(mockSynapseClient).getEntityInfo(anyString(), any(AsyncCallback.class));
+		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		return bundle;
+	}
+	
+	private EntityQueryResult configure() {
+		EntityQueryResult header = new EntityQueryResult();
+		header.setId(entityId);
+		widget.configure(header);
+		return header;
 	}
 	
 	@Test
 	public void testConfigure() throws Exception {
-		EntityQueryResult header = new EntityQueryResult();
-		header.setId("syn008");
-		widget.configure(header);
+		EntityQueryResult header = configure();
 		verify(mockView).setEntity(header);
 		
 		//in this case, "modified by" and "modified on" are not set.
@@ -155,28 +156,101 @@ public class EntityBadgeTest {
 		verify(mockView).setModifiedOn(smallDateString);
 	}
 
+	/**
+	 * This tests the standard case when the badge is outside the viewport and scrolled into view.  
+	 */
 	@Test
-	public void testGetInfoHappyCase() throws Exception {
+	public void testCheckForInViewAndLoadData() {
+		//set up entity
 		String entityId = "syn12345";
 		Project testProject = new Project();
 		testProject.setModifiedBy("4444");
 		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
 		testProject.setId(entityId);
 		setupEntity(testProject);
-		widget.getInfo(entityId, getInfoCallback);
-		verify(getInfoCallback).onSuccess(any(KeyValueDisplay.class));
-	}
-
-	@Test
-	public void testGetInfoFailure() throws Exception {
-		//failure to get entity
-		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityInfo(anyString(), any(AsyncCallback.class));
-		widget.getInfo(entityId, getInfoCallback);
-		//exception should be passed back to callback
-		verify(getInfoCallback).onFailure(eq(ex));
+		
+		//simulate the view is not yet attached, or in viewport
+		when(mockView.isAttached()).thenReturn(false);
+		when(mockView.isInViewport()).thenReturn(false);
+		
+		widget.startCheckingIfAttachedAndConfigured();
+		verifyZeroInteractions(mockGWT);
+		verifyZeroInteractions(mockSynapseClient);
+		
+		//configure
+		configure();
+		
+		//has not yet started looking to get entity bundle, because it's been configured but not attached (view tells presenter when it's attached).
+		verifyZeroInteractions(mockGWT);
+		
+		//attach
+		//still not in viewport
+		when(mockView.isAttached()).thenReturn(true);
+		widget.viewAttached();
+		
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		
+		verify(mockGWT).scheduleExecution(captor.capture(), eq(EntityBadge.DELAY_UNTIL_IN_VIEW));
+		Callback callback = captor.getValue();
+		
+		//simulate the view is now attached and in the viewport, and widget is configure, so it should ask for entity bundle
+		when(mockView.isInViewport()).thenReturn(true);
+		callback.invoke();
+		
+		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).showPublicIcon();
+		verify(mockView).showAnnotationsIcon();
+		verify(mockView).setAnnotations(anyString());
+		verify(mockView).setAnnotations(anyString());
+		verify(mockView).showHasWikiIcon();
 	}
 	
+	/**
+	 * This tests the case when the badge is attached to the dom and remains outside the viewport, and is eventually detached
+	 */
+	@Test
+	public void testNeverInViewport() {
+		//set up entity
+		String entityId = "syn12345";
+		Project testProject = new Project();
+		testProject.setModifiedBy("4444");
+		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+		testProject.setId(entityId);
+		setupEntity(testProject);
+		
+		//configure
+		configure();
+		when(mockView.isInViewport()).thenReturn(false);
+		//attach
+		when(mockView.isAttached()).thenReturn(true);
+		widget.viewAttached();
+		
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		
+		verify(mockGWT).scheduleExecution(captor.capture(), eq(EntityBadge.DELAY_UNTIL_IN_VIEW));
+		Callback callback = captor.getValue();
+		
+		Mockito.reset(mockGWT);
+		//simulate the view detached before it's ever scrolled into view
+		when(mockView.isAttached()).thenReturn(false);
+		callback.invoke();
+		//verify that this cycle is dead
+		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
+	}
+	
+	@Test
+	public void testCheckForInViewAndLoadDataFailure() {
+		configure();
+		//test failure response from getEntityBundle
+		String errorMessage = "problem occurred while asking for entity bundle";
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		widget.getEntityBundle();
+
+		verify(mockView).showErrorIcon();
+		verify(mockView).setError(errorMessage);
+	}
+
 	@Test
 	public void testEntityClicked() throws Exception {
 		//check the passthrough
@@ -229,89 +303,86 @@ public class EntityBadgeTest {
 		verify(mockUserBadge).setCustomClickHandler(mockClickHandler);
 	}
 
+	@Test
+	public void testAnnotationsEmpty() throws Exception {
+		annotationList.clear();
+		String result = widget.getAnnotationsHTML(annotationList);
+		assertTrue("".equals(result));
+	}
+	
+	@Test
+	public void testAnnotations() throws Exception {
+		String result = widget.getAnnotationsHTML(annotationList);
+		assertTrue(result.contains(KEY1));
+		assertTrue(result.contains(KEY2));
+		assertTrue(result.contains(KEY3));
+		assertTrue(result.contains(TRANSFORMED_FRIENDLY_VALUE));
+	}
 
 	@Test
-	public void testAddAnnotationsAndWikiStatusEmpty() throws Exception {
-		rootWikiKeyId = null;
-		annotationList.clear();
-		widget.addAnnotations(keyValueDisplay, annotations);
-		widget.addWikiStatus(keyValueDisplay, rootWikiKeyId);
-		//verify nothing was added to keyValueDisplay
-		assertTrue(map.isEmpty());
-		assertTrue(order.isEmpty());
+	public void testNoWiki() throws Exception {
+		configure();
+		EntityBundle bundle = setupEntity(new Project());
+		when(bundle.getRootWikiId()).thenReturn(null);
+		widget.setEntityBundle(bundle);
+		verify(mockView, never()).showHasWikiIcon();
 	}
 	
 	@Test
-	public void testWikiStatus() throws Exception {
-		rootWikiKeyId = "8888";
-		annotationList.clear();
-		widget.addWikiStatus(keyValueDisplay, rootWikiKeyId);
-		assertEquals(1, map.size());
-		assertEquals(1, order.size());
-	}
-	
-	@Test
-	public void testAddPublic() throws Exception {
-		widget.addPublicPrivate(keyValueDisplay, mockPermissions);
-		assertEquals(1, map.size());
-		assertEquals(1, order.size());
-		assertEquals("Public", map.keySet().iterator().next());
-	}
-	@Test
-	public void testAddPrivate() throws Exception {
+	public void testPrivate() throws Exception {
+		configure();
 		when(mockPermissions.getCanPublicRead()).thenReturn(false);
-		widget.addPublicPrivate(keyValueDisplay, mockPermissions);
-		assertEquals(1, map.size());
-		assertEquals(1, order.size());
-		assertEquals("Private", map.keySet().iterator().next());
-	}
-	
-	@Test
-	public void testAddLocalSharingSettingsInherited() throws Exception {
-		widget.addHasLocalSharingSettings(keyValueDisplay, entityId, mockBenefactorAcl);
-		assertEquals(0, map.size());
-		assertEquals(0, order.size());
-	}
-	@Test
-	public void testAddLocalSharingSettingsHasLocal() throws Exception {
-		when(mockBenefactorAcl.getId()).thenReturn(entityId);
-		widget.addHasLocalSharingSettings(keyValueDisplay, entityId, mockBenefactorAcl);
-		assertEquals(1, map.size());
-		assertEquals(1, order.size());
-		assertEquals(EntityBadge.HAS_LOCAL_SHARING_SETTINGS, map.keySet().iterator().next());
-	}
-
-
-	
-	@Test
-	public void testAddAnnotationsAndWikiStatus() throws Exception {
-		rootWikiKeyId = "8888";
-		widget.addAnnotations(keyValueDisplay, annotations);
-		widget.addWikiStatus(keyValueDisplay, rootWikiKeyId);
-		//in the @before we set up 3 annotation keys.  Plus the has a wiki note.
-		assertEquals(4, map.size());
-		assertEquals(4, order.size());
-		assertTrue(map.containsKey("key1"));
-	}
-	
-	@Test
-	public void testAddContentSize() {
+		EntityBundle bundle = setupEntity(new Project());
 		
+		widget.setEntityBundle(bundle);
+		verify(mockView).showPrivateIcon();
+	}
+	
+	@Test
+	public void testLocalSharingSettings() throws Exception {
+		configure();
+		EntityBundle bundle = setupEntity(new Project());
+		when(mockBenefactorAcl.getId()).thenReturn(entityId);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView).showSharingSetIcon();
+	}
+	
+	
+	@Test
+	public void testContentSize() {
+		String friendlySize = "44MB";
+		when(mockView.getFriendlySize(anyLong(), anyBoolean())).thenReturn(friendlySize);
 		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
 		FileHandle previewFileHandle = new PreviewFileHandle();
 		fileHandles.add(previewFileHandle);
-		widget.addContentSize(keyValueDisplay, fileHandles);
-		assertEquals(0, map.size());
-		assertEquals(0, order.size());
-		assertFalse(map.containsKey("File Size"));
+		String result = widget.getContentSize(fileHandles);
+		assertTrue("".equals(result));
 		
 		FileHandle s3FileHandle = new S3FileHandle();
 		s3FileHandle.setContentSize(500L);
 		fileHandles.add(s3FileHandle);
 		
-		widget.addContentSize(keyValueDisplay, fileHandles);
-		assertEquals(1, map.size());
-		assertEquals(1, order.size());
-		assertTrue(map.containsKey("File Size"));
+		result = widget.getContentSize(fileHandles);
+		assertEquals(friendlySize, result);
+	}
+	
+	@Test
+	public void testContentMd5() {
+		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
+		FileHandle previewFileHandle = new PreviewFileHandle();
+		String previewContentMd5 = "abcde";
+		previewFileHandle.setContentMd5(previewContentMd5);
+		fileHandles.add(previewFileHandle);
+		String result = widget.getContentMd5(fileHandles);
+		assertTrue("".equals(result));
+		
+		FileHandle s3FileHandle = new S3FileHandle();
+		String contentMd5 = "fghij";
+		s3FileHandle.setContentMd5(contentMd5);
+		fileHandles.add(s3FileHandle);
+		
+		result = widget.getContentMd5(fileHandles);
+		assertEquals(contentMd5, result);
 	}
 }

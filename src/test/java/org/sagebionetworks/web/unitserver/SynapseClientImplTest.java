@@ -15,7 +15,16 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +46,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -133,7 +141,6 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -1978,17 +1985,6 @@ public class SynapseClientImplTest {
 		assertEquals(new Long(3L), results.get(0).getRequestCount());
 		assertEquals(new Long(3L), results.get(1).getRequestCount());
 
-	}
-	
-	@Test
-	public void testGetEntityInfo() throws RestServiceException,
-	JSONObjectAdapterException, SynapseException{
-		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
-		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
-		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
-		assertEquals(eup, entityBundlePlus.getEntityBundle().getPermissions());
-		assertEquals(acl, entityBundlePlus.getEntityBundle().getBenefactorAcl());
-		assertEquals(testUserProfile, entityBundlePlus.getProfile());
 	}
 	
 	@Test(expected = BadRequestException.class)
