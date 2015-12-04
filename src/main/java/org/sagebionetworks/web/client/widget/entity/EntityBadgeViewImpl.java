@@ -58,6 +58,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Label sizeField;
 	@UiField
+	TextBox md5Field;
+	@UiField
 	Icon publicIcon;
 	@UiField
 	Icon privateIcon;
@@ -84,6 +86,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				idField.selectAll();
+			}
+		});
+		md5Field.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				md5Field.selectAll();
 			}
 		});
 	}
@@ -222,6 +230,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void setSize(String s) {
 		sizeField.setText(s);
 	}
+	@Override
+	public void setMd5(String s) {
+		md5Field.setText(s);
+	}
+
 	@Override
 	public void showHasWikiIcon() {
 		wikiIcon.setVisible(true);

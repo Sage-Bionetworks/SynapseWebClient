@@ -329,4 +329,23 @@ public class EntityBadgeTest {
 		result = widget.getContentSize(fileHandles);
 		assertEquals(friendlySize, result);
 	}
+	
+	@Test
+	public void testContentMd5() {
+		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
+		FileHandle previewFileHandle = new PreviewFileHandle();
+		String previewContentMd5 = "abcde";
+		previewFileHandle.setContentMd5(previewContentMd5);
+		fileHandles.add(previewFileHandle);
+		String result = widget.getContentMd5(fileHandles);
+		assertTrue("".equals(result));
+		
+		FileHandle s3FileHandle = new S3FileHandle();
+		String contentMd5 = "fghij";
+		s3FileHandle.setContentMd5(contentMd5);
+		fileHandles.add(s3FileHandle);
+		
+		result = widget.getContentMd5(fileHandles);
+		assertEquals(contentMd5, result);
+	}
 }

@@ -28,6 +28,9 @@
 				<t:TableHeader width="100px" addStyleNames="visible-lg">
 					<bh:Span text="Size"/>
 				</t:TableHeader>
+				<t:TableHeader width="65px" addStyleNames="visible-lg">
+					<bh:Span text="MD5"/>
+				</t:TableHeader>
 				<t:TableHeader width="100px">
 					<bh:Span text="ID" />
 				</t:TableHeader>

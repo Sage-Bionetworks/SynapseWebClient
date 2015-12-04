@@ -160,6 +160,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		}
 		
 		view.setSize(getContentSize(handles));
+		view.setMd5(getContentMd5(handles));
 		if(eb.getPermissions().getCanPublicRead()) {
 			view.showPublicIcon();
 		} else {
@@ -183,6 +184,18 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 					if (contentSize != null && contentSize > 0) {
 						return view.getFriendlySize(contentSize, true);
 					}
+				}
+			}
+		}
+		return "";
+	}
+	
+
+	public String getContentMd5(List<FileHandle> handles) {
+		if (handles != null) {
+			for (FileHandle handle: handles) {
+				if (!(handle instanceof PreviewFileHandle)) {
+					return handle.getContentMd5();
 				}
 			}
 		}

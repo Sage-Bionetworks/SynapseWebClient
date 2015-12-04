@@ -45,6 +45,9 @@
 			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden">
 				<g:Label ui:field="sizeField"/>
 			</t:TableData>
+			<t:TableData width="65px" addStyleNames="visible-lg overflow-x-hidden">
+				<g:TextBox ui:field="md5Field" width="61px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
+			</t:TableData>
 			<t:TableData width="100px" >
 				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
