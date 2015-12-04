@@ -19,7 +19,7 @@
 				<t:TableHeader>
 					<bh:Span text="Name" />
 				</t:TableHeader>
-				<t:TableHeader width="275px" addStyleNames="visible-lg">
+				<t:TableHeader width="310px" addStyleNames="visible-lg">
 					<bh:Span text="Modified By"/>
 				</t:TableHeader>
 				<t:TableHeader width="165px" addStyleNames="visible-sm visible-md visible-lg">

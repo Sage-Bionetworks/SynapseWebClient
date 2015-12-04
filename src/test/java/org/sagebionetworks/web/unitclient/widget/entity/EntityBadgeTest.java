@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
@@ -157,9 +158,6 @@ public class EntityBadgeTest {
 
 	/**
 	 * This tests the standard case when the badge is outside the viewport and scrolled into view.  
-	 * View is initially not ready (not attached) so it schedules a deferred callback.
-	 * The view is ready when the deferred call is invoked, but the widget is not in the viewport, so it schedules execution to check again later.
-	 * The widget is then in view, so it asks for the entity bundle, and successfully configures the view based on the response.
 	 */
 	@Test
 	public void testCheckForInViewAndLoadData() {
@@ -175,20 +173,27 @@ public class EntityBadgeTest {
 		when(mockView.isAttached()).thenReturn(false);
 		when(mockView.isInViewport()).thenReturn(false);
 		
+		widget.startCheckingIfAttachedAndConfigured();
+		verifyZeroInteractions(mockGWT);
+		verifyZeroInteractions(mockSynapseClient);
+		
+		//configure
 		configure();
 		
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockGWT).scheduleDeferred(captor.capture());
-		Callback callback = captor.getValue();
+		//has not yet started looking to get entity bundle, because it's been configured but not attached (view tells presenter when it's attached).
+		verifyZeroInteractions(mockGWT);
 		
-		//simulate the view is now attached when callback is invoked, but still not in viewport
+		//attach
+		//still not in viewport
 		when(mockView.isAttached()).thenReturn(true);
-		callback.invoke();
+		widget.viewAttached();
+		
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		
 		verify(mockGWT).scheduleExecution(captor.capture(), eq(EntityBadge.DELAY_UNTIL_IN_VIEW));
-		callback = captor.getValue();
+		Callback callback = captor.getValue();
 		
-		//simulate the view is now attached and in the viewport, should ask for entity bundle
+		//simulate the view is now attached and in the viewport, and widget is configure, so it should ask for entity bundle
 		when(mockView.isInViewport()).thenReturn(true);
 		callback.invoke();
 		
@@ -198,7 +203,39 @@ public class EntityBadgeTest {
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
+	}
+	
+	/**
+	 * This tests the case when the badge is attached to the dom and remains outside the viewport, and is eventually detached
+	 */
+	@Test
+	public void testNeverInViewport() {
+		//set up entity
+		String entityId = "syn12345";
+		Project testProject = new Project();
+		testProject.setModifiedBy("4444");
+		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+		testProject.setId(entityId);
+		setupEntity(testProject);
 		
+		//configure
+		configure();
+		when(mockView.isInViewport()).thenReturn(false);
+		//attach
+		when(mockView.isAttached()).thenReturn(true);
+		widget.viewAttached();
+		
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		
+		verify(mockGWT).scheduleExecution(captor.capture(), eq(EntityBadge.DELAY_UNTIL_IN_VIEW));
+		Callback callback = captor.getValue();
+		
+		Mockito.reset(mockGWT);
+		//simulate the view detached before it's ever scrolled into view
+		when(mockView.isAttached()).thenReturn(false);
+		callback.invoke();
+		//verify that this cycle is dead
+		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
 	}
 	
 	@Test

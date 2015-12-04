@@ -50,6 +50,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		void entityClicked(EntityQueryResult entityHeader);
+		void viewAttached();
 	}
 	String getFriendlySize(Long contentSize, boolean b);
 

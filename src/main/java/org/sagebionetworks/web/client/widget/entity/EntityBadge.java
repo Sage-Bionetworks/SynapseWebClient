@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -51,6 +52,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private GWTWrapper gwt;
 	private CallbackP<String> customEntityClickHandler;
 	private Callback invokeCheckForInViewAndLoadData;
+	private boolean isConfigured;
+	private boolean isAttached;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -74,11 +77,18 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				checkForInViewAndLoadData();
 			}
 		};
+		isConfigured = false;
+		isAttached = false;
 	}
-	
+	public void startCheckingIfAttachedAndConfigured() {
+		if (isAttached && isConfigured) {
+			checkForInViewAndLoadData();
+		}
+	}
 	public void checkForInViewAndLoadData() {
 		if (!view.isAttached()) {
-			gwt.scheduleDeferred(invokeCheckForInViewAndLoadData);
+			//Done, view has been detached and widget was never in the viewport
+			return;
 		} else if (view.isInViewport()) {
 			//try to load data!
 			getEntityBundle();
@@ -86,6 +96,11 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			//wait for a few seconds and see if we should load data
 			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DELAY_UNTIL_IN_VIEW);
 		}
+	}
+	@Override
+	public void viewAttached() {
+		isAttached = true;
+		startCheckingIfAttachedAndConfigured();
 	}
 	
 	public void getEntityBundle() {
@@ -119,7 +134,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		} else {
 			view.setModifiedOn("");
 		}
-		checkForInViewAndLoadData();
+		isConfigured = true;
+		startCheckingIfAttachedAndConfigured();
 	}
 	
 

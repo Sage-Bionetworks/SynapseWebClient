@@ -96,6 +96,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		});
 	}
 	
+	@Override
+	protected void onAttach() {
+		super.onAttach();
+		presenter.viewAttached();
+	}
 	
 	@Override
 	public void setEntity(final EntityQueryResult entityHeader) {
