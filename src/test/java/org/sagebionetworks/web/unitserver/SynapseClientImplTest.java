@@ -1980,17 +1980,6 @@ public class SynapseClientImplTest {
 
 	}
 	
-	@Test
-	public void testGetEntityInfo() throws RestServiceException,
-	JSONObjectAdapterException, SynapseException{
-		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
-		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
-		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
-		assertEquals(eup, entityBundlePlus.getEntityBundle().getPermissions());
-		assertEquals(acl, entityBundlePlus.getEntityBundle().getBenefactorAcl());
-		assertEquals(testUserProfile, entityBundlePlus.getProfile());
-	}
-	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
 		String tokenTypeName = null;

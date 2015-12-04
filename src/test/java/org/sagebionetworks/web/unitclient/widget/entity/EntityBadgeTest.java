@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,6 +15,8 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -74,9 +75,12 @@ public class EntityBadgeTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
+	@Mock
+	GWTWrapper mockGWT;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityBadgeView.class);
@@ -91,7 +95,7 @@ public class EntityBadgeTest {
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key1", Collections.EMPTY_LIST));
@@ -106,21 +110,13 @@ public class EntityBadgeTest {
 	}
 	
 	private void setupEntity(Entity entity) throws JSONObjectAdapterException {
-		UserProfile userProfile =  new UserProfile();
-		userProfile.setOwnerId("4444");
-		userProfile.setUserName("Bilbo");
-		
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
 //		when(bundle.getAnnotations()).thenReturn(value);
 		when(bundle.getPermissions()).thenReturn(mockPermissions);
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
 		
-		EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
-		entityBundlePlus.setEntityBundle(bundle);
-		entityBundlePlus.setProfile(userProfile);
-		
-		AsyncMockStubber.callSuccessWith(entityBundlePlus).when(mockSynapseClient).getEntityInfo(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
