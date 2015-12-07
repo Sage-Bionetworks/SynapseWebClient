@@ -24,7 +24,7 @@ public interface MemberListWidgetView extends IsWidget, SynapseView {
 		//used for the user profile links
 		void goTo(Place place);
 		void removeMember(String principalId);
-		
+		void setIsAdmin(String principalId, boolean isAdmin);
 		void jumpToOffset(int offset);
 		void search(String searchTerm);
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);

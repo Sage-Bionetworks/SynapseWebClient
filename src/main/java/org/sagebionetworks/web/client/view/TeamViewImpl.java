@@ -71,10 +71,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem inviteMemberItem;
 	@UiField
 	TextBox synapseEmailField;
-	@UiField
-	Button shareButton;
-	@UiField
-	SimplePanel aclModalContainer;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -95,12 +91,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		setDropdownHandlers();
-		shareButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.shareButtonClicked();
-			}
-		});
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -261,13 +251,5 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setTeamEmailAddress(String teamEmail) {
 		synapseEmailField.setValue(teamEmail);
-	}
-	@Override
-	public void setShareButtonVisible(boolean isVisible) {
-		shareButton.setVisible(isVisible);
-	}
-	@Override
-	public void setAclModalWidget(Widget asWidget) {
-		aclModalContainer.setWidget(asWidget);
 	}
 }
