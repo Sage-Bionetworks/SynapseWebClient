@@ -73,7 +73,7 @@ public class TeamEditModalWidgetTest {
 		mockFileMeta = mock(FileMetadata.class);
 		presenter = new TeamEditModalWidget(mockSynAlert, mockView, mockSynapseClient,
 				mockUploader, mockJSNIUtils, mockAuthenticationController);
-		presenter.configure(mockTeam);
+		presenter.configureAndShow(mockTeam);
 		presenter.setRefreshCallback(mockRefreshCallback);
 		
 		ArgumentCaptor<Callback> startedUploadingCaptor = ArgumentCaptor.forClass(Callback.class);
@@ -87,7 +87,7 @@ public class TeamEditModalWidgetTest {
 		finishedUploadingCallback = finishedUploadingCaptor.getValue();
 		
 		AsyncMockStubber.callSuccessWith(mockTeam).when(mockSynapseClient)
-				.updateTeam(eq(mockTeam), any(AsyncCallback.class));
+				.updateTeam(eq(mockTeam), null, any(AsyncCallback.class));
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMeta);
 		when(mockFileMeta.getFileName()).thenReturn("new filename");
 		when(mockView.getName()).thenReturn(newName);
@@ -142,7 +142,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
 		
-		verify(mockSynapseClient).updateTeam(eq(mockTeam), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), null, any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
@@ -165,7 +165,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam, never()).setIcon(newIcon);
 		
-		verify(mockSynapseClient).updateTeam(eq(mockTeam), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), null, any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
@@ -174,7 +174,7 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testConfirmFailedChanges() {
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient)
-				.updateTeam(eq(mockTeam), any(AsyncCallback.class));
+				.updateTeam(eq(mockTeam), null, any(AsyncCallback.class));
 		when(mockFileUpload.getFileHandleId()).thenReturn(newIcon);
 		finishedUploadingCallback.invoke(mockFileUpload);
 		verify(mockView).hideLoading();
@@ -187,7 +187,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
 		
-		verify(mockSynapseClient).updateTeam(eq(mockTeam), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), null, any(AsyncCallback.class));
 		verify(mockUploader).reset();
 		verify(mockView, Mockito.atLeast(1)).hideLoading();
 		verify(mockSynAlert).handleException(caught);

@@ -198,8 +198,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void showEditModal() {
 		synAlert.clear();
-		editTeamWidget.configure(team);
-		editTeamWidget.show();
+		editTeamWidget.configureAndShow(team);
 	}
 
 	@Override

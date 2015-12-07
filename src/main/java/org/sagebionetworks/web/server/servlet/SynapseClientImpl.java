@@ -2148,9 +2148,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Team updateTeam(Team team) throws RestServiceException {
+	public Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			updateTeamAcl(teamAcl);
 			return synapseClient.updateTeam(team);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

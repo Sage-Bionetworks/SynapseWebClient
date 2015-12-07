@@ -25,6 +25,10 @@
 		            <b:CheckBox text="People can join this team without team manager authorization" ui:field="publicJoinCheckbox"
 		                addStyleNames="checkbox margin-left-10 displayInlineBlock"/>
 		        </b:FormGroup>
+				<b:FormGroup>
+		            <b:CheckBox text="Any Synapse user can send messages to this team" ui:field="authenticatedUsersCanSendCheckbox"
+		                addStyleNames="checkbox margin-left-10 displayInlineBlock"/>
+		        </b:FormGroup>
 		        <b:FormGroup>
 		            <b:FormLabel for="uploadWidget">Upload new Icon</b:FormLabel>
 		            <b:Row b:id="uploadWidget">
