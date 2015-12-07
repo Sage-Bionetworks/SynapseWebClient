@@ -165,39 +165,35 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		ResourceAccess ra = getResourceAccess(authenticatedUserGroupId);
 		if (ra != null) {
 			view.setAuthenticatedUsersCanSendMessageToTeam(ModelConstants.TEAM_MESSENGER_PERMISSIONS.equals(ra.getAccessType()));
+		} else {
+			view.setAuthenticatedUsersCanSendMessageToTeam(false);
 		}
 	}
 	
 	public void updateACLFromView() {
 		if (view.canAuthenticatedUsersSendMessageToTeam()) {
 			//remove team id (if exists and is set to team messenger permissions)
-			ResourceAccess ra = getResourceAccess(teamId);
-			if (ra != null && ModelConstants.TEAM_MESSENGER_PERMISSIONS.equals(ra.getAccessType())) {
-				teamACL.getResourceAccess().remove(ra);
-			}
-			//add/update authenticated users
-			ra = getResourceAccess(authenticatedUserGroupId);
-			if (ra == null) {
-				ra = new ResourceAccess();
-				ra.setPrincipalId(authenticatedUserGroupId);
-			}
-			ra.setAccessType(ModelConstants.TEAM_MESSENGER_PERMISSIONS);
-			teamACL.getResourceAccess().add(ra);
+			changeMessengerGroup(teamId, authenticatedUserGroupId);
 		} else {
 			//remove authenticated users (if exists and is set to team messenger permission)
-			ResourceAccess ra = getResourceAccess(authenticatedUserGroupId);
-			if (ra != null && ModelConstants.TEAM_MESSENGER_PERMISSIONS.equals(ra.getAccessType())) {
-				teamACL.getResourceAccess().remove(ra);
-			}
-			//add/update team
-			ra = getResourceAccess(teamId);
-			if (ra == null) {
-				ra = new ResourceAccess();
-				ra.setPrincipalId(teamId);
-			}
-			ra.setAccessType(ModelConstants.TEAM_MESSENGER_PERMISSIONS);
-			teamACL.getResourceAccess().add(ra);
+			changeMessengerGroup(authenticatedUserGroupId, teamId);
 		}
+	}
+	
+	private void changeMessengerGroup(Long principalIdToRemove, Long principalIdToAdd) {
+		//remove
+		ResourceAccess ra = getResourceAccess(principalIdToRemove);
+		if (ra != null && ModelConstants.TEAM_MESSENGER_PERMISSIONS.equals(ra.getAccessType())) {
+			teamACL.getResourceAccess().remove(ra);
+		}
+		//add/update
+		ra = getResourceAccess(principalIdToAdd);
+		if (ra == null) {
+			ra = new ResourceAccess();
+			ra.setPrincipalId(principalIdToAdd);
+		}
+		ra.setAccessType(ModelConstants.TEAM_MESSENGER_PERMISSIONS);
+		teamACL.getResourceAccess().add(ra);
 	}
 	
 	private ResourceAccess getResourceAccess(Long principalId) {
