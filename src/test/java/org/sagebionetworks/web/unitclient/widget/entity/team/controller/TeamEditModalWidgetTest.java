@@ -275,52 +275,31 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testUpdateACLFromViewAuthenticatedUsersCanSend() {
 		presenter.configureAndShow(mockTeam);
-		//set up team can message, should be removed from acl.  Authenticated users should be added.
+		//set up team can message, should not be touched in the acl.  Authenticated users should be added.
 		addCanMessageTeam(TEAM_ID, acl);
 		when(mockView.canAuthenticatedUsersSendMessageToTeam()).thenReturn(true);
 		presenter.updateACLFromView();
 		
 		//verify that stubbed acl has been modified in the way that we expect
-		assertEquals(1, acl.getResourceAccess().size());
-		ResourceAccess ra = acl.getResourceAccess().iterator().next();
-		assertEquals(AUTHENTICATED_USERS_GROUP_ID, ra.getPrincipalId());
-		assertEquals(ModelConstants.TEAM_MESSENGER_PERMISSIONS, ra.getAccessType());
+		assertEquals(2, acl.getResourceAccess().size());
+		ResourceAccess teamRA = null, authenticatedUsersGroupRA = null;
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			if (AUTHENTICATED_USERS_GROUP_ID.equals(ra.getPrincipalId())) {
+				authenticatedUsersGroupRA = ra;
+			} else if (TEAM_ID.equals(ra.getPrincipalId())) {
+				teamRA = ra;
+			}
+		}
+		assertTrue(teamRA != null && authenticatedUsersGroupRA != null);
+		assertEquals(ModelConstants.TEAM_MESSENGER_PERMISSIONS, authenticatedUsersGroupRA.getAccessType());
 	}
 	
 	@Test
 	public void testUpdateACLFromViewTeamMembersCanSend() {
 		presenter.configureAndShow(mockTeam);
-		//set up authenticated users can message, should be removed from acl.  Team should be added.
+		//set up authenticated users can message, should be removed from acl.
 		addCanMessageTeam(AUTHENTICATED_USERS_GROUP_ID, acl);
-		when(mockView.canAuthenticatedUsersSendMessageToTeam()).thenReturn(false);
-		presenter.updateACLFromView();
-		
-		//verify that stubbed acl has been modified in the way that we expect
-		assertEquals(1, acl.getResourceAccess().size());
-		ResourceAccess ra = acl.getResourceAccess().iterator().next();
-		assertEquals(TEAM_ID, ra.getPrincipalId());
-		assertEquals(ModelConstants.TEAM_MESSENGER_PERMISSIONS, ra.getAccessType());
-	}
-
-	
-	@Test
-	public void testUpdateACLFromViewAuthenticatedUsersCanSendEmptyACL() {
-		presenter.configureAndShow(mockTeam);
-		//note: team not present in the ACL
-		when(mockView.canAuthenticatedUsersSendMessageToTeam()).thenReturn(true);
-		presenter.updateACLFromView();
-		
-		//verify that stubbed acl has been modified in the way that we expect
-		assertEquals(1, acl.getResourceAccess().size());
-		ResourceAccess ra = acl.getResourceAccess().iterator().next();
-		assertEquals(AUTHENTICATED_USERS_GROUP_ID, ra.getPrincipalId());
-		assertEquals(ModelConstants.TEAM_MESSENGER_PERMISSIONS, ra.getAccessType());
-	}
-	
-	@Test
-	public void testUpdateACLFromViewTeamMembersCanSendEmptyACL() {
-		presenter.configureAndShow(mockTeam);
-		//note: authenticated users not present in the ACL
+		addCanMessageTeam(TEAM_ID, acl);
 		when(mockView.canAuthenticatedUsersSendMessageToTeam()).thenReturn(false);
 		presenter.updateACLFromView();
 		
