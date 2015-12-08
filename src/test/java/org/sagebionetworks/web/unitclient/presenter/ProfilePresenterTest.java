@@ -67,6 +67,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -139,6 +140,8 @@ public class ProfilePresenterTest {
 	VerificationSubmissionWidget mockVerificationSubmissionModal;
 	@Mock
 	VerificationSubmission mockVerificationSubmission;
+	@Mock
+	WikiModalWidget mockWikiModalWidget;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -163,7 +166,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal);	
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockWikiModalWidget);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -1573,7 +1576,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUnbindOrcId() {
 		viewProfile("123", "456");
-		profilePresenter.unbindOrcId();
+		profilePresenter.unbindOrcIdAfterConfirmation();
 		//success message and page refresh
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockGlobalApplicationState).refreshPage();
@@ -1584,9 +1587,21 @@ public class ProfilePresenterTest {
 		Exception ex = new Exception("bad things happened");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		viewProfile("123", "456");
-		profilePresenter.unbindOrcId();
+		profilePresenter.unbindOrcIdAfterConfirmation();
 		//error is shown
 		verify(mockSynAlert).handleException(ex);
 	}
-
+	
+	@Test
+	public void testonVerifyMoreInfoClicked() {
+		profilePresenter.onVerifyMoreInfoClicked();
+		verify(mockWikiModalWidget).show(anyString());
+	}
+	
+	@Test
+	public void testSetVerifyUndismissed() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		profilePresenter.setVerifyUndismissed();
+		verify(mockCookies).removeCookie(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId());
+	}
 }

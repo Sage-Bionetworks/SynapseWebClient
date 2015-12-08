@@ -64,6 +64,7 @@ public class WikiModalWidget implements WikiModalWidgetView.Presenter, IsWidget 
 	
 	private void clear() {
 		synAlert.clear();
+		helpWikiPage.clear();
 		view.clear();
 	}
 	
