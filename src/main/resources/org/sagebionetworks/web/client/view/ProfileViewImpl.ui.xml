@@ -49,9 +49,10 @@
 								<g:Image ui:field="certificationBadge" resource='{sageImageBundle.certificate}' addStyleNames="displayInline imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10" height="32px" width="25px"/>
 					        	<b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
 					        	<b:Heading ui:field="headlineField" addStyleNames="user-profile-headline" size="H4" />
-					        	<b:Alert type="INFO" ui:field="verifyAlert" dismissable="true">
+					        	<b:Alert type="INFO" ui:field="verifyAlert">
 									<bh:Div>
 									    <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
+									    <b:Button ui:field="dismissValidationUIButton" styleName="close pull-right moveup-35" text="x"/>
 										<bh:Paragraph>
 											<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
 											<b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!"/>

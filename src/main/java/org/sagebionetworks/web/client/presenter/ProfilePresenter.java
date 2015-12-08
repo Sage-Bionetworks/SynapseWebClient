@@ -411,14 +411,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
 			if (currentState.getState() == VerificationStateEnum.SUSPENDED) {
 				view.setVerificationSuspendedButtonVisible(true);
-				if (isOwner) {
-					view.setVerificationButtonVisible(true);
-				}
+				initializeShowHideVerification(isOwner);
 			} else if (currentState.getState() == VerificationStateEnum.REJECTED) {
 				view.setVerificationRejectedButtonVisible(true);
-				if (isOwner) {
-					view.setVerificationButtonVisible(true);
-				}
+				initializeShowHideVerification(isOwner);
 			} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
 				view.setVerificationSubmittedButtonVisible(true);
 			} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
@@ -1023,6 +1019,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		cookies.setCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
 		//and show button instead
 		view.setVerificationButtonVisible(true);
+	}
+	
+	@Override
+	public void setVerifyUndismissed() {
+		cookies.removeCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
 	}
 	
 	/**

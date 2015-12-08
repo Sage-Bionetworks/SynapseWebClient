@@ -257,7 +257,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	org.gwtbootstrap3.client.ui.Anchor reviewProfileLink;
 	@UiField
 	org.gwtbootstrap3.client.ui.Anchor createOrcIdLink;
-	
+	@UiField
+	Button dismissValidationUIButton;
 	
 	@UiField
 	Button verifiedBadge;
@@ -386,6 +387,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			public void onClick(ClickEvent event) {
 				submitProfileValidationButton.setVisible(false);
 				verifyAlert.setVisible(true);
+				presenter.setVerifyUndismissed();
 			}
 		});
 		initCertificationBadge();
@@ -487,10 +489,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		
-		verifyAlert.addClosedHandler(new AlertClosedHandler() {
+		dismissValidationUIButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClosed(AlertClosedEvent evt) {
+			public void onClick(ClickEvent event) {
 				presenter.setVerifyDismissed();
+				verifyAlert.setVisible(false);
 			}
 		});
 		
