@@ -296,6 +296,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void unbindOrcId() {
+		view.showConfirmDialog("Unlink","Are you sure you want to unlink this ORC ID from your Synapse user profile?", new Callback() {
+			@Override
+			public void invoke() {
+				unbindOrcIdAfterConfirmation();
+			}
+		});
+	}
+	
+	public void unbindOrcIdAfterConfirmation() {
 		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
