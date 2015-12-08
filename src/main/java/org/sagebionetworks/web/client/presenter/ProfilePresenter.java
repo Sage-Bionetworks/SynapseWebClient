@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
@@ -110,6 +111,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
 	public Map<String, Boolean> isACTMemberMap;
+	public WikiModalWidget verificationMoreInfoWikiModal;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -126,7 +128,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal) {
+			VerificationSubmissionWidget verificationModal,
+			WikiModalWidget verificationMoreInfoWikiModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -143,6 +146,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
+		this.verificationMoreInfoWikiModal = verificationMoreInfoWikiModal;
 		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -1124,6 +1128,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				currentUserBundle.getORCID(), 
 				true) //isModal
 			.show();
+	}
+	
+	@Override
+	public void onVerifyMoreInfoClicked() {
+		verificationMoreInfoWikiModal.show("WhyGetValidated");
 	}
 }
 

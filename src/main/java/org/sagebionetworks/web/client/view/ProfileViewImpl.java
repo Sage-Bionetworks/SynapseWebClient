@@ -353,7 +353,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		whyGetValidatedButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("#!StandaloneWiki:WhyGetValidated", "_blank", "");
+				presenter.onVerifyMoreInfoClicked();
 			}
 		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
