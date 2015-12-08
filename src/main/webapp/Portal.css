@@ -1685,6 +1685,13 @@ ol.lowerroman {
 	top: -35px;
 }
 
+.small-icon, i.fa.small-icon {
+	font-size: 6px;
+	top: -.7em;
+	position: relative;
+}
+
+
 .moveup-70 {
 	position: relative;
 	top: -70px;

@@ -34,6 +34,7 @@
 			<b:Column size="SM_6">
 				<b:FormGroup>
 					<b:FormLabel for="firstName">First Name</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-blue"/>
 					<b:TextBox name="firstName" ui:field="firstName"
 						placeholder="Enter first name" />
 				</b:FormGroup>
@@ -41,6 +42,7 @@
 			<b:Column size="SM_6">
 				<b:FormGroup>
 					<b:FormLabel for="lastName">Last Name</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-blue"/>
 					<b:TextBox name="lastName" ui:field="lastName"
 						placeholder="Enter last name" />
 				</b:FormGroup>
@@ -57,6 +59,7 @@
 			<b:Column size="SM_6">
 				<b:FormGroup>
 					<b:FormLabel for="currentAffiliation">Current affiliation</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-blue"/>
 					<b:TextBox name="currentAffiliation" ui:field="currentAffiliation"
 						placeholder="Enter current affiliation" />
 				</b:FormGroup>
@@ -73,6 +76,7 @@
 			<b:Column size="SM_6">
 				<b:FormGroup>
 					<b:FormLabel for="location">City, Country</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-blue"/>
 					<b:TextBox name="location" ui:field="location"
 						placeholder="Enter City, Country" />
 				</b:FormGroup>
@@ -94,6 +98,12 @@
 					<b:TextArea name="bio" ui:field="bio" placeholder="Enter bio"
 						height="150px" />
 				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+		<b:Row>
+			<b:Column size="SM_12">
+				<b:Icon type="ASTERISK" addStyleNames="small-icon margin-right-5 synapse-blue"/>
+				<bh:Paragraph addStyleNames="displayInline"> = Required for profile validation</bh:Paragraph>
 			</b:Column>
 		</b:Row>
 	</g:HTMLPanel>

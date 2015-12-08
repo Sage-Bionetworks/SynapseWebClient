@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
@@ -110,6 +111,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
 	public Map<String, Boolean> isACTMemberMap;
+	public WikiModalWidget verificationMoreInfoWikiModal;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -126,7 +128,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal) {
+			VerificationSubmissionWidget verificationModal,
+			WikiModalWidget verificationMoreInfoWikiModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -143,6 +146,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
+		this.verificationMoreInfoWikiModal = verificationMoreInfoWikiModal;
 		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -292,6 +296,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void unbindOrcId() {
+		view.showConfirmDialog("Unlink","Are you sure you want to unlink this ORC ID from your Synapse user profile?", new Callback() {
+			@Override
+			public void invoke() {
+				unbindOrcIdAfterConfirmation();
+			}
+		});
+	}
+	
+	public void unbindOrcIdAfterConfirmation() {
 		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -411,14 +424,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
 			if (currentState.getState() == VerificationStateEnum.SUSPENDED) {
 				view.setVerificationSuspendedButtonVisible(true);
-				if (isOwner) {
-					view.setVerificationButtonVisible(true);
-				}
+				initializeShowHideVerification(isOwner);
 			} else if (currentState.getState() == VerificationStateEnum.REJECTED) {
 				view.setVerificationRejectedButtonVisible(true);
-				if (isOwner) {
-					view.setVerificationButtonVisible(true);
-				}
+				initializeShowHideVerification(isOwner);
 			} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
 				view.setVerificationSubmittedButtonVisible(true);
 			} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
@@ -1025,6 +1034,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setVerificationButtonVisible(true);
 	}
 	
+	@Override
+	public void setVerifyUndismissed() {
+		cookies.removeCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+	}
+	
 	/**
 	 * For testing purposes only
 	 * @param currentUserId
@@ -1123,6 +1137,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				currentUserBundle.getORCID(), 
 				true) //isModal
 			.show();
+	}
+	
+	@Override
+	public void onVerifyMoreInfoClicked() {
+		verificationMoreInfoWikiModal.show("WhyGetValidated");
 	}
 }
 
