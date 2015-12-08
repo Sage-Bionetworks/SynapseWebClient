@@ -393,22 +393,4 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockSynapseAlert).showError(anyString());
 		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
 	}
-	
-	@Test
-	public void testDeleteVerificationState() {
-		configureWithMockSubmission();
-		widget.deleteVerification();
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockView).hide();
-		verify(mockGlobalApplicationState).refreshPage();
-	}
-	@Test
-	public void testDeleteVerificationStateFailure() {
-		configureWithMockSubmission();
-		Exception ex =new Exception("something went wrong");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
-		
-		widget.deleteVerification();
-		verify(mockSynapseAlert).handleException(ex);
-	}
 }

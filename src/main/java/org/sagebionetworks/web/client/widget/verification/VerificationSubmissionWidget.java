@@ -346,7 +346,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	
 	@Override
 	public void deleteVerification() {
-		updateVerificationState(VerificationStateEnum.REJECTED, "User rejected own submission");
+		//TODO: allow user to rescind own submission
 	}
 	@Override
 	public Widget asWidget() {
