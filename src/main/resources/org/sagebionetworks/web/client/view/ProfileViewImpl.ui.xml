@@ -50,23 +50,26 @@
 					        	<b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
 					        	<b:Heading ui:field="headlineField" addStyleNames="user-profile-headline" size="H4" />
 					        	<b:Alert type="INFO" ui:field="verifyAlert" dismissable="true">
-									<g:FocusPanel ui:field="verifyFocusPanel" addStyleNames="imageButton">
-										<bh:Div>
-										    <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
-											<bh:Paragraph>
-												<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
-												<bh:Strong>Validate your profile today!</bh:Strong>
-											</bh:Paragraph>
-											<bh:Paragraph>
-												<bh:OrderedList>
-													<b:ListItem text="Review/Complete your profile."/>
-													<b:ListItem text="Create an ORCID or link to your existing one."/>
-													<b:ListItem text="Upload one form of Identity verification."/>
-													<b:ListItem text="Request Profile validation."/>
-												</bh:OrderedList>
-											</bh:Paragraph>
-										</bh:Div>
-									</g:FocusPanel>
+									<bh:Div>
+									    <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
+										<bh:Paragraph>
+											<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
+											<b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!"/>
+										</bh:Paragraph>
+										<bh:Paragraph>
+											<bh:OrderedList>
+												<b:ListItem>
+													<b:Anchor ui:field="reviewProfileLink" text="Review/Complete your profile."/>
+												</b:ListItem>
+												<b:ListItem>
+													<b:Anchor ui:field="createOrcIdLink" text="Create an ORCID or link to your existing one."/>
+												</b:ListItem>
+												<b:ListItem>
+													<b:Anchor ui:field="requestProfileValidationLink2" text="Request Profile validation."/>
+												</b:ListItem>
+											</bh:OrderedList>
+										</bh:Paragraph>
+									</bh:Div>
 									<b:Button ui:field="whyGetValidatedButton" type="DEFAULT" icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="More info..."/>
 								</b:Alert>
 								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
