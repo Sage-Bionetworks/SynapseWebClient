@@ -14,48 +14,27 @@ public interface TeamEditModalWidgetView {
 
 	public interface Presenter {
 		public Widget asWidget();
-
 		void setRefreshCallback(Callback refreshCallback);
-
-		void configure(Team team);
-
 		void onConfirm();
-
 		void hide();
-
-		void show();
 	}
 
 	public Widget asWidget();
-
 	public void setAlertWidget(Widget asWidget);
-
 	void setPresenter(Presenter presenter);
-
 	String getName();
-
 	String getDescription();
-
 	boolean getPublicJoin();
-
 	void setUploadWidget(Widget uploader);
-
 	void setImageURL(String fileHandleId);
-
 	void setDefaultIconVisible();
-
+	void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage);
+	boolean canAuthenticatedUsersSendMessageToTeam();
 	void showInfo(String title, String message);
-
 	void show();
-
 	void hide();
-
 	void showLoading();
-
 	void hideLoading();
-
 	void clear();
-
-	public void configure(Team team);
-
+	void configure(Team team);
 }
