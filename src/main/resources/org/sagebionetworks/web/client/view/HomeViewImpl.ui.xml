@@ -115,7 +115,7 @@
 											<t:TableData>
 												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="R client" />
 												<b:Anchor href="http://r-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!Help:RClient" addStyleNames="displayBlock" target="_blank" text="Example code"/>
+												<b:Anchor href="#!Help:RClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -131,7 +131,7 @@
 											<t:TableData>
 												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Python client" />
 												<b:Anchor href="http://python-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!Help:PythonClient" addStyleNames="displayBlock" target="_blank" text="Example code"/>
+												<b:Anchor href="#!Help:PythonClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -147,7 +147,7 @@
 											<t:TableData>
 												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Command line client" />
 												<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!Help:CommandLineClient" addStyleNames="displayBlock" target="_blank" text="Example code"/>
+												<b:Anchor href="#!Help:CommandLineClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -162,8 +162,8 @@
 											</t:TableData>
 											<t:TableData>
 												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Java client" />
-												<b:Anchor href="#!StandaloneWiki:JavaClient" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" addStyleNames="displayBlock" target="_blank" text="Example code"/>
+												<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Anchor href="#!StandaloneWiki:JavaClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
