@@ -114,12 +114,12 @@ public class MyEntitiesBrowserTest {
 	@Test
 	public void testIsSameContextNullPlaceAndToken() {
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn(null);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(null);
 		assertFalse(widget.isSameContext());
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
 		assertFalse(widget.isSameContext());
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("12345");
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("12345");
 		assertFalse(widget.isSameContext());
 	}
 	
@@ -127,14 +127,14 @@ public class MyEntitiesBrowserTest {
 	public void testContextChange() {
 		//first, verify that updateContext does what we expect it to
 		Synapse s = new Synapse("syn123");
-		String token = "12345";
+		String userId = "12345";
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn(token);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		assertNull(widget.getCachedCurrentPlace());
-		assertNull(widget.getCachedUserSessionToken());
+		assertNull(widget.getCachedUserId());
 		widget.updateContext();
 		assertEquals(s, widget.getCachedCurrentPlace());
-		assertEquals(token, widget.getCachedUserSessionToken());
+		assertEquals(userId, widget.getCachedUserId());
 		
 		//test refresh when the context has not changed
 		widget.refresh();

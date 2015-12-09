@@ -39,8 +39,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private SynapseClientAsync synapseClient;
 	private SelectedHandler selectedHandler;
 	AdapterFactory adapterFactory;
-	private Place currentPlace;
-	private String userSessionToken;
+	private Place cachedPlace;
+	private String cachedUserId;
 	
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
@@ -94,21 +94,21 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	}
 
 	public boolean isSameContext() {
-		if (globalApplicationState.getCurrentPlace() == null || authenticationController.getCurrentUserSessionToken() == null) {
+		if (globalApplicationState.getCurrentPlace() == null || authenticationController.getCurrentUserPrincipalId() == null) {
 			return false;
 		}
-		return globalApplicationState.getCurrentPlace().equals(currentPlace) && authenticationController.getCurrentUserSessionToken().equals(userSessionToken);
+		return globalApplicationState.getCurrentPlace().equals(cachedPlace) && authenticationController.getCurrentUserPrincipalId().equals(cachedUserId);
 	}
 	public void updateContext() {
-		currentPlace = globalApplicationState.getCurrentPlace();
-		userSessionToken = authenticationController.getCurrentUserSessionToken();
+		cachedPlace = globalApplicationState.getCurrentPlace();
+		cachedUserId = authenticationController.getCurrentUserPrincipalId();
 	}
 	
 	public Place getCachedCurrentPlace() {
-		return currentPlace;
+		return cachedPlace;
 	}
-	public String getCachedUserSessionToken() {
-		return userSessionToken;
+	public String getCachedUserId() {
+		return cachedUserId;
 	}
 	
 	/**
