@@ -18,6 +18,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 * in the tree will become selected.
 	 */
 	void makeSelectable();
+	void clearSelection();
 	
 	/**
 	 * Presenter interface

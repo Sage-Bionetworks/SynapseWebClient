@@ -226,12 +226,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	 */
 
 	private void selectEntity(EntityTreeItem itemToSelect) {
-		if (selectedItem != null) {
-			selectedItem.asWidget().removeStyleName("entityTreeItem-selected");
-		}
+		clearSelection();
 		selectedItem = itemToSelect;
 		selectedItem.asWidget().addStyleName("entityTreeItem-selected");
 		presenter.setSelection(selectedItem.getHeader().getId());
+	}
+	
+	@Override
+	public void clearSelection() {
+		if (selectedItem != null) {
+			selectedItem.asWidget().removeStyleName("entityTreeItem-selected");
+		}
 	}
 
 	/**

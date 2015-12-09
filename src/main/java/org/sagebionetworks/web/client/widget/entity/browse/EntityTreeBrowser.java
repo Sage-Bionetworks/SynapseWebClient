@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -290,5 +291,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			}
 
 		}
+	}
+	public void clearSelection() {
+		currentSelection = null;
+		view.clearSelection();
 	}
 }
