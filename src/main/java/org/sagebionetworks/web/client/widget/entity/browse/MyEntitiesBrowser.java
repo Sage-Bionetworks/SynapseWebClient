@@ -5,13 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +39,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private SynapseClientAsync synapseClient;
 	private SelectedHandler selectedHandler;
 	AdapterFactory adapterFactory;
+	private Place cachedPlace;
+	private String cachedUserId;
 	
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
@@ -67,7 +70,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	}	
 
 	public void clearState() {
-		view.clear();
+		if (isSameContext()) {
+			view.clearSelection();
+		} else {
+			view.clear();
+		}
 	}
 
 	@Override
@@ -78,8 +85,30 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	}
 	
 	public void refresh() {
-		loadUserUpdateable();
-		loadFavorites();
+		//do not reload if the session is unchanged, and the context (project) is unchanged.
+		if (!isSameContext()) {
+			loadUserUpdateable();
+			loadFavorites();
+			updateContext();
+		}
+	}
+
+	public boolean isSameContext() {
+		if (globalApplicationState.getCurrentPlace() == null || authenticationController.getCurrentUserPrincipalId() == null) {
+			return false;
+		}
+		return globalApplicationState.getCurrentPlace().equals(cachedPlace) && authenticationController.getCurrentUserPrincipalId().equals(cachedUserId);
+	}
+	public void updateContext() {
+		cachedPlace = globalApplicationState.getCurrentPlace();
+		cachedUserId = authenticationController.getCurrentUserPrincipalId();
+	}
+	
+	public Place getCachedCurrentPlace() {
+		return cachedPlace;
+	}
+	public String getCachedUserId() {
+		return cachedUserId;
 	}
 	
 	/**
