@@ -21,6 +21,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
@@ -51,6 +52,7 @@ public class MyEntitiesBrowserTest {
 				jsonObjectAdapter, adapterFactory);
 		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
 		when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
+		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockEntityTreeBrowser);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		searchResults = new EntityQueryResults();
@@ -108,5 +110,51 @@ public class MyEntitiesBrowserTest {
 		assertEquals(MyEntitiesBrowser.PROJECT_LIMIT, query.getLimit());
 		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, query.getOffset());
 	}
+	
+	@Test
+	public void testIsSameContextNullPlaceAndToken() {
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
+		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn(null);
+		assertFalse(widget.isSameContext());
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
+		assertFalse(widget.isSameContext());
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(null);
+		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("12345");
+		assertFalse(widget.isSameContext());
+	}
+	
+	@Test
+	public void testContextChange() {
+		//first, verify that updateContext does what we expect it to
+		Synapse s = new Synapse("syn123");
+		String token = "12345";
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn(token);
+		assertNull(widget.getCachedCurrentPlace());
+		assertNull(widget.getCachedUserSessionToken());
+		widget.updateContext();
+		assertEquals(s, widget.getCachedCurrentPlace());
+		assertEquals(token, widget.getCachedUserSessionToken());
+		
+		//test refresh when the context has not changed
+		widget.refresh();
+		//should have done nothing
+		verifyZeroInteractions(mockSynapseClient);
+		
+		//test clearState() when context has not changed
+		widget.clearState();
+		verify(mockView).clearSelection();
 
+		//now test refresh after a context change
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("different place"));
+		widget.refresh();
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
+				any(AsyncCallback.class));
+		
+		//test clearState() when context has changed
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));
+		widget.clearState();
+		verify(mockView).clear();
+
+	}
 }

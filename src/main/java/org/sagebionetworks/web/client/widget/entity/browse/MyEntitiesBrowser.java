@@ -93,15 +93,22 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		}
 	}
 
-	private boolean isSameContext() {
+	public boolean isSameContext() {
 		if (globalApplicationState.getCurrentPlace() == null || authenticationController.getCurrentUserSessionToken() == null) {
 			return false;
 		}
 		return globalApplicationState.getCurrentPlace().equals(currentPlace) && authenticationController.getCurrentUserSessionToken().equals(userSessionToken);
 	}
-	private void updateContext() {
+	public void updateContext() {
 		currentPlace = globalApplicationState.getCurrentPlace();
 		userSessionToken = authenticationController.getCurrentUserSessionToken();
+	}
+	
+	public Place getCachedCurrentPlace() {
+		return currentPlace;
+	}
+	public String getCachedUserSessionToken() {
+		return userSessionToken;
 	}
 	
 	/**
