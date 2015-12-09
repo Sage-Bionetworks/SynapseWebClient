@@ -15,7 +15,7 @@
 			</t:TableData>
 			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden ">
 				<bh:Div addStyleNames="margin-right-5"> 
-					<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
+					<g:FlowPanel ui:field="entityContainer" styleName="displayInline pull-left"/>
 					<b:Tooltip title="Public">
 						<b:Icon ui:field="publicIcon" fixedWidth="true" type="GLOBE" visible="false" pull="RIGHT"/>
 					</b:Tooltip>
