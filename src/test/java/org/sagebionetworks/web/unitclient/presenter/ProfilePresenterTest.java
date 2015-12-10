@@ -456,6 +456,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testLinkOrcIdClicked() throws JSONObjectAdapterException {
 		when(mockUserBundle.getORCID()).thenReturn("a value");
+		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		profilePresenter.linkOrcIdClicked();
 		verify(mockView).showErrorMessage(anyString());
 	}
