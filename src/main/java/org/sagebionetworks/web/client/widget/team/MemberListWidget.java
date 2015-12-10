@@ -103,6 +103,25 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	}
 	
 	@Override
+	public void setIsAdmin(String principalId, boolean isAdmin) {
+		synapseClient.setIsTeamAdmin(authenticationController.getCurrentUserPrincipalId(), principalId, teamId, isAdmin, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				//success, refresh the team
+				view.showInfo("Successfully updated the team member", "");
+				teamUpdatedCallback.invoke();			
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				}
+				refreshMembers(searchTerm, offset);
+			}
+		});
+	}
+	
+	@Override
 	public void jumpToOffset(int offset) {
 		//everything remains the same except for the offset
 		refreshMembers(searchTerm, offset);

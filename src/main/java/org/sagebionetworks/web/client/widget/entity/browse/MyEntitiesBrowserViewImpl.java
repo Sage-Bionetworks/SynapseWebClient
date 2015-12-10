@@ -107,9 +107,16 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
+	
+	@Override
+	public void clearSelection() {
+		myTreeBrowser.clearSelection();
+		favoritesTreeBrowser.clearSelection();
+	}
+	
 	@Override
 	public void clear() {
+		myTreeBrowser.clearState();
 	}
 
 	@Override

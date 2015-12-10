@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
@@ -44,7 +43,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private VerificationSubmissionWidgetView view;
 	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
-	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
@@ -65,7 +63,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			FileHandleList fileHandleList,
 			SynapseJSNIUtils jsniUtils,
 			PromptModalView promptModalView,
-			CookieProvider cookies,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt
 			) {
@@ -77,7 +74,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.fileHandleList = fileHandleList;
 		this.jsniUtils = jsniUtils;
 		this.promptModal = promptModalView;
-		this.cookies = cookies;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
 		promptModal.configure("", "Reason", "OK", "");
@@ -179,7 +175,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setCancelButtonVisible(true);
 			view.setSubmitButtonVisible(true);
 			fileHandleList.configure(rawFileHandleClickedCallback)
-				.setUploadButtonText("Upload evidence...")
+				.setUploadButtonText("Upload documentation...")
 				.setCanDelete(true)
 				.setCanUpload(true);
 			view.setFirstName(profile.getFirstName());
@@ -205,8 +201,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		view.setOrcID(submission.getOrcid());
 		view.setEmails(submission.getEmails());
 		
-		//show delete button if not act (is the owner), and in alpha website mode
-		view.setDeleteButtonVisible(!isACTMember && DisplayUtils.isInTestWebsite(cookies));
+		//marking own submission as rejected currently forbidden, and we don't want to actually delete the submission
+		view.setDeleteButtonVisible(false);
 		
 		view.setOKButtonVisible(true);
 		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
@@ -320,7 +316,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			attachments.add(meta);
 		}
 		if (attachments.size() == 0) {
-			synAlert.showError("Please upload evidence and re-submit.");
+			synAlert.showError("Please upload documentation and re-submit.");
 			return;
 		}
 		sub.setAttachments(attachments);
@@ -350,17 +346,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	
 	@Override
 	public void deleteVerification() {
-		long verificationId = Long.parseLong(submission.getId());
-		userProfileClient.deleteVerificationSubmission(verificationId, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				handleSuccess("Submission deleted.");
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
+		//TODO: allow user to rescind own submission
 	}
 	@Override
 	public Widget asWidget() {

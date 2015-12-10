@@ -22,7 +22,7 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
 	void setFavoriteEntities(List<EntityHeader> favoriteEntities);
 
 	public EntityTreeBrowser getFavoritesTreeBrowser();
-
+	void clearSelection();
 	/**
 	 * Presenter interface
 	 */
