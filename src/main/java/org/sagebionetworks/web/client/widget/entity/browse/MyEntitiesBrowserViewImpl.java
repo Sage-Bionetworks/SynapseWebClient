@@ -16,6 +16,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -88,7 +89,7 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 			}
 		});
 		
-		setTabSelected(currentContextLink, currentContextListItem, currentContextTabContents);
+		setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
 	}
 	
 	@Override
@@ -205,5 +206,10 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	@Override
 	public EntityTreeBrowser getCurrentContextTreeBrowser() {
 		return currentContextTreeBrowser;
+	}
+	
+	@Override
+	public void setCurrentContextTabVisible(boolean visible) {
+		UIObject.setVisible(currentContextListItem, visible);	
 	}
 }

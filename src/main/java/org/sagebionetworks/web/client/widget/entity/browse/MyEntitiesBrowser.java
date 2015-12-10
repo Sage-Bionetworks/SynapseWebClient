@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -136,7 +134,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		view.getCurrentContextTreeBrowser().clear();
 		//get the entity path, and ask for each entity to add to the tree
 		Place currentPlace = globalApplicationState.getCurrentPlace();
-		if (currentPlace instanceof Synapse) {
+		boolean isSynapsePlace = currentPlace instanceof Synapse;
+		view.setCurrentContextTabVisible(isSynapsePlace);
+		if (isSynapsePlace) {
 			String entityId = ((Synapse) currentPlace).getEntityId();
 			int mask = ENTITY_PATH;
 			synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {

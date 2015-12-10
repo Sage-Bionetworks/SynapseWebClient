@@ -23,7 +23,7 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
 
 	public EntityTreeBrowser getFavoritesTreeBrowser();
 	public EntityTreeBrowser getCurrentContextTreeBrowser();
-	
+	void setCurrentContextTabVisible(boolean visible);
 	void clearSelection();
 	/**
 	 * Presenter interface
