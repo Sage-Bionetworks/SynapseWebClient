@@ -117,7 +117,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			parent = makeTreeItemFromQueryResult(entity, true,
 					false);
 			view.appendRootEntityTreeItem(parent);
-			parent.asTreeItem().setState(true, false);
+			parent.setState(true, false);
 		}
 		//now process 1 to the last container (do not process the leaf)
 		for (int i = 1; i < resultList.size()-1; i++) {
@@ -127,10 +127,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			view.appendChildEntityTreeItem(childToAdd, parent);
 			parent = childToAdd;
 			parentEntityQueryResult = entity;
-			parent.asTreeItem().setState(true, false);
+			parent.setState(true, false);
 		}
 		//start loading container siblings
-		getChildren(parentEntityQueryResult.getId(), parent, 0);
+		if (parentEntityQueryResult != null && parent != null) {
+			getChildren(parentEntityQueryResult.getId(), parent, 0);	
+		}
+		
 		
 		view.setLoadingVisible(false);
 	}

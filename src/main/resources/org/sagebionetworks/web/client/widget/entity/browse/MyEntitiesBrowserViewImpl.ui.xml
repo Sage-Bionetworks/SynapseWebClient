@@ -5,9 +5,9 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
 		<!-- Tabs -->
-		<div class="margin-top-15">
+		<div>
 		    <ul class="nav nav-tabs">
-		        <li class="active margin-left-15" ui:field="myProjectsListItem">
+		        <li class="active" ui:field="myProjectsListItem">
 			    	<g:Anchor styleName="text-align-center no-background" ui:field="myProjectsLink" text="My Projects" />
 			    </li>
 			    <li ui:field="currentContextListItem">

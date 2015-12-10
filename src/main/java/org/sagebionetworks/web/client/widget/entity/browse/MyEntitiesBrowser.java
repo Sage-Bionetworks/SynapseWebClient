@@ -147,8 +147,10 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				public void onSuccess(EntityBundle result) {
 					EntityPath path = result.getPath();
 					List<EntityHeader> pathHeaders = path.getPath();
-					//remove the root
-					pathHeaders.remove(0);
+					//remove the high level root, so that the first item in the list is the Project
+					if (pathHeaders.size() > 0) {
+						pathHeaders.remove(0);	
+					}
 					//add to the current context tree, and show all children of this container (or siblings if leaf)
 					view.getCurrentContextTreeBrowser().configureWithPath(pathHeaders);
 				};
