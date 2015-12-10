@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.core.client.GWT;
@@ -30,6 +32,8 @@ public class VerificationIDCardViewImpl implements IsWidget {
 	Anchor orcIdAnchor;
 	@UiField
 	Modal modal;
+	@UiField
+	Span dateVerified;
 	
 	public VerificationIDCardViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
@@ -63,6 +67,10 @@ public class VerificationIDCardViewImpl implements IsWidget {
 	public void setOrcID(String href) {
 		orcIdAnchor.setText(href);
 		orcIdAnchor.setHref(href);
+	}
+	
+	public void setDateVerified(String date) {
+		dateVerified.setText(date);
 	}
 
 	@Override

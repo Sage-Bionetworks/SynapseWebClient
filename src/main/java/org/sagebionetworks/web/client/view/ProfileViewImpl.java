@@ -1032,13 +1032,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifyAlert.setVisible(isVisible);
 	}
 	@Override
-	public void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref) {
+	public void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified) {
 		verifiedBadge.setVisible(true);
 		idCard.setFirstName(firstName);
 		idCard.setLastName(lastName);
 		idCard.setLocation(location);
 		idCard.setOrganization(affiliation);
 		idCard.setOrcID(orcIdHref);
+		idCard.setDateVerified(dateVerified);
 	}
 	@Override
 	public void setVerificationButtonVisible(boolean isVisible) {
