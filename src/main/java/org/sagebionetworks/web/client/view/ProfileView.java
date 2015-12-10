@@ -105,6 +105,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setVerifyDismissed();
 		void setVerifyUndismissed();
 		void onVerifyMoreInfoClicked();
+		void linkOrcIdClicked();
 	}
 
 	void addMyTeamProjectsFilter();

@@ -1143,5 +1143,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void onVerifyMoreInfoClicked() {
 		verificationMoreInfoWikiModal.show("WhyGetValidated");
 	}
+	
+	@Override
+	public void linkOrcIdClicked() {
+		String orcId = currentUserBundle.getORCID();
+		if (orcId != null && orcId.length() > 0) {
+			//already set!
+			view.showErrorMessage("An ORC ID has already been linked to your Synapse account.");
+		} else {
+			DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+		}
+	}
 }
 

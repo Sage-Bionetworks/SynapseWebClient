@@ -452,6 +452,14 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).addCertifiedBadge();
 	}
 	
+
+	@Test
+	public void testLinkOrcIdClicked() throws JSONObjectAdapterException {
+		when(mockUserBundle.getORCID()).thenReturn("a value");
+		profilePresenter.linkOrcIdClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
 	
 	@Test
 	public void testRefreshProjects() {

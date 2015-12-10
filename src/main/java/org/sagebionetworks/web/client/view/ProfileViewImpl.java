@@ -476,7 +476,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		ClickHandler orcIdClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+				presenter.linkOrcIdClicked();
 			}
 		};
 		linkORCIDButton.addClickHandler(orcIdClickHandler);
