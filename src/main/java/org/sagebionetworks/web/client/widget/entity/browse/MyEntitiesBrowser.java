@@ -1,10 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
@@ -21,9 +26,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -87,6 +94,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public void refresh() {
 		//do not reload if the session is unchanged, and the context (project) is unchanged.
 		if (!isSameContext()) {
+			loadCurrentContext();
 			loadUserUpdateable();
 			loadFavorites();
 			updateContext();
@@ -124,9 +132,31 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		selectedHandler.onSelection(selectedEntityId);
 	}
 
+	public void loadCurrentContext() {
+		view.getCurrentContextTreeBrowser().clear();
+		//get the entity path, and ask for each entity to add to the tree
+		Place currentPlace = globalApplicationState.getCurrentPlace();
+		if (currentPlace instanceof Synapse) {
+			String entityId = ((Synapse) currentPlace).getEntityId();
+			int mask = ENTITY_PATH;
+			synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+				public void onSuccess(EntityBundle result) {
+					EntityPath path = result.getPath();
+					List<EntityHeader> pathHeaders = path.getPath();
+					//remove the root
+					pathHeaders.remove(0);
+					//add to the current context tree, and show all children of this container (or siblings if leaf)
+					view.getCurrentContextTreeBrowser().configureWithPath(pathHeaders);
+				};
+			});
+		}
+	}
 	@Override
 	public void loadUserUpdateable() {
-		view.showLoading();
 		view.getEntityTreeBrowser().clear();
 		if (authenticationController.isLoggedIn()) {
 			synapseClient.executeEntityQuery(createMyProjectQuery(), new AsyncCallback<EntityQueryResults>() {
