@@ -57,6 +57,7 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -364,7 +365,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//The UI is depends on the current state
 		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
 		if (isVerified) {
-			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid());
+			List<VerificationState> stateHistory = submission.getStateHistory();
+			VerificationState latestState = stateHistory.get(stateHistory.size()-1);
+			String dateVerified = gwt.getFormattedDateString(latestState.getCreatedOn());
+			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid(), dateVerified);
 		}
 		
 		if (submission == null) {
@@ -1142,6 +1146,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void onVerifyMoreInfoClicked() {
 		verificationMoreInfoWikiModal.show("WhyGetValidated");
+	}
+	
+	@Override
+	public void linkOrcIdClicked() {
+		String orcId = currentUserBundle.getORCID();
+		if (orcId != null && orcId.length() > 0) {
+			//already set!
+			view.showErrorMessage("An ORC ID has already been linked to your Synapse account.");
+		} else {
+			DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+		}
 	}
 }
 
