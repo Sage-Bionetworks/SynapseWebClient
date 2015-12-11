@@ -22,6 +22,8 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
 	void setFavoriteEntities(List<EntityHeader> favoriteEntities);
 
 	public EntityTreeBrowser getFavoritesTreeBrowser();
+	public EntityTreeBrowser getCurrentContextTreeBrowser();
+	void setCurrentContextTabVisible(boolean visible);
 	void clearSelection();
 	/**
 	 * Presenter interface
