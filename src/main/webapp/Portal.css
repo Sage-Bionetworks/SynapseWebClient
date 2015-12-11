@@ -36,7 +36,7 @@ a:focus{color:#1e7098; text-decoration:underline;}
 	}	
 }
 .visible-xl{
-	display:none !important
+	display:none !important;
 }
 
 .btn-link {
