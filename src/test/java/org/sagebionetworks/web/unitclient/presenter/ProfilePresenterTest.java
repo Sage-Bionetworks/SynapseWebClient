@@ -452,6 +452,15 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).addCertifiedBadge();
 	}
 	
+
+	@Test
+	public void testLinkOrcIdClicked() throws JSONObjectAdapterException {
+		when(mockUserBundle.getORCID()).thenReturn("a value");
+		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.linkOrcIdClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
 	
 	@Test
 	public void testRefreshProjects() {
@@ -1423,7 +1432,7 @@ public class ProfilePresenterTest {
 		viewProfile("123", "456");
 		
 		//user bundle reported that target user is not verified, should show badge
-		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null);
+		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null, null);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationRejectedButtonVisible(true);
 		//since this is ACT, should not see a way to submit a new validation request
@@ -1440,7 +1449,7 @@ public class ProfilePresenterTest {
 		viewProfile("123", "456");
 		
 		//user bundle reported that target user is not verified
-		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null);
+		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null, null);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationSubmittedButtonVisible(true);
 	}	
@@ -1454,17 +1463,19 @@ public class ProfilePresenterTest {
 		String company = "Rebel Alliance";
 		String orcId = "http://orcid/address";
 		String location= "Jundland Wastes, Tatooine";
+		String friendlyDate= "October 2nd";
 		when(mockVerificationSubmission.getFirstName()).thenReturn(fName);
 		when(mockVerificationSubmission.getLastName()).thenReturn(lName);
 		when(mockVerificationSubmission.getCompany()).thenReturn(company);
 		when(mockVerificationSubmission.getOrcid()).thenReturn(orcId);
 		when(mockVerificationSubmission.getLocation()).thenReturn(location);
 		
+		when(mockGwt.getFormattedDateString(any(Date.class))).thenReturn(friendlyDate);
 		//not the owner of this profile, but is ACT
 		viewProfile("123", "456");
 		
 		//user bundle reported that target user is verified
-		verify(mockView).showVerifiedBadge(fName, lName, location, company, orcId);
+		verify(mockView).showVerifiedBadge(fName, lName, location, company, orcId, friendlyDate);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		verify(mockView).setVerificationDetailsButtonVisible(true);
 	}
@@ -1477,7 +1488,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		viewProfile("123", null);
 
-		verify(mockView).showVerifiedBadge(null, null, null, null, null);
+		verify(mockView).showVerifiedBadge(null, null, null, null, null, null);
 		//no need to check for act membership for anonymous
 		verify(mockUserProfileClient, never()).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		//validation details button is not visible to anonymous
@@ -1491,7 +1502,7 @@ public class ProfilePresenterTest {
 		when(mockCurrentUserBundle.getIsACTMember()).thenReturn(false);
 		viewProfile("123", "456");
 
-		verify(mockView).showVerifiedBadge(null, null, null, null, null);
+		verify(mockView).showVerifiedBadge(null, null, null, null, null, null);
 		//no need to check for act membership for anonymous
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		//validation details button is not visible to a person who is not the owner and not part of the ACT

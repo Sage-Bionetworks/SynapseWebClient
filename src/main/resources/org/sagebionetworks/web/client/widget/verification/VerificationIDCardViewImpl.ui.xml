@@ -9,22 +9,27 @@
 	<b:Modal title="Validated Synapse Profile"  closable="false" fade="true" ui:field="modal">
 		<b:ModalBody addStyleNames="bg-primary color-white">
 			<bh:Div >
-				<bh:Div>
-					<b:Icon type="CHECK_SQUARE_O" addStyleNames="color-white displayInline" width="30px" height="35px" size="TIMES2" />
+				<bh:Div height="35px">
+					<b:Icon type="CHECK_SQUARE_O" addStyleNames="color-white displayInline" width="30px" size="TIMES2" />
 					<b:Heading ui:field="firstName" size="H3" addStyleNames="color-white margin-right-5 displayInline" />
 					<b:Heading ui:field="lastName" size="H3" addStyleNames="color-white displayInline" />
 				</bh:Div>
-				<bh:Div>
-					<b:Icon type="BUILDING" addStyleNames="color-white margin-left-12" width="20px" height="20px"/>
+				<bh:Div height="22px">
+					<b:Icon type="BUILDING" addStyleNames="color-white margin-left-12" width="20px"/>
 					<bh:Span ui:field="currentAffiliation" addStyleNames="color-white" />
 				</bh:Div>
-				<bh:Div>
-					<b:Icon type="MAP_MARKER" addStyleNames="color-white margin-left-12" width="20px" height="20px"/>
+				<bh:Div height="22px">
+					<b:Icon type="MAP_MARKER" addStyleNames="color-white margin-left-12" width="20px"/>
 					<bh:Span ui:field="location" addStyleNames="color-white" />
 				</bh:Div>
-				<bh:Div>
-					<b:Heading size="H5" addStyleNames="color-white displayInline margin-left-12 margin-right-5" width="20px" height="20px" text="iD" />
+				<bh:Div height="22px">
+					<b:Heading size="H5" addStyleNames="color-white displayInline margin-left-12 margin-right-5" width="20px" text="iD" />
 					<b:Anchor ui:field="orcIdAnchor" addStyleNames="color-white" target="_blank" />
+				</bh:Div>
+				<bh:Div height="22px">
+					<b:Icon type="CLOCK_O" addStyleNames="color-white margin-left-12" width="20px"/>
+					<bh:Span addStyleNames="color-white margin-right-5" text="Validated by the ACT on"/>
+					<bh:Span ui:field="dateVerified" addStyleNames="color-white" />
 				</bh:Div>
 			</bh:Div>
 		</b:ModalBody>

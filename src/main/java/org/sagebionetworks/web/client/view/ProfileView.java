@@ -105,6 +105,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setVerifyDismissed();
 		void setVerifyUndismissed();
 		void onVerifyMoreInfoClicked();
+		void linkOrcIdClicked();
 	}
 
 	void addMyTeamProjectsFilter();
@@ -122,7 +123,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 
 	void addCertifiedBadge();
-	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref);
+	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);
 
 	void showTabs(boolean isOwner);
 

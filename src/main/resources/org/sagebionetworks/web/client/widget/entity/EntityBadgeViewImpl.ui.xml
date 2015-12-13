@@ -36,10 +36,10 @@
 					</b:Tooltip>
 				</bh:Div>
 			</t:TableData>
-			<t:TableData width="310px" addStyleNames="visible-lg overflow-x-hidden">
+			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
 				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg overflow-x-hidden">
+			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
 			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden">
@@ -48,7 +48,7 @@
 			<t:TableData width="65px" addStyleNames="visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="md5Field" width="64px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
 			</t:TableData>
-			<t:TableData width="100px" >
+			<t:TableData width="100px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 		</t:TableRow>
