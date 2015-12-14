@@ -15,6 +15,8 @@ import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -34,6 +36,8 @@ public class AuthenticationControllerImplTest {
 
 	AuthenticationController authenticationController;
 	CookieProvider mockCookieProvider;
+	SynapseClientAsync mockSynClient;
+	GlobalApplicationState mockGlobalAppState;
 	UserAccountServiceAsync mockUserAccountService;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	UserSessionData sessionData;
@@ -52,7 +56,7 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockSynClient, mockGlobalAppState);
 	}
 	
 	@Test

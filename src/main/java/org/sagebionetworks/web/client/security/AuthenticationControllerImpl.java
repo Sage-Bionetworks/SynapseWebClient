@@ -2,12 +2,14 @@ package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
 
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -26,17 +28,23 @@ import com.google.inject.Inject;
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
+	private static final String USER_BUNDLE_FETCH_ERROR_MESSAGE = "Failed to fetch User Bundle.";
 	private static UserSessionData currentUser;
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private AdapterFactory adapterFactory;
+	private SynapseClientAsync synapseClient;
+	private GlobalApplicationState globalAppState;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory,
+			SynapseClientAsync synapseClient, GlobalApplicationState globalAppState){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.adapterFactory = adapterFactory;
+		this.globalAppState = globalAppState;
+		this.synapseClient = synapseClient;
 	}
 
 	@Override
@@ -47,7 +55,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(Session session) {				
 				revalidateSession(session.getSessionToken(), callback);
 			}
-
+			
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -82,6 +90,31 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 					currentUser = userSessionData;
 					callback.onSuccess(userSessionData);
+					
+					// Attempt to get UserBundle information for user being set
+					try {
+						// 63 is the mask equivalent for getting every UserBundle component
+						synapseClient.getUserBundle(Long.valueOf(userSessionData.getProfile().getOwnerId()), 63, new AsyncCallback<UserBundle>() {
+
+							@Override
+							public void onFailure(Throwable e) {
+								// log in JS console?
+							}
+
+							@Override
+							public void onSuccess(UserBundle bundle) {
+								globalAppState.setUserBundle(bundle);
+							}
+							
+						});
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SynapseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				} else {
 					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}

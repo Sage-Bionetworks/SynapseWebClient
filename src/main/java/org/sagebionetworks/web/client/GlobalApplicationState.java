@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -123,4 +124,8 @@ public interface GlobalApplicationState {
 	public void refreshPage();
 	
 	public void recordPlaceVisit(Place targetPlace);
+
+	UserBundle getUserBundle();
+
+	void setUserBundle(UserBundle userBundle);
 }
