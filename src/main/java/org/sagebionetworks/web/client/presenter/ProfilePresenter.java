@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
@@ -56,6 +57,7 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -110,6 +112,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
 	public Map<String, Boolean> isACTMemberMap;
+	public WikiModalWidget verificationMoreInfoWikiModal;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -126,7 +129,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal) {
+			VerificationSubmissionWidget verificationModal,
+			WikiModalWidget verificationMoreInfoWikiModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -143,6 +147,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
+		this.verificationMoreInfoWikiModal = verificationMoreInfoWikiModal;
 		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -292,6 +297,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void unbindOrcId() {
+		view.showConfirmDialog("Unlink","Are you sure you want to unlink this ORC ID from your Synapse user profile?", new Callback() {
+			@Override
+			public void invoke() {
+				unbindOrcIdAfterConfirmation();
+			}
+		});
+	}
+	
+	public void unbindOrcIdAfterConfirmation() {
 		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -351,7 +365,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//The UI is depends on the current state
 		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
 		if (isVerified) {
-			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid());
+			List<VerificationState> stateHistory = submission.getStateHistory();
+			VerificationState latestState = stateHistory.get(stateHistory.size()-1);
+			String dateVerified = gwt.getFormattedDateString(latestState.getCreatedOn());
+			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid(), dateVerified);
 		}
 		
 		if (submission == null) {
@@ -411,14 +428,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
 			if (currentState.getState() == VerificationStateEnum.SUSPENDED) {
 				view.setVerificationSuspendedButtonVisible(true);
-				if (isOwner) {
-					view.setVerificationButtonVisible(true);
-				}
+				initializeShowHideVerification(isOwner);
 			} else if (currentState.getState() == VerificationStateEnum.REJECTED) {
 				view.setVerificationRejectedButtonVisible(true);
-				if (isOwner) {
-					view.setVerificationButtonVisible(true);
-				}
+				initializeShowHideVerification(isOwner);
 			} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
 				view.setVerificationSubmittedButtonVisible(true);
 			} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
@@ -1025,6 +1038,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setVerificationButtonVisible(true);
 	}
 	
+	@Override
+	public void setVerifyUndismissed() {
+		cookies.removeCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+	}
+	
 	/**
 	 * For testing purposes only
 	 * @param currentUserId
@@ -1123,6 +1141,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				currentUserBundle.getORCID(), 
 				true) //isModal
 			.show();
+	}
+	
+	@Override
+	public void onVerifyMoreInfoClicked() {
+		verificationMoreInfoWikiModal.show("WhyGetValidated");
+	}
+	
+	@Override
+	public void linkOrcIdClicked() {
+		String orcId = currentUserBundle.getORCID();
+		if (orcId != null && orcId.length() > 0) {
+			//already set!
+			view.showErrorMessage("An ORC ID has already been linked to your Synapse account.");
+		} else {
+			DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+		}
 	}
 }
 

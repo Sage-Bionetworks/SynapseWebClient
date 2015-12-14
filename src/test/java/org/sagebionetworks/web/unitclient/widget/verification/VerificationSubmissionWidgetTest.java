@@ -1,8 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.verification;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -26,7 +33,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
@@ -63,8 +69,6 @@ public class VerificationSubmissionWidgetTest {
 	@Mock
 	PromptModalView mockPromptModalView;
 	@Mock
-	CookieProvider mockCookieProvider;
-	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	VerificationSubmission mockSubmission;
@@ -91,7 +95,7 @@ public class VerificationSubmissionWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockCookieProvider, mockGlobalApplicationState, mockGWT);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockGlobalApplicationState, mockGWT);
 		
 		ArgumentCaptor<PromptModalView.Presenter> captor = ArgumentCaptor.forClass(PromptModalView.Presenter.class);
 		verify(mockPromptModalView).setPresenter(captor.capture());
@@ -388,23 +392,5 @@ public class VerificationSubmissionWidgetTest {
 		widget.submitVerification();
 		verify(mockSynapseAlert).showError(anyString());
 		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testDeleteVerificationState() {
-		configureWithMockSubmission();
-		widget.deleteVerification();
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockView).hide();
-		verify(mockGlobalApplicationState).refreshPage();
-	}
-	@Test
-	public void testDeleteVerificationStateFailure() {
-		configureWithMockSubmission();
-		Exception ex =new Exception("something went wrong");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
-		
-		widget.deleteVerification();
-		verify(mockSynapseAlert).handleException(ex);
 	}
 }

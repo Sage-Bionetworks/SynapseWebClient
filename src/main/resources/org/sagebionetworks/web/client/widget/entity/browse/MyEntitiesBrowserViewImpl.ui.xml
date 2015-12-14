@@ -5,17 +5,23 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
 		<!-- Tabs -->
-		<div class="margin-top-15">
+		<div>
 		    <ul class="nav nav-tabs">
-			    <li class="active margin-left-15" ui:field="myProjectsListItem">
+		        <li class="active" ui:field="myProjectsListItem">
 			    	<g:Anchor styleName="text-align-center no-background" ui:field="myProjectsLink" text="My Projects" />
 			    </li>
+			    <li ui:field="currentContextListItem">
+			    	<g:Anchor styleName="text-align-center link no-background" ui:field="currentContextLink" text="Current Folder" />
+			    </li>
+			    
 			    <li ui:field="myFavoritesListItem">
 			    	<g:Anchor styleName="text-align-center link no-background" ui:field="myFavoritesLink" text="My Favorites" />
 			    </li>
 		    </ul>
 		</div>
-		
+		<bh:Div ui:field="currentContextTabContents" addStyleNames="panel margin-top-15">
+			<g:SimplePanel ui:field="currentContextContainer" />
+		</bh:Div>
 		<bh:Div ui:field="myProjectsTabContents" addStyleNames="panel margin-top-15">
 			<g:SimplePanel ui:field="myProjectsContainer" />
 		</bh:Div>

@@ -35,6 +35,8 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	
 	@UiField
 	CheckBox publicJoinCheckbox;
+	@UiField
+	CheckBox authenticatedUsersCanSendCheckbox;
 	
 	@UiField
 	Button primaryButton;
@@ -191,5 +193,13 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	@Override
+	public boolean canAuthenticatedUsersSendMessageToTeam() {
+		return authenticatedUsersCanSendCheckbox.getValue();
+	}
+	@Override
+	public void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage) {
+		authenticatedUsersCanSendCheckbox.setValue(canSendMessage);
 	}
 }

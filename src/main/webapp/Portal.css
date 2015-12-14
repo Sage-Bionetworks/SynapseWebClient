@@ -29,6 +29,16 @@ a:focus{color:#1e7098; text-decoration:underline;}
 	background-color: #1e7098;
 	border-color:#1e7098;
 }
+
+@media (min-width: 1500px) {
+	th.visible-xl, td.visible-xl {
+		display: table-cell !important;
+	}	
+}
+.visible-xl{
+	display:none !important;
+}
+
 .btn-link {
 	color: #1e7098;
 }
@@ -1684,6 +1694,13 @@ ol.lowerroman {
 	position: relative;
 	top: -35px;
 }
+
+.small-icon, i.fa.small-icon {
+	font-size: 6px;
+	top: -.7em;
+	position: relative;
+}
+
 
 .moveup-70 {
 	position: relative;

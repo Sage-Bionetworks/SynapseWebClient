@@ -2126,6 +2126,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
+	public void setIsTeamAdmin(String currentUserId, String targetUserId,
+			String teamId, boolean isTeamAdmin) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.setTeamMemberPermissions(teamId, targetUserId,
+					isTeamAdmin);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public void deleteTeamMember(String currentUserId, String targetUserId,
 			String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2137,9 +2149,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Team updateTeam(Team team) throws RestServiceException {
+	public Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			updateTeamAcl(teamAcl);
 			return synapseClient.updateTeam(team);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
