@@ -23,7 +23,6 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -47,7 +46,6 @@ public class AuthenticationControllerImplTest {
 	UserAccountServiceAsync mockUserAccountService;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	UserSessionData sessionData;
-	UserLoginBundle loginBundle;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -62,9 +60,7 @@ public class AuthenticationControllerImplTest {
 		sessionData.getSession().setSessionToken("1234");
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		
-		loginBundle = new UserLoginBundle(sessionData, new UserBundle());
-		
-		AsyncMockStubber.callSuccessWith(loginBundle).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
 
 		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockUserProfileClient);
 	}
@@ -104,7 +100,7 @@ public class AuthenticationControllerImplTest {
 	@Test
 	public void testReloadUserSessionDataFailure() {
 		Exception testException = new UnauthorizedException("Test failure");
-		AsyncMockStubber.callFailureWith(testException).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(testException).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
 		AsyncCallback<UserSessionData> mockCallback = mock(AsyncCallback.class);
 		authenticationController.reloadUserSessionData(mockCallback);
 		//should remove cookie
@@ -138,7 +134,7 @@ public class AuthenticationControllerImplTest {
 		sessionData.getSession().setSessionToken("1234");
 		
 		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));	
 		
 		// not logged in
 		assertNull(authenticationController.getCurrentUserPrincipalId());
