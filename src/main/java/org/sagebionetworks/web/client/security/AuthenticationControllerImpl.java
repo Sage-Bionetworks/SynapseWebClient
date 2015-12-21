@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.server.servlet.UserLoginBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -77,41 +78,32 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		if(token == null) {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
-		}
-		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
+		}		
+		// clear out old userBundle
+		userBundle = null;
+		
+		userAccountService.getUserLoginBundle(token, new AsyncCallback<UserLoginBundle>() {
 			@Override
-			public void onSuccess(UserSessionData userSessionData) {
-				if (userSessionData != null) {					
+			public void onSuccess(UserLoginBundle userLoginBundle) {
+				UserSessionData userSessionData = userLoginBundle.getUserSessionData();
+				UserBundle fetchedUserBundle = userLoginBundle.getUserBundle();
+				if (userSessionData != null && fetchedUserBundle != null) {					
 					Date tomorrow = getDayFromNow();
 					cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 					currentUser = userSessionData;
+					userBundle = fetchedUserBundle;
 					callback.onSuccess(userSessionData);
-					
-					// Attempt to get UserBundle information for user being set, first resetting userBundle
-					userBundle = null;
-					// 63 is the mask equivalent for getting every UserBundle component
-					userProfileClient.getUserBundle(Long.valueOf(userSessionData.getProfile().getOwnerId()), 63, new AsyncCallback<UserBundle>() {
-						@Override
-						public void onFailure(Throwable e) {
-							// log in JS console?
-						}
-						@Override
-						public void onSuccess(UserBundle bundle) {
-							userBundle = bundle;
-						}
-					});
 				} else {
 					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				logoutUser();
 				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE + " " + caught.getMessage()));
 			}
-		});		
+		});
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.server.servlet.UserLoginBundle;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -45,6 +47,7 @@ public class AuthenticationControllerImplTest {
 	UserAccountServiceAsync mockUserAccountService;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	UserSessionData sessionData;
+	UserLoginBundle loginBundle;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -58,8 +61,11 @@ public class AuthenticationControllerImplTest {
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1234");
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		
+		loginBundle = new UserLoginBundle(sessionData, new UserBundle());
+		
+		AsyncMockStubber.callSuccessWith(loginBundle).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
+
 		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockUserProfileClient);
 	}
 	
