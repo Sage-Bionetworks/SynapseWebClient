@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
 	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
+	private Integer requestExpiresInXDays;
 	private boolean isSimpleRequestButton;
 	private Callback widgetRefreshRequired;
 	private List<AccessRequirement> accessRequirements;
@@ -99,6 +101,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.buttonText = null;
 		this.requestOpenInfoText = null;
 		this.widgetRefreshRequired = callback;
+		this.requestExpiresInXDays = null;
 		refresh();
 	}
 	
@@ -177,7 +180,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		if (descriptor.containsKey(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON)) {
 			this.isSimpleRequestButton = Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON));
 		}
-			
+		this.requestExpiresInXDays = null;
+		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY)) {
+			this.requestExpiresInXDays = Integer.parseInt(descriptor.get(WidgetConstants.JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY));
+		}
 		this.isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
 		
 		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
@@ -413,7 +419,12 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	}
 	
 	public void sendJoinRequestStep3() {
-		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+		Date expiresOn = null;
+		if (requestExpiresInXDays != null) {
+			expiresOn = new Date();
+			gwt.addDaysToDate(expiresOn, requestExpiresInXDays);
+		}
+		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), expiresOn, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				if (teamMembershipStatus.getCanJoin()) {

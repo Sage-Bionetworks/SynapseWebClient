@@ -9,10 +9,12 @@ import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -84,6 +87,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 @UiField
 	 org.gwtbootstrap3.client.ui.Anchor orcIdField;
 	 @UiField
+	 Icon unbindButton;
+	 @UiField
+	 Span unbindButtonUI;
+	 @UiField
 	 TextBox synapseEmailField;
 	@UiField
 	Button editProfileButton;
@@ -96,6 +103,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	SimplePanel picturePanel;
+	@UiField
+	VerificationIDCardViewImpl idCard;
 	
 	//////Tabs
 	@UiField
@@ -241,11 +250,30 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Alert verifyAlert;
 	@UiField
-	FocusPanel verifyFocusPanel;
+	org.gwtbootstrap3.client.ui.Anchor requestProfileValidationLink1;
+	@UiField
+	org.gwtbootstrap3.client.ui.Anchor requestProfileValidationLink2;
+	@UiField
+	org.gwtbootstrap3.client.ui.Anchor reviewProfileLink;
+	@UiField
+	org.gwtbootstrap3.client.ui.Anchor createOrcIdLink;
+	@UiField
+	Button dismissValidationUIButton;
+	
 	@UiField
 	Button verifiedBadge;
 	@UiField
+	Button verificationSubmittedButton;
+	@UiField
+	Button verificationSuspendedButton;
+	@UiField
+	Button verificationRejectedButton;
+	@UiField
 	Button submitProfileValidationButton;
+	@UiField
+	Button verificationApprovedButton;
+	@UiField
+	Button whyGetValidatedButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -256,7 +284,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private OpenTeamInvitationsWidget openInvitesWidget;
 	private SettingsPresenter settingsPresenter;
 	
 	@Inject
@@ -265,14 +292,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			Footer footerWidget, 
 			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils, 
-			OpenTeamInvitationsWidget openInvitesWidget, 
 			SettingsPresenter settingsPresenter) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.openInvitesWidget = openInvitesWidget;
 		this.settingsPresenter = settingsPresenter;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -325,28 +350,46 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Search(""));
 			}
 		});
-		
+		whyGetValidatedButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onVerifyMoreInfoClicked();
+			}
+		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.goTo(new Quiz("Certification"));
 			}
 		});
-		
-		verifyFocusPanel.addClickHandler(new ClickHandler() {
+		ClickHandler newVerificationSubmissionCallback = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.verificationAlertClicked();
+				presenter.newVerificationSubmissionClicked();
 			}
-		});
+		};
+		ClickHandler editVerificationSubmissionCallback = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.editVerificationSubmissionClicked();
+			}
+		};
+		
+		requestProfileValidationLink1.addClickHandler(newVerificationSubmissionCallback);
+		requestProfileValidationLink2.addClickHandler(newVerificationSubmissionCallback);
+		verificationApprovedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationSubmittedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationRejectedButton.addClickHandler(editVerificationSubmissionCallback);
 		
 		submitProfileValidationButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.verificationAlertClicked();
+				submitProfileValidationButton.setVisible(false);
+				verifyAlert.setVisible(true);
+				presenter.setVerifyUndismissed();
 			}
 		});
-
 		initCertificationBadge();
 
 		moreProjectsButton.addClickHandler(new ClickHandler() {
@@ -402,13 +445,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.hideProfileButtonClicked();
 			}
 		});
-		editProfileButton.addClickHandler(new ClickHandler() {
-			
+		ClickHandler editProfileClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onEditProfile();
 			}
-		});
+		};
+		editProfileButton.addClickHandler(editProfileClickHandler);
+		reviewProfileLink.addClickHandler(editProfileClickHandler);
 		importLinkedIn.addClickHandler(new ClickHandler() {
 	
 			@Override
@@ -429,21 +473,36 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		
-		linkORCIDButton.addClickHandler(new ClickHandler() {
+		ClickHandler orcIdClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+				presenter.linkOrcIdClicked();
 			}
-		});
+		};
+		linkORCIDButton.addClickHandler(orcIdClickHandler);
+		createOrcIdLink.addClickHandler(orcIdClickHandler);
 		
-		verifyAlert.addClosedHandler(new AlertClosedHandler() {
+		unbindButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClosed(AlertClosedEvent evt) {
-				presenter.setVerifyDismissed();
+			public void onClick(ClickEvent event) {
+				presenter.unbindOrcId();
 			}
 		});
 		
-
+		dismissValidationUIButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.setVerifyDismissed();
+				verifyAlert.setVisible(false);
+			}
+		});
+		
+		verifiedBadge.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				idCard.show();
+			}
+		});
 	}
 	
 	@Override
@@ -725,6 +784,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setUnbindOrcIdVisible(boolean isVisible) {
+		unbindButtonUI.setVisible(isVisible);
+	}
+	
+	@Override
 	public void setOrcId(String href) {
 		 orcIdField.setText(href);
 		 orcIdField.setHref(href);
@@ -764,7 +828,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void clear() {
 		certificationBadge.setVisible(false);
 		verifiedBadge.setVisible(false);
+		verificationApprovedButton.setVisible(false);
 		submitProfileValidationButton.setVisible(false);
+		verificationSubmittedButton.setVisible(false);
+		verificationSuspendedButton.setVisible(false);
+		verificationRejectedButton.setVisible(false);
 		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
@@ -964,11 +1032,33 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifyAlert.setVisible(isVisible);
 	}
 	@Override
-	public void addVerifiedBadge() {
+	public void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified) {
 		verifiedBadge.setVisible(true);
+		idCard.setFirstName(firstName);
+		idCard.setLastName(lastName);
+		idCard.setLocation(location);
+		idCard.setOrganization(affiliation);
+		idCard.setOrcID(orcIdHref);
+		idCard.setDateVerified(dateVerified);
 	}
 	@Override
 	public void setVerificationButtonVisible(boolean isVisible) {
 		submitProfileValidationButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSubmittedButtonVisible(boolean isVisible) {
+		verificationSubmittedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSuspendedButtonVisible(boolean isVisible) {
+		verificationSuspendedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationRejectedButtonVisible(boolean isVisible) {
+		verificationRejectedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationDetailsButtonVisible(boolean isVisible) {
+		verificationApprovedButton.setVisible(isVisible);
 	}
 }

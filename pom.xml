@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.sagebionetworks</groupId>
 	<artifactId>portal</artifactId>
@@ -16,7 +17,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>112.0-38-g551638b</synapse.version>
+ 		<synapse.version>114.0-2-g42fa6fa</synapse.version>
 		<gwtVersion>2.7.0</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -30,7 +31,7 @@
 		<gwtboostrap3.version>1.2-gwt-2.7.0</gwtboostrap3.version>
 		<gwtboostrap3.extras.version>1.0-gwt-2.7.0</gwtboostrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gwtvisualizationwrappers.version>1.5-gwt-2.7.0</gwtvisualizationwrappers.version>
+		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
 
 	<repositories>

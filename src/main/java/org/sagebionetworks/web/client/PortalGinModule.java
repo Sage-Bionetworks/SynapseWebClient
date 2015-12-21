@@ -25,6 +25,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
+import org.sagebionetworks.web.client.view.ACTView;
+import org.sagebionetworks.web.client.view.ACTViewImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
@@ -85,6 +87,8 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.WikiModalWidgetView;
+import org.sagebionetworks.web.client.widget.WikiModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -194,6 +198,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
@@ -242,6 +247,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
@@ -292,6 +299,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipan
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeView;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
@@ -546,6 +555,8 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidgetView;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -853,6 +864,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
 
 		// MyEntitiesBrowser
+		bind(MyEntitiesBrowser.class).in(Singleton.class);
 		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
 		// Wiki Attachments		
@@ -1164,5 +1176,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
 		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
 		bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
+		bind(ACTView.class).to(ACTViewImpl.class);
+		bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
+		bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
+		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
 	}
 }

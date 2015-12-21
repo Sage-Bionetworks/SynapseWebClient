@@ -13,18 +13,42 @@
 					<b:Icon ui:field="icon" type="FILE"/>
 				</g:FocusPanel>
 			</t:TableData>
-			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden">
-				<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
-		    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
-				</b:Tooltip>
+			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden ">
+				<bh:Div addStyleNames="margin-right-5"> 
+					<g:FlowPanel ui:field="entityContainer" styleName="displayInline pull-left"/>
+					<b:Tooltip title="Public">
+						<b:Icon ui:field="publicIcon" fixedWidth="true" type="GLOBE" visible="false" pull="RIGHT"/>
+					</b:Tooltip>
+					<b:Tooltip title="Private">
+						<b:Icon ui:field="privateIcon" fixedWidth="true" type="LOCK" visible="false" pull="RIGHT"/>
+					</b:Tooltip>
+					<b:Tooltip title="Has a wiki">
+						<b:Icon ui:field="wikiIcon" fixedWidth="true" type="NEWSPAPER_O" visible="false" pull="RIGHT"/>
+					</b:Tooltip>
+					<b:Tooltip title="Sharing Settings have been set">
+						<b:Icon ui:field="sharingSetIcon" fixedWidth="true" type="CHECK" visible="false" pull="RIGHT"/>
+					</b:Tooltip>
+					<b:Tooltip ui:field="annotationsField">
+					  <b:Icon ui:field="annotationsIcon" fixedWidth="true" type="TAGS" visible="false" pull="RIGHT"/>
+					</b:Tooltip>
+					<b:Tooltip ui:field="errorField">
+					  <b:Icon ui:field="errorIcon" fixedWidth="true" type="EXCLAMATION_CIRCLE" visible="false" pull="RIGHT" addStyleNames="text-danger"/>
+					</b:Tooltip>
+				</bh:Div>
 			</t:TableData>
-			<t:TableData width="275px" addStyleNames="visible-lg">
+			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
 				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg">
+			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="100px" >
+			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden">
+				<g:Label ui:field="sizeField"/>
+			</t:TableData>
+			<t:TableData width="65px" addStyleNames="visible-lg overflow-x-hidden">
+				<g:TextBox ui:field="md5Field" width="64px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
+			</t:TableData>
+			<t:TableData width="100px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 		</t:TableRow>

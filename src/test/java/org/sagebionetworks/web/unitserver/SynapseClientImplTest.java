@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
@@ -45,7 +46,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -141,7 +141,6 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -350,9 +349,10 @@ public class SynapseClientImplTest {
 		bundle.setHasChildren(false);
 		bundle.setAccessRequirements(accessRequirements);
 		bundle.setUnmetAccessRequirements(accessRequirements);
+		bundle.setBenefactorAcl(acl);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS)))
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL)))
 				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
@@ -1316,11 +1316,12 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenRequest(true);
 		// verify it does not create a new request since one is already open
-		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		synapseClient.requestMembership("123", "a team", "let me join", TEST_HOME_PAGE_BASE, null);
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
 				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
-				any(MembershipRqstSubmission.class), anyString(), anyString());
+				captor.capture(), anyString(), anyString());
 	}
 
 	@Test
@@ -1335,7 +1336,7 @@ public class SynapseClientImplTest {
 	public void testRequestMembershipCanJoin() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
-		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE, new Date());
 		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
@@ -1350,10 +1351,39 @@ public class SynapseClientImplTest {
 	@Test
 	public void testRequestMembership() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
+				captor.capture(), anyString(), anyString());
+		String teamId = "a team";
+		String message=  "let me join";
+		Date expiresOn = null;
+		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse).createMembershipRequest(
-				any(MembershipRqstSubmission.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		MembershipRqstSubmission request = captor.getValue();
+		assertEquals(expiresOn, request.getExpiresOn());
+		assertEquals(teamId, request.getTeamId());
+		assertEquals(message, request.getMessage());
 	}
+	
+	@Test
+	public void testRequestMembershipWithExpiresOn() throws SynapseException,
+			RestServiceException, JSONObjectAdapterException {
+		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
+				captor.capture(), anyString(), anyString());
+		String teamId = "a team";
+		String message=  "let me join";
+		Date expiresOn = new Date();
+		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
+		verify(mockSynapse).createMembershipRequest(
+				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		MembershipRqstSubmission request = captor.getValue();
+		assertEquals(expiresOn, request.getExpiresOn());
+		assertEquals(teamId, request.getTeamId());
+		assertEquals(message, request.getMessage());
+	}
+
 
 	@Test
 	public void testGetOpenRequestCountUnauthorized() throws SynapseException,
@@ -1955,16 +1985,6 @@ public class SynapseClientImplTest {
 		assertEquals(new Long(3L), results.get(0).getRequestCount());
 		assertEquals(new Long(3L), results.get(1).getRequestCount());
 
-	}
-	
-	@Test
-	public void testGetEntityInfo() throws RestServiceException,
-	JSONObjectAdapterException, SynapseException{
-		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
-		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
-		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
-		assertEquals(eup, entityBundlePlus.getEntityBundle().getPermissions());
-		assertEquals(testUserProfile, entityBundlePlus.getProfile());
 	}
 	
 	@Test(expected = BadRequestException.class)

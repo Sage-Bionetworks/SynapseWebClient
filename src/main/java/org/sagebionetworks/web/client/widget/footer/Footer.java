@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 
 public class Footer implements FooterView.Presenter, IsWidget {
 
+	public static final String UNKNOWN = "unknown";
 	private FooterView view;
 	GlobalApplicationState globalAppState;
 	private boolean isInitialized = false;
@@ -27,17 +28,23 @@ public class Footer implements FooterView.Presenter, IsWidget {
 			globalAppState.checkVersionCompatibility(new AsyncCallback<VersionState>() {
 				@Override
 				public void onSuccess(VersionState state) {
+					if (state == null || state.getVersion() == null) {
+						onFailure(null);
+						return;
+					}
 					String versions = state.getVersion();
 					String[] vals = versions.split(",");
-					if(vals.length == 2)
+					if(vals.length == 2) {
 						view.setVersion(vals[0],vals[1]);
-					else 
+					} else {
 						onFailure(null);
+						return;
+					}
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.setVersion("unknown", "unknown");
+					view.setVersion(UNKNOWN, UNKNOWN);
 				}
 			});
 		}

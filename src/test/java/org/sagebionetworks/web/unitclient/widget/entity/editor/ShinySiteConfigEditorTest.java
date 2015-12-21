@@ -40,7 +40,7 @@ public class ShinySiteConfigEditorTest {
 	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
-		descriptor.put(WidgetConstants.SHINYSITE_HEIGHT_KEY, "500");
+		descriptor.put(WidgetConstants.HEIGHT_KEY, "500");
 		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(validSiteUrl, 500);		
 	}
@@ -59,6 +59,6 @@ public class ShinySiteConfigEditorTest {
 		verify(mockView, atLeastOnce()).getSiteHeight();
 		
 		assertEquals(validSiteUrl, descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY));
-		assertEquals("500", descriptor.get(WidgetConstants.SHINYSITE_HEIGHT_KEY));
+		assertEquals("500", descriptor.get(WidgetConstants.HEIGHT_KEY));
 	}
 }

@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityTreeBrowserView extends IsWidget, SynapseView {
-
 	/**
 	 * Set the presenter.
 	 * @param presenter
@@ -19,6 +18,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 * in the tree will become selected.
 	 */
 	void makeSelectable();
+	void clearSelection();
 	
 	/**
 	 * Presenter interface
@@ -37,7 +37,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 				EntityTreeItem parent, long offset);
 
 		void getChildren(String parentId, EntityTreeItem parent, long offset);
-
 	}
 
 	void appendRootEntityTreeItem(EntityTreeItem childToAdd);
@@ -61,6 +60,5 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void hideEmptyUI();
 	
 	void setLoadingVisible(boolean isShown);
-
 
 }

@@ -5,6 +5,7 @@ import java.net.URL;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -18,10 +19,11 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 		UserProfileClient {
 	
 	@Override
-	public VerificationSubmission createVerificationSubmission(VerificationSubmission verificationSubmission) throws RestServiceException {
+	public VerificationSubmission createVerificationSubmission(VerificationSubmission verificationSubmission, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createVerificationSubmission(verificationSubmission);
+			String notificationEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			return synapseClient.createVerificationSubmission(verificationSubmission, notificationEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -38,10 +40,22 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void updateVerificationState(long verificationId, VerificationState verificationState) throws RestServiceException {
+	public void unbindOAuthProvidersUserId(OAuthProvider provider, String alias) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.updateVerificationState(verificationId, verificationState);
+			synapseClient.unbindOAuthProvidersUserId(provider, alias);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	
+	@Override
+	public void updateVerificationState(long verificationId, VerificationState verificationState, String hostPageBaseURL) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			String notificationEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			synapseClient.updateVerificationState(verificationId, verificationState, notificationEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -72,18 +86,6 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getUserBundle(principalId, mask);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public String getFileURL(FileHandleAssociation fileHandleAssociation) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			//java.net.URL not serializable over GWT rpc, send back the url in string form...
-			URL url = synapseClient.getFileURL(fileHandleAssociation);
-			return url.toString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

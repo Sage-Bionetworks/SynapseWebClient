@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.sharing.TeamAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
@@ -42,7 +41,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private MemberListWidget memberListWidget;
 	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
 	private OpenUserInvitationsWidget openUserInvitationsWidget;
-	private TeamAccessControlListModalWidget aclModalWidget;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -55,8 +53,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			JoinTeamWidget joinTeamWidget,  
 			MemberListWidget memberListWidget, 
 			OpenMembershipRequestsWidget openMembershipRequestsWidget,
-			OpenUserInvitationsWidget openUserInvitationsWidget,
-			TeamAccessControlListModalWidget aclModalWidget) {
+			OpenUserInvitationsWidget openUserInvitationsWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -70,7 +67,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.memberListWidget = memberListWidget;
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
-		this.aclModalWidget = aclModalWidget;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
@@ -81,7 +77,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenMembershipRequestWidget(memberListWidget.asWidget());
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
-		view.setAclModalWidget(aclModalWidget.asWidget());
 		Callback refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -150,7 +145,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 						refresh(teamId);
 					}
 				};
-				view.setShareButtonVisible(isAdmin);
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
@@ -204,8 +198,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void showEditModal() {
 		synAlert.clear();
-		editTeamWidget.configure(team);
-		editTeamWidget.show();
+		editTeamWidget.configureAndShow(team);
 	}
 
 	@Override
@@ -220,17 +213,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		synAlert.clear();
 		leaveTeamWidget.configure(team);
 		leaveTeamWidget.showDialog();		
-	}
-	
-	@Override
-	public void shareButtonClicked() {
-		aclModalWidget.configure(team);
-		aclModalWidget.showSharing(new Callback() {
-			@Override
-			public void invoke() {
-				refresh();	
-			}
-		});
 	}
 	
 	//testing only

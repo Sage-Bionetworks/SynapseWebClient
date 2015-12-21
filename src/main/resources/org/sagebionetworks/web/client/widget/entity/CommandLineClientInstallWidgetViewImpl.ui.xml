@@ -16,6 +16,6 @@ pip install synapseclient
 easy_install synapseclient</pre>
  	    <b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="link" target="_blank" text="API Documentation"/>
 		<bh:Text text="and"/>
-		<b:Anchor href="https://www.synapse.org/#!Help:CommandLineClient" addStyleNames="link" target="_blank" text="Example Code"/>
+		<b:Anchor href="#!Help:CommandLineClient" addStyleNames="link" target="_blank" text="Example Code"/>
 	</g:HTMLPanel>
 </ui:UiBinder>

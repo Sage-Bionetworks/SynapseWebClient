@@ -32,7 +32,7 @@ public class VideoWidget implements VideoWidgetView.Presenter, WidgetRendererPre
 		String oggSynapseId = descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY);
 		String webmSynapseId = descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY);
 		String width = descriptor.get(WidgetConstants.VIDEO_WIDGET_WIDTH_KEY);
-		String height = descriptor.get(WidgetConstants.VIDEO_WIDGET_HEIGHT_KEY);
+		String height = descriptor.get(WidgetConstants.HEIGHT_KEY);
 		view.configure(wikiKey,	mp4SynapseId, oggSynapseId, webmSynapseId, width, height, authenticationController.isLoggedIn(), wikiVersionInView);
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;

@@ -1,15 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -36,12 +31,26 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void setModifiedByWidget(Widget w);
 	void setModifiedByWidgetVisible(boolean visible);
 	void setIcon(IconType iconType);
+	
+	void setAnnotations(String html);
+	void setSize(String s);
+	void setMd5(String s);
+	void showPublicIcon();
+	void showPrivateIcon();
+	void showSharingSetIcon();
+	void showHasWikiIcon();
+	void showAnnotationsIcon();
+	boolean isInViewport();
+	boolean isAttached();
+	void setError(String error);
+	void showErrorIcon();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback);
 		void entityClicked(EntityQueryResult entityHeader);
+		void viewAttached();
 	}
 	String getFriendlySize(Long contentSize, boolean b);
 

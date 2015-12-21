@@ -31,7 +31,7 @@
 					    <b:AnchorListItem ui:field="queryLink">Table: Query on Files/Folders</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="videoLink">Video</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT">Video</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
 					  </b:DropDownMenu>
@@ -44,6 +44,7 @@
 						    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="challengeParticipantsLink">Challenge Participants List</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="challengeTeamsLink">Challenge Teams List</b:AnchorListItem>
+						    <b:AnchorListItem ui:field="cytoscapeJsLink">Cytoscape JS Graph</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="genomeBrowserLink">Genome Browser</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="registerChallengeTeamLink">Register Challenge Team Button</b:AnchorListItem>

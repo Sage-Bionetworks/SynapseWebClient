@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
@@ -9,18 +10,14 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -42,8 +39,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
-	Tooltip tooltip;
-	@UiField
 	FocusPanel iconContainer;
 	@UiField
 	Icon icon;
@@ -58,8 +53,26 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	ClickHandler nonDefaultClickHandler;
 	
-	boolean isPopoverInitialized;
-	boolean isPopover;
+	@UiField
+	Tooltip annotationsField;
+	@UiField
+	Label sizeField;
+	@UiField
+	TextBox md5Field;
+	@UiField
+	Icon publicIcon;
+	@UiField
+	Icon privateIcon;
+	@UiField
+	Icon sharingSetIcon;
+	@UiField
+	Icon wikiIcon;
+	@UiField
+	Icon annotationsIcon;
+	@UiField
+	Tooltip errorField;
+	@UiField
+	Icon errorIcon;
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -75,8 +88,19 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				idField.selectAll();
 			}
 		});
+		md5Field.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				md5Field.selectAll();
+			}
+		});
 	}
 	
+	@Override
+	protected void onAttach() {
+		super.onAttach();
+		presenter.viewAttached();
+	}
 	
 	@Override
 	public void setEntity(final EntityQueryResult entityHeader) {
@@ -84,27 +108,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
-			isPopoverInitialized = false;
-			
 			final Anchor anchor = new Anchor();
 			anchor.setText(entityHeader.getName());
 			anchor.addStyleName("link");
-			isPopover = false;
-			anchor.addMouseOverHandler(new MouseOverHandler() {
-				
-				@Override
-				public void onMouseOver(MouseOverEvent event) {
-					showPopover(anchor, entityHeader.getId(), entityHeader.getName());
-					isPopover = true;
-				}
-			});
-			anchor.addMouseOutHandler(new MouseOutHandler() {
-				@Override
-				public void onMouseOut(MouseOutEvent event) {
-					isPopover = false;
-					tooltip.hide();
-				}
-			});
 			
 			anchor.addClickHandler(new ClickHandler() {
 				@Override
@@ -130,34 +136,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.setType(iconType);
 	}
 	
-	public void showPopover(final Anchor anchor, final String entityId, final String entityName) {
-		if (!isPopoverInitialized) {
-			presenter.getInfo(entityId, new AsyncCallback<KeyValueDisplay<String>>() {						
-				@Override
-				public void onSuccess(KeyValueDisplay<String> result) {
-					renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
-				}
-				
-				private void renderPopover(final String content) {
-					isPopoverInitialized = true;
-					if (entityContainer.isAttached()) {
-						tooltip.setTitle(content);
-						tooltip.reconfigure();
-						if (isPopover)
-							tooltip.show();
-					}
-				}
-			});
-		} else {
-			tooltip.show();	
-		}
-	}
-
 	@Override
 	public void showLoadError(String principalId) {
 		clear();
@@ -231,6 +209,64 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public String getFriendlySize(Long contentSize, boolean abbreviatedUnits) {
 		return DisplayUtils.getFriendlySize(contentSize, abbreviatedUnits);
+	}
+	
+	@Override
+	public void setAnnotations(String html) {
+		annotationsField.setHtml(SafeHtmlUtils.fromTrustedString(html));
+		annotationsField.reconfigure();
+	}
+	@Override
+	public void showAnnotationsIcon() {
+		annotationsIcon.setVisible(true);
+	}
+	
+	@Override
+	public void setError(String error) {
+		errorField.setTitle(error);
+		errorField.reconfigure();
+	}
+	@Override
+	public void showErrorIcon() {
+		errorIcon.setVisible(true);
+	}
+	
+	@Override
+	public void setSize(String s) {
+		sizeField.setText(s);
+	}
+	@Override
+	public void setMd5(String s) {
+		md5Field.setText(s);
+	}
+
+	@Override
+	public void showHasWikiIcon() {
+		wikiIcon.setVisible(true);
+	}
+	@Override
+	public void showPrivateIcon() {
+		privateIcon.setVisible(true);
+	}
+	@Override
+	public void showPublicIcon() {
+		publicIcon.setVisible(true);
+	}
+	@Override
+	public void showSharingSetIcon() {
+		sharingSetIcon.setVisible(true);
+	}
+
+	/**
+	 * return true if the widget is in the visible part of the page
+	 */
+	@Override
+	public boolean isInViewport() {
+		int docViewTop = Window.getScrollTop();
+		int docViewBottom = docViewTop + Window.getClientHeight();
+		int elemTop = this.getAbsoluteTop();
+		int elemBottom = elemTop + this.getOffsetHeight();
+		return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
 	}
 	
 	/*

@@ -1,13 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -36,7 +30,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.verification.VerificationState;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -69,6 +67,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -76,6 +75,7 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -128,11 +128,20 @@ public class ProfilePresenterTest {
 	SynapseAlert mockSynAlert;
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
 	String targetUserId = "12345";
+	List<VerificationState> verificationStateList;
 	
 	@Mock
 	UserProfileClientAsync mockUserProfileClient;
 	@Mock
 	UserBundle mockUserBundle;
+	@Mock
+	UserBundle mockCurrentUserBundle;
+	@Mock
+	VerificationSubmissionWidget mockVerificationSubmissionModal;
+	@Mock
+	VerificationSubmission mockVerificationSubmission;
+	@Mock
+	WikiModalWidget mockWikiModalWidget;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -157,7 +166,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient);	
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockWikiModalWidget);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -171,6 +180,9 @@ public class ProfilePresenterTest {
 		testUser.setIsSSO(false);
 		
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
@@ -237,6 +249,13 @@ public class ProfilePresenterTest {
 		setupTestChallengePagedResults();
 		
 		when(place.toToken()).thenReturn(targetUserId);
+		when(mockUserBundle.getVerificationSubmission()).thenReturn(mockVerificationSubmission);
+		verificationStateList = new ArrayList<VerificationState>();
+		VerificationState oldState = new VerificationState();
+		oldState.setState(VerificationStateEnum.SUSPENDED);
+		oldState.setReason("numerous violations of the terms of use");
+		verificationStateList.add(oldState);
+		when(mockVerificationSubmission.getStateHistory()).thenReturn(verificationStateList);
 	}
 	
 	public void setupTestChallengePagedResults() {
@@ -256,8 +275,6 @@ public class ProfilePresenterTest {
 		ProfileArea initialTab = ProfileArea.PROJECTS;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(isOwner);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		//TODO: remove alpha mode website mock below after ORCID exposed in profile 
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		profilePresenter.updateProfileView(userId, initialTab);
 		
 		verify(mockView).clear();
@@ -340,6 +357,12 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
+		
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		
+		verify(mockView, never()).setOrcIdVisible(true);
+		verify(mockView, never()).setUnbindOrcIdVisible(true);
 	} 
 	
 
@@ -383,6 +406,15 @@ public class ProfilePresenterTest {
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
+		
+		//also verify that when orc id is not set in the user bundle (for the owner), then orc id is not visible
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		verify(mockView, never()).setOrcIdVisible(true);
+		verify(mockView, never()).setUnbindOrcIdVisible(true);
+		verify(mockView).setOrcIDLinkButtonVisible(true); 
+		verify(mockView, never()).setOrcIDLinkButtonVisible(false); 
+
 	}
 	
 	@Test
@@ -392,9 +424,19 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
+		when(mockUserBundle.getORCID()).thenReturn("an orc id");
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
+		
+		//also verify that when orc id is set in the user bundle (for the owner), then orc id is visible (and can be unbound)
+		verify(mockView).setOrcIdVisible(false);
+		verify(mockView).setUnbindOrcIdVisible(false);
+		verify(mockView).setOrcIdVisible(true);
+		verify(mockView).setUnbindOrcIdVisible(true);
+		//link ORC ID button initially visible because this is the owner, but hidden because orc id is set
+		verify(mockView).setOrcIDLinkButtonVisible(true); 
+		verify(mockView).setOrcIDLinkButtonVisible(false); 
 	}
 	
 	
@@ -408,6 +450,15 @@ public class ProfilePresenterTest {
 		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		verify(mockView).setGetCertifiedVisible(false);
 		verify(mockView, never()).addCertifiedBadge();
+	}
+	
+
+	@Test
+	public void testLinkOrcIdClicked() throws JSONObjectAdapterException {
+		when(mockUserBundle.getORCID()).thenReturn("a value");
+		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.linkOrcIdClicked();
+		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	
@@ -1308,8 +1359,9 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
 		profilePresenter.initializeShowHideVerification(false);
-		verify(mockView).setVerificationAlertVisible(false);
-		verify(mockView).setVerificationButtonVisible(false);
+		//ui elements are hidden by default, so there should be no interactions
+		verify(mockView, never()).setVerificationAlertVisible(anyBoolean());
+		verify(mockView, never()).setVerificationButtonVisible(anyBoolean());
 	}
 	
 	@Test
@@ -1353,6 +1405,108 @@ public class ProfilePresenterTest {
 		profilePresenter.setVerifyDismissed();
 		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()), eq(Boolean.FALSE.toString()), any(Date.class));
 		verify(mockView).setVerificationButtonVisible(true);
+	}
+	
+	private void setupVerificationState(VerificationStateEnum s, String reason) {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockCurrentUserBundle.getIsACTMember()).thenReturn(true);
+		VerificationState state = new VerificationState();
+		state.setState(s);
+		state.setReason(reason);
+		verificationStateList.add(state);
+		//TODO: remove alpha mode website mock below after Validation has been exposed
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+	}
+	
+	private void viewProfile(String targetUserId, String currentUserId) {
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		profilePresenter.updateProfileView(targetUserId, ProfileArea.PROJECTS);
+	}
+	
+	@Test
+	public void testVerificationUIInitRejected() {
+		setupVerificationState(VerificationStateEnum.REJECTED, "bad behavior");
+		when(mockUserBundle.getIsVerified()).thenReturn(false);
+		
+		//not the owner of this profile, but is ACT
+		viewProfile("123", "456");
+		
+		//user bundle reported that target user is not verified, should show badge
+		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null, null);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verify(mockView).setVerificationRejectedButtonVisible(true);
+		//since this is ACT, should not see a way to submit a new validation request
+		verify(mockView, never()).setVerificationButtonVisible(anyBoolean());
+	}
+	
+	@Test
+	public void testVerificationUIInitSubmitted() {
+		setupVerificationState(VerificationStateEnum.SUBMITTED, null);
+		when(mockUserBundle.getIsVerified()).thenReturn(false);
+		
+		//is not the owner of this profile, but is ACT
+		//not the owner of this profile, but is ACT
+		viewProfile("123", "456");
+		
+		//user bundle reported that target user is not verified
+		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null, null);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verify(mockView).setVerificationSubmittedButtonVisible(true);
+	}	
+	
+	@Test
+	public void testVerificationUIInitApproved() {
+		setupVerificationState(VerificationStateEnum.APPROVED, null);
+		when(mockUserBundle.getIsVerified()).thenReturn(true);
+		String fName = "Luke";
+		String lName = "Skywalker";
+		String company = "Rebel Alliance";
+		String orcId = "http://orcid/address";
+		String location= "Jundland Wastes, Tatooine";
+		String friendlyDate= "October 2nd";
+		when(mockVerificationSubmission.getFirstName()).thenReturn(fName);
+		when(mockVerificationSubmission.getLastName()).thenReturn(lName);
+		when(mockVerificationSubmission.getCompany()).thenReturn(company);
+		when(mockVerificationSubmission.getOrcid()).thenReturn(orcId);
+		when(mockVerificationSubmission.getLocation()).thenReturn(location);
+		
+		when(mockGwt.getFormattedDateString(any(Date.class))).thenReturn(friendlyDate);
+		//not the owner of this profile, but is ACT
+		viewProfile("123", "456");
+		
+		//user bundle reported that target user is verified
+		verify(mockView).showVerifiedBadge(fName, lName, location, company, orcId, friendlyDate);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verify(mockView).setVerificationDetailsButtonVisible(true);
+	}
+	
+	@Test
+	public void testVerificationApprovedAsAnonymous() {
+		setupVerificationState(VerificationStateEnum.APPROVED, null);
+		when(mockUserBundle.getIsVerified()).thenReturn(true);
+		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		viewProfile("123", null);
+
+		verify(mockView).showVerifiedBadge(null, null, null, null, null, null);
+		//no need to check for act membership for anonymous
+		verify(mockUserProfileClient, never()).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		//validation details button is not visible to anonymous
+		verify(mockView, never()).setVerificationDetailsButtonVisible(anyBoolean());
+	}
+	
+	@Test
+	public void testVerificationApprovedAsNonACT() {
+		setupVerificationState(VerificationStateEnum.APPROVED, null);
+		when(mockUserBundle.getIsVerified()).thenReturn(true);
+		when(mockCurrentUserBundle.getIsACTMember()).thenReturn(false);
+		viewProfile("123", "456");
+
+		verify(mockView).showVerifiedBadge(null, null, null, null, null, null);
+		//no need to check for act membership for anonymous
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		//validation details button is not visible to a person who is not the owner and not part of the ACT
+		verify(mockView, never()).setVerificationDetailsButtonVisible(anyBoolean());
 	}
 	
 	@Test
@@ -1418,6 +1572,47 @@ public class ProfilePresenterTest {
 		assertEquals(currentUserId, capturedPlace.getUserId());
 		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
 	}
-
-
+	@Test
+	public void testNewVerificationSubmissionClicked() {
+		//view my own profile.  submit a new verification submission, verify that modal is shown
+		String currentUserId = "94837";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean())).thenReturn(mockVerificationSubmissionModal);
+		viewProfile(currentUserId, currentUserId);
+		profilePresenter.newVerificationSubmissionClicked();
+		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true));
+		verify(mockVerificationSubmissionModal).show();
+	}
+	@Test
+	public void testUnbindOrcId() {
+		viewProfile("123", "456");
+		profilePresenter.unbindOrcIdAfterConfirmation();
+		//success message and page refresh
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	
+	@Test
+	public void testUnbindOrcIdFailure() {
+		Exception ex = new Exception("bad things happened");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		viewProfile("123", "456");
+		profilePresenter.unbindOrcIdAfterConfirmation();
+		//error is shown
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testonVerifyMoreInfoClicked() {
+		profilePresenter.onVerifyMoreInfoClicked();
+		verify(mockWikiModalWidget).show(anyString());
+	}
+	
+	@Test
+	public void testSetVerifyUndismissed() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		profilePresenter.setVerifyUndismissed();
+		verify(mockCookies).removeCookie(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId());
+	}
 }

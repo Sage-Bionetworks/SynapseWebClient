@@ -1,35 +1,38 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+
 import java.util.List;
-import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -38,30 +41,80 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPresenter {
 	
+	public static final int DELAY_UNTIL_IN_VIEW = 2000;
 	private EntityBadgeView view;
-	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
 	private EntityQueryResult entityHeader;
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	private CallbackP<String> customEntityClickHandler;
-	
+	private Callback invokeCheckForInViewAndLoadData;
+	private boolean isConfigured;
+	private boolean isAttached;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
-			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			SynapseClientAsync synapseClient,
+			GWTWrapper gwt) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseClient = synapseClient;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
+		invokeCheckForInViewAndLoadData = new Callback() {
+			@Override
+			public void invoke() {
+				checkForInViewAndLoadData();
+			}
+		};
+		isConfigured = false;
+		isAttached = false;
+	}
+	public void startCheckingIfAttachedAndConfigured() {
+		if (isAttached && isConfigured) {
+			checkForInViewAndLoadData();
+		}
+	}
+	public void checkForInViewAndLoadData() {
+		if (!view.isAttached()) {
+			//Done, view has been detached and widget was never in the viewport
+			return;
+		} else if (view.isInViewport()) {
+			//try to load data!
+			getEntityBundle();
+		} else {
+			//wait for a few seconds and see if we should load data
+			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DELAY_UNTIL_IN_VIEW);
+		}
+	}
+	@Override
+	public void viewAttached() {
+		isAttached = true;
+		startCheckingIfAttachedAndConfigured();
+	}
+	
+	public void getEntityBundle() {
+		int partsMask = ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
+		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorIcon();
+				view.setError(caught.getMessage());
+			}
+			public void onSuccess(EntityBundle eb) {
+				setEntityBundle(eb);
+			};
+		});
 	}
 	
 	public void configure(EntityQueryResult header) {
@@ -81,6 +134,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		} else {
 			view.setModifiedOn("");
 		}
+		isConfigured = true;
+		startCheckingIfAttachedAndConfigured();
 	}
 	
 
@@ -110,56 +165,57 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		return view.asWidget();
 	}
 	
-	@Override
-	public void getInfo(String entityId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		synapseClient.getEntityInfo(entityId, new AsyncCallback<EntityBundlePlus>() {
-			@Override
-			public void onSuccess(EntityBundlePlus result) {
-				EntityBundle eb = result.getEntityBundle();
-				Entity entity = eb.getEntity();
-				Annotations annotations = eb.getAnnotations();
-				String rootWikiId = eb.getRootWikiId();
-				List<FileHandle> handles = eb.getFileHandles();
-				KeyValueDisplay<String> keyValueDisplay = ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(result.getProfile()), false);
-				addAnnotations(keyValueDisplay, annotations);
-				addContentSize(keyValueDisplay, handles);
-				addPublicPrivate(keyValueDisplay, eb.getPermissions());
-				addWikiStatus(keyValueDisplay, rootWikiId);
-				callback.onSuccess(keyValueDisplay);		
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
+	public void setEntityBundle(EntityBundle eb) {
+		Annotations annotations = eb.getAnnotations();
+		String rootWikiId = eb.getRootWikiId();
+		List<FileHandle> handles = eb.getFileHandles();
+		List<Annotation> annotationList = transformer.annotationsToList(annotations);
+		if (!annotationList.isEmpty()) {
+			view.showAnnotationsIcon();
+			view.setAnnotations(getAnnotationsHTML(annotationList));
+		}
+		
+		view.setSize(getContentSize(handles));
+		view.setMd5(getContentMd5(handles));
+		if(eb.getPermissions().getCanPublicRead()) {
+			view.showPublicIcon();
+		} else {
+			view.showPrivateIcon();
+		}
+		boolean hasLocalSharingSettings = eb.getBenefactorAcl().getId().equals(entityHeader.getId());
+		if (hasLocalSharingSettings) {
+			view.showSharingSetIcon();
+		}
+		
+		if (DisplayUtils.isDefined(rootWikiId)) {
+			view.showHasWikiIcon();
+		}
 	}
 	
-	public void addContentSize(KeyValueDisplay<String> keyValueDisplay, List<FileHandle> handles) {
-		Map<String,String> map = keyValueDisplay.getMap();
-		List<String> order = keyValueDisplay.getKeyDisplayOrder();
+	public String getContentSize(List<FileHandle> handles) {
 		if (handles != null) {
 			for (FileHandle handle: handles) {
 				if (!(handle instanceof PreviewFileHandle)) {
 					Long contentSize = handle.getContentSize();
 					if (contentSize != null && contentSize > 0) {
-						order.add("File Size");
-						map.put("File Size", view.getFriendlySize(contentSize, true));
+						return view.getFriendlySize(contentSize, true);
 					}
 				}
 			}
 		}
+		return "";
 	}
+	
 
-	public void addPublicPrivate(KeyValueDisplay<String> keyValueDisplay, UserEntityPermissions permissions) {
-		Map<String,String> map = keyValueDisplay.getMap();
-		List<String> order = keyValueDisplay.getKeyDisplayOrder();
-		if (permissions.getCanPublicRead()) {
-			order.add("Public");
-			map.put("Public", "");
-		} else {
-			order.add("Private");
-			map.put("Private", "");	
+	public String getContentMd5(List<FileHandle> handles) {
+		if (handles != null) {
+			for (FileHandle handle: handles) {
+				if (!(handle instanceof PreviewFileHandle)) {
+					return handle.getContentMd5();
+				}
+			}
 		}
+		return "";
 	}
 	
 	/**
@@ -167,32 +223,19 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	 * @param keyValueDisplay
 	 * @param annotations
 	 */
-	public void addAnnotations(KeyValueDisplay<String> keyValueDisplay, Annotations annotations) {
-		Map<String,String> map = keyValueDisplay.getMap();
-		List<String> order = keyValueDisplay.getKeyDisplayOrder();
-		
-		List<Annotation> annotationList = transformer.annotationsToList(annotations);
-		for (Annotation annotation : annotationList) {
+	public String getAnnotationsHTML(List<Annotation> annotations) {
+		StringBuilder sb = new StringBuilder();
+		for (Annotation annotation : annotations) {
 			String key = annotation.getKey();
-			order.add(key);
-			map.put(key, SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(annotation)));
+			sb.append("<strong>");
+			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(key));
+			sb.append("</strong>&nbsp;");
+			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(annotation)));
+			sb.append("<br />");
 		}
+		return sb.toString();
 	}
 	
-	/**
-	 * Adds annotations and wiki status values to the given key value display
-	 * @param keyValueDisplay
-	 * @param rootWikiKeyId
-	 */
-	public void addWikiStatus(KeyValueDisplay<String> keyValueDisplay, String rootWikiKeyId) {
-		Map<String,String> map = keyValueDisplay.getMap();
-		List<String> order = keyValueDisplay.getKeyDisplayOrder();
-		
-		if (DisplayUtils.isDefined(rootWikiKeyId)) {
-			order.add("Has a wiki");
-			map.put("Has a wiki", "");
-		}
-	}
 	
 	public void setEntityClickedHandler(CallbackP<String> callback) {
 		customEntityClickHandler = callback;
@@ -224,5 +267,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		modifiedByUserBadge.setCustomClickHandler(handler);
 		view.setClickHandler(handler);
 	}
-
+	
+	public String getEntityId() {
+		return entityHeader.getId();
+	}
 }

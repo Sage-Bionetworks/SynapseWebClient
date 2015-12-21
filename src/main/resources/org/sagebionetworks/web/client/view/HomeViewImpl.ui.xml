@@ -57,7 +57,7 @@
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
-			<b:Row addStyleNames="margin-top-40">
+			<b:Row addStyleNames="margin-top-20">
 				<b:Column size="SM_7">
 					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-30 margin-left-15 margin-bottom-15" visible="false">
 						<bh:Div>
@@ -74,9 +74,109 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
-		
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-blue-bg margin-top-40">
+			<b:Row addStyleNames="synapse-blue-bg margin-top-20">
+				<b:Column size="SM_12">
+					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="HELP"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_3" addStyleNames="margin-top-30">
+					<g:FocusPanel ui:field="gettingStartedBox">
+						<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
+							<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Synapse Tutorial" />
+							<b:Heading size="H6" text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. " />
+							<b:Heading size="H6" text="This tutorial steps you through how to create your first Project, store your research data, share with your collaborators, and more!" />
+							<b:Button text="Open the tutorial" />
+						</b:Panel>
+					</g:FocusPanel>
+				</b:Column>
+				<b:Column size="SM_9" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Programmatic Clients" />
+						<b:Heading size="H6" text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
+						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
+						   all from the comfort of your own code." />
+						<b:Heading size="H6" text="Don't see your language of choice here? Check out our full&nbsp;">
+							<b:Anchor href="http://rest.synapse.org" text="REST API documentation" target="_blank"/>
+						</b:Heading>
+						<b:Row>
+							<b:Column size="SM_3">
+								<bh:Div>
+									<t:Table>
+										<t:TableRow>
+											<t:TableData addStyleNames="vertical-align-top">
+												<g:Image resource='{sageImageBundle.logoR45}' addStyleNames="margin-right-5"/>
+											</t:TableData>
+											<t:TableData>
+												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="R client" />
+												<b:Anchor href="http://r-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Anchor href="#!Help:RClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+											</t:TableData>
+										</t:TableRow>
+									</t:Table>
+								</bh:Div>
+							</b:Column>
+							<b:Column size="SM_3">
+								<bh:Div>
+									<t:Table>
+										<t:TableRow>
+											<t:TableData addStyleNames="vertical-align-top">
+												<g:Image resource='{sageImageBundle.logoPython45}' addStyleNames="margin-right-5"/>
+											</t:TableData>
+											<t:TableData>
+												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Python client" />
+												<b:Anchor href="http://python-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Anchor href="#!Help:PythonClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+											</t:TableData>
+										</t:TableRow>
+									</t:Table>
+								</bh:Div>
+							</b:Column>
+							<b:Column size="SM_3">
+								<bh:Div>
+									<t:Table>
+										<t:TableRow>
+											<t:TableData addStyleNames="vertical-align-top">
+												<g:Image resource='{sageImageBundle.logoCommandLine45}' addStyleNames="margin-right-5"/>
+											</t:TableData>
+											<t:TableData>
+												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Command line client" />
+												<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Anchor href="#!Help:CommandLineClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+											</t:TableData>
+										</t:TableRow>
+									</t:Table>
+								</bh:Div>
+							</b:Column>
+							<b:Column size="SM_3">
+								<bh:Div>
+									<t:Table>
+										<t:TableRow>
+											<t:TableData addStyleNames="vertical-align-top">
+												<g:Image resource='{sageImageBundle.logoJava45}' addStyleNames="margin-right-5"/>
+											</t:TableData>
+											<t:TableData>
+												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Java client" />
+												<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Anchor href="#!StandaloneWiki:JavaClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+											</t:TableData>
+										</t:TableRow>
+									</t:Table>
+								</bh:Div>
+							</b:Column>						
+						</b:Row>
+					</b:Panel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-blue-bg margin-top-20">
 				<b:Column size="SM_12">
 					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="EXPLORE HOW RESEARCHERS ARE USING SYNAPSE"
@@ -132,8 +232,9 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
+
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-purple-bg margin-top-40">
+			<b:Row addStyleNames="synapse-purple-bg margin-top-20">
 				<b:Column size="SM_12">
 					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="GOVERNANCE"
@@ -172,8 +273,9 @@
 					</b:Column>
 			</b:Row>
 		</b:Container>
+		
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-yellow-bg margin-top-40">
+			<b:Row addStyleNames="synapse-yellow-bg margin-top-20">
 				<b:Column size="SM_12">
 					<b:Heading ui:field="organizeDigitalResearchAssetsHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="ORGANIZE YOUR DIGITAL RESEARCH ASSETS"
@@ -225,7 +327,7 @@
 		</b:Container>
 		
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-green-bg margin-top-40">
+			<b:Row addStyleNames="synapse-green-bg margin-top-20">
 				<b:Column size="SM_12">
 					<b:Heading ui:field="getCreditHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="GET CREDIT FOR YOUR RESEARCH"
@@ -268,7 +370,7 @@
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-purple-bg margin-top-40">
+			<b:Row addStyleNames="synapse-purple-bg margin-top-20">
 				<b:Column size="SM_12">
 					<b:Heading ui:field="collaborateHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="COLLABORATE"

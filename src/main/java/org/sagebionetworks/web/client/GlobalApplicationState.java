@@ -103,6 +103,8 @@ public interface GlobalApplicationState {
 	String getSynapseProperty(String key);
 	
 	void clearLastPlace();
+	void clearCurrentPlace();
+	
 	
 	public boolean isWikiBasedEntity(String entityId);
 

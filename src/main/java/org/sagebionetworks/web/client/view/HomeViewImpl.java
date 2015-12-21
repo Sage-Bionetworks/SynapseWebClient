@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -16,6 +18,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -77,6 +80,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	FocusPanel organizeResearchAssetsBox;
 	@UiField
 	FocusPanel collaborateBox;
+	
+	
+	@UiField
+	FocusPanel gettingStartedBox;
 	
 	@UiField
 	Heading organizeDigitalResearchAssetsHeading;
@@ -186,11 +193,17 @@ public class HomeViewImpl extends Composite implements HomeView {
 				Window.scrollTo(0, collaborateHeading.getAbsoluteTop());
 			}
 		});
-		
 		termsOfUseBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new Help("Governance"));
+			}
+		});
+		
+		gettingStartedBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Help("GettingStarted"));
 			}
 		});
 		

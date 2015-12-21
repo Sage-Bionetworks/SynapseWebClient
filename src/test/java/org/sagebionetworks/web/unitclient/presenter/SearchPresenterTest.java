@@ -54,20 +54,17 @@ public class SearchPresenterTest {
 	public void setup() throws Exception{
 		mockView = mock(SearchView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockSynAlert = mock(SynapseAlert.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		IconsImageBundle mockIconsImageBundle = mock(IconsImageBundle.class);
-
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		searchPresenter = new SearchPresenter(mockView,
-				mockGlobalApplicationState, mockAuthenticationController,
+				mockGlobalApplicationState,
 				mockSynapseClient,
 				new JSONObjectAdapterImpl(),
-				mockIconsImageBundle, mockSynAlert);
+				mockSynAlert);
 		
 		exampleTerm = "searchQueryTerm";
 		exampleTermSearchQuery = SearchQueryUtils.getDefaultSearchQuery();

@@ -16,6 +16,6 @@ easy_install synapseclient</pre>
 		</g:HTMLPanel>
 		<b:Anchor href="http://python-docs.synapse.org/" addStyleNames="link" target="_blank" text="API Documentation"/>
 		<bh:Text text="and"/>
-		<b:Anchor href="https://www.synapse.org/#!Help:PythonClient" addStyleNames="link" target="_blank" text="Example Code"/>
+		<b:Anchor href="#!Help:PythonClient" addStyleNames="link" target="_blank" text="Example Code"/>
 	</g:HTMLPanel>
 </ui:UiBinder>

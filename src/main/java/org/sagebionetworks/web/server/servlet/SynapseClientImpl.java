@@ -1,11 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +14,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -151,7 +146,6 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -1857,7 +1851,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Override
 	public void requestMembership(String currentUserId, String teamId,
-			String message, String hostPageBaseURL) throws RestServiceException {
+			String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
@@ -1874,6 +1868,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				membershipRequest.setMessage(message);
 				membershipRequest.setTeamId(teamId);
 				membershipRequest.setUserId(currentUserId);
+				if (expiresOn != null) {
+					membershipRequest.setExpiresOn(expiresOn);	
+				}
 
 				// make new Synapse call
 				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
@@ -2128,6 +2125,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
+	public void setIsTeamAdmin(String currentUserId, String targetUserId,
+			String teamId, boolean isTeamAdmin) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.setTeamMemberPermissions(teamId, targetUserId,
+					isTeamAdmin);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public void deleteTeamMember(String currentUserId, String targetUserId,
 			String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2139,9 +2148,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Team updateTeam(Team team) throws RestServiceException {
+	public Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			updateTeamAcl(teamAcl);
 			return synapseClient.updateTeam(team);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2980,24 +2990,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		// This method does nothing?
 		
-	}
-	
-	@Override
-	public EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException{
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			//first, get the entity bundle with all information that we want
-			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS;
-			EntityBundle bundle = synapseClient.getEntityBundle(entityId, partsMask);
-			//now get the profile for the last modified by
-			UserProfile modifiedByProfile = synapseClient.getUserProfile(bundle.getEntity().getModifiedBy());
-			EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
-			entityBundlePlus.setEntityBundle(bundle);
-			entityBundlePlus.setProfile(modifiedByProfile);
-			return entityBundlePlus;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 
 	@Override

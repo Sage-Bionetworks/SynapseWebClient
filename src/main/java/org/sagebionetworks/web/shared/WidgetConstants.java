@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 
 public class WidgetConstants {
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
@@ -28,6 +27,10 @@ public class WidgetConstants {
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
+	
+	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs25";
+	public static final String CYTOSCAPE_FRIENDLY_NAME ="Cytoscape JS";
+
 
 	public static final String SYNAPSE_TABLE_CONTENT_TYPE = "synapsetable";
 	public static final String SYNAPSE_TABLE_FRIENDLY_NAME = "Synapse Table";
@@ -96,14 +99,17 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
 	
+	public static final String SYNAPSE_ID_KEY = "synapseId";
+	public static final String STYLE_SYNAPSE_ID_KEY = "styleSynapseId";
+	
 	public static final String VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY = "mp4SynapseId";
 	public static final String VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY = "oggSynapseId";
 	public static final String VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY = "webmSynapseId";
 	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
-	public static final String VIDEO_WIDGET_HEIGHT_KEY = "height";
 	
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
 	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
+	public static final String JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY = "requestExpiresInXDays";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
 	public static final String IS_MEMBER_MESSAGE = "isMemberMessage";
 	public static final String JOIN_TEAM_BUTTON_TEXT = "text";
@@ -160,7 +166,7 @@ public class WidgetConstants {
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
 	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
-	public static final String SHINYSITE_HEIGHT_KEY = "height";
+	public static final String HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	public static final String LINK_URL_KEY = "url";

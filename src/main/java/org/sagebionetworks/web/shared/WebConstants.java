@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.shared;
 
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 
@@ -104,6 +105,12 @@ public class WebConstants {
 
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 
+	/** FileHandleAssociation servlet params **/
+	public static final String ASSOCIATED_OBJECT_ID_PARAM_KEY = "associatedObjectId";
+	public static final String ASSOCIATED_OBJECT_TYPE_PARAM_KEY = "associatedObjectType";
+	public static final String FILE_HANDLE_ID_PARAM_KEY = "fileHandleId";
+	/** END FileHandleAssociation servlet params **/
+	
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	
 	public static final String TEAM_PARAM_KEY = "teamId";
@@ -177,6 +184,7 @@ public class WebConstants {
 	public static final String STAGE_IX_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIX_synapse_id";
 	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
 	
+	public static final String FILE_HANDLE_ASSOCIATION_SERVLET = "filehandleassociation";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
@@ -216,6 +224,7 @@ public class WebConstants {
 	public static final String STAGE_X = "StageX";
 	
 	public static final String CERTIFICATION = "Certification";
+	public static final String VALIDATION = "Validation";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";

@@ -29,6 +29,16 @@ a:focus{color:#1e7098; text-decoration:underline;}
 	background-color: #1e7098;
 	border-color:#1e7098;
 }
+
+@media (min-width: 1500px) {
+	th.visible-xl, td.visible-xl {
+		display: table-cell !important;
+	}	
+}
+.visible-xl{
+	display:none !important;
+}
+
 .btn-link {
 	color: #1e7098;
 }
@@ -722,6 +732,10 @@ a.shortBtn {
 .margin-left-10 {
 	margin-left: 10px;
 }
+.margin-left-12 {
+	margin-left: 12px;
+}
+
 .margin-left-15 {
 	margin-left: 15px;
 }
@@ -1354,6 +1368,10 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #fff !important;
 }	
 
+.greyBackground {
+	background-color: #ccc;
+}
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;
@@ -1676,6 +1694,13 @@ ol.lowerroman {
 	position: relative;
 	top: -35px;
 }
+
+.small-icon, i.fa.small-icon {
+	font-size: 6px;
+	top: -.7em;
+	position: relative;
+}
+
 
 .moveup-70 {
 	position: relative;

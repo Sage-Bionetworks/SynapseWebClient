@@ -15,6 +15,7 @@ import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class GWTWrapperImpl implements GWTWrapper {
@@ -116,4 +117,8 @@ public class GWTWrapperImpl implements GWTWrapper {
 		return Random.nextInt();
 	}
 	
+	@Override
+	public void addDaysToDate(Date date, int days) {
+		CalendarUtil.addDaysToDate(date, days);
+	}
 }

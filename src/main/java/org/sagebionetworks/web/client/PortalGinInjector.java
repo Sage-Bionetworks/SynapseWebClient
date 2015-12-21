@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
@@ -61,6 +62,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -90,6 +92,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
@@ -140,6 +143,9 @@ import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -219,7 +225,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ActionMenuWidget createActionMenuWidget();
 	
 	public EntityActionController createEntityActionController();
-		
+	public ACTPresenter getACTPresenter();
 	/*
 	 *  Markdown Widgets
 	 */
@@ -246,6 +252,7 @@ public interface PortalGinInjector extends Ginjector {
 	public PreviewConfigEditor getPreviewConfigEditor();
 	public BiodallianceEditor getBiodallianceEditor();
 	public BiodallianceSourceEditor getBiodallianceSourceEditor();
+	public CytoscapeConfigEditor getCytoscapeConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -273,6 +280,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeTeamsWidget getChallengeTeamsWidget();
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	public BiodallianceWidget getBiodallianceRenderer();
+	public CytoscapeWidget getCytoscapeRenderer();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -353,4 +361,7 @@ public interface PortalGinInjector extends Ginjector {
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 	public ModifiedCreatedByWidget getModifiedCreatedByWidget();
 	public FileHandleLink getFileHandleLink();
+	public VerificationSubmissionWidget getVerificationSubmissionWidget();
+	public VerificationSubmissionModalViewImpl getVerificationSubmissionModalViewImpl();
+	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 }

@@ -70,9 +70,14 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setEmptyProjectUIVisible(boolean b);
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
+	void setUnbindOrcIdVisible(boolean isVisible);
 	void setOrcId(String href);
 	void setVerificationAlertVisible(boolean isVisible);
 	void setVerificationButtonVisible(boolean isVisible);
+	void setVerificationSuspendedButtonVisible(boolean isVisible);
+	void setVerificationRejectedButtonVisible(boolean isVisible);
+	void setVerificationSubmittedButtonVisible(boolean isVisible);
+	void setVerificationDetailsButtonVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -85,6 +90,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
+		void unbindOrcId();
 		void certificationBadgeClicked();
 		void getMoreProjects();
 		void getMoreChallenges();
@@ -94,8 +100,12 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 		void refreshTeamInvites();
-		void verificationAlertClicked();
+		void newVerificationSubmissionClicked();
+		void editVerificationSubmissionClicked();
 		void setVerifyDismissed();
+		void setVerifyUndismissed();
+		void onVerifyMoreInfoClicked();
+		void linkOrcIdClicked();
 	}
 
 	void addMyTeamProjectsFilter();
@@ -113,7 +123,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 
 	void addCertifiedBadge();
-	void addVerifiedBadge();
+	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);
 
 	void showTabs(boolean isOwner);
 
