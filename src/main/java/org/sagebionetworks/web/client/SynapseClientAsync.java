@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
@@ -27,7 +26,6 @@ import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -445,8 +443,6 @@ public interface SynapseClientAsync {
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
 	
-	void getUserBundle(long principalId, int mask, AsyncCallback<UserBundle> callback) throws SynapseException;
-
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 }

@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -546,6 +545,4 @@ public interface SynapseClient extends RemoteService {
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
-	
-	UserBundle getUserBundle(long principalId, int mask) throws RestServiceException;
-}
+	}

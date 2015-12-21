@@ -2,15 +2,13 @@ package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
@@ -30,21 +28,20 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static final String USER_BUNDLE_FETCH_ERROR_MESSAGE = "Failed to fetch User Bundle.";
 	private static UserSessionData currentUser;
+	private static UserBundle userBundle;
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private AdapterFactory adapterFactory;
-	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalAppState;
+	private UserProfileClientAsync userProfileClient;
 	
 	@Inject
 	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory,
-			SynapseClientAsync synapseClient, GlobalApplicationState globalAppState){
+			UserProfileClientAsync userProfileClient){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.adapterFactory = adapterFactory;
-		this.globalAppState = globalAppState;
-		this.synapseClient = synapseClient;
+		this.userProfileClient = userProfileClient;
 	}
 
 	@Override
@@ -91,30 +88,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					currentUser = userSessionData;
 					callback.onSuccess(userSessionData);
 					
-					// Attempt to get UserBundle information for user being set
-					try {
-						// 63 is the mask equivalent for getting every UserBundle component
-						synapseClient.getUserBundle(Long.valueOf(userSessionData.getProfile().getOwnerId()), 63, new AsyncCallback<UserBundle>() {
-
-							@Override
-							public void onFailure(Throwable e) {
-								// log in JS console?
-							}
-
-							@Override
-							public void onSuccess(UserBundle bundle) {
-								globalAppState.setUserBundle(bundle);
-							}
-							
-						});
-					} catch (NumberFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SynapseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
+					// Attempt to get UserBundle information for user being set, first resetting userBundle
+					userBundle = null;
+					// 63 is the mask equivalent for getting every UserBundle component
+					userProfileClient.getUserBundle(Long.valueOf(userSessionData.getProfile().getOwnerId()), 63, new AsyncCallback<UserBundle>() {
+						@Override
+						public void onFailure(Throwable e) {
+							// log in JS console?
+						}
+						@Override
+						public void onSuccess(UserBundle bundle) {
+							userBundle = bundle;
+						}
+					});
 				} else {
 					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}

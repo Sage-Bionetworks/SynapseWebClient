@@ -125,7 +125,4 @@ public interface GlobalApplicationState {
 	
 	public void recordPlaceVisit(Place targetPlace);
 
-	UserBundle getUserBundle();
-
-	void setUserBundle(UserBundle userBundle);
 }

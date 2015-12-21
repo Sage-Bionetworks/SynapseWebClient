@@ -1,8 +1,16 @@
 package org.sagebionetworks.web.client.security;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
@@ -11,17 +19,14 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -36,8 +41,7 @@ public class AuthenticationControllerImplTest {
 
 	AuthenticationController authenticationController;
 	CookieProvider mockCookieProvider;
-	SynapseClientAsync mockSynClient;
-	GlobalApplicationState mockGlobalAppState;
+	UserProfileClientAsync mockUserProfileClient;
 	UserAccountServiceAsync mockUserAccountService;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	UserSessionData sessionData;
@@ -56,7 +60,7 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockSynClient, mockGlobalAppState);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockUserProfileClient);
 	}
 	
 	@Test

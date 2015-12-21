@@ -340,14 +340,4 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		Place currentPlace = appPlaceHistoryMapper.getPlace(place);
 		getPlaceChanger().goTo(currentPlace);
 	}
-	
-	@Override
-	public UserBundle getUserBundle() {
-		return userBundle;
-	}
-
-	@Override
-	public void setUserBundle(UserBundle userBundle) {
-		this.userBundle = userBundle;
-	}
 }
