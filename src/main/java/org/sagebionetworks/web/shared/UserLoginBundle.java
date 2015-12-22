@@ -1,12 +1,16 @@
-package org.sagebionetworks.web.server.servlet;
+package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserSessionData;
 
-public class UserLoginBundle {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+public class UserLoginBundle implements IsSerializable {
 
 	private UserSessionData userSessionData;
 	private UserBundle userBundle;
+	
+	public UserLoginBundle() {}
 	
 	public UserLoginBundle(UserSessionData userSessionData, UserBundle userBundle) {
 		this.userSessionData = userSessionData;
