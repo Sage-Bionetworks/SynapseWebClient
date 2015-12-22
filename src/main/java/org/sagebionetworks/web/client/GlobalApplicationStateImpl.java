@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -43,7 +42,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-	private UserBundle userBundle;
 
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
@@ -61,7 +59,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.logger = logger;
 		this.view = view;
 		isEditing = false;
-		userBundle = null;
 		initUncaughtExceptionHandler();
 	}
 	

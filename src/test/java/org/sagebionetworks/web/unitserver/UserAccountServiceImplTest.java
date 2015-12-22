@@ -18,14 +18,10 @@ import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
-import com.amazonaws.auth.profile.internal.Profile;
 
 /**
  * Test for the UserAccountServiceImpl

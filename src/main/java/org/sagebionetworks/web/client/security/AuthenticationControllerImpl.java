@@ -27,7 +27,6 @@ import com.google.inject.Inject;
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
-	private static final String USER_BUNDLE_FETCH_ERROR_MESSAGE = "Failed to fetch User Bundle.";
 	private static UserSessionData currentUser;
 	private static UserBundle userBundle;
 	
@@ -153,6 +152,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public String getCurrentUserSessionToken() {
 		if(currentUser != null) return currentUser.getSession().getSessionToken();
 		else return null;
+	}
+	
+	@Override
+	public UserBundle getCurrentUserBundle() {
+		String currUserId = currentUser.getProfile().getOwnerId();
+		if (userBundle != null && userBundle.getUserId().equals(currUserId)) {
+			return userBundle;
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
