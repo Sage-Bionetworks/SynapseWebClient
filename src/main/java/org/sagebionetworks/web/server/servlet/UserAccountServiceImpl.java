@@ -3,18 +3,17 @@ package org.sagebionetworks.web.server.servlet;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.UserLoginBundle;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -110,10 +109,26 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	@Override 
 	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {
 		validateService();
-		
 		SynapseClient synapseClient = createSynapseClient(sessionToken);
 		try {
 			return synapseClient.getUserSessionData();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override 
+	public UserLoginBundle getUserLoginBundle(String sessionToken) throws RestServiceException {
+		validateService();
+		SynapseClient synapseClient = createSynapseClient(sessionToken);
+		try {
+			UserSessionData userSessionData = synapseClient.getUserSessionData();
+			long principalId = Long.valueOf(userSessionData.getProfile().getOwnerId());
+			
+			// 63 is the mask equivalent for getting every UserBundle component
+			UserBundle userBundle = synapseClient.getUserBundle(principalId, 63);
+			
+			return new UserLoginBundle(userSessionData, userBundle);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

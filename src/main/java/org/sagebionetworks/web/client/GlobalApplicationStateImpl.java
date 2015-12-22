@@ -42,7 +42,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-	
+
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,

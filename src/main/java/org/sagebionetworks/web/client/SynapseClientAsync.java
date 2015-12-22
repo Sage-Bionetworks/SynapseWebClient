@@ -442,7 +442,7 @@ public interface SynapseClientAsync {
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
-
+	
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 }

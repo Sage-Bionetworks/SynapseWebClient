@@ -12,6 +12,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
@@ -31,16 +33,22 @@ public class UserAccountServiceImplTest {
 	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	UserAccountServiceImpl userAccountService;
+	UserSessionData mockUserSessionData;
 	String testSessionToken = "12345abcde";
+	UserProfile testProfile;	
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
+		mockUserSessionData = Mockito.mock(UserSessionData.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 
+		testProfile = new UserProfile();
+		testProfile.setOwnerId("123");		
+		
 		userAccountService = new UserAccountServiceImpl();
 		userAccountService.setSynapseProvider(mockSynapseProvider);
 		userAccountService.setTokenProvider(mockTokenProvider);
@@ -48,6 +56,8 @@ public class UserAccountServiceImplTest {
 		Session testSession = new Session();
 		testSession.setSessionToken(testSessionToken);
 		when(mockSynapse.createNewAccount(any(AccountSetupInfo.class))).thenReturn(testSession);
+		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockUserSessionData.getProfile()).thenReturn(testProfile);
 	}
 
 	@Test
@@ -78,6 +88,13 @@ public class UserAccountServiceImplTest {
 		verify(mockSynapse).createNewAccount(arg.capture());
 		AccountSetupInfo capturedSetInfo = arg.getValue();
 		assertEquals(testASI, capturedSetInfo);
+	}
+	
+	@Test
+	public void testGetUserLoginBundle() throws Exception {
+		userAccountService.getUserLoginBundle(testSessionToken);
+		verify(mockSynapse).getUserSessionData();
+		verify(mockSynapse).getUserBundle(Long.valueOf(testProfile.getOwnerId()), 63);
 	}
 
 }

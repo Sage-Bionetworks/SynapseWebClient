@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.security;
 
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 
@@ -64,4 +65,6 @@ public interface AuthenticationController {
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);
 	
 	public void updateCachedProfile(UserProfile updatedProfile);
+
+	public UserBundle getCurrentUserBundle();
 }

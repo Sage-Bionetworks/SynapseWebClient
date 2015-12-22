@@ -545,4 +545,4 @@ public interface SynapseClient extends RemoteService {
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
-}
+	}

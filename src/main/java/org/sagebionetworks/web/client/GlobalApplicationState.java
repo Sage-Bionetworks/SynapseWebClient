@@ -123,4 +123,5 @@ public interface GlobalApplicationState {
 	public void refreshPage();
 	
 	public void recordPlaceVisit(Place targetPlace);
+
 }
