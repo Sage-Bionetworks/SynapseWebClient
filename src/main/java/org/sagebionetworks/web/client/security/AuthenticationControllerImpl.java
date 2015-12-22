@@ -71,13 +71,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		currentUser = null;
+		userBundle = null;
 	}
 
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
-		}		
+		}
+		
 		// clear out old userBundle
 		userBundle = null;
 		
@@ -156,8 +158,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	@Override
 	public UserBundle getCurrentUserBundle() {
-		String currUserId = currentUser.getProfile().getOwnerId();
-		if (userBundle != null && userBundle.getUserId().equals(currUserId)) {
+		if (currentUser != null && userBundle != null && currentUser.getProfile() != null
+				&& userBundle.getUserId().equals(currentUser.getProfile().getOwnerId())) {
 			return userBundle;
 		} else {
 			return null;

@@ -145,10 +145,42 @@ public class AuthenticationControllerImplTest {
 		
 		// empty user profile
 		sessionData.setProfile(null);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));	
 		authenticationController.revalidateSession("token", callback);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testGetCurrentUserBundle() throws Exception {
+		String principalId = "4321";
+		UserSessionData sessionData = new UserSessionData();
+		sessionData.setIsSSO(false);
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId(principalId);
+		sessionData.setProfile(profile);
+		sessionData.setSession(new Session());
+		sessionData.getSession().setSessionToken("1234");
+		UserBundle bundle = new UserBundle();
+		bundle.setUserId("4321");
+		bundle.setUserProfile(profile);
+		
+		
+		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, bundle)).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));	
+		
+		// not logged in
+		assertNull(authenticationController.getCurrentUserBundle());
+		
+		// logged in
+		authenticationController.revalidateSession("token", callback);
+		assertEquals(bundle, authenticationController.getCurrentUserBundle());	
+		
+		// empty user profile
+		sessionData.setProfile(null);
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, bundle)).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));	
+		authenticationController.revalidateSession("token", callback);
+		assertNull(authenticationController.getCurrentUserPrincipalId());
+	}
 	
 }

@@ -66,5 +66,5 @@ public interface AuthenticationController {
 	
 	public void updateCachedProfile(UserProfile updatedProfile);
 
-	UserBundle getCurrentUserBundle();
+	public UserBundle getCurrentUserBundle();
 }
