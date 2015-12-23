@@ -58,11 +58,15 @@ public class AuthenticationControllerImplTest {
 		sessionData.setProfile(new UserProfile());
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1234");
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("456");
+		sessionData.setProfile(profile);
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
-		
-		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
+		UserBundle bundle = new UserBundle();
+		bundle.setUserId("456");
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, bundle)).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
 
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockUserProfileClient);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService);
 	}
 	
 	@Test
@@ -132,9 +136,10 @@ public class AuthenticationControllerImplTest {
 		sessionData.setProfile(profile);
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1234");
-		
+		UserBundle bundle = new UserBundle();
+		bundle.setUserId("4321");
 		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));	
+		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, bundle)).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));	
 		
 		// not logged in
 		assertNull(authenticationController.getCurrentUserPrincipalId());
