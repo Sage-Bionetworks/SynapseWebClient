@@ -796,8 +796,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onEditFileMetadata() {
-		Synapse place = ((Synapse)globalApplicationState.getCurrentPlace());
-		Long version = place.getVersionNumber();
+		Long version = getVersion();
 		// Can only edit file metadata of the current file version
 		if (version == null) {
 			// Validate the user can update this entity.

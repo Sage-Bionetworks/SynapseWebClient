@@ -50,9 +50,11 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -250,7 +252,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		return a == b || (a != null && a.equals(b));
 	}
 	  
-	public void getTargetBundleAndDisplay(String entityId, Long versionNumber) {
+	public void getTargetBundleAndDisplay(String entityId, final Long versionNumber) {
 		//only ask for it if we are showing a different entity/version
 		if (equal(currentEntityId,entityId) && equal(currentVersionNumber, versionNumber)) {
 			return;
@@ -260,7 +262,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		currentVersionNumber = versionNumber;
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME;
-		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				if (bundle.getEntity() instanceof Link) {
@@ -271,6 +273,9 @@ public class FilesTab implements FilesTabView.Presenter{
 					Long versionNumber = ref.getTargetVersionNumber();
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
 					return;
+				}
+				if (versionNumber == null) {
+					((Versionable) bundle.getEntity()).setVersionNumber(null);
 				}
 				setTargetBundle(bundle);
 				tab.showTab();
@@ -283,10 +288,28 @@ public class FilesTab implements FilesTabView.Presenter{
 				tab.showTab();
 			}	
 		};
+		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+
+			@Override
+			public void onSuccess(EntityBundlePlus result) {
+				EntityBundle bundle = result.getEntityBundle();
+				if (bundle.getEntity() instanceof Versionable && versionNumber == result.getLatestVersionNumber()) {
+					((Versionable) bundle.getEntity()).setVersionNumber(null);
+					currentVersionNumber = null;
+				}
+				callback.onSuccess(bundle);
+			}
+			
+		};
 		if (versionNumber == null) {
 			synapseClient.getEntityBundle(entityId, mask, callback);
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+			synapseClient.getEntityBundlePlusForVersion(entityId, versionNumber, mask, ebpCallback);
 		}
 	}
 	
