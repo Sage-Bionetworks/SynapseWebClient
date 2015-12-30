@@ -147,7 +147,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void configureEntityTreeItem(final EntityTreeItem childToAdd) {
-		childToAdd.asTreeItem().addItem(createDummyItem());
 		if (isSelectable) {
 			// Add select functionality.
 			childToAdd.setClickHandler(new ClickHandler() {
