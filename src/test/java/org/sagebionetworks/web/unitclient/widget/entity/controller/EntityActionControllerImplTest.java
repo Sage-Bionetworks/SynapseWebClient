@@ -702,16 +702,15 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testEditFileMetadataIsNotCurrent(){
-		Entity file = new FileEntity();
+		FileEntity file = new FileEntity();
 		file.setId(entityId);
 		file.setParentId(parentId);
+		file.setVersionNumber(1L);
 		entityBundle.setEntity(file);
 		// currentPlace returns a non-null versionNumber
-		Synapse currentPlace = new Synapse(currentUserId, 1L, null, currentUserId);
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(currentPlace);
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		// method under test
 		controller.onAction(Action.EDIT_FILE_METADATA);
 		verify(mockEditFileMetadataModalWidget, never()).configure(any(FileEntity.class), anyString(), any(Callback.class));

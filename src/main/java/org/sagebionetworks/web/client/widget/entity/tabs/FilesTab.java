@@ -274,7 +274,7 @@ public class FilesTab implements FilesTabView.Presenter{
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
 					return;
 				}
-				if (versionNumber == null) {
+				if (bundle.getEntity() instanceof FileEntity && versionNumber == null) {
 					((Versionable) bundle.getEntity()).setVersionNumber(null);
 				}
 				setTargetBundle(bundle);
