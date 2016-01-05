@@ -55,7 +55,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
-import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -99,7 +98,6 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -191,7 +189,6 @@ public class SynapseClientImplTest {
 	V2WikiPage v2Page;
 	S3FileHandle handle;
 	Evaluation mockEvaluation;
-	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
@@ -376,10 +373,6 @@ public class SynapseClientImplTest {
 		handle.setFileName(testFileName);
 		handle.setKey("key");
 		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
-		when(
-				mockSynapse
-						.completeChunkFileUpload(any(CompleteChunkedFileRequest.class)))
-				.thenReturn(handle);
 		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> ars = new org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
@@ -399,14 +392,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
-		mockParticipant = Mockito.mock(Participant.class);
-		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(
-				mockParticipant);
-
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
-		when(mockSynapse.createParticipant(anyString())).thenReturn(
-				mockParticipant);
-
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		String fileHandleId = "myFileHandleId";
 		status.setFileHandleId(fileHandleId);

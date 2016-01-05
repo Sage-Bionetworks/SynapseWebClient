@@ -147,8 +147,6 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
 
-	public PaginatedResults<EntityHeader> getEntityReferencedBy(String entityId) throws RestServiceException;
-	
 	/**
 	 * Log a debug message in the server-side log.
 	 * @param message
