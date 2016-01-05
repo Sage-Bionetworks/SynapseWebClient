@@ -170,12 +170,11 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public void showNewVerificationSubmission() {
 		if (isPreconditionsForNewSubmissionMet(profile, orcId)) {
 			//show wiki on validation process
-			view.setWikiPageVisible(true);
 			loadWikiHelpContent();
 			view.setCancelButtonVisible(true);
 			view.setSubmitButtonVisible(true);
 			fileHandleList.configure(rawFileHandleClickedCallback)
-				.setUploadButtonText("Upload documentation...")
+				.setUploadButtonText("Upload...")
 				.setCanDelete(true)
 				.setCanUpload(true);
 			view.setFirstName(profile.getFirstName());
@@ -219,6 +218,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setTitle("Profile Validation Suspended");
 			view.setSuspendedReason(currentState.getReason());
 			view.setSuspendedAlertVisible(true);
+			loadWikiHelpContent();
 		}
 		fileHandleList.configure(fileHandleClickedCallback)
 			.setCanDelete(false)
@@ -315,8 +315,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			meta.setId(fileHandleId);
 			attachments.add(meta);
 		}
-		if (attachments.size() == 0) {
-			synAlert.showError("Please upload documentation and re-submit.");
+		if (attachments.size() < 2) {
+			synAlert.showError("Please upload your signed and initialed oath AND your documentation, then re-submit.");
 			return;
 		}
 		sub.setAttachments(attachments);

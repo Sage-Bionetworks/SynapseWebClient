@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
@@ -76,6 +77,9 @@ public class VerificationSubmissionWidgetTest {
 	UserProfile mockProfile;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	HashMap<String,WikiPageKey> mockWikiPageMap;
+	
 	PromptModalView.Presenter reasonPromptCallback;
 	
 	VerificationSubmissionWidget widget;
@@ -124,6 +128,8 @@ public class VerificationSubmissionWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).deleteVerificationSubmission(anyLong(), any(AsyncCallback.class));
 		fileHandleIds = new ArrayList<String>();
 		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
+		
+		AsyncMockStubber.callSuccessWith(mockWikiPageMap).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 	}
 	private void configureWithMockSubmission(){
 		boolean isACTMember = false;
@@ -327,6 +333,20 @@ public class VerificationSubmissionWidgetTest {
 		widget.show();
 		verify(mockView).setSuspendedAlertVisible(true);
 		verify(mockView).setSuspendedReason(reason);
+		verify(mockMarkdownWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class), eq(false));
+		verify(mockView).setWikiPageVisible(true);
+	}
+	
+	@Test
+	public void testShowExistingRejectedVerificationSubmission() {
+		configureWithMockSubmission();
+		String reason = "a reason for the rejected submission";
+		setCurrentMockState(VerificationStateEnum.REJECTED, reason);
+		widget.show();
+		verify(mockView).setSuspendedAlertVisible(true);
+		verify(mockView).setSuspendedReason(reason);
+		verify(mockMarkdownWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class), eq(false));
+		verify(mockView).setWikiPageVisible(true);
 	}
 
 	@Test
@@ -373,6 +393,8 @@ public class VerificationSubmissionWidgetTest {
 		
 		//attach evidence
 		fileHandleIds.add("999");
+		//attach oath
+		fileHandleIds.add("11");
 		widget.submitVerification();
 		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), eq(hostPageURL), any(AsyncCallback.class));
 		
@@ -392,5 +414,22 @@ public class VerificationSubmissionWidgetTest {
 		widget.submitVerification();
 		verify(mockSynapseAlert).showError(anyString());
 		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testSubmitVerificationSingleFile() {
+		String orcId = "http://orcid.org/123";
+		UserProfile profile = getPopulatedProfile();
+		boolean isModal = true;
+		widget.configure(profile, orcId, isModal);
+		
+		//attach evidence
+		fileHandleIds.add("999");
+		widget.submitVerification();
+
+		//not enough evidence
+		verify(mockSynapseAlert).showError(anyString());
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+
 	}
 }
