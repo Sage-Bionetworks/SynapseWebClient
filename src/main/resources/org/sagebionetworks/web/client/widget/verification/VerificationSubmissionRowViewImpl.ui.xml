@@ -7,36 +7,36 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
   	<bh:Div addStyleNames="margin-left-10 margin-right-10">
-	  	<t:Table width="100%" height="30px" addStyleNames="markdowntable">
+	  	<t:Table width="100%" height="30px" addStyleNames="markdowntable table-layout-fixed">
 			<t:TableRow>
-				<t:TableData width="100px" >
+				<t:TableData width="10%" addStyleNames="overflowHidden">
 					<b:Anchor ui:field="profileAnchor" target="_blank" />
 				</t:TableData>
-				<t:TableData width="120px" addStyleNames="hidden-xs">
+				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">
 					<bh:Span ui:field="firstName"/>
 				</t:TableData>
-				<t:TableData width="120px" addStyleNames="hidden-xs">
+				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">
 					<bh:Span ui:field="lastName"/>
 				</t:TableData>
-				<t:TableData width="120px" addStyleNames="hidden-xs">
+				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">
 					<bh:Span ui:field="currentAffiliation"/>
 				</t:TableData>
-				<t:TableData width="120px" addStyleNames="hidden-xs">
+				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">
 					<bh:Span ui:field="location"/>
 				</t:TableData>
-				<t:TableData width="120px" addStyleNames="hidden-xs">
+				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">
 					<b:Anchor ui:field="orcIdAnchor" target="_blank" />
 				</t:TableData>
-				<t:TableData width="120px">
+				<t:TableData width="10%" addStyleNames="overflowHidden">
 					<bh:Div ui:field="emailAddresses"/>
 				</t:TableData>
-				<t:TableData width="120px">
+				<t:TableData width="10%" addStyleNames="overflowHidden">
 					<bh:Div ui:field="filesContainer"/>
 				</t:TableData>
-				<t:TableData width="120px">
+				<t:TableData width="10%" addStyleNames="overflowHidden">
 					<bh:Span ui:field="reasonAlertText" addStyleNames="bg-danger" />
 				</t:TableData>
-				<t:TableData width="100px">
+				<t:TableData width="10%" addStyleNames="overflowHidden">
 					<b:Button ui:field="approveButton" size="EXTRA_SMALL" type="SUCCESS">Approve</b:Button>
 					<b:Button ui:field="rejectButton" size="EXTRA_SMALL" type="DANGER">Reject</b:Button>
 					<b:Button ui:field="suspendButton" size="EXTRA_SMALL" type="DANGER">Suspend</b:Button>
