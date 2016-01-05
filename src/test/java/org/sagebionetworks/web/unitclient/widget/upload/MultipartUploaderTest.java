@@ -16,7 +16,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
@@ -27,6 +29,7 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -57,9 +60,12 @@ public class MultipartUploaderTest {
 	UploadDaemonStatus status;
 	String[] fileNames;
 	Long storageLocationId = 9090L;
+	@Mock
+	MultipartFileUploadClientAsync mockMultipartFileUploadClient; 
 	
 	@Before
 	public void before() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		mockHandler = mock(ProgressingFileUploadHandler.class);
 		synapseClient = mock(SynapseClientAsync.class);
 		synapseJsniUtils =mock(SynapseJSNIUtils.class);
@@ -107,7 +113,7 @@ public class MultipartUploaderTest {
 		fileNames = new String[]{file1};
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
-		uploader = new MultipartUploaderImpl(gwt, synapseClient, synapseJsniUtils, mockLogger);
+		uploader = new MultipartUploaderImpl(gwt, synapseClient, synapseJsniUtils, mockLogger, mockMultipartFileUploadClient);
 		
 	}
 	

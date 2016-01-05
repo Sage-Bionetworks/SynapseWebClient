@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -42,12 +43,12 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public static final double UPLOADING_TOTAL_PERCENT = .9d;
 	public static final double COMBINING_TOTAL_PERCENT = .1d;
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
-	public static final long BYTES_PER_CHUNK = (long)ClientProperties.MB * 5; //5MB
 	public static final int MAX_RETRY = 5;
 	public static final int RETRY_DELAY = 1000;
 	
 	private GWTWrapper gwt;
 	private SynapseClientAsync synapseClient;
+	private MultipartFileUploadClientAsync multipartFileUploadClient;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private NumberFormat percentFormat;
 	private ClientLogger logger;
@@ -67,11 +68,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public MultipartUploaderImpl(GWTWrapper gwt,
 			SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJsniUtils,
-			ClientLogger logger) {
+			ClientLogger logger, 
+			MultipartFileUploadClientAsync multipartFileUploadClient) {
 		super();
 		this.gwt = gwt;
 		this.synapseClient = synapseClient;
 		this.synapseJsniUtils = synapseJsniUtils;
+		this.multipartFileUploadClient = multipartFileUploadClient;
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.logger = logger;
 	}
@@ -114,9 +117,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				public void onSuccess(ChunkedFileToken result) {
 					token = result;
 					long fileSize = (long)synapseJsniUtils.getFileSize(fileInputId, fileIndex);
-					long totalChunkCount = getChunkCount(fileSize);
-					uploadLog.append("fileSize="+fileSize + " totalChunkCount=" + totalChunkCount+"\n");
-					attemptChunkUpload(1, 1, totalChunkCount, fileSize, new ArrayList<ChunkRequest>());
+					long partSizeBytes = PartUtils.choosePartSize(fileSize);
+					long numberOfParts = PartUtils.calculateNumberOfParts(
+							fileSize, partSizeBytes);
+					String fileStats = "fileSize="+fileSize + " partSizeBytes=" + partSizeBytes + " numberOfParts=" + numberOfParts+"\n"; 
+					uploadLog.append(fileStats);
+					synapseJsniUtils.consoleLog(fileStats);
+					attemptChunkUpload(1, 1, numberOfParts, fileSize, partSizeBytes, new ArrayList<ChunkRequest>());
 				}
 				@Override
 				public void onFailure(Throwable t) {
@@ -129,16 +136,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	/**
-	 * Calculate a chunk size for a given file size.
-	 * 
-	 * @param fileSize
-	 * @return
-	 */
-	public long getChunkCount(long fileSize) {
-		return (long)Math.ceil((double)fileSize / (double)BYTES_PER_CHUNK);
-	}
-	
-	/**
 	 * Step three of an upload is to upload each chunk.
 	 * 
 	 * @param currentChunkNumber
@@ -147,7 +144,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void attemptChunkUpload(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList){
+	public void attemptChunkUpload(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final long partSize, final List<ChunkRequest> requestList){
 		//get the presigned upload url
 		//and upload the file
 		try {
@@ -168,16 +165,16 @@ public class MultipartUploaderImpl implements MultipartUploader {
 								if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
 									if (xhr.getStatus() == 200) { //OK
 										uploadLog.append("XMLHttpRequest.setOnReadyStateChange: OK\n");
-										chunkUploadSuccess(request, currentChunkNumber, totalChunkCount, fileSize, requestList);
+										chunkUploadSuccess(request, currentChunkNumber, totalChunkCount, fileSize, partSize, requestList);
 									} else {
 										uploadLog.append("XMLHttpRequest.setOnReadyStateChange: Failure\n");
-										chunkUploadFailure(currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, xhr.getStatusText());
+										chunkUploadFailure(currentChunkNumber, currentAttempt, totalChunkCount, fileSize, partSize, requestList, xhr.getStatusText());
 									}
 								}
 							}
 						});
 					}
-					ByteRange range = getByteRange(currentChunkNumber, fileSize);
+					ByteRange range = getByteRange(currentChunkNumber, fileSize, partSize);
 					uploadLog.append("directUploadStep2: uploading file chunk.  ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
 					synapseJsniUtils.uploadFileChunk(contentType, fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
 						@Override
@@ -192,11 +189,11 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				}
 				@Override
 				public void onFailure(Throwable t) {
-					chunkUploadFailure(currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, t.getMessage());
+					chunkUploadFailure(currentChunkNumber, currentAttempt, totalChunkCount, fileSize, partSize, requestList, t.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
-			chunkUploadFailure(currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, e.getMessage());
+			chunkUploadFailure(currentChunkNumber, currentAttempt, totalChunkCount, fileSize, partSize, requestList, e.getMessage());
 		}
 	}
 	
@@ -235,7 +232,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadFailure(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList, String detailedMessage) {
+	public void chunkUploadFailure(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final long partSize, final List<ChunkRequest> requestList, String detailedMessage) {
 		if (currentAttempt >= MAX_RETRY)
 			uploadError(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK + detailedMessage, new CombineFileChunksException(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK));
 		else { //retry
@@ -243,7 +240,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			gwt.scheduleExecution(new Callback() {
 				@Override
 				public void invoke() {
-					attemptChunkUpload(currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
+					attemptChunkUpload(currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, partSize, requestList);
 				}
 			}, RETRY_DELAY);
 		}
@@ -258,13 +255,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadSuccess(ChunkRequest chunkedRequest, int currentChunkNumber, long totalChunkCount, long fileSize, List<ChunkRequest> requestList){
+	public void chunkUploadSuccess(ChunkRequest chunkedRequest, int currentChunkNumber, long totalChunkCount, long fileSize, long partSize, List<ChunkRequest> requestList){
 		//are there more chunks to upload?
 		requestList.add(chunkedRequest);
 		if (currentChunkNumber >= totalChunkCount)
 			attemptCombineChunks(requestList, 1);
 		else
-			attemptChunkUpload(currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
+			attemptChunkUpload(currentChunkNumber+1, 1, totalChunkCount, fileSize, partSize, requestList);
 	}
 	
 	private void combineChunksUploadFailure(List<ChunkRequest> requestList, int currentAttempt, String errorMessage) {
@@ -288,9 +285,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		}
 	}
 	
-	public ByteRange getByteRange(int currentChunkNumber, Long fileSize) {
-		long startByte = (currentChunkNumber-1) * BYTES_PER_CHUNK;
-		long endByte = currentChunkNumber * BYTES_PER_CHUNK - 1;
+	public ByteRange getByteRange(int currentChunkNumber, Long fileSize, long partSize) {
+		long startByte = (currentChunkNumber-1) * partSize;
+		long endByte = currentChunkNumber * partSize - 1;
 		if (endByte >= fileSize)
 			endByte = fileSize-1;
 		return new ByteRange(startByte, endByte);
