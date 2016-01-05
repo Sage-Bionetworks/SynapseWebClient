@@ -128,6 +128,7 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
 		set.add(ACCESS_TYPE.CHANGE_SETTINGS);
+		set.add(ACCESS_TYPE.MODERATE);
 		return set;
 	}
 	
