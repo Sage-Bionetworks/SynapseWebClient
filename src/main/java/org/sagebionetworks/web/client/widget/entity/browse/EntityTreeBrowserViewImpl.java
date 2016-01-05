@@ -147,6 +147,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void configureEntityTreeItem(final EntityTreeItem childToAdd) {
+		childToAdd.asTreeItem().addItem(createDummyItem());
+//		childToAdd.asTreeItem().addTextItem("");
 		if (isSelectable) {
 			// Add select functionality.
 			childToAdd.setClickHandler(new ClickHandler() {
@@ -161,8 +163,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Add dummy item to childItem to make expandable.
 		// Pass in something to tell it to add a createDummy item for folder
 		// expansion or not
-		if (childToAdd.isExpandable()) {
-			childToAdd.asTreeItem().addItem(createDummyItem());
+		if (!childToAdd.isExpandable()) {
+			childToAdd.asTreeItem().removeItems();
 		}
 	}
 
