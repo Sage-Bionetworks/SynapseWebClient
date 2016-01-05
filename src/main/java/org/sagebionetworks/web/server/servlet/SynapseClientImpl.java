@@ -352,18 +352,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public PaginatedResults<EntityHeader> getEntityReferencedBy(String entityId)
-			throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return convertPaginated(synapseClient
-					.getEntityReferencedBy(entityId, null));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public void logDebug(String message) {
 		log.debug(message);
 	}
