@@ -162,8 +162,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Add dummy item to childItem to make expandable.
 		// Pass in something to tell it to add a createDummy item for folder
 		// expansion or not
-		if (childToAdd.isExpandable()) {
-			childToAdd.asTreeItem().addItem(createDummyItem());
+		if (!childToAdd.isExpandable()) {
+			childToAdd.asTreeItem().removeItems();
 		}
 	}
 
