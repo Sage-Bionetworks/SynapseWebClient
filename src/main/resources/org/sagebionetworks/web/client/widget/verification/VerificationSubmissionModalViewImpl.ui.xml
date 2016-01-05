@@ -71,7 +71,7 @@
 					</b:Column>
 				</b:Row>
 				<b:FormGroup>
-					<b:FormLabel>Documentation (e.g. a letter from a signing official at your institution using your institution's letterhead)</b:FormLabel>
+					<b:FormLabel>Upload your signed and initialed oath AND your documentation (e.g. a letter from a signing official at your institution using your institution's letterhead) below</b:FormLabel>
 					<b:Panel ui:field="filesContainer" addStyleNames="padding-10"/>
 				</b:FormGroup>
 			</bh:Div>
