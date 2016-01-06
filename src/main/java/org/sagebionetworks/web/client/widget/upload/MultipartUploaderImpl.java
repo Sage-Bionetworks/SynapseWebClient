@@ -140,17 +140,17 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		totalPartCount = partState.length();
 		for (int i = 0; i < partState.length(); i++) {
 			//part is 1 based
-			final int currentPart = i + 1;
+			final int currentPartNumber = i + 1;
 			if (partState.charAt(i) == '0') {
 				//needs to be uploaded
-				uploadLog.append("directUploadStep4: part number ="+currentPart+"\n");
+				uploadLog.append("directUploadStep4: part number ="+currentPartNumber+"\n");
 				BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest = new BatchPresignedUploadUrlRequest();
-				batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPart)));
+				batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPartNumber)));
 				batchPresignedUploadUrlRequest.setUploadId(currentStatus.getUploadId());
 				multipartFileUploadClient.getMultipartPresignedUrlBatch(batchPresignedUploadUrlRequest, new AsyncCallback<BatchPresignedUploadUrlResponse>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						partFailure(currentPart, caught.getMessage());
+						partFailure(currentPartNumber, caught.getMessage());
 					}
 					public void onSuccess(BatchPresignedUploadUrlResponse batchPresignedUploadUrlResponse) {
 						PartPresignedUrl url = batchPresignedUploadUrlResponse.getPartPresignedUrls().get(0);
@@ -165,22 +165,24 @@ public class MultipartUploaderImpl implements MultipartUploader {
 										if (xhr.getStatus() == 200) { //OK
 											uploadLog.append("XMLHttpRequest.setOnReadyStateChange: OK\n");
 											//add part number to the upload (and potentially complete)
-											addPartToUpload(uploadId, currentPart);
+											addPartToUpload(uploadId, currentPartNumber);
 										} else {
-											partFailure(currentPart, "XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
+											uploadLog.append("XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
+											partFailure(currentPartNumber, uploadLog.toString());
+											uploadLog = new StringBuilder();
 										}
 									}
 								}
 							});
 						}
-						ByteRange range = getByteRange(currentPart, request.getFileSizeBytes(), request.getPartSizeBytes());
+						ByteRange range = getByteRange(currentPartNumber, request.getFileSizeBytes(), request.getPartSizeBytes());
 						uploadLog.append("attemptChunkUpload: uploading file chunk.  ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
 						synapseJsniUtils.uploadFileChunk(request.getContentType(), fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
 							@Override
 							public void updateProgress(double value) {
 								//Note:  0 <= value <= 1
 								//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-								double currentProgress = (((double)(completedChunkCount-1)) + value)/((double)totalPartCount);
+								double currentProgress = (((double)(completedChunkCount)) + value)/((double)totalPartCount);
 								String progressText = percentFormat.format(currentProgress*100.0) + "%";
 								handler.updateProgress(currentProgress, progressText);
 							}
