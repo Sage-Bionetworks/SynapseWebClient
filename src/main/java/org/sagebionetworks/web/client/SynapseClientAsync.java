@@ -98,9 +98,6 @@ public interface SynapseClientAsync {
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);
 
-	void getEntityReferencedBy(String entityId,
-			AsyncCallback<PaginatedResults<EntityHeader>> callback);
-
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
