@@ -40,6 +40,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	
 	public static final int RETRY_DELAY = 2000;
+	public static final int MAX_RETRIES = 10;
 	
 	private GWTWrapper gwt;
 	private MultipartFileUploadClientAsync multipartFileUploadClient;
@@ -57,6 +58,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private ProgressingFileUploadHandler handler;
 	private int completedChunkCount;
 	private boolean retryRequired;
+	private int attempt;
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
 			SynapseClientAsync synapseClient,
@@ -76,6 +78,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 */
 	@Override
 	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, final Long storageLocationId) {
+		//initialize attempt count. 
+		attempt=0;
 		this.request = null;
 		this.uploadId = null;
 		this.totalPartCount = 0;
@@ -112,7 +116,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * Step two of an upload is to create a ChunkedFileToken.
 	 */
 	public void startMultipartUpload(){
-		if (synapseJsniUtils.isElementExists(fileInputId)) {
+		attempt++;
+		if (synapseJsniUtils.isElementExists(fileInputId) && attempt <= MAX_RETRIES) {
 			retryRequired = false;
 			multipartFileUploadClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
 				@Override
@@ -126,6 +131,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					attemptChunkUpload(request, status);
 				}
 			});
+		} else {
+			handler.uploadFailed("Unable to upload the file at this time. Please try again later.");
 		}
 	}
 	
@@ -138,12 +145,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		uploadId = currentStatus.getUploadId();
 		String partState = currentStatus.getPartsState();
 		totalPartCount = partState.length();
+		uploadLog.append("attemptChunkUpload: attempt number "+attempt+" to upload file.\n");
 		for (int i = 0; i < partState.length(); i++) {
 			//part is 1 based
 			final int currentPartNumber = i + 1;
 			if (partState.charAt(i) == '0') {
 				//needs to be uploaded
-				uploadLog.append("directUploadStep4: part number ="+currentPartNumber+"\n");
+				uploadLog.append("attemptChunkUpload: attempting to upload part number = "+currentPartNumber+"\n");
 				BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest = new BatchPresignedUploadUrlRequest();
 				batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPartNumber)));
 				batchPresignedUploadUrlRequest.setUploadId(currentStatus.getUploadId());
@@ -160,7 +168,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 							xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
 								@Override
 								public void onReadyStateChange(XMLHttpRequest xhr) {
-									uploadLog.append("XMLHttpRequest.setOnReadyStateChange:  readyState="+xhr.getReadyState() + " status=" + xhr.getStatus()+"\n");
+									uploadLog.append("XMLHttpRequest.setOnReadyStateChange: readyState="+xhr.getReadyState() + " status=" + xhr.getStatus()+"\n");
 									if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
 										if (xhr.getStatus() == 200) { //OK
 											uploadLog.append("XMLHttpRequest.setOnReadyStateChange: OK\n");
@@ -176,7 +184,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 							});
 						}
 						ByteRange range = getByteRange(currentPartNumber, request.getFileSizeBytes(), request.getPartSizeBytes());
-						uploadLog.append("attemptChunkUpload: uploading file chunk.  ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
+						uploadLog.append("attemptChunkUpload: uploading file chunk. ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
 						synapseJsniUtils.uploadFileChunk(request.getContentType(), fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
 							@Override
 							public void updateProgress(double value) {
@@ -191,6 +199,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				});		
 			} else {
 				//this part has already been uploaded, skip it
+				uploadLog.append("attemptChunkUpload: skipping part number = "+currentPartNumber+"\n");
 				partSuccess();
 			}
 		}
@@ -202,7 +211,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	public void partFailure(int partNumber, String message) {
-		logError("Upload error on part " + partNumber + ": " + message);
+		logError("Upload error on part " + partNumber + ": \n" + message);
 		completedChunkCount++;
 		retryRequired = true;
 		checkAllPartsProcessed();
