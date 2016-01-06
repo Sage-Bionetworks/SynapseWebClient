@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
@@ -132,6 +133,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
 		serve("/Portal/linkedin").with(LinkedInServiceImpl.class);
+
+		// Setup the Discussion Forum service mapping
+		bind(DiscussionForumClientImpl.class).in(Singleton.class);
+		serve("/Portal/discussionforumclient").with(DiscussionForumClientImpl.class);
 		
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);
