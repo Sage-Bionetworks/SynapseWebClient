@@ -311,7 +311,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	        var start = currentChunk * chunkSize,
 	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-	
+			console.log("MD5 full file: loading next chunk: start=", start, " end=", end);
 	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
 		};
        $wnd.loadNext();
@@ -321,16 +321,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
 	 */
 	@Override
-	public void getFilePartMd5(String fileFieldId, Long start, Long end, int fileIndex, MD5Callback md5Callback) {
-		_getFilePartMd5(fileFieldId, start, end, fileIndex, md5Callback);
+	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback) {
+		_getFilePartMd5(fileFieldId, currentChunk, chunkSize.doubleValue(), fileIndex, md5Callback);
 	}
-	private final static native void _getFilePartMd5(String fileFieldId, Long start, Long end, int fileIndex, MD5Callback md5Callback) /*-{
+	private final static native void _getFilePartMd5(String fileFieldId, int currentChunk, double chunkSize, int fileIndex, MD5Callback md5Callback) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		var file = fileToUploadElement.files[fileIndex];
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		spark = new $wnd.SparkMD5.ArrayBuffer();
         $wnd.frOnload = function(e) {
-            spark.append(e.target.result);                 // append array buffer
+            spark.append(e.target.result); // append array buffer
            // Call instance method setMD5() on md5Callback with the final md5
 			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
         };
@@ -343,6 +343,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
             var fileReader = new FileReader();
 	        fileReader.onload = $wnd.frOnload;
 	        fileReader.onerror = $wnd.frOnerror;
+			var start = currentChunk * chunkSize,
+	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+	        
+	        console.log("MD5 file part: loading chunk: start=", start, " end=", end);
 	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
 		};
        $wnd.loadPart();

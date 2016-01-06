@@ -55,7 +55,7 @@ public interface SynapseJSNIUtils {
 	public boolean isElementExists(String elementId);
 	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, int index, MD5Callback callback);
-	public void getFilePartMd5(String fileFieldId, Long start, Long end, int fileIndex, MD5Callback md5Callback);
+	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback);
 	public double getFileSize(String fileFieldId, int index);
 	String[] getMultipleUploadFileNames(String fileFieldId);
 	public void consoleLog(String message);
