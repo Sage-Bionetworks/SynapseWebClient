@@ -42,8 +42,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	
+	public static final int MAX_RETRY = 10;
 	public static final int RETRY_DELAY = 3000;
-	public static final int MAX_RETRIES = 10;
 	
 	private GWTWrapper gwt;
 	private MultipartFileUploadClientAsync multipartFileUploadClient;
@@ -56,15 +56,21 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private StringBuilder uploadLog;
 	private String fileInputId;
 	int fileIndex;
+	//This class will create a multipart upload request (containing information specific to the file that the user wants to upload).
 	private MultipartUploadRequest request;
-	private String uploadId;
-	private int totalPartCount;
-	private ProgressingFileUploadHandler handler;
-	private boolean retryRequired;
-	private int attempt;
-	private int currentPartNumber;
+	//Get the upload status of all parts from the backend.  Will be refreshed from the server on each attempt.
 	private MultipartUploadStatus currentStatus;
-	private String partState;
+	//For convenient reference, remember how many parts this file upload has.
+	private int totalPartCount;
+	//Report success/failure/progress to the given ProgressingFileUploadHandler.
+	private ProgressingFileUploadHandler handler;
+	//Will retry the entire file upload if any part fails to upload.  Use this variable to flag the necessity to retry after going through all parts.
+	private boolean retryRequired;
+	//Keep track of how many times we try to upload the file (processing all parts).
+	private int attempt;
+	//Keep track of the part number (1-based index) that we are currently trying to upload.
+	private int currentPartNumber;
+	
 	private boolean isDebugLevelLogging = false;
 	
 	@Inject
@@ -84,11 +90,23 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	@Override
+	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId) {
+		// First get the name of the file
+		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
+		if(names == null || names.length < 1){
+			handler.uploadFailed(PLEASE_SELECT_A_FILE);
+			return;
+		}
+		int index = 0;
+		String fileName = names[0];
+		uploadFile(fileName, fileInputId, index, handler, storageLocationId);
+	}
+	
+	@Override
 	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, final Long storageLocationId) {
 		//initialize attempt count. 
 		attempt=0;
 		this.request = null;
-		this.uploadId = null;
 		this.totalPartCount = 0;
 		this.fileInputId = fileInputId;
 		this.fileIndex = fileIndex;
@@ -106,7 +124,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						fileSize, partSizeBytes);
 				String fileStats = "fileName="+fileName+"MD5=" + md5+" contentType="+contentType+" fileSize="+fileSize + " partSizeBytes=" + partSizeBytes + " numberOfParts=" + numberOfParts+"\n"; 
 				log(fileStats);
-				synapseJsniUtils.consoleLog(fileStats);
 				//create request
 				request = new MultipartUploadRequest();
 				request.setContentMD5Hex(md5);
@@ -123,9 +140,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	/**
 	 * Start uploading the file
 	 */
-	public void startMultipartUpload(){
+	public void startMultipartUpload() {
 		attempt++;
-		if (attempt <= MAX_RETRIES) {
+		if (attempt <= MAX_RETRY) {
 			if (isStillUploading()) {
 				retryRequired = false;
 				//update the status and process
@@ -140,9 +157,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					public void onSuccess(MultipartUploadStatus status) {
 						currentStatus = status;
 						currentPartNumber = 0;
-						uploadId = currentStatus.getUploadId();
-						partState = currentStatus.getPartsState();
-						totalPartCount = partState.length();
+						totalPartCount = currentStatus.getPartsState().length();
 						log("attemptChunkUpload: attempt number "+attempt+" to upload file.\n");
 						attemptToUploadNextPart();
 					}
@@ -154,13 +169,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	/**
-	 * Step three of an upload is to upload each chunk.
+	 * Increment the current part that we are processing.  Look at the MultipartUploadStatus part state to determine if we should try to upload the part, or skip it.
 	 */
 	public void attemptToUploadNextPart(){
 		//for each chunk that still needs to be uploaded, get the presigned url and upload to it
 		currentPartNumber++;
 		
-		if (partState.charAt(currentPartNumber-1) == '0') {
+		if (currentStatus.getPartsState().charAt(currentPartNumber-1) == '0') {
 			attemptUploadCurrentPart();
 		} else {
 			//this part has already been uploaded, skip it
@@ -170,8 +185,10 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		}
 	}
 	
+	/**
+	 * Get a presigned URL for the current part number, upload the part to it, and add the part to the upload. 
+	 */
 	public void attemptUploadCurrentPart() {
-		//needs to be uploaded
 		log("attemptChunkUpload: attempting to upload part number = "+currentPartNumber+"\n");
 		BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest = new BatchPresignedUploadUrlRequest();
 		batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPartNumber)));
@@ -196,7 +213,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 									if (xhr.getStatus() == 200) { //OK
 										log("XMLHttpRequest.setOnReadyStateChange: OK\n");
 										//add part number to the upload (and potentially complete)
-										addPartToUpload(uploadId);
+										addPartToUpload();
 									} else {
 										log("XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
 										logFullUpload();
@@ -225,19 +242,33 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		});
 	}
 	
+	/**
+	 * @return True if user is still looking at the upload UI.
+	 */
 	public boolean isStillUploading() {
 		return synapseJsniUtils.isElementExists(fileInputId);
 	}
+	
+	/**
+	 * Called if the current part was successfully uploaded.  Will continue on to process the next file part (if there is one).
+	 */
 	public void partSuccess() {
 		checkAllPartsProcessed();
 	}
 	
+	/**
+	 * Called if the current part failed to upload.  Will continue on to process the next file part (if there is one).
+	 */
 	public void partFailure(int partNumber, String message) {
 		logError("Upload error on part " + partNumber + ": \n" + message);
 		retryRequired = true;
 		checkAllPartsProcessed();
 	}
 	
+	/**
+	 * If all parts have been processed, it will either restart (if there were any problems during upload that were detected), or attempt to complete the upload.
+	 * If parts are left, then it will continue on to process the next file part.
+	 */
 	public void checkAllPartsProcessed() {
 		if (currentPartNumber >= totalPartCount) {
 			if (retryRequired) {
@@ -256,15 +287,11 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			attemptToUploadNextPart();
 		}
 	}
-	private void logFullUpload() {
-		log(uploadLog.toString());
-		uploadLog = new StringBuilder();
-	}
 	
 	public void completeMultipartUpload() {
 		logFullUpload();
 		//combine
-		multipartFileUploadClient.completeMultipartUpload(uploadId, new AsyncCallback<MultipartUploadStatus>() {
+		multipartFileUploadClient.completeMultipartUpload(currentStatus.getUploadId(), new AsyncCallback<MultipartUploadStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				//failed to complete multipart upload.  log it and start over.
@@ -280,14 +307,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		});
 	}
 	
-	public void addPartToUpload(final String uploadId) {
+	public void addPartToUpload() {
 		//calculate the md5 of this file part
 		if (isStillUploading()) {
 			synapseJsniUtils.getFilePartMd5(fileInputId, currentPartNumber-1, request.getPartSizeBytes(), fileIndex, new MD5Callback() {
 				@Override
 				public void setMD5(String partMd5) {
 					log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
-					multipartFileUploadClient.addPartToMultipartUpload(uploadId, currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
+					multipartFileUploadClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							partFailure(currentPartNumber, caught.getMessage());
@@ -318,18 +345,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		synapseJsniUtils.consoleError(message);
 		logger.error(message);
 	}
+	
 
-	@Override
-	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId) {
-		// First get the name of the file
-		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
-		if(names == null || names.length < 1){
-			handler.uploadFailed(PLEASE_SELECT_A_FILE);
-			return;
-		}
-		int index = 0;
-		String fileName = names[0];
-		uploadFile(fileName, fileInputId, index, handler, storageLocationId);
+	/**
+	 * Logs entire upload (and resets the upload log). 
+	 */
+	private void logFullUpload() {
+		log(uploadLog.toString());
+		uploadLog = new StringBuilder();
 	}
 
 	public String fixDefaultContentType(String type, String fileName) {
