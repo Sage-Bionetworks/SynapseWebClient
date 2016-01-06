@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
@@ -51,7 +52,6 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class MultipartUploaderTest {
 	
 	ProgressingFileUploadHandler mockHandler;
-	SynapseClientAsync synapseClient;
 	SynapseJSNIUtils synapseJsniUtils;
 	ClientLogger mockLogger;
 	GWTWrapper gwt;
@@ -61,13 +61,14 @@ public class MultipartUploaderTest {
 	String[] fileNames;
 	Long storageLocationId = 9090L;
 	@Mock
-	MultipartFileUploadClientAsync mockMultipartFileUploadClient; 
+	MultipartFileUploadClientAsync mockMultipartFileUploadClient;
+	@Mock
+	CookieProvider mockCookies;
 	
 	@Before
 	public void before() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		mockHandler = mock(ProgressingFileUploadHandler.class);
-		synapseClient = mock(SynapseClientAsync.class);
 		synapseJsniUtils =mock(SynapseJSNIUtils.class);
 		gwt = mock(GWTWrapper.class);
 		mockLogger = mock(ClientLogger.class);
@@ -113,7 +114,7 @@ public class MultipartUploaderTest {
 		fileNames = new String[]{file1};
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
-		uploader = new MultipartUploaderImpl(gwt, synapseClient, synapseJsniUtils, mockLogger, mockMultipartFileUploadClient);
+		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockLogger, mockMultipartFileUploadClient, mockCookies);
 		
 	}
 	

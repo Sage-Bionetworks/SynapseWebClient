@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -75,7 +74,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
-			SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJsniUtils,
 			ClientLogger logger, 
 			MultipartFileUploadClientAsync multipartFileUploadClient,
