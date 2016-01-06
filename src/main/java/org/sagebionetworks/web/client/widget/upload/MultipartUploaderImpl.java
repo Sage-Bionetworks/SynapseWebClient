@@ -205,6 +205,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		}
 	}
 	
+	/**
+	 * Step three of an upload is to upload each chunk.
+	 */
+	public void attemptChunkUpload(final MultipartUploadRequest request, MultipartUploadStatus currentStatus, final int partNumber){
+		
+	}
+	
+	
 	public void partSuccess() {
 		completedChunkCount++;
 		checkAllPartsProcessed();
@@ -255,8 +263,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	public void addPartToUpload(final String uploadId, final int partNumber) {
 		//calculate the md5 of this file part
-		Long chunkSize = request.getPartSizeBytes();
-		synapseJsniUtils.getFilePartMd5(fileInputId, partNumber, chunkSize, fileIndex, new MD5Callback() {
+		ByteRange range = getByteRange(partNumber, request.getFileSizeBytes(), request.getPartSizeBytes());
+		synapseJsniUtils.getFilePartMd5(fileInputId, range.getStart(), range.getEnd(), fileIndex, new MD5Callback() {
 			@Override
 			public void setMD5(String partMd5) {
 				synapseJsniUtils.consoleLog("partNumber="+partNumber + " partNumberMd5="+partMd5);
