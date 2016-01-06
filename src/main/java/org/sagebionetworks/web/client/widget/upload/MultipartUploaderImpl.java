@@ -12,12 +12,14 @@ import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -35,6 +37,7 @@ import com.google.inject.Inject;
  */
 public class MultipartUploaderImpl implements MultipartUploader {
 
+	public static final String EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE = "Exceeded the maximum number of attempts to upload a file. Please try again later.";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
@@ -47,7 +50,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private SynapseJSNIUtils synapseJsniUtils;
 	private NumberFormat percentFormat;
 	private ClientLogger logger;
-
+	private CookieProvider cookies;
+	
 	//string builder to capture upload information.  sends to output if any errors occur during direct upload.
 	private StringBuilder uploadLog;
 	private String fileInputId;
@@ -61,24 +65,24 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private int currentPartNumber;
 	private MultipartUploadStatus currentStatus;
 	private String partState;
+	private boolean isDebugLevelLogging = false;
 	
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
 			SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJsniUtils,
 			ClientLogger logger, 
-			MultipartFileUploadClientAsync multipartFileUploadClient) {
+			MultipartFileUploadClientAsync multipartFileUploadClient,
+			CookieProvider cookies) {
 		super();
 		this.gwt = gwt;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.multipartFileUploadClient = multipartFileUploadClient;
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.logger = logger;
+		this.cookies = cookies;
 	}
 	
-	/**
-	 * 
-	 */
 	@Override
 	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, final Long storageLocationId) {
 		//initialize attempt count. 
@@ -89,8 +93,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.fileInputId = fileInputId;
 		this.fileIndex = fileIndex;
 		this.handler = handler;
+		isDebugLevelLogging = DisplayUtils.isInTestWebsite(cookies);
 		uploadLog = new StringBuilder();
-		uploadLog.append(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
+		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
 		synapseJsniUtils.getFileMd5(fileInputId, fileIndex, new MD5Callback() {
 			@Override
 			public void setMD5(String md5) {
@@ -100,7 +105,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				long numberOfParts = PartUtils.calculateNumberOfParts(
 						fileSize, partSizeBytes);
 				String fileStats = "fileName="+fileName+"MD5=" + md5+" contentType="+contentType+" fileSize="+fileSize + " partSizeBytes=" + partSizeBytes + " numberOfParts=" + numberOfParts+"\n"; 
-				uploadLog.append(fileStats);
+				log(fileStats);
 				synapseJsniUtils.consoleLog(fileStats);
 				//create request
 				request = new MultipartUploadRequest();
@@ -116,37 +121,35 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	/**
-	 * Step two of an upload is to create a ChunkedFileToken.
+	 * Start uploading the file
 	 */
 	public void startMultipartUpload(){
 		attempt++;
 		if (attempt <= MAX_RETRIES) {
-			if (!synapseJsniUtils.isElementExists(fileInputId)) {
-				//the file input element is no longer on the page, just return.
-				return;
+			if (isStillUploading()) {
+				retryRequired = false;
+				//update the status and process
+				multipartFileUploadClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
+					@Override
+					public void onFailure(Throwable t) {
+						logError(t.getMessage());
+						handler.uploadFailed(t.getMessage());
+					}
+					
+					@Override
+					public void onSuccess(MultipartUploadStatus status) {
+						currentStatus = status;
+						currentPartNumber = 0;
+						uploadId = currentStatus.getUploadId();
+						partState = currentStatus.getPartsState();
+						totalPartCount = partState.length();
+						log("attemptChunkUpload: attempt number "+attempt+" to upload file.\n");
+						attemptToUploadNextPart();
+					}
+				});
 			}
-			retryRequired = false;
-			//update the status and process
-			multipartFileUploadClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
-				@Override
-				public void onFailure(Throwable t) {
-					logError(t.getMessage());
-					handler.uploadFailed(t.getMessage());
-				}
-				
-				@Override
-				public void onSuccess(MultipartUploadStatus status) {
-					currentStatus = status;
-					currentPartNumber = 0;
-					uploadId = currentStatus.getUploadId();
-					partState = currentStatus.getPartsState();
-					totalPartCount = partState.length();
-					uploadLog.append("attemptChunkUpload: attempt number "+attempt+" to upload file.\n");
-					attemptToUploadNextPart();
-				}
-			});
 		} else {
-			handler.uploadFailed("Unable to upload the file at this time. Please try again later.");
+			handler.uploadFailed(EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE);
 		}
 	}
 	
@@ -161,14 +164,15 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			attemptUploadCurrentPart();
 		} else {
 			//this part has already been uploaded, skip it
-			uploadLog.append("attemptChunkUpload: skipping part number = "+currentPartNumber+"\n");
+			String skipMessage = "attemptChunkUpload: skipping part number = "+currentPartNumber+"\n";
+			log(skipMessage);
 			partSuccess();
 		}
 	}
 	
 	public void attemptUploadCurrentPart() {
 		//needs to be uploaded
-		uploadLog.append("attemptChunkUpload: attempting to upload part number = "+currentPartNumber+"\n");
+		log("attemptChunkUpload: attempting to upload part number = "+currentPartNumber+"\n");
 		BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest = new BatchPresignedUploadUrlRequest();
 		batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPartNumber)));
 		batchPresignedUploadUrlRequest.setUploadId(currentStatus.getUploadId());
@@ -179,45 +183,51 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			}
 			@Override
 			public void onSuccess(BatchPresignedUploadUrlResponse batchPresignedUploadUrlResponse) {
-				PartPresignedUrl url = batchPresignedUploadUrlResponse.getPartPresignedUrls().get(0);
-				String urlString = url.getUploadPresignedUrl();
-				XMLHttpRequest xhr = gwt.createXMLHttpRequest();
-				if (xhr != null) {
-					xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
-						@Override
-						public void onReadyStateChange(XMLHttpRequest xhr) {
-							uploadLog.append("XMLHttpRequest.setOnReadyStateChange: readyState="+xhr.getReadyState() + " status=" + xhr.getStatus()+"\n");
-							if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
-								if (xhr.getStatus() == 200) { //OK
-									uploadLog.append("XMLHttpRequest.setOnReadyStateChange: OK\n");
-									//add part number to the upload (and potentially complete)
-									addPartToUpload(uploadId);
-								} else {
-									uploadLog.append("XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
-									partFailure(currentPartNumber, uploadLog.toString());
-									uploadLog = new StringBuilder();
+				if (isStillUploading()) {
+					PartPresignedUrl url = batchPresignedUploadUrlResponse.getPartPresignedUrls().get(0);
+					String urlString = url.getUploadPresignedUrl();
+					XMLHttpRequest xhr = gwt.createXMLHttpRequest();
+					if (xhr != null) {
+						xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
+							@Override
+							public void onReadyStateChange(XMLHttpRequest xhr) {
+								log("XMLHttpRequest.setOnReadyStateChange: readyState="+xhr.getReadyState() + " status=" + xhr.getStatus()+"\n");
+								if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
+									if (xhr.getStatus() == 200) { //OK
+										log("XMLHttpRequest.setOnReadyStateChange: OK\n");
+										//add part number to the upload (and potentially complete)
+										addPartToUpload(uploadId);
+									} else {
+										log("XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
+										logFullUpload();
+										partFailure(currentPartNumber, uploadLog.toString());
+										uploadLog = new StringBuilder();
+									}
 								}
 							}
-						}
-					});
-				}
-				ByteRange range = getByteRange(currentPartNumber, request.getFileSizeBytes(), request.getPartSizeBytes());
-				uploadLog.append("attemptChunkUpload: uploading file chunk. ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
-				ProgressCallback progressCallback = new ProgressCallback() {
-					@Override
-					public void updateProgress(double value) {
-						//Note:  0 <= value <= 1
-						//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-						double currentProgress = (((double)(currentPartNumber)) + value)/((double)totalPartCount);
-						String progressText = percentFormat.format(currentProgress*100.0) + "%";
-						handler.updateProgress(currentProgress, progressText);
+						});
 					}
-				};
-				synapseJsniUtils.uploadFileChunk(request.getContentType(), fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
+					ByteRange range = new ByteRange(currentPartNumber, request.getFileSizeBytes(), request.getPartSizeBytes());
+					log("attemptChunkUpload: uploading file chunk. ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
+					ProgressCallback progressCallback = new ProgressCallback() {
+						@Override
+						public void updateProgress(double value) {
+							//Note:  0 <= value <= 1
+							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
+							double currentProgress = (((double)(currentPartNumber-1)) + value)/((double)totalPartCount);
+							String progressText = percentFormat.format(currentProgress*100.0) + "%";
+							handler.updateProgress(currentProgress, progressText);
+						}
+					};
+					synapseJsniUtils.uploadFileChunk(request.getContentType(), fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
+				}
 			}
 		});
 	}
 	
+	public boolean isStillUploading() {
+		return synapseJsniUtils.isElementExists(fileInputId);
+	}
 	public void partSuccess() {
 		checkAllPartsProcessed();
 	}
@@ -246,9 +256,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			attemptToUploadNextPart();
 		}
 	}
+	private void logFullUpload() {
+		log(uploadLog.toString());
+		uploadLog = new StringBuilder();
+	}
 	
 	public void completeMultipartUpload() {
-		synapseJsniUtils.consoleLog(uploadLog.toString());
+		logFullUpload();
 		//combine
 		multipartFileUploadClient.completeMultipartUpload(uploadId, new AsyncCallback<MultipartUploadStatus>() {
 			@Override
@@ -268,50 +282,37 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	public void addPartToUpload(final String uploadId) {
 		//calculate the md5 of this file part
-		synapseJsniUtils.getFilePartMd5(fileInputId, currentPartNumber-1, request.getPartSizeBytes(), fileIndex, new MD5Callback() {
-			@Override
-			public void setMD5(String partMd5) {
-				synapseJsniUtils.consoleLog("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
-				multipartFileUploadClient.addPartToMultipartUpload(uploadId, currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						partFailure(currentPartNumber, caught.getMessage());
-					}
-					
-					public void onSuccess(AddPartResponse addPartResponse) {
-						if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
-							partSuccess();	
-						} else {
-							partFailure(currentPartNumber, addPartResponse.getErrorMessage());
+		if (isStillUploading()) {
+			synapseJsniUtils.getFilePartMd5(fileInputId, currentPartNumber-1, request.getPartSizeBytes(), fileIndex, new MD5Callback() {
+				@Override
+				public void setMD5(String partMd5) {
+					log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
+					multipartFileUploadClient.addPartToMultipartUpload(uploadId, currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							partFailure(currentPartNumber, caught.getMessage());
 						}
-					};
-				});
-			}});
-	}
-	
-	public class ByteRange {
-		private long start, end;
-		public ByteRange(long start, long end) {
-			this.start = start;
-			this.end = end;
-		}
-		public long getEnd() {
-			return end;
-		}
-		public long getStart() {
-			return start;
+						
+						public void onSuccess(AddPartResponse addPartResponse) {
+							if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
+								partSuccess();	
+							} else {
+								partFailure(currentPartNumber, addPartResponse.getErrorMessage());
+							}
+						};
+					});
+				}});
 		}
 	}
 	
-	public ByteRange getByteRange(int partNumber, Long fileSize, long partSize) {
-		long startByte = (partNumber-1) * partSize;
-		long endByte = partNumber * partSize - 1;
-		if (endByte >= fileSize)
-			endByte = fileSize-1;
-		return new ByteRange(startByte, endByte);
-	}	
-	
-	private void logError(String message) {
+	public void log(String message) {
+		if (isDebugLevelLogging) {
+			synapseJsniUtils.consoleLog(message);
+		}
+		uploadLog.append(message);
+	}
+
+	public void logError(String message) {
 		uploadLog.append(message+"\n");
 		//and to the console
 		synapseJsniUtils.consoleError(message);
