@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
@@ -84,6 +85,8 @@ public class EntityPageTopTest {
 	@Mock
 	ChallengeTab mockChallengeTab;
 	@Mock
+	DiscussionTab mockDiscussionTab;
+	@Mock
 	Tab mockChallengeInnerTab;
 	@Mock
 	UserEntityPermissions mockPermissions;
@@ -109,7 +112,7 @@ public class EntityPageTopTest {
 		when(mockTablesTab.asTab()).thenReturn(mockTablesInnerTab);
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
-				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockEntityActionController, 
+				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockEntityActionController, 
 				mockActionMenuWidget, mockGWTWrapper);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callWithInvoke().when(mockGWTWrapper).scheduleDeferred(any(Callback.class));
