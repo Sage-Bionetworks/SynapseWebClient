@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -86,9 +87,11 @@ public class EntityPageTopTest {
 	@Mock
 	ChallengeTab mockChallengeTab;
 	@Mock
+	Tab mockChallengeInnerTab;
+	@Mock
 	DiscussionTab mockDiscussionTab;
 	@Mock
-	Tab mockChallengeInnerTab;
+	Tab mockDiscussionInnerTab;
 	@Mock
 	UserEntityPermissions mockPermissions;
 	@Mock
@@ -114,6 +117,7 @@ public class EntityPageTopTest {
 		when(mockWikiTab.asTab()).thenReturn(mockWikiInnerTab);
 		when(mockTablesTab.asTab()).thenReturn(mockTablesInnerTab);
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
+		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockEntityActionController, 
 				mockActionMenuWidget, mockGWTWrapper, mockCookies);
@@ -127,6 +131,8 @@ public class EntityPageTopTest {
 		when(mockProjectHeader.getName()).thenReturn(projectName);
 		when(mockProjectBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
+		// pretend we are in test website
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 	}
 	
 	@Test
@@ -140,6 +146,7 @@ public class EntityPageTopTest {
 		verify(mockTabs).addTab(mockWikiInnerTab);
 		verify(mockTabs).addTab(mockTablesInnerTab);
 		verify(mockTabs).addTab(mockChallengeInnerTab);
+		verify(mockTabs).addTab(mockDiscussionInnerTab);
 		
 		verify(mockActionMenuWidget).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
@@ -189,6 +196,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName);
 		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, projectWikiId, mockEntityUpdatedHandler);
 	}
 	
@@ -206,6 +214,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, null);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName);
 		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, areaToken, mockEntityUpdatedHandler);
 	}
 	
@@ -224,6 +233,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName);
 	}
 	
 
@@ -245,6 +255,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName);
 	}
 	
 	@Test
@@ -264,6 +275,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName);
 	}
 	
 	@Test
@@ -282,6 +294,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName);
 	}
 	
 	@Test

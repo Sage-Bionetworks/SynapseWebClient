@@ -251,6 +251,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (area == null) {
 			configureTablesTab();
 			configureAdminTab();
+			configureDiscussionTab();
 		} else {
 			switch (area) {
 			case FILES:
