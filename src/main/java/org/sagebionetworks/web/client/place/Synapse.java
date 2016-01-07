@@ -15,6 +15,7 @@ public class Synapse extends Place implements RestartActivityOptional{
 	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
 	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
 	public static final String TABLES_DELIMITER = getDelimiter(Synapse.EntityArea.TABLES);
+	public static final String DISCUSSION_DELIMITER = getDelimiter(Synapse.EntityArea.DISCUSSION);
 	
 	private String token;
 	private String entityId, areaToken;
@@ -69,6 +70,9 @@ public class Synapse extends Place implements RestartActivityOptional{
 				String[] parts = toProcess.split(TABLES_DELIMITER);
 				if(parts.length == 2)
 					areaToken = parts[1]; 
+				return;
+			} else if(toProcess.contains(DISCUSSION_DELIMITER)) {
+				area = Synapse.EntityArea.DISCUSSION;
 				return;
 			}
 		} else {
@@ -147,7 +151,7 @@ public class Synapse extends Place implements RestartActivityOptional{
         }
     }
 
-	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN }
+	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN, DISCUSSION }
 	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, SETTINGS }
 
 	@Override
