@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
@@ -58,6 +59,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private FilesTab filesTab;
 	private TablesTab tablesTab;
 	private ChallengeTab adminTab;
+	private DiscussionTab discussionTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
@@ -75,6 +77,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			FilesTab filesTab,
 			TablesTab tablesTab,
 			ChallengeTab adminTab,
+			DiscussionTab discussionTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
 			GWTWrapper gwt) {
@@ -85,6 +88,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.filesTab = filesTab;
 		this.tablesTab = tablesTab;
 		this.adminTab = adminTab;
+		this.discussionTab = discussionTab;
 		this.projectMetadata = projectMetadata;
 		this.controller = controller;
 		this.actionMenu = actionMenu;
@@ -114,6 +118,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab.asTab());
 		tabs.addTab(adminTab.asTab());
+		tabs.addTab(discussionTab.asTab());
 		
 		CallbackP<Boolean> showHideProjectInfoCallback = new CallbackP<Boolean>() {
 			public void invoke(Boolean visible) {
@@ -131,6 +136,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
 		adminTab.setTabClickedCallback(showProjectInfoCallback);
+
+		//on tab change to these tabs, always hide project info
+		CallbackP<Tab> hideProjectInfoCallback = new CallbackP<Tab>() {
+			public void invoke(Tab t) {
+				view.setProjectInformationVisible(false);
+			};
+		};
+		discussionTab.setTabClickedCallback(hideProjectInfoCallback);
 	}
 	
     /**
@@ -168,6 +181,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			tablesAreaToken = areaToken;
 		} else if (area == EntityArea.ADMIN) {
 			tabs.showTab(adminTab.asTab());
+		} else if (area == EntityArea.DISCUSSION) {
+			tabs.showTab(discussionTab.asTab());
 		}
 		
     	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later
@@ -226,6 +241,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			case ADMIN:
 				configureAdminTab();
 				break;
+			case DISCUSSION:
+				configureDiscussionTab();
+				break;
 			default:
 			}
 		}
@@ -235,27 +253,38 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (area == null) {
 			configureTablesTab();
 			configureAdminTab();
+			configureDiscussionTab();
 		} else {
 			switch (area) {
 			case FILES:
 				configureWikiTab();
 				configureTablesTab();
 				configureAdminTab();
+				configureDiscussionTab();
 				break;
 			case WIKI:
 				configureFilesTab();
 				configureTablesTab();
 				configureAdminTab();
+				configureDiscussionTab();
 				break;
 			case TABLES:
 				configureWikiTab();
 				configureFilesTab();
 				configureAdminTab();
+				configureDiscussionTab();
 				break;
 			case ADMIN:
 				configureWikiTab();
 				configureFilesTab();
 				configureTablesTab();
+				configureDiscussionTab();
+				break;
+			case DISCUSSION:
+				configureWikiTab();
+				configureFilesTab();
+				configureTablesTab();
+				configureAdminTab();
 				break;
 			default:
 			}
@@ -330,6 +359,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void configureAdminTab() {
 		String projectId = projectHeader.getId();
 		adminTab.configure(projectId, projectHeader.getName());
+	}
+
+	public void configureDiscussionTab() {
+		String projectId = projectHeader.getId();
+		discussionTab.configure(projectId, projectHeader.getName());
 	}
 		
 	@Override
