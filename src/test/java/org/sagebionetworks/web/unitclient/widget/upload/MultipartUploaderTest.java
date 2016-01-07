@@ -21,6 +21,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.file.AddPartResponse;
+import org.sagebionetworks.repo.model.file.AddPartState;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
@@ -78,6 +80,8 @@ public class MultipartUploaderTest {
 	BatchPresignedUploadUrlResponse mockBatchPresignedUploadUrlResponse;
 	@Mock
 	PartPresignedUrl mockPartPresignedUrl;
+	@Mock
+	AddPartResponse mockAddPartResponse;
 	public static final String UPLOAD_ID = "39282";
 	public static final String RESULT_FILE_HANDLE_ID = "999999";
 	public static final double FILE_SIZE=9281;
@@ -102,7 +106,9 @@ public class MultipartUploaderTest {
 		when(mockBatchPresignedUploadUrlResponse.getPartPresignedUrls()).thenReturn(presignedUrlList);
 		presignedUrlList.add(mockPartPresignedUrl);
 		when(mockPartPresignedUrl.getUploadPresignedUrl()).thenReturn("http://fakepresignedurl.uploader.test");
-		AsyncMockStubber.callSuccessWith(presignedUrlList).when(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBatchPresignedUploadUrlResponse).when(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		when(mockAddPartResponse.getAddPartState()).thenReturn(AddPartState.ADD_SUCCESS);
+		AsyncMockStubber.callSuccessWith(mockAddPartResponse).when(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// Stub the generation of a MD5.
 		MD5 = "some md5";
@@ -175,7 +181,56 @@ public class MultipartUploaderTest {
 		// the handler should get the id.
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
+	
+	@Test
+	public void testDirectUploadSinglePart() throws Exception {
+		setPartsState("0");
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
+		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		//manually call the method that's invoked with a successful xhr put (upload)
+		uploader.addPartToUpload();
+		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		// the handler should get the id.
+		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
+	}
+	
 
+	@Test
+	public void testDirectUploadSingleSecondPart() throws Exception {
+		setPartsState("10");
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
+		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		//manually call the method that's invoked with a successful xhr put (upload)
+		uploader.addPartToUpload();
+		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		// the handler should get the id.
+		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
+	}
+
+	@Test
+	public void testDirectUploadMultiPart() throws Exception {
+		setPartsState("00");
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
+		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		//manually call the method that's invoked with a successful xhr put (upload)
+		uploader.addPartToUpload();
+		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		//should not have completed, since there's another part
+		verify(mockMultipartFileUploadClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		
+		uploader.addPartToUpload();
+		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		// the handler should get the id.
+		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
+	}
 	
 	@Test
 	public void testDirectUploadStep3Failure() throws Exception {
