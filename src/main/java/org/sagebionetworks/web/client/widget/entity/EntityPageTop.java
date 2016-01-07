@@ -18,7 +18,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -68,7 +67,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
-	private CookieProvider cookies;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -82,8 +80,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			DiscussionTab discussionTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
-			GWTWrapper gwt,
-			CookieProvider cookies) {
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -96,7 +93,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.controller = controller;
 		this.actionMenu = actionMenu;
 		this.gwt = gwt;
-		this.cookies = cookies;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -140,6 +136,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
 		adminTab.setTabClickedCallback(showProjectInfoCallback);
+		discussionTab.setTabClickedCallback(showProjectInfoCallback);
 	}
 	
     /**
@@ -178,9 +175,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		} else if (area == EntityArea.ADMIN) {
 			tabs.showTab(adminTab.asTab());
 		} else if (area == EntityArea.DISCUSSION) {
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				tabs.showTab(discussionTab.asTab());
-			}
+			tabs.showTab(discussionTab.asTab());
 		}
 		
     	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later

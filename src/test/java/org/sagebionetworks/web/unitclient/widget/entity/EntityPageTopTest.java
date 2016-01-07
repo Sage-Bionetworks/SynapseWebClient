@@ -22,10 +22,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -102,8 +100,6 @@ public class EntityPageTopTest {
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	GWTWrapper mockGWTWrapper;
-	@Mock
-	CookieProvider mockCookies;
 	
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
@@ -120,7 +116,7 @@ public class EntityPageTopTest {
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockEntityActionController, 
-				mockActionMenuWidget, mockGWTWrapper, mockCookies);
+				mockActionMenuWidget, mockGWTWrapper);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callWithInvoke().when(mockGWTWrapper).scheduleDeferred(any(Callback.class));
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
@@ -131,8 +127,6 @@ public class EntityPageTopTest {
 		when(mockProjectHeader.getName()).thenReturn(projectName);
 		when(mockProjectBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
-		// pretend we are in test website
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 	}
 	
 	@Test
