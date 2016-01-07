@@ -21,8 +21,13 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
+import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
@@ -36,7 +41,9 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.upload.ByteRange;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
+import org.sagebionetworks.web.client.widget.upload.PartUtils;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
@@ -57,13 +64,23 @@ public class MultipartUploaderTest {
 	GWTWrapper gwt;
 	MultipartUploaderImpl uploader;
 	String MD5;
-	UploadDaemonStatus status;
+	String partMd5;
+	
 	String[] fileNames;
 	Long storageLocationId = 9090L;
 	@Mock
 	MultipartFileUploadClientAsync mockMultipartFileUploadClient;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	MultipartUploadStatus mockMultipartUploadStatus;
+	@Mock
+	BatchPresignedUploadUrlResponse mockBatchPresignedUploadUrlResponse;
+	@Mock
+	PartPresignedUrl mockPartPresignedUrl;
+	public static final String UPLOAD_ID = "39282";
+	public static final String RESULT_FILE_HANDLE_ID = "999999";
+	public static final double FILE_SIZE=9281;
 	
 	@Before
 	public void before() throws Exception {
@@ -78,12 +95,15 @@ public class MultipartUploaderTest {
 		//direct upload
 		//by default, do not support direct upload (direct upload tests will turn on)
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(token).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(Long.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
-		status = new UploadDaemonStatus();
-		status.setState(State.COMPLETED);
-		status.setFileHandleId("fake handle");
-		AsyncMockStubber.callSuccessWith(status).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		when(mockMultipartUploadStatus.getUploadId()).thenReturn(UPLOAD_ID);
+		when(mockMultipartUploadStatus.getResultFileHandleId()).thenReturn(RESULT_FILE_HANDLE_ID);
+		List<PartPresignedUrl> presignedUrlList = new ArrayList<PartPresignedUrl>();
+		when(mockBatchPresignedUploadUrlResponse.getPartPresignedUrls()).thenReturn(presignedUrlList);
+		presignedUrlList.add(mockPartPresignedUrl);
+		when(mockPartPresignedUrl.getUploadPresignedUrl()).thenReturn("http://fakepresignedurl.uploader.test");
+		AsyncMockStubber.callSuccessWith(presignedUrlList).when(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// Stub the generation of a MD5.
 		MD5 = "some md5";
 		doAnswer(new Answer<Void>() {
@@ -95,6 +115,17 @@ public class MultipartUploaderTest {
 			}
 		}).when(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
 		
+		partMd5 = "another md5";
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                ((MD5Callback) args[args.length - 1]).setMD5(partMd5);
+				return null;
+			}
+		}).when(synapseJsniUtils).getFilePartMd5(anyString(), anyInt(), anyLong(), anyInt(), any(MD5Callback.class));
+
+		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(FILE_SIZE);
 		// fire the timer 
 		doAnswer(new Answer<Void>() {
 			@Override
@@ -116,6 +147,11 @@ public class MultipartUploaderTest {
 		
 		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockLogger, mockMultipartFileUploadClient, mockCookies);
 		
+		when(synapseJsniUtils.isElementExists(anyString())).thenReturn(true);
+	}
+	
+	private void setPartsState(String partsState) {
+		when(mockMultipartUploadStatus.getPartsState()).thenReturn(partsState);
 	}
 	
 	@Test
@@ -126,17 +162,18 @@ public class MultipartUploaderTest {
 	}
 	
 	@Test
-	public void testDirectUploadHappyCase() throws Exception {
+	public void testDirectUploadAllPartsExist() throws Exception {
+		setPartsState("11");
 		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
-		// jump to step three
-		uploader.attemptCombineChunks(null, 1);
-		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(Long.class), any(AsyncCallback.class));
-		verify(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
-		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
-		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
+		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		
+		//never tries to get a presigned url, since all parts are uploaded.
+		verify(mockMultipartFileUploadClient, never()).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(synapseJsniUtils, never()).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		//combine parts
+		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// the handler should get the id.
-		FileUpload uploadedFile = new FileUpload(null, status.getFileHandleId());
-		verify(mockHandler).uploadSuccess(anyString());
+		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
 
 	
@@ -191,28 +228,29 @@ public class MultipartUploaderTest {
 	@Test
 	public void testByteRange() {
 		//test chunk sizes
-		MultipartUploaderImpl.ByteRange range;
+		ByteRange range;
+		
 		//case when total file size is less than chunk size
-		range = uploader.getByteRange(1, BYTES_PER_CHUNK - 1024);
+		range = new ByteRange(1, PartUtils.MAX_PART_SIZE_BYTES - 1024, PartUtils.MAX_PART_SIZE_BYTES);
 		assertEquals(0, range.getStart());
-		assertEquals(BYTES_PER_CHUNK - 1024 - 1, range.getEnd());
+		assertEquals(PartUtils.MAX_PART_SIZE_BYTES - 1024 - 1, range.getEnd());
 		
 		//case when total file size is equal to chunk size
-		range = uploader.getByteRange(1, BYTES_PER_CHUNK);
+		range = new ByteRange(1, PartUtils.MAX_PART_SIZE_BYTES, PartUtils.MAX_PART_SIZE_BYTES);
 		assertEquals(0, range.getStart());
-		assertEquals(BYTES_PER_CHUNK-1, range.getEnd());
+		assertEquals(PartUtils.MAX_PART_SIZE_BYTES-1, range.getEnd());
 
 		//case when total file size is greater than chunk size
-		range = uploader.getByteRange(1, BYTES_PER_CHUNK + 1024); 
+		range = new ByteRange(1, PartUtils.MAX_PART_SIZE_BYTES + 1024, PartUtils.MAX_PART_SIZE_BYTES); 
 		assertEquals(0, range.getStart());
-		assertEquals(BYTES_PER_CHUNK-1, range.getEnd());
+		assertEquals(PartUtils.MAX_PART_SIZE_BYTES-1, range.getEnd());
 		//also verify second chunk has the expected range
-		range = uploader.getByteRange(2, BYTES_PER_CHUNK + 1024);
-		assertEquals(BYTES_PER_CHUNK, range.getStart());
-		assertEquals(BYTES_PER_CHUNK+1024-1, range.getEnd());
+		range = new ByteRange(2, PartUtils.MAX_PART_SIZE_BYTES + 1024, PartUtils.MAX_PART_SIZE_BYTES);
+		assertEquals(PartUtils.MAX_PART_SIZE_BYTES, range.getStart());
+		assertEquals(PartUtils.MAX_PART_SIZE_BYTES+1024-1, range.getEnd());
 		
 		//verify byte range is valid in later chunk in large file
-		range = uploader.getByteRange(430, (long)(4 * ClientProperties.GB));
+		range = new ByteRange(430, (long)(4 * ClientProperties.GB), PartUtils.MAX_PART_SIZE_BYTES);
 		assertTrue(range.getStart() > -1);
 		assertTrue(range.getEnd() > -1);
 	}

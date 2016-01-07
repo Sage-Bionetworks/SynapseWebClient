@@ -53,7 +53,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	//string builder to capture upload information.  sends to output if any errors occur during direct upload.
 	private StringBuilder uploadLog;
+	//Id linked to the file input element in the dom.
 	private String fileInputId;
+	//File index in the file input element (if multi-select this could be non-zero)
 	int fileIndex;
 	//This class will create a multipart upload request (containing information specific to the file that the user wants to upload).
 	private MultipartUploadRequest request;
