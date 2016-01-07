@@ -61,6 +61,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
@@ -2021,25 +2022,44 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetOrCreateActivityForEntityVersionGet() throws SynapseException, RestServiceException {
-		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenReturn(new Activity());
-		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		Activity activity = new Activity();
+		activity.setName("with name");
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenReturn(activity);
+		synapseClient.getCopyOfActivityForEntityVersion(entityId, version);
 		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).createActivity(eq(activity));
 	}
 	
 	@Test
-	public void testGetOrCreateActivityForEntityVersionCreate() throws SynapseException, RestServiceException {
+	public void testGetCopyOfActivityForEntityVersion() throws SynapseException, RestServiceException {
 		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new SynapseNotFoundException());
 		when(mockSynapse.createActivity(any(Activity.class))).thenReturn(mockActivity);
-		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		synapseClient.getCopyOfActivityForEntityVersion(entityId, version);
 		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
-		verify(mockSynapse).createActivity(any(Activity.class));
-		verify(mockSynapse).putEntity(mockSynapse.getEntityById(entityId), mockActivity.getId());
+		verify(mockSynapse).createActivity(any(Activity.class));		
 	}
 	
 	@Test(expected = Exception.class)
-	public void testGetOrCreateActivityForEntityVersionFailure() throws SynapseException, RestServiceException {
+	public void testGetCopyOfActivityForEntityVersionFailure() throws SynapseException, RestServiceException {
 		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new Exception());
-		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		synapseClient.getCopyOfActivityForEntityVersion(entityId, version);
+	}
+	
+	public void testSaveNewActivity() throws SynapseException, RestServiceException {
+		Activity activity = new Activity();
+		String activityId="2928";
+		activity.setId(activityId);
+		Entity mockEntity = Mockito.mock(Entity.class);
+		when(mockSynapse.getEntityById(anyString())).thenReturn(mockEntity);
+		synapseClient.saveNewActivity(activity, entityId);
+		verify(mockSynapse).putActivity(activity);
+		verify(mockSynapse).putEntity(mockEntity, activityId);
+	}
+	
+	@Test(expected = Exception.class)
+	public void testSaveNewActivityFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getEntityById(anyString())).thenThrow(new Exception());
+		synapseClient.saveNewActivity(new Activity(), entityId);
 	}
 	
 	private void setupGetMyLocationSettings() throws SynapseException, RestServiceException{
