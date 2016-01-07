@@ -12,6 +12,9 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	Tab tab;
 	DiscussionTabView view;
 	CookieProvider cookies;
+	private final static Long PROJECT_VERSION_NUMBER = null;
+	// TODO: use this token to navigate between threads within the discussion tab
+	String areaToken = null;
 
 	@Inject
 	public DiscussionTab(
@@ -30,7 +33,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	}
 
 	public void configure(String entityId, String entityName) {
-		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.DISCUSSION, null));
+		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, areaToken));
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
