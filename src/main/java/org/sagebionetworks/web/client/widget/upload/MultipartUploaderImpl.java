@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientLogger;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
@@ -38,9 +37,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 
 	public static final String EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE = "Exceeded the maximum number of attempts to upload a file. Please try again later.";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
-	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
-	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	
+	//if any parts fail to upload, then it will restart the upload from the beginning up to 10 times, with a 3 second delay between attempts.
 	public static final int MAX_RETRY = 10;
 	public static final int RETRY_DELAY = 3000;
 	
@@ -72,6 +70,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	//Keep track of the part number (1-based index) that we are currently trying to upload.
 	private int currentPartNumber;
 	
+	//in alpha mode, upload log is sent to the js console
 	private boolean isDebugLevelLogging = false;
 	
 	@Inject
@@ -179,8 +178,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			attemptUploadCurrentPart();
 		} else {
 			//this part has already been uploaded, skip it
-			String skipMessage = "attemptChunkUpload: skipping part number = "+currentPartNumber+"\n";
-			log(skipMessage);
+			log("attemptChunkUpload: skipping part number = "+currentPartNumber+"\n");
 			partSuccess();
 		}
 	}
@@ -196,7 +194,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		multipartFileUploadClient.getMultipartPresignedUrlBatch(batchPresignedUploadUrlRequest, new AsyncCallback<BatchPresignedUploadUrlResponse>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				partFailure(currentPartNumber, caught.getMessage());
+				partFailure(caught.getMessage());
 			}
 			@Override
 			public void onSuccess(BatchPresignedUploadUrlResponse batchPresignedUploadUrlResponse) {
@@ -213,12 +211,11 @@ public class MultipartUploaderImpl implements MultipartUploader {
 									if (xhr.getStatus() == 200) { //OK
 										log("XMLHttpRequest.setOnReadyStateChange: OK\n");
 										//add part number to the upload (and potentially complete)
-										addPartToUpload();
+										addCurrentPartToMultipartUpload();
 									} else {
 										log("XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
 										logFullUpload();
-										partFailure(currentPartNumber, uploadLog.toString());
-										uploadLog = new StringBuilder();
+										partFailure(uploadLog.toString());
 									}
 								}
 							}
@@ -259,8 +256,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	/**
 	 * Called if the current part failed to upload.  Will continue on to process the next file part (if there is one).
 	 */
-	public void partFailure(int partNumber, String message) {
-		logError("Upload error on part " + partNumber + ": \n" + message);
+	public void partFailure(String message) {
+		logError("Upload error on part " + currentPartNumber + ": \n" + message);
 		retryRequired = true;
 		checkAllPartsProcessed();
 	}
@@ -307,7 +304,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		});
 	}
 	
-	public void addPartToUpload() {
+	public void addCurrentPartToMultipartUpload() {
 		//calculate the md5 of this file part
 		if (isStillUploading()) {
 			synapseJsniUtils.getFilePartMd5(fileInputId, currentPartNumber-1, request.getPartSizeBytes(), fileIndex, new MD5Callback() {
@@ -317,14 +314,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					multipartFileUploadClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							partFailure(currentPartNumber, caught.getMessage());
+							partFailure(caught.getMessage());
 						}
 						
 						public void onSuccess(AddPartResponse addPartResponse) {
 							if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
-								partSuccess();	
+								partSuccess();
 							} else {
-								partFailure(currentPartNumber, addPartResponse.getErrorMessage());
+								partFailure(addPartResponse.getErrorMessage());
 							}
 						};
 					});
@@ -374,6 +371,4 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		}
 		return contentType;
 	}
-
-	
 }
