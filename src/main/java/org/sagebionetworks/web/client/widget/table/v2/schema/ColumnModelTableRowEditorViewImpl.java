@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
@@ -15,6 +14,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +35,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@UiField
 	HelpBlock nameHelp;
 	@UiField
-	Select type;
+	ListBox type;
 	@UiField
 	FormGroup sizeGroup;
 	@UiField
@@ -67,7 +67,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public ColumnTypeViewEnum getColumnType() {
-		return ColumnTypeViewEnum.valueOf(type.getValue());
+		return ColumnTypeViewEnum.valueOf(type.getSelectedValue());
 	}
 
 	@Override
@@ -103,7 +103,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public void setColumnType(ColumnTypeViewEnum type) {
-		this.type.setValue(type.name());
+		int index = 0;
+		String targetName = type.name();
+		for (int i = 0; i < this.type.getItemCount(); i++) {
+			if (this.type.getValue(i).equals(targetName)){
+				index = i;
+				break;
+			}
+		}
+		this.type.setSelectedIndex(index);
 	}
 
 	@Override
