@@ -9,8 +9,8 @@ import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
+import org.sagebionetworks.repo.model.file.PartUtils;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
-import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
@@ -46,7 +46,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private MultipartFileUploadClientAsync multipartFileUploadClient;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private NumberFormat percentFormat;
-	private ClientLogger logger;
 	private CookieProvider cookies;
 	
 	//string builder to capture upload information.  sends to output if any errors occur during direct upload.
@@ -76,7 +75,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
 			SynapseJSNIUtils synapseJsniUtils,
-			ClientLogger logger, 
 			MultipartFileUploadClientAsync multipartFileUploadClient,
 			CookieProvider cookies) {
 		super();
@@ -84,7 +82,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.multipartFileUploadClient = multipartFileUploadClient;
 		this.percentFormat = gwt.getNumberFormat("##");;
-		this.logger = logger;
 		this.cookies = cookies;
 	}
 	
@@ -340,7 +337,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		uploadLog.append(message+"\n");
 		//and to the console
 		synapseJsniUtils.consoleError(message);
-		logger.error(message);
 	}
 	
 

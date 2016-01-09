@@ -2,22 +2,27 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.MAX_RETRY;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -25,32 +30,24 @@ import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.AddPartState;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
-import org.sagebionetworks.repo.model.file.State;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.file.PartUtils;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
-import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.ByteRange;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.PartUtils;
-import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
-import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.CombineFileChunksException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -62,7 +59,6 @@ public class MultipartUploaderTest {
 	
 	ProgressingFileUploadHandler mockHandler;
 	SynapseJSNIUtils synapseJsniUtils;
-	ClientLogger mockLogger;
 	GWTWrapper gwt;
 	MultipartUploaderImpl uploader;
 	String MD5;
@@ -92,7 +88,6 @@ public class MultipartUploaderTest {
 		mockHandler = mock(ProgressingFileUploadHandler.class);
 		synapseJsniUtils =mock(SynapseJSNIUtils.class);
 		gwt = mock(GWTWrapper.class);
-		mockLogger = mock(ClientLogger.class);
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setFileName("testFile.txt");
 		
@@ -151,7 +146,7 @@ public class MultipartUploaderTest {
 		fileNames = new String[]{file1};
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
-		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockLogger, mockMultipartFileUploadClient, mockCookies);
+		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockMultipartFileUploadClient, mockCookies);
 		
 		when(synapseJsniUtils.isElementExists(anyString())).thenReturn(true);
 	}
@@ -275,8 +270,8 @@ public class MultipartUploaderTest {
 		
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
-		//should have logged the error, and attempted to retry the upload from the beginning
-		verify(mockLogger).error(error);
+		//should have logged the error locally, and attempted to retry the upload from the beginning
+		verify(synapseJsniUtils).consoleError(error);
 		verify(mockMultipartFileUploadClient, times(2)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 	}
 
