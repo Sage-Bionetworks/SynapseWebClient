@@ -6,8 +6,8 @@
 	<g:HTMLPanel>
 		<b:Modal ui:field="newThreadModal" title="title" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
-				<bh:Paragraph>You've reached NewThreadModal.</bh:Paragraph>
-				<g:FlowPanel ui:field="mainContent" />
+				<b:TextBox ui:field="threadTitle" placeholder="Title" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
+				<b:TextArea ui:field="messageMarkdown" placeholder="Message" addStyleNames="hide-resize" height="250px"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="cancelButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>

@@ -5,18 +5,22 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalView;
 
 public class NewThreadModalTest {
 	@Mock
 	NewThreadModalView mockView;
+	@Mock
+	DiscussionForumClientAsync mockDiscussionForumClient;
+	String forumId;
 	NewThreadModal modal;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new NewThreadModal(mockView);
+		modal = new NewThreadModal(mockView, mockDiscussionForumClient);
 	}
 
 	@Test
