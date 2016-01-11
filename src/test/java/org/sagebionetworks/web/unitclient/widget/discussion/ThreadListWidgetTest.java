@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
-
+import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
@@ -12,7 +11,7 @@ import org.sagebionetworks.web.client.widget.discussion.ThreadWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public class DiscussionListWidgetTest {
+public class ThreadListWidgetTest {
 
 	@Mock
 	ThreadListWidgetView mockView;
@@ -26,24 +25,23 @@ public class DiscussionListWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		Mockito.when(mockGinInjector.createThreadWidget()).thenReturn(mockThreadWidget);
+		when(mockGinInjector.createThreadWidget()).thenReturn(mockThreadWidget);
 		discussionListWidget = new ThreadListWidget(mockView, mockGinInjector);
 	}
 
 	@Test
 	public void testConfigure() {
-		Mockito.verify(mockView).setPresenter(discussionListWidget);
+		verify(mockView).setPresenter(discussionListWidget);
 		// configure
-		Mockito.verify(mockView).clear();
-		Mockito.verify(mockView, Mockito.times(2)).addThread((Widget) Mockito.any());
-		Mockito.verify(mockGinInjector, Mockito.times(2)).createThreadWidget();
-		Mockito.verify(mockThreadWidget, Mockito.times(2)).configure();
+		verify(mockView).clear();
+		verify(mockView, times(2)).addThread(any(Widget.class));
+		verify(mockGinInjector, times(2)).createThreadWidget();
+		verify(mockThreadWidget, times(2)).configure();
 	}
 
 	@Test
 	public void asWidgetTest() {
 		discussionListWidget.asWidget();
-		Mockito.verify(mockView).setPresenter(discussionListWidget);
-		Mockito.verify(mockView).asWidget();
+		verify(mockView).asWidget();
 	}
 }
