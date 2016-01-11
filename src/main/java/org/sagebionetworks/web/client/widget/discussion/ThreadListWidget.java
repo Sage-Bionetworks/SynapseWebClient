@@ -5,14 +5,14 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DiscussionListWidget implements DiscussionListWidgetView.Presenter{
+public class ThreadListWidget implements ThreadListWidgetView.Presenter{
 
-	DiscussionListWidgetView view;
+	ThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 
 	@Inject
-	public DiscussionListWidget(
-			DiscussionListWidgetView view,
+	public ThreadListWidget(
+			ThreadListWidgetView view,
 			PortalGinInjector ginInjector
 			) {
 		this.view = view;

@@ -109,8 +109,8 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ThreadListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ThreadWidgetView;
@@ -1194,7 +1194,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// discussion
 		bind(NewThreadModalView.class).to(NewThreadModalViewImpl.class);
-		bind(DiscussionListWidgetView.class).to(DiscussionListWidgetViewImpl.class);
+		bind(ThreadListWidgetView.class).to(ThreadListWidgetViewImpl.class);
 		bind(ThreadWidgetView.class).to(ThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
 	}
