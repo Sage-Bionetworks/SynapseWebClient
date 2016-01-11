@@ -2183,62 +2183,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-
-	}
-
-
-	@Override
-	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType,
-			String contentMD5, Long storageLocationId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
-			ccftr.setFileName(fileName);
-			ccftr.setContentType(contentType);
-			ccftr.setContentMD5(contentMD5);
-			ccftr.setStorageLocationId(storageLocationId);
-			// Start the upload
-			return synapseClient.createChunkedFileUploadToken(ccftr);
-
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public String getChunkedPresignedUrl(ChunkRequest request)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.createChunkedPresignedUrl(request).toString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			// reconstruct all part numbers, and token
-			ChunkedFileToken token = null;
-			List<Long> parts = new ArrayList<Long>();
-
-			for (ChunkRequest request : requests) {
-				token = request.getChunkedFileToken();
-				parts.add(request.getChunkNumber());
-			}
-
-			CompleteAllChunksRequest cacr = new CompleteAllChunksRequest();
-			cacr.setChunkedFileToken(token);
-			cacr.setChunkNumbers(parts);
-
-			// Start the daemon
-			return synapseClient.startUploadDeamon(cacr);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 
 	@Override

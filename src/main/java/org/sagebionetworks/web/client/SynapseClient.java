@@ -360,9 +360,6 @@ public interface SynapseClient extends RemoteService {
 	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
 	
-	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5, Long storageLocationId) throws RestServiceException;
-	public String getChunkedPresignedUrl(ChunkRequest chunkRequest) throws RestServiceException;
-	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests) throws RestServiceException;
 	public UploadDaemonStatus getUploadDaemonStatus(String daemonId) throws RestServiceException;
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;

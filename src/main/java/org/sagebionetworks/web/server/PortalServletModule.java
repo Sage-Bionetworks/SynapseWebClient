@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.MultipartFileUploadClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
+import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
@@ -119,7 +121,11 @@ public class PortalServletModule extends ServletModule {
 		// FileHandleAssociation download
 		bind(FileHandleAssociationServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET).with(FileHandleAssociationServlet.class);
-				
+
+		// Multipart file upload
+		bind(MultipartFileUploadClientImpl.class).in(Singleton.class);
+		serve("/Portal/multipartFileUploadClient").with(MultipartFileUploadClientImpl.class);
+
 		
 		// FileHandle upload
 		bind(FileEntityResolverServlet.class).in(Singleton.class);
