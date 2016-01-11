@@ -39,6 +39,6 @@ public class ThreadListWidgetViewImpl implements ThreadListWidgetView{
 
 	@Override
 	public void clear() {
-		threadListContainer.clear();;
+		threadListContainer.clear();
 	}
 }
