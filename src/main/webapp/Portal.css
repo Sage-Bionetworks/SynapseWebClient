@@ -2037,6 +2037,10 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	width: 95%;
 }
 
+.gwt-TreeItem-selected [class*="link"] {
+	text-decoration: underline;
+}
+
 /* Prevent body from scrolling when modal is open
 http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
 */
