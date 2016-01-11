@@ -46,11 +46,11 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 
 	@Override
 	public void setDiscussionList(Widget w) {
-		discussionContainer.add(w);
+		discussionContainer.setWidget(w);
 	}
 
 	@Override
 	public void setNewThreadModal(Widget w) {
-		newThreadModalContainer.add(w);
+		newThreadModalContainer.setWidget(w);
 	}
 }
