@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
 
 import com.google.inject.Inject;
@@ -19,19 +20,25 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	String areaToken = null;
 	NewThreadModal newThreadModal;
 
+	private DiscussionListWidget discussionListWidget;
+
 	@Inject
 	public DiscussionTab(
 			DiscussionTabView view,
 			Tab tab,
+			DiscussionListWidget discussionListWidget,
 			NewThreadModal newThreadModal,
 			CookieProvider cookies
 			) {
 		this.view = view;
 		this.tab = tab;
+		this.discussionListWidget = discussionListWidget;
 		this.newThreadModal = newThreadModal;
 		this.cookies = cookies;
 		tab.configure("Discussion", view.asWidget());
 		view.setPresenter(this);
+		view.setDiscussionList(discussionListWidget.asWidget());
+		view.setNewThreadModal(newThreadModal.asWidget());
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {

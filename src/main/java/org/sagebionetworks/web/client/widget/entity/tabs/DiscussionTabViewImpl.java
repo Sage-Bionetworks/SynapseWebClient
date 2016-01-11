@@ -6,12 +6,17 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionTabViewImpl implements DiscussionTabView {
 
 	@UiField
 	Button newThreadButton;
+	@UiField
+	SimplePanel discussionContainer;
+	@UiField
+	SimplePanel newThreadModalContainer;
 
 	private Presenter presenter;
 
@@ -39,4 +44,13 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 		this.presenter = presenter;
 	}
 
+	@Override
+	public void setDiscussionList(Widget w) {
+		discussionContainer.add(w);
+	}
+
+	@Override
+	public void setNewThreadModal(Widget w) {
+		newThreadModalContainer.add(w);
+	}
 }

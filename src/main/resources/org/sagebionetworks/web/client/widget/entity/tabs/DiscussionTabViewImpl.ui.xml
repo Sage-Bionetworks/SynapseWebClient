@@ -10,5 +10,8 @@
 		<b:Column size="XS_12">
 			<g:SimplePanel addStyleNames="margin-top-10" ui:field="discussionContainer"/>
 		</b:Column>
+		<bh:Div>
+			<g:SimplePanel ui:field="newThreadModalContainer"/>
+		</bh:Div>
 	</b:Row>
 </ui:UiBinder>
