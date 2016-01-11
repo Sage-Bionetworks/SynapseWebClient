@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:Row>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
-			<g:Button ui:field="newThreadButton" styleName="btn btn-lg btn-primary margin-top-10 right" text="New Thread"/>
+			<b:Button ui:field="primaryButton" type="PRIMARY" pull="RIGHT">New Thread</b:Button>
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel addStyleNames="margin-top-10" ui:field="discussionContainer"/>
