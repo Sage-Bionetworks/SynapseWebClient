@@ -1106,28 +1106,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
 	}
 
-	private List<ChunkRequest> getTestChunkRequestJson()
-			throws JSONObjectAdapterException {
-		ChunkRequest chunkRequest = new ChunkRequest();
-		ChunkedFileToken token = new ChunkedFileToken();
-		token.setKey("test key");
-		chunkRequest.setChunkedFileToken(token);
-		chunkRequest.setChunkNumber(1l);
-		List<ChunkRequest> chunkRequests = new ArrayList<ChunkRequest>();
-		chunkRequests.add(chunkRequest);
-		return chunkRequests;
-	}
-
-	@Test
-	public void testCombineChunkedFileUpload()
-			throws JSONObjectAdapterException, SynapseException,
-			RestServiceException {
-		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
-		synapseClient.combineChunkedFileUpload(chunkRequests);
-		verify(mockSynapse).startUploadDeamon(
-				any(CompleteAllChunksRequest.class));
-	}
-
 	@Test
 	public void testGetUploadDaemonStatus() throws JSONObjectAdapterException,
 			SynapseException, RestServiceException {
@@ -1226,62 +1204,6 @@ public class SynapseClientImplTest {
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 		assertEquals(fileEntityId, file.getId());
-	}
-
-	@Test
-	public void testCompleteChunkedFileUploadExistingEntity()
-			throws JSONObjectAdapterException, SynapseException,
-			RestServiceException {
-		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
-		FileEntity testFileEntity = getTestFileEntity();
-		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
-		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(
-				new AssertionError("No need to create a new entity!"));
-		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(
-				testFileEntity);
-		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId");
-
-		// it should have tried to find the entity
-		verify(mockSynapse).getEntityById(anyString());
-		// update the data file handle id
-		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
-	}
-
-	@Test
-	public void testGetChunkedFileToken() throws SynapseException,
-			RestServiceException, JSONObjectAdapterException {
-		String fileName = "test file.zip";
-		String contentType = "application/test";
-		String md5 = "0123456789abcdef";
-		ChunkedFileToken testToken = new ChunkedFileToken();
-		testToken.setFileName(fileName);
-		testToken.setKey("a key 42");
-		testToken.setUploadId("upload ID 123");
-		testToken.setContentMD5(md5);
-		testToken.setStorageLocationId(storageLocationId);
-		when(
-				mockSynapse
-						.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class)))
-				.thenReturn(testToken);
-
-		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName,
-				contentType, md5, storageLocationId);
-		verify(mockSynapse).createChunkedFileUploadToken(
-				any(CreateChunkedFileTokenRequest.class));
-		assertEquals(testToken, token);
-	}
-
-	@Test
-	public void testGetChunkedPresignedUrl() throws SynapseException,
-			RestServiceException, MalformedURLException,
-			JSONObjectAdapterException {
-		URL testUrl = new URL("http://test.presignedurl.com/foo");
-		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class)))
-				.thenReturn(testUrl);
-		String presignedUrl = synapseClient
-				.getChunkedPresignedUrl(getTestChunkRequestJson().get(0));
-		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
-		assertEquals(testUrl.toString(), presignedUrl);
 	}
 
 	@Test

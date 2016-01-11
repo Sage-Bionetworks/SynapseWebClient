@@ -286,9 +286,6 @@ public interface SynapseClientAsync {
 	void submitCertificationQuizResponse(QuizResponse response,
 			AsyncCallback<PassingRecord> callback);
 	
-	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, Long storageLocationId, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
-	void getChunkedPresignedUrl(ChunkRequest request, AsyncCallback<String> callback) throws RestServiceException;
-	void combineChunkedFileUpload(List<ChunkRequest> requests, AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
