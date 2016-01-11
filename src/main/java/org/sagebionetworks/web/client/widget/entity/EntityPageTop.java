@@ -149,7 +149,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     /**
      * Update the bundle attached to this EntityPageTop. 
      *
-     * @param bundle
+     * @param userBundle
      */
     public void configure(Entity entity, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	this.projectHeader = projectHeader;

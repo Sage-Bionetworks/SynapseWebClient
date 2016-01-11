@@ -6,9 +6,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.shared.UserLoginBundle;
@@ -32,16 +30,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
-	private AdapterFactory adapterFactory;
-	private UserProfileClientAsync userProfileClient;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory,
-			UserProfileClientAsync userProfileClient){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService) {
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
-		this.adapterFactory = adapterFactory;
-		this.userProfileClient = userProfileClient;
 	}
 
 	@Override
@@ -52,8 +45,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(Session session) {				
 				revalidateSession(session.getSessionToken(), callback);
 			}
-			
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
@@ -63,26 +54,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	@Override
 	public void revalidateSession(final String token, final AsyncCallback<UserSessionData> callback) {
-		setUser(token, callback);
-	}
-
-	@Override
-	public void logoutUser() {
-		// don't actually terminate session, just remove the cookie
-		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
-		currentUser = null;
-		userBundle = null;
-	}
-
-	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
-		
 		// clear out old userBundle
 		userBundle = null;
-		
 		userAccountService.getUserLoginBundle(token, new AsyncCallback<UserLoginBundle>() {
 			@Override
 			public void onSuccess(UserLoginBundle userLoginBundle) {
@@ -108,8 +85,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
+	public void logoutUser() {
+		// don't actually terminate session, just remove the cookie
+		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		currentUser = null;
+		userBundle = null;
+	}
+
+	@Override
 	public void updateCachedProfile(UserProfile updatedProfile){
-		if(currentUser != null) {
+		if (isLoggedIn()) {
 			currentUser.setProfile(updatedProfile);
 		}
 	}
@@ -122,16 +107,17 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public boolean isLoggedIn() {
 		String token = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		return token != null && !token.isEmpty() && currentUser != null;
+		boolean isValidToken = token != null && !token.isEmpty();
+		// Checks currentuser and userBundle for existence and matching
+		boolean isValidUserState = currentUser != null && userBundle != null && currentUser.getProfile() != null
+				&& userBundle.getUserId().equals(currentUser.getProfile().getOwnerId());
+		return  isValidToken && isValidUserState;
 	}
 
 	@Override
 	public String getCurrentUserPrincipalId() {
-		if(currentUser != null) {		
-			UserProfile profileObj = currentUser.getProfile();
-			if(profileObj != null && profileObj.getOwnerId() != null) {							
-				return profileObj.getOwnerId();						
-			}
+		if (isLoggedIn()) {		
+			return currentUser.getProfile().getOwnerId();						
 		} 
 		return null;
 	}
@@ -139,27 +125,30 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void reloadUserSessionData(AsyncCallback<UserSessionData> callback) {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		setUser(sessionToken, callback);
+		revalidateSession(sessionToken, callback);
 	}
 
 	@Override
 	public UserSessionData getCurrentUserSessionData() {
 		if (isLoggedIn()) {
 			return currentUser;
-		} else
+		} else {
 			return null;
+		}
 	}
 
 	@Override
 	public String getCurrentUserSessionToken() {
-		if(currentUser != null) return currentUser.getSession().getSessionToken();
-		else return null;
+		if (isLoggedIn()) {
+			return currentUser.getSession().getSessionToken();
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
 	public UserBundle getCurrentUserBundle() {
-		if (currentUser != null && userBundle != null && currentUser.getProfile() != null
-				&& userBundle.getUserId().equals(currentUser.getProfile().getOwnerId())) {
+		if (isLoggedIn()) {
 			return userBundle;
 		} else {
 			return null;
