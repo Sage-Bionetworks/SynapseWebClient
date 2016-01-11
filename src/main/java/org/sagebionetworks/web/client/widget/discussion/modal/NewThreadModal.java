@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -37,6 +38,11 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 	public void onCancel() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 
 }

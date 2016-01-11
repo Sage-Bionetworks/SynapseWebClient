@@ -35,4 +35,11 @@ public class NewThreadModalTest {
 		modal.hide();
 		Mockito.verify(mockView).hideDialog();
 	}
+
+	@Test
+	public void asWidgetTest() {
+		modal.asWidget();
+		Mockito.verify(mockView).setPresenter(modal);
+		Mockito.verify(mockView).asWidget();
+	}
 }
