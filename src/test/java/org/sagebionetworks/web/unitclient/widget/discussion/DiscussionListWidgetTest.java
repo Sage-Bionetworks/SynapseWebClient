@@ -26,7 +26,7 @@ public class DiscussionListWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		Mockito.when(mockGinInjector.getThreadWidget()).thenReturn(mockThreadWidget);
+		Mockito.when(mockGinInjector.createThreadWidget()).thenReturn(mockThreadWidget);
 		discussionListWidget = new DiscussionListWidget(mockView, mockGinInjector);
 	}
 
@@ -36,7 +36,7 @@ public class DiscussionListWidgetTest {
 		// configure
 		Mockito.verify(mockView).clear();
 		Mockito.verify(mockView, Mockito.times(2)).addThread((Widget) Mockito.any());
-		Mockito.verify(mockGinInjector, Mockito.times(2)).getThreadWidget();
+		Mockito.verify(mockGinInjector, Mockito.times(2)).createThreadWidget();
 		Mockito.verify(mockThreadWidget, Mockito.times(2)).configure();
 	}
 

@@ -24,10 +24,10 @@ public class DiscussionListWidget implements DiscussionListWidgetView.Presenter{
 	@Override
 	public void configure() {
 		view.clear();
-		ThreadWidget thread1 = ginInjector.getThreadWidget();
+		ThreadWidget thread1 = ginInjector.createThreadWidget();
 		thread1.configure();
 		view.addThread(thread1.asWidget());
-		ThreadWidget thread2 = ginInjector.getThreadWidget();
+		ThreadWidget thread2 = ginInjector.createThreadWidget();
 		thread2.configure();
 		view.addThread(thread2.asWidget());
 	}

@@ -29,10 +29,10 @@ public class ThreadWidget implements ThreadWidgetView.Presenter{
 	@Override
 	public void configure() {
 		view.clear();
-		ReplyWidget reply1 = ginInjector.getReplyWidget();
+		ReplyWidget reply1 = ginInjector.createReplyWidget();
 		reply1.configure();
 		view.addReply(reply1.asWidget());
-		ReplyWidget reply2 = ginInjector.getReplyWidget();
+		ReplyWidget reply2 = ginInjector.createReplyWidget();
 		reply2.configure();
 		view.addReply(reply2.asWidget());
 	}
