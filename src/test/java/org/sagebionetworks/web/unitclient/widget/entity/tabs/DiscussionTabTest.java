@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidget;
+import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
@@ -30,7 +30,7 @@ public class DiscussionTabTest {
 	@Mock
 	DiscussionTabView mockView;
 	@Mock
-	DiscussionListWidget mockDiscussionListWidget;
+	ThreadListWidget mockDiscussionListWidget;
 	@Mock
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock

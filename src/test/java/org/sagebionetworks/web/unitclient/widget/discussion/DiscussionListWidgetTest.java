@@ -6,8 +6,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidget;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
+import org.sagebionetworks.web.client.widget.discussion.ThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ThreadWidget;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -15,19 +15,19 @@ import com.google.gwt.user.client.ui.Widget;
 public class DiscussionListWidgetTest {
 
 	@Mock
-	DiscussionListWidgetView mockView;
+	ThreadListWidgetView mockView;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
 	ThreadWidget mockThreadWidget;
 
-	DiscussionListWidget discussionListWidget;
+	ThreadListWidget discussionListWidget;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(mockGinInjector.createThreadWidget()).thenReturn(mockThreadWidget);
-		discussionListWidget = new DiscussionListWidget(mockView, mockGinInjector);
+		discussionListWidget = new ThreadListWidget(mockView, mockGinInjector);
 	}
 
 	@Test
