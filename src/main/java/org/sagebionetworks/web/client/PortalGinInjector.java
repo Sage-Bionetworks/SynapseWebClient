@@ -36,6 +36,8 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.discussion.ThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -364,4 +366,8 @@ public interface PortalGinInjector extends Ginjector {
 	public VerificationSubmissionWidget getVerificationSubmissionWidget();
 	public VerificationSubmissionModalViewImpl getVerificationSubmissionModalViewImpl();
 	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
+
+	// discussion
+	public ThreadWidget createThreadWidget();
+	public ReplyWidget createReplyWidget();
 }

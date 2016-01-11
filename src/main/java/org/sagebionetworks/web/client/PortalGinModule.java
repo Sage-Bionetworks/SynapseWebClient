@@ -109,6 +109,14 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -1183,5 +1191,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
 		bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
 		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
+
+		// discussion
+		bind(NewThreadModalView.class).to(NewThreadModalViewImpl.class);
+		bind(DiscussionListWidgetView.class).to(DiscussionListWidgetViewImpl.class);
+		bind(ThreadWidgetView.class).to(ThreadWidgetViewImpl.class);
+		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
 	}
 }
