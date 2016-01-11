@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
-
+import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalView;
@@ -21,25 +20,24 @@ public class NewThreadModalTest {
 
 	@Test
 	public void testConstructor() {
-		Mockito.verify(mockView).setPresenter(modal);
+		verify(mockView).setPresenter(modal);
 	}
 
 	@Test
 	public void testShowDialog() {
 		modal.show();
-		Mockito.verify(mockView).showDialog();
+		verify(mockView).showDialog();
 	}
 
 	@Test
 	public void testHideDialog() {
 		modal.hide();
-		Mockito.verify(mockView).hideDialog();
+		verify(mockView).hideDialog();
 	}
 
 	@Test
 	public void asWidgetTest() {
 		modal.asWidget();
-		Mockito.verify(mockView).setPresenter(modal);
-		Mockito.verify(mockView).asWidget();
+		verify(mockView).asWidget();
 	}
 }

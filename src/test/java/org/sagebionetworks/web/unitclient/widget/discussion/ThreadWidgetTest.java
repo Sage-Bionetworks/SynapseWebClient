@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,24 +27,23 @@ public class ThreadWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		Mockito.when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
+		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		threadWidget = new ThreadWidget(mockView, mockGinInjector);
 	}
 
 	@Test
 	public void testConfigure() {
-		Mockito.verify(mockView).setPresenter(threadWidget);
+		verify(mockView).setPresenter(threadWidget);
 		// configure
-		Mockito.verify(mockView).clear();
-		Mockito.verify(mockView, Mockito.times(2)).addReply((Widget) Mockito.any());
-		Mockito.verify(mockGinInjector, Mockito.times(2)).createReplyWidget();
-		Mockito.verify(mockReplyWidget, Mockito.times(2)).configure();
+		verify(mockView).clear();
+		verify(mockView, Mockito.times(2)).addReply(any(Widget.class));
+		verify(mockGinInjector, times(2)).createReplyWidget();
+		verify(mockReplyWidget, times(2)).configure();
 	}
 
 	@Test
 	public void asWidgetTest() {
 		threadWidget.asWidget();
-		Mockito.verify(mockView).setPresenter(threadWidget);
-		Mockito.verify(mockView).asWidget();
+		verify(mockView).asWidget();
 	}
 }

@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
-
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -44,14 +41,14 @@ public class DiscussionTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		tab = new DiscussionTab(mockView, mockTab, mockDiscussionListWidget, mockNewThreadModal, mockCookies);
-		Mockito.when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 	}
 
 	@Test
 	public void testConstruction() {
-		verify(mockTab).configure(Mockito.anyString(), (Widget) Mockito.any());
-		verify(mockView).setDiscussionList((Widget) Mockito.any());
-		verify(mockView).setNewThreadModal((Widget) Mockito.any());
+		verify(mockTab).configure(anyString(), any(Widget.class));
+		verify(mockView).setDiscussionList(any(Widget.class));
+		verify(mockView).setNewThreadModal(any(Widget.class));
 	}
 	
 	@Test
@@ -79,7 +76,7 @@ public class DiscussionTabTest {
 
 	@Test
 	public void testNotInTestWebsite() {
-		Mockito.when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		String entityId = "syn1"; 
 		String entityName = "discussion project test";
 		tab.configure(entityId, entityName);
