@@ -28,7 +28,7 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 	}
 
 	@Override
-	public void setForumId(String forumId) {
+	public void configure(String forumId) {
 		this.forumId = forumId;
 	}
 
@@ -73,5 +73,4 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
 }

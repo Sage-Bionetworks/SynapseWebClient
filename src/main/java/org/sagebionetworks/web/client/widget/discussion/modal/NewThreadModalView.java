@@ -19,7 +19,7 @@ public interface NewThreadModalView extends IsWidget{
 
 		Widget asWidget();
 
-		void setForumId(String forumId);
+		void configure(String forumId);
 	}
 
 	void setPresenter(Presenter presenter);
