@@ -49,7 +49,7 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	}
 
 	@Override
-	public void setDiscussionList(Widget w) {
+	public void setThreadList(Widget w) {
 		discussionContainer.setWidget(w);
 	}
 

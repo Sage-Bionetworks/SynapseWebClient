@@ -54,7 +54,7 @@ public class DiscussionTabTest {
 	@Test
 	public void testConstruction() {
 		verify(mockTab).configure(anyString(), any(Widget.class));
-		verify(mockView).setDiscussionList(any(Widget.class));
+		verify(mockView).setThreadList(any(Widget.class));
 		verify(mockView).setNewThreadModal(any(Widget.class));
 	}
 	
