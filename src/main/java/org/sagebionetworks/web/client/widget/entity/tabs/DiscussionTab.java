@@ -23,10 +23,17 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	// TODO: use this token to navigate between threads within the discussion tab
 	String areaToken = null;
 	NewThreadModal newThreadModal;
-	ThreadListWidget discussionListWidget;
+	ThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	Forum forum;
 	DiscussionForumClientAsync discussionForumClient;
+	CallbackP<Void> newThreadCallback = new CallbackP<Void>(){
+
+		@Override
+		public void invoke(Void param) {
+			configureThreadList();
+		}
+	};
 
 	@Inject
 	public DiscussionTab(
@@ -34,22 +41,27 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			Tab tab,
 			SynapseAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
-			ThreadListWidget discussionListWidget,
+			ThreadListWidget threadListWidget,
 			NewThreadModal newThreadModal,
 			CookieProvider cookies
 			) {
 		this.view = view;
 		this.tab = tab;
 		this.synAlert = synAlert;
-		this.discussionListWidget = discussionListWidget;
+		this.threadListWidget = threadListWidget;
 		this.newThreadModal = newThreadModal;
 		this.discussionForumClient = discussionForumClient;
 		this.cookies = cookies;
 		tab.configure("Discussion", view.asWidget());
 		view.setPresenter(this);
-		view.setDiscussionList(discussionListWidget.asWidget());
+		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
+	}
+
+	private void configureThreadList() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
@@ -69,7 +81,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			@Override
 			public void onSuccess(Forum result) {
 				forum = result;
-				newThreadModal.configure(forum.getId());
+				newThreadModal.configure(forum.getId(), newThreadCallback);
 			}
 		});
 	}
