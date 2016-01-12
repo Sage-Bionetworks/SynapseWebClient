@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,6 +17,7 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 	private NewThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private String forumId;
+	CallbackP<Void> newThreadCallback;
 
 	@Inject
 	public NewThreadModal(
@@ -28,8 +30,9 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 	}
 
 	@Override
-	public void configure(String forumId) {
+	public void configure(String forumId, CallbackP<Void> newThreadCallback) {
 		this.forumId = forumId;
+		this.newThreadCallback = newThreadCallback;
 	}
 
 	@Override
@@ -57,8 +60,9 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				// TODO Auto-generated method stub
-				
+				if (newThreadCallback != null) {
+					newThreadCallback.invoke(null);
+				}
 			}
 		});
 	}

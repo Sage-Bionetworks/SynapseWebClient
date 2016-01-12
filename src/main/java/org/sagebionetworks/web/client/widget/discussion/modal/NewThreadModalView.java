@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
+import org.sagebionetworks.web.client.utils.CallbackP;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -19,7 +21,7 @@ public interface NewThreadModalView extends IsWidget{
 
 		Widget asWidget();
 
-		void configure(String forumId);
+		void configure(String forumId, CallbackP<Void> newThreadCallback);
 	}
 
 	void setPresenter(Presenter presenter);
