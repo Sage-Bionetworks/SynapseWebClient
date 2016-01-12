@@ -6,13 +6,12 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.shared.UserLoginBundle;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -32,16 +31,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
-	private AdapterFactory adapterFactory;
-	private UserProfileClientAsync userProfileClient;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory,
-			UserProfileClientAsync userProfileClient){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
-		this.adapterFactory = adapterFactory;
-		this.userProfileClient = userProfileClient;
 	}
 
 	@Override
@@ -88,12 +82,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(UserLoginBundle userLoginBundle) {
 				UserSessionData userSessionData = userLoginBundle.getUserSessionData();
 				UserBundle fetchedUserBundle = userLoginBundle.getUserBundle();
-				if (userSessionData != null && fetchedUserBundle != null) {					
+				if (userSessionData != null) {					
 					Date tomorrow = getDayFromNow();
 					cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 					currentUser = userSessionData;
-					userBundle = fetchedUserBundle;
+					if (fetchedUserBundle != null) {
+						userBundle = fetchedUserBundle;	
+					}
 					callback.onSuccess(userSessionData);
 				} else {
 					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));

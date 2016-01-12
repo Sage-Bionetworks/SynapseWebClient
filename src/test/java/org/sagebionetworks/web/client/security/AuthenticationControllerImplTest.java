@@ -42,9 +42,7 @@ public class AuthenticationControllerImplTest {
 
 	AuthenticationController authenticationController;
 	CookieProvider mockCookieProvider;
-	UserProfileClientAsync mockUserProfileClient;
 	UserAccountServiceAsync mockUserAccountService;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	UserSessionData sessionData;
 	
 	@Before
@@ -62,7 +60,7 @@ public class AuthenticationControllerImplTest {
 		
 		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
 
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory, mockUserProfileClient);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService);
 	}
 	
 	@Test
