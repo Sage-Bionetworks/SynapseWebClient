@@ -924,7 +924,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> accessRequirements;
 			if (unmetOnly)
 				accessRequirements = synapseClient
-						.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE);
+						.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.SUBMIT);
 			else
 				accessRequirements = synapseClient
 						.getAccessRequirements(subjectId);
