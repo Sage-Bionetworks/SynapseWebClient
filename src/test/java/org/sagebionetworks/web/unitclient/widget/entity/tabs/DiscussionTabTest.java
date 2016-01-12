@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -15,6 +17,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -34,13 +37,17 @@ public class DiscussionTabTest {
 	NewThreadModal mockNewThreadModal;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	DiscussionForumClientAsync mockDiscussionForumClient;
 
 	DiscussionTab tab;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new DiscussionTab(mockView, mockTab, mockDiscussionListWidget, mockNewThreadModal, mockCookies);
+		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient, mockDiscussionListWidget, mockNewThreadModal, mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 	}
 

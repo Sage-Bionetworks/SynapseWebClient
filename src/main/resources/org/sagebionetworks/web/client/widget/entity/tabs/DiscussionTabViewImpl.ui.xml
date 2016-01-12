@@ -11,5 +11,6 @@
 			<g:SimplePanel addStyleNames="margin-top-10" ui:field="discussionContainer"/>
 		</b:Column>
 		<g:SimplePanel ui:field="newThreadModalContainer"/>
+		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</b:Row>
 </ui:UiBinder>

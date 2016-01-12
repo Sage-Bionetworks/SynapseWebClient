@@ -12,4 +12,5 @@ public interface DiscussionTabView extends IsWidget{
 	void setPresenter(Presenter presenter);
 	void setDiscussionList(Widget w);
 	void setNewThreadModal(Widget w);
+	void setAlert(Widget w);
 }
