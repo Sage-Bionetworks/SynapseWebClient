@@ -8,7 +8,6 @@
 		<b:Column size="XS_12">
 			<t:Table ui:field="threadHeader" width="100%">
 				<t:TableRow>
-					<t:TableHeader width="20px" />
 					<t:TableHeader>
 						<bh:Span ui:field="threadTitle"></bh:Span>
 					</t:TableHeader>
