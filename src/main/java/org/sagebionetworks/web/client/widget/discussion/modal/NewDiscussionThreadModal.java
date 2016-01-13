@@ -76,6 +76,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
 				view.hideDialog();
+				view.showSuccess();
 				if (newThreadCallback != null) {
 					newThreadCallback.invoke();
 				}

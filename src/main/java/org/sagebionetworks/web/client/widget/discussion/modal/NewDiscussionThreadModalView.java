@@ -29,5 +29,6 @@ public interface NewDiscussionThreadModalView extends IsWidget{
 	String getMessageMarkdown();
 	void clear();
 	void setAlert(Widget w);
+	void showSuccess();
 
 }

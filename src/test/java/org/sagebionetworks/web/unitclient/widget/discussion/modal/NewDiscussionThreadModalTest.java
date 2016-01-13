@@ -88,6 +88,7 @@ public class NewDiscussionThreadModalTest {
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).hideDialog();
+		verify(mockView).showSuccess();
 		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
@@ -104,6 +105,7 @@ public class NewDiscussionThreadModalTest {
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
+		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 
 	@Test
