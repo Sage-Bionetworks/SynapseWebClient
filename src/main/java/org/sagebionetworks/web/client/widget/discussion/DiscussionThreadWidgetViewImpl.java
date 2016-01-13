@@ -58,32 +58,32 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	@Override
 	public void setTitle(String title) {
-		threadTitle.setHTML(title);
+		threadTitle.setText(title);
 	}
 
 	@Override
 	public void setMessage(String message) {
-		threadMessage.setHTML(message);
+		threadMessage.setText(message);
 	}
 
 	@Override
 	public void setActiveUsers(String activeUsers){
-		this.activeUsers.setHTML(activeUsers);
+		this.activeUsers.setText(activeUsers);
 	}
 
 	@Override
 	public void setNumberOfReplies(String numberOfReplies) {
-		this.numberOfReplies.setHTML(numberOfReplies);
+		this.numberOfReplies.setText(numberOfReplies);
 	}
 
 	@Override
 	public void setNumberOfViews(String numberOfViews) {
-		this.numberOfViews.setHTML(numberOfViews);
+		this.numberOfViews.setText(numberOfViews);
 	}
 
 	@Override
 	public void setLastActivity(String lastActivity) {
-		this.lastActivity.setHTML(lastActivity);
+		this.lastActivity.setText(lastActivity);
 	}
 
 }
