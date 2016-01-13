@@ -140,6 +140,7 @@ public class HeaderTest {
 
 	@Test
 	public void testOnFavoriteClickEmptyCase() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		header.onFavoriteClick();
 		verify(mockView).clearFavorite();
 		verify(mockView).setEmptyFavorite();
@@ -147,6 +148,7 @@ public class HeaderTest {
 
 	@Test
 	public void testOnFavoriteClickNonEmptyCase() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		EntityHeader entityHeader1 = new EntityHeader();
 		entityHeader1.setId("syn012345");
 		EntityHeader entityHeader2 = new EntityHeader();
@@ -161,6 +163,7 @@ public class HeaderTest {
 	@Test
 	public void testFavoriteRoundTrip() {
 		// After User Logged in
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		UserSessionData userSessionData = new UserSessionData();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
 		header.onFavoriteClick();
@@ -181,6 +184,17 @@ public class HeaderTest {
 		verify(mockView, times(2)).clearFavorite();
 		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
+	}
+	
+	@Test
+	public void testFavoriteAnonymous() {
+		// SWC-2805: User is not logged in.  This is an odd case, since the favorites menu should not be shown.
+		// in this case, do not even try to update the favorites, will show whatever we had (possibly stale, like the rest of the page).
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		header.onFavoriteClick();
+		verify(mockView, never()).showFavoritesLoading();
+		verify(mockView, never()).clearFavorite();
+		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test
