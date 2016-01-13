@@ -68,6 +68,24 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
+		verify(mockView).setLoadMoreButtonVisibility(false);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureSuccessDisplayLoadmore() {
+		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
+				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
+		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(11L);
+		discussionThreadBundleList.add(new DiscussionThreadBundle());
+		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
+		discussionThreadListWidget.configure("123");
+		verify(mockView).clear();
+		verify(mockView).addThread(any(Widget.class));
+		verify(mockGinInjector).createThreadWidget();
+		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
+		verify(mockView).setLoadMoreButtonVisibility(true);
 	}
 
 	@SuppressWarnings("unchecked")

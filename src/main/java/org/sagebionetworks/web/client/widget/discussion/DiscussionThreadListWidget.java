@@ -13,7 +13,9 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter{
 
-	private static final Long LIMIT = 10L;
+	public static final Long LIMIT = 10L;
+	public static final DiscussionThreadOrder DEFAULT_ORDER = DiscussionThreadOrder.LAST_ACTIVITY;
+	public static final Boolean DEFAULT_ASCENDING = false;
 	DiscussionThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
@@ -40,8 +42,12 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	public void configure(String forumId) {
 		view.clear();
 		offset = 0L;
-		order = DiscussionThreadOrder.LAST_ACTIVITY;
-		ascending = false;
+		if (order == null) {
+			order = DEFAULT_ORDER;
+		}
+		if (ascending == null) {
+			ascending = DEFAULT_ASCENDING;
+		}
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
@@ -53,12 +59,13 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 					@Override
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
-						result.getTotalNumberOfResults();
 						for(DiscussionThreadBundle bundle: result.getResults()) {
 							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
 							thread.configure(bundle);
 							view.addThread(thread.asWidget());
 						}
+						offset += LIMIT;
+						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 					}
 		});
 	}
@@ -66,5 +73,11 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	@Override
+	public void loadMore() {
+		// TODO Auto-generated method stub
+		
 	}
 }

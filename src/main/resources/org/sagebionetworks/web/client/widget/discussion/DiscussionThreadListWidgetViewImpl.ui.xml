@@ -9,7 +9,6 @@
 			<!-- Thread header -->
 			<t:Table ui:field="threadHeader" width="100%">
 				<t:TableRow>
-					<t:TableHeader width="20px" />
 					<t:TableHeader>
 						<bh:Span text="Topic" />
 					</t:TableHeader>
@@ -29,6 +28,7 @@
 			</t:Table>
 		</b:Column>
 		<bh:Div ui:field="threadListContainer"></bh:Div>
+		<b:Button ui:field="loadMoreButton" pull="RIGHT">Load more</b:Button>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</b:Row>
 </ui:UiBinder>
