@@ -28,7 +28,6 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	Forum forum;
 	DiscussionForumClientAsync discussionForumClient;
 	CallbackP<Void> newThreadCallback = new CallbackP<Void>(){
-
 		@Override
 		public void invoke(Void param) {
 			configureThreadList();
@@ -59,9 +58,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		view.setAlert(synAlert.asWidget());
 	}
 
-	private void configureThreadList() {
-		// TODO Auto-generated method stub
-		
+	public void configureThreadList() {
+		if (forum != null && forum.getId() != null) {
+			threadListWidget.configure(forum.getId());
+		}
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
@@ -82,6 +82,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			public void onSuccess(Forum result) {
 				forum = result;
 				newThreadModal.configure(forum.getId(), newThreadCallback);
+				threadListWidget.configure(forum.getId());
 			}
 		});
 	}

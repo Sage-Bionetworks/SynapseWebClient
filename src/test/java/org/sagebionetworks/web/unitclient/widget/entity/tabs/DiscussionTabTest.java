@@ -21,7 +21,9 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionTabTest {
@@ -41,6 +43,8 @@ public class DiscussionTabTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
+	@Mock
+	Forum mockForum;
 
 	DiscussionTab tab;
 
@@ -53,19 +57,31 @@ public class DiscussionTabTest {
 
 	@Test
 	public void testConstruction() {
-		verify(mockTab).configure(anyString(), any(Widget.class));
 		verify(mockView).setThreadList(any(Widget.class));
 		verify(mockView).setNewThreadModal(any(Widget.class));
+		verify(mockView).setPresenter(tab);
+		verify(mockView).setAlert(any(Widget.class));
 	}
-	
+
+	@Test
+	public void testConfigureThreadListWithoutConfig() {
+		tab.configureThreadList();
+		verify(mockDiscussionListWidget, never()).configure(anyString());
+	}
+
 	@Test
 	public void testSetTabClickedCallback() {
 		tab.setTabClickedCallback(mockOnClickCallback);
 		verify(mockTab).addTabClickedCallback(mockOnClickCallback);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigure() {
+	public void testConfigureSuccess() {
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
 		String entityId = "syn1"; 
 		String entityName = "discussion project test";
 		tab.configure(entityId, entityName);
@@ -79,6 +95,37 @@ public class DiscussionTabTest {
 		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.DISCUSSION, place.getArea());
 		assertNull(place.getAreaToken());
+
+		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
+		verify(mockNewThreadModal).configure(anyString(), any(CallbackP.class));
+		verify(mockDiscussionListWidget).configure(anyString());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureFailure() {
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1"; 
+		String entityName = "discussion project test";
+		tab.configure(entityId, entityName);
+
+		verify(mockTab).setTabListItemVisible(true);
+
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
+		Synapse place = captor.getValue();
+		assertEquals(entityId, place.getEntityId());
+		assertNull(place.getVersionNumber());
+		assertEquals(EntityArea.DISCUSSION, place.getArea());
+		assertNull(place.getAreaToken());
+
+		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
+		verify(mockNewThreadModal, never()).configure(anyString(), any(CallbackP.class));
+		verify(mockDiscussionListWidget, never()).configure(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
 	@Test
