@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,9 +10,10 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -25,7 +28,7 @@ public class NewDiscussionThreadModalTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	CallbackP<Void> mockCallback;
+	Callback mockCallback;
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	String forumId = "123";
@@ -64,45 +67,17 @@ public class NewDiscussionThreadModalTest {
 	}
 
 	@Test
-	public void testOnSaveNullTitle() {
+	public void testOnSaveInvalidArgument() {
 		when(mockView.getTitle()).thenReturn(null);
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		modal.onSave();
-		verify(mockSynAlert).showError("Title cannot be empty.");
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).showError(anyString());
 		verify(mockView, never()).hideDialog();
 		verifyZeroInteractions(mockDiscussionForumClient);
 	}
 
-	@Test
-	public void testOnSaveEmptyTitle() {
-		when(mockView.getTitle()).thenReturn("");
-		when(mockView.getMessageMarkdown()).thenReturn("message");
-		modal.onSave();
-		verify(mockSynAlert).showError("Title cannot be empty.");
-		verify(mockView, never()).hideDialog();
-		verifyZeroInteractions(mockDiscussionForumClient);
-	}
-
-	@Test
-	public void testOnSaveNullMessage() {
-		when(mockView.getTitle()).thenReturn("title");
-		when(mockView.getMessageMarkdown()).thenReturn(null);
-		modal.onSave();
-		verify(mockSynAlert).showError("Message cannot be empty.");
-		verify(mockView, never()).hideDialog();
-		verifyZeroInteractions(mockDiscussionForumClient);
-	}
-
-	@Test
-	public void testOnSaveEmptyMessage() {
-		when(mockView.getTitle()).thenReturn("title");
-		when(mockView.getMessageMarkdown()).thenReturn("");
-		modal.onSave();
-		verify(mockSynAlert).showError("Message cannot be empty.");
-		verify(mockView, never()).hideDialog();
-		verifyZeroInteractions(mockDiscussionForumClient);
-	}
-
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
 		when(mockView.getTitle()).thenReturn("title");
@@ -111,11 +86,13 @@ public class NewDiscussionThreadModalTest {
 			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
 					any(AsyncCallback.class));
 		modal.onSave();
+		verify(mockSynAlert).clear();
 		verify(mockView).hideDialog();
 		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
-		verify(mockCallback).invoke(null);
+		verify(mockCallback).invoke();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveFailure() {
 		when(mockView.getTitle()).thenReturn("title");
@@ -124,8 +101,42 @@ public class NewDiscussionThreadModalTest {
 			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
 					any(AsyncCallback.class));
 		modal.onSave();
-		verify(mockView).hideDialog();
+		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
+	}
+
+	@Test
+	public void testValidateNullTitle() {
+		ValidationResult validationResult = NewDiscussionThreadModal.validate(null, "message");
+		assertEquals(false, validationResult.isValid());
+		assertTrue(validationResult.getErrorMessage().contains(EMPTY_TITLE_ERROR));
+	}
+
+	@Test
+	public void testValidateEmptyTitle() {
+		ValidationResult validationResult = NewDiscussionThreadModal.validate("", "message");
+		assertEquals(false, validationResult.isValid());
+		assertTrue(validationResult.getErrorMessage().contains(EMPTY_TITLE_ERROR));
+	}
+
+	@Test
+	public void testValidateNullMessage() {
+		ValidationResult validationResult = NewDiscussionThreadModal.validate("title", null);
+		assertEquals(false, validationResult.isValid());
+		assertTrue(validationResult.getErrorMessage().contains(EMPTY_MESSAGE_ERROR));
+	}
+
+	@Test
+	public void testValidateEmptyMessage() {
+		ValidationResult validationResult = NewDiscussionThreadModal.validate("title", "");
+		assertEquals(false, validationResult.isValid());
+		assertTrue(validationResult.getErrorMessage().contains(EMPTY_MESSAGE_ERROR));
+	}
+
+	@Test
+	public void testValidate() {
+		ValidationResult validationResult = NewDiscussionThreadModal.validate("title", "message");
+		assertEquals(true, validationResult.isValid());
 	}
 }

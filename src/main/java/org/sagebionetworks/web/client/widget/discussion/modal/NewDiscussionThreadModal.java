@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -14,12 +14,14 @@ import com.google.inject.Inject;
  * A simple modal dialog for adding a new thread.
  */
 public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Presenter{
+	public static final String EMPTY_TITLE_ERROR = "Title cannot be empty.";
+	public static final String EMPTY_MESSAGE_ERROR = "Message cannot be empty.";
 
 	private NewDiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private String forumId;
-	CallbackP<Void> newThreadCallback;
+	Callback newThreadCallback;
 
 	@Inject
 	public NewDiscussionThreadModal(
@@ -35,7 +37,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 	}
 
 	@Override
-	public void configure(String forumId, CallbackP<Void> newThreadCallback) {
+	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
 	}
@@ -53,17 +55,14 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 
 	@Override
 	public void onSave() {
+		synAlert.clear();
 		String threadTitle = view.getTitle();
 		String messageMarkdown = view.getMessageMarkdown();
-		if (!isValidTitle(threadTitle)) {
-			synAlert.showError("Title cannot be empty.");
+		ValidationResult validationResult = validate(threadTitle, messageMarkdown);
+		if (!validationResult.isValid()) {
+			synAlert.showError(validationResult.getErrorMessage());
 			return;
 		}
-		if (!isValidMessage(messageMarkdown)) {
-			synAlert.showError("Message cannot be empty.");
-			return;
-		}
-		view.hideDialog();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
 		toCreate.setTitle(threadTitle);
@@ -71,25 +70,36 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				
+				synAlert.handleException(caught);
 			}
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
+				view.hideDialog();
 				if (newThreadCallback != null) {
-					newThreadCallback.invoke(null);
+					newThreadCallback.invoke();
 				}
 			}
 		});
 	}
 
-	private boolean isValidMessage(String messageMarkdown) {
-		return (messageMarkdown != null && !messageMarkdown.equals(""));
-	}
-
-	private boolean isValidTitle(String threadTitle) {
-		return (threadTitle != null && !threadTitle.equals(""));
+	public static ValidationResult validate(String threadTitle, String messageMarkdown) {
+		String errorMessages = "";
+		ValidationResult result = new ValidationResult();
+		result.setValidity(true);
+		if (threadTitle == null || threadTitle.equals("")) {
+			result.setValidity(false);
+			errorMessages += EMPTY_TITLE_ERROR;
+		}
+		if (messageMarkdown == null || messageMarkdown.equals("")) {
+			result.setValidity(false);
+			if (!errorMessages.equals("")) {
+				errorMessages += "\n";
+			}
+			errorMessages += EMPTY_MESSAGE_ERROR;
+		}
+		result.setErrorMessage(errorMessages);
+		return result;
 	}
 
 	@Override
