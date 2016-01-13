@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,6 +19,8 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	SimplePanel discussionContainer;
 	@UiField
 	SimplePanel newThreadModalContainer;
+	@UiField
+	Div synAlertContainer;
 
 	private Presenter presenter;
 
@@ -46,12 +49,18 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	}
 
 	@Override
-	public void setDiscussionList(Widget w) {
+	public void setThreadList(Widget w) {
 		discussionContainer.setWidget(w);
 	}
 
 	@Override
 	public void setNewThreadModal(Widget w) {
 		newThreadModalContainer.setWidget(w);
+	}
+
+	@Override
+	public void setAlert(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

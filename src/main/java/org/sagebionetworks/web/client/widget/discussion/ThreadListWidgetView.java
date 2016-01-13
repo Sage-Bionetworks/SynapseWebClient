@@ -9,7 +9,7 @@ public interface ThreadListWidgetView extends IsWidget{
 
 		Widget asWidget();
 
-		void configure();
+		void configure(String forumId);
 	}
 
 	void setPresenter(ThreadListWidget presenter);

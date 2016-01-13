@@ -1,20 +1,30 @@
 package org.sagebionetworks.web.server.servlet;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DiscussionForumClient;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 @SuppressWarnings("serial")
 public class DiscussionForumClientImpl extends SynapseClientBase implements
 		DiscussionForumClient{
+
+	/**
+	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
+	 * @param in
+	 * @return
+	 */
+	public <T extends JSONEntity> PaginatedResults<T> convertPaginated(org.sagebionetworks.reflection.model.PaginatedResults<T> in){
+		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
+	}
 
 	@Override
 	public Forum getForumMetadata(String projectId) throws RestServiceException {
@@ -55,7 +65,7 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getThreadsForForum(forumId, limit, offset, order, ascending);
+			return convertPaginated(synapseClient.getThreadsForForum(forumId, limit, offset, order, ascending));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
