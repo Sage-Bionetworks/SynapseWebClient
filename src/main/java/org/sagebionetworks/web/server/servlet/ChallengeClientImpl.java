@@ -366,25 +366,26 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		try {
 			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengesForParticipant(userId, limit.longValue(), offset.longValue());
 			List<Challenge> challenges = pagedResults.getResults();
-			
-			//gather all project ids
-			List<Reference> references = new ArrayList<Reference>();
-			for (Challenge challenge : challenges) {
-				Reference ref = new Reference();
-				ref.setTargetId(challenge.getProjectId());
-				references.add(ref);
-			}
-			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
-			List<EntityHeader> projectHeaders = headers.getResults();
-			
-			Map<String, String> projectNameLookup = new HashMap<String, String>();
-			for (EntityHeader projectHeader : projectHeaders) {
-				projectNameLookup.put(projectHeader.getId(), projectHeader.getName());
-			}
-			
 			List<ChallengeBundle> results = new ArrayList<ChallengeBundle>(pagedResults.getResults().size());
-			for (Challenge challenge : challenges) {
-				results.add(new ChallengeBundle(challenge, projectNameLookup.get(challenge.getProjectId())));
+			if (pagedResults.getResults().size() > 0) {
+				//gather all project ids
+				List<Reference> references = new ArrayList<Reference>();
+				for (Challenge challenge : challenges) {
+					Reference ref = new Reference();
+					ref.setTargetId(challenge.getProjectId());
+					references.add(ref);
+				}
+				org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
+				List<EntityHeader> projectHeaders = headers.getResults();
+				
+				Map<String, String> projectNameLookup = new HashMap<String, String>();
+				for (EntityHeader projectHeader : projectHeaders) {
+					projectNameLookup.put(projectHeader.getId(), projectHeader.getName());
+				}
+				
+				for (Challenge challenge : challenges) {
+					results.add(new ChallengeBundle(challenge, projectNameLookup.get(challenge.getProjectId())));
+				}
 			}
 			ChallengePagedResults challengeBundles = new ChallengePagedResults(results, pagedResults.getTotalNumberOfResults());
 			return challengeBundles;
