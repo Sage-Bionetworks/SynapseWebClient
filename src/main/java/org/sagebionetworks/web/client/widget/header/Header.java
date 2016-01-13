@@ -146,23 +146,25 @@ public class Header implements HeaderView.Presenter, IsWidget {
 
 	@Override
 	public void onFavoriteClick() {
-		view.showFavoritesLoading();
-		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> favorites) {
-				view.clearFavorite();
-				globalApplicationState.setFavorites(favorites);
-				if (favorites == null || favorites.size() == 0) {
-					view.setEmptyFavorite();
-				} else {
-					view.addFavorite(favorites);
-				}		
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.clearFavorite();
-				view.setEmptyFavorite();	
-			}
-		});
+		if(authenticationController.isLoggedIn()) {
+			view.showFavoritesLoading();
+			synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+				@Override
+				public void onSuccess(List<EntityHeader> favorites) {
+					view.clearFavorite();
+					globalApplicationState.setFavorites(favorites);
+					if (favorites == null || favorites.size() == 0) {
+						view.setEmptyFavorite();
+					} else {
+						view.addFavorite(favorites);
+					}		
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.clearFavorite();
+					view.setEmptyFavorite();	
+				}
+			});
+		}
 	}
 }
