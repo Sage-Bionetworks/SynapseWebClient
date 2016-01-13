@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -16,6 +17,7 @@ public class ThreadListWidget implements ThreadListWidgetView.Presenter{
 	ThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
+	SynapseAlert synAlert;
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
@@ -24,15 +26,17 @@ public class ThreadListWidget implements ThreadListWidgetView.Presenter{
 	public ThreadListWidget(
 			ThreadListWidgetView view,
 			PortalGinInjector ginInjector,
-			DiscussionForumClientAsync discussionForumClientAsync
+			DiscussionForumClientAsync discussionForumClientAsync,
+			SynapseAlert synAlert
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setAlert(synAlert.asWidget());
 	}
 
-	@Override
 	public void configure(String forumId) {
 		view.clear();
 		offset = 0L;
@@ -43,8 +47,8 @@ public class ThreadListWidget implements ThreadListWidgetView.Presenter{
 
 					@Override
 					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-						
+						synAlert.clear();
+						synAlert.handleException(caught);
 					}
 
 					@Override

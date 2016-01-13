@@ -13,6 +13,8 @@ public class ThreadListWidgetViewImpl implements ThreadListWidgetView{
 
 	@UiField
 	Div threadListContainer;
+	@UiField
+	Div synAlertContainer;
 
 	Widget widget;
 	private ThreadListWidget presenter;
@@ -40,5 +42,10 @@ public class ThreadListWidgetViewImpl implements ThreadListWidgetView{
 	@Override
 	public void clear() {
 		threadListContainer.clear();
+	}
+
+	@Override
+	public void setAlert(Widget w) {
+		synAlertContainer.add(w);
 	}
 }

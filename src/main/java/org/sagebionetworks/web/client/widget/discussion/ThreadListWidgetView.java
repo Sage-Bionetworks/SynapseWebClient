@@ -8,8 +8,6 @@ public interface ThreadListWidgetView extends IsWidget{
 	public interface Presenter {
 
 		Widget asWidget();
-
-		void configure(String forumId);
 	}
 
 	void setPresenter(ThreadListWidget presenter);
@@ -17,4 +15,6 @@ public interface ThreadListWidgetView extends IsWidget{
 	void addThread(Widget w);
 
 	void clear();
+
+	void setAlert(Widget w);
 }

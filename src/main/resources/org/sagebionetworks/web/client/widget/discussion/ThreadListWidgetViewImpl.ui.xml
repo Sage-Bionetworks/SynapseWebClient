@@ -29,5 +29,6 @@
 			</t:Table>
 		</b:Column>
 		<bh:Div ui:field="threadListContainer"></bh:Div>
+		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</b:Row>
 </ui:UiBinder>

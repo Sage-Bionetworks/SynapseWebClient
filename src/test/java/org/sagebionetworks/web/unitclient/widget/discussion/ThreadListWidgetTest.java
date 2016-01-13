@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ThreadWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -33,6 +34,8 @@ public class ThreadListWidgetTest {
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
 	PaginatedResults<DiscussionThreadBundle> mockThreadBundlePage;
+	@Mock
+	SynapseAlert mockSynAlert;
 	List<DiscussionThreadBundle> threadBundleList = new ArrayList<DiscussionThreadBundle>();
 
 	ThreadListWidget discussionListWidget;
@@ -42,12 +45,13 @@ public class ThreadListWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createThreadWidget()).thenReturn(mockThreadWidget);
-		discussionListWidget = new ThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient);
+		discussionListWidget = new ThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert);
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionListWidget);
+		verify(mockView).setAlert(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -72,13 +76,12 @@ public class ThreadListWidgetTest {
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
-		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
-		threadBundleList.add(new DiscussionThreadBundle());
-		when(mockThreadBundlePage.getResults()).thenReturn(threadBundleList);
 		discussionListWidget.configure("123");
 		verify(mockView).clear();
 		verify(mockView, never()).addThread(any(Widget.class));
 		verify(mockGinInjector, never()).createThreadWidget();
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 
 	@Test
