@@ -11,10 +11,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ThreadListWidget implements ThreadListWidgetView.Presenter{
+public class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter{
 
 	private static final Long LIMIT = 10L;
-	ThreadListWidgetView view;
+	DiscussionThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseAlert synAlert;
@@ -23,8 +23,8 @@ public class ThreadListWidget implements ThreadListWidgetView.Presenter{
 	private Boolean ascending;
 
 	@Inject
-	public ThreadListWidget(
-			ThreadListWidgetView view,
+	public DiscussionThreadListWidget(
+			DiscussionThreadListWidgetView view,
 			PortalGinInjector ginInjector,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			SynapseAlert synAlert
@@ -55,7 +55,7 @@ public class ThreadListWidget implements ThreadListWidgetView.Presenter{
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
 						result.getTotalNumberOfResults();
 						for(DiscussionThreadBundle bundle: result.getResults()) {
-							ThreadWidget thread = ginInjector.createThreadWidget();
+							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
 							thread.configure(bundle);
 							view.addThread(thread.asWidget());
 						}

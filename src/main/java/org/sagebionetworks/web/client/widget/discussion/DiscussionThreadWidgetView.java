@@ -5,7 +5,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface ThreadWidgetView extends IsWidget{
+public interface DiscussionThreadWidgetView extends IsWidget{
 
 	public interface Presenter {
 
@@ -14,7 +14,7 @@ public interface ThreadWidgetView extends IsWidget{
 		void configure(DiscussionThreadBundle bundle);
 	}
 
-	void setPresenter(ThreadWidget presenter);
+	void setPresenter(DiscussionThreadWidget presenter);
 
 	void addReply(Widget w);
 

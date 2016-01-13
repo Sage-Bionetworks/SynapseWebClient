@@ -5,7 +5,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface NewThreadModalView extends IsWidget{
+public interface NewDiscussionThreadModalView extends IsWidget{
 
 	public interface Presenter {
 		/**

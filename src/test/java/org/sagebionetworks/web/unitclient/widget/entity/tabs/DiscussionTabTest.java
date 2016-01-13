@@ -15,8 +15,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
@@ -32,11 +32,11 @@ public class DiscussionTabTest {
 	@Mock
 	DiscussionTabView mockView;
 	@Mock
-	ThreadListWidget mockDiscussionListWidget;
+	DiscussionThreadListWidget mockDiscussionThreadListWidget;
 	@Mock
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
-	NewThreadModal mockNewThreadModal;
+	NewDiscussionThreadModal mockNewDiscussionThreadModal;
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
@@ -51,7 +51,7 @@ public class DiscussionTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient, mockDiscussionListWidget, mockNewThreadModal, mockCookies);
+		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient, mockDiscussionThreadListWidget, mockNewDiscussionThreadModal, mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 	}
 
@@ -66,7 +66,7 @@ public class DiscussionTabTest {
 	@Test
 	public void testConfigureThreadListWithoutConfig() {
 		tab.configureThreadList();
-		verify(mockDiscussionListWidget, never()).configure(anyString());
+		verify(mockDiscussionThreadListWidget, never()).configure(anyString());
 	}
 
 	@Test
@@ -97,8 +97,8 @@ public class DiscussionTabTest {
 		assertNull(place.getAreaToken());
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
-		verify(mockNewThreadModal).configure(anyString(), any(CallbackP.class));
-		verify(mockDiscussionListWidget).configure(anyString());
+		verify(mockNewDiscussionThreadModal).configure(anyString(), any(CallbackP.class));
+		verify(mockDiscussionThreadListWidget).configure(anyString());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -123,8 +123,8 @@ public class DiscussionTabTest {
 		assertNull(place.getAreaToken());
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
-		verify(mockNewThreadModal, never()).configure(anyString(), any(CallbackP.class));
-		verify(mockDiscussionListWidget, never()).configure(anyString());
+		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(CallbackP.class));
+		verify(mockDiscussionThreadListWidget, never()).configure(anyString());
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
@@ -145,6 +145,6 @@ public class DiscussionTabTest {
 	@Test
 	public void onCLickNewThreadTest() {
 		tab.onClickNewThread();
-		verify(mockNewThreadModal).show();;
+		verify(mockNewDiscussionThreadModal).show();;
 	}
 }

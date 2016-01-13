@@ -13,17 +13,17 @@ import com.google.inject.Inject;
 /**
  * A simple modal dialog for adding a new thread.
  */
-public class NewThreadModal implements NewThreadModalView.Presenter{
+public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Presenter{
 
-	private NewThreadModalView view;
+	private NewDiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private String forumId;
 	CallbackP<Void> newThreadCallback;
 
 	@Inject
-	public NewThreadModal(
-			NewThreadModalView view,
+	public NewDiscussionThreadModal(
+			NewDiscussionThreadModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert
 			) {

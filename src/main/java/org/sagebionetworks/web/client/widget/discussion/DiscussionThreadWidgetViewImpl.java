@@ -9,9 +9,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ThreadWidgetViewImpl implements ThreadWidgetView {
+public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
 
-	public interface Binder extends UiBinder<Widget, ThreadWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
 	@UiField
 	Div replyListContainer;
@@ -29,10 +29,10 @@ public class ThreadWidgetViewImpl implements ThreadWidgetView {
 	Span lastActivity;
 
 	private Widget widget;
-	private ThreadWidget presenter;
+	private DiscussionThreadWidget presenter;
 
 	@Inject
-	public ThreadWidgetViewImpl(Binder binder) {
+	public DiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 
@@ -42,7 +42,7 @@ public class ThreadWidgetViewImpl implements ThreadWidgetView {
 	}
 
 	@Override
-	public void setPresenter(ThreadWidget presenter) {
+	public void setPresenter(DiscussionThreadWidget presenter) {
 		this.presenter = presenter;
 	}
 

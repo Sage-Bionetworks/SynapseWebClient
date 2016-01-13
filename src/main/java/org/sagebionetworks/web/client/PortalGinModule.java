@@ -109,14 +109,14 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.ThreadListWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.ThreadListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.ThreadWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.ThreadWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -1193,9 +1193,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
 
 		// discussion
-		bind(NewThreadModalView.class).to(NewThreadModalViewImpl.class);
-		bind(ThreadListWidgetView.class).to(ThreadListWidgetViewImpl.class);
-		bind(ThreadWidgetView.class).to(ThreadWidgetViewImpl.class);
+		bind(NewDiscussionThreadModalView.class).to(NewDiscussionThreadModalViewImpl.class);
+		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
+		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
 	}
 }

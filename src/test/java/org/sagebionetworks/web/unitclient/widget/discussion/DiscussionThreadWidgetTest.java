@@ -12,32 +12,32 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
-import org.sagebionetworks.web.client.widget.discussion.ThreadWidget;
-import org.sagebionetworks.web.client.widget.discussion.ThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public class ThreadWidgetTest {
+public class DiscussionThreadWidgetTest {
 
 	@Mock
-	ThreadWidgetView mockView;
+	DiscussionThreadWidgetView mockView;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
 	ReplyWidget mockReplyWidget;
 
-	ThreadWidget threadWidget;
+	DiscussionThreadWidget discussionThreadWidget;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
-		threadWidget = new ThreadWidget(mockView, mockGinInjector);
+		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockGinInjector);
 	}
 
 	@Test
 	public void testConstructor() {
-		verify(mockView).setPresenter(threadWidget);
+		verify(mockView).setPresenter(discussionThreadWidget);
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class ThreadWidgetTest {
 		threadBundle.setNumberOfReplies(1L);
 		threadBundle.setNumberOfViews(2L);
 		threadBundle.setLastActivity(new Date());
-		threadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setMessage("messageUrl");
@@ -65,7 +65,7 @@ public class ThreadWidgetTest {
 
 	@Test
 	public void asWidgetTest() {
-		threadWidget.asWidget();
+		discussionThreadWidget.asWidget();
 		verify(mockView).asWidget();
 	}
 }

@@ -7,9 +7,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ThreadListWidgetViewImpl implements ThreadListWidgetView{
+public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListWidgetView{
 
-	public interface Binder extends UiBinder<Widget, ThreadListWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, DiscussionThreadListWidgetViewImpl> {}
 
 	@UiField
 	Div threadListContainer;
@@ -17,10 +17,10 @@ public class ThreadListWidgetViewImpl implements ThreadListWidgetView{
 	Div synAlertContainer;
 
 	Widget widget;
-	private ThreadListWidget presenter;
+	private DiscussionThreadListWidget presenter;
 
 	@Inject
-	public ThreadListWidgetViewImpl(Binder binder) {
+	public DiscussionThreadListWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 
@@ -30,7 +30,7 @@ public class ThreadListWidgetViewImpl implements ThreadListWidgetView{
 	}
 
 	@Override
-	public void setPresenter(ThreadListWidget presenter) {
+	public void setPresenter(DiscussionThreadListWidget presenter) {
 		this.presenter = presenter;
 	}
 

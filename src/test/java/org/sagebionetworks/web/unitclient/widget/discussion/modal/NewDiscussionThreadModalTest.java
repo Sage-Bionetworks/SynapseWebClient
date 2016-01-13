@@ -9,17 +9,17 @@ import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public class NewThreadModalTest {
+public class NewDiscussionThreadModalTest {
 	@Mock
-	NewThreadModalView mockView;
+	NewDiscussionThreadModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -29,12 +29,12 @@ public class NewThreadModalTest {
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	String forumId = "123";
-	NewThreadModal modal;
+	NewDiscussionThreadModal modal;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new NewThreadModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient, mockSynAlert);
 		modal.configure(forumId, mockCallback);
 	}
 

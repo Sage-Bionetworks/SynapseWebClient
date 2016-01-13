@@ -7,8 +7,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,8 +22,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	CookieProvider cookies;
 	// TODO: use this token to navigate between threads within the discussion tab
 	String areaToken = null;
-	NewThreadModal newThreadModal;
-	ThreadListWidget threadListWidget;
+	NewDiscussionThreadModal newThreadModal;
+	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	Forum forum;
 	DiscussionForumClientAsync discussionForumClient;
@@ -40,8 +40,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			Tab tab,
 			SynapseAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
-			ThreadListWidget threadListWidget,
-			NewThreadModal newThreadModal,
+			DiscussionThreadListWidget threadListWidget,
+			NewDiscussionThreadModal newThreadModal,
 			CookieProvider cookies
 			) {
 		this.view = view;
