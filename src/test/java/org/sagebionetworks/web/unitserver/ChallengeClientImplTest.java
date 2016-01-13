@@ -329,6 +329,20 @@ public class ChallengeClientImplTest {
 		assertEquals(testChallenge, results.getResults().get(0).getChallenge());
 	}
 	
+	@Test
+	public void testGetChallengesWithNoChallenges() throws SynapseException, RestServiceException {
+		org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
+		results.setResults(new ArrayList<Challenge>());
+		results.setTotalNumberOfResults(0L);
+		when(mockSynapse.listChallengesForParticipant(anyString(), anyLong(), anyLong())).thenReturn(results);
+		
+		ChallengePagedResults challengeResults = synapseClient.getChallenges("userid", 10, 0);
+		verify(mockSynapse).listChallengesForParticipant(anyString(), anyLong(), anyLong());
+		verify(mockSynapse, never()).getEntityHeaderBatch(anyList());
+		
+		assertTrue(challengeResults.getTotalNumberOfResults() == 0);
+	}
+	
 	@Test (expected=NotFoundException.class)
 	public void testGetRegistratableTeamsNotMember() throws SynapseException, RestServiceException {
 		//asks for team membership status.  if not member, returns notfoundexception
