@@ -123,11 +123,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		SynapseClient synapseClient = createSynapseClient(sessionToken);
 		try {
 			UserSessionData userSessionData = synapseClient.getUserSessionData();
-			long principalId = Long.valueOf(userSessionData.getProfile().getOwnerId());
-			
-			// 63 is the mask equivalent for getting every UserBundle component
-			UserBundle userBundle = synapseClient.getUserBundle(principalId, 63);
-			
+			UserBundle userBundle = null;
+			if (userSessionData.getSession().getAcceptsTermsOfUse()) {
+				long principalId = Long.valueOf(userSessionData.getProfile().getOwnerId());
+				// 63 is the mask equivalent for getting every UserBundle component
+				userBundle = synapseClient.getUserBundle(principalId, 63);
+			}
 			return new UserLoginBundle(userSessionData, userBundle);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
