@@ -13,19 +13,21 @@ public interface NewThreadModalView extends IsWidget{
 		 */
 		public void show();
 
-		public void onSave(String threadTitle, String messageMarkdown);
-
-		public void onCancel();
-
 		public void hide();
 
 		Widget asWidget();
 
 		void configure(String forumId, CallbackP<Void> newThreadCallback);
+
+		void onSave();
 	}
 
 	void setPresenter(Presenter presenter);
 	void showDialog();
 	void hideDialog();
+	String getTitle();
+	String getMessageMarkdown();
+	void clear();
+	void setAlert(Widget w);
 
 }

@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,17 +17,21 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 
 	private NewThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
+	private SynapseAlert synAlert;
 	private String forumId;
 	CallbackP<Void> newThreadCallback;
 
 	@Inject
 	public NewThreadModal(
 			NewThreadModalView view,
-			DiscussionForumClientAsync discussionForumClient
+			DiscussionForumClientAsync discussionForumClient,
+			SynapseAlert synAlert
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setAlert(synAlert.asWidget());
 	}
 
 	@Override
@@ -37,6 +42,7 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 
 	@Override
 	public void show() {
+		view.clear();
 		view.showDialog();
 	}
 
@@ -46,7 +52,18 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 	}
 
 	@Override
-	public void onSave(String threadTitle, String messageMarkdown) {
+	public void onSave() {
+		String threadTitle = view.getTitle();
+		String messageMarkdown = view.getMessageMarkdown();
+		if (!isValidTitle(threadTitle)) {
+			synAlert.showError("Title cannot be empty.");
+			return;
+		}
+		if (!isValidMessage(messageMarkdown)) {
+			synAlert.showError("Message cannot be empty.");
+			return;
+		}
+		view.hideDialog();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
 		toCreate.setTitle(threadTitle);
@@ -67,10 +84,12 @@ public class NewThreadModal implements NewThreadModalView.Presenter{
 		});
 	}
 
-	@Override
-	public void onCancel() {
-		// TODO Auto-generated method stub
-		
+	private boolean isValidMessage(String messageMarkdown) {
+		return (messageMarkdown != null && !messageMarkdown.equals(""));
+	}
+
+	private boolean isValidTitle(String threadTitle) {
+		return (threadTitle != null && !threadTitle.equals(""));
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,6 +29,8 @@ public class NewThreadModalViewImpl implements NewThreadModalView {
 	TextBox threadTitle;
 	@UiField
 	TextArea messageMarkdown;
+	@UiField
+	Div synAlertContainer;
 
 	private Widget widget;
 	private Presenter presenter;
@@ -39,15 +42,13 @@ public class NewThreadModalViewImpl implements NewThreadModalView {
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				newThreadModal.hide();
-				presenter.onSave(threadTitle.getText(), messageMarkdown.getText());
+				presenter.onSave();
 			}
 		});
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				newThreadModal.hide();
-				presenter.onCancel();
 			}
 		});
 	}
@@ -70,5 +71,26 @@ public class NewThreadModalViewImpl implements NewThreadModalView {
 	@Override
 	public void hideDialog() {
 		newThreadModal.hide();
+	}
+
+	@Override
+	public String getTitle() {
+		return threadTitle.getText();
+	}
+
+	@Override
+	public String getMessageMarkdown() {
+		return messageMarkdown.getText();
+	}
+
+	@Override
+	public void clear() {
+		threadTitle.setText("");
+		messageMarkdown.setText("");
+	}
+
+	@Override
+	public void setAlert(Widget w) {
+		synAlertContainer.add(w);
 	}
 }
