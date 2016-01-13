@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -18,7 +19,6 @@ public class ThreadWidget implements ThreadWidgetView.Presenter{
 		this.ginInjector = ginInjector;
 		this.view = view;
 		view.setPresenter(this);
-		configure();
 	}
 
 	@Override
@@ -27,8 +27,15 @@ public class ThreadWidget implements ThreadWidgetView.Presenter{
 	}
 
 	@Override
-	public void configure() {
+	public void configure(DiscussionThreadBundle bundle) {
 		view.clear();
+		view.setTitle(bundle.getTitle());
+		view.setMessage(bundle.getMessageUrl());
+		view.setActiveUsers(bundle.getActiveAuthors().toString());
+		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
+		view.setNumberOfViews(bundle.getNumberOfViews().toString());
+		view.setLastActivity(bundle.getLastActivity().toString());
+		// TODO: handle reply properly
 		ReplyWidget reply1 = ginInjector.createReplyWidget();
 		reply1.configure();
 		view.addReply(reply1.asWidget());
