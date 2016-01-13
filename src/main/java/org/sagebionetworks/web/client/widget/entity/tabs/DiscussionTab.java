@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
@@ -25,14 +26,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	NewDiscussionThreadModal newThreadModal;
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
-	Forum forum;
 	DiscussionForumClientAsync discussionForumClient;
-	CallbackP<Void> newThreadCallback = new CallbackP<Void>(){
-		@Override
-		public void invoke(Void param) {
-			configureThreadList();
-		}
-	};
 
 	@Inject
 	public DiscussionTab(
@@ -58,12 +52,6 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		view.setAlert(synAlert.asWidget());
 	}
 
-	public void configureThreadList() {
-		if (forum != null && forum.getId() != null) {
-			threadListWidget.configure(forum.getId());
-		}
-	}
-
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
@@ -79,9 +67,13 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			}
 
 			@Override
-			public void onSuccess(Forum result) {
-				forum = result;
-				newThreadModal.configure(forum.getId(), newThreadCallback);
+			public void onSuccess(final Forum forum) {
+				newThreadModal.configure(forum.getId(), new Callback(){
+					@Override
+					public void invoke() {
+						threadListWidget.configure(forum.getId());
+					}
+				});
 				threadListWidget.configure(forum.getId());
 			}
 		});
