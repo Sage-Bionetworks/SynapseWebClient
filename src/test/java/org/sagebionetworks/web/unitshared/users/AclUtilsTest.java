@@ -17,7 +17,7 @@ public class AclUtilsTest {
 	@Test
 	public void testGetPermissionLevel() {
 		assertEquals(PermissionLevel.CAN_VIEW, AclUtils.getPermissionLevel(getReadAccessTypeSet()));
-		assertEquals(PermissionLevel.CAN_PARTICIPATE_EVALUATION, AclUtils.getPermissionLevel(getParticipateAccessTypeSet()));
+		assertEquals(PermissionLevel.CAN_SUBMIT_EVALUATION, AclUtils.getPermissionLevel(getParticipateAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SCORE_EVALUATION, AclUtils.getPermissionLevel(getScoreAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_EDIT, AclUtils.getPermissionLevel(getEditAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_EDIT_DELETE, AclUtils.getPermissionLevel(getEditDeleteAccessTypeSet()));
@@ -31,7 +31,7 @@ public class AclUtilsTest {
 	@Test
 	public void testGetACCESS_TYPEs() {
 		assertEquals(getReadAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
-		assertEquals(getParticipateAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_PARTICIPATE_EVALUATION));
+		assertEquals(getParticipateAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_SUBMIT_EVALUATION));
 		assertEquals(getScoreAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_SCORE_EVALUATION));
 		assertEquals(getEditAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT));
 		assertEquals(getEditDeleteAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT_DELETE));
@@ -42,12 +42,12 @@ public class AclUtilsTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetPermissionLevels() {		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_PARTICIPATE_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
 				PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION,
 				PermissionLevel.CAN_MESSAGE_TEAM, PermissionLevel.CAN_ADMINISTER_TEAM})), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.READ));
 		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_PARTICIPATE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.SUBMIT));
 		
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, 
