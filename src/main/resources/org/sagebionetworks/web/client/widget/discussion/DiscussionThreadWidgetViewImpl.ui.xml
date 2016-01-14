@@ -14,13 +14,13 @@
 					<t:TableData width="310px" addStyleNames="visible-lg">
 						<bh:Span ui:field="activeUsers"></bh:Span>
 					</t:TableData>
-					<t:TableData width="70px" addStyleNames="visible-lg visible-md">
+					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfReplies"></bh:Span>
 					</t:TableData>
-					<t:TableData width="70px" addStyleNames="visible-lg visible-md">
+					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfViews"></bh:Span>
 					</t:TableData>
-					<t:TableData width="120px" addStyleNames="visible-lg visible-md">
+					<t:TableData width="130px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="lastActivity"></bh:Span>
 					</t:TableData>
 				</t:TableRow>

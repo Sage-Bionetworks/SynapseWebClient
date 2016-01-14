@@ -12,18 +12,18 @@
 					<t:Table ui:field="threadHeader" width="100%">
 						<t:TableRow>
 							<t:TableHeader>
-								<bh:Span text="Topic" addStyleNames="margin-left-10"/>
+								<bh:Span text="Topic"/>
 							</t:TableHeader>
 							<t:TableHeader width="310px" addStyleNames="visible-lg">
 								<bh:Span text="Active Users"/>
 							</t:TableHeader>
-							<t:TableHeader width="70px" addStyleNames="visible-lg visible-md">
+							<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
 								<bh:Span text="Replies" />
 							</t:TableHeader>
-							<t:TableHeader width="70px" addStyleNames="visible-lg visible-md">
+							<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
 								<bh:Span text="Views"/>
 							</t:TableHeader>
-							<t:TableHeader width="120px" addStyleNames="visible-lg visible-md">
+							<t:TableHeader width="130px" addStyleNames="visible-lg visible-md">
 								<bh:Span text="Activity"/>
 							</t:TableHeader>
 						</t:TableRow>
