@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
@@ -25,6 +26,8 @@ public class DiscussionThreadWidgetTest {
 	PortalGinInjector mockGinInjector;
 	@Mock
 	ReplyWidget mockReplyWidget;
+	@Mock
+	GWTWrapper mockGwtWrapper;
 
 	DiscussionThreadWidget discussionThreadWidget;
 
@@ -32,7 +35,7 @@ public class DiscussionThreadWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
-		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockGinInjector);
+		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockGinInjector, mockGwtWrapper);
 	}
 
 	@Test
@@ -57,6 +60,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
+		verify(mockGwtWrapper).getFormattedDateString(any(Date.class));
 		// TODO: remove
 		verify(mockView, Mockito.times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();

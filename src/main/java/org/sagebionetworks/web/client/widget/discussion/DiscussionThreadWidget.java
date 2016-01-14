@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -10,14 +11,17 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	DiscussionThreadWidgetView view;
 	PortalGinInjector ginInjector;
+	GWTWrapper gwtWrapper;
 
 	@Inject
 	public DiscussionThreadWidget(
 			DiscussionThreadWidgetView view,
-			PortalGinInjector ginInjector
+			PortalGinInjector ginInjector,
+			GWTWrapper gwtWrapper
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
+		this.gwtWrapper = gwtWrapper;
 		view.setPresenter(this);
 	}
 
@@ -33,7 +37,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setActiveUsers(bundle.getActiveAuthors().toString());
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
-		view.setLastActivity(bundle.getLastActivity().toString());
+		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
 		// TODO: handle reply properly
 		ReplyWidget reply1 = ginInjector.createReplyWidget();
 		reply1.configure();
