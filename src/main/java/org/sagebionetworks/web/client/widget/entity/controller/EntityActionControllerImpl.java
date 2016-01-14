@@ -40,9 +40,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -165,7 +162,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureAddWikiSubpage();
 			configureDeleteWikiAction();
 			configureMove();
-			configureLink();
 			configureSubmit();
 			configureAnnotations();
 			configureFileHistory();
@@ -295,17 +291,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}else{
 			actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
 			actionMenu.setActionEnabled(Action.MOVE_ENTITY, false);
-		}
-	}
-	
-	private void configureLink(){
-		if(isLinkType(entityBundle.getEntity())){
-			actionMenu.setActionVisible(Action.CREATE_LINK, true);
-			actionMenu.setActionEnabled(Action.CREATE_LINK, true);
-			actionMenu.setActionListener(Action.CREATE_LINK, this);
-		}else{
-			actionMenu.setActionVisible(Action.CREATE_LINK, false);
-			actionMenu.setActionEnabled(Action.CREATE_LINK, false);
 		}
 	}
 	
@@ -519,9 +504,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case MOVE_ENTITY:
 			onMove();
 			break;
-		case CREATE_LINK:
-			onLink();
-			break;
 		case SUBMIT_TO_CHALLENGE:
 			onSubmit();
 			break;
@@ -582,71 +564,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void postOnSubmit(){
 		this.submitter.configure(this.entityBundle.getEntity(), null);
-	}
-	
-	private void onLink() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckLink();
-			}
-		});
-	}
-	
-	private void postCheckLink(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
-			@Override
-			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					createLink(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
-			}
-		});
-		entityFinder.show();
-	}
-	
-	/**
-	 * Create a link with the given target as a parent.
-	 * @param target
-	 */
-	public void createLink(String target){
-		Link link = new Link();
-		link.setParentId(target);
-		Reference ref = new Reference();
-		ref.setTargetId(entityBundle.getEntity().getId());
-		link.setLinksTo(ref); // links to this entity
-		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
-		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
-		link.setEntityType(Link.class.getName());
-		synapseClient.createEntity(link, new AsyncCallback<Entity>() {
-			
-			@Override
-			public void onSuccess(Entity result) {
-				view.showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(caught instanceof BadRequestException) {
-					view.showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
-					return;
-				}
-				if(caught instanceof NotFoundException) {
-					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-					return;
-				}
-				if (caught instanceof UnauthorizedException) {
-					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
-					return;
-				}
-				view.showErrorMessage(caught.getMessage());
-				
-			}
-		});
 	}
 	
 	private void onMove() {

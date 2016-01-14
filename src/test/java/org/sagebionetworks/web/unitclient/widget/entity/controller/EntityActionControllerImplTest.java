@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -15,11 +14,11 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
 import java.util.Set;
 
@@ -74,9 +73,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -862,81 +858,6 @@ public class EntityActionControllerImplTest {
 		verify(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 		verify(mockView, never()).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testCreateLinkBadRequest(){
-		AsyncMockStubber.callFailureWith(new BadRequestException("bad")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
-	}
-	
-	@Test
-	public void testCreateLinkNotFound(){
-		AsyncMockStubber.callFailureWith(new NotFoundException("not found")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-	}
-	
-	@Test
-	public void testCreateLinkUnauthorizedException(){
-		AsyncMockStubber.callFailureWith(new UnauthorizedException("no way")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
-	}
-	
-	@Test
-	public void testCreateLinkUnknownException(){
-		String error = "some error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(error);
-	}
-	
-	@Test
-	public void testCreateLink(){
-		entityBundle.getEntity().setId("syn123");
-		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
-		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		String target = "syn9876";
-		controller.createLink(target);
-		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
-		Entity capture = argument.getValue();
-		assertNotNull(capture);
-		assertTrue(capture instanceof Link);
-		Link link = (Link) capture;
-		assertEquals(target, link.getParentId());
-		assertEquals(entityBundle.getEntity().getName(), link.getName());
-		Reference ref = link.getLinksTo();
-		assertNotNull(ref);
-		assertEquals(entityBundle.getEntity().getId(), ref.getTargetId());
-	}
-	
-	@Test
-	public void testOnLinkNoUpdate(){
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
-		verify(mockEntityFinder, never()).show();
-		verify(mockView, never()).showInfo(anyString(), anyString());
-	}
-	
-	@Test
-	public void testOnLink(){
-		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
-		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
-		verify(mockEntityFinder).show();
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
 	}
 	
 	@Test
