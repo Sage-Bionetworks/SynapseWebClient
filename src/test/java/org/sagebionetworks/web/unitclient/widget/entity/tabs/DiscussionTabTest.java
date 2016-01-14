@@ -82,6 +82,7 @@ public class DiscussionTabTest {
 		tab.configure(entityId, entityName);
 
 		verify(mockTab).setTabListItemVisible(true);
+		verify(mockTab).onTabClicked();
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
@@ -108,6 +109,7 @@ public class DiscussionTabTest {
 		tab.configure(entityId, entityName);
 
 		verify(mockTab).setTabListItemVisible(true);
+		verify(mockTab).onTabClicked();
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
