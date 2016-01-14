@@ -50,7 +50,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Span clickToViewReplies;
 	@UiField
-	Button loadMore;
+	Button loadMoreButton;
 	@UiField
 	Button replyButton;
 
