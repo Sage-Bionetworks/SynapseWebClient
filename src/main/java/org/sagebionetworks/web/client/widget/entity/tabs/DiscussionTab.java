@@ -57,7 +57,6 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	}
 
 	public void configure(final String entityId,final String entityName) {
-		tab.onTabClicked();
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, areaToken));
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
