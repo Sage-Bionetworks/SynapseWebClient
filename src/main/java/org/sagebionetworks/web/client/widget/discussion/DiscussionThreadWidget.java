@@ -26,7 +26,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		return view.asWidget();
 	}
 
-	@Override
 	public void configure(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(bundle.getTitle());
@@ -42,5 +41,10 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		ReplyWidget reply2 = ginInjector.createReplyWidget();
 		reply2.configure();
 		view.addReply(reply2.asWidget());
+	}
+
+	@Override
+	public void toggle() {
+		view.toggle();
 	}
 }

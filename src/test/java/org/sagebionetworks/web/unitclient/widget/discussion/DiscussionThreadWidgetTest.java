@@ -68,4 +68,10 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.asWidget();
 		verify(mockView).asWidget();
 	}
+
+	@Test
+	public void toggleTest() {
+		discussionThreadWidget.toggle();
+		verify(mockView).toggle();
+	}
 }

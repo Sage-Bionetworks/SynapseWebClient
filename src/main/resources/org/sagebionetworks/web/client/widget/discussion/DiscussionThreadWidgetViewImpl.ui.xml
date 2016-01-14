@@ -4,29 +4,31 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<b:Row>
-		<b:Column size="XS_12">
-			<t:Table ui:field="threadHeader" width="100%">
+	<bh:Div addStyleNames="padding-10 light-border-bottom">
+		<g:FocusPanel ui:field="clickBox">
+			<t:Table width="100%">
 				<t:TableRow>
-					<t:TableHeader>
+					<t:TableData>
 						<bh:Span ui:field="threadTitle"></bh:Span>
-					</t:TableHeader>
-					<t:TableHeader width="310px" addStyleNames="visible-lg">
+					</t:TableData>
+					<t:TableData width="310px" addStyleNames="visible-lg">
 						<bh:Span ui:field="activeUsers"></bh:Span>
-					</t:TableHeader>
-					<t:TableHeader width="70px" addStyleNames="visible-lg visible-md">
+					</t:TableData>
+					<t:TableData width="70px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfReplies"></bh:Span>
-					</t:TableHeader>
-					<t:TableHeader width="70px" addStyleNames="visible-lg visible-md">
+					</t:TableData>
+					<t:TableData width="70px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfViews"></bh:Span>
-					</t:TableHeader>
-					<t:TableHeader width="120px" addStyleNames="visible-lg visible-md">
+					</t:TableData>
+					<t:TableData width="120px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="lastActivity"></bh:Span>
-					</t:TableHeader>
+					</t:TableData>
 				</t:TableRow>
 			</t:Table>
+		</g:FocusPanel>
+		<b:Collapse ui:field="collapsePanel" visible="false">
 			<bh:Paragraph ui:field="threadMessage"></bh:Paragraph>
-		</b:Column>
-		<bh:Div ui:field="replyListContainer"></bh:Div>
-	</b:Row>
+			<bh:Div ui:field="replyListContainer"></bh:Div>
+		</b:Collapse>
+	</bh:Div>
 </ui:UiBinder>

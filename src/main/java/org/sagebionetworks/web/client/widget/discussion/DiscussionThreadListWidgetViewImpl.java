@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,7 +16,7 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	public interface Binder extends UiBinder<Widget, DiscussionThreadListWidgetViewImpl> {}
 
 	@UiField
-	Div threadListContainer;
+	Column threadListContainer;
 	@UiField
 	Div synAlertContainer;
 	@UiField
