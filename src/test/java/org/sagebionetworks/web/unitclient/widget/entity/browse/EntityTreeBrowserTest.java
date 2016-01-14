@@ -226,7 +226,9 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testConfigure() {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		headers.add(new EntityHeader());
+		EntityHeader header = new EntityHeader();
+		header.setType("project");
+		headers.add(header);
 		
 		entityTreeBrowser.configure(headers);
 		verify(mockView).clear();
