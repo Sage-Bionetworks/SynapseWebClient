@@ -98,7 +98,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		EntityQueryResults results = getEntityQueryResultsFromHeaders(headers);
 		for (EntityQueryResult wrappedHeader : results.getEntities()) {
 			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(wrappedHeader, true,
-					false));
+					isExpandable(wrappedHeader)));
 		}
 		view.setLoadingVisible(false);
 	}
@@ -315,19 +315,22 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void addResultsToParent(final EntityTreeItem parent,	EntityQueryResults results) {
 		if (parent == null) {
 			for (EntityQueryResult header : results.getEntities()) {
-				String entityType = header.getEntityType();
-				boolean isFolder = entityType.equals("folder");
-				view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, isFolder));
+				boolean isExpandable = isExpandable(header);
+				view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, isExpandable));
 			}
 		} else {
 			for (EntityQueryResult header : results.getEntities()) {
-				String entityType = header.getEntityType();
-				boolean isFolder = entityType.equals("folder");
-				view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, isFolder), parent);
+				boolean isExpandable = isExpandable(header);
+				view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, isExpandable), parent);
 			}
-
 		}
 	}
+	
+	public boolean isExpandable(EntityQueryResult header) {
+		String entityType = header.getEntityType();
+		return entityType.equals("folder") || entityType.equals("project");
+	}
+	
 	public void clearSelection() {
 		currentSelection = null;
 		view.clearSelection();

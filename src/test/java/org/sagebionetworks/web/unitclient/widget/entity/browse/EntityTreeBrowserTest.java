@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -26,7 +27,6 @@ import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -400,4 +400,16 @@ public class EntityTreeBrowserTest {
 		//tries to load project children
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),any(AsyncCallback.class));
 	}
+	
+	@Test
+	public void testIsExpandable() {
+		EntityQueryResult result = new EntityQueryResult();
+		result.setEntityType("folder");
+		assertTrue(entityTreeBrowser.isExpandable(result));
+		result.setEntityType("project");
+		assertTrue(entityTreeBrowser.isExpandable(result));
+		result.setEntityType("file");
+		assertFalse(entityTreeBrowser.isExpandable(result));
+	}
+	
 }
