@@ -31,4 +31,8 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setLastActivity(String lastActivity);
 
 	void toggle();
+
+	void setAuthor(String author);
+
+	void setCreatedOn(String createdOn);
 }

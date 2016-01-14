@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<bh:Div addStyleNames="padding-10 light-border-bottom">
+	<bh:Div addStyleNames="padding-10 light-border-bottom overflow-x-hidden">
 		<g:FocusPanel ui:field="clickBox">
 			<t:Table width="100%">
 				<t:TableRow>
@@ -27,8 +27,19 @@
 			</t:Table>
 		</g:FocusPanel>
 		<b:Collapse ui:field="collapsePanel" visible="false">
-			<bh:Paragraph ui:field="threadMessage"></bh:Paragraph>
-			<bh:Div ui:field="replyListContainer"></bh:Div>
+			<bh:Div addStyleNames="margin-10 light-border-bottom" width="95%" pull="RIGHT" >
+				<t:Table width="100%">
+					<t:TableData>
+						<bh:Span ui:field="author"></bh:Span>
+					</t:TableData>
+					<t:TableData width="130px" addStyleNames="visible-lg visible-md">
+						<bh:Span ui:field="createdOn"></bh:Span>
+					</t:TableData>
+				</t:Table>
+				<bh:Paragraph ui:field="threadMessage"></bh:Paragraph>
+				<bh:Div ui:field="showReplies"></bh:Div>
+			</bh:Div>
+			<bh:Div ui:field="replyListContainer" addStyleNames="padding-top-10" width="90%" pull="RIGHT" ></bh:Div>
 		</b:Collapse>
 	</bh:Div>
 </ui:UiBinder>

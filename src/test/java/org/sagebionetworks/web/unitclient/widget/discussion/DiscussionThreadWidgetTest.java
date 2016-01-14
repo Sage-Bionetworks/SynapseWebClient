@@ -60,7 +60,9 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockGwtWrapper).getFormattedDateString(any(Date.class));
+		verify(mockView).setAuthor(anyString());
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		// TODO: remove
 		verify(mockView, Mockito.times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();

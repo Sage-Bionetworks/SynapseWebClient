@@ -38,6 +38,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
+		view.setAuthor(bundle.getCreatedBy());
+		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
 		// TODO: handle reply properly
 		ReplyWidget reply1 = ginInjector.createReplyWidget();
 		reply1.configure();

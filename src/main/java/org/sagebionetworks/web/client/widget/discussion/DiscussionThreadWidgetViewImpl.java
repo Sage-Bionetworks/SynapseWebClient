@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.gwtbootstrap3.client.ui.PanelCollapse;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -37,6 +36,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	FocusPanel clickBox;
 	@UiField
 	Collapse collapsePanel;
+	@UiField
+	Span author;
+	@UiField
+	Span createdOn;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -111,6 +114,16 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setLastActivity(String lastActivity) {
 		this.lastActivity.setText(lastActivity);
+	}
+
+	@Override
+	public void setAuthor(String author) {
+		this.author.setText(author);
+	}
+
+	@Override
+	public void setCreatedOn(String createdOn) {
+		this.createdOn.setText(createdOn);
 	}
 
 	@Override
