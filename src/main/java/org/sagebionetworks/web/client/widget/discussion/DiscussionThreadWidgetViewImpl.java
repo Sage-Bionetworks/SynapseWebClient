@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -18,6 +19,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
+	public static final String REPLIES = "replies";
+
 	@UiField
 	Div replyListContainer;
 	@UiField
@@ -33,13 +36,23 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Span lastActivity;
 	@UiField
-	FocusPanel clickBox;
+	FocusPanel showThread;
 	@UiField
-	Collapse collapsePanel;
+	Collapse threadDetails;
+	@UiField
+	FocusPanel showReplies;
+	@UiField
+	Collapse replyDetails;
 	@UiField
 	Span author;
 	@UiField
 	Span createdOn;
+	@UiField
+	Span clickToViewReplies;
+	@UiField
+	Button loadMore;
+	@UiField
+	Button replyButton;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -47,21 +60,43 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Inject
 	public DiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		clickBox.addClickHandler(new ClickHandler() {
+		showThread.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.toggle();
+				presenter.toggleThread();
 			}
 		});
-		collapsePanel.addAttachHandler(new AttachEvent.Handler(){
+
+		threadDetails.addAttachHandler(new AttachEvent.Handler(){
 
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
 				if (event.isAttached()) {
-					collapsePanel.hide();
-					collapsePanel.setVisible(true);
+					threadDetails.hide();
+					threadDetails.setVisible(true);
 				}
+			}
+		});
+		replyDetails.addAttachHandler(new AttachEvent.Handler(){
+
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					replyDetails.hide();
+					replyDetails.setVisible(true);
+				}
+			}
+		});
+	}
+
+	@Override
+	public void addClickHandlerToShowReplies(){
+		showReplies.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.toggleReplies();
 			}
 		});
 	}
@@ -104,6 +139,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setNumberOfReplies(String numberOfReplies) {
 		this.numberOfReplies.setText(numberOfReplies);
+		this.clickToViewReplies.setText(numberOfReplies + " " + REPLIES);
 	}
 
 	@Override
@@ -127,8 +163,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void toggle() {
-		collapsePanel.toggle();
+	public void toggleThread() {
+		threadDetails.toggle();
+	}
+
+	@Override
+	public void toggleReplies() {
+		replyDetails.toggle();
 	}
 
 }

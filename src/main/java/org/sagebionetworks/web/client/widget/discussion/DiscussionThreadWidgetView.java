@@ -9,7 +9,9 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 		Widget asWidget();
 
-		void toggle();
+		void toggleReplies();
+
+		void toggleThread();
 	}
 
 	void setPresenter(DiscussionThreadWidget presenter);
@@ -30,9 +32,13 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setLastActivity(String lastActivity);
 
-	void toggle();
-
 	void setAuthor(String author);
 
 	void setCreatedOn(String createdOn);
+
+	void toggleThread();
+
+	void toggleReplies();
+
+	void addClickHandlerToShowReplies();
 }

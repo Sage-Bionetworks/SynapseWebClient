@@ -12,6 +12,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	DiscussionThreadWidgetView view;
 	PortalGinInjector ginInjector;
 	GWTWrapper gwtWrapper;
+	boolean areRepliesConfigure;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -22,6 +23,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.gwtWrapper = gwtWrapper;
+		this.areRepliesConfigure = false;
 		view.setPresenter(this);
 	}
 
@@ -40,6 +42,25 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
 		view.setAuthor(bundle.getCreatedBy());
 		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
+		if (bundle.getNumberOfReplies() > 0) {
+			view.addClickHandlerToShowReplies();
+		}
+	}
+
+	@Override
+	public void toggleThread() {
+		view.toggleThread();
+	}
+
+	@Override
+	public void toggleReplies() {
+		if (!areRepliesConfigure) {
+			configureReplies();
+		}
+		view.toggleReplies();
+	}
+
+	private void configureReplies() {
 		// TODO: handle reply properly
 		ReplyWidget reply1 = ginInjector.createReplyWidget();
 		reply1.configure();
@@ -47,10 +68,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		ReplyWidget reply2 = ginInjector.createReplyWidget();
 		reply2.configure();
 		view.addReply(reply2.asWidget());
-	}
 
-	@Override
-	public void toggle() {
-		view.toggle();
+		this.areRepliesConfigure = true;
 	}
 }

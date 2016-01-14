@@ -62,11 +62,31 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setAuthor(anyString());
 		verify(mockView).setCreatedOn(anyString());
+		verify(mockView).addClickHandlerToShowReplies();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
-		// TODO: remove
-		verify(mockView, Mockito.times(2)).addReply(any(Widget.class));
-		verify(mockGinInjector, times(2)).createReplyWidget();
-		verify(mockReplyWidget, times(2)).configure();
+	}
+
+	@Test
+	public void testConfigureWithZeroReplies(){
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setTitle("title");
+		threadBundle.setMessageUrl("messageUrl");
+		threadBundle.setActiveAuthors(Arrays.asList("123"));
+		threadBundle.setNumberOfReplies(0L);
+		threadBundle.setNumberOfViews(2L);
+		threadBundle.setLastActivity(new Date());
+		discussionThreadWidget.configure(threadBundle );
+		verify(mockView).clear();
+		verify(mockView).setTitle("title");
+		verify(mockView).setMessage("messageUrl");
+		verify(mockView).setActiveUsers(anyString());
+		verify(mockView).setNumberOfReplies("0");
+		verify(mockView).setNumberOfViews("2");
+		verify(mockView).setLastActivity(anyString());
+		verify(mockView).setAuthor(anyString());
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockView, never()).addClickHandlerToShowReplies();
+		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 	}
 
 	@Test
@@ -76,8 +96,18 @@ public class DiscussionThreadWidgetTest {
 	}
 
 	@Test
-	public void toggleTest() {
-		discussionThreadWidget.toggle();
-		verify(mockView).toggle();
+	public void toggleThreadTest() {
+		discussionThreadWidget.toggleThread();
+		verify(mockView).toggleThread();
+	}
+
+	@Test
+	public void toggleRepliesTest() {
+		discussionThreadWidget.toggleReplies();
+		verify(mockView).toggleReplies();
+		// TODO: remove
+		verify(mockView, Mockito.times(2)).addReply(any(Widget.class));
+		verify(mockGinInjector, times(2)).createReplyWidget();
+		verify(mockReplyWidget, times(2)).configure();
 	}
 }
