@@ -283,7 +283,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if (orcId != null && orcId.length() > 0) {
 					view.setOrcId(orcId);
 					view.setOrcIdVisible(true);
-					view.setUnbindOrcIdVisible(true);
+					view.setUnbindOrcIdVisible(isOwner);
 					view.setOrcIDLinkButtonVisible(false);
 				}
 			}

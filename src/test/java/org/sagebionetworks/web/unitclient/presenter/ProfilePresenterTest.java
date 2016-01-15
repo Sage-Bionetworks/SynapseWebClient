@@ -438,7 +438,18 @@ public class ProfilePresenterTest {
 		verify(mockView).setOrcIDLinkButtonVisible(true); 
 		verify(mockView).setOrcIDLinkButtonVisible(false); 
 	}
-	
+	@Test
+	public void testUnbindHiddenIfNotOwner() {
+		when(mockUserBundle.getIsCertified()).thenReturn(false);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
+		when(mockUserBundle.getORCID()).thenReturn("an orc id");
+		//view another user profile
+		profilePresenter.updateProfileView("12937", ProfileArea.PROJECTS);
+
+		verify(mockView, times(2)).setUnbindOrcIdVisible(false);
+	}
 	
 	@Test
 	public void testNotCertifiedAlertHiddenAndUserNotCertifiedCookieFalse() throws JSONObjectAdapterException {
