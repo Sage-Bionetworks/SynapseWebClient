@@ -74,7 +74,7 @@ public class NewReplyModalTest {
 
 	@Test
 	public void testOnSaveInvalidArgument() {
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockView.getMessageMarkdown()).thenReturn("");
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(anyString());
