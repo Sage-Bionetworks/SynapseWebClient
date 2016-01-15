@@ -51,5 +51,7 @@
 				<b:Button ui:field="replyButton" pull="LEFT">Reply</b:Button>
 			</bh:Div>
 		</b:Collapse>
+		<g:SimplePanel ui:field="newReplyModalContainer"/>
+		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>

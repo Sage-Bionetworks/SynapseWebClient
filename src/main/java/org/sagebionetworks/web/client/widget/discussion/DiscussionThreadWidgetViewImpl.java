@@ -12,6 +12,7 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -53,6 +54,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Button loadMoreButton;
 	@UiField
 	Button replyButton;
+	@UiField
+	SimplePanel newReplyModalContainer;
+	@UiField
+	Div synAlertContainer;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -67,7 +72,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				presenter.toggleThread();
 			}
 		});
+		showReplies.addClickHandler(new ClickHandler() {
 
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.toggleReplies();
+			}
+		});
 		threadDetails.addAttachHandler(new AttachEvent.Handler(){
 
 			@Override
@@ -88,15 +99,11 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				}
 			}
 		});
-	}
-
-	@Override
-	public void addClickHandlerToShowReplies(){
-		showReplies.addClickHandler(new ClickHandler() {
+		replyButton.addClickHandler(new ClickHandler(){
 
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.toggleReplies();
+				presenter.onClickNewReply();
 			}
 		});
 	}
@@ -170,6 +177,26 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void toggleReplies() {
 		replyDetails.toggle();
+	}
+
+	@Override
+	public void setNewReplyModal(Widget w) {
+		newReplyModalContainer.setWidget(w);
+	}
+
+	@Override
+	public void setAlert(Widget w) {
+		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void setLoadMoreButtonVisibility(boolean visible) {
+		loadMoreButton.setVisible(visible);
+	}
+
+	@Override
+	public void setShowRepliesVisibility(boolean visible) {
+		showReplies.setVisible(visible);
 	}
 
 }

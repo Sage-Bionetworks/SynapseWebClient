@@ -12,6 +12,8 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void toggleReplies();
 
 		void toggleThread();
+
+		void onClickNewReply();
 	}
 
 	void setPresenter(DiscussionThreadWidget presenter);
@@ -40,5 +42,11 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void toggleReplies();
 
-	void addClickHandlerToShowReplies();
+	void setNewReplyModal(Widget w);
+
+	void setAlert(Widget w);
+
+	void setLoadMoreButtonVisibility(boolean visible);
+
+	void setShowRepliesVisibility(boolean visible);
 }
