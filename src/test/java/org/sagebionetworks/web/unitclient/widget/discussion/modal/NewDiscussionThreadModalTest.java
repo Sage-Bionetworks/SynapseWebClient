@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +16,6 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -106,39 +108,5 @@ public class NewDiscussionThreadModalTest {
 		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-	}
-
-	@Test
-	public void testValidateNullTitle() {
-		ValidationResult validationResult = NewDiscussionThreadModal.validate(null, "message");
-		assertEquals(false, validationResult.isValid());
-		assertTrue(validationResult.getErrorMessage().contains(EMPTY_TITLE_ERROR));
-	}
-
-	@Test
-	public void testValidateEmptyTitle() {
-		ValidationResult validationResult = NewDiscussionThreadModal.validate("", "message");
-		assertEquals(false, validationResult.isValid());
-		assertTrue(validationResult.getErrorMessage().contains(EMPTY_TITLE_ERROR));
-	}
-
-	@Test
-	public void testValidateNullMessage() {
-		ValidationResult validationResult = NewDiscussionThreadModal.validate("title", null);
-		assertEquals(false, validationResult.isValid());
-		assertTrue(validationResult.getErrorMessage().contains(EMPTY_MESSAGE_ERROR));
-	}
-
-	@Test
-	public void testValidateEmptyMessage() {
-		ValidationResult validationResult = NewDiscussionThreadModal.validate("title", "");
-		assertEquals(false, validationResult.isValid());
-		assertTrue(validationResult.getErrorMessage().contains(EMPTY_MESSAGE_ERROR));
-	}
-
-	@Test
-	public void testValidate() {
-		ValidationResult validationResult = NewDiscussionThreadModal.validate("title", "message");
-		assertEquals(true, validationResult.isValid());
 	}
 }

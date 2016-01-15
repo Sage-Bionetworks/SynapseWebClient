@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -14,8 +15,6 @@ import com.google.inject.Inject;
  * A simple modal dialog for adding a new thread.
  */
 public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Presenter{
-	public static final String EMPTY_TITLE_ERROR = "Title cannot be empty.";
-	public static final String EMPTY_MESSAGE_ERROR = "Message cannot be empty.";
 
 	private NewDiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
@@ -58,9 +57,11 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 		synAlert.clear();
 		String threadTitle = view.getTitle();
 		String messageMarkdown = view.getMessageMarkdown();
-		ValidationResult validationResult = validate(threadTitle, messageMarkdown);
-		if (!validationResult.isValid()) {
-			synAlert.showError(validationResult.getErrorMessage());
+		ValidationResult result = new ValidationResult();
+		result.requiredField("Title", threadTitle)
+				.requiredField("Message", messageMarkdown);
+		if (!result.isValid()) {
+			synAlert.showError(result.getErrorMessage());
 			return;
 		}
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
@@ -82,25 +83,6 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 				}
 			}
 		});
-	}
-
-	public static ValidationResult validate(String threadTitle, String messageMarkdown) {
-		String errorMessages = "";
-		ValidationResult result = new ValidationResult();
-		result.setValidity(true);
-		if (threadTitle == null || threadTitle.equals("")) {
-			result.setValidity(false);
-			errorMessages += EMPTY_TITLE_ERROR;
-		}
-		if (messageMarkdown == null || messageMarkdown.equals("")) {
-			result.setValidity(false);
-			if (!errorMessages.equals("")) {
-				errorMessages += "\n";
-			}
-			errorMessages += EMPTY_MESSAGE_ERROR;
-		}
-		result.setErrorMessage(errorMessages);
-		return result;
 	}
 
 	@Override
