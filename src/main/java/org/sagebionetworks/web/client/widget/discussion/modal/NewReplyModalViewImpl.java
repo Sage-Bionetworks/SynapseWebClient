@@ -28,7 +28,7 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	@UiField
 	Button cancelButton;
 	@UiField
-	Modal newThreadModal;
+	Modal newReplyModal;
 	@UiField
 	TextArea messageMarkdown;
 	@UiField
@@ -40,7 +40,7 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	@Inject
 	public NewReplyModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		newThreadModal.setTitle(NEW_REPLY_MODAL_TITLE);
+		newReplyModal.setTitle(NEW_REPLY_MODAL_TITLE);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -50,7 +50,7 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				newThreadModal.hide();
+				newReplyModal.hide();
 			}
 		});
 	}
@@ -67,12 +67,12 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 
 	@Override
 	public void showDialog() {
-		newThreadModal.show();
+		newReplyModal.show();
 	}
 
 	@Override
 	public void hideDialog() {
-		newThreadModal.hide();
+		newReplyModal.hide();
 	}
 
 	@Override
