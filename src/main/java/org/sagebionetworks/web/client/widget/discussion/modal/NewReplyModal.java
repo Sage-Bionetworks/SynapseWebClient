@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
