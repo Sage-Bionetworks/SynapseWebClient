@@ -74,6 +74,19 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void invoke() {
+				synAlert.clear();
+				discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+
+					@Override
+					public void onSuccess(DiscussionThreadBundle result) {
+						configure(result);
+					}
+				});
 				configureReplies();
 			}
 		});
@@ -112,6 +125,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 					@Override
 					public void onSuccess(
 							PaginatedResults<DiscussionReplyBundle> result) {
+						view.setShowRepliesVisibility(true);
 						offset += LIMIT;
 						for (DiscussionReplyBundle bundle : result.getResults()) {
 							ReplyWidget replyWidget = ginInjector.createReplyWidget();
@@ -119,7 +133,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							view.addReply(replyWidget.asWidget());
 						}
 						areRepliesConfigure = true;
+						view.setNumberOfReplies(""+result.getTotalNumberOfResults());
 						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
+						view.showReplyDetails();
 					}
 		});
 	}

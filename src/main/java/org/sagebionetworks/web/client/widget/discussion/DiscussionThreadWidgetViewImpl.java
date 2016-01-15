@@ -199,4 +199,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		showReplies.setVisible(visible);
 	}
 
+	@Override
+	public void showReplyDetails() {
+		replyDetails.show();
+	}
 }
