@@ -65,6 +65,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.configure("123");
 		verify(mockView).clear();
+		verify(mockSynAlert).clear();
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
@@ -82,6 +83,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.configure("123");
 		verify(mockView).clear();
+		verify(mockSynAlert).clear();
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
