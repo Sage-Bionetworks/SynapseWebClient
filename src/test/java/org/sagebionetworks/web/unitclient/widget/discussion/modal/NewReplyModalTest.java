@@ -10,21 +10,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public class NewDiscussionThreadModalTest {
+public class NewReplyModalTest {
 	@Mock
-	NewDiscussionThreadModalView mockView;
+	NewReplyModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -32,15 +32,15 @@ public class NewDiscussionThreadModalTest {
 	@Mock
 	Callback mockCallback;
 	@Mock
-	DiscussionThreadBundle mockDiscussionThreadBundle;
-	String forumId = "123";
-	NewDiscussionThreadModal modal;
+	DiscussionReplyBundle mockDiscussionReplyBundle;
+	String threadId = "123";
+	NewReplyModal modal;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient, mockSynAlert);
-		modal.configure(forumId, mockCallback);
+		modal = new NewReplyModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal.configure(threadId, mockCallback);
 	}
 
 	@Test
@@ -70,8 +70,7 @@ public class NewDiscussionThreadModalTest {
 
 	@Test
 	public void testOnSaveInvalidArgument() {
-		when(mockView.getTitle()).thenReturn(null);
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockView.getMessageMarkdown()).thenReturn("");
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(anyString());
@@ -82,30 +81,28 @@ public class NewDiscussionThreadModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
-		when(mockView.getTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
-		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
-			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
+		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
+			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess();
-		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveFailure() {
-		when(mockView.getTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
+			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}

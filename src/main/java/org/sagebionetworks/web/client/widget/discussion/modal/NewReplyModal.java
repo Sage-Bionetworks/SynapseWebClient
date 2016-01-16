@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
@@ -12,19 +12,19 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * A simple modal dialog for adding a new thread.
+ * A simple modal dialog for adding a new reply.
  */
-public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Presenter{
+public class NewReplyModal implements NewReplyModalView.Presenter{
 
-	private NewDiscussionThreadModalView view;
+	private NewReplyModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
-	private String forumId;
-	Callback newThreadCallback;
+	private String threadId;
+	Callback newReplyCallback;
 
 	@Inject
-	public NewDiscussionThreadModal(
-			NewDiscussionThreadModalView view,
+	public NewReplyModal(
+			NewReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert
 			) {
@@ -36,9 +36,9 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 	}
 
 	@Override
-	public void configure(String forumId, Callback newThreadCallback) {
-		this.forumId = forumId;
-		this.newThreadCallback = newThreadCallback;
+	public void configure(String threadId, Callback newReplyCallback) {
+		this.threadId = threadId;
+		this.newReplyCallback = newReplyCallback;
 	}
 
 	@Override
@@ -55,31 +55,28 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		String threadTitle = view.getTitle();
 		String messageMarkdown = view.getMessageMarkdown();
 		ValidationResult result = new ValidationResult();
-		result.requiredField("Title", threadTitle)
-				.requiredField("Message", messageMarkdown);
+		result.requiredField("Message", messageMarkdown);
 		if (!result.isValid()) {
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		CreateDiscussionThread toCreate = new CreateDiscussionThread();
-		toCreate.setForumId(forumId);
-		toCreate.setTitle(threadTitle);
+		CreateDiscussionReply toCreate = new CreateDiscussionReply();
+		toCreate.setThreadId(threadId);
 		toCreate.setMessageMarkdown(messageMarkdown);
-		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>(){
+		discussionForumClient.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 
 			@Override
-			public void onSuccess(DiscussionThreadBundle result) {
+			public void onSuccess(DiscussionReplyBundle result) {
 				view.hideDialog();
 				view.showSuccess();
-				if (newThreadCallback != null) {
-					newThreadCallback.invoke();
+				if (newReplyCallback != null) {
+					newReplyCallback.invoke();
 				}
 			}
 		});

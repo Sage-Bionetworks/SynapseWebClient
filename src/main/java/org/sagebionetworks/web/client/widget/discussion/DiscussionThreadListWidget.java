@@ -41,6 +41,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 	public void configure(String forumId) {
 		view.clear();
+		synAlert.clear();
 		offset = 0L;
 		if (order == null) {
 			order = DEFAULT_ORDER;
@@ -53,7 +54,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 					@Override
 					public void onFailure(Throwable caught) {
-						synAlert.clear();
 						synAlert.handleException(caught);
 					}
 

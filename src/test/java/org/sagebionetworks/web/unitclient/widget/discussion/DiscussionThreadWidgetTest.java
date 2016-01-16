@@ -1,21 +1,35 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionThreadWidgetTest {
@@ -28,24 +42,37 @@ public class DiscussionThreadWidgetTest {
 	ReplyWidget mockReplyWidget;
 	@Mock
 	GWTWrapper mockGwtWrapper;
+	@Mock
+	NewReplyModal mockNewReplyModal;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	DiscussionForumClientAsync mockDiscussionForumClientAsync;
+	@Mock
+	PaginatedResults<DiscussionReplyBundle> mockReplyBundlePage;
 
 	DiscussionThreadWidget discussionThreadWidget;
+	List<DiscussionReplyBundle> bundleList;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
-		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockGinInjector, mockGwtWrapper);
+		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
+				mockSynAlert, mockDiscussionForumClientAsync, mockGinInjector, mockGwtWrapper);
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadWidget);
+		verify(mockView).setNewReplyModal(any(Widget.class));
+		verify(mockView).setAlert(any(Widget.class));
 	}
 
 	@Test
 	public void testConfigure() {
 		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setId("1");
 		threadBundle.setTitle("title");
 		threadBundle.setMessageUrl("messageUrl");
 		threadBundle.setActiveAuthors(Arrays.asList("123"));
@@ -62,13 +89,15 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setAuthor(anyString());
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).addClickHandlerToShowReplies();
+		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 	}
 
 	@Test
 	public void testConfigureWithZeroReplies(){
 		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setId("1");
 		threadBundle.setTitle("title");
 		threadBundle.setMessageUrl("messageUrl");
 		threadBundle.setActiveAuthors(Arrays.asList("123"));
@@ -85,8 +114,9 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setAuthor(anyString());
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockView, never()).addClickHandlerToShowReplies();
+		verify(mockView).setShowRepliesVisibility(false);
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 	}
 
 	@Test
@@ -105,9 +135,105 @@ public class DiscussionThreadWidgetTest {
 	public void toggleRepliesTest() {
 		discussionThreadWidget.toggleReplies();
 		verify(mockView).toggleReplies();
-		// TODO: remove
-		verify(mockView, Mockito.times(2)).addReply(any(Widget.class));
+	}
+
+	@Test
+	public void testOnClickNewReply() {
+		discussionThreadWidget.onClickNewReply();
+		verify(mockNewReplyModal).show();
+	}
+
+	@Test
+	public void testConfigureRepliesSuccess() {
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setId("1");
+		threadBundle.setTitle("title");
+		threadBundle.setMessageUrl("messageUrl");
+		threadBundle.setActiveAuthors(Arrays.asList("123"));
+		threadBundle.setNumberOfReplies(0L);
+		threadBundle.setNumberOfViews(2L);
+		threadBundle.setLastActivity(new Date());
+		discussionThreadWidget.configure(threadBundle );
+		bundleList = createReplyBundleList(2);
+		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
+		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
+		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
+				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
+		discussionThreadWidget.configureReplies();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(AsyncCallback.class));
+		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
+		verify(mockView).showReplyDetails();
+		verify(mockView).setLoadMoreButtonVisibility(anyBoolean());
+		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
-		verify(mockReplyWidget, times(2)).configure();
+	}
+
+	@Test
+	public void testConfigureRepliesFailure() {
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setId("1");
+		threadBundle.setTitle("title");
+		threadBundle.setMessageUrl("messageUrl");
+		threadBundle.setActiveAuthors(Arrays.asList("123"));
+		threadBundle.setNumberOfReplies(0L);
+		threadBundle.setNumberOfViews(2L);
+		threadBundle.setLastActivity(new Date());
+		discussionThreadWidget.configure(threadBundle );
+		AsyncMockStubber.callFailureWith(new Exception())
+				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
+		discussionThreadWidget.configureReplies();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(AsyncCallback.class));
+		verify(mockView, never()).setLoadMoreButtonVisibility(anyBoolean());
+		verify(mockView, never()).addReply(any(Widget.class));
+		verify(mockGinInjector, never()).createReplyWidget();
+		verify(mockSynAlert).handleException(any(Throwable.class));
+	}
+
+	@Test
+	public void testConfigureRepliesHasNextPage() {
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setId("1");
+		threadBundle.setTitle("title");
+		threadBundle.setMessageUrl("messageUrl");
+		threadBundle.setActiveAuthors(Arrays.asList("123"));
+		threadBundle.setNumberOfReplies(0L);
+		threadBundle.setNumberOfViews(2L);
+		threadBundle.setLastActivity(new Date());
+		discussionThreadWidget.configure(threadBundle );
+		bundleList = createReplyBundleList(2);
+		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(11L);
+		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
+		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
+				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
+		discussionThreadWidget.configureReplies();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(AsyncCallback.class));
+		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
+		verify(mockView).showReplyDetails();
+		verify(mockView).setLoadMoreButtonVisibility(true);
+		verify(mockView, times(2)).addReply(any(Widget.class));
+		verify(mockGinInjector, times(2)).createReplyWidget();
+	}
+
+	private List<DiscussionReplyBundle> createReplyBundleList(int numberOfBundle) {
+		List<DiscussionReplyBundle> list = new ArrayList<DiscussionReplyBundle>();
+		for (int i = 0; i < numberOfBundle; i++) {
+			DiscussionReplyBundle bundle = new DiscussionReplyBundle();
+			list.add(bundle);
+		}
+		return list;
 	}
 }

@@ -117,6 +117,8 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetVi
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -1194,6 +1196,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// discussion
 		bind(NewDiscussionThreadModalView.class).to(NewDiscussionThreadModalViewImpl.class);
+		bind(NewReplyModalView.class).to(NewReplyModalViewImpl.class);
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);

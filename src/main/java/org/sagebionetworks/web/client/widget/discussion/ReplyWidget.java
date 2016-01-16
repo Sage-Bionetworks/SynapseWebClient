@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -16,7 +18,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	}
 
 	@Override
-	public void configure() {
+	public void configure(DiscussionReplyBundle bundle) {
 		// TODO Auto-generated method stub
 		
 	}
