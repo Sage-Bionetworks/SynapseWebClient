@@ -19,14 +19,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = false;
-	private static final Long LIMIT = 5L;
+	public static final Long LIMIT = 20L;
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
 	GWTWrapper gwtWrapper;
-	boolean areRepliesConfigure;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -47,7 +46,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.newReplyModal = newReplyModal;
 		this.synAlert = synAlert;
 		this.discussionForumClientAsync = discussionForumClientAsync;
-		this.areRepliesConfigure = false;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -74,22 +72,26 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void invoke() {
-				synAlert.clear();
-				discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
-
-					@Override
-					public void onFailure(Throwable caught) {
-						synAlert.handleException(caught);
-					}
-
-					@Override
-					public void onSuccess(DiscussionThreadBundle result) {
-						configure(result);
-					}
-				});
-				configureReplies();
+				reconfigure();
 			}
 		});
+	}
+
+	private void reconfigure() {
+		synAlert.clear();
+		discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(DiscussionThreadBundle result) {
+				configure(result);
+			}
+		});
+		configureReplies();
 	}
 
 	@Override
@@ -99,9 +101,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	@Override
 	public void toggleReplies() {
-		if (!areRepliesConfigure) {
-			configureReplies();
-		}
+		configureReplies();
 		view.toggleReplies();
 	}
 
@@ -132,7 +132,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							replyWidget.configure(bundle);
 							view.addReply(replyWidget.asWidget());
 						}
-						areRepliesConfigure = true;
 						view.setNumberOfReplies(""+result.getTotalNumberOfResults());
 						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 						view.showReplyDetails();
