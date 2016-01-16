@@ -1,4 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
+
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -71,14 +73,8 @@ public class DiscussionThreadWidgetTest {
 
 	@Test
 	public void testConfigure() {
-		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
-		threadBundle.setId("1");
-		threadBundle.setTitle("title");
-		threadBundle.setMessageUrl("messageUrl");
-		threadBundle.setActiveAuthors(Arrays.asList("123"));
-		threadBundle.setNumberOfReplies(1L);
-		threadBundle.setNumberOfViews(2L);
-		threadBundle.setLastActivity(new Date());
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				"messageUrl", Arrays.asList("123"), 1L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
@@ -96,14 +92,8 @@ public class DiscussionThreadWidgetTest {
 
 	@Test
 	public void testConfigureWithZeroReplies(){
-		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
-		threadBundle.setId("1");
-		threadBundle.setTitle("title");
-		threadBundle.setMessageUrl("messageUrl");
-		threadBundle.setActiveAuthors(Arrays.asList("123"));
-		threadBundle.setNumberOfReplies(0L);
-		threadBundle.setNumberOfViews(2L);
-		threadBundle.setLastActivity(new Date());
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				"messageUrl", Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
@@ -145,14 +135,8 @@ public class DiscussionThreadWidgetTest {
 
 	@Test
 	public void testConfigureRepliesSuccess() {
-		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
-		threadBundle.setId("1");
-		threadBundle.setTitle("title");
-		threadBundle.setMessageUrl("messageUrl");
-		threadBundle.setActiveAuthors(Arrays.asList("123"));
-		threadBundle.setNumberOfReplies(0L);
-		threadBundle.setNumberOfViews(2L);
-		threadBundle.setLastActivity(new Date());
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				"messageUrl", Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
@@ -175,14 +159,8 @@ public class DiscussionThreadWidgetTest {
 
 	@Test
 	public void testConfigureRepliesFailure() {
-		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
-		threadBundle.setId("1");
-		threadBundle.setTitle("title");
-		threadBundle.setMessageUrl("messageUrl");
-		threadBundle.setActiveAuthors(Arrays.asList("123"));
-		threadBundle.setNumberOfReplies(0L);
-		threadBundle.setNumberOfViews(2L);
-		threadBundle.setLastActivity(new Date());
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				"messageUrl", Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
@@ -200,17 +178,11 @@ public class DiscussionThreadWidgetTest {
 
 	@Test
 	public void testConfigureRepliesHasNextPage() {
-		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
-		threadBundle.setId("1");
-		threadBundle.setTitle("title");
-		threadBundle.setMessageUrl("messageUrl");
-		threadBundle.setActiveAuthors(Arrays.asList("123"));
-		threadBundle.setNumberOfReplies(0L);
-		threadBundle.setNumberOfViews(2L);
-		threadBundle.setLastActivity(new Date());
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				"messageUrl", Arrays.asList("123"), 2L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		bundleList = createReplyBundleList(2);
-		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(11L);
+		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(LIMIT+1);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
@@ -220,12 +192,26 @@ public class DiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(AsyncCallback.class));
-		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockView, atLeastOnce()).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
 		verify(mockView).showReplyDetails();
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
+	}
+
+	private DiscussionThreadBundle createThreadBundle(String threadId, String title,
+			String messageUrl, List<String> activeAuthors, Long numberOfReplies,
+			Long numberOfViews, Date lastActivity) {
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		threadBundle.setId(threadId);
+		threadBundle.setTitle(title);
+		threadBundle.setMessageUrl(messageUrl);
+		threadBundle.setActiveAuthors(activeAuthors);
+		threadBundle.setNumberOfReplies(numberOfReplies);
+		threadBundle.setNumberOfViews(numberOfViews);
+		threadBundle.setLastActivity(lastActivity);
+		return threadBundle;
 	}
 
 	private List<DiscussionReplyBundle> createReplyBundleList(int numberOfBundle) {
