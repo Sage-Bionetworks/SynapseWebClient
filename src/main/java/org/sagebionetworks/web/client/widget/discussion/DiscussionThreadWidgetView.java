@@ -51,4 +51,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setShowRepliesVisibility(boolean visible);
 
 	void showReplyDetails();
+
+	void clearReplies();
 }

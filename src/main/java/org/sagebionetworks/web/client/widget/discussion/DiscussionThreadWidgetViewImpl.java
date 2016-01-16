@@ -125,6 +125,14 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	@Override
 	public void clear() {
+		threadTitle.clear();
+		threadMessage.clear();
+		activeUsers.clear();
+		numberOfReplies.clear();
+		clickToViewReplies.clear();
+		lastActivity.clear();
+		author.clear();
+		createdOn.clear();
 		replyListContainer.clear();
 	}
 
@@ -202,5 +210,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void showReplyDetails() {
 		replyDetails.show();
+	}
+
+	@Override
+	public void clearReplies() {
+		replyListContainer.clear();
 	}
 }

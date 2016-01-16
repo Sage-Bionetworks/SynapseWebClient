@@ -107,6 +107,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	public void configureReplies() {
 		synAlert.clear();
+		view.clearReplies();
 		offset = 0L;
 		if (order == null) {
 			order = DEFAULT_ORDER;

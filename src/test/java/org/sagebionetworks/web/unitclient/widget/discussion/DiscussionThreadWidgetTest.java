@@ -149,6 +149,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(AsyncCallback.class));
+		verify(mockView).clearReplies();
 		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
 		verify(mockView).showReplyDetails();
@@ -170,6 +171,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(AsyncCallback.class));
+		verify(mockView).clearReplies();
 		verify(mockView, never()).setLoadMoreButtonVisibility(anyBoolean());
 		verify(mockView, never()).addReply(any(Widget.class));
 		verify(mockGinInjector, never()).createReplyWidget();
@@ -192,6 +194,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(AsyncCallback.class));
+		verify(mockView).clearReplies();
 		verify(mockView, atLeastOnce()).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
 		verify(mockView).showReplyDetails();
