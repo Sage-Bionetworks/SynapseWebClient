@@ -1,20 +1,20 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface ThreadWidgetView extends IsWidget{
+public interface DiscussionThreadWidgetView extends IsWidget{
 
 	public interface Presenter {
 
 		Widget asWidget();
 
-		void configure(DiscussionThreadBundle bundle);
+		void toggleReplies();
+
+		void toggleThread();
 	}
 
-	void setPresenter(ThreadWidget presenter);
+	void setPresenter(DiscussionThreadWidget presenter);
 
 	void addReply(Widget w);
 
@@ -31,4 +31,14 @@ public interface ThreadWidgetView extends IsWidget{
 	void setNumberOfViews(String numberOfViews);
 
 	void setLastActivity(String lastActivity);
+
+	void setAuthor(String author);
+
+	void setCreatedOn(String createdOn);
+
+	void toggleThread();
+
+	void toggleReplies();
+
+	void addClickHandlerToShowReplies();
 }

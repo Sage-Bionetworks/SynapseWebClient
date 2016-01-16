@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -13,11 +14,15 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class NewThreadModalViewImpl implements NewThreadModalView {
+public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModalView {
 
-	public interface Binder extends UiBinder<Widget, NewThreadModalViewImpl> {}
+	public interface Binder extends UiBinder<Widget, NewDiscussionThreadModalViewImpl> {}
 
 	private static final String NEW_THREAD_MODAL_TITLE = "New Thread";
+
+	private static final String SUCCESS_TITLE = "Thread created";
+
+	private static final String SUCCESS_MESSAGE = "A new thread has been created.";
 
 	@UiField
 	Button saveButton;
@@ -36,7 +41,7 @@ public class NewThreadModalViewImpl implements NewThreadModalView {
 	private Presenter presenter;
 
 	@Inject
-	public NewThreadModalViewImpl(Binder binder) {
+	public NewDiscussionThreadModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		newThreadModal.setTitle(NEW_THREAD_MODAL_TITLE);
 		saveButton.addClickHandler(new ClickHandler() {
@@ -92,5 +97,10 @@ public class NewThreadModalViewImpl implements NewThreadModalView {
 	@Override
 	public void setAlert(Widget w) {
 		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void showSuccess() {
+		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
 	}
 }

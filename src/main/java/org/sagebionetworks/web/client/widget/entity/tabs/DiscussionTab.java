@@ -6,9 +6,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.ThreadListWidget;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewThreadModal;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
+import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,17 +23,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	CookieProvider cookies;
 	// TODO: use this token to navigate between threads within the discussion tab
 	String areaToken = null;
-	NewThreadModal newThreadModal;
-	ThreadListWidget threadListWidget;
+	NewDiscussionThreadModal newThreadModal;
+	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
-	Forum forum;
 	DiscussionForumClientAsync discussionForumClient;
-	CallbackP<Void> newThreadCallback = new CallbackP<Void>(){
-		@Override
-		public void invoke(Void param) {
-			configureThreadList();
-		}
-	};
 
 	@Inject
 	public DiscussionTab(
@@ -40,8 +34,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			Tab tab,
 			SynapseAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
-			ThreadListWidget threadListWidget,
-			NewThreadModal newThreadModal,
+			DiscussionThreadListWidget threadListWidget,
+			NewDiscussionThreadModal newThreadModal,
 			CookieProvider cookies
 			) {
 		this.view = view;
@@ -56,12 +50,6 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
-	}
-
-	public void configureThreadList() {
-		if (forum != null && forum.getId() != null) {
-			threadListWidget.configure(forum.getId());
-		}
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
@@ -79,9 +67,13 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			}
 
 			@Override
-			public void onSuccess(Forum result) {
-				forum = result;
-				newThreadModal.configure(forum.getId(), newThreadCallback);
+			public void onSuccess(final Forum forum) {
+				newThreadModal.configure(forum.getId(), new Callback(){
+					@Override
+					public void invoke() {
+						threadListWidget.configure(forum.getId());
+					}
+				});
 				threadListWidget.configure(forum.getId());
 			}
 		});

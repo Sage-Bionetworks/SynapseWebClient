@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
-import org.sagebionetworks.web.client.widget.discussion.ThreadWidget;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -368,6 +368,6 @@ public interface PortalGinInjector extends Ginjector {
 	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 
 	// discussion
-	public ThreadWidget createThreadWidget();
+	public DiscussionThreadWidget createThreadWidget();
 	public ReplyWidget createReplyWidget();
 }
