@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="90%" pull="RIGHT" >
+	<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
 		<t:Table width="100%">
 			<t:TableData>
 				<bh:Span ui:field="author"></bh:Span>
