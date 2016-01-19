@@ -131,7 +131,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		numberOfReplies.clear();
 		clickToViewReplies.clear();
 		lastActivity.clear();
-		author.clear();
 		createdOn.clear();
 		replyListContainer.clear();
 	}
