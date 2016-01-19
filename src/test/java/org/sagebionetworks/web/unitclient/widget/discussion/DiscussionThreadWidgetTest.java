@@ -55,6 +55,8 @@ public class DiscussionThreadWidgetTest {
 	PaginatedResults<DiscussionReplyBundle> mockReplyBundlePage;
 	@Mock
 	UserBadge mockUserBadge;
+	@Mock
+	UserBadge mockAuthorWidget;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -65,7 +67,8 @@ public class DiscussionThreadWidgetTest {
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
-				mockSynAlert, mockDiscussionForumClientAsync, mockGinInjector, mockGwtWrapper);
+				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
+				mockGinInjector, mockGwtWrapper);
 	}
 
 	@Test
@@ -73,6 +76,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setPresenter(discussionThreadWidget);
 		verify(mockView).setNewReplyModal(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setAuthor(any(Widget.class));
 	}
 
 	@Test
@@ -86,12 +90,12 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(true);
-		verify(mockGinInjector, times(2)).getUserBadgeWidget();
+		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
 	}
 
 	@Test
@@ -105,12 +109,12 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfReplies("0");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(false);
-		verify(mockGinInjector, times(2)).getUserBadgeWidget();
+		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
 	}
 
 	@Test

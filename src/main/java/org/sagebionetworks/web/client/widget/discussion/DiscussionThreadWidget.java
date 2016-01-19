@@ -27,6 +27,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
 	GWTWrapper gwtWrapper;
+	UserBadge authorWidget;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -37,6 +38,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			DiscussionThreadWidgetView view,
 			NewReplyModal newReplyModal,
 			SynapseAlert synAlert,
+			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
 			GWTWrapper gwtWrapper
@@ -46,10 +48,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.gwtWrapper = gwtWrapper;
 		this.newReplyModal = newReplyModal;
 		this.synAlert = synAlert;
+		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
+		view.setAuthor(authorWidget.asWidget());
 	}
 
 	@Override
@@ -68,9 +72,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
-		UserBadge author = ginInjector.getUserBadgeWidget();
-		author.configure(bundle.getCreatedBy());
-		view.setAuthor(author.asWidget());
+		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		threadId = bundle.getId();

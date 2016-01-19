@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -22,22 +21,20 @@ public class ReplyWidgetTest {
 	@Mock
 	GWTWrapper mockGwtWrapper;
 	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
-	UserBadge mockUserBadge;
+	UserBadge mockAuthorWidget;
 
 	ReplyWidget replyWidget;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
-		replyWidget = new ReplyWidget(mockView, mockGwtWrapper, mockGinInjector);
+		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockGwtWrapper);
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(replyWidget);
+		verify(mockView).setAuthor(any(Widget.class));
 	}
 
 	@Test
@@ -45,7 +42,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("author", new Date());
 		when(mockGwtWrapper.getFormattedDateString(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle);
-		verify(mockView).setAuthor(any(Widget.class));
+		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setMessage(anyString());
 		verify(mockGwtWrapper).getFormattedDateString(any(Date.class));
