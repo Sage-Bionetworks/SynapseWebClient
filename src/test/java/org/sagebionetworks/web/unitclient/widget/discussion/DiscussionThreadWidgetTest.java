@@ -78,7 +78,6 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
-		verify(mockView).setMessage("messageUrl");
 		verify(mockView).setActiveUsers(anyString());
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
@@ -97,7 +96,6 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
-		verify(mockView).setMessage("messageUrl");
 		verify(mockView).setActiveUsers(anyString());
 		verify(mockView).setNumberOfReplies("0");
 		verify(mockView).setNumberOfViews("2");

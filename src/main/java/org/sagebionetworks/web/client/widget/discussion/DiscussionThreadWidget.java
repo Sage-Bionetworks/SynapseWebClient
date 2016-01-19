@@ -59,7 +59,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public void configure(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(bundle.getTitle());
-		view.setMessage(bundle.getMessageUrl());
 		view.setActiveUsers(bundle.getActiveAuthors().toString());
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
