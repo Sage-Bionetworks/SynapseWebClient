@@ -34,9 +34,6 @@
 					<t:TableData>
 						<bh:Span ui:field="author"></bh:Span>
 					</t:TableData>
-					<t:TableData width="20px" addStyleNames="hidden-xs">
-						<bh:Span>at</bh:Span>
-					</t:TableData>
 					<t:TableData width="130px" addStyleNames="hidden-xs">
 						<bh:Span ui:field="createdOn"></bh:Span>
 					</t:TableData>
