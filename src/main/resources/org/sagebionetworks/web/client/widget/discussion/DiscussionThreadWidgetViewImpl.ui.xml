@@ -22,7 +22,7 @@
 					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
 						<bh:Span ui:field="numberOfViews"></bh:Span>
 					</t:TableData>
-					<t:TableData width="130px" addStyleNames="visible-lg visible-md">
+					<t:TableData width="130px" addStyleNames="hidden-xs">
 						<bh:Span ui:field="lastActivity"></bh:Span>
 					</t:TableData>
 				</t:TableRow>
@@ -34,7 +34,10 @@
 					<t:TableData>
 						<bh:Span ui:field="author"></bh:Span>
 					</t:TableData>
-					<t:TableData width="130px" addStyleNames="visible-lg visible-md">
+					<t:TableData width="20px" addStyleNames="hidden-xs">
+						<bh:Span>at</bh:Span>
+					</t:TableData>
+					<t:TableData width="130px" addStyleNames="hidden-xs">
 						<bh:Span ui:field="createdOn"></bh:Span>
 					</t:TableData>
 				</t:Table>
@@ -50,7 +53,7 @@
 			<b:Collapse ui:field="replyDetails" visible="false">
 				<bh:Div ui:field="replyListContainer" width="90%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 				<bh:Div width="90%" pull="RIGHT" addStyleNames="margin-top-10">
-					<b:Button ui:field="loadMoreButton">Load more</b:Button>
+					<b:Button ui:field="loadMoreButton">Load more replies</b:Button>
 				</bh:Div>
 			</b:Collapse>
 			<bh:Div width="95%" pull="RIGHT" addStyleNames="margin-top-10">
