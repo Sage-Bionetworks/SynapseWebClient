@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -26,6 +27,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
 	GWTWrapper gwtWrapper;
+	UserBadge authorWidget;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -36,6 +38,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			DiscussionThreadWidgetView view,
 			NewReplyModal newReplyModal,
 			SynapseAlert synAlert,
+			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
 			GWTWrapper gwtWrapper
@@ -45,10 +48,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.gwtWrapper = gwtWrapper;
 		this.newReplyModal = newReplyModal;
 		this.synAlert = synAlert;
+		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
+		view.setAuthor(authorWidget.asWidget());
 	}
 
 	@Override
@@ -59,12 +64,15 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public void configure(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(bundle.getTitle());
-		view.setMessage(bundle.getMessageUrl());
-		view.setActiveUsers(bundle.getActiveAuthors().toString());
+		for (String userId : bundle.getActiveAuthors()){
+			UserBadge user = ginInjector.getUserBadgeWidget();
+			user.configure(userId);
+			view.addActiveAuthor(user.asWidget());
+		}
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
-		view.setAuthor(bundle.getCreatedBy());
+		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		threadId = bundle.getId();
