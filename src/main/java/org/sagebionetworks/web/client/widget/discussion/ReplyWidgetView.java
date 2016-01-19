@@ -12,7 +12,7 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setPresenter(ReplyWidget presenter);
 
-	void setAuthor(String author);
+	void setAuthor(Widget widget);
 
 	void setCreatedOn(String createdOn);
 

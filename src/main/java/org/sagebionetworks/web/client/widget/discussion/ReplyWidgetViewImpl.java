@@ -38,8 +38,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void setAuthor(String author){
-		this.author.setText(author);
+	public void setAuthor(Widget author){
+		this.author.add(author);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -52,6 +53,8 @@ public class DiscussionThreadWidgetTest {
 	DiscussionForumClientAsync mockDiscussionForumClientAsync;
 	@Mock
 	PaginatedResults<DiscussionReplyBundle> mockReplyBundlePage;
+	@Mock
+	UserBadge mockUserBadge;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -60,6 +63,7 @@ public class DiscussionThreadWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
+		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockDiscussionForumClientAsync, mockGinInjector, mockGwtWrapper);
 	}
@@ -78,13 +82,14 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
-		verify(mockView).setActiveUsers(anyString());
+		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setAuthor(anyString());
+		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockGinInjector, times(2)).getUserBadgeWidget();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 	}
@@ -96,13 +101,14 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
-		verify(mockView).setActiveUsers(anyString());
+		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfReplies("0");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setAuthor(anyString());
+		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(false);
+		verify(mockGinInjector, times(2)).getUserBadgeWidget();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 	}
@@ -131,6 +137,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockNewReplyModal).show();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureRepliesSuccess() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
@@ -156,6 +163,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureRepliesFailure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
@@ -176,6 +184,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureRepliesHasNextPage() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",

@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -59,11 +60,17 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public void configure(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(bundle.getTitle());
-		view.setActiveUsers(bundle.getActiveAuthors().toString());
+		for (String userId : bundle.getActiveAuthors()){
+			UserBadge user = ginInjector.getUserBadgeWidget();
+			user.configure(userId);
+			view.addActiveAuthor(user.asWidget());
+		}
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
-		view.setAuthor(bundle.getCreatedBy());
+		UserBadge author = ginInjector.getUserBadgeWidget();
+		author.configure(bundle.getCreatedBy());
+		view.setAuthor(author.asWidget());
 		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		threadId = bundle.getId();
