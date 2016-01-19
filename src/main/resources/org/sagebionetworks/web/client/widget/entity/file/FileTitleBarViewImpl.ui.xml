@@ -17,7 +17,7 @@
 			 	<g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
 			<g:HTMLPanel ui:field="fileNameContainer">
-				<span class="boldText">File:</span>
+				<span class="boldText">Download file as:</span>
 				<span ui:field="fileName"/>
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileSize" />
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileLocation" />
