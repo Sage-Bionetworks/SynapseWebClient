@@ -54,7 +54,6 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	@Override
 	public void clear() {
-		this.author.clear();
 		this.createdOn.clear();
 		this.replyMessage.clear();
 	}

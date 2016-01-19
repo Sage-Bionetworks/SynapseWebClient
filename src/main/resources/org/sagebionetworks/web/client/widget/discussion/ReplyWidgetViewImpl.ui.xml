@@ -9,7 +9,7 @@
 			<t:TableData>
 				<bh:Span ui:field="author"></bh:Span>
 			</t:TableData>
-			<t:TableData width="130px" addStyleNames="visible-lg visible-md">
+			<t:TableData width="130px" addStyleNames="hidden-xs">
 				<bh:Span ui:field="createdOn"></bh:Span>
 			</t:TableData>
 		</t:Table>
