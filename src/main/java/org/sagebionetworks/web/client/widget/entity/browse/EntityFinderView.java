@@ -21,8 +21,14 @@ public interface EntityFinderView extends SynapseView {
 
 	public void setVersions(List<VersionInfo> versions);
 	
+	void initFinderComponents();
+	void setBrowseAreaVisible();
+	void setSynapseIdAreaVisible();
+	void setSearchAreaVisible();
+	boolean isShowing();
 	void show();
 	void hide();
+	EntityFinderArea getCurrentArea();
 	/**
 	 * Presenter interface
 	 */
