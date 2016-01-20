@@ -15,7 +15,7 @@
 					<b:TextBox ui:field="entityNameField" />
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:FormLabel>File name</b:FormLabel>
+					<b:FormLabel>Download file as</b:FormLabel>
 					<b:TextBox ui:field="fileNameField" />
 				</b:FormGroup>
 			</bh:Div>
