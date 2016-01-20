@@ -26,15 +26,13 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setMessage(String message);
 
-	void setActiveUsers(String activeAuthors);
-
 	void setNumberOfReplies(String numberOfReplies);
 
 	void setNumberOfViews(String numberOfViews);
 
 	void setLastActivity(String lastActivity);
 
-	void setAuthor(String author);
+	void setAuthor(Widget author);
 
 	void setCreatedOn(String createdOn);
 
@@ -53,4 +51,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void showReplyDetails();
 
 	void clearReplies();
+
+	void addActiveAuthor(Widget user);
 }

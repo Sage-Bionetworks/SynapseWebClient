@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -52,6 +53,10 @@ public class DiscussionThreadWidgetTest {
 	DiscussionForumClientAsync mockDiscussionForumClientAsync;
 	@Mock
 	PaginatedResults<DiscussionReplyBundle> mockReplyBundlePage;
+	@Mock
+	UserBadge mockUserBadge;
+	@Mock
+	UserBadge mockAuthorWidget;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -60,8 +65,10 @@ public class DiscussionThreadWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
+		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
-				mockSynAlert, mockDiscussionForumClientAsync, mockGinInjector, mockGwtWrapper);
+				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
+				mockGinInjector, mockGwtWrapper);
 	}
 
 	@Test
@@ -69,44 +76,45 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setPresenter(discussionThreadWidget);
 		verify(mockView).setNewReplyModal(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setAuthor(any(Widget.class));
 	}
 
 	@Test
 	public void testConfigure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				"messageUrl", Arrays.asList("123"), 1L, 2L, new Date());
+				Arrays.asList("123"), 1L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
-		verify(mockView).setMessage("messageUrl");
-		verify(mockView).setActiveUsers(anyString());
+		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setAuthor(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
 	}
 
 	@Test
 	public void testConfigureWithZeroReplies(){
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				"messageUrl", Arrays.asList("123"), 0L, 2L, new Date());
+				Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
-		verify(mockView).setMessage("messageUrl");
-		verify(mockView).setActiveUsers(anyString());
+		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfReplies("0");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setAuthor(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(false);
+		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
 	}
 
 	@Test
@@ -133,10 +141,11 @@ public class DiscussionThreadWidgetTest {
 		verify(mockNewReplyModal).show();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureRepliesSuccess() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				"messageUrl", Arrays.asList("123"), 0L, 2L, new Date());
+				Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
@@ -158,10 +167,11 @@ public class DiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureRepliesFailure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				"messageUrl", Arrays.asList("123"), 0L, 2L, new Date());
+				Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
@@ -178,10 +188,11 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureRepliesHasNextPage() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				"messageUrl", Arrays.asList("123"), 2L, 2L, new Date());
+				Arrays.asList("123"), 2L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(LIMIT+1);
@@ -204,12 +215,11 @@ public class DiscussionThreadWidgetTest {
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,
-			String messageUrl, List<String> activeAuthors, Long numberOfReplies,
+			List<String> activeAuthors, Long numberOfReplies,
 			Long numberOfViews, Date lastActivity) {
 		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
 		threadBundle.setId(threadId);
 		threadBundle.setTitle(title);
-		threadBundle.setMessageUrl(messageUrl);
 		threadBundle.setActiveAuthors(activeAuthors);
 		threadBundle.setNumberOfReplies(numberOfReplies);
 		threadBundle.setNumberOfViews(numberOfViews);
