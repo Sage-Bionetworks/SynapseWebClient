@@ -56,7 +56,17 @@ public class DiscussionThreadListWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureSuccess() {
+	public void testConfigure() {
+		discussionThreadListWidget.configure("123");
+		verify(mockView).clear();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadMoreSuccess() {
 		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
 				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
@@ -66,6 +76,8 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure("123");
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
@@ -74,7 +86,7 @@ public class DiscussionThreadListWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureSuccessDisplayLoadmore() {
+	public void testLoadmoreSuccessDisplayLoadmore() {
 		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
 				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
@@ -84,6 +96,8 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure("123");
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
@@ -92,7 +106,7 @@ public class DiscussionThreadListWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureFailure() {
+	public void testLoadmoreFailure() {
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
@@ -101,6 +115,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView, never()).addThread(any(Widget.class));
 		verify(mockGinInjector, never()).createThreadWidget();
 		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 

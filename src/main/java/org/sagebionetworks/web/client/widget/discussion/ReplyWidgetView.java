@@ -19,4 +19,6 @@ public interface ReplyWidgetView extends IsWidget{
 	void setMessage(String message);
 
 	void clear();
+
+	void setAlert(Widget w);
 }
