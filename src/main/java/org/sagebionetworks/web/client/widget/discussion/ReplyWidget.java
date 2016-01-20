@@ -65,26 +65,30 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(MessageURL result) {
-				requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
-				try {
-					requestBuilder.sendRequest(null, new RequestCallback() {
-						public void onError(final Request request, final Throwable e) {
-							synAlert.handleException(e);
-						}
-						public void onResponseReceived(final Request request, final Response response) {
-							int statusCode = response.getStatusCode();
-							if (statusCode == Response.SC_OK) {
-								view.setMessage(response.getText());
-							} else {
-								onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId));
-							}
-						}
-					});
-				} catch (final Exception e) {
-					synAlert.handleException(e);
-				}
+				getMessage(result);
 			}
 		});
+	}
+
+	private void getMessage(MessageURL result) {
+		requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
+		try {
+			requestBuilder.sendRequest(null, new RequestCallback() {
+				public void onError(final Request request, final Throwable e) {
+					synAlert.handleException(e);
+				}
+				public void onResponseReceived(final Request request, final Response response) {
+					int statusCode = response.getStatusCode();
+					if (statusCode == Response.SC_OK) {
+						view.setMessage(response.getText());
+					} else {
+						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId));
+					}
+				}
+			});
+		} catch (final Exception e) {
+			synAlert.handleException(e);
+		}
 	}
 
 	@Override
