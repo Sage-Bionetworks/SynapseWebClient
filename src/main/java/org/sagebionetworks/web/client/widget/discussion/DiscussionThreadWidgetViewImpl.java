@@ -131,7 +131,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		numberOfReplies.clear();
 		clickToViewReplies.clear();
 		lastActivity.clear();
-		author.clear();
 		createdOn.clear();
 		replyListContainer.clear();
 	}
@@ -144,11 +143,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setMessage(String message) {
 		threadMessage.setText(message);
-	}
-
-	@Override
-	public void setActiveUsers(String activeUsers){
-		this.activeUsers.setText(activeUsers);
 	}
 
 	@Override
@@ -168,8 +162,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setAuthor(String author) {
-		this.author.setText(author);
+	public void setAuthor(Widget author) {
+		this.author.add(author);
 	}
 
 	@Override
@@ -215,5 +209,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
+	}
+
+	@Override
+	public void addActiveAuthor(Widget user) {
+		activeUsers.add(user);
 	}
 }
