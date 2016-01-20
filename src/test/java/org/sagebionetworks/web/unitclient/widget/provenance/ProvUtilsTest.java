@@ -366,7 +366,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
-
+			@Override
+			public String getRelativeTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void uploadUrlToGenomeSpace(String url, String filename) {
 				// TODO Auto-generated method stub

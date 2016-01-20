@@ -343,7 +343,11 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				
 			}
-			
+			@Override
+			public String getRelativeTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void hideBootstrapTooltip(String id) {
 				// TODO Auto-generated method stub
