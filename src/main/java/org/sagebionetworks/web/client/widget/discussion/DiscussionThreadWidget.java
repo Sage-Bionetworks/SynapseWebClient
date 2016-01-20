@@ -175,7 +175,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	}
 
 	public void configureReplies() {
-		synAlert.clear();
 		view.clearReplies();
 		offset = 0L;
 		if (order == null) {
@@ -184,6 +183,17 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		if (ascending == null) {
 			ascending = DEFAULT_ASCENDING;
 		}
+		loadMore();
+	}
+
+	@Override
+	public void onClickNewReply() {
+		newReplyModal.show();
+	}
+
+	@Override
+	public void loadMore() {
+		synAlert.clear();
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
@@ -207,10 +217,5 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 						view.showReplyDetails();
 					}
 		});
-	}
-
-	@Override
-	public void onClickNewReply() {
-		newReplyModal.show();
 	}
 }

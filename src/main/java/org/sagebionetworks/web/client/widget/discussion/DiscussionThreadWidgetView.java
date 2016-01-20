@@ -14,6 +14,8 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void toggleThread();
 
 		void onClickNewReply();
+
+		void loadMore();
 	}
 
 	void setPresenter(DiscussionThreadWidget presenter);

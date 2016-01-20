@@ -74,6 +74,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Inject
 	public DiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		loadMoreButton.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.loadMore();
+			}
+		});
 		showThread.addClickHandler(new ClickHandler() {
 
 			@Override

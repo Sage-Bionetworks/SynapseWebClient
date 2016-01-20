@@ -178,10 +178,24 @@ public class DiscussionThreadWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureRepliesSuccess() {
+	public void testConfigureReplies() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date());
-		discussionThreadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle);
+		discussionThreadWidget.configureReplies();
+		verify(mockSynAlert).clear();
+		verify(mockView).clearReplies();
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(AsyncCallback.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadmoreSuccess() {
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 0L, 2L, new Date());
+		discussionThreadWidget.configure(threadBundle);
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
@@ -204,7 +218,7 @@ public class DiscussionThreadWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureRepliesFailure() {
+	public void testLoadmoreFailure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
@@ -225,7 +239,7 @@ public class DiscussionThreadWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureRepliesHasNextPage() {
+	public void testLoadmoreHasNextPage() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 2L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
