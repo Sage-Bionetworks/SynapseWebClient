@@ -19,9 +19,11 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
@@ -31,7 +33,12 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -57,6 +64,10 @@ public class DiscussionThreadWidgetTest {
 	UserBadge mockUserBadge;
 	@Mock
 	UserBadge mockAuthorWidget;
+	@Mock
+	RequestBuilderWrapper mockRequestBuilder;
+	@Mock
+	Response mockResponse;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -68,7 +79,7 @@ public class DiscussionThreadWidgetTest {
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
-				mockGinInjector, mockGwtWrapper);
+				mockGinInjector, mockGwtWrapper, mockRequestBuilder);
 	}
 
 	@Test
@@ -124,14 +135,38 @@ public class DiscussionThreadWidgetTest {
 	}
 
 	@Test
-	public void toggleThreadTest() {
+	public void testToggleThreadWithThreadDetailsCollapsed() {
+		when(mockView.isThreadCollapsed()).thenReturn(true);
 		discussionThreadWidget.toggleThread();
+		verify(mockView).setThreadDownIconVisible(false);
+		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).toggleThread();
 	}
 
 	@Test
-	public void toggleRepliesTest() {
+	public void testToggleThreadWithThreadDetailsExpanded() {
+		when(mockView.isThreadCollapsed()).thenReturn(false);
+		discussionThreadWidget.toggleThread();
+		verify(mockView).setThreadDownIconVisible(true);
+		verify(mockView).setThreadUpIconVisible(false);
+		verify(mockView).toggleThread();
+	}
+
+	@Test
+	public void testToggleRepliesWithReplyDetailsCollapsed() {
+		when(mockView.isReplyCollapsed()).thenReturn(true);
 		discussionThreadWidget.toggleReplies();
+		verify(mockView).setReplyDownIconVisible(false);
+		verify(mockView).setReplyUpIconVisible(true);
+		verify(mockView).toggleReplies();
+	}
+
+	@Test
+	public void testToggleRepliesWithReplyDetailsExpanded() {
+		when(mockView.isReplyCollapsed()).thenReturn(false);
+		discussionThreadWidget.toggleReplies();
+		verify(mockView).setReplyDownIconVisible(true);
+		verify(mockView).setReplyUpIconVisible(false);
 		verify(mockView).toggleReplies();
 	}
 
@@ -143,10 +178,24 @@ public class DiscussionThreadWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureRepliesSuccess() {
+	public void testConfigureReplies() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date());
-		discussionThreadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle);
+		discussionThreadWidget.configureReplies();
+		verify(mockSynAlert).clear();
+		verify(mockView).clearReplies();
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(AsyncCallback.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadmoreSuccess() {
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 0L, 2L, new Date());
+		discussionThreadWidget.configure(threadBundle);
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
@@ -169,7 +218,7 @@ public class DiscussionThreadWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureRepliesFailure() {
+	public void testLoadmoreFailure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
@@ -190,7 +239,7 @@ public class DiscussionThreadWidgetTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureRepliesHasNextPage() {
+	public void testLoadmoreHasNextPage() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 2L, 2L, new Date());
 		discussionThreadWidget.configure(threadBundle );
@@ -212,6 +261,79 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureMessageFailToGetUrl() {
+		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+				1L, 1L, new Date());
+		AsyncMockStubber.callFailureWith(new Exception())
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configureMessage();
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(any(Throwable.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureMessageFailToGetMessage() throws RequestException {
+		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+				1L, 1L, new Date());
+		MessageURL messageUrl = new MessageURL();
+		messageUrl.setMessageUrl("messageURL");
+		AsyncMockStubber.callSuccessWith(messageUrl)
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+		RequestBuilderMockStubber.callOnError(null, new Exception())
+				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configureMessage();
+		verify(mockSynAlert).clear();
+		verify(mockRequestBuilder).configure(RequestBuilder.GET, messageUrl.getMessageUrl());
+		verify(mockSynAlert).handleException(any(Throwable.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureMessageFailToGetMessageCase2() throws RequestException {
+		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+				1L, 1L, new Date());
+		MessageURL messageUrl = new MessageURL();
+		messageUrl.setMessageUrl("messageURL");
+		AsyncMockStubber.callSuccessWith(messageUrl)
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
+				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configureMessage();
+		verify(mockSynAlert).clear();
+		verify(mockRequestBuilder).configure(RequestBuilder.GET, messageUrl.getMessageUrl());
+		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView, never()).setMessage(anyString());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureMessageSuccess() throws RequestException {
+		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+				1L, 1L, new Date());
+		MessageURL messageUrl = new MessageURL();
+		messageUrl.setMessageUrl("messageURL");
+		AsyncMockStubber.callSuccessWith(messageUrl)
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
+		String message = "message";
+		when(mockResponse.getText()).thenReturn(message);
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
+				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configureMessage();
+		verify(mockSynAlert).clear();
+		verify(mockRequestBuilder).configure(RequestBuilder.GET, messageUrl.getMessageUrl());
+		verify(mockSynAlert, never()).handleException(any(Throwable.class));
+		verify(mockView).setMessage(message);
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,

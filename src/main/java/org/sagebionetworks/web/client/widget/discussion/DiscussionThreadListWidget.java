@@ -23,6 +23,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
+	private String forumId;
 
 	@Inject
 	public DiscussionThreadListWidget(
@@ -41,7 +42,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 	public void configure(String forumId) {
 		view.clear();
-		synAlert.clear();
 		offset = 0L;
 		if (order == null) {
 			order = DEFAULT_ORDER;
@@ -49,6 +49,18 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		if (ascending == null) {
 			ascending = DEFAULT_ASCENDING;
 		}
+		this.forumId = forumId;
+		loadMore();
+	}
+
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
+	}
+
+	@Override
+	public void loadMore() {
+		synAlert.clear();
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
@@ -68,16 +80,5 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 					}
 		});
-	}
-
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
-
-	@Override
-	public void loadMore() {
-		// TODO Auto-generated method stub
-		
 	}
 }

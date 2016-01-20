@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
@@ -50,4 +51,8 @@ public interface DiscussionForumClientAsync{
 			AsyncCallback<DiscussionReplyBundle> callback);
 
 	void markReplyAsDeleted(String replyId, AsyncCallback<Void> callback);
+
+	void getThreadUrl(String threadId, AsyncCallback<MessageURL> callback);
+
+	void getReplyUrl(String replyId, AsyncCallback<MessageURL> callback);
 }

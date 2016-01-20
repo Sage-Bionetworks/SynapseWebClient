@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 
@@ -18,6 +19,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Span createdOn;
 	@UiField
 	Paragraph replyMessage;
+	@UiField
+	Div synAlertContainer;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -56,5 +59,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public void clear() {
 		this.createdOn.clear();
 		this.replyMessage.clear();
+	}
+
+	@Override
+	public void setAlert(Widget w) {
+		synAlertContainer.add(w);
 	}
 }
