@@ -9,7 +9,7 @@
 			<t:Table width="100%">
 				<t:TableRow>
 					<t:TableData>
-						<bh:Span ui:field="threadTitle" addStyleNames="margin-right-10"></bh:Span>
+						<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
 						<b:Icon ui:field="threadDownIcon" type="ANGLE_DOUBLE_DOWN"/>
 						<b:Icon ui:field="threadUpIcon" type="ANGLE_DOUBLE_UP"/>
 					</t:TableData>

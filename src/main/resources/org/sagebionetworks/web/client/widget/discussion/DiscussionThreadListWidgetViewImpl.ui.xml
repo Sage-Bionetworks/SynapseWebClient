@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<bh:Div addStyleNames="highlight-box padding-top-0-imp">
+	<bh:Div addStyleNames="highlight-box padding-top-0-imp margin-bottom-20">
 		<b:Row>
 			<b:Column size="XS_12">
 				<bh:Div addStyleNames="padding-10 light-border-bottom">
