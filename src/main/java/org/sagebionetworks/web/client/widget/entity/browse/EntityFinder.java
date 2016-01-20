@@ -143,7 +143,11 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void hide() {
 		//save area
-		cache.put(ENTITY_FINDER_AREA_KEY, view.getCurrentArea().toString());
+		EntityFinderArea area = view.getCurrentArea();
+		if (area != null) {
+			cache.put(ENTITY_FINDER_AREA_KEY, area.toString());	
+		}
+		
 		view.hide();
 	}
 	
