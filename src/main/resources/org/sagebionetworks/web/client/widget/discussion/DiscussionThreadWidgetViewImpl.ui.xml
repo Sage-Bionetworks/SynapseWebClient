@@ -5,33 +5,43 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div addStyleNames="padding-10 light-border-bottom overflow-x-hidden">
-		<g:FocusPanel ui:field="showThread" addStyleNames="imageButton">
-			<t:Table width="100%">
-				<t:TableRow>
-					<t:TableData>
-						<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
-						<b:Icon ui:field="threadDownIcon" type="ANGLE_DOUBLE_DOWN"/>
-						<b:Icon ui:field="threadUpIcon" type="ANGLE_DOUBLE_UP"/>
-					</t:TableData>
-					<t:TableData width="310px" addStyleNames="visible-lg">
-						<bh:Span ui:field="activeUsers"></bh:Span>
-					</t:TableData>
-					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
-						<bh:Span ui:field="numberOfReplies"></bh:Span>
-					</t:TableData>
-					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
-						<bh:Span ui:field="numberOfViews"></bh:Span>
-					</t:TableData>
-					<t:TableData width="130px" addStyleNames="hidden-xs">
-						<bh:Span ui:field="lastActivity"></bh:Span>
-					</t:TableData>
-				</t:TableRow>
-			</t:Table>
-		</g:FocusPanel>
+		<t:Table width="100%">
+			<t:TableRow>
+				<t:TableData>
+					<g:FocusPanel ui:field="showThread" addStyleNames="imageButton">
+						<bh:Div>
+							<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
+							<b:Icon ui:field="threadDownIcon" type="ANGLE_DOUBLE_DOWN"/>
+							<b:Icon ui:field="threadUpIcon" type="ANGLE_DOUBLE_UP"/>
+						</bh:Div>
+					</g:FocusPanel>
+				</t:TableData>
+				<t:TableData width="310px" addStyleNames="visible-lg">
+					<bh:Span ui:field="activeUsers"></bh:Span>
+				</t:TableData>
+				<t:TableData width="60px" addStyleNames="visible-lg visible-md">
+					<bh:Span ui:field="numberOfReplies"></bh:Span>
+				</t:TableData>
+				<t:TableData width="60px" addStyleNames="visible-lg visible-md">
+					<bh:Span ui:field="numberOfViews"></bh:Span>
+				</t:TableData>
+				<t:TableData width="130px" addStyleNames="hidden-xs">
+					<bh:Span ui:field="lastActivity"></bh:Span>
+				</t:TableData>
+			</t:TableRow>
+		</t:Table>
 		<b:Collapse ui:field="threadDetails" visible="false" addStyleNames="overflow-x-hidden">
 			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
-				<g:SimplePanel ui:field="author"></g:SimplePanel>
-				<bh:Span ui:field="createdOn" addStyleNames="small margin-left-20"></bh:Span>
+				<b:Row>
+					<b:Column size="SM_9">
+						<g:SimplePanel ui:field="author"></g:SimplePanel>
+					</b:Column>
+					<b:Column size="SM_3">
+						<bh:Div pull="RIGHT">
+							<bh:Span ui:field="createdOn"></bh:Span>
+						</bh:Div>
+					</b:Column>
+				</b:Row>
 				<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
 					<bh:Div addStyleNames="link">

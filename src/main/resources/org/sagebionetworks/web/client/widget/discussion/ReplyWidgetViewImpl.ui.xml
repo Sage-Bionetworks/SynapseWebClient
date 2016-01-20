@@ -6,9 +6,17 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div width="100%" pull="RIGHT">
 		<b:Well size="SMALL" addStyleNames="margin-bottom-5-imp">
-			<g:SimplePanel ui:field="author"></g:SimplePanel>
-			<bh:Span ui:field="createdOn" addStyleNames="small margin-left-20"></bh:Span>
-			<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp margin-top-10"></bh:Paragraph>
+			<b:Row>
+				<b:Column size="SM_9">
+					<g:SimplePanel ui:field="author"></g:SimplePanel>
+				</b:Column>
+				<b:Column size="SM_3">
+					<bh:Div pull="RIGHT">
+						<bh:Span ui:field="createdOn"></bh:Span>
+					</bh:Div>
+				</b:Column>
+			</b:Row>
+			<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
 		</b:Well>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
