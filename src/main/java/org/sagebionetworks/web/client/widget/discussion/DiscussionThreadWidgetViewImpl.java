@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -58,6 +59,14 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	SimplePanel newReplyModalContainer;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Icon threadDownIcon;
+	@UiField
+	Icon threadUpIcon;
+	@UiField
+	Icon replyDownIcon;
+	@UiField
+	Icon replyUpIcon;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -133,6 +142,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		lastActivity.clear();
 		createdOn.clear();
 		replyListContainer.clear();
+		threadDownIcon.setVisible(true);
+		threadUpIcon.setVisible(false);
+		replyDownIcon.setVisible(true);
+		replyUpIcon.setVisible(false);
 	}
 
 	@Override
@@ -214,5 +227,35 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void addActiveAuthor(Widget user) {
 		activeUsers.add(user);
+	}
+
+	@Override
+	public boolean isThreadCollapsed() {
+		return threadDetails.isHidden();
+	}
+
+	@Override
+	public void setThreadUpIconVisible(boolean visible) {
+		threadUpIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setThreadDownIconVisible(boolean visible) {
+		threadDownIcon.setVisible(visible);
+	}
+
+	@Override
+	public boolean isReplyCollapsed() {
+		return replyDetails.isHidden();
+	}
+
+	@Override
+	public void setReplyUpIconVisible(boolean visible) {
+		replyUpIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setReplyDownIconVisible(boolean visible) {
+		replyDownIcon.setVisible(visible);
 	}
 }

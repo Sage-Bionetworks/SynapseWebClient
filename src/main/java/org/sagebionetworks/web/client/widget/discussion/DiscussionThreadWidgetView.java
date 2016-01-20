@@ -53,4 +53,16 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void clearReplies();
 
 	void addActiveAuthor(Widget user);
+
+	boolean isThreadCollapsed();
+
+	void setThreadUpIconVisible(boolean visible);
+
+	void setThreadDownIconVisible(boolean visible);
+
+	void setReplyUpIconVisible(boolean visible);
+
+	void setReplyDownIconVisible(boolean visible);
+
+	boolean isReplyCollapsed();
 }

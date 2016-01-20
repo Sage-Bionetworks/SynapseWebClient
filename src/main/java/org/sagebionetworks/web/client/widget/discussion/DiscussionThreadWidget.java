@@ -104,12 +104,35 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	@Override
 	public void toggleThread() {
+		if (view.isThreadCollapsed()) {
+			// expand
+			view.setThreadDownIconVisible(false);
+			view.setThreadUpIconVisible(true);
+			configureMessage();
+		} else {
+			// collapse
+			view.setThreadDownIconVisible(true);
+			view.setThreadUpIconVisible(false);
+		}
 		view.toggleThread();
+	}
+
+	private void configureMessage() {
+		view.setMessage("thread message");
 	}
 
 	@Override
 	public void toggleReplies() {
-		configureReplies();
+		if (view.isReplyCollapsed()) {
+			// expand
+			view.setReplyDownIconVisible(false);
+			view.setReplyUpIconVisible(true);
+			configureReplies();
+		} else {
+			// collapse
+			view.setReplyDownIconVisible(true);
+			view.setReplyUpIconVisible(false);
+		}
 		view.toggleReplies();
 	}
 
