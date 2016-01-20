@@ -14,5 +14,6 @@
 			</t:TableData>
 		</t:Table>
 		<bh:Paragraph ui:field="replyMessage"></bh:Paragraph>
+		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>

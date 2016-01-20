@@ -3,15 +3,21 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,6 +34,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	PortalGinInjector ginInjector;
 	GWTWrapper gwtWrapper;
 	UserBadge authorWidget;
+	RequestBuilderWrapper requestBuilder;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -41,7 +48,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
-			GWTWrapper gwtWrapper
+			GWTWrapper gwtWrapper,
+			RequestBuilderWrapper requestBuilder
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -50,6 +58,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		this.requestBuilder = requestBuilder;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -117,8 +126,37 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.toggleThread();
 	}
 
-	private void configureMessage() {
-		view.setMessage("thread message");
+	public void configureMessage() {
+		synAlert.clear();
+		discussionForumClientAsync.getThreadUrl(threadId, new AsyncCallback<MessageURL>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(MessageURL result) {
+				requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
+				try {
+					requestBuilder.sendRequest(null, new RequestCallback() {
+						public void onError(final Request request, final Throwable e) {
+							synAlert.handleException(e);
+						}
+						public void onResponseReceived(final Request request, final Response response) {
+							int statusCode = response.getStatusCode();
+							if (statusCode == Response.SC_OK) {
+								view.setMessage(response.getText());
+							} else {
+								onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId));
+							}
+						}
+					});
+				} catch (final Exception e) {
+					synAlert.handleException(e);
+				}
+			}
+		});
 	}
 
 	@Override
