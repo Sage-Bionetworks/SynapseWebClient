@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Reference;
@@ -19,8 +21,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -38,18 +42,22 @@ public class EntityFinderTest {
 	AuthenticationController mockAuthenticationController;
 
 	EntityFinder entityFinder;	
+	@Mock
+	ClientCache mockClientCache;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(EntityFinderView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		
-		entityFinder = new EntityFinder(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
+		entityFinder = new EntityFinder(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockClientCache);
 		verify(mockView).setPresenter(entityFinder);
 		reset(mockView);
+		when(mockView.isShowing()).thenReturn(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -153,6 +161,56 @@ public class EntityFinderTest {
 		entityFinder.okClicked();
 		verify(mockHandler).onSelected(mockReference);
 	}	
+	@Test
+	public void testShowAlreadyShowing() {
+		when(mockView.isShowing()).thenReturn(true);
+		entityFinder.show();
+		verify(mockView, never()).show();
+	}
 	
+	@Test
+	public void testShowDefaultArea() {
+		entityFinder.show();
+		verify(mockView).clear();
+		verify(mockView).setBrowseAreaVisible();
+		verify(mockView).show();
+	}
+	@Test
+	public void testShowBrowseArea() {
+		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.BROWSE.toString());
+		entityFinder.show();
+		verify(mockView).clear();
+		verify(mockView).setBrowseAreaVisible();
+		verify(mockView).show();
+	}
+	@Test
+	public void testShowSearchArea() {
+		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SEARCH.toString());
+		entityFinder.show();
+		verify(mockView).clear();
+		verify(mockView).setSearchAreaVisible();
+		verify(mockView).show();
+	}
+	@Test
+	public void testShowSynIdArea() {
+		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SYNAPSE_ID.toString());
+		entityFinder.show();
+		verify(mockView).clear();
+		verify(mockView).setSynapseIdAreaVisible();
+		verify(mockView).show();
+	}
+	@Test
+	public void testHideNoArea() {
+		when(mockView.getCurrentArea()).thenReturn(null);
+		entityFinder.hide();
+		verify(mockClientCache, never()).put(anyString(), anyString());
+	}
+	@Test
+	public void testHideSearchArea() {
+		when(mockView.getCurrentArea()).thenReturn(EntityFinderArea.SEARCH);
+		entityFinder.hide();
+		verify(mockClientCache).put(EntityFinder.ENTITY_FINDER_AREA_KEY, EntityFinderArea.SEARCH.toString());
+	}
 }
+
 
