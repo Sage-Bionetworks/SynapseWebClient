@@ -28,19 +28,11 @@
 				</t:TableRow>
 			</t:Table>
 		</g:FocusPanel>
-		<b:Collapse ui:field="threadDetails" visible="false">
-			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="95%" pull="RIGHT" >
-				<t:Table width="100%">
-					<t:TableData>
-						<bh:Span ui:field="author"></bh:Span>
-					</t:TableData>
-					<t:TableData width="130px" addStyleNames="hidden-xs">
-						<bh:Span ui:field="createdOn"></bh:Span>
-					</t:TableData>
-				</t:Table>
-				<b:Well size="SMALL">
-					<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
-				</b:Well>
+		<b:Collapse ui:field="threadDetails" visible="false" addStyleNames="overflow-x-hidden">
+			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
+				<g:SimplePanel ui:field="author"></g:SimplePanel>
+				<bh:Span ui:field="createdOn" addStyleNames="small margin-left-20"></bh:Span>
+				<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
 					<bh:Div addStyleNames="link">
 						<bh:Span ui:field="clickToViewReplies" addStyleNames="margin-right-10"></bh:Span>
@@ -50,12 +42,12 @@
 				</g:FocusPanel>
 			</bh:Div>
 			<b:Collapse ui:field="replyDetails" visible="false">
-				<bh:Div ui:field="replyListContainer" width="90%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
-				<bh:Div width="90%" pull="RIGHT" addStyleNames="margin-top-10">
+				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
+				<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-top-10">
 					<b:Button ui:field="loadMoreButton">Load more replies</b:Button>
 				</bh:Div>
 			</b:Collapse>
-			<bh:Div width="95%" pull="RIGHT" addStyleNames="margin-top-10">
+			<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-top-10 margin-bottom-10">
 				<b:Button ui:field="replyButton" pull="LEFT">Reply</b:Button>
 			</bh:Div>
 		</b:Collapse>

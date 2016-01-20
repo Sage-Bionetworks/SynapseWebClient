@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -14,7 +15,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
 	@UiField
-	Span author;
+	SimplePanel author;
 	@UiField
 	Span createdOn;
 	@UiField

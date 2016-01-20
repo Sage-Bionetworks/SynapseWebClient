@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -76,6 +77,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
 			user.configure(userId);
+			user.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 			view.addActiveAuthor(user.asWidget());
 		}
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());

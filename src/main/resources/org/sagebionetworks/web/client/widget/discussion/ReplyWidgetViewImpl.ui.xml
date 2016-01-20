@@ -4,17 +4,11 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<bh:Div width="100%" pull="RIGHT" >
-		<t:Table width="100%">
-			<t:TableData>
-				<bh:Span ui:field="author"></bh:Span>
-			</t:TableData>
-			<t:TableData width="130px" addStyleNames="hidden-xs">
-				<bh:Span ui:field="createdOn"></bh:Span>
-			</t:TableData>
-		</t:Table>
-		<b:Well size="SMALL">
-			<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
+	<bh:Div width="100%" pull="RIGHT">
+		<b:Well size="SMALL" addStyleNames="margin-bottom-5-imp">
+			<g:SimplePanel ui:field="author"></g:SimplePanel>
+			<bh:Span ui:field="createdOn" addStyleNames="small margin-left-20"></bh:Span>
+			<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp margin-top-10"></bh:Paragraph>
 		</b:Well>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>

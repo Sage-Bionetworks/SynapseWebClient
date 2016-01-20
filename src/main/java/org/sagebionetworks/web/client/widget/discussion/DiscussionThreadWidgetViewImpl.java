@@ -46,7 +46,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Collapse replyDetails;
 	@UiField
-	Span author;
+	SimplePanel author;
 	@UiField
 	Span createdOn;
 	@UiField
