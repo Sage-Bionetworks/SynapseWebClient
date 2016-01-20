@@ -19,6 +19,7 @@ import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
@@ -89,11 +90,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _bindBootstrapPopover(String id) /*-{
 		$wnd.jQuery('#'+id).popover();
 	}-*/;
+	
+	private static native String _getRelativeTime(String s) /*-{
+		return $wnd.moment(s).fromNow();
+	}-*/;
+
 
 	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
+	private static DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
+	
 	@Override
 	public String convertDateToSmallString(Date toFormat) {
 		return smallDateFormat.format(toFormat);
+	}
+	@Override
+	public String getRelativeTime(Date toFormat) {
+		return _getRelativeTime(iso8601Format.format(toFormat));
 	}
 
 	@Override

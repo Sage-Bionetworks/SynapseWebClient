@@ -29,7 +29,7 @@ public interface SynapseJSNIUtils {
 	public void tablesorter(String id);
 	
 	public String convertDateToSmallString(Date toFormat);
-	
+	public String getRelativeTime(Date toFormat);
 	public String getBaseFileHandleUrl();
 	
 	public String getBaseProfileAttachmentUrl();
