@@ -83,6 +83,7 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	@Override
 	public void clear() {
 		messageMarkdown.setText("");
+		saveButton.state().reset();
 	}
 
 	@Override
@@ -93,5 +94,15 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	@Override
 	public void showSuccess() {
 		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
+	}
+
+	@Override
+	public void showSaving() {
+		saveButton.state().loading();
+	}
+
+	@Override
+	public void resetButton() {
+		saveButton.state().reset();
 	}
 }

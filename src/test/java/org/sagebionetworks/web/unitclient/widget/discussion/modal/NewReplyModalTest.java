@@ -87,6 +87,7 @@ public class NewReplyModalTest {
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
+		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess();
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
@@ -102,8 +103,10 @@ public class NewReplyModalTest {
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
+		verify(mockView).showSaving();
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).resetButton();
 	}
 }

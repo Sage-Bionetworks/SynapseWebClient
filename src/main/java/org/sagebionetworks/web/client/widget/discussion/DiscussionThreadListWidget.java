@@ -61,11 +61,13 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	@Override
 	public void loadMore() {
 		synAlert.clear();
+		view.setLoadingVisible(true);
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
+						view.setLoadingVisible(false);
 						synAlert.handleException(caught);
 					}
 
@@ -77,7 +79,16 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 							view.addThread(thread.asWidget());
 						}
 						offset += LIMIT;
-						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
+						long numberOfThreads = result.getTotalNumberOfResults();
+						view.setLoadingVisible(false);
+						view.setLoadMoreButtonVisibility(offset < numberOfThreads);
+						if (numberOfThreads > 0) {
+							view.setEmptyUIVisible(false);
+							view.setThreadHeaderVisible(true);
+						} else {
+							view.setEmptyUIVisible(true);
+							view.setThreadHeaderVisible(false);
+						}
 					}
 		});
 	}

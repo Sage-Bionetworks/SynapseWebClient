@@ -5,11 +5,12 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -25,14 +26,14 @@ import com.google.inject.Inject;
 public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presenter{
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
-	private static final Boolean DEFAULT_ASCENDING = false;
+	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
-	GWTWrapper gwtWrapper;
+	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	private Long offset;
@@ -48,12 +49,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
-			GWTWrapper gwtWrapper,
+			SynapseJSNIUtils jsniUtils,
 			RequestBuilderWrapper requestBuilder
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
-		this.gwtWrapper = gwtWrapper;
+		this.jsniUtils = jsniUtils;
 		this.newReplyModal = newReplyModal;
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
@@ -76,13 +77,14 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
 			user.configure(userId);
+			user.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 			view.addActiveAuthor(user.asWidget());
 		}
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
-		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
+		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
+		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		threadId = bundle.getId();
 		newReplyModal.configure(bundle.getId(), new Callback(){
@@ -137,26 +139,30 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void onSuccess(MessageURL result) {
-				requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
-				try {
-					requestBuilder.sendRequest(null, new RequestCallback() {
-						public void onError(final Request request, final Throwable e) {
-							synAlert.handleException(e);
-						}
-						public void onResponseReceived(final Request request, final Response response) {
-							int statusCode = response.getStatusCode();
-							if (statusCode == Response.SC_OK) {
-								view.setMessage(response.getText());
-							} else {
-								onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId));
-							}
-						}
-					});
-				} catch (final Exception e) {
-					synAlert.handleException(e);
-				}
+				getMessage(result);
 			}
 		});
+	}
+
+	public void getMessage(MessageURL result) {
+		requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
+		try {
+			requestBuilder.sendRequest(null, new RequestCallback() {
+				public void onError(final Request request, final Throwable e) {
+					synAlert.handleException(e);
+				}
+				public void onResponseReceived(final Request request, final Response response) {
+					int statusCode = response.getStatusCode();
+					if (statusCode == Response.SC_OK) {
+						view.setMessage(response.getText());
+					} else {
+						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId));
+					}
+				}
+			});
+		} catch (final Exception e) {
+			synAlert.handleException(e);
+		}
 	}
 
 	@Override
@@ -194,11 +200,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	@Override
 	public void loadMore() {
 		synAlert.clear();
+		view.setLoadingVisible(true);
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
+						view.setLoadingVisible(false);
 						synAlert.handleException(caught);
 					}
 
@@ -212,6 +220,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							replyWidget.configure(bundle);
 							view.addReply(replyWidget.asWidget());
 						}
+						view.setLoadingVisible(false);
 						view.setNumberOfReplies(""+result.getTotalNumberOfResults());
 						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 						view.showReplyDetails();

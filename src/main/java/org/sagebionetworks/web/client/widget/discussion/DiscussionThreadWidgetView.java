@@ -67,4 +67,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setReplyDownIconVisible(boolean visible);
 
 	boolean isReplyCollapsed();
+
+	void setLoadingVisible(boolean visible);
 }

@@ -92,6 +92,7 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 	public void clear() {
 		threadTitle.setText("");
 		messageMarkdown.setText("");
+		saveButton.state().reset();
 	}
 
 	@Override
@@ -102,5 +103,15 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 	@Override
 	public void showSuccess() {
 		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
+	}
+
+	@Override
+	public void showSaving() {
+		saveButton.state().loading();
+	}
+
+	@Override
+	public void resetButton() {
+		saveButton.state().reset();
 	}
 }

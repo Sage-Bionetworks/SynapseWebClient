@@ -35,7 +35,6 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 		view.setAlert(synAlert.asWidget());
 	}
 
-	@Override
 	public void configure(String threadId, Callback newReplyCallback) {
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
@@ -62,12 +61,14 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
+		view.showSaving();
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
 		toCreate.setThreadId(threadId);
 		toCreate.setMessageMarkdown(messageMarkdown);
 		discussionForumClient.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
+				view.resetButton();
 				synAlert.handleException(caught);
 			}
 

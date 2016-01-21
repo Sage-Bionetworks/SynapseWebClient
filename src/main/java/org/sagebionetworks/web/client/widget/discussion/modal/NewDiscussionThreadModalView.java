@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
-import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -17,8 +15,6 @@ public interface NewDiscussionThreadModalView extends IsWidget{
 
 		Widget asWidget();
 
-		void configure(String forumId, Callback newThreadCallback);
-
 		void onSave();
 	}
 
@@ -30,5 +26,7 @@ public interface NewDiscussionThreadModalView extends IsWidget{
 	void clear();
 	void setAlert(Widget w);
 	void showSuccess();
+	void showSaving();
+	void resetButton();
 
 }

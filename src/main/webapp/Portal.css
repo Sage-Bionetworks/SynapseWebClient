@@ -1372,6 +1372,10 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #ccc;
 }
 
+.lightGreyBackground {
+	background-color: #F9F9F9;
+}
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;

@@ -35,7 +35,6 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 		view.setAlert(synAlert.asWidget());
 	}
 
-	@Override
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
@@ -64,6 +63,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
+		view.showSaving();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
 		toCreate.setTitle(threadTitle);
@@ -71,6 +71,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
+				view.resetButton();
 				synAlert.handleException(caught);
 			}
 
@@ -82,6 +83,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 					newThreadCallback.invoke();
 				}
 			}
+
 		});
 	}
 

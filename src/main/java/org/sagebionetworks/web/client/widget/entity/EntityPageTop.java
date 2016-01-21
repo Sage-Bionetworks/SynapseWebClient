@@ -136,14 +136,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
 		adminTab.setTabClickedCallback(showProjectInfoCallback);
-
-		//on tab change to these tabs, always hide project info
-		CallbackP<Tab> hideProjectInfoCallback = new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				view.setProjectInformationVisible(false);
-			};
-		};
-		discussionTab.setTabClickedCallback(hideProjectInfoCallback);
+		discussionTab.setTabClickedCallback(showProjectInfoCallback);
 	}
 	
     /**

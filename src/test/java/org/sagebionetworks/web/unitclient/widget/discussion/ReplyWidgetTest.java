@@ -14,8 +14,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -34,7 +34,7 @@ public class ReplyWidgetTest {
 	@Mock
 	ReplyWidgetView mockView;
 	@Mock
-	GWTWrapper mockGwtWrapper;
+	SynapseJSNIUtils mockJsniUtils;
 	@Mock
 	UserBadge mockAuthorWidget;
 	@Mock
@@ -51,7 +51,7 @@ public class ReplyWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockGwtWrapper,
+		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockJsniUtils,
 				mockSynAlert, mockDiscussionForumClientAsync, mockRequestBuilder);
 	}
 
@@ -65,12 +65,12 @@ public class ReplyWidgetTest {
 	@Test
 	public void testConfigure() {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", new Date());
-		when(mockGwtWrapper.getFormattedDateString(any(Date.class))).thenReturn("today");
+		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockGwtWrapper).getFormattedDateString(any(Date.class));
+		verify(mockJsniUtils).getRelativeTime(any(Date.class));
 	}
 
 	@Test
