@@ -21,9 +21,9 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
@@ -51,7 +51,7 @@ public class DiscussionThreadWidgetTest {
 	@Mock
 	ReplyWidget mockReplyWidget;
 	@Mock
-	GWTWrapper mockGwtWrapper;
+	SynapseJSNIUtils mockJsniUtils;
 	@Mock
 	NewReplyModal mockNewReplyModal;
 	@Mock
@@ -79,7 +79,7 @@ public class DiscussionThreadWidgetTest {
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
-				mockGinInjector, mockGwtWrapper, mockRequestBuilder);
+				mockGinInjector, mockJsniUtils, mockRequestBuilder);
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockGinInjector).getUserBadgeWidget();
-		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
+		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 	}
@@ -123,7 +123,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(false);
 		verify(mockGinInjector).getUserBadgeWidget();
-		verify(mockGwtWrapper, times(2)).getFormattedDateString(any(Date.class));
+		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 	}
