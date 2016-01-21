@@ -24,7 +24,7 @@
 				</g:FocusPanel>
 				<g:Image ui:field="userPicture" addStyleNames="userProfileImage imageButton margin-right-2" />
 			</t:TableData>
-			<t:TableData paddingRight="2" addStyleNames="vertical-align-bottom">
+			<t:TableData paddingRight="2" addStyleNames="vertical-align-middle">
 				<b:Tooltip placement="BOTTOM" title="" ui:field="usernameTooltip">
 					<b:Anchor ui:field="usernameLink" />
 				</b:Tooltip>
