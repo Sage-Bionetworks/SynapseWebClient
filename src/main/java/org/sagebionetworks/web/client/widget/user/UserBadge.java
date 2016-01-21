@@ -19,7 +19,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,6 +28,8 @@ import com.google.inject.Inject;
 
 public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresenter, WidgetRendererPresenter, IsWidget {
 	
+	public static final String DEFAULT_COLOR = "lightgrey";
+	public static final String DEFAULT_LETTER = "S";
 	private UserBadgeView view;
 	SynapseClientAsync synapseClient;
 	private Integer maxNameLength;
@@ -105,10 +106,17 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			}
 			view.showCustomUserPicture(url);
 		} else {
-			view.setDefaultPictureLetter(getDefaultLetter(profile).toUpperCase());
-			view.setDefaultPictureColor(getColor(profile.getUserName().hashCode()));
+			view.setDefaultPictureLetter(getDefaultPictureLetter(profile));
+			view.setDefaultPictureColor(getDefaultPictureColor(profile));
 			view.showAnonymousUserPicture();
 		}
+	}
+	
+	public String getDefaultPictureColor(UserProfile profile) {
+		if (profile == null) {
+			return DEFAULT_COLOR;
+		}
+		return getColor(profile.getUserName().hashCode());
 	}
 	
 	public String getColor(int hashcode) {
@@ -116,11 +124,14 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		return COLORS[index];
 	}
 	
-	public String getDefaultLetter(UserProfile profile) {
+	public String getDefaultPictureLetter(UserProfile profile) {
+		if (profile == null) {
+			return DEFAULT_LETTER;
+		}
 		if (DisplayUtils.isDefined(profile.getFirstName())) {
-			return ""+profile.getFirstName().charAt(0);
+			return (""+profile.getFirstName().charAt(0)).toUpperCase();
 		} else {
-			return ""+profile.getUserName().charAt(0);
+			return (""+profile.getUserName().charAt(0)).toUpperCase();
 		}
 	}
 	/**
