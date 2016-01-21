@@ -847,10 +847,6 @@ a.shortBtn {
 	margin-bottom: 0px !important;
 }
 
-.margin-bottom-5-imp {
-	margin-bottom: 5px !important;
-}
-
 .margin-bottom-300 {
 	margin-bottom: 300px;
 }
@@ -1374,6 +1370,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .greyBackground {
 	background-color: #ccc;
+}
+
+.lightGreyBackground {
+	background-color: #F9F9F9;
 }
 
 .sidebarMenu { 
