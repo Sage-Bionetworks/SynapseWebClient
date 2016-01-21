@@ -108,16 +108,16 @@ public class NewReplyModalTest {
 	}
 
 	@Test
-	public void testViewProcessing() {
-		modal.viewProcessing();
+	public void testShowProcessing() {
+		modal.showProcessing();
 		verify(mockView).setSendingRequestVisible(true);
 		verify(mockView).setCancelButtonEnabled(false);
 		verify(mockView).setSaveButtonEnabled(false);
 	}
 
 	@Test
-	public void testViewProcessed() {
-		modal.viewProcessed();
+	public void testShowProcessed() {
+		modal.showProcessed();
 		verify(mockView).setSendingRequestVisible(false);
 		verify(mockView).setCancelButtonEnabled(true);
 		verify(mockView).setSaveButtonEnabled(true);

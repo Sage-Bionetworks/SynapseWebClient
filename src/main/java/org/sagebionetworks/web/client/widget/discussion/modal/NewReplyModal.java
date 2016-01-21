@@ -61,14 +61,14 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		viewProcessing();
+		showProcessing();
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
 		toCreate.setThreadId(threadId);
 		toCreate.setMessageMarkdown(messageMarkdown);
 		discussionForumClient.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				viewProcessed();
+				showProcessed();
 				synAlert.handleException(caught);
 			}
 
@@ -76,7 +76,7 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 			public void onSuccess(DiscussionReplyBundle result) {
 				view.hideDialog();
 				view.showSuccess();
-				viewProcessed();
+				showProcessed();
 				if (newReplyCallback != null) {
 					newReplyCallback.invoke();
 				}
@@ -84,13 +84,13 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 		});
 	}
 
-	public void viewProcessed() {
+	public void showProcessed() {
 		view.setSaveButtonEnabled(true);
 		view.setCancelButtonEnabled(true);
 		view.setSendingRequestVisible(false);
 	}
 
-	public void viewProcessing() {
+	public void showProcessing() {
 		view.setSaveButtonEnabled(false);
 		view.setCancelButtonEnabled(false);
 		view.setSendingRequestVisible(true);
