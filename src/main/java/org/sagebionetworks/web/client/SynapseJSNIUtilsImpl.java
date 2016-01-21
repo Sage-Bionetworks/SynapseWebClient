@@ -94,7 +94,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native String _getRelativeTime(String s) /*-{
 		return $wnd.moment(s).fromNow();
 	}-*/;
-
+	private static native String _getCalendarTime(String s) /*-{
+		return $wnd.moment(s).calendar();
+	}-*/;
+	
+	private static native String _getLongFriendlyDate(String s) /*-{
+		return $wnd.moment(s).format('LLLL');
+	}-*/;
 
 	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
 	private static DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
@@ -107,7 +113,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String getRelativeTime(Date toFormat) {
 		return _getRelativeTime(iso8601Format.format(toFormat));
 	}
-
+	@Override
+	public String getCalendarTime(Date toFormat) {
+		return _getCalendarTime(iso8601Format.format(toFormat));
+	}
+	
+	@Override
+	public String getLongFriendlyDate(Date toFormat) {
+		return _getLongFriendlyDate(iso8601Format.format(toFormat));
+	}
+	
 	@Override
 	public String getBaseFileHandleUrl() {
 		return GWT.getModuleBaseURL()+"filehandle";

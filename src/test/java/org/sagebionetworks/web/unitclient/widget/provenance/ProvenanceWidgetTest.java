@@ -349,6 +349,16 @@ public class ProvenanceWidgetTest {
 				return null;
 			}
 			@Override
+			public String getCalendarTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public String getLongFriendlyDate(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
 			public void hideBootstrapTooltip(String id) {
 				// TODO Auto-generated method stub
 				

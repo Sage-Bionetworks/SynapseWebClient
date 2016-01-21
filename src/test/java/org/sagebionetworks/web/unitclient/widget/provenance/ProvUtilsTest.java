@@ -314,7 +314,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+			@Override
+			public String getLongFriendlyDate(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void bindBootstrapTooltip(String id) {
 				// TODO Auto-generated method stub
@@ -368,6 +372,11 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public String getRelativeTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public String getCalendarTime(Date toFormat) {
 				// TODO Auto-generated method stub
 				return null;
 			}
