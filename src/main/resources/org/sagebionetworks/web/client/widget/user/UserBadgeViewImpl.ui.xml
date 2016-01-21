@@ -16,7 +16,7 @@
 			<t:TableData paddingRight="2">
 				<g:FocusPanel ui:field="defaultUserPicture" addStyleNames="margin-right-2 imageButton">
 					<g:HTMLPanel height="25px">
-						<span class="fa-stack moveup-2">
+						<span class="fa-stack moveup-3">
 							<b:Icon ui:field="squareIcon" type="SQUARE_O" addStyleNames="font-size-1-5x fa-stack-1x"/>
 							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x"/>
 						</span>
