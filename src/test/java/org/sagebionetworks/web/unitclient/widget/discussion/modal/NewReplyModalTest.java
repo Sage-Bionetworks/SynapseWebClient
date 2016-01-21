@@ -106,4 +106,20 @@ public class NewReplyModalTest {
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
+
+	@Test
+	public void testViewProcessing() {
+		modal.viewProcessing();
+		verify(mockView).setSendingRequestVisible(true);
+		verify(mockView).setCancelButtonEnabled(false);
+		verify(mockView).setSaveButtonEnabled(false);
+	}
+
+	@Test
+	public void testViewProcessed() {
+		modal.viewProcessed();
+		verify(mockView).setSendingRequestVisible(false);
+		verify(mockView).setCancelButtonEnabled(true);
+		verify(mockView).setSaveButtonEnabled(true);
+	}
 }

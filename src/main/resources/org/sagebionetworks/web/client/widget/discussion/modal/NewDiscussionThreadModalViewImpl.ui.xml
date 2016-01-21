@@ -7,6 +7,7 @@
 		<b:ModalBody>
 			<b:TextBox ui:field="threadTitle" placeholder="Title" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
 			<b:TextArea ui:field="messageMarkdown" placeholder="Message" addStyleNames="hide-resize" height="250px"/>
+			<bh:Paragraph ui:field="sendingRequest" addStyleNames="margin-top-10" visible="false">Sending request...</bh:Paragraph>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>

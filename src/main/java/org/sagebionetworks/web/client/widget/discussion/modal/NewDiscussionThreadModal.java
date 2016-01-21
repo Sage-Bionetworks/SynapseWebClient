@@ -35,7 +35,6 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 		view.setAlert(synAlert.asWidget());
 	}
 
-	@Override
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
@@ -64,6 +63,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
+		viewProcessing();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
 		toCreate.setTitle(threadTitle);
@@ -71,6 +71,7 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
+				viewProcessed();
 				synAlert.handleException(caught);
 			}
 
@@ -78,11 +79,25 @@ public class NewDiscussionThreadModal implements NewDiscussionThreadModalView.Pr
 			public void onSuccess(DiscussionThreadBundle result) {
 				view.hideDialog();
 				view.showSuccess();
+				viewProcessed();
 				if (newThreadCallback != null) {
 					newThreadCallback.invoke();
 				}
 			}
+
 		});
+	}
+
+	public void viewProcessing() {
+		view.setSaveButtonEnabled(false);
+		view.setCancelButtonEnabled(false);
+		view.setSendingRequestVisible(true);
+	}
+
+	public void viewProcessed() {
+		view.setSaveButtonEnabled(true);
+		view.setCancelButtonEnabled(true);
+		view.setSendingRequestVisible(false);
 	}
 
 	@Override

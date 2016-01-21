@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
-import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -17,8 +15,6 @@ public interface NewReplyModalView extends IsWidget{
 
 		Widget asWidget();
 
-		void configure(String threadId, Callback newReplyCallback);
-
 		void onSave();
 	}
 
@@ -29,5 +25,8 @@ public interface NewReplyModalView extends IsWidget{
 	void clear();
 	void setAlert(Widget w);
 	void showSuccess();
+	void setSendingRequestVisible(boolean visible);
+	void setSaveButtonEnabled(boolean enabled);
+	void setCancelButtonEnabled(boolean enabled);
 
 }

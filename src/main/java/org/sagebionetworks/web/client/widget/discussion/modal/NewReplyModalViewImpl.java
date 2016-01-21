@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -33,6 +34,8 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	TextArea messageMarkdown;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Paragraph sendingRequest;
 
 	private Widget widget;
 	private Presenter presenter;
@@ -93,5 +96,20 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	@Override
 	public void showSuccess() {
 		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
+	}
+
+	@Override
+	public void setSendingRequestVisible(boolean visible) {
+		sendingRequest.setVisible(visible);
+	}
+
+	@Override
+	public void setSaveButtonEnabled(boolean enabled) {
+		saveButton.setEnabled(enabled);
+	}
+
+	@Override
+	public void setCancelButtonEnabled(boolean enabled) {
+		cancelButton.setEnabled(enabled);
 	}
 }
