@@ -106,11 +106,16 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			view.showCustomUserPicture(url);
 		} else {
 			view.setDefaultPictureLetter(getDefaultLetter(profile).toUpperCase());
-			int index = profile.getUserName().hashCode() % COLORS.length;
-			view.setDefaultPictureColor(COLORS[index]);
+			view.setDefaultPictureColor(getColor(profile.getUserName().hashCode()));
 			view.showAnonymousUserPicture();
 		}
 	}
+	
+	public String getColor(int hashcode) {
+		int index = hashcode % COLORS.length;
+		return COLORS[index];
+	}
+	
 	public String getDefaultLetter(UserProfile profile) {
 		if (DisplayUtils.isDefined(profile.getFirstName())) {
 			return ""+profile.getFirstName().charAt(0);
