@@ -5,9 +5,9 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
@@ -26,14 +26,14 @@ import com.google.inject.Inject;
 public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presenter{
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
-	private static final Boolean DEFAULT_ASCENDING = false;
+	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
-	GWTWrapper gwtWrapper;
+	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	private Long offset;
@@ -49,12 +49,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
-			GWTWrapper gwtWrapper,
+			SynapseJSNIUtils jsniUtils,
 			RequestBuilderWrapper requestBuilder
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
-		this.gwtWrapper = gwtWrapper;
+		this.jsniUtils = jsniUtils;
 		this.newReplyModal = newReplyModal;
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
@@ -82,9 +82,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		}
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
-		view.setLastActivity(gwtWrapper.getFormattedDateString(bundle.getLastActivity()));
+		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
+		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		threadId = bundle.getId();
 		newReplyModal.configure(bundle.getId(), new Callback(){

@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	ReplyWidgetView view;
-	GWTWrapper gwtWrapper;
+	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
@@ -30,14 +30,14 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	public ReplyWidget(
 			ReplyWidgetView view,
 			UserBadge authorWidget,
-			GWTWrapper gwtWrapper,
+			SynapseJSNIUtils jsniUtils,
 			SynapseAlert synAlert,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			RequestBuilderWrapper requestBuilder
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
-		this.gwtWrapper = gwtWrapper;
+		this.jsniUtils = jsniUtils;
 		this.synAlert = synAlert;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.requestBuilder = requestBuilder;
@@ -50,7 +50,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.clear();
 		this.replyId = bundle.getId();
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(gwtWrapper.getFormattedDateString(bundle.getCreatedOn()));
+		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		configureMessage();
 	}
 
