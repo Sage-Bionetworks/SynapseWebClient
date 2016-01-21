@@ -87,6 +87,7 @@ public class NewReplyModalTest {
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
+		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess();
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
@@ -102,24 +103,10 @@ public class NewReplyModalTest {
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
+		verify(mockView).showSaving();
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-	}
-
-	@Test
-	public void testShowProcessing() {
-		modal.showProcessing();
-		verify(mockView).setSendingRequestVisible(true);
-		verify(mockView).setCancelButtonEnabled(false);
-		verify(mockView).setSaveButtonEnabled(false);
-	}
-
-	@Test
-	public void testShowProcessed() {
-		modal.showProcessed();
-		verify(mockView).setSendingRequestVisible(false);
-		verify(mockView).setCancelButtonEnabled(true);
-		verify(mockView).setSaveButtonEnabled(true);
+		verify(mockView).resetButton();
 	}
 }

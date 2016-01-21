@@ -25,8 +25,7 @@ public interface NewReplyModalView extends IsWidget{
 	void clear();
 	void setAlert(Widget w);
 	void showSuccess();
-	void setSendingRequestVisible(boolean visible);
-	void setSaveButtonEnabled(boolean enabled);
-	void setCancelButtonEnabled(boolean enabled);
+	void showSaving();
+	void resetButton();
 
 }
