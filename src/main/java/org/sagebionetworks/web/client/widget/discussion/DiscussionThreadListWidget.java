@@ -77,7 +77,15 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 							view.addThread(thread.asWidget());
 						}
 						offset += LIMIT;
-						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
+						long numberOfThreads = result.getTotalNumberOfResults();
+						view.setLoadMoreButtonVisibility(offset < numberOfThreads);
+						if (numberOfThreads > 0) {
+							view.setEmptyUIVisible(false);
+							view.setThreadHeaderVisible(true);
+						} else {
+							view.setEmptyUIVisible(true);
+							view.setThreadHeaderVisible(false);
+						}
 					}
 		});
 	}

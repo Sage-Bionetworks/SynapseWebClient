@@ -82,6 +82,29 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockView).setLoadMoreButtonVisibility(false);
+		verify(mockView).setEmptyUIVisible(false);
+		verify(mockView).setThreadHeaderVisible(true);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadMoreZeroThreads() {
+		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
+				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
+		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(0L);
+		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
+		discussionThreadListWidget.configure("123");
+		verify(mockView).clear();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView, never()).addThread(any(Widget.class));
+		verify(mockGinInjector, never()).createThreadWidget();
+		verify(mockDiscussionThreadWidget, never()).configure(any(DiscussionThreadBundle.class));
+		verify(mockView).setLoadMoreButtonVisibility(false);
+		verify(mockView).setEmptyUIVisible(true);
+		verify(mockView).setThreadHeaderVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,6 +125,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockGinInjector).createThreadWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockView).setLoadMoreButtonVisibility(true);
+		verify(mockView).setEmptyUIVisible(false);
+		verify(mockView).setThreadHeaderVisible(true);
 	}
 
 	@SuppressWarnings("unchecked")

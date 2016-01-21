@@ -8,6 +8,7 @@
 		<b:Row>
 			<b:Column size="XS_12">
 				<bh:Div addStyleNames="padding-10 light-border-bottom">
+					<bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
 					<!-- Thread header -->
 					<t:Table ui:field="threadHeader" width="100%">
 						<t:TableRow>

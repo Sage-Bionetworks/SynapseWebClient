@@ -21,4 +21,8 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	void setAlert(Widget w);
 
 	void setLoadMoreButtonVisibility(boolean visible);
+
+	void setEmptyUIVisible(boolean visible);
+
+	void setThreadHeaderVisible(boolean visible);
 }
