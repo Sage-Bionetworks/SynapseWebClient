@@ -19,6 +19,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,6 +41,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	boolean useCachedImage;
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
+	public static final String[] COLORS = {"silver","gray","black","red","maroon","olive","lime","green","aqua","teal","blue","navy","fuchsia","purple"};
 	
 	@Inject
 	public UserBadge(UserBadgeView view, 
@@ -103,10 +105,19 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			}
 			view.showCustomUserPicture(url);
 		} else {
+			view.setDefaultPictureLetter(getDefaultLetter(profile).toUpperCase());
+			int index = profile.getUserName().hashCode() % COLORS.length;
+			view.setDefaultPictureColor(COLORS[index]);
 			view.showAnonymousUserPicture();
 		}
 	}
-	
+	public String getDefaultLetter(UserProfile profile) {
+		if (DisplayUtils.isDefined(profile.getFirstName())) {
+			return ""+profile.getFirstName().charAt(0);
+		} else {
+			return ""+profile.getUserName().charAt(0);
+		}
+	}
 	/**
 	 * Wiki configure
 	 */

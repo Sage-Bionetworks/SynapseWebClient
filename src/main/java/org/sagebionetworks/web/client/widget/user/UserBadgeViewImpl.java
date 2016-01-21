@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -13,6 +13,7 @@ import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,7 +24,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@UiField
 	TableData loadingUI;
 	@UiField
-	Icon defaultUserPicture;
+	FocusPanel defaultUserPicture;
 	@UiField
 	Image userPicture;
 	@UiField
@@ -34,6 +35,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	Paragraph description;
 	@UiField
 	Paragraph errorLoadingUI;
+	@UiField
+	Strong defaultUserPictureLetter;
+	@UiField
+	Icon squareIcon;
 	
 	private Presenter presenter;
 	Widget widget;
@@ -47,7 +52,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
-		
 		userPicture.addClickHandler(badgeClicked);
 		usernameLink.addClickHandler(badgeClicked);
 		defaultUserPicture.addClickHandler(badgeClicked);
@@ -60,6 +64,15 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		});
 	}
 	
+	@Override
+	public void setDefaultPictureColor(String color) {
+		squareIcon.setColor(color);
+		defaultUserPictureLetter.setColor(color);
+	}
+	@Override
+	public void setDefaultPictureLetter(String letter) {
+		defaultUserPictureLetter.setText(letter);
+	}
 	public void clear() {
 		loadingUI.setVisible(false);
 		defaultUserPicture.setVisible(false);
