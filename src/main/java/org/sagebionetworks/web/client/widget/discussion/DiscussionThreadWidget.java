@@ -200,11 +200,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	@Override
 	public void loadMore() {
 		synAlert.clear();
+		view.setLoadingVisible(true);
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
+						view.setLoadingVisible(false);
 						synAlert.handleException(caught);
 					}
 
@@ -218,6 +220,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							replyWidget.configure(bundle);
 							view.addReply(replyWidget.asWidget());
 						}
+						view.setLoadingVisible(false);
 						view.setNumberOfReplies(""+result.getTotalNumberOfResults());
 						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 						view.showReplyDetails();

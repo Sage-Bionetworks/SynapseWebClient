@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -27,6 +28,8 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	Span emptyUI;
 	@UiField
 	Table threadHeader;
+	@UiField
+	HTMLPanel loadingUI;
 
 	Widget widget;
 	private DiscussionThreadListWidget presenter;
@@ -81,5 +84,10 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Override
 	public void setThreadHeaderVisible(boolean visible) {
 		threadHeader.setVisible(visible);
+	}
+
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(false);
 	}
 }

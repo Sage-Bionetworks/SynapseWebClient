@@ -214,6 +214,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(anyBoolean());
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -235,6 +237,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView, never()).addReply(any(Widget.class));
 		verify(mockGinInjector, never()).createReplyWidget();
 		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -261,6 +265,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")

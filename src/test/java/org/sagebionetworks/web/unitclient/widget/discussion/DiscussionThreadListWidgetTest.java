@@ -84,6 +84,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(false);
 		verify(mockView).setEmptyUIVisible(false);
 		verify(mockView).setThreadHeaderVisible(true);
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -105,6 +107,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(false);
 		verify(mockView).setEmptyUIVisible(true);
 		verify(mockView).setThreadHeaderVisible(false);
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -127,6 +131,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView).setEmptyUIVisible(false);
 		verify(mockView).setThreadHeaderVisible(true);
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -143,6 +149,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@Test
