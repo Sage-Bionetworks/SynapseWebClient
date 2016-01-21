@@ -47,8 +47,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
+		
 		userPicture.addClickHandler(badgeClicked);
 		usernameLink.addClickHandler(badgeClicked);
+		defaultUserPicture.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {
 			@Override
