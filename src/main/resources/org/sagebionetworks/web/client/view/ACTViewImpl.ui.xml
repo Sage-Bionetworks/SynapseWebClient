@@ -14,40 +14,40 @@
 						<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 							<b:PanelHeader>
 								<b:Heading size="H3" text="State Filter" />
+								<bh:Span ui:field="currentState"/>
+								<b:Button ui:field="clearStateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
 							</b:PanelHeader>
 							<b:PanelBody>
-								<g:ListBox ui:field="stateComboBox" styleName="form-control" />
+								<b:ButtonGroup>
+									<b:Button dataToggle="DROPDOWN" text="Filter by submission state..."/>
+									<b:DropDownMenu ui:field="stateDropdownMenu" />
+								</b:ButtonGroup>
 							</b:PanelBody>
-							<b:PanelFooter>
-								<b:Button ui:field="applyStateFilter" type="PRIMARY"
-									addStyleNames="margin-right-5">Apply</b:Button>
-								<b:Button ui:field="clearStateFilter" type="DANGER">Clear</b:Button>
-							</b:PanelFooter>
 						</b:Panel>
 					</b:Column>
 					<b:Column size="SM_6">
 						<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 							<b:PanelHeader>
 								<b:Heading size="H3" text="User Filter" />
+								<bh:Div ui:field="currentUserContainer" />
+								<b:Button ui:field="clearUserFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
 							</b:PanelHeader>
 							<b:PanelBody>
 								<bh:Div ui:field="userSelectContainer" />
 							</b:PanelBody>
-							<b:PanelFooter>
-								<b:Button ui:field="applyUserFilter" type="PRIMARY"
-									addStyleNames="margin-right-5">Apply</b:Button>
-								<b:Button ui:field="clearUserFilter" type="DANGER">Clear</b:Button>
-							</b:PanelFooter>
 						</b:Panel>
 					</b:Column>
 				</b:Row>
 				<!-- table header -->
 				<t:Table width="100%" addStyleNames="margin-left-10 margin-right-10 table-layout-fixed">
 					<t:TableRow>
-						<t:TableHeader width="10%">
+						<t:TableHeader width="6%" addStyleNames="hidden-xs">
+							<bh:Span text="State" />
+						</t:TableHeader>
+						<t:TableHeader width="7%">
 							<bh:Span text="User ID" />
 						</t:TableHeader>
-						<t:TableHeader width="10%" addStyleNames="hidden-xs">
+						<t:TableHeader width="7%" addStyleNames="hidden-xs">
 							<bh:Span text="First name" />
 						</t:TableHeader>
 						<t:TableHeader width="10%" addStyleNames="hidden-xs">

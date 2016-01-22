@@ -18,15 +18,14 @@ public interface ACTView extends IsWidget, SynapseView {
 	
 	void setSynAlert(Widget w);
 	void updatePagination(List<PaginationEntry> entries);
-	void setSelectedState(int index);
-	String getSelectedState();
-	
+	void setSelectedStateText(String state);
+	void setSelectedUserBadge(Widget w);
+	void setSelectedUserBadgeVisible(boolean visible);
 	public interface Presenter extends SynapsePresenter {
-		void onApplyUserFilter();
-		void onApplyStateFilter();
 		void onClearUserFilter();
 		void onClearStateFilter();
-
+		
 		void loadData(Long offset);
+		void onStateSelected(String state);
 	}
 }

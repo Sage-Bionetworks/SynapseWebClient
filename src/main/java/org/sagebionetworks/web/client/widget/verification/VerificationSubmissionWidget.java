@@ -205,6 +205,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		
 		view.setOKButtonVisible(true);
 		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+		view.setState(currentState.getState());
 		if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
 			//pending
 			view.setApproveButtonVisible(isACTMember);
