@@ -138,6 +138,13 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 			view.setSelectedUserBadgeVisible(true);
 		}
 	}
+	/**
+	 * For testing
+	 * @return
+	 */
+	public ACTPlace getPlace() {
+		return place;
+	}
 	
 	@Override
 	public void onStateSelected(String selectedState) {
