@@ -21,7 +21,7 @@
 								</g:FlowPanel>
 							</b:FormGroup>
 						</b:FormGroup>
-						<b:FormGroup>
+						<b:FormGroup ui:field="evaluationListUI">
 							<b:FormGroup>
 								<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
 								<g:SimplePanel ui:field="evaluationListContainer" />

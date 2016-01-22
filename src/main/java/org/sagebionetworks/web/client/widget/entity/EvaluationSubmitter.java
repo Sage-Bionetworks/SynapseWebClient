@@ -140,6 +140,7 @@ public class EvaluationSubmitter implements Presenter {
 					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 				} 
 				else {
+					view.setEvaluationListVisible(evaluations.size() > 1);
 					view.showModal1(submissionEntity == null, evaluations);
 				}
 			}

@@ -23,6 +23,10 @@ public class EvaluationList implements EvaluationListView.Presenter,
 	public void configure(List<Evaluation> list) {
 		this.evaluationList = list;
 		view.configure(list);
+		//if there is only a single item, then there is no choice (just select it)
+		if (list.size() == 1) {
+			view.setSelectedEvaluationIndex(0);
+		}
 	}
 	
 	@Override

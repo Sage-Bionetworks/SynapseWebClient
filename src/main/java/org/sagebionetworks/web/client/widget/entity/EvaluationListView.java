@@ -25,4 +25,5 @@ public interface EvaluationListView extends IsWidget, SynapseView {
 
 	void configure(List<Evaluation> evaluationList);
 	Integer getSelectedEvaluationIndex();
+	void setSelectedEvaluationIndex(int i);
 }
