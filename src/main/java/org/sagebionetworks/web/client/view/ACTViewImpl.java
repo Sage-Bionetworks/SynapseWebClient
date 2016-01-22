@@ -2,25 +2,23 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.ACTPresenter;
-import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +33,7 @@ public class ACTViewImpl implements ACTView {
 	SimplePanel footer;
 	
 	@UiField
-	ListBox stateComboBox;
+	DropDownMenu stateDropdownMenu;
 	@UiField
 	Div userSelectContainer;
 	@UiField
@@ -44,15 +42,16 @@ public class ACTViewImpl implements ACTView {
 	@UiField
 	Div tableData;
 	@UiField
-	Button applyStateFilter;
-	@UiField
 	Button clearStateFilter;
-	@UiField
-	Button applyUserFilter;
 	@UiField
 	Button clearUserFilter;
 	@UiField
 	Div paginationContainer;
+	@UiField
+	Span currentState;
+	@UiField
+	Div currentUserContainer;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -70,22 +69,10 @@ public class ACTViewImpl implements ACTView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
-		applyStateFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onApplyStateFilter();
-			}
-		});
 		clearStateFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClearStateFilter();
-			}
-		});
-		applyUserFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onApplyUserFilter();
 			}
 		});
 		clearUserFilter.addClickHandler(new ClickHandler() {
@@ -128,17 +115,37 @@ public class ACTViewImpl implements ACTView {
 	public void clear() {		
 	}
 	@Override
+	public void setSelectedStateText(String state) {
+		currentState.setText(state);
+	}
+	@Override
+	public void setSelectedUserBadge(Widget w) {
+		currentUserContainer.add(w);
+	}
+	@Override
+	public void setSelectedUserBadgeVisible(boolean visible) {
+		currentUserContainer.setVisible(visible);
+	}
+	@Override
 	public Widget asWidget() {
 		return widget;
 	}
 	
 	@Override
 	public void setStates(List<String> states) {
-		stateComboBox.clear();
-		for (String state : states) {
-			stateComboBox.addItem(state);
+		stateDropdownMenu.clear();
+		for (final String state : states) {
+			AnchorListItem item = new AnchorListItem(state);
+			item.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.onStateSelected(state);
+				}
+			});
+			stateDropdownMenu.add(item);
 		}
 	}
+	
 	@Override
 	public void setUserPickerWidget(Widget w) {
 		userSelectContainer.clear();
@@ -188,14 +195,5 @@ public class ACTViewImpl implements ACTView {
 			}
 		});
 		return a;
-	}
-	
-	@Override
-	public String getSelectedState() {
-		return stateComboBox.getSelectedValue();
-	}
-	@Override
-	public void setSelectedState(int index) {
-		stateComboBox.setSelectedIndex(index);
 	}
 }

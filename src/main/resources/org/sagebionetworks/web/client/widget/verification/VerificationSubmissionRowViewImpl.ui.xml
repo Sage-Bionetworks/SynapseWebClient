@@ -9,10 +9,13 @@
   	<bh:Div addStyleNames="margin-left-10 margin-right-10">
 	  	<t:Table width="100%" height="30px" addStyleNames="markdowntable table-layout-fixed">
 			<t:TableRow>
-				<t:TableData width="10%" addStyleNames="overflowHidden">
+				<t:TableData width="6%" addStyleNames="hidden-xs overflowHidden">
+					<bh:Span ui:field="state"/>
+				</t:TableData>
+				<t:TableData width="7%" addStyleNames="overflowHidden">
 					<b:Anchor ui:field="profileAnchor" target="_blank" />
 				</t:TableData>
-				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">
+				<t:TableData width="7%" addStyleNames="hidden-xs overflowHidden">
 					<bh:Span ui:field="firstName"/>
 				</t:TableData>
 				<t:TableData width="10%" addStyleNames="hidden-xs overflowHidden">

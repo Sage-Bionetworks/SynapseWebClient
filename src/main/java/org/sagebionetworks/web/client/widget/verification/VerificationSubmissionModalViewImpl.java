@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -298,6 +299,10 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	}
 	@Override
 	public void setProfileLink(String profileId, String href) {
+		//Not used in this view implementation
+	}
+	@Override
+	public void setState(VerificationStateEnum state) {
 		//Not used in this view implementation
 	}
 }

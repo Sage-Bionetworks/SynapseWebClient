@@ -112,6 +112,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		suggestBox.setVisible(true);
 		selectedItem.setVisible(false);
 		selectedItem.setText("");
+		selectedItemText.setText("");
 	}
 	
 	public void selectSuggestion(SynapseSuggestion suggestion) {
