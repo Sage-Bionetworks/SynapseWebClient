@@ -53,7 +53,6 @@ public class EvaluationSubmitter implements Presenter {
 	private Team selectedTeam;
 	private String selectedTeamMemberStateHash;
 	private List<Long> selectedTeamEligibleMembers;
-	private PortalGinInjector ginInjector;
 	private SynapseAlert challengeListSynAlert;
 	private SynapseAlert teamSelectSynAlert;
 	private SynapseAlert contributorSynAlert;
@@ -74,7 +73,6 @@ public class EvaluationSubmitter implements Presenter {
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
 		this.gwt = gwt;
-		this.ginInjector = ginInjector;
 		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();
 		this.teamSelectSynAlert = ginInjector.getSynapseAlertWidget();
 		this.contributorSynAlert = ginInjector.getSynapseAlertWidget();
@@ -140,6 +138,7 @@ public class EvaluationSubmitter implements Presenter {
 					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 				} 
 				else {
+					view.setEvaluationListVisible(evaluations.size() > 1);
 					view.showModal1(submissionEntity == null, evaluations);
 				}
 			}

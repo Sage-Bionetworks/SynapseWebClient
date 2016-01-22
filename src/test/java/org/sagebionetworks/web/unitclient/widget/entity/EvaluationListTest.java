@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -35,6 +35,18 @@ public class EvaluationListTest {
 		//configure with no evaluations
 		List<Evaluation> emptyList = new ArrayList<Evaluation>();
 		widget.configure(emptyList);
+		verify(mockView, never()).setSelectedEvaluationIndex(anyInt());
+	}
+	
+	@Test
+	public void testGetSingleSelectedEvaluation() throws RestServiceException {
+		//user selected none
+		List<Evaluation> evaluations = new ArrayList<Evaluation>();
+		evaluations.add(new Evaluation());
+		widget.configure(evaluations);
+		verify(mockView).setSelectedEvaluationIndex(0);
+		when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
+		assertNull(widget.getSelectedEvaluation());
 	}
 	
 	@Test
@@ -44,6 +56,7 @@ public class EvaluationListTest {
 		evaluations.add(new Evaluation());
 		evaluations.add(new Evaluation());
 		widget.configure(evaluations);
+		verify(mockView, never()).setSelectedEvaluationIndex(anyInt());
 		when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
 		assertNull(widget.getSelectedEvaluation());
 	}

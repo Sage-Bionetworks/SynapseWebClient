@@ -109,4 +109,8 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 		}
 		return null;
 	}
+	@Override
+	public void setSelectedEvaluationIndex(int i) {
+		evaluationCheckboxes.get(i).setValue(true, true);
+	}
 }
