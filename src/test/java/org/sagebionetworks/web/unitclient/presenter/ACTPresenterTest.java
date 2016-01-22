@@ -124,6 +124,7 @@ public class ACTPresenterTest {
 	@Test
 	public void testOnUserSelected() {
 		widget.setPlace(new ACTPlace(""));
+		reset(mockView, mockPeopleSuggestBox);
 		widget.onUserSelected(mockSuggestion);
 		assertEquals(OWNER_ID, widget.getPlace().getParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM));
 		verify(mockUserBadge).configure(OWNER_ID);
@@ -134,7 +135,7 @@ public class ACTPresenterTest {
 	@Test
 	public void testClearUserFilter() {
 		widget.setPlace(new ACTPlace(""));
-		reset(mockView);
+		reset(mockView, mockPeopleSuggestBox);
 		widget.onClearUserFilter();
 		assertNull(widget.getPlace().getParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM));
 		verify(mockPeopleSuggestBox).clear();
