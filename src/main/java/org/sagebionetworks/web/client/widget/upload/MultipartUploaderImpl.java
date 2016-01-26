@@ -35,7 +35,7 @@ import com.google.inject.Inject;
  */
 public class MultipartUploaderImpl implements MultipartUploader {
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
-	
+	public static final String BINARY_CONTENT_TYPE = "application/octet-stream";
 	//if any parts fail to upload, then it will restart the upload from the beginning up to 10 times, with a 3 second delay between attempts.
 	public static final int RETRY_DELAY = 3000;
 	
@@ -187,6 +187,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void attemptUploadCurrentPart() {
 		log("attemptChunkUpload: attempting to upload part number = "+currentPartNumber+"\n");
 		BatchPresignedUploadUrlRequest batchPresignedUploadUrlRequest = new BatchPresignedUploadUrlRequest();
+		batchPresignedUploadUrlRequest.setContentType(BINARY_CONTENT_TYPE);
 		batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPartNumber)));
 		batchPresignedUploadUrlRequest.setUploadId(currentStatus.getUploadId());
 		multipartFileUploadClient.getMultipartPresignedUrlBatch(batchPresignedUploadUrlRequest, new AsyncCallback<BatchPresignedUploadUrlResponse>() {
@@ -231,7 +232,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 							handler.updateProgress(currentProgress, progressText);
 						}
 					};
-					synapseJsniUtils.uploadFileChunk(request.getContentType(), fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
+					synapseJsniUtils.uploadFileChunk(BINARY_CONTENT_TYPE, fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
 				}
 			}
 		});

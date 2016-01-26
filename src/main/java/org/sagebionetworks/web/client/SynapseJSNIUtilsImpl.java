@@ -204,8 +204,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-  		//explicitly set content type to application/octet-stream (s3 signature match)
-  		xhr.setRequestHeader('Content-type', 'application/octet-stream');
+  		//explicitly set content type
+  		xhr.setRequestHeader('Content-type', contentType);
   		xhr.send(fileSliceToUpload);
 	}-*/;
 	
