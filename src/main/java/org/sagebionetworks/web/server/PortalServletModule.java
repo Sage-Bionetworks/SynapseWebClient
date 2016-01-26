@@ -146,7 +146,7 @@ public class PortalServletModule extends ServletModule {
 
 		// Discussion message download
 		bind(DiscussionMessageServlet.class).in(Singleton.class);
-		serve("/Portal/discussion/messageUrl").with(DiscussionMessageServlet.class);
+		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
 
 		
 		//Jira client service mapping
