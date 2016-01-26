@@ -1,27 +1,19 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.MAX_RETRY;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -182,8 +174,10 @@ public class MultipartUploaderTest {
 		setPartsState("0");
 		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
-		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		ArgumentCaptor<BatchPresignedUploadUrlRequest> captor = ArgumentCaptor.forClass(BatchPresignedUploadUrlRequest.class);
+		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(captor.capture(), any(AsyncCallback.class));
+		assertEquals(MultipartUploaderImpl.BINARY_CONTENT_TYPE, captor.getValue().getContentType());
+		verify(synapseJsniUtils).uploadFileChunk(eq(MultipartUploaderImpl.BINARY_CONTENT_TYPE), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
 		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
@@ -255,10 +249,16 @@ public class MultipartUploaderTest {
 		setPartsState("0");
 		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		//simulate the single part fails to upload MAX_RETRY times
-		for (int i = 0; i < MAX_RETRY; i++) {
+		for (int i = 0; i < 11; i++) {
 			uploader.partFailure("part failed");
 		}
-		verify(mockHandler).uploadFailed(EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE);
+		//should have retried 11 times.  plus the initial attempt, so 12 calls to start the upload...
+		verify(mockMultipartFileUploadClient, times(12)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		//close dialog, and retry once more
+		when(synapseJsniUtils.isElementExists(anyString())).thenReturn(false);
+		reset(mockMultipartFileUploadClient);
+		uploader.partFailure("part failed");
+		verifyZeroInteractions(mockMultipartFileUploadClient);
 	}
 	
 	@Test
@@ -335,5 +335,14 @@ public class MultipartUploaderTest {
 		// should fix text files as well
 		inputFilename = "file.TXT";
 		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+	}
+	
+	@Test
+	public void testCompletedPartCount() {
+		assertEquals(0, uploader.getCompletedPartCount(""));
+		assertEquals(0, uploader.getCompletedPartCount("0"));
+		assertEquals(0, uploader.getCompletedPartCount("0000"));
+		assertEquals(2, uploader.getCompletedPartCount("0101"));
+		assertEquals(4, uploader.getCompletedPartCount("1111"));
 	}
 }
