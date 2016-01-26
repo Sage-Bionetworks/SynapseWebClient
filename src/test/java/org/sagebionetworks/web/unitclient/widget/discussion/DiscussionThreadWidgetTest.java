@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
@@ -278,6 +279,7 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 
@@ -292,6 +294,7 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
 	}
@@ -309,6 +312,7 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
 	}

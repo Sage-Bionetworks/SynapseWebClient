@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 
@@ -281,4 +280,8 @@ public class WebConstants {
 	public static final String TYPE_PARAM = "type";
 	public static final String THREAD_TYPE = "thread";
 	public static final String REPLY_TYPE = "reply";
+
+	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
+
+	public static final String CONTENT_TYPE = "Content-Type";
 }

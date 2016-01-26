@@ -134,6 +134,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		synAlert.clear();
 		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.THREAD_TYPE);
 		requestBuilder.configure(RequestBuilder.GET, url);
+		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {
