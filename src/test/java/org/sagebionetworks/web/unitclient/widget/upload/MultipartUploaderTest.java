@@ -1,25 +1,19 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static junit.framework.Assert.*;
-import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -180,7 +174,9 @@ public class MultipartUploaderTest {
 		setPartsState("0");
 		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		ArgumentCaptor<BatchPresignedUploadUrlRequest> captor = ArgumentCaptor.forClass(BatchPresignedUploadUrlRequest.class);
+		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(captor.capture(), any(AsyncCallback.class));
+		assertEquals(MultipartUploaderImpl.BINARY_CONTENT_TYPE, captor.getValue().getContentType());
 		verify(synapseJsniUtils).uploadFileChunk(eq(MultipartUploaderImpl.BINARY_CONTENT_TYPE), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
