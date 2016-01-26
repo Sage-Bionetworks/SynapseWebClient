@@ -274,5 +274,11 @@ public class WebConstants {
 	
 	public static final String OAUTH2_PROVIDER = "oauth2provider";
 	public static final String OAUTH2_CODE = "code";
-	
+
+	// discussion message
+	public static final String DISCUSSION_MESSAGE_SERVLET = "/discussion/messageUrl";
+	public static final String MESSAGE_KEY_PARAM = "messageKey";
+	public static final String TYPE_PARAM = "type";
+	public static final String THREAD_TYPE = "thread";
+	public static final String REPLY_TYPE = "reply";
 }
