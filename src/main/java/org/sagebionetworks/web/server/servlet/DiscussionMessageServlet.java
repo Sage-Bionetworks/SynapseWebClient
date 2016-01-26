@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -71,7 +70,7 @@ public class DiscussionMessageServlet extends HttpServlet {
 				throw new IllegalArgumentException("Do not support type "+type);
 			}
 			response.sendRedirect(resolvedUrl.toString());
-		} catch (SynapseException e) {
+		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 		}
 	}
