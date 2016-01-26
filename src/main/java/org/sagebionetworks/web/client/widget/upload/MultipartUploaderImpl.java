@@ -34,12 +34,9 @@ import com.google.inject.Inject;
  *
  */
 public class MultipartUploaderImpl implements MultipartUploader {
-
-	public static final String EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE = "Exceeded the maximum number of attempts to upload a file. Please try again later.";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
 	
 	//if any parts fail to upload, then it will restart the upload from the beginning up to 10 times, with a 3 second delay between attempts.
-	public static final int MAX_RETRY = 10;
 	public static final int RETRY_DELAY = 3000;
 	
 	private GWTWrapper gwt;
@@ -64,10 +61,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private ProgressingFileUploadHandler handler;
 	//Will retry the entire file upload if any part fails to upload.  Use this variable to flag the necessity to retry after going through all parts.
 	private boolean retryRequired;
-	//Keep track of how many times we try to upload the file (processing all parts).
-	private int attempt;
 	//Keep track of the part number (1-based index) that we are currently trying to upload.
 	private int currentPartNumber;
+	private int completedPartCount;
 	
 	//in alpha mode, upload log is sent to the js console
 	private boolean isDebugLevelLogging = false;
@@ -101,7 +97,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	@Override
 	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, final Long storageLocationId) {
 		//initialize attempt count. 
-		attempt=0;
 		this.request = null;
 		this.totalPartCount = 0;
 		this.fileInputId = fileInputId;
@@ -137,31 +132,37 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * Start uploading the file
 	 */
 	public void startMultipartUpload() {
-		attempt++;
-		if (attempt <= MAX_RETRY) {
-			if (isStillUploading()) {
-				retryRequired = false;
-				//update the status and process
-				multipartFileUploadClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
-					@Override
-					public void onFailure(Throwable t) {
-						logError(t.getMessage());
-						handler.uploadFailed(t.getMessage());
-					}
-					
-					@Override
-					public void onSuccess(MultipartUploadStatus status) {
-						currentStatus = status;
-						currentPartNumber = 0;
-						totalPartCount = currentStatus.getPartsState().length();
-						log("attemptChunkUpload: attempt number "+attempt+" to upload file.\n");
-						attemptToUploadNextPart();
-					}
-				});
-			}
-		} else {
-			handler.uploadFailed(EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE);
+		if (isStillUploading()) {
+			retryRequired = false;
+			//update the status and process
+			multipartFileUploadClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
+				@Override
+				public void onFailure(Throwable t) {
+					logError(t.getMessage());
+					handler.uploadFailed(t.getMessage());
+				}
+				
+				@Override
+				public void onSuccess(MultipartUploadStatus status) {
+					currentStatus = status;
+					currentPartNumber = 0;
+					totalPartCount = currentStatus.getPartsState().length();
+					completedPartCount = getCompletedPartCount(currentStatus.getPartsState());
+					attemptToUploadNextPart();
+				}
+			});
 		}
+	}
+	
+	public int getCompletedPartCount(String partState) {
+		int successCount = 0;
+		for (int i = 0; i < partState.length(); i++) {
+			if (partState.charAt(i) == '1') {
+				successCount++;
+			}
+		}
+		
+		return successCount;
 	}
 	
 	/**
@@ -225,7 +226,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						public void updateProgress(double value) {
 							//Note:  0 <= value <= 1
 							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-							double currentProgress = (((double)(currentPartNumber-1)) + value)/((double)totalPartCount);
+							double currentProgress = (((double)(completedPartCount-1)) + value)/((double)totalPartCount);
 							String progressText = percentFormat.format(currentProgress*100.0) + "%";
 							handler.updateProgress(currentProgress, progressText);
 						}
@@ -316,6 +317,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						
 						public void onSuccess(AddPartResponse addPartResponse) {
 							if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
+								completedPartCount++;
 								partSuccess();
 							} else {
 								partFailure(addPartResponse.getErrorMessage());

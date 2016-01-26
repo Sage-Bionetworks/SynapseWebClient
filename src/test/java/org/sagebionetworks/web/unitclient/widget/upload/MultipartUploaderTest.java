@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -11,11 +11,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.MAX_RETRY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,10 +253,16 @@ public class MultipartUploaderTest {
 		setPartsState("0");
 		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		//simulate the single part fails to upload MAX_RETRY times
-		for (int i = 0; i < MAX_RETRY; i++) {
+		for (int i = 0; i < 11; i++) {
 			uploader.partFailure("part failed");
 		}
-		verify(mockHandler).uploadFailed(EXCEEDED_THE_MAXIMUM_UPLOAD_A_FILE);
+		//should have retried 11 times.  plus the initial attempt, so 12 calls to start the upload...
+		verify(mockMultipartFileUploadClient, times(12)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		//close dialog, and retry once more
+		when(synapseJsniUtils.isElementExists(anyString())).thenReturn(false);
+		reset(mockMultipartFileUploadClient);
+		uploader.partFailure("part failed");
+		verifyZeroInteractions(mockMultipartFileUploadClient);
 	}
 	
 	@Test
@@ -335,5 +339,14 @@ public class MultipartUploaderTest {
 		// should fix text files as well
 		inputFilename = "file.TXT";
 		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+	}
+	
+	@Test
+	public void testCompletedPartCount() {
+		assertEquals(0, uploader.getCompletedPartCount(""));
+		assertEquals(0, uploader.getCompletedPartCount("0"));
+		assertEquals(0, uploader.getCompletedPartCount("0000"));
+		assertEquals(2, uploader.getCompletedPartCount("0101"));
+		assertEquals(4, uploader.getCompletedPartCount("1111"));
 	}
 }
