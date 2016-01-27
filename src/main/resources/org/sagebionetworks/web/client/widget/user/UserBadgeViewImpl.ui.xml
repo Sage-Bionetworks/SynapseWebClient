@@ -18,7 +18,7 @@
 					<g:HTMLPanel>
 						<span class="fa-stack">
 							<b:Icon ui:field="squareIcon" type="SQUARE_O" addStyleNames="font-size-1-5x fa-stack-1x"/>
-							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x"/>
+							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x moveup-1"/>
 						</span>
 					</g:HTMLPanel>
 				</g:FocusPanel>
