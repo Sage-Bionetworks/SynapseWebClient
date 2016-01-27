@@ -17,10 +17,10 @@
 		  	</bh:Div>
 		  	<bh:Span ui:field="headerButtons" addStyleNames="right">
 				<b:Tooltip placement="BOTTOM" title="Log out">
-					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="26px" />	
+					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="28px" />	
 				</b:Tooltip>
 				<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px">Help</b:Button>
+					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="28px">Help</b:Button>
 					<b:DropDownMenu addStyleNames="dropdown-menu-right">
 						<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Synapse tutorial</b:AnchorListItem>
 						<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
@@ -33,20 +33,20 @@
 				</b:ButtonGroup> 
 				<b:Tooltip placement="BOTTOM" title="Favorites">
 					<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
-						<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px" addStyleNames="favoriteIcon"></b:Button>
+						<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="28px" addStyleNames="favoriteIcon"></b:Button>
 						<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
 						</b:DropDownMenu>
 					</b:ButtonGroup>
 				</b:Tooltip>
-				<b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" height="26px" >@ Trash can</b:Button>
+				<b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" height="28px" >@ Trash can</b:Button>
 			    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-					<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
+					<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Log in</b:Button>
 				</g:SimplePanel>
 			    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-					<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="26px">Register</b:Button>
+					<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
 				</g:SimplePanel>
 				<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px" addStyleNames="my-dashboard-header-button" />
+					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="28px" addStyleNames="my-dashboard-header-button" />
 				</g:SimplePanel>
 			    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
 				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">

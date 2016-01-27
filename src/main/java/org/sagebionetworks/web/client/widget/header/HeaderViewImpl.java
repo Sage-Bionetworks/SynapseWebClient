@@ -131,7 +131,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
 		myDashboardButtonContents = new HorizontalPanel();
-		myDashboardButtonContents.addStyleName("moveup-3");
+		myDashboardButtonContents.addStyleName("moveup-1");
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		myDashboardButtonContents.add(userBadge.asWidget());
 		userBadgeText = new Span();
