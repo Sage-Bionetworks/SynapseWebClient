@@ -63,9 +63,9 @@ public class DiscussionMessageServlet extends HttpServlet {
 		try {
 			URL resolvedUrl = null;
 			if (type.equals(WebConstants.THREAD_TYPE)) {
-				resolvedUrl = client.getThreadMessageUrl(messageKey);
+				resolvedUrl = client.getThreadUrl(messageKey);
 			} else if (type.equals(WebConstants.REPLY_TYPE)) {
-				resolvedUrl = client.getReplyMessageUrl(messageKey);
+				resolvedUrl = client.getReplyUrl(messageKey);
 			} else {
 				throw new IllegalArgumentException("Do not support type "+type);
 			}

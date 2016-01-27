@@ -136,6 +136,9 @@ public class DiscussionThreadWidgetTest {
 
 	@Test
 	public void testToggleThreadWithThreadDetailsCollapsed() {
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey");
+		discussionThreadWidget.configure(threadBundle);
 		when(mockView.isThreadCollapsed()).thenReturn(true);
 		discussionThreadWidget.toggleThread();
 		verify(mockView).setThreadDownIconVisible(false);

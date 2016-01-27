@@ -54,8 +54,8 @@ public class DiscussionMessageServletTest {
 		ReflectionTestUtils.setField(servlet, "tokenProvider", mockTokenProvider);
 
 		URL resolvedUrl = new URL("http://localhost/file.png");
-		when(mockSynapse.getThreadMessageUrl(anyString())).thenReturn(resolvedUrl);
-		when(mockSynapse.getReplyMessageUrl(anyString())).thenReturn(resolvedUrl);
+		when(mockSynapse.getThreadUrl(anyString())).thenReturn(resolvedUrl);
+		when(mockSynapse.getReplyUrl(anyString())).thenReturn(resolvedUrl);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
@@ -78,7 +78,7 @@ public class DiscussionMessageServletTest {
 		when(mockRequest.getParameter(WebConstants.TYPE_PARAM)).thenReturn(WebConstants.THREAD_TYPE);
 		servlet.doGet(mockRequest, mockResponse);
 
-		verify(mockSynapse).getThreadMessageUrl(anyString());
+		verify(mockSynapse).getThreadUrl(anyString());
 		verify(mockResponse).sendRedirect(anyString());
 
 		//as an additional test, verify that synapse client is set up
@@ -105,7 +105,7 @@ public class DiscussionMessageServletTest {
 		when(mockRequest.getParameter(WebConstants.TYPE_PARAM)).thenReturn(WebConstants.REPLY_TYPE);
 		servlet.doGet(mockRequest, mockResponse);
 
-		verify(mockSynapse).getReplyMessageUrl(anyString());
+		verify(mockSynapse).getReplyUrl(anyString());
 		verify(mockResponse).sendRedirect(anyString());
 
 		//as an additional test, verify that synapse client is set up
@@ -115,7 +115,7 @@ public class DiscussionMessageServletTest {
 		verify(mockSynapse).setSessionToken(sessionToken);
 	}
 
-	@Test (expected=IllegalArgumentException.class)
+	@Test
 	public void testDoGetUnsupportedType() throws Exception {
 		String sessionToken = "fake";
 
@@ -131,6 +131,7 @@ public class DiscussionMessageServletTest {
 		when(mockRequest.getParameter(WebConstants.MESSAGE_KEY_PARAM)).thenReturn("key");
 		when(mockRequest.getParameter(WebConstants.TYPE_PARAM)).thenReturn("type");
 		servlet.doGet(mockRequest, mockResponse);
+		verify(mockResponse).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
 	}
 
 	@Test
@@ -148,7 +149,7 @@ public class DiscussionMessageServletTest {
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		when(mockRequest.getParameter(WebConstants.MESSAGE_KEY_PARAM)).thenReturn("key");
 		when(mockRequest.getParameter(WebConstants.TYPE_PARAM)).thenReturn(WebConstants.THREAD_TYPE);
-		when(mockSynapse.getThreadMessageUrl(anyString())).thenThrow(new SynapseBadRequestException());
+		when(mockSynapse.getThreadUrl(anyString())).thenThrow(new SynapseBadRequestException());
 		servlet.doGet(mockRequest, mockResponse);
 
 		verify(mockResponse).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
