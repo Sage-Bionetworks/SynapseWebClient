@@ -139,11 +139,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		boolean isFilenamePanelVisible = fileHandle != null;
 		fileNameContainer.setVisible(isFilenamePanelVisible);
 		if (isFilenamePanelVisible) {
+			fileName.setInnerText(entityBundle.getFileName());
 			//don't ask for the size if it's external, just display that this is external data
 			if (fileHandle instanceof ExternalFileHandle) {
 				ExternalFileHandle externalFileHandle = (ExternalFileHandle)fileHandle;
-				fileName.setInnerText(externalFileHandle.getExternalURL());
-
+				
 				if (externalFileHandle.getContentSize() != null) {
 					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
 				} else {
@@ -157,7 +157,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				}
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
-				fileName.setInnerText(entityBundle.getFileName());
 				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 				presenter.setS3Description();
 
