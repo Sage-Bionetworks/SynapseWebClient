@@ -5,9 +5,9 @@
 
 	<bh:Div addStyleNames="displayInlineTable">
 		<b:InputGroup>
-			<g:TextBox ui:field="searchField" height="26px" />
+			<g:TextBox ui:field="searchField" height="28px" />
 			<b:InputGroupButton>
-				<b:Button icon="SEARCH" ui:field="searchButton" height="26px"/>
+				<b:Button icon="SEARCH" ui:field="searchButton" height="28px"/>
 			</b:InputGroupButton>
 		</b:InputGroup>
 	</bh:Div>
