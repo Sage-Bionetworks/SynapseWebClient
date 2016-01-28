@@ -42,12 +42,13 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setAlert(synAlert.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator) {
 		view.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setDeleteButtonVisibility(isCurrentUserModerator);
 		configureMessage();
 	}
 

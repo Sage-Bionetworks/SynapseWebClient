@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -22,6 +23,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Paragraph replyMessage;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Button deleteButton;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -65,5 +68,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setAlert(Widget w) {
 		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void setDeleteButtonVisibility(Boolean visible) {
+		deleteButton.setVisible(visible);
 	}
 }

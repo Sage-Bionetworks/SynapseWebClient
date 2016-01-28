@@ -94,7 +94,7 @@ public class DiscussionThreadWidgetTest {
 	public void testConfigure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle, false);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
@@ -107,13 +107,34 @@ public class DiscussionThreadWidgetTest {
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setDeleteButtonVisible(false);
+	}
+
+	@Test
+	public void testConfigureWithModerator() {
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey");
+		discussionThreadWidget.configure(threadBundle, true);
+		verify(mockView).clear();
+		verify(mockView).setTitle("title");
+		verify(mockView).addActiveAuthor(any(Widget.class));
+		verify(mockView).setNumberOfReplies("1");
+		verify(mockView).setNumberOfViews("2");
+		verify(mockView).setLastActivity(anyString());
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockGinInjector).getUserBadgeWidget();
+		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setDeleteButtonVisible(true);
 	}
 
 	@Test
 	public void testConfigureWithZeroReplies(){
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle, false);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
@@ -126,6 +147,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@Test
@@ -138,12 +160,13 @@ public class DiscussionThreadWidgetTest {
 	public void testToggleThreadWithThreadDetailsCollapsed() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle);
+		discussionThreadWidget.configure(threadBundle, false);
 		when(mockView.isThreadCollapsed()).thenReturn(true);
 		discussionThreadWidget.toggleThread();
 		verify(mockView).setThreadDownIconVisible(false);
 		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).toggleThread();
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@Test
@@ -184,13 +207,14 @@ public class DiscussionThreadWidgetTest {
 	public void testConfigureReplies() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle);
+		discussionThreadWidget.configure(threadBundle, false);
 		discussionThreadWidget.configureReplies();
 		verify(mockSynAlert).clear();
 		verify(mockView).clearReplies();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(AsyncCallback.class));
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -198,7 +222,7 @@ public class DiscussionThreadWidgetTest {
 	public void testLoadmoreSuccess() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle);
+		discussionThreadWidget.configure(threadBundle, false);
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
@@ -219,6 +243,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -226,7 +251,7 @@ public class DiscussionThreadWidgetTest {
 	public void testLoadmoreFailure() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle, false);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
 						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
@@ -242,6 +267,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -249,7 +275,7 @@ public class DiscussionThreadWidgetTest {
 	public void testLoadmoreHasNextPage() {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 2L, 2L, new Date(), "messageKey");
-		discussionThreadWidget.configure(threadBundle );
+		discussionThreadWidget.configure(threadBundle, false);
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(LIMIT+1);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
@@ -270,6 +296,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@Test
@@ -278,12 +305,13 @@ public class DiscussionThreadWidgetTest {
 				1L, 1L, new Date(), "messageKey");
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configure(bundle, false);
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@Test
@@ -293,13 +321,14 @@ public class DiscussionThreadWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configure(bundle, false);
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	@Test
@@ -311,13 +340,14 @@ public class DiscussionThreadWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle);
+		discussionThreadWidget.configure(bundle, false);
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
+		verify(mockView).setDeleteButtonVisible(false);
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,

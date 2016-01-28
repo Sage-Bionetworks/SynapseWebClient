@@ -41,6 +41,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private Boolean ascending;
 	private String threadId;
 	private String messageKey;
+	private Boolean isCurrentUserModerator;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -72,7 +73,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle) {
+	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator) {
 		view.clear();
 		view.setTitle(bundle.getTitle());
 		for (String userId : bundle.getActiveAuthors()){
@@ -96,6 +97,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 				reconfigure();
 			}
 		});
+		this.isCurrentUserModerator = isCurrentUserModerator;
+		view.setDeleteButtonVisible(isCurrentUserModerator);
 	}
 
 	private void reconfigure() {
@@ -109,7 +112,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result);
+				configure(result, isCurrentUserModerator);
 			}
 		});
 		configureReplies();
@@ -206,7 +209,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 						offset += LIMIT;
 						for (DiscussionReplyBundle bundle : result.getResults()) {
 							ReplyWidget replyWidget = ginInjector.createReplyWidget();
-							replyWidget.configure(bundle);
+							replyWidget.configure(bundle, isCurrentUserModerator);
 							view.addReply(replyWidget.asWidget());
 						}
 						view.setLoadingVisible(false);

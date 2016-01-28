@@ -70,6 +70,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Icon replyUpIcon;
 	@UiField
 	HTMLPanel loadingUI;
+	@UiField
+	Button deleteButton;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -272,5 +274,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
+	}
+
+	@Override
+	public void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisible(visible);
 	}
 }

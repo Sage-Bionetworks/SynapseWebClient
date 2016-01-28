@@ -59,11 +59,24 @@ public class ReplyWidgetTest {
 	public void testConfigure() {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date());
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle);
+		replyWidget.configure(bundle, false);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
+		verify(mockView).setDeleteButtonVisibility(false);
+	}
+
+	@Test
+	public void testConfigureWithModerator() {
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date());
+		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
+		replyWidget.configure(bundle, true);
+		verify(mockView).clear();
+		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockJsniUtils).getRelativeTime(any(Date.class));
+		verify(mockView).setDeleteButtonVisibility(true);
 	}
 
 	@Test
@@ -77,11 +90,12 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date());
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle);
+		replyWidget.configure(bundle, false);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).setDeleteButtonVisibility(false);
 	}
 
 	@Test
@@ -90,12 +104,13 @@ public class ReplyWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle);
+		replyWidget.configure(bundle, false);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
+		verify(mockView).setDeleteButtonVisibility(false);
 	}
 
 	@Test
@@ -106,12 +121,13 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle);
+		replyWidget.configure(bundle, false);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
+		verify(mockView).setDeleteButtonVisibility(false);
 	}
 
 	private DiscussionReplyBundle createReplyBundle(String replyId, String author, String messageKey, Date createdOn) {

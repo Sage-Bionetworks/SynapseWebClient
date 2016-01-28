@@ -69,4 +69,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	boolean isReplyCollapsed();
 
 	void setLoadingVisible(boolean visible);
+
+	void setDeleteButtonVisible(boolean visible);
 }

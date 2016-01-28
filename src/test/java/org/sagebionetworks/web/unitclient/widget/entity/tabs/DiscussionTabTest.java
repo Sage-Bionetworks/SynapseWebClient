@@ -48,6 +48,7 @@ public class DiscussionTabTest {
 	Forum mockForum;
 
 	DiscussionTab tab;
+	private boolean canModerate = false;
 
 	@Before
 	public void setUp() {
@@ -79,7 +80,7 @@ public class DiscussionTabTest {
 
 		String entityId = "syn1"; 
 		String entityName = "discussion project test";
-		tab.configure(entityId, entityName);
+		tab.configure(entityId, entityName, canModerate);
 
 		verify(mockTab).setTabListItemVisible(true);
 
@@ -93,7 +94,7 @@ public class DiscussionTabTest {
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
-		verify(mockDiscussionThreadListWidget).configure(anyString());
+		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(canModerate));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -105,7 +106,7 @@ public class DiscussionTabTest {
 
 		String entityId = "syn1"; 
 		String entityName = "discussion project test";
-		tab.configure(entityId, entityName);
+		tab.configure(entityId, entityName, canModerate);
 
 		verify(mockTab).setTabListItemVisible(true);
 
@@ -119,8 +120,22 @@ public class DiscussionTabTest {
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
-		verify(mockDiscussionThreadListWidget, never()).configure(anyString());
+		verify(mockDiscussionThreadListWidget, never()).configure(anyString(), eq(canModerate));
 		verify(mockSynAlert).handleException(any(Exception.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureSuccessWithModerator() {
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1"; 
+		String entityName = "discussion project test";
+		canModerate = true;
+		tab.configure(entityId, entityName, canModerate);
+		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(canModerate));
 	}
 
 	@Test
@@ -128,7 +143,7 @@ public class DiscussionTabTest {
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		String entityId = "syn1"; 
 		String entityName = "discussion project test";
-		tab.configure(entityId, entityName);
+		tab.configure(entityId, entityName, canModerate);
 		verify(mockTab).setTabListItemVisible(false);
 	}
 

@@ -178,7 +178,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			tabs.showTab(discussionTab.asTab());
 		}
 		
-    	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later
+    	//note: the files/tables/wiki/discussion tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
     
@@ -356,7 +356,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	public void configureDiscussionTab() {
 		String projectId = projectHeader.getId();
-		discussionTab.configure(projectId, projectHeader.getName());
+		boolean canModerate = false;
+		if (projectBundle != null) {
+			canModerate = projectBundle.getPermissions().getCanModerate();
+		}
+		discussionTab.configure(projectId, projectHeader.getName(), canModerate);
 	}
 		
 	@Override

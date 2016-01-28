@@ -27,6 +27,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
+	Boolean isCurrentUserModerator;
 
 	@Inject
 	public DiscussionTab(
@@ -56,9 +57,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId,final String entityName) {
+	public void configure(final String entityId,final String entityName, final Boolean isCurrentUserModerator) {
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, areaToken));
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
 
 			@Override
@@ -71,10 +73,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				newThreadModal.configure(forum.getId(), new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forum.getId());
+						threadListWidget.configure(forum.getId(), isCurrentUserModerator);
 					}
 				});
-				threadListWidget.configure(forum.getId());
+				threadListWidget.configure(forum.getId(), isCurrentUserModerator);
 			}
 		});
 	}
