@@ -22,6 +22,10 @@
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileSize" />
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileLocation" />
 				<g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
+				<div ui:field="externalUrlUI">
+					<span class="boldText">URL:</span>
+					<span ui:field="externalUrl"/>
+				</div>
 			</g:HTMLPanel>
 		</g:HTMLPanel>
 	</g:HTMLPanel>
