@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.MultipartFileUploadClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
@@ -143,6 +143,11 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Discussion Forum service mapping
 		bind(DiscussionForumClientImpl.class).in(Singleton.class);
 		serve("/Portal/discussionforumclient").with(DiscussionForumClientImpl.class);
+
+		// Discussion message download
+		bind(DiscussionMessageServlet.class).in(Singleton.class);
+		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
+
 		
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);

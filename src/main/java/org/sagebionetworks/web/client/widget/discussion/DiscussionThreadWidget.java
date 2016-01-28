@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -14,6 +13,7 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -40,6 +40,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
 	private String threadId;
+	private String messageKey;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -87,6 +88,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		threadId = bundle.getId();
+		messageKey = bundle.getMessageKey();
 		newReplyModal.configure(bundle.getId(), new Callback(){
 
 			@Override
@@ -130,22 +132,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	public void configureMessage() {
 		synAlert.clear();
-		discussionForumClientAsync.getThreadUrl(threadId, new AsyncCallback<MessageURL>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-
-			@Override
-			public void onSuccess(MessageURL result) {
-				getMessage(result);
-			}
-		});
-	}
-
-	public void getMessage(MessageURL result) {
-		requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
+		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.THREAD_TYPE);
+		requestBuilder.configure(RequestBuilder.GET, url);
+		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {
@@ -156,7 +145,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 					if (statusCode == Response.SC_OK) {
 						view.setMessage(response.getText());
 					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId));
+						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId + ". Reason: " + response.getStatusText()));
 					}
 				}
 			});

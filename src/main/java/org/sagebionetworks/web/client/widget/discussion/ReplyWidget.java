@@ -1,18 +1,16 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
-import org.sagebionetworks.repo.model.discussion.MessageURL;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -23,8 +21,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
-	DiscussionForumClientAsync discussionForumClientAsync;
 	private String replyId;
+	private String messageKey;
 
 	@Inject
 	public ReplyWidget(
@@ -32,14 +30,12 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			UserBadge authorWidget,
 			SynapseJSNIUtils jsniUtils,
 			SynapseAlert synAlert,
-			DiscussionForumClientAsync discussionForumClientAsync,
 			RequestBuilderWrapper requestBuilder
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
 		this.jsniUtils = jsniUtils;
 		this.synAlert = synAlert;
-		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.requestBuilder = requestBuilder;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
@@ -49,6 +45,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	public void configure(DiscussionReplyBundle bundle) {
 		view.clear();
 		this.replyId = bundle.getId();
+		this.messageKey = bundle.getMessageKey();
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		configureMessage();
@@ -56,22 +53,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	public void configureMessage() {
 		synAlert.clear();
-		discussionForumClientAsync.getReplyUrl(replyId, new AsyncCallback<MessageURL>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-
-			@Override
-			public void onSuccess(MessageURL result) {
-				getMessage(result);
-			}
-		});
-	}
-
-	private void getMessage(MessageURL result) {
-		requestBuilder.configure(RequestBuilder.GET, result.getMessageUrl());
+		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.REPLY_TYPE);
+		requestBuilder.configure(RequestBuilder.GET, url);
+		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {
@@ -82,7 +66,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 					if (statusCode == Response.SC_OK) {
 						view.setMessage(response.getText());
 					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId));
+						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
 					}
 				}
 			});
