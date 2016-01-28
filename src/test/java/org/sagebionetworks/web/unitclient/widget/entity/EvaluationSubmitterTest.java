@@ -218,15 +218,30 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
-	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
+	public void testShowSingleAvailableEvaluation() throws RestServiceException, JSONObjectAdapterException {
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(1);
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		evaluationList.add(new Evaluation());
 		availableEvaluations.setResults(evaluationList);
-		
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockView).setEvaluationListVisible(false);
+		verify(mockView).showModal1(anyBoolean(), any(List.class));
+	}
+	@Test
+	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
+		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
+		availableEvaluations.setTotalNumberOfResults(2);
+		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		evaluationList.add(new Evaluation());
+		evaluationList.add(new Evaluation());
+		availableEvaluations.setResults(evaluationList);
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		submitter.configure(entity, null);
+		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockView).setEvaluationListVisible(true);
 		verify(mockView).showModal1(anyBoolean(), any(List.class));
 	}
 	

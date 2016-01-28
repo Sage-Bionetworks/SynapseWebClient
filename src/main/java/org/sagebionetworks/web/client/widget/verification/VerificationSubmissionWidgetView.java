@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -34,6 +35,7 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void setSuspendButtonVisible(boolean visible);
 	void setSuspendedReason(String reason);
 	void setSuspendedAlertVisible(boolean visible);
+	void setState(VerificationStateEnum state);
 	void popupError(String message);
 	void openWindow(String url);
 	void setPromptModal(Widget w);

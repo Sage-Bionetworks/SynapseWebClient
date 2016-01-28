@@ -293,6 +293,7 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockFileHandleList).setCanUpload(false);
 		verify(mockFileHandleList).addFileLink(anyString(), anyString());
 		verify(mockFileHandleList).refreshLinkUI();
+		verify(mockView).setState(VerificationStateEnum.SUBMITTED);
 		verify(mockView).show();
 	}
 	
