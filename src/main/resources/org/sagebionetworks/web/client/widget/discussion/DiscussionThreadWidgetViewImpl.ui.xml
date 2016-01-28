@@ -65,7 +65,7 @@
 			<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-top-10 margin-bottom-10">
 				<b:ButtonGroup>
 					<b:Button ui:field="replyButton">Reply</b:Button>
-					<b:Button ui:field="deleteButton" icon="TRASH_O" visible="false">Delete</b:Button>
+					<b:Button ui:field="deleteButton" icon="TRASH_O" visible="false">Delete Thread</b:Button>
 				</b:ButtonGroup>
 			</bh:Div>
 		</b:Collapse>

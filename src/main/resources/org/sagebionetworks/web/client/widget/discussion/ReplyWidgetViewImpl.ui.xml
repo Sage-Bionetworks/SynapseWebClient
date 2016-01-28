@@ -18,7 +18,7 @@
 		<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
 		<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-top-10 margin-bottom-10">
 			<b:ButtonGroup>
-				<b:Button ui:field="deleteButton" icon="TRASH_O" visible="false">Delete</b:Button>
+				<b:Button ui:field="deleteButton" icon="TRASH_O" visible="false">Delete Reply</b:Button>
 			</b:ButtonGroup>
 		</bh:Div>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
