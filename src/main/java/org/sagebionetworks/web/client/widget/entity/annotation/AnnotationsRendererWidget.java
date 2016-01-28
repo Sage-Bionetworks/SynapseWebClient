@@ -44,8 +44,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 		this.view.addEditorToPage(editorDialog.asWidget());
 	}
 
-	@Override
-	public void configure(EntityBundle bundle, boolean canEdit) {
+	public void configure(EntityBundle bundle, boolean canEdit, boolean isCurrentVersion) {
 		this.bundle = bundle;
 		annotationsList = annotationTransformer.annotationsToList(bundle.getAnnotations());
 		if (!annotationsList.isEmpty())
@@ -53,8 +52,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 		else {
 			view.showNoAnnotations();
 		}
-			
-		view.setEditUIVisible(canEdit);
+		view.setEditUIVisible(isCurrentVersion && canEdit);
 	}
 
 
