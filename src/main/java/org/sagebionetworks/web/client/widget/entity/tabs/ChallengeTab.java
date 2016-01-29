@@ -24,6 +24,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 		
 		view.setEvaluationList(evaluationList.asWidget());
 		tab.configure("Challenge", view.asWidget());
+		tab.setTabListItemVisible(false);
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
