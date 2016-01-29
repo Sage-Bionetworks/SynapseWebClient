@@ -227,7 +227,6 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).setEvaluationListVisible(false);
 		verify(mockView).showModal1(anyBoolean(), any(List.class));
 	}
 	@Test
@@ -241,7 +240,6 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).setEvaluationListVisible(true);
 		verify(mockView).showModal1(anyBoolean(), any(List.class));
 	}
 	

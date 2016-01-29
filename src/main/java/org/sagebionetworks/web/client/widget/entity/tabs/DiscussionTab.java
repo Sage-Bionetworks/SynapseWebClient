@@ -50,6 +50,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
+		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
