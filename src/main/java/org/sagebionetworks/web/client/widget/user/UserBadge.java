@@ -120,7 +120,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public String getColor(int hashcode) {
-		int index = hashcode % COLORS.length;
+		int index = Math.abs(hashcode % COLORS.length);
 		return COLORS[index];
 	}
 	
