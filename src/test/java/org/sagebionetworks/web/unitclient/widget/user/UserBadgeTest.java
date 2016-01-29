@@ -190,5 +190,8 @@ public class UserBadgeTest {
 		for (int i = 0; i < 100; i++) {
 			assertNotNull(userBadge.getColor(i));
 		}
+		
+		//test negative hashcode
+		assertNotNull(userBadge.getColor(-418745608));
 	}
 }
