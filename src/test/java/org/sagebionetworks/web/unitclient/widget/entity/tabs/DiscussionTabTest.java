@@ -96,7 +96,7 @@ public class DiscussionTabTest {
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
-		verify(mockView).setModeratorModeSwitchVisibility(canModerate);
+		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -123,7 +123,7 @@ public class DiscussionTabTest {
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
 		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
-		verify(mockView).setModeratorModeSwitchVisibility(canModerate);
+		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
@@ -139,7 +139,7 @@ public class DiscussionTabTest {
 		canModerate = true;
 		tab.configure(entityId, entityName, canModerate);
 		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
-		verify(mockView).setModeratorModeSwitchVisibility(canModerate);
+		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 	}
 
 	@Test

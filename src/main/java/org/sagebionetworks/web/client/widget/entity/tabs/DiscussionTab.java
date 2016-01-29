@@ -80,7 +80,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
 			}
 		});
-		view.setModeratorModeSwitchVisibility(isCurrentUserModerator);
+		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
 	}
 
 	public Tab asTab(){

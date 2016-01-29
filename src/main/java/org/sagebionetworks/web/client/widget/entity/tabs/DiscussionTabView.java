@@ -15,6 +15,6 @@ public interface DiscussionTabView extends IsWidget{
 	void setThreadList(Widget w);
 	void setNewThreadModal(Widget w);
 	void setAlert(Widget w);
-	void setModeratorModeSwitchVisibility(Boolean visible);
+	void setModeratorModeContainerVisibility(Boolean visible);
 	Boolean getModeratorMode();
 }

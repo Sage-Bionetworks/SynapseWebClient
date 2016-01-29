@@ -26,6 +26,8 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	Div synAlertContainer;
 	@UiField
 	ToggleSwitch moderatorModeSwitch;
+	@UiField
+	Div moderatorModeContainer;
 
 	private Presenter presenter;
 
@@ -76,8 +78,8 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	}
 
 	@Override
-	public void setModeratorModeSwitchVisibility(Boolean visible) {
-		moderatorModeSwitch.setVisible(visible);
+	public void setModeratorModeContainerVisibility(Boolean visible) {
+		moderatorModeContainer.setVisible(visible);
 	}
 
 	@Override
