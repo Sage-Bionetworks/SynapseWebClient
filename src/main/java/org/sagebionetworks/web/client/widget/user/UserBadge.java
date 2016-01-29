@@ -42,7 +42,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	boolean useCachedImage;
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
-	public static final String[] COLORS = {"silver","gray","black","red","maroon","olive","lime","green","aqua","teal","blue","navy","fuchsia","purple"};
+	public static final String[] COLORS = {"chocolate","black","firebrick","maroon","olive","limegreen","forestgreen","darkturquoise","teal","blue","navy","darkmagenta","purple", "stateblue","orangered","forestblue", "blueviolet"};
 	
 	@Inject
 	public UserBadge(UserBadgeView view, 
@@ -120,7 +120,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public String getColor(int hashcode) {
-		int index = hashcode % COLORS.length;
+		int index = Math.abs(hashcode % COLORS.length);
 		return COLORS[index];
 	}
 	
