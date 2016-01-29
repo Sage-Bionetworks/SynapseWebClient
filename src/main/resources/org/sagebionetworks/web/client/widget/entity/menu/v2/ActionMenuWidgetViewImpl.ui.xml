@@ -43,7 +43,6 @@
 						<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="MOVE_ENTITY">Move</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_DOI">Create DOI</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
-						<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link to This Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
 					</b:DropDownMenu>
 				</b:DropDown>
