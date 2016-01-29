@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 
 public class DiscussionTab implements DiscussionTabView.Presenter{
 	private final static Long PROJECT_VERSION_NUMBER = null;
+	public final static Boolean DEFAULT_MODERATOR_MODE = false;
 
 	Tab tab;
 	DiscussionTabView view;
@@ -27,7 +28,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
-	Boolean isCurrentUserModerator;
+	private String forumId;
 
 	@Inject
 	public DiscussionTab(
@@ -57,10 +58,9 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId,final String entityName, final Boolean isCurrentUserModerator) {
+	public void configure(final String entityId, final String entityName, final Boolean isCurrentUserModerator) {
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, areaToken));
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
-		this.isCurrentUserModerator = isCurrentUserModerator;
 		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
 
 			@Override
@@ -70,15 +70,17 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 			@Override
 			public void onSuccess(final Forum forum) {
-				newThreadModal.configure(forum.getId(), new Callback(){
+				forumId = forum.getId();
+				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forum.getId(), isCurrentUserModerator);
+						threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
 					}
 				});
-				threadListWidget.configure(forum.getId(), isCurrentUserModerator);
+				threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
 			}
 		});
+		view.setModeratorModeSwitchVisibility(isCurrentUserModerator);
 	}
 
 	public Tab asTab(){
@@ -88,5 +90,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	@Override
 	public void onClickNewThread() {
 		newThreadModal.show();
+	}
+
+	@Override
+	public void onModeratorModeChange() {
+		threadListWidget.configure(forumId, view.getModeratorMode());
 	}
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +95,8 @@ public class DiscussionTabTest {
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
-		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(canModerate));
+		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
+		verify(mockView).setModeratorModeSwitchVisibility(canModerate);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -120,7 +122,8 @@ public class DiscussionTabTest {
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
-		verify(mockDiscussionThreadListWidget, never()).configure(anyString(), eq(canModerate));
+		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
+		verify(mockView).setModeratorModeSwitchVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
@@ -135,7 +138,8 @@ public class DiscussionTabTest {
 		String entityName = "discussion project test";
 		canModerate = true;
 		tab.configure(entityId, entityName, canModerate);
-		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(canModerate));
+		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
+		verify(mockView).setModeratorModeSwitchVisibility(canModerate);
 	}
 
 	@Test

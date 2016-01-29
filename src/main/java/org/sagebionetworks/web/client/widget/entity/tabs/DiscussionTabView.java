@@ -7,10 +7,14 @@ public interface DiscussionTabView extends IsWidget{
 
 	public interface Presenter {
 		void onClickNewThread();
+
+		void onModeratorModeChange();
 	}
 
 	void setPresenter(Presenter presenter);
 	void setThreadList(Widget w);
 	void setNewThreadModal(Widget w);
 	void setAlert(Widget w);
+	void setModeratorModeSwitchVisibility(Boolean visible);
+	Boolean getModeratorMode();
 }

@@ -28,12 +28,12 @@
 	
     <inherits name="org.gwtvisualizationwrappers.CytoscapeJs"/>
     <inherits name="org.gwtvisualizationwrappers.Biodalliance13"/>
+    <inherits name="org.gwtbootstrap3.extras.toggleswitch.ToggleSwitch"/>
 
 	<!-- Commented out unused gwt bootstrap extra modules.  
 	Note that importing will cause the associated render-blocking css to loaded.
     <inherits name="org.gwtbootstrap3.extras.card.Card"/>
     <inherits name="org.gwtbootstrap3.extras.slider.Slider"/>
-    <inherits name="org.gwtbootstrap3.extras.toggleswitch.ToggleSwitch"/>
     <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
     <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
     <inherits name="org.gwtbootstrap3.extras.growl.Growl"/>
