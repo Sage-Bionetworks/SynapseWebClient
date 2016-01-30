@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -23,7 +24,12 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -44,6 +50,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	private CookieProvider cookies;
 	AuthenticationController authenticationController;
 	GWTWrapper gwt;
+	private SessionStorage sessionStorage;
 	PortalGinInjector ginInjector;
 	private ResourceLoader resourceLoader;
 	private String md;
@@ -59,7 +66,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			GWTWrapper gwt,
 			PortalGinInjector ginInjector,
 			MarkdownWidgetView view,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SessionStorage sessionStorage) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -70,6 +78,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.synAlert = synAlert;
+		this.sessionStorage = sessionStorage;
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
 	
@@ -88,29 +97,73 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
 		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
-		synapseClient.markdown2Html(md, uniqueSuffix, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(final String result) {
-				view.callbackWhenAttached(new Callback() {
-					@Override
-					public void invoke() {
-						if(result != null && !result.isEmpty()) {
-							view.setEmptyVisible(false);
-							view.setMarkdown(result);
-							loadMath(uniqueSuffix);
-							loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
-							loadTableSorters();
-						} else {
-							view.setEmptyVisible(true);
+		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+		String hostPrefix = gwt.getHostPrefix();
+		final String key = getKey(md, hostPrefix, isInTestWebsite);
+		final JSONObject cachedValue = getValueFromCache(key);
+		if(cachedValue == null) {
+			synapseClient.markdown2Html(md, uniqueSuffix, isInTestWebsite, hostPrefix, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(final String result) {
+					view.callbackWhenAttached(new Callback() {
+						@Override
+						public void invoke() {
+							//save in cache
+							sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+							loadHtml(uniqueSuffix, result);
 						}
-					}
-				});
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
+					});
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+			});
+		} else {
+			//used cached value
+			view.callbackWhenAttached(new Callback() {
+				@Override
+				public void invoke() {
+					JSONString suffix = (JSONString)cachedValue.get("uniqueSuffix");
+					JSONString html = (JSONString)cachedValue.get("html");
+					loadHtml(URL.decode(suffix.stringValue()), URL.decode(html.stringValue()));
+				}
+			});
+		}
+	}
+	
+	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {
+		JSONObject json = new JSONObject();
+		json.put("md", new JSONString(URL.encode(md)));
+		json.put("hostPrefix", new JSONString(URL.encode(hostPrefix)));
+		json.put("isInTestWebsite", new JSONString(Boolean.toString(isInTestWebsite)));
+		return json.toString();
+	}
+	
+	public String getValueToCache(String uniqueSuffix, String html) {
+		JSONObject json = new JSONObject();
+		json.put("uniqueSuffix", new JSONString(URL.encode(uniqueSuffix)));
+		json.put("html", new JSONString(URL.encode(html)));
+		return json.toString();
+	}
+	
+	public JSONObject getValueFromCache(String key) {
+		String value = sessionStorage.getItem(key);
+		if (value != null) {
+			return (JSONObject)JSONParser.parseStrict(value);
+		}
+		return null;
+	}
+	public void loadHtml(String uniqueSuffix, String result) {
+		if(result != null && !result.isEmpty()) {
+			view.setEmptyVisible(false);
+			view.setMarkdown(result);
+			loadMath(uniqueSuffix);
+			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
+			loadTableSorters();
+		} else {
+			view.setEmptyVisible(true);
+		}
 	}
 	
 	@Override
