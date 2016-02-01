@@ -16,6 +16,8 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -25,6 +27,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.shared.UserLoginBundle;
@@ -44,9 +47,12 @@ public class AuthenticationControllerImplTest {
 	CookieProvider mockCookieProvider;
 	UserAccountServiceAsync mockUserAccountService;
 	UserSessionData sessionData;
+	@Mock
+	SessionStorage mockSessionStorage;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		
@@ -60,7 +66,7 @@ public class AuthenticationControllerImplTest {
 		
 		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
 
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage);
 	}
 	
 	@Test
@@ -181,4 +187,10 @@ public class AuthenticationControllerImplTest {
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 	}
 	
+	@Test
+	public void testLogout() {
+		authenticationController.logoutUser();
+		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		verify(mockSessionStorage).clear();
+	}
 }
