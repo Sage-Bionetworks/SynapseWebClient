@@ -12,12 +12,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
@@ -56,9 +59,12 @@ public class MarkdownWidgetTest {
 	String testMarkdown = "markdown";
 	String elementContentType = "image";
 	Exception caught = new Exception("test");
+	@Mock
+	SessionStorage mockSessionStorage;
 	
 	@Before
 	public void setup() {
+		MockitoAnnotations.initMocks(this);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
@@ -76,7 +82,7 @@ public class MarkdownWidgetTest {
 		mockElementWrapper = mock(ElementWrapper.class);
 		//the mockElement to be rendered will be an image
 		when(mockElementWrapper.getAttribute("widgetParams")).thenReturn(elementContentType);
-		presenter = new MarkdownWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockCookies, mockResourceLoader, mockGwt, mockInjector, mockView, mockSynAlert);
+		presenter = new MarkdownWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockCookies, mockResourceLoader, mockGwt, mockInjector, mockView, mockSynAlert, mockSessionStorage);
 	}
 	
 	@Test

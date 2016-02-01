@@ -36,6 +36,8 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
@@ -370,4 +372,7 @@ public interface PortalGinInjector extends Ginjector {
 	// discussion
 	public DiscussionThreadWidget createThreadWidget();
 	public ReplyWidget createReplyWidget();
+	
+	public MarkdownCacheKey getMarkdownCacheKey();
+	public MarkdownCacheValue getMarkdownCacheValue();
 }

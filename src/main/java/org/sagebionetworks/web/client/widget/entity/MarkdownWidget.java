@@ -19,17 +19,14 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -100,7 +97,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 		String hostPrefix = gwt.getHostPrefix();
 		final String key = getKey(md, hostPrefix, isInTestWebsite);
-		final JSONObject cachedValue = getValueFromCache(key);
+		final MarkdownCacheValue cachedValue = getValueFromCache(key);
 		if(cachedValue == null) {
 			synapseClient.markdown2Html(md, uniqueSuffix, isInTestWebsite, hostPrefix, new AsyncCallback<String>() {
 				@Override
@@ -124,33 +121,30 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			view.callbackWhenAttached(new Callback() {
 				@Override
 				public void invoke() {
-					JSONString suffix = (JSONString)cachedValue.get("uniqueSuffix");
-					JSONString html = (JSONString)cachedValue.get("html");
-					loadHtml(URL.decode(suffix.stringValue()), URL.decode(html.stringValue()));
+					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
 				}
 			});
 		}
 	}
 	
 	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {
-		JSONObject json = new JSONObject();
-		json.put("md", new JSONString(URL.encode(md)));
-		json.put("hostPrefix", new JSONString(URL.encode(hostPrefix)));
-		json.put("isInTestWebsite", new JSONString(Boolean.toString(isInTestWebsite)));
-		return json.toString();
+		MarkdownCacheKey key = ginInjector.getMarkdownCacheKey();
+		key.init(md, hostPrefix, isInTestWebsite);
+		return key.toJSON();
 	}
 	
 	public String getValueToCache(String uniqueSuffix, String html) {
-		JSONObject json = new JSONObject();
-		json.put("uniqueSuffix", new JSONString(URL.encode(uniqueSuffix)));
-		json.put("html", new JSONString(URL.encode(html)));
-		return json.toString();
+		MarkdownCacheValue value = ginInjector.getMarkdownCacheValue();
+		value.init(uniqueSuffix, html);
+		return value.toJSON();
 	}
 	
-	public JSONObject getValueFromCache(String key) {
+	public MarkdownCacheValue getValueFromCache(String key) {
 		String value = sessionStorage.getItem(key);
 		if (value != null) {
-			return (JSONObject)JSONParser.parseStrict(value);
+			MarkdownCacheValue cacheValue = ginInjector.getMarkdownCacheValue();
+			cacheValue.init(value);
+			return cacheValue;
 		}
 		return null;
 	}
