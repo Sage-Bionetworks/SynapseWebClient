@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -401,7 +401,7 @@ public class DiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
-		verify(mockView).showDeleteConfirm(anyString(), any(ConfirmCallback.class));
+		verify(mockView).showDeleteConfirm(anyString(), any(AlertCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")

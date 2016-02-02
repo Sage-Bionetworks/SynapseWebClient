@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,5 +28,5 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setDeleteButtonVisibility(Boolean visible);
 
-	void showDeleteConfirm(String deleteConfirmMessage, ConfirmCallback confirmCallback);
+	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback callback);
 }

@@ -5,7 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -16,6 +16,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ReplyWidgetViewImpl implements ReplyWidgetView {
+
+	private static final String PRIMARY_BUTTON_STYLE = "btn-primary";
+
+	private static final String DANGER_BUTTON_STYLE = "btn-danger";
+
+	private static final String CANCEL = "Cancel";
+
+	private static final String DELETE = "Delete";
+
+	private static final String CONFIRM_DELETE_MESSAGE = "Confirm Deletion";
 
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
@@ -86,7 +96,13 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void showDeleteConfirm(String deleteConfirmMessage, ConfirmCallback deleteCallback) {
-		Bootbox.confirm(deleteConfirmMessage, deleteCallback);
+	public void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback) {
+		Bootbox.Dialog.create()
+		.setMessage(deleteConfirmMessage)
+		.setCloseButton(false)
+		.setTitle(CONFIRM_DELETE_MESSAGE)
+		.addButton(DELETE, DANGER_BUTTON_STYLE, deleteCallback)
+		.addButton(CANCEL, PRIMARY_BUTTON_STYLE)
+		.show();
 	}
 }

@@ -7,7 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,13 +22,23 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
 
-	private static final String DELETED_TEXT_STYLE = "deletedText";
+	private static final String PRIMARY_BUTTON_STYLE = "btn-primary";
+
+	private static final String DANGER_BUTTON_STYLE = "btn-danger";
+
+	private static final String CANCEL = "Cancel";
+
+	private static final String DELETE = "Delete";
+
+	private static final String DELETED_THREAD_TITLE = "<Deleted>";
 
 	private static final String DELETED_THREAD_TOOLTIP = "This thread has been deleted.";
 
 	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
 	public static final String REPLIES = "replies";
+
+	private static final String CONFIRM_DELETE_MESSAGE = "Confirm Deletion";
 
 	@UiField
 	Div replyListContainer;
@@ -294,13 +304,19 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void showDeleteConfirm(String deleteConfirmMessage, ConfirmCallback deleteCallback) {
-		Bootbox.confirm(deleteConfirmMessage, deleteCallback);
+	public void showDeleteConfirm(String deleteConfirmMessage, final AlertCallback deleteCallback) {
+		Bootbox.Dialog.create()
+				.setMessage(deleteConfirmMessage)
+				.setCloseButton(false)
+				.setTitle(CONFIRM_DELETE_MESSAGE)
+				.addButton(DELETE, DANGER_BUTTON_STYLE, deleteCallback)
+				.addButton(CANCEL, PRIMARY_BUTTON_STYLE)
+				.show();
 	}
 
 	@Override
 	public void setTitleAsDeleted() {
-		threadTitle.addStyleName(DELETED_TEXT_STYLE);
+		threadTitle.setText(DELETED_THREAD_TITLE);
 		threadTitle.setTitle(DELETED_THREAD_TOOLTIP);
 	}
 

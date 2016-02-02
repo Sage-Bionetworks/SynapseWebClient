@@ -7,7 +7,7 @@ import static org.sagebionetworks.web.client.widget.discussion.ReplyWidget.*;
 
 import java.util.Date;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -154,7 +154,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testOnClickDeleteReply() {
 		replyWidget.onClickDeleteReply();
-		verify(mockView).showDeleteConfirm(anyString(), any(ConfirmCallback.class));
+		verify(mockView).showDeleteConfirm(anyString(), any(AlertCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -98,13 +98,11 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickDeleteReply() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new ConfirmCallback(){
+		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new AlertCallback(){
 
 			@Override
-			public void callback(boolean result) {
-				if (result) {
-					deleteReply();
-				}
+			public void callback() {
+				deleteReply();
 			}
 		});
 	}
