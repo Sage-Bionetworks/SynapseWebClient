@@ -19,10 +19,10 @@
   		</b:Alert>
   		<g:HTMLPanel ui:field="httpCode404" visible="false">
   			<b:Row>
-  				<b:Column size="XS_2">
-  					<b:Icon type="WARNING" addStyleNames="text-warning font-size-5x" pull="RIGHT"/>
+  				<b:Column size="XS_6">
+  					<b:Image responsive="true" url="https://s3.amazonaws.com/static.synapse.org/stu/notfound.png"/>
   				</b:Column>
-  				<b:Column size="XS_10">
+  				<b:Column size="XS_6">
   					<b:Heading size="H3" text="The page you requested was not found." />	
   				</b:Column>
   			</b:Row>
