@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class ChallengeTabTest {
 		
 		verify(mockAdministerEvaluationsList).configure(eq(entityId), callbackCaptor.capture());
 		
-		verify(mockTab).setTabListItemVisible(false);
+		verify(mockTab, times(2)).setTabListItemVisible(false);
 		verify(mockTab, never()).setTabListItemVisible(true);
 		callbackCaptor.getValue().invoke(true);
 		verify(mockTab).setTabListItemVisible(true);

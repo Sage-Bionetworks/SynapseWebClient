@@ -9,6 +9,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.ClientCacheImpl;
+import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cache.SessionStorageImpl;
 import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -1200,5 +1202,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
+		
+		bind(SessionStorage.class).to(SessionStorageImpl.class);
 	}
 }

@@ -7,11 +7,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.shared.UserLoginBundle;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -31,11 +31,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
+	private SessionStorage sessionStorage;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
+		this.sessionStorage = sessionStorage;
 	}
 
 	@Override
@@ -64,12 +66,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void logoutUser() {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		sessionStorage.clear();
 		currentUser = null;
 		userBundle = null;
 	}
 
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
+			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}

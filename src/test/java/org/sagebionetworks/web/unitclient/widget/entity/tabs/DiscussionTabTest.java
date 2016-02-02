@@ -146,6 +146,7 @@ public class DiscussionTabTest {
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		String entityId = "syn1"; 
 		String entityName = "discussion project test";
+		reset(mockTab);
 		tab.configure(entityId, entityName, canModerate);
 		verify(mockTab).setTabListItemVisible(false);
 	}
