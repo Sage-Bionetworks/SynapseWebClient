@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
@@ -54,7 +55,9 @@ public class SynapseAlertViewImpl implements
 	@UiField
 	Div requestAccessUI;
 	@UiField
-	Button requestAccessButton;
+	Anchor requestAccessLink;
+	@UiField
+	Div requestLoadingUI;
 	
 	Presenter presenter;
 	
@@ -85,7 +88,7 @@ public class SynapseAlertViewImpl implements
 				presenter.onLoginClicked();
 			}
 		});
-		requestAccessButton.addClickHandler(new ClickHandler() {
+		requestAccessLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onRequestAccess();
@@ -129,6 +132,7 @@ public class SynapseAlertViewImpl implements
 		httpCode403.setVisible(false);
 		httpCode404.setVisible(false);
 		requestAccessUI.setVisible(false);
+		requestLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -164,7 +168,7 @@ public class SynapseAlertViewImpl implements
 	
 	@Override
 	public void showRequestAccessUI() {
-		requestAccessButton.state().reset();
+		requestLoadingUI.setVisible(false);
 		requestAccessUI.setVisible(true);
 	}
 	@Override
@@ -173,6 +177,6 @@ public class SynapseAlertViewImpl implements
 	}
 	@Override
 	public void showRequestAccessButtonLoading() {
-		requestAccessButton.state().loading();	
+		requestLoadingUI.setVisible(true);
 	}
 }
