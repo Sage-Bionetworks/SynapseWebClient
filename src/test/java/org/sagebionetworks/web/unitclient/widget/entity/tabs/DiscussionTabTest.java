@@ -122,7 +122,6 @@ public class DiscussionTabTest {
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
-		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
