@@ -161,4 +161,12 @@ public class DiscussionTabTest {
 		tab.onClickNewThread();
 		verify(mockNewDiscussionThreadModal).show();;
 	}
+
+	@Test
+	public void testOnModeratorModeChange() {
+		when(mockView.getModeratorMode()).thenReturn(true);
+		tab.onModeratorModeChange();
+		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(true));
+		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
+	}
 }

@@ -96,5 +96,11 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	@Override
 	public void onModeratorModeChange() {
 		threadListWidget.configure(forumId, view.getModeratorMode());
+		newThreadModal.configure(forumId, new Callback(){
+			@Override
+			public void invoke() {
+				threadListWidget.configure(forumId, view.getModeratorMode());
+			}
+		});
 	}
 }
