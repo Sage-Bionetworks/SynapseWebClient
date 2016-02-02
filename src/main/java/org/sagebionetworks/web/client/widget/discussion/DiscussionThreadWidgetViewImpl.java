@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,6 +21,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
+
+	private static final String DELETED_TEXT_STYLE = "deletedText";
+
+	private static final String DELETED_THREAD_TOOLTIP = "This thread has been deleted.";
 
 	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
@@ -125,6 +131,12 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickNewReply();
+			}
+		});
+		deleteButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickDeleteThread();
 			}
 		});
 	}
@@ -279,5 +291,21 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setDeleteButtonVisible(boolean visible) {
 		deleteButton.setVisible(visible);
+	}
+
+	@Override
+	public void showDeleteConfirm(String deleteConfirmMessage, ConfirmCallback deleteCallback) {
+		Bootbox.confirm(deleteConfirmMessage, deleteCallback);
+	}
+
+	@Override
+	public void setTitleAsDeleted() {
+		threadTitle.addStyleName(DELETED_TEXT_STYLE);
+		threadTitle.setTitle(DELETED_THREAD_TOOLTIP);
+	}
+
+	@Override
+	public void disableToggle() {
+		showThread.setStyleName("");
 	}
 }

@@ -25,10 +25,10 @@
 	<inherits name="org.gwtbootstrap3.GwtBootstrap3PaperTheme"/>
     <inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
     <inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
+    <inherits name="org.gwtbootstrap3.extras.toggleswitch.ToggleSwitch"/>
 	
     <inherits name="org.gwtvisualizationwrappers.CytoscapeJs"/>
     <inherits name="org.gwtvisualizationwrappers.Biodalliance13"/>
-    <inherits name="org.gwtbootstrap3.extras.toggleswitch.ToggleSwitch"/>
 
 	<!-- Commented out unused gwt bootstrap extra modules.  
 	Note that importing will cause the associated render-blocking css to loaded.

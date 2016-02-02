@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -28,6 +29,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
+	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread? Once a thread is deleted, you will not be able to undo this action.";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -42,6 +44,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private String threadId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
+	private Boolean isThreadDeleted;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -85,20 +88,29 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
-		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
-		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
-		threadId = bundle.getId();
-		messageKey = bundle.getMessageKey();
-		newReplyModal.configure(bundle.getId(), new Callback(){
-
-			@Override
-			public void invoke() {
-				reconfigure();
-			}
-		});
-		this.isCurrentUserModerator = isCurrentUserModerator;
-		view.setDeleteButtonVisible(isCurrentUserModerator);
+		this.isThreadDeleted = bundle.getIsDeleted();
+		if (isThreadDeleted) {
+			view.setTitleAsDeleted();
+			view.setThreadDownIconVisible(false);
+			view.setThreadUpIconVisible(false);
+			view.disableToggle();
+		} else {
+			authorWidget.configure(bundle.getCreatedBy());
+			view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
+			threadId = bundle.getId();
+			messageKey = bundle.getMessageKey();
+			newReplyModal.configure(bundle.getId(), new Callback(){
+	
+				@Override
+				public void invoke() {
+					reconfigure();
+					configureReplies();
+				}
+			});
+			this.isCurrentUserModerator = isCurrentUserModerator;
+			view.setDeleteButtonVisible(isCurrentUserModerator);
+		}
 	}
 
 	private void reconfigure() {
@@ -115,11 +127,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 				configure(result, isCurrentUserModerator);
 			}
 		});
-		configureReplies();
 	}
 
 	@Override
 	public void toggleThread() {
+		if (isThreadDeleted) {
+			return;
+		}
 		if (view.isThreadCollapsed()) {
 			// expand
 			view.setThreadDownIconVisible(false);
@@ -218,5 +232,43 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 						view.showReplyDetails();
 					}
 		});
+	}
+
+	@Override
+	public void onClickDeleteThread() {
+		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new ConfirmCallback(){
+
+			@Override
+			public void callback(boolean result) {
+				if (result) {
+					deleteThread();
+				}
+			}
+		});
+	}
+
+	public void deleteThread() {
+		synAlert.clear();
+		discussionForumClientAsync.markThreadAsDeleted(threadId, new AsyncCallback<Void>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				reset();
+				reconfigure();
+			}
+		});
+	}
+
+
+	public void reset() {
+		view.clear();
+		if (!view.isThreadCollapsed()) {
+			view.toggleThread();
+		}
 	}
 }
