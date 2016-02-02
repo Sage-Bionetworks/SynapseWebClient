@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -11,18 +13,23 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
+	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply? Once a reply is deleted, you will not be able to undo this action.";
+	public static final String DELETED_REPLY_DEFAULT_MESSAGE = "This reply has been deleted.";
 	ReplyWidgetView view;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
+	DiscussionForumClientAsync discussionForumClientAsync;
 	private String replyId;
 	private String messageKey;
+	private Boolean isCurrentUserModerator;
 
 	@Inject
 	public ReplyWidget(
@@ -30,13 +37,15 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			UserBadge authorWidget,
 			SynapseJSNIUtils jsniUtils,
 			SynapseAlert synAlert,
-			RequestBuilderWrapper requestBuilder
+			RequestBuilderWrapper requestBuilder,
+			DiscussionForumClientAsync discussionForumClientAsync
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
 		this.jsniUtils = jsniUtils;
 		this.synAlert = synAlert;
 		this.requestBuilder = requestBuilder;
+		this.discussionForumClientAsync = discussionForumClientAsync;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -48,8 +57,13 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.messageKey = bundle.getMessageKey();
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		view.setDeleteButtonVisibility(isCurrentUserModerator);
-		configureMessage();
+		if (bundle.getIsDeleted()) {
+			view.setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
+		} else {
+			configureMessage();
+		}
 	}
 
 	public void configureMessage() {
@@ -79,5 +93,50 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	@Override
+	public void onClickDeleteReply() {
+		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new ConfirmCallback(){
+
+			@Override
+			public void callback(boolean result) {
+				if (result) {
+					deleteReply();
+				}
+			}
+		});
+	}
+
+	public void deleteReply() {
+		synAlert.clear();
+		discussionForumClientAsync.markReplyAsDeleted(replyId, new AsyncCallback<Void>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				reconfigure();
+			}
+		});
+	}
+
+	public void reconfigure() {
+		synAlert.clear();
+		discussionForumClientAsync.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(DiscussionReplyBundle result) {
+				configure(result, isCurrentUserModerator);
+			}
+		});
 	}
 }
