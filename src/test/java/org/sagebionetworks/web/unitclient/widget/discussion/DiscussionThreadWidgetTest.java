@@ -413,7 +413,7 @@ public class DiscussionThreadWidgetTest {
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.deleteThread();
-		verify(mockSynAlert, atLeast(1)).clear();
+		verify(mockSynAlert, times(2)).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(eq("1"), any(AsyncCallback.class));
 		verify(mockView, atLeast(1)).clear();
 	}
