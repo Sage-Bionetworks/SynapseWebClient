@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.shared.WebConstants.*;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -22,14 +24,6 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
 
-	private static final String PRIMARY_BUTTON_STYLE = "btn-primary";
-
-	private static final String DANGER_BUTTON_STYLE = "btn-danger";
-
-	private static final String CANCEL = "Cancel";
-
-	private static final String DELETE = "Delete";
-
 	private static final String DELETED_THREAD_TITLE = "<Deleted>";
 
 	private static final String DELETED_THREAD_TOOLTIP = "This thread has been deleted.";
@@ -38,7 +32,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	public static final String REPLIES = "replies";
 
-	private static final String CONFIRM_DELETE_MESSAGE = "Confirm Deletion";
+	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
 	@UiField
 	Div replyListContainer;
@@ -308,9 +302,9 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		Bootbox.Dialog.create()
 				.setMessage(deleteConfirmMessage)
 				.setCloseButton(false)
-				.setTitle(CONFIRM_DELETE_MESSAGE)
+				.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
 				.addButton(DELETE, DANGER_BUTTON_STYLE, deleteCallback)
-				.addButton(CANCEL, PRIMARY_BUTTON_STYLE)
+				.addButton(CANCEL, DEFAULT_BUTTON_STYLE)
 				.show();
 	}
 
@@ -321,7 +315,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void disableToggle() {
-		showThread.setStyleName("");
+	public void setReplyButtonVisible(boolean visible) {
+		replyButton.setVisible(visible);
 	}
 }

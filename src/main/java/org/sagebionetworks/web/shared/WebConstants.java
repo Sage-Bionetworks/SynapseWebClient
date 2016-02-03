@@ -284,4 +284,11 @@ public class WebConstants {
 	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
 
 	public static final String CONTENT_TYPE = "Content-Type";
+
+	// Style
+	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
+	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
+	public static final String DANGER_BUTTON_STYLE = "btn-danger";
+	public static final String CANCEL = "Cancel";
+	public static final String DELETE = "Delete";
 }

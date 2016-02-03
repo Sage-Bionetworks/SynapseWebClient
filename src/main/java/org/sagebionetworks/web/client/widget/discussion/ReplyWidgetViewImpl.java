@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.shared.WebConstants.*;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -17,15 +19,7 @@ import com.google.inject.Inject;
 
 public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
-	private static final String PRIMARY_BUTTON_STYLE = "btn-primary";
-
-	private static final String DANGER_BUTTON_STYLE = "btn-danger";
-
-	private static final String CANCEL = "Cancel";
-
-	private static final String DELETE = "Delete";
-
-	private static final String CONFIRM_DELETE_MESSAGE = "Confirm Deletion";
+	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
@@ -100,7 +94,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 		Bootbox.Dialog.create()
 		.setMessage(deleteConfirmMessage)
 		.setCloseButton(false)
-		.setTitle(CONFIRM_DELETE_MESSAGE)
+		.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
 		.addButton(DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 		.addButton(CANCEL, PRIMARY_BUTTON_STYLE)
 		.show();

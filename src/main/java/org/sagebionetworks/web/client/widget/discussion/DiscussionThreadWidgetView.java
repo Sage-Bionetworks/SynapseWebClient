@@ -78,7 +78,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setTitleAsDeleted();
 
-	void disableToggle();
-
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
+
+	void setReplyButtonVisible(boolean visible);
 }

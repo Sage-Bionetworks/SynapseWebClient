@@ -29,7 +29,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
-	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread? Once a thread is deleted, you will not be able to undo this action.";
+	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -45,6 +45,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
 	private Boolean isThreadDeleted;
+	private String title;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -78,7 +79,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator) {
 		view.clear();
-		view.setTitle(bundle.getTitle());
+		this.title = bundle.getTitle();
+		view.setTitle(title);
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
 			user.configure(userId);
@@ -88,28 +90,28 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.isThreadDeleted = bundle.getIsDeleted();
+		authorWidget.configure(bundle.getCreatedBy());
+		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		threadId = bundle.getId();
+		messageKey = bundle.getMessageKey();
 		if (isThreadDeleted) {
 			view.setTitleAsDeleted();
-			view.setThreadDownIconVisible(false);
-			view.setThreadUpIconVisible(false);
-			view.disableToggle();
+			view.setShowRepliesVisibility(false);
+			view.setDeleteButtonVisible(false);
+			view.setReplyButtonVisible(false);
 		} else {
-			authorWidget.configure(bundle.getCreatedBy());
-			view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+			view.setDeleteButtonVisible(isCurrentUserModerator);
 			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
-			threadId = bundle.getId();
-			messageKey = bundle.getMessageKey();
 			newReplyModal.configure(bundle.getId(), new Callback(){
-	
+
 				@Override
 				public void invoke() {
 					reconfigure();
 					configureReplies();
 				}
 			});
-			this.isCurrentUserModerator = isCurrentUserModerator;
-			view.setDeleteButtonVisible(isCurrentUserModerator);
 		}
 	}
 
@@ -131,18 +133,19 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	@Override
 	public void toggleThread() {
-		if (isThreadDeleted) {
-			return;
-		}
 		if (view.isThreadCollapsed()) {
 			// expand
 			view.setThreadDownIconVisible(false);
 			view.setThreadUpIconVisible(true);
+			view.setTitle(title);
 			configureMessage();
 		} else {
 			// collapse
 			view.setThreadDownIconVisible(true);
 			view.setThreadUpIconVisible(false);
+			if (isThreadDeleted) {
+				view.setTitleAsDeleted();
+			}
 		}
 		view.toggleThread();
 	}
@@ -182,6 +185,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			// collapse
 			view.setReplyDownIconVisible(true);
 			view.setReplyUpIconVisible(false);
+			view.setLoadMoreButtonVisibility(false);
 		}
 		view.toggleReplies();
 	}
@@ -267,6 +271,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.clear();
 		if (!view.isThreadCollapsed()) {
 			view.toggleThread();
+		}
+		if (!view.isReplyCollapsed()) {
+			view.toggleReplies();
 		}
 	}
 }

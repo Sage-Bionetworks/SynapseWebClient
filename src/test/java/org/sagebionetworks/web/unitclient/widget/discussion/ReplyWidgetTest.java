@@ -48,6 +48,8 @@ public class ReplyWidgetTest {
 	DiscussionForumClientAsync mockDiscussionForumClientAsync;
 
 	ReplyWidget replyWidget;
+	boolean isDeleted = false;
+	boolean canModerate = false;
 
 	@Before
 	public void before() {
@@ -65,39 +67,41 @@ public class ReplyWidgetTest {
 
 	@Test
 	public void testConfigure() {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 	}
 
 	@Test
 	public void testConfigureDeletedReply() {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), true);
+		isDeleted = true;
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockView).setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 	}
 
 	@Test
 	public void testConfigureWithModerator() {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), false);
+		canModerate = true;
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, true);
+		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(true);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 	}
 
 	@Test
@@ -108,47 +112,47 @@ public class ReplyWidgetTest {
 
 	@Test
 	public void testConfigureMessageFailToGetMessage() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 	}
 
 	@Test
 	public void testConfigureMessageFailToGetMessageCase2() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 	}
 
 	@Test
 	public void testConfigureMessageSuccess() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 	}
 
 	@Test
@@ -160,13 +164,13 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteReplySuccess() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
@@ -178,13 +182,13 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteReplyFailure() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
@@ -197,13 +201,13 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testReconfigureSuccess() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		AsyncMockStubber.callSuccessWith(bundle)
 				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
@@ -218,13 +222,13 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testReconfigureFailure() throws RequestException {
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), false);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, false);
+		replyWidget.configure(bundle, canModerate);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
@@ -233,7 +237,7 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 

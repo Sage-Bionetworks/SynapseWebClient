@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	<bh:Div addStyleNames="padding-10 light-border-bottom overflow-x-hidden">
+	<bh:Div addStyleNames="padding-5 light-border-bottom overflow-x-hidden">
 		<t:Table width="100%">
 			<t:TableRow>
 				<t:TableData>
@@ -58,15 +58,11 @@
 					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 					&nbsp;Loading...
 				</g:HTMLPanel>
-				<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-top-10">
-					<b:Button ui:field="loadMoreButton">Load more replies</b:Button>
-				</bh:Div>
 			</b:Collapse>
-			<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-top-10 margin-bottom-10">
-				<b:ButtonGroup>
-					<b:Button ui:field="replyButton">Reply</b:Button>
-					<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false">Delete Thread</b:Button>
-				</b:ButtonGroup>
+			<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-bottom-5">
+				<b:Button ui:field="loadMoreButton" addStyleNames="margin-top-5" visible="false">Load more replies</b:Button>
+				<b:Button ui:field="replyButton" addStyleNames="margin-top-5 margin-left-10">Reply</b:Button>
+				<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5 margin-left-10">Delete Thread</b:Button>
 			</bh:Div>
 		</b:Collapse>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>
