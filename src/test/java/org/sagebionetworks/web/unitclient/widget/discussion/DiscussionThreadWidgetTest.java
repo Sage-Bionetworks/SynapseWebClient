@@ -27,9 +27,12 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
@@ -75,6 +78,12 @@ public class DiscussionThreadWidgetTest {
 	RequestBuilderWrapper mockRequestBuilder;
 	@Mock
 	Response mockResponse;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -88,7 +97,10 @@ public class DiscussionThreadWidgetTest {
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
-				mockGinInjector, mockJsniUtils, mockRequestBuilder);
+				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
+				mockGlobalApplicationState);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 
 	@Test
@@ -270,6 +282,15 @@ public class DiscussionThreadWidgetTest {
 	public void testOnClickNewReply() {
 		discussionThreadWidget.onClickNewReply();
 		verify(mockNewReplyModal).show();
+	}
+
+	@Test
+	public void testOnClickNewReplyAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		discussionThreadWidget.onClickNewReply();
+		verify(mockNewReplyModal, never()).show();
+		verify(mockGlobalApplicationState).getPlaceChanger();
+		verify(mockView).showErrorMessage(anyString());
 	}
 
 	@SuppressWarnings("unchecked")

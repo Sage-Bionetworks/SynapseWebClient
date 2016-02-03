@@ -17,4 +17,5 @@ public interface DiscussionTabView extends IsWidget{
 	void setAlert(Widget w);
 	void setModeratorModeContainerVisibility(Boolean visible);
 	Boolean getModeratorMode();
+	void showErrorMessage(String errorMessage);
 }

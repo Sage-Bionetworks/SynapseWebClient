@@ -5,6 +5,8 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -12,6 +14,8 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -38,6 +42,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
+	AuthenticationController authController;
+	GlobalApplicationState globalApplicationState;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -56,7 +62,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils,
-			RequestBuilderWrapper requestBuilder
+			RequestBuilderWrapper requestBuilder,
+			AuthenticationController authController,
+			GlobalApplicationState globalApplicationState
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -66,6 +74,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.requestBuilder = requestBuilder;
+		this.authController = authController;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -204,7 +214,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	@Override
 	public void onClickNewReply() {
-		newReplyModal.show();
+		if (!authController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		} else {
+			newReplyModal.show();
+		}
 	}
 
 	@Override

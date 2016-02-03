@@ -2,10 +2,14 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -28,6 +32,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
+	AuthenticationController authController;
+	GlobalApplicationState globalApplicationState;
 	private String forumId;
 
 	@Inject
@@ -38,7 +44,9 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
 			NewDiscussionThreadModal newThreadModal,
-			CookieProvider cookies
+			CookieProvider cookies,
+			AuthenticationController authController,
+			GlobalApplicationState globalApplicationState
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -47,6 +55,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.newThreadModal = newThreadModal;
 		this.discussionForumClient = discussionForumClient;
 		this.cookies = cookies;
+		this.authController = authController;
+		this.globalApplicationState = globalApplicationState;
 		tab.configure("Discussion", view.asWidget());
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
@@ -90,7 +100,12 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 	@Override
 	public void onClickNewThread() {
-		newThreadModal.show();
+		if (!authController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		} else {
+			newThreadModal.show();
+		}
 	}
 
 	@Override
