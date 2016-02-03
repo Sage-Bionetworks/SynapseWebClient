@@ -1,7 +1,10 @@
-package org.sagebionetworks.web.client;
+package org.sagebionetworks.web.shared.discussion;
 
-public class UpdateThread {
+import java.io.Serializable;
 
+public class UpdateThread implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	String title;
 	String message;
 
