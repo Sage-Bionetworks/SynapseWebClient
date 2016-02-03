@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -16,6 +18,8 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void onClickNewReply();
 
 		void loadMore();
+
+		void onClickDeleteThread();
 	}
 
 	void setPresenter(DiscussionThreadWidget presenter);
@@ -69,4 +73,14 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	boolean isReplyCollapsed();
 
 	void setLoadingVisible(boolean visible);
+
+	void setDeleteButtonVisible(boolean visible);
+
+	void setTitleAsDeleted();
+
+	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
+
+	void setReplyButtonVisible(boolean visible);
+
+	void showErrorMessage(String errorMessage);
 }

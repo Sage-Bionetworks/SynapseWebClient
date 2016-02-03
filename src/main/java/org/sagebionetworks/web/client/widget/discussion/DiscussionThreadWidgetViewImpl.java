@@ -1,11 +1,16 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.DisplayConstants.*;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,9 +25,15 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
 
+	private static final String DELETED_THREAD_TITLE = "<Deleted>";
+
+	private static final String DELETED_THREAD_TOOLTIP = "This thread has been deleted.";
+
 	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
 	public static final String REPLIES = "replies";
+
+	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
 	@UiField
 	Div replyListContainer;
@@ -70,6 +81,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Icon replyUpIcon;
 	@UiField
 	HTMLPanel loadingUI;
+	@UiField
+	Button deleteButton;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -123,6 +136,12 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickNewReply();
+			}
+		});
+		deleteButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickDeleteThread();
 			}
 		});
 	}
@@ -272,5 +291,37 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
+	}
+
+	@Override
+	public void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisible(visible);
+	}
+
+	@Override
+	public void showDeleteConfirm(String deleteConfirmMessage, final AlertCallback deleteCallback) {
+		Bootbox.Dialog.create()
+				.setMessage(deleteConfirmMessage)
+				.setCloseButton(false)
+				.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
+				.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
+				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
+				.show();
+	}
+
+	@Override
+	public void setTitleAsDeleted() {
+		threadTitle.setText(DELETED_THREAD_TITLE);
+		threadTitle.setTitle(DELETED_THREAD_TOOLTIP);
+	}
+
+	@Override
+	public void setReplyButtonVisible(boolean visible) {
+		replyButton.setVisible(visible);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }

@@ -3,11 +3,15 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -20,6 +24,9 @@ import com.google.inject.Inject;
 
 public class DiscussionTab implements DiscussionTabView.Presenter{
 	private final static Long PROJECT_VERSION_NUMBER = null;
+
+	public final static Boolean DEFAULT_MODERATOR_MODE = false;
+
 	//used to tell the discussion tab to show a single thread
 	public final static String THREAD_ID_KEY = "threadId";
 	Tab tab;
@@ -32,8 +39,14 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
+
+	AuthenticationController authController;
+	GlobalApplicationState globalApplicationState;
+	private String forumId;
+
 	DiscussionThreadWidget singleThreadWidget;
 	String entityName, entityId;
+	Boolean isCurrentUserModerator;
 	
 	@Inject
 	public DiscussionTab(
@@ -44,6 +57,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			DiscussionThreadListWidget threadListWidget,
 			NewDiscussionThreadModal newThreadModal,
 			CookieProvider cookies,
+			AuthenticationController authController,
+			GlobalApplicationState globalApplicationState,
 			DiscussionThreadWidget singleThreadWidget
 			) {
 		this.view = view;
@@ -53,6 +68,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.newThreadModal = newThreadModal;
 		this.discussionForumClient = discussionForumClient;
 		this.cookies = cookies;
+		this.authController = authController;
+		this.globalApplicationState = globalApplicationState;
 		this.singleThreadWidget = singleThreadWidget;
 		tab.configure("Discussion", view.asWidget());
 		view.setPresenter(this);
@@ -67,9 +84,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(String entityId, String entityName, String areaToken) {
+	public void configure(String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
 		this.entityId = entityId;
 		this.entityName = entityName;
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		params = new ParameterizedToken(areaToken);
 		updatePlace();
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
@@ -101,7 +119,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				singleThreadWidget.configure(result);
+				singleThreadWidget.configure(result, isCurrentUserModerator);
 				if (singleThreadWidget.isThreadCollapsed()) {
 					singleThreadWidget.toggleThread();	
 				}
@@ -120,15 +138,17 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 			@Override
 			public void onSuccess(final Forum forum) {
-				newThreadModal.configure(forum.getId(), new Callback(){
+				forumId = forum.getId();
+				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forum.getId());
+						threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
 					}
 				});
-				threadListWidget.configure(forum.getId());
+				threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
 			}
 		});
+		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
 	}
 	
 	@Override
@@ -146,6 +166,22 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 	@Override
 	public void onClickNewThread() {
-		newThreadModal.show();
+		if (!authController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		} else {
+			newThreadModal.show();
+		}
+	}
+
+	@Override
+	public void onModeratorModeChange() {
+		threadListWidget.configure(forumId, view.getModeratorMode());
+		newThreadModal.configure(forumId, new Callback(){
+			@Override
+			public void invoke() {
+				threadListWidget.configure(forumId, view.getModeratorMode());
+			}
+		});
 	}
 }

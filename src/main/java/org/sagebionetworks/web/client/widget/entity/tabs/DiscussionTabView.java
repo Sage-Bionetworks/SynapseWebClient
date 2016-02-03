@@ -7,6 +7,8 @@ public interface DiscussionTabView extends IsWidget{
 
 	public interface Presenter {
 		void onClickNewThread();
+
+		void onModeratorModeChange();
 		void onClickShowAllThreads();
 	}
 
@@ -15,6 +17,9 @@ public interface DiscussionTabView extends IsWidget{
 	void setSingleThread(Widget w);
 	void setNewThreadModal(Widget w);
 	void setAlert(Widget w);
+	void setModeratorModeContainerVisibility(Boolean visible);
+	Boolean getModeratorMode();
+	void showErrorMessage(String errorMessage);
 	void setSingleThreadUIVisible(boolean visible);
 	void setThreadListUIVisible(boolean visible);
 }

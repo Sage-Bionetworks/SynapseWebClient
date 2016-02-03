@@ -36,8 +36,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -180,7 +178,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			discussionAreaToken = areaToken;
 		}
 		
-    	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later
+    	//note: the files/tables/wiki/discussion tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
     
@@ -358,7 +356,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	public void configureDiscussionTab() {
 		String projectId = projectHeader.getId();
-		discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken);
+		boolean canModerate = false;
+		if (projectBundle != null) {
+			canModerate = projectBundle.getPermissions().getCanModerate();
+		}
+		discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
 	}
 		
 	@Override
