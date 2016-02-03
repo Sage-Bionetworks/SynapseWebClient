@@ -29,6 +29,9 @@ public interface DiscussionForumClientAsync{
 			DiscussionThreadOrder order, Boolean ascending,
 			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
 
+	void updateThread(String threadId, UpdateThread newThread,
+			AsyncCallback<DiscussionThreadBundle> callback);
+
 	void updateThreadTitle(String threadId, UpdateThreadTitle newTitle,
 			AsyncCallback<DiscussionThreadBundle> callback);
 

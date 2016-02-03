@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DiscussionForumClient;
+import org.sagebionetworks.web.client.UpdateThread;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -159,6 +160,22 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.markReplyAsDeleted(replyId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public DiscussionThreadBundle updateThread(String threadId,
+			UpdateThread newThread) throws RestServiceException {
+		UpdateThreadTitle updateTitle = new UpdateThreadTitle();
+		updateTitle.setTitle(newThread.getTitle());
+		UpdateThreadMessage updateMessage = new UpdateThreadMessage();
+		updateMessage.setMessageMarkdown(newThread.getMessage());
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.updateThreadTitle(threadId, updateTitle);
+			return synapseClient.updateThreadMessage(threadId, updateMessage);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

@@ -31,6 +31,9 @@ public interface DiscussionForumClient extends RemoteService {
 			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending)
 			throws RestServiceException;
 
+	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
+			throws RestServiceException;
+
 	DiscussionThreadBundle updateThreadTitle(String threadId, UpdateThreadTitle newTitle)
 			throws RestServiceException;
 
