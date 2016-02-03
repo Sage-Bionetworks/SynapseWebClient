@@ -155,6 +155,7 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String BUTTON_DELETE = "Delete";
 	public static final String REMIND_ME_LATER = "Remind me later";
 	public static final String BUTTON_CONTINUE = "Continue";
 	public static final String BECOME_CERTIFIED = "Become Certified";
@@ -740,5 +741,9 @@ public class DisplayConstants {
 	public static final String ENTER_A_USER_NAME = "Enter a user name...";
 	public static final String SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT = "Successfully linked the external account to your Synapse profile.";
 
+	// Button styles
+	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
+	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
+	public static final String DANGER_BUTTON_STYLE = "btn-danger";
 }
 

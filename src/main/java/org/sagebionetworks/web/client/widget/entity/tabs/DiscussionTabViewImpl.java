@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.extras.toggleswitch.client.ui.ToggleSwitch;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -21,6 +24,10 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	SimplePanel newThreadModalContainer;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	ToggleSwitch moderatorModeSwitch;
+	@UiField
+	Div moderatorModeContainer;
 
 	private Presenter presenter;
 
@@ -34,6 +41,12 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickNewThread();
+			}
+		});
+		moderatorModeSwitch.addValueChangeHandler(new ValueChangeHandler<Boolean>(){
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				presenter.onModeratorModeChange();
 			}
 		});
 	}
@@ -62,5 +75,15 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	public void setAlert(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void setModeratorModeContainerVisibility(Boolean visible) {
+		moderatorModeContainer.setVisible(visible);
+	}
+
+	@Override
+	public Boolean getModeratorMode() {
+		return moderatorModeSwitch.getValue();
 	}
 }
