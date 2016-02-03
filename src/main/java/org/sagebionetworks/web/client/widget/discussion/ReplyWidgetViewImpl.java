@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.shared.WebConstants.*;
+import static org.sagebionetworks.web.client.DisplayConstants.*;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -95,8 +95,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 		.setMessage(deleteConfirmMessage)
 		.setCloseButton(false)
 		.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
-		.addButton(DELETE, DANGER_BUTTON_STYLE, deleteCallback)
-		.addButton(CANCEL, PRIMARY_BUTTON_STYLE)
+		.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
+		.addButton(BUTTON_CANCEL, PRIMARY_BUTTON_STYLE)
 		.show();
 	}
 }
