@@ -24,6 +24,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
 	private String forumId;
+	private Boolean isCurrentUserModerator;
 
 	@Inject
 	public DiscussionThreadListWidget(
@@ -40,8 +41,9 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		view.setAlert(synAlert.asWidget());
 	}
 
-	public void configure(String forumId) {
+	public void configure(String forumId, Boolean isCurrentUserModerator) {
 		view.clear();
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		offset = 0L;
 		if (order == null) {
 			order = DEFAULT_ORDER;
@@ -75,7 +77,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
 						for(DiscussionThreadBundle bundle: result.getResults()) {
 							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
-							thread.configure(bundle);
+							thread.configure(bundle, isCurrentUserModerator);
 							view.addThread(thread.asWidget());
 						}
 						offset += LIMIT;
