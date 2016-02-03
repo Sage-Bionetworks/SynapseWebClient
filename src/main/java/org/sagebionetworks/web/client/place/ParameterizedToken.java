@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
-
 public class ParameterizedToken {
-	public static final String DEFAULT_TOKEN = "0";
+	public static final String DEFAULT_TOKEN = "default";
 	private Map<String, String> params;
 
 	public ParameterizedToken(String token) {
