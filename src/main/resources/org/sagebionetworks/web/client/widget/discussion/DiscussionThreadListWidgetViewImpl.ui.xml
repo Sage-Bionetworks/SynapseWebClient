@@ -38,7 +38,7 @@
 				&nbsp;Loading...
 			</g:HTMLPanel>
 			<b:Column size="XS_12" addStyleNames="margin-top-10">
-				<b:Button ui:field="loadMoreButton" pull="LEFT">Load more threads</b:Button>
+				<b:Button ui:field="loadMoreButton" block="true">Load more threads</b:Button>
 			</b:Column>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:Row>
