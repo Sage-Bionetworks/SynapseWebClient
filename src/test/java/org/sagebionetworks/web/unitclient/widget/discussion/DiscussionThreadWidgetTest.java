@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
@@ -75,6 +76,8 @@ public class DiscussionThreadWidgetTest {
 	RequestBuilderWrapper mockRequestBuilder;
 	@Mock
 	Response mockResponse;
+	@Mock
+	AuthenticationController mockAuthController;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -88,7 +91,8 @@ public class DiscussionThreadWidgetTest {
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
-				mockGinInjector, mockJsniUtils, mockRequestBuilder);
+				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -117,6 +121,29 @@ public class DiscussionThreadWidgetTest {
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteButtonVisible(canModerate);
+		verify(mockView).setReplyButtonVisible(true);
+	}
+
+	@Test
+	public void testConfigureWithAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted);
+		discussionThreadWidget.configure(threadBundle, canModerate);
+		verify(mockView).clear();
+		verify(mockView).setTitle("title");
+		verify(mockView).addActiveAuthor(any(Widget.class));
+		verify(mockView).setNumberOfReplies("1");
+		verify(mockView).setNumberOfViews("2");
+		verify(mockView).setLastActivity(anyString());
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockView).setShowRepliesVisibility(true);
+		verify(mockGinInjector).getUserBadgeWidget();
+		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setDeleteButtonVisible(canModerate);
+		verify(mockView).setReplyButtonVisible(false);
 	}
 
 	@Test
@@ -161,6 +188,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteButtonVisible(canModerate);
+		verify(mockView).setReplyButtonVisible(true);
 	}
 
 	@Test
@@ -181,6 +209,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteButtonVisible(canModerate);
+		verify(mockView).setReplyButtonVisible(true);
 	}
 
 	@Test

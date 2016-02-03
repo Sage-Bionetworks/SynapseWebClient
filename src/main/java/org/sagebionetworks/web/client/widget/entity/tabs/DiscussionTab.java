@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -28,6 +29,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
+	AuthenticationController authController;
 	private String forumId;
 
 	@Inject
@@ -38,7 +40,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
 			NewDiscussionThreadModal newThreadModal,
-			CookieProvider cookies
+			CookieProvider cookies,
+			AuthenticationController authController
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -47,6 +50,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.newThreadModal = newThreadModal;
 		this.discussionForumClient = discussionForumClient;
 		this.cookies = cookies;
+		this.authController = authController;
 		tab.configure("Discussion", view.asWidget());
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
@@ -82,6 +86,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			}
 		});
 		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
+		view.setNewThreadVisible(authController.isLoggedIn());
 	}
 
 	public Tab asTab(){

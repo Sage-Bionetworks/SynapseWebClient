@@ -86,4 +86,9 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	public Boolean getModeratorMode() {
 		return moderatorModeSwitch.getValue();
 	}
+
+	@Override
+	public void setNewThreadVisible(boolean visible) {
+		newThreadButton.setVisible(visible);
+	}
 }

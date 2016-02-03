@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -38,6 +39,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
+	AuthenticationController authController;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -56,7 +58,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils,
-			RequestBuilderWrapper requestBuilder
+			RequestBuilderWrapper requestBuilder,
+			AuthenticationController authController
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -66,6 +69,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.requestBuilder = requestBuilder;
+		this.authController = authController;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -102,6 +106,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			view.setDeleteButtonVisible(false);
 			view.setReplyButtonVisible(false);
 		} else {
+			view.setReplyButtonVisible(authController.isLoggedIn());
 			view.setDeleteButtonVisible(isCurrentUserModerator);
 			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 			newReplyModal.configure(bundle.getId(), new Callback(){

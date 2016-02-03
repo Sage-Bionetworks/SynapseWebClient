@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -47,6 +48,8 @@ public class DiscussionTabTest {
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
 	Forum mockForum;
+	@Mock
+	AuthenticationController mockAuthController;
 
 	DiscussionTab tab;
 	private boolean canModerate = false;
@@ -54,8 +57,11 @@ public class DiscussionTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient, mockDiscussionThreadListWidget, mockNewDiscussionThreadModal, mockCookies);
+		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient,
+				mockDiscussionThreadListWidget, mockNewDiscussionThreadModal, mockCookies,
+				mockAuthController);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -97,6 +103,22 @@ public class DiscussionTabTest {
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
+		verify(mockView).setNewThreadVisible(true);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureSuccessAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1"; 
+		String entityName = "discussion project test";
+		tab.configure(entityId, entityName, canModerate);
+
+		verify(mockView).setNewThreadVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -124,6 +146,7 @@ public class DiscussionTabTest {
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
+		verify(mockView).setNewThreadVisible(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -139,6 +162,7 @@ public class DiscussionTabTest {
 		tab.configure(entityId, entityName, canModerate);
 		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
+		verify(mockView).setNewThreadVisible(true);
 	}
 
 	@Test
