@@ -73,6 +73,9 @@ public class Synapse extends Place implements RestartActivityOptional{
 				return;
 			} else if(toProcess.contains(DISCUSSION_DELIMITER)) {
 				area = Synapse.EntityArea.DISCUSSION;
+				String[] parts = toProcess.split(DISCUSSION_DELIMITER);
+				if(parts.length == 2)
+					areaToken = parts[1];
 				return;
 			}
 		} else {
