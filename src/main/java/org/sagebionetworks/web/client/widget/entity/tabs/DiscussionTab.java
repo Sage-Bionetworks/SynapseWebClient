@@ -105,7 +105,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	 * Based on the current area parameters, update the address bar (push the url in to the browser history).
 	 */
 	public void updatePlace(){
-		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, params.toString()));
+		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, getCurrentAreaToken()));
 	}
 	public void showThread(String threadId) {
 		view.setSingleThreadUIVisible(true);
@@ -183,5 +183,9 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				threadListWidget.configure(forumId, view.getModeratorMode());
 			}
 		});
+	}
+	
+	public String getCurrentAreaToken() {
+		return params.toString();
 	}
 }

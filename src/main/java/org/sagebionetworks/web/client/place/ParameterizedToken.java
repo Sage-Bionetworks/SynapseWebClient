@@ -7,7 +7,7 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 
 public class ParameterizedToken {
-	private static final String DEFAULT_TOKEN = "0";
+	public static final String DEFAULT_TOKEN = "0";
 	private Map<String, String> params;
 
 	public ParameterizedToken(String token) {
