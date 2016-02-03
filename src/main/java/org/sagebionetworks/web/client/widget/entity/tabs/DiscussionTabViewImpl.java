@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.toggleswitch.client.ui.ToggleSwitch;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -85,5 +86,10 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	@Override
 	public Boolean getModeratorMode() {
 		return moderatorModeSwitch.getValue();
+	}
+
+	@Override
+	public void showErrorMessage(String errorMessage) {
+		DisplayUtils.showErrorMessage(errorMessage);
 	}
 }

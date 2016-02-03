@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -12,9 +13,12 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -47,6 +51,12 @@ public class DiscussionTabTest {
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
 	Forum mockForum;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 
 	DiscussionTab tab;
 	private boolean canModerate = false;
@@ -54,8 +64,12 @@ public class DiscussionTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient, mockDiscussionThreadListWidget, mockNewDiscussionThreadModal, mockCookies);
+		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient,
+				mockDiscussionThreadListWidget, mockNewDiscussionThreadModal, mockCookies,
+				mockAuthController, mockGlobalApplicationState);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 
 	@Test
@@ -160,6 +174,15 @@ public class DiscussionTabTest {
 	public void onCLickNewThreadTest() {
 		tab.onClickNewThread();
 		verify(mockNewDiscussionThreadModal).show();;
+	}
+
+	@Test
+	public void onCLickNewThreadAnonymousTest() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		tab.onClickNewThread();
+		verify(mockNewDiscussionThreadModal, never()).show();
+		verify(mockGlobalApplicationState).getPlaceChanger();
+		verify(mockView).showErrorMessage(anyString());
 	}
 
 	@Test
