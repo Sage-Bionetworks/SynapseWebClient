@@ -115,6 +115,10 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		configureReplies();
 	}
 
+	public boolean isThreadCollapsed() {
+		return view.isThreadCollapsed();
+	}
+	
 	@Override
 	public void toggleThread() {
 		if (view.isThreadCollapsed()) {

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.core.shared.GWT;
@@ -22,6 +23,15 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	@UiField
 	Div synAlertContainer;
 
+	@UiField
+	Div singleThreadUI;
+	@UiField
+	Row threadListUI;
+	@UiField
+	Button showAllThreadsButton;
+	@UiField
+	SimplePanel discussionThreadContainer;
+	
 	private Presenter presenter;
 
 	Widget widget;
@@ -36,6 +46,17 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 				presenter.onClickNewThread();
 			}
 		});
+		showAllThreadsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickShowAllThreads();
+			}
+		});
+	}
+	
+	@Override
+	public void setSingleThread(Widget w) {
+		discussionThreadContainer.setWidget(w);
 	}
 
 	@Override
@@ -62,5 +83,15 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	public void setAlert(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public void setSingleThreadUIVisible(boolean visible) {
+		singleThreadUI.setVisible(visible);
+	}
+	
+	@Override
+	public void setThreadListUIVisible(boolean visible) {
+		threadListUI.setVisible(visible);
 	}
 }
