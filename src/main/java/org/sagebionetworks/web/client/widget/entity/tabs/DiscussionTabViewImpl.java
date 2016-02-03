@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.toggleswitch.client.ui.ToggleSwitch;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -30,6 +31,15 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	@UiField
 	Div moderatorModeContainer;
 
+	@UiField
+	Div singleThreadUI;
+	@UiField
+	Row threadListUI;
+	@UiField
+	Button showAllThreadsButton;
+	@UiField
+	SimplePanel discussionThreadContainer;
+	
 	private Presenter presenter;
 
 	Widget widget;
@@ -50,6 +60,17 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 				presenter.onModeratorModeChange();
 			}
 		});
+		showAllThreadsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickShowAllThreads();
+			}
+		});
+	}
+	
+	@Override
+	public void setSingleThread(Widget w) {
+		discussionThreadContainer.setWidget(w);
 	}
 
 	@Override
@@ -91,5 +112,15 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	@Override
 	public void showErrorMessage(String errorMessage) {
 		DisplayUtils.showErrorMessage(errorMessage);
+	}
+	
+	@Override
+	public void setSingleThreadUIVisible(boolean visible) {
+		singleThreadUI.setVisible(visible);
+	}
+	
+	@Override
+	public void setThreadListUIVisible(boolean visible) {
+		threadListUI.setVisible(visible);
 	}
 }

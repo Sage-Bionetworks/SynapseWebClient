@@ -36,7 +36,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -50,7 +49,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private Entity entity;
 	
 	private Synapse.EntityArea area;
-	private String wikiAreaToken, tablesAreaToken;
+	private String wikiAreaToken, tablesAreaToken, discussionAreaToken;
 	private Long filesVersionNumber;
 	private EntityHeader projectHeader;
 	
@@ -149,6 +148,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.area = area;
     	wikiAreaToken = null;
     	tablesAreaToken = null;
+    	discussionAreaToken = null;
     	filesVersionNumber = versionNumber;
     	this.entity = entity;
 
@@ -162,8 +162,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				area = EntityArea.FILES;
 			}
 		}
-		
-    	//go to the tab corresponding to the area stated
+		//go to the tab corresponding to the area stated
 		if (area == EntityArea.WIKI) {
 			tabs.showTab(wikiTab.asTab());
 			wikiAreaToken = areaToken;
@@ -176,6 +175,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			tabs.showTab(adminTab.asTab());
 		} else if (area == EntityArea.DISCUSSION) {
 			tabs.showTab(discussionTab.asTab());
+			discussionAreaToken = areaToken;
 		}
 		
     	//note: the files/tables/wiki/discussion tabs rely on the project bundle, so they are configured later
@@ -360,7 +360,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (projectBundle != null) {
 			canModerate = projectBundle.getPermissions().getCanModerate();
 		}
-		discussionTab.configure(projectId, projectHeader.getName(), canModerate);
+		discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
 	}
 		
 	@Override
