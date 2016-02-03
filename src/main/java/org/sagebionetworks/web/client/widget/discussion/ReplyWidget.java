@@ -19,7 +19,7 @@ import com.google.inject.Inject;
 
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
-	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply? Once a reply is deleted, you will not be able to undo this action.";
+	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply?";
 	public static final String DELETED_REPLY_DEFAULT_MESSAGE = "This reply has been deleted.";
 	ReplyWidgetView view;
 	SynapseJSNIUtils jsniUtils;
