@@ -185,6 +185,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			// collapse
 			view.setReplyDownIconVisible(true);
 			view.setReplyUpIconVisible(false);
+			view.setLoadMoreButtonVisibility(false);
 		}
 		view.toggleReplies();
 	}

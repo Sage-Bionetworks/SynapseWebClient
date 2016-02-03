@@ -263,6 +263,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setReplyDownIconVisible(true);
 		verify(mockView).setReplyUpIconVisible(false);
 		verify(mockView).toggleReplies();
+		verify(mockView).setLoadMoreButtonVisibility(false);
 	}
 
 	@Test
