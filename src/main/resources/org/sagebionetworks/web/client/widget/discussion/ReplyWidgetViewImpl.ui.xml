@@ -15,7 +15,16 @@
 				</bh:Div>
 			</b:Column>
 		</b:Row>
-		<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
+		<b:Row>
+			<b:Column size="SM_9">
+				<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
+			</b:Column>
+			<b:Column size="SM_3">
+				<bh:Div pull="RIGHT">
+					<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" addStyleNames="imageButton" visible="false"/>
+				</bh:Div>
+			</b:Column>
+		</b:Row>
 		<bh:Div>
 			<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5">Delete Reply</b:Button>
 		</bh:Div>

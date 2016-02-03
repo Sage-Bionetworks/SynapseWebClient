@@ -111,9 +111,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			view.setShowRepliesVisibility(false);
 			view.setDeleteButtonVisible(false);
 			view.setReplyButtonVisible(false);
+			view.setEditIconVisible(false);
 		} else {
 			view.setDeleteButtonVisible(isCurrentUserModerator);
 			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
+			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			newReplyModal.configure(bundle.getId(), new Callback(){
 
 				@Override
@@ -281,7 +283,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		});
 	}
 
-
 	public void reset() {
 		view.clear();
 		if (!view.isThreadCollapsed()) {
@@ -290,5 +291,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		if (!view.isReplyCollapsed()) {
 			view.toggleReplies();
 		}
+	}
+
+	@Override
+	public void onClickEditThread() {
+		// TODO Auto-generated method stub
+		
 	}
 }

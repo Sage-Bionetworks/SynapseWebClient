@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -27,6 +28,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
+	AuthenticationController authController;
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
@@ -38,7 +40,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			SynapseJSNIUtils jsniUtils,
 			SynapseAlert synAlert,
 			RequestBuilderWrapper requestBuilder,
-			DiscussionForumClientAsync discussionForumClientAsync
+			DiscussionForumClientAsync discussionForumClientAsync,
+			AuthenticationController authController
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -46,6 +49,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.synAlert = synAlert;
 		this.requestBuilder = requestBuilder;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		this.authController = authController;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -61,8 +65,10 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		if (bundle.getIsDeleted()) {
 			view.setDeleteButtonVisibility(false);
 			view.setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
+			view.setEditIconVisible(false);
 		} else {
 			view.setDeleteButtonVisibility(isCurrentUserModerator);
+			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			configureMessage();
 		}
 	}
@@ -137,5 +143,11 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 				configure(result, isCurrentUserModerator);
 			}
 		});
+	}
+
+	@Override
+	public void onClickEditReply() {
+		// TODO Auto-generated method stub
+		
 	}
 }

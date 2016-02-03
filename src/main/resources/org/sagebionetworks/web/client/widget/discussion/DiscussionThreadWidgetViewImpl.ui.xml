@@ -43,7 +43,16 @@
 						</bh:Div>
 					</b:Column>
 				</b:Row>
-				<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
+				<b:Row>
+					<b:Column size="SM_9">
+						<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
+					</b:Column>
+					<b:Column size="SM_3">
+						<bh:Div pull="RIGHT">
+							<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" addStyleNames="imageButton" visible="false"/>
+						</bh:Div>
+					</b:Column>
+				</b:Row>
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
 					<bh:Div addStyleNames="link">
 						<bh:Span ui:field="clickToViewReplies" addStyleNames="margin-right-10"></bh:Span>
