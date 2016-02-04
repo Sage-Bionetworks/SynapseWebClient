@@ -5,13 +5,16 @@ import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -23,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
@@ -57,6 +61,7 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -66,6 +71,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
  */
 public class CrawlFilter implements Filter {
 
+	private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
 	public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
 	ServletContext sc;
 	
@@ -108,12 +114,15 @@ public class CrawlFilter implements Filter {
 				if (fixedQueryString.contains("#!Home")) {
 					//send back info about the site
 					html = getHomePageHtml();
-					
 				} else if (fixedQueryString.contains("#!Synapse")) {
-					//index information about the synapse entity
-					String entityId = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
-					html=getEntityHtml(entityId);
-					
+					if (fixedQueryString.contains(DISCUSSION_THREAD_ID)) {
+						String threadId = fixedQueryString.substring(fixedQueryString.indexOf(DISCUSSION_THREAD_ID)+DISCUSSION_THREAD_ID.length());
+						html=getThreadHtml(threadId);
+					} else {
+						//index information about the synapse entity
+						String entityId = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
+						html=getEntityHtml(entityId);
+					}
 				} else if (fixedQueryString.contains("#!Search")) {
 					//index all projects
 					String searchQueryJson = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
@@ -163,6 +172,20 @@ public class CrawlFilter implements Filter {
 		return html.toString();
 	}
 	
+	private String getCreatedByString(String userId) throws RestServiceException {
+		UserProfile profile = synapseClient.getUserProfile(userId);
+		StringBuilder createdByBuilder = new StringBuilder();
+		if (profile.getFirstName() != null) {
+			createdByBuilder.append(profile.getFirstName() + " ");
+		}
+		if (profile.getLastName() != null) {
+			createdByBuilder.append(profile.getLastName() + " ");
+		}
+		createdByBuilder.append(profile.getUserName());
+
+		return createdByBuilder.toString();
+	}
+	
 	private String getEntityHtml(String entityId) throws RestServiceException, JSONObjectAdapterException{
 		int mask = ENTITY | ANNOTATIONS;
 		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
@@ -173,17 +196,7 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = null;
 		try{
-			UserProfile profile = synapseClient.getUserProfile(entity.getCreatedBy());
-			StringBuilder createdByBuilder = new StringBuilder();
-			if (profile.getFirstName() != null) {
-				createdByBuilder.append(profile.getFirstName() + " ");
-			}
-			if (profile.getLastName() != null) {
-				createdByBuilder.append(profile.getLastName() + " ");
-			}
-			createdByBuilder.append(profile.getUserName());
-
-			createdBy = createdByBuilder.toString();
+			createdBy = getCreatedByString(entity.getCreatedBy());
 		}  catch (Exception e) {}
 		try{
 			WikiPage rootPage = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
@@ -233,9 +246,7 @@ public class CrawlFilter implements Filter {
 				PaginatedResults<DiscussionThreadBundle> paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 100L, 0L, DiscussionThreadOrder.LAST_ACTIVITY, false);
 				List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
 				for (DiscussionThreadBundle thread : threadList) {
-					html.append("<a href=\"#!Synapse:"+entity.getId()+"/discussion/threadId="+thread.getId()+"\">"+thread.getTitle());
-//					PaginatedResults<DiscussionReplyBundle> replies = discussionForumClient.getRepliesForThread(thread.getId(), 100L, 0L, DiscussionReplyOrder.CREATED_ON, false);
-					html.append("</a><br />");
+					html.append("<a href=\"#!Synapse:"+entity.getId()+DISCUSSION_THREAD_ID+thread.getId()+"\">"+thread.getTitle() + "</a><br />");
 				}
 			}
 		}
@@ -248,6 +259,57 @@ public class CrawlFilter implements Filter {
 			}} catch(Exception e) {};
 		html.append("</body></html>");
 		return html.toString();
+	}
+	
+	private String getThreadHtml(String threadId)
+			throws JSONObjectAdapterException, RestServiceException,
+			IOException {
+		StringBuilder html = new StringBuilder();
+		DiscussionThreadBundle thread = discussionForumClient
+				.getThread(threadId);
+		html.append("<!DOCTYPE html><html><head><title>" + thread.getTitle()
+				+ "</title></head><body>");
+		html.append("<h1>" + thread.getTitle() + "</h1>");
+		try {
+			String url = discussionForumClient.getThreadUrl(thread
+					.getMessageKey());
+			html.append("<h4>" + getURLContents(url) + "</h4>");
+		} catch (Exception e1) {}
+
+		String createdBy = null;
+		try {
+			createdBy = getCreatedByString(thread.getCreatedBy());
+		} catch (Exception e) {
+		}
+		html.append("Created by " + createdBy + "<br>");
+		PaginatedResults<DiscussionReplyBundle> replies = discussionForumClient
+				.getRepliesForThread(thread.getId(), 100L, 0L,
+						DiscussionReplyOrder.CREATED_ON, false);
+		for (DiscussionReplyBundle reply : replies.getResults()) {
+			try {
+				String replyURL = discussionForumClient.getReplyUrl(reply
+						.getMessageKey());
+				html.append(getURLContents(replyURL) + "<br>");
+			} catch (Exception e) {}
+		}
+		return html.toString();
+	}
+
+	private String getURLContents(String urlTarget) throws IOException {
+		URL url = new URL(urlTarget);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		try {
+			conn.setRequestProperty(WebConstants.CONTENT_TYPE,
+					WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+			InputStream in = new GZIPInputStream(conn.getInputStream());
+			try {
+				return IOUtils.toString(in, "UTF-8");
+			} finally {
+				IOUtils.closeQuietly(in);
+			}
+		} finally {
+			conn.disconnect();
+		}
 	}
 	
 	private String getValueString(List value) {
