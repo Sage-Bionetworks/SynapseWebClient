@@ -28,10 +28,14 @@ import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityId;
-import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -39,8 +43,6 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
 import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -50,13 +52,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * This filter detects ajax crawler (Google).  If so, it takes over the renders the javascript page and handles the response.
@@ -71,6 +73,7 @@ public class CrawlFilter implements Filter {
 	 * Injected with Gin
 	 */
 	private SynapseClientImpl synapseClient;
+	private DiscussionForumClientImpl discussionForumClient;
 	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Override
@@ -221,6 +224,21 @@ public class CrawlFilter implements Filter {
 			List<Double> value = annotations.getDoubleAnnotations().get(key);
 			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
 		}
+		//and link to the discussion forum (all threads and replies) if this is a project.
+		if (entity instanceof Project) {
+			Forum forum = discussionForumClient.getForumMetadata(entity.getId());
+			if (forum != null) {
+				String forumId = forum.getId();
+				//index 100 of the most recent project thread titles
+				PaginatedResults<DiscussionThreadBundle> paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 100L, 0L, DiscussionThreadOrder.LAST_ACTIVITY, false);
+				List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
+				for (DiscussionThreadBundle thread : threadList) {
+					html.append("<a href=\"#!Synapse:"+entity.getId()+"/discussion/threadId="+thread.getId()+"\">"+thread.getTitle());
+//					PaginatedResults<DiscussionReplyBundle> replies = discussionForumClient.getRepliesForThread(thread.getId(), 100L, 0L, DiscussionReplyOrder.CREATED_ON, false);
+					html.append("</a><br />");
+				}
+			}
+		}
 		
 		//and ask for all children
 		try {
@@ -294,7 +312,10 @@ public class CrawlFilter implements Filter {
 	public void init(FilterConfig config) throws ServletException {
 		this.sc = config.getServletContext();
 		synapseClient = new SynapseClientImpl();
-		synapseClient.setServiceUrlProvider(new ServiceUrlProvider());
+		ServiceUrlProvider urlProvider = new ServiceUrlProvider();
+		synapseClient.setServiceUrlProvider(urlProvider);
+		discussionForumClient = new DiscussionForumClientImpl();
+		discussionForumClient.setServiceUrlProvider(urlProvider);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
     }
 }
