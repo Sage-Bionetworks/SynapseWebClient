@@ -14,9 +14,12 @@ import com.google.inject.Inject;
 /**
  * A simple modal dialog for editing a thread.
  */
-public class EditDiscussionThreadModal implements EditDiscussionThreadModalView.Presenter{
+public class EditDiscussionThreadModal implements DiscussionThreadModalView.Presenter{
 
-	private EditDiscussionThreadModalView view;
+	private static final String EDIT_THREAD_MODAL_TITLE = "Edit Thread";
+	private static final String SUCCESS_TITLE = "Thread edited";
+	private static final String SUCCESS_MESSAGE = "A thread has been edited.";
+	private DiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private String threadId;
@@ -26,7 +29,7 @@ public class EditDiscussionThreadModal implements EditDiscussionThreadModalView.
 
 	@Inject
 	public EditDiscussionThreadModal(
-			EditDiscussionThreadModalView view,
+			DiscussionThreadModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert
 			) {
@@ -35,6 +38,7 @@ public class EditDiscussionThreadModal implements EditDiscussionThreadModalView.
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
+		view.setModalTitle(EDIT_THREAD_MODAL_TITLE);
 	}
 
 	public void configure(String threadId, String currentTitle, String currentMessage, Callback editThreadCallback) {
@@ -60,7 +64,7 @@ public class EditDiscussionThreadModal implements EditDiscussionThreadModalView.
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		String threadTitle = view.getTitle();
+		String threadTitle = view.getThreadTitle();
 		String messageMarkdown = view.getMessageMarkdown();
 		ValidationResult result = new ValidationResult();
 		result.requiredField("Title", threadTitle)
@@ -83,7 +87,7 @@ public class EditDiscussionThreadModal implements EditDiscussionThreadModalView.
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
 				view.hideDialog();
-				view.showSuccess();
+				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				if (editThreadCallback != null) {
 					editThreadCallback.invoke();
 				}

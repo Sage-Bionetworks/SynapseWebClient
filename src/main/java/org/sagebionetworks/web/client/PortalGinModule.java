@@ -117,12 +117,10 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
@@ -1199,9 +1197,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
 
 		// discussion
-		bind(NewDiscussionThreadModalView.class).to(NewDiscussionThreadModalViewImpl.class);
 		bind(NewReplyModalView.class).to(NewReplyModalViewImpl.class);
-		bind(EditDiscussionThreadModalView.class).to(EditDiscussionThreadModalViewImpl.class);
+		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);
 		bind(EditReplyModalView.class).to(EditReplyModalViewImpl.class);
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);

@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class EditDiscussionThreadModalTest {
 	@Mock
-	EditDiscussionThreadModalView mockView;
+	DiscussionThreadModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -75,7 +75,7 @@ public class EditDiscussionThreadModalTest {
 
 	@Test
 	public void testOnSaveInvalidArgument() {
-		when(mockView.getTitle()).thenReturn(null);
+		when(mockView.getThreadTitle()).thenReturn(null);
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		modal.onSave();
 		verify(mockSynAlert).clear();
@@ -87,7 +87,7 @@ public class EditDiscussionThreadModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
-		when(mockView.getTitle()).thenReturn("title");
+		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
 			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
@@ -96,7 +96,7 @@ public class EditDiscussionThreadModalTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
-		verify(mockView).showSuccess();
+		verify(mockView).showSuccess(anyString(), anyString());
 		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
 				any(AsyncCallback.class));
 		verify(mockCallback).invoke();
@@ -105,7 +105,7 @@ public class EditDiscussionThreadModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveFailure() {
-		when(mockView.getTitle()).thenReturn("title");
+		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),

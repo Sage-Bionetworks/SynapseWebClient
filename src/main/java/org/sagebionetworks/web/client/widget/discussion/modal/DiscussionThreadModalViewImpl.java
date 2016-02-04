@@ -14,22 +14,16 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EditDiscussionThreadModalViewImpl implements EditDiscussionThreadModalView {
+public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView {
 
-	public interface Binder extends UiBinder<Widget, EditDiscussionThreadModalViewImpl> {}
-
-	private static final String EDIT_THREAD_MODAL_TITLE = "Edit Thread";
-
-	private static final String SUCCESS_TITLE = "Thread edited";
-
-	private static final String SUCCESS_MESSAGE = "A thread has been edited.";
+	public interface Binder extends UiBinder<Widget, DiscussionThreadModalViewImpl> {}
 
 	@UiField
 	Button saveButton;
 	@UiField
 	Button cancelButton;
 	@UiField
-	Modal editThreadModal;
+	Modal threadModal;
 	@UiField
 	TextBox threadTitle;
 	@UiField
@@ -41,9 +35,8 @@ public class EditDiscussionThreadModalViewImpl implements EditDiscussionThreadMo
 	private Presenter presenter;
 
 	@Inject
-	public EditDiscussionThreadModalViewImpl(Binder binder) {
+	public DiscussionThreadModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		editThreadModal.setTitle(EDIT_THREAD_MODAL_TITLE);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -53,7 +46,7 @@ public class EditDiscussionThreadModalViewImpl implements EditDiscussionThreadMo
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				editThreadModal.hide();
+				threadModal.hide();
 			}
 		});
 	}
@@ -70,16 +63,16 @@ public class EditDiscussionThreadModalViewImpl implements EditDiscussionThreadMo
 
 	@Override
 	public void showDialog() {
-		editThreadModal.show();
+		threadModal.show();
 	}
 
 	@Override
 	public void hideDialog() {
-		editThreadModal.hide();
+		threadModal.hide();
 	}
 
 	@Override
-	public String getTitle() {
+	public String getThreadTitle() {
 		return threadTitle.getText();
 	}
 
@@ -101,8 +94,8 @@ public class EditDiscussionThreadModalViewImpl implements EditDiscussionThreadMo
 	}
 
 	@Override
-	public void showSuccess() {
-		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
+	public void showSuccess(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -123,5 +116,10 @@ public class EditDiscussionThreadModalViewImpl implements EditDiscussionThreadMo
 	@Override
 	public void setThreadMessage(String currentMessage) {
 		messageMarkdown.setText(currentMessage);
+	}
+
+	@Override
+	public void setModalTitle(String title) {
+		threadModal.setTitle(title);
 	}
 }

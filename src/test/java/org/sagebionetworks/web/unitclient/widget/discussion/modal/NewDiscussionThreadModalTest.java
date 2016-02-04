@@ -14,8 +14,8 @@ import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class NewDiscussionThreadModalTest {
 	@Mock
-	NewDiscussionThreadModalView mockView;
+	DiscussionThreadModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -70,7 +70,7 @@ public class NewDiscussionThreadModalTest {
 
 	@Test
 	public void testOnSaveInvalidArgument() {
-		when(mockView.getTitle()).thenReturn(null);
+		when(mockView.getThreadTitle()).thenReturn(null);
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		modal.onSave();
 		verify(mockSynAlert).clear();
@@ -82,7 +82,7 @@ public class NewDiscussionThreadModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
-		when(mockView.getTitle()).thenReturn("title");
+		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
 			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
@@ -91,7 +91,7 @@ public class NewDiscussionThreadModalTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
-		verify(mockView).showSuccess();
+		verify(mockView).showSuccess(anyString(), anyString());
 		verify(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
@@ -99,7 +99,7 @@ public class NewDiscussionThreadModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveFailure() {
-		when(mockView.getTitle()).thenReturn("title");
+		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
