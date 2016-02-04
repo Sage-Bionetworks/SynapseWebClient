@@ -85,6 +85,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Button deleteButton;
 	@UiField
 	Icon editIcon;
+	@UiField
+	SimplePanel editThreadModalContainer;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -337,5 +339,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setEditIconVisible(boolean visible) {
 		editIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setEditThreadModal(Widget widget) {
+		editThreadModalContainer.add(widget);
 	}
 }

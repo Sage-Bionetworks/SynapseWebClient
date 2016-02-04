@@ -87,4 +87,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void showErrorMessage(String errorMessage);
 
 	void setEditIconVisible(boolean visible);
+
+	void setEditThreadModal(Widget w);
 }

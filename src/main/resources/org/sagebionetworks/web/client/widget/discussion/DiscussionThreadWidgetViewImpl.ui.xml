@@ -75,6 +75,7 @@
 			</bh:Div>
 		</b:Collapse>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>
+		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>

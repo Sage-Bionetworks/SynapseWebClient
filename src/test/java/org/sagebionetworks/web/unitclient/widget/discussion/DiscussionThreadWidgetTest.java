@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -84,6 +85,8 @@ public class DiscussionThreadWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	EditDiscussionThreadModal mockEditThreadModal;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -100,7 +103,7 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
-				mockGlobalApplicationState);
+				mockGlobalApplicationState, mockEditThreadModal);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(nonAuthor);
@@ -112,6 +115,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNewReplyModal(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setAuthor(any(Widget.class));
+		verify(mockView).setEditThreadModal(any(Widget.class));
 	}
 
 	@Test
@@ -175,7 +179,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setShowRepliesVisibility(false);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
-		verify(mockNewReplyModal, never()).configure(anyString(), any(Callback.class));
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setReplyButtonVisible(false);
 	}
@@ -199,7 +203,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setShowRepliesVisibility(false);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
-		verify(mockNewReplyModal, never()).configure(anyString(), any(Callback.class));
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setReplyButtonVisible(false);
 	}
@@ -488,6 +492,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
 		verify(mockView).setDeleteButtonVisible(canModerate);
+		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
 	}
 
 	@Test
@@ -540,6 +545,12 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.reset();
 		verify(mockView).clear();
 		verify(mockView).toggleThread();
+	}
+
+	@Test
+	public void testOnClickEditThread() {
+		discussionThreadWidget.onClickEditThread();
+		verify(mockEditThreadModal).show();
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,
