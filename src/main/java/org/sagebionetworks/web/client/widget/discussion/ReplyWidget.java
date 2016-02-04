@@ -73,6 +73,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			view.setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 			view.setEditIconVisible(false);
 		} else {
+			view.setEditedVisible(bundle.getIsEdited());
 			view.setDeleteButtonVisibility(isCurrentUserModerator);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			configureMessage();
@@ -110,7 +111,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void invoke() {
-				configureMessage();
+				reconfigure();
 			}
 		});
 	}

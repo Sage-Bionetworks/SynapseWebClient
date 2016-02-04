@@ -35,4 +35,6 @@ public interface ReplyWidgetView extends IsWidget{
 	void setEditIconVisible(boolean visible);
 
 	void setEditReplyModal(Widget widget);
+
+	void setEditedVisible(Boolean visible);
 }

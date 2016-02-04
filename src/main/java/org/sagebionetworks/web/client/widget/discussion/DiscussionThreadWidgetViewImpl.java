@@ -58,7 +58,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Collapse replyDetails;
 	@UiField
-	SimplePanel author;
+	Span author;
 	@UiField
 	Span createdOn;
 	@UiField
@@ -87,6 +87,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Icon editIcon;
 	@UiField
 	SimplePanel editThreadModalContainer;
+	@UiField
+	Span edited;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -344,5 +346,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setEditThreadModal(Widget widget) {
 		editThreadModalContainer.add(widget);
+	}
+
+	@Override
+	public void setEditedVisible(Boolean visible) {
+		edited.setVisible(visible);
 	}
 }

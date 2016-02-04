@@ -25,7 +25,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
 	@UiField
-	SimplePanel author;
+	Span author;
 	@UiField
 	Span createdOn;
 	@UiField
@@ -38,6 +38,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Icon editIcon;
 	@UiField
 	SimplePanel editReplyModalContainer;
+	@UiField
+	Span edited;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -120,5 +122,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setEditReplyModal(Widget widget) {
 		editReplyModalContainer.add(widget);
+	}
+
+	@Override
+	public void setEditedVisible(Boolean visible) {
+		edited.setVisible(visible);
 	}
 }

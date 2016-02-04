@@ -89,4 +89,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setEditIconVisible(boolean visible);
 
 	void setEditThreadModal(Widget w);
+
+	void setEditedVisible(Boolean visible);
 }

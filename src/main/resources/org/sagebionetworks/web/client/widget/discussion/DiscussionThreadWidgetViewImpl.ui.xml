@@ -35,7 +35,8 @@
 			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
 				<b:Row>
 					<b:Column size="SM_9">
-						<g:SimplePanel ui:field="author"></g:SimplePanel>
+						<bh:Span ui:field="author"></bh:Span>
+						<bh:Span ui:field="edited" visible="false" addStyleNames="margin-left-10 vertical-align-top">Edited</bh:Span>
 					</b:Column>
 					<b:Column size="SM_3">
 						<bh:Div pull="RIGHT">

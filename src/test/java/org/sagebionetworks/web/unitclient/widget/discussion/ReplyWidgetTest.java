@@ -59,6 +59,7 @@ public class ReplyWidgetTest {
 	boolean canModerate = false;
 	String userId = "123";
 	String nonAuthor = "456";
+	boolean isEdited = false;
 
 	@Before
 	public void before() {
@@ -80,7 +81,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testConfigure() {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
@@ -89,13 +90,30 @@ public class ReplyWidgetTest {
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
 		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockView).setEditIconVisible(false);
+		verify(mockView).setEditedVisible(isEdited);
+	}
+
+	@Test
+	public void testConfigureEdited() {
+		isEdited = true;
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
+				new Date(), isDeleted, userId, isEdited);
+		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
+		replyWidget.configure(bundle, canModerate);
+		verify(mockView).clear();
+		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockJsniUtils).getRelativeTime(any(Date.class));
+		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setEditIconVisible(false);
+		verify(mockView).setEditedVisible(isEdited);
 	}
 
 	@Test
 	public void testConfigureWithAuthor() {
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
@@ -104,13 +122,14 @@ public class ReplyWidgetTest {
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
 		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockView).setEditIconVisible(true);
+		verify(mockView).setEditedVisible(isEdited);
 	}
 
 	@Test
 	public void testConfigureDeletedReply() {
 		isDeleted = true;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
@@ -120,6 +139,7 @@ public class ReplyWidgetTest {
 		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockView).setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 		verify(mockView).setEditIconVisible(false);
+		verify(mockView, never()).setEditedVisible(isEdited);
 	}
 
 	@Test
@@ -127,7 +147,7 @@ public class ReplyWidgetTest {
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
 		isDeleted = true;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
@@ -137,13 +157,14 @@ public class ReplyWidgetTest {
 		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockView).setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 		verify(mockView).setEditIconVisible(false);
+		verify(mockView, never()).setEditedVisible(isEdited);
 	}
 
 	@Test
 	public void testConfigureWithModerator() {
 		canModerate = true;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
@@ -151,6 +172,7 @@ public class ReplyWidgetTest {
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
 		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setEditedVisible(isEdited);
 	}
 
 	@Test
@@ -162,7 +184,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testConfigureMessageFailToGetMessage() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate);
@@ -176,7 +198,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testConfigureMessageFailToGetMessageCase2() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
@@ -192,7 +214,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testConfigureMessageSuccess() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -218,7 +240,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testDeleteReplySuccess() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -237,7 +259,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testDeleteReplyFailure() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -257,7 +279,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testReconfigureSuccess() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -279,7 +301,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testReconfigureFailure() throws RequestException {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId);
+				new Date(), isDeleted, userId, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -305,7 +327,8 @@ public class ReplyWidgetTest {
 	}
 
 	private DiscussionReplyBundle createReplyBundle(String replyId, String author,
-			String messageKey, Date createdOn, Boolean isDeleted, String createdBy) {
+			String messageKey, Date createdOn, Boolean isDeleted, String createdBy,
+			Boolean isEdited) {
 		DiscussionReplyBundle bundle = new DiscussionReplyBundle();
 		bundle.setId(replyId);
 		bundle.setCreatedBy(author);
@@ -313,6 +336,7 @@ public class ReplyWidgetTest {
 		bundle.setCreatedOn(createdOn);
 		bundle.setIsDeleted(isDeleted);
 		bundle.setCreatedBy(createdBy);
+		bundle.setIsEdited(isEdited);
 		return bundle;
 	}
 

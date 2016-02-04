@@ -123,6 +123,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setEditedVisible(bundle.getIsEdited());
 		if (isThreadDeleted) {
 			view.setTitleAsDeleted();
 			view.setShowRepliesVisibility(false);
