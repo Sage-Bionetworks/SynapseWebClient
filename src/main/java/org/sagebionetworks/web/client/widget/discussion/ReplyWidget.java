@@ -6,6 +6,8 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -29,6 +31,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	AuthenticationController authController;
+	EditReplyModal editReplyModal;
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
@@ -41,7 +44,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			SynapseAlert synAlert,
 			RequestBuilderWrapper requestBuilder,
 			DiscussionForumClientAsync discussionForumClientAsync,
-			AuthenticationController authController
+			AuthenticationController authController,
+			EditReplyModal editReplyModal
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -50,18 +54,20 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.requestBuilder = requestBuilder;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.authController = authController;
+		this.editReplyModal = editReplyModal;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
+		view.setEditReplyModal(editReplyModal.asWidget());
 	}
 
 	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator) {
 		view.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
-		this.isCurrentUserModerator = isCurrentUserModerator;
 		if (bundle.getIsDeleted()) {
 			view.setDeleteButtonVisibility(false);
 			view.setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
@@ -86,7 +92,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 				public void onResponseReceived(final Request request, final Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						view.setMessage(response.getText());
+						String message = response.getText();
+						view.setMessage(message);
+						configureEditReplyModal(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
 					}
@@ -95,6 +103,16 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		} catch (final Exception e) {
 			synAlert.handleException(e);
 		}
+	}
+
+	private void configureEditReplyModal(String message) {
+		editReplyModal.configure(replyId, message, new Callback(){
+
+			@Override
+			public void invoke() {
+				configureMessage();
+			}
+		});
 	}
 
 	@Override
@@ -147,7 +165,6 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickEditReply() {
-		// TODO Auto-generated method stub
-		
+		editReplyModal.show();
 	}
 }

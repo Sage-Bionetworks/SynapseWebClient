@@ -36,6 +36,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Button deleteButton;
 	@UiField
 	Icon editIcon;
+	@UiField
+	SimplePanel editReplyModalContainer;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -113,5 +115,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setEditIconVisible(boolean visible) {
 		editIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setEditReplyModal(Widget widget) {
+		editReplyModalContainer.add(widget);
 	}
 }

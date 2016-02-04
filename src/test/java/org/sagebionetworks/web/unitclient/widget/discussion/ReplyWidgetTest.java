@@ -17,8 +17,10 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -49,6 +51,8 @@ public class ReplyWidgetTest {
 	DiscussionForumClientAsync mockDiscussionForumClientAsync;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	EditReplyModal mockEditReplyModal;
 
 	ReplyWidget replyWidget;
 	boolean isDeleted = false;
@@ -61,7 +65,7 @@ public class ReplyWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockJsniUtils,
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
-				mockAuthController);
+				mockAuthController, mockEditReplyModal);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(nonAuthor);
 	}
 
@@ -70,6 +74,7 @@ public class ReplyWidgetTest {
 		verify(mockView).setPresenter(replyWidget);
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setEditReplyModal(any(Widget.class));
 	}
 
 	@Test
@@ -200,6 +205,7 @@ public class ReplyWidgetTest {
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
 		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
 	}
 
 	@Test
@@ -290,6 +296,12 @@ public class ReplyWidgetTest {
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
 		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Throwable.class));
+	}
+
+	@Test
+	public void testOnClickEditReply() {
+		replyWidget.onClickEditReply();
+		verify(mockEditReplyModal).show();
 	}
 
 	private DiscussionReplyBundle createReplyBundle(String replyId, String author,

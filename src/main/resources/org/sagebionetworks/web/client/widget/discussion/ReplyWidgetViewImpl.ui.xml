@@ -28,6 +28,7 @@
 		<bh:Div>
 			<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5">Delete Reply</b:Button>
 		</bh:Div>
+		<g:SimplePanel ui:field="editReplyModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>
