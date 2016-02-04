@@ -36,7 +36,6 @@
 				<b:Row>
 					<b:Column size="SM_9">
 						<bh:Span ui:field="author"></bh:Span>
-						<bh:Span ui:field="edited" visible="false" addStyleNames="margin-left-10 vertical-align-top">Edited</bh:Span>
 					</b:Column>
 					<b:Column size="SM_3">
 						<bh:Div pull="RIGHT">
@@ -50,7 +49,8 @@
 					</b:Column>
 					<b:Column size="SM_3">
 						<bh:Div pull="RIGHT">
-							<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" addStyleNames="imageButton" visible="false"/>
+							<b:Label text="Edited" ui:field="edited" visible="false"/>
+							<b:Icon ui:field="editIcon" type="PENCIL" title="Edit thread" size="LARGE" addStyleNames="imageButton margin-left-10" visible="false"/>
 						</bh:Div>
 					</b:Column>
 				</b:Row>

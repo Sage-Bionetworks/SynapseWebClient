@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.*;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -88,7 +89,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	SimplePanel editThreadModalContainer;
 	@UiField
-	Span edited;
+	Label edited;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;

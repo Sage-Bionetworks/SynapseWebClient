@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.*;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -39,7 +40,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@UiField
 	SimplePanel editReplyModalContainer;
 	@UiField
-	Span edited;
+	Label edited;
 
 	private Widget widget;
 	private ReplyWidget presenter;
