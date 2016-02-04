@@ -117,6 +117,10 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
@@ -569,8 +573,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidgetView;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -1199,6 +1201,8 @@ public class PortalGinModule extends AbstractGinModule {
 		// discussion
 		bind(NewDiscussionThreadModalView.class).to(NewDiscussionThreadModalViewImpl.class);
 		bind(NewReplyModalView.class).to(NewReplyModalViewImpl.class);
+		bind(EditDiscussionThreadModalView.class).to(EditDiscussionThreadModalViewImpl.class);
+		bind(EditReplyModalView.class).to(EditReplyModalViewImpl.class);
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
