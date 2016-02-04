@@ -13,22 +13,16 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class NewReplyModalViewImpl implements NewReplyModalView {
+public class ReplyModalViewImpl implements ReplyModalView {
 
-	public interface Binder extends UiBinder<Widget, NewReplyModalViewImpl> {}
-
-	private static final String NEW_REPLY_MODAL_TITLE = "New Reply";
-
-	private static final String SUCCESS_TITLE = "Reply created";
-
-	private static final String SUCCESS_MESSAGE = "A new reply has been created.";
+	public interface Binder extends UiBinder<Widget, ReplyModalViewImpl> {}
 
 	@UiField
 	Button saveButton;
 	@UiField
 	Button cancelButton;
 	@UiField
-	Modal newReplyModal;
+	Modal replyModal;
 	@UiField
 	TextArea messageMarkdown;
 	@UiField
@@ -38,9 +32,8 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	private Presenter presenter;
 
 	@Inject
-	public NewReplyModalViewImpl(Binder binder) {
+	public ReplyModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		newReplyModal.setTitle(NEW_REPLY_MODAL_TITLE);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -50,7 +43,7 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				newReplyModal.hide();
+				replyModal.hide();
 			}
 		});
 	}
@@ -67,12 +60,12 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 
 	@Override
 	public void showDialog() {
-		newReplyModal.show();
+		replyModal.show();
 	}
 
 	@Override
 	public void hideDialog() {
-		newReplyModal.hide();
+		replyModal.hide();
 	}
 
 	@Override
@@ -92,8 +85,8 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	}
 
 	@Override
-	public void showSuccess() {
-		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
+	public void showSuccess(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -104,5 +97,15 @@ public class NewReplyModalViewImpl implements NewReplyModalView {
 	@Override
 	public void resetButton() {
 		saveButton.state().reset();
+	}
+
+	@Override
+	public void setMessage(String message) {
+		messageMarkdown.setText(message);
+	}
+
+	@Override
+	public void setModalTitle(String title) {
+		replyModal.setTitle(title);
 	}
 }

@@ -119,10 +119,8 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetVi
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -1197,9 +1195,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
 
 		// discussion
-		bind(NewReplyModalView.class).to(NewReplyModalViewImpl.class);
 		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);
-		bind(EditReplyModalView.class).to(EditReplyModalViewImpl.class);
+		bind(ReplyModalView.class).to(ReplyModalViewImpl.class);
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);

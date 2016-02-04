@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class NewReplyModalTest {
 	@Mock
-	NewReplyModalView mockView;
+	ReplyModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -47,6 +47,7 @@ public class NewReplyModalTest {
 	public void testConstructor() {
 		verify(mockView).setPresenter(modal);
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setModalTitle(anyString());
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public class NewReplyModalTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
-		verify(mockView).showSuccess();
+		verify(mockView).showSuccess(anyString(), anyString());
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}

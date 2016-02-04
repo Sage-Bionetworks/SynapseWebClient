@@ -50,6 +50,7 @@ public class EditDiscussionThreadModalTest {
 	public void testConstructor() {
 		verify(mockView).setPresenter(modal);
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setModalTitle(anyString());
 	}
 
 	@Test

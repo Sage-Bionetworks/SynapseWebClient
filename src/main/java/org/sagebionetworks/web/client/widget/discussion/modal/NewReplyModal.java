@@ -14,9 +14,12 @@ import com.google.inject.Inject;
 /**
  * A simple modal dialog for adding a new reply.
  */
-public class NewReplyModal implements NewReplyModalView.Presenter{
+public class NewReplyModal implements ReplyModalView.Presenter{
 
-	private NewReplyModalView view;
+	private static final String NEW_REPLY_MODAL_TITLE = "New Reply";
+	private static final String SUCCESS_TITLE = "Reply created";
+	private static final String SUCCESS_MESSAGE = "A new reply has been created.";
+	private ReplyModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private String threadId;
@@ -24,7 +27,7 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 
 	@Inject
 	public NewReplyModal(
-			NewReplyModalView view,
+			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert
 			) {
@@ -33,6 +36,7 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
+		view.setModalTitle(NEW_REPLY_MODAL_TITLE);
 	}
 
 	public void configure(String threadId, Callback newReplyCallback) {
@@ -75,7 +79,7 @@ public class NewReplyModal implements NewReplyModalView.Presenter{
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
 				view.hideDialog();
-				view.showSuccess();
+				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				if (newReplyCallback != null) {
 					newReplyCallback.invoke();
 				}

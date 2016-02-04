@@ -14,9 +14,12 @@ import com.google.inject.Inject;
 /**
  * A simple modal dialog for editing a reply.
  */
-public class EditReplyModal implements EditReplyModalView.Presenter{
+public class EditReplyModal implements ReplyModalView.Presenter{
 
-	private EditReplyModalView view;
+	private static final String EDIT_REPLY_MODAL_TITLE = "Edit Reply";
+	private static final String SUCCESS_TITLE = "Reply edited";
+	private static final String SUCCESS_MESSAGE = "A reply has been edited.";
+	private ReplyModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private String replyId;
@@ -25,7 +28,7 @@ public class EditReplyModal implements EditReplyModalView.Presenter{
 
 	@Inject
 	public EditReplyModal(
-			EditReplyModalView view,
+			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert
 			) {
@@ -34,6 +37,7 @@ public class EditReplyModal implements EditReplyModalView.Presenter{
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
+		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
 	}
 
 	public void configure(String replyId, String message, Callback editReplyCallback) {
@@ -77,7 +81,7 @@ public class EditReplyModal implements EditReplyModalView.Presenter{
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
 				view.hideDialog();
-				view.showSuccess();
+				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				if (editReplyCallback != null) {
 					editReplyCallback.invoke();
 				}

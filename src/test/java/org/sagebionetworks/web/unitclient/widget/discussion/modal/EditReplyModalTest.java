@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class EditReplyModalTest {
 	@Mock
-	EditReplyModalView mockView;
+	ReplyModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -48,6 +48,7 @@ public class EditReplyModalTest {
 	public void testConstructor() {
 		verify(mockView).setPresenter(modal);
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setModalTitle(anyString());
 	}
 
 	@Test
@@ -90,7 +91,7 @@ public class EditReplyModalTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
-		verify(mockView).showSuccess();
+		verify(mockView).showSuccess(anyString(), anyString());
 		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
