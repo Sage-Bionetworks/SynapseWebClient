@@ -117,10 +117,10 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModalViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalView;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -569,8 +569,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidgetView;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -1197,8 +1195,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
 
 		// discussion
-		bind(NewDiscussionThreadModalView.class).to(NewDiscussionThreadModalViewImpl.class);
-		bind(NewReplyModalView.class).to(NewReplyModalViewImpl.class);
+		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);
+		bind(ReplyModalView.class).to(ReplyModalViewImpl.class);
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);

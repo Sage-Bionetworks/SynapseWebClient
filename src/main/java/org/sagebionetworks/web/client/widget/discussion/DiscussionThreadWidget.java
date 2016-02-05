@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
@@ -44,6 +45,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
+	EditDiscussionThreadModal editThreadModal;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -64,7 +66,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			SynapseJSNIUtils jsniUtils,
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState
+			GlobalApplicationState globalApplicationState,
+			EditDiscussionThreadModal editThreadModal
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -76,10 +79,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
+		this.editThreadModal = editThreadModal;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
+		view.setEditThreadModal(editThreadModal.asWidget());
 	}
 
 	@Override
@@ -88,8 +93,25 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	}
 
 	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator) {
-		view.clear();
 		this.title = bundle.getTitle();
+		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.isThreadDeleted = bundle.getIsDeleted();
+		this.threadId = bundle.getId();
+		this.messageKey = bundle.getMessageKey();
+		configureView(bundle);
+		authorWidget.configure(bundle.getCreatedBy());
+		newReplyModal.configure(bundle.getId(), new Callback(){
+
+			@Override
+			public void invoke() {
+				reconfigure();
+				configureReplies();
+			}
+		});
+	}
+
+	private void configureView(DiscussionThreadBundle bundle) {
+		view.clear();
 		view.setTitle(title);
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
@@ -100,28 +122,18 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
-		this.isCurrentUserModerator = isCurrentUserModerator;
-		this.isThreadDeleted = bundle.getIsDeleted();
-		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
-		threadId = bundle.getId();
-		messageKey = bundle.getMessageKey();
+		view.setEditedVisible(bundle.getIsEdited());
 		if (isThreadDeleted) {
 			view.setTitleAsDeleted();
 			view.setShowRepliesVisibility(false);
 			view.setDeleteButtonVisible(false);
 			view.setReplyButtonVisible(false);
+			view.setEditIconVisible(false);
 		} else {
 			view.setDeleteButtonVisible(isCurrentUserModerator);
 			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
-			newReplyModal.configure(bundle.getId(), new Callback(){
-
-				@Override
-				public void invoke() {
-					reconfigure();
-					configureReplies();
-				}
-			});
+			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		}
 	}
 
@@ -177,7 +189,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 				public void onResponseReceived(final Request request, final Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						view.setMessage(response.getText());
+						String message = response.getText();
+						view.setMessage(message);
+						configureEditThreadModal(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId + ". Reason: " + response.getStatusText()));
 					}
@@ -186,6 +200,20 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		} catch (final Exception e) {
 			synAlert.handleException(e);
 		}
+	}
+
+	private void configureEditThreadModal(String message) {
+		editThreadModal.configure(threadId, title, message, new Callback(){
+
+			@Override
+			public void invoke() {
+				reconfigure();
+				configureMessage();
+				if (!view.isReplyCollapsed()) {
+					configureReplies();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -285,7 +313,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		});
 	}
 
-
 	public void reset() {
 		view.clear();
 		if (!view.isThreadCollapsed()) {
@@ -294,5 +321,10 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		if (!view.isReplyCollapsed()) {
 			view.toggleReplies();
 		}
+	}
+
+	@Override
+	public void onClickEditThread() {
+		editThreadModal.show();
 	}
 }

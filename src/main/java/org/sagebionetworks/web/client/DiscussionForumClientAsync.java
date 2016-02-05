@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.discussion.UpdateThread;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -28,6 +29,9 @@ public interface DiscussionForumClientAsync{
 	void getThreadsForForum(String forumId, Long limit, Long offset,
 			DiscussionThreadOrder order, Boolean ascending,
 			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
+
+	void updateThread(String threadId, UpdateThread newThread,
+			AsyncCallback<DiscussionThreadBundle> callback);
 
 	void updateThreadTitle(String threadId, UpdateThreadTitle newTitle,
 			AsyncCallback<DiscussionThreadBundle> callback);

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -10,21 +11,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
-import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public class NewReplyModalTest {
+public class EditDiscussionThreadModalTest {
 	@Mock
-	ReplyModalView mockView;
+	DiscussionThreadModalView mockView;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -32,15 +33,17 @@ public class NewReplyModalTest {
 	@Mock
 	Callback mockCallback;
 	@Mock
-	DiscussionReplyBundle mockDiscussionReplyBundle;
+	DiscussionThreadBundle mockDiscussionThreadBundle;
 	String threadId = "123";
-	NewReplyModal modal;
+	String title = "title";
+	String message = "message";
+	EditDiscussionThreadModal modal;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new NewReplyModal(mockView, mockDiscussionForumClient, mockSynAlert);
-		modal.configure(threadId, mockCallback);
+		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal.configure(threadId, title, message, mockCallback);
 	}
 
 	@Test
@@ -54,6 +57,8 @@ public class NewReplyModalTest {
 	public void testShowDialog() {
 		modal.show();
 		verify(mockView).clear();
+		verify(mockView).setThreadTitle(title);
+		verify(mockView).setThreadMessage(message);
 		verify(mockView).showDialog();
 	}
 
@@ -71,7 +76,8 @@ public class NewReplyModalTest {
 
 	@Test
 	public void testOnSaveInvalidArgument() {
-		when(mockView.getMessageMarkdown()).thenReturn("");
+		when(mockView.getThreadTitle()).thenReturn(null);
+		when(mockView.getMessageMarkdown()).thenReturn("message");
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(anyString());
@@ -82,32 +88,36 @@ public class NewReplyModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
+		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
-		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
+			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess(anyString(), anyString());
-		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
+				any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveFailure() {
+		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
+			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
 					any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
-		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
+				any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
-		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).resetButton();
+		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 }

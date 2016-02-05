@@ -20,6 +20,8 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void loadMore();
 
 		void onClickDeleteThread();
+
+		void onClickEditThread();
 	}
 
 	void setPresenter(DiscussionThreadWidget presenter);
@@ -83,4 +85,10 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setReplyButtonVisible(boolean visible);
 
 	void showErrorMessage(String errorMessage);
+
+	void setEditIconVisible(boolean visible);
+
+	void setEditThreadModal(Widget w);
+
+	void setEditedVisible(Boolean visible);
 }

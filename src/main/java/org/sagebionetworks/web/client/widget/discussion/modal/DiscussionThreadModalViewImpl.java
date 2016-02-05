@@ -14,22 +14,16 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModalView {
+public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView {
 
-	public interface Binder extends UiBinder<Widget, NewDiscussionThreadModalViewImpl> {}
-
-	private static final String NEW_THREAD_MODAL_TITLE = "New Thread";
-
-	private static final String SUCCESS_TITLE = "Thread created";
-
-	private static final String SUCCESS_MESSAGE = "A new thread has been created.";
+	public interface Binder extends UiBinder<Widget, DiscussionThreadModalViewImpl> {}
 
 	@UiField
 	Button saveButton;
 	@UiField
 	Button cancelButton;
 	@UiField
-	Modal newThreadModal;
+	Modal threadModal;
 	@UiField
 	TextBox threadTitle;
 	@UiField
@@ -41,9 +35,8 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 	private Presenter presenter;
 
 	@Inject
-	public NewDiscussionThreadModalViewImpl(Binder binder) {
+	public DiscussionThreadModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		newThreadModal.setTitle(NEW_THREAD_MODAL_TITLE);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -53,7 +46,7 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				newThreadModal.hide();
+				threadModal.hide();
 			}
 		});
 	}
@@ -70,16 +63,16 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 
 	@Override
 	public void showDialog() {
-		newThreadModal.show();
+		threadModal.show();
 	}
 
 	@Override
 	public void hideDialog() {
-		newThreadModal.hide();
+		threadModal.hide();
 	}
 
 	@Override
-	public String getTitle() {
+	public String getThreadTitle() {
 		return threadTitle.getText();
 	}
 
@@ -101,8 +94,8 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 	}
 
 	@Override
-	public void showSuccess() {
-		DisplayUtils.showInfo(SUCCESS_TITLE, SUCCESS_MESSAGE);
+	public void showSuccess(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -113,5 +106,20 @@ public class NewDiscussionThreadModalViewImpl implements NewDiscussionThreadModa
 	@Override
 	public void resetButton() {
 		saveButton.state().reset();
+	}
+
+	@Override
+	public void setThreadTitle(String currentTitle) {
+		threadTitle.setText(currentTitle);
+	}
+
+	@Override
+	public void setThreadMessage(String currentMessage) {
+		messageMarkdown.setText(currentMessage);
+	}
+
+	@Override
+	public void setModalTitle(String title) {
+		threadModal.setTitle(title);
 	}
 }

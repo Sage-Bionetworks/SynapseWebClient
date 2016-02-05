@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.discussion;
 import static org.sagebionetworks.web.client.DisplayConstants.*;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -24,7 +26,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
 	@UiField
-	SimplePanel author;
+	Span author;
 	@UiField
 	Span createdOn;
 	@UiField
@@ -33,6 +35,12 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Div synAlertContainer;
 	@UiField
 	Button deleteButton;
+	@UiField
+	Icon editIcon;
+	@UiField
+	SimplePanel editReplyModalContainer;
+	@UiField
+	Label edited;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -44,6 +52,13 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteReply();
+			}
+		});
+		editIcon.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickEditReply();
 			}
 		});
 	}
@@ -98,5 +113,20 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 		.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 		.addButton(BUTTON_CANCEL, PRIMARY_BUTTON_STYLE)
 		.show();
+	}
+
+	@Override
+	public void setEditIconVisible(boolean visible) {
+		editIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setEditReplyModal(Widget widget) {
+		editReplyModalContainer.add(widget);
+	}
+
+	@Override
+	public void setEditedVisible(Boolean visible) {
+		edited.setVisible(visible);
 	}
 }

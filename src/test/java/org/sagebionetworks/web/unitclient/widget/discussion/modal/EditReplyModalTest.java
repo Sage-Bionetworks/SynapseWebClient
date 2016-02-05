@@ -10,11 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -22,7 +22,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public class NewReplyModalTest {
+public class EditReplyModalTest {
 	@Mock
 	ReplyModalView mockView;
 	@Mock
@@ -33,14 +33,15 @@ public class NewReplyModalTest {
 	Callback mockCallback;
 	@Mock
 	DiscussionReplyBundle mockDiscussionReplyBundle;
-	String threadId = "123";
-	NewReplyModal modal;
+	String replyId = "123";
+	String message = "message";
+	EditReplyModal modal;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new NewReplyModal(mockView, mockDiscussionForumClient, mockSynAlert);
-		modal.configure(threadId, mockCallback);
+		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal.configure(replyId, message, mockCallback);
 	}
 
 	@Test
@@ -54,6 +55,7 @@ public class NewReplyModalTest {
 	public void testShowDialog() {
 		modal.show();
 		verify(mockView).clear();
+		verify(mockView).setMessage(message);
 		verify(mockView).showDialog();
 	}
 
@@ -84,14 +86,13 @@ public class NewReplyModalTest {
 	public void testOnSaveSuccess() {
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
-					any(AsyncCallback.class));
+			.when(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess(anyString(), anyString());
-		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
 
@@ -100,12 +101,12 @@ public class NewReplyModalTest {
 	public void testOnSaveFailure() {
 		when(mockView.getMessageMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
-					any(AsyncCallback.class));
+			.when(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
+
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
-		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).resetButton();

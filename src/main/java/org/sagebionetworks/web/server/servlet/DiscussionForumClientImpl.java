@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DiscussionForumClient;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -163,7 +164,23 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
+	@Override
+	public DiscussionThreadBundle updateThread(String threadId,
+			UpdateThread newThread) throws RestServiceException {
+		UpdateThreadTitle updateTitle = new UpdateThreadTitle();
+		updateTitle.setTitle(newThread.getTitle());
+		UpdateThreadMessage updateMessage = new UpdateThreadMessage();
+		updateMessage.setMessageMarkdown(newThread.getMessage());
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.updateThreadTitle(threadId, updateTitle);
+			return synapseClient.updateThreadMessage(threadId, updateMessage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
 	public String getThreadUrl(String messageKey) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -172,7 +189,7 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	public String getReplyUrl(String messageKey) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

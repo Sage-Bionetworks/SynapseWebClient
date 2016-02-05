@@ -3,12 +3,10 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface NewDiscussionThreadModalView extends IsWidget{
+public interface DiscussionThreadModalView extends IsWidget{
 
 	public interface Presenter {
-		/**
-		 * Show the new thread modal.
-		 */
+
 		public void show();
 
 		public void hide();
@@ -21,12 +19,15 @@ public interface NewDiscussionThreadModalView extends IsWidget{
 	void setPresenter(Presenter presenter);
 	void showDialog();
 	void hideDialog();
-	String getTitle();
+	String getThreadTitle();
 	String getMessageMarkdown();
 	void clear();
 	void setAlert(Widget w);
-	void showSuccess();
+	void showSuccess(String title, String message);
 	void showSaving();
 	void resetButton();
+	void setThreadTitle(String currentTitle);
+	void setThreadMessage(String currentMessage);
+	void setModalTitle(String title);
 
 }

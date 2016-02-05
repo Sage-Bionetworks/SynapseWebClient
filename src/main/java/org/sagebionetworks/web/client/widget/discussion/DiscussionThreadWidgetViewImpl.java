@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.*;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -58,7 +59,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Collapse replyDetails;
 	@UiField
-	SimplePanel author;
+	Span author;
 	@UiField
 	Span createdOn;
 	@UiField
@@ -83,6 +84,12 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	HTMLPanel loadingUI;
 	@UiField
 	Button deleteButton;
+	@UiField
+	Icon editIcon;
+	@UiField
+	SimplePanel editThreadModalContainer;
+	@UiField
+	Label edited;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -142,6 +149,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteThread();
+			}
+		});
+		editIcon.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickEditThread();
 			}
 		});
 	}
@@ -323,5 +337,20 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void setEditIconVisible(boolean visible) {
+		editIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setEditThreadModal(Widget widget) {
+		editThreadModalContainer.add(widget);
+	}
+
+	@Override
+	public void setEditedVisible(Boolean visible) {
+		edited.setVisible(visible);
 	}
 }

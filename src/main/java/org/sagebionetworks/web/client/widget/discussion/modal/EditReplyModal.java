@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
@@ -12,22 +12,23 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * A simple modal dialog for adding a new thread.
+ * A simple modal dialog for editing a reply.
  */
-public class NewDiscussionThreadModal implements DiscussionThreadModalView.Presenter{
+public class EditReplyModal implements ReplyModalView.Presenter{
 
-	private static final String NEW_THREAD_MODAL_TITLE = "New Thread";
-	private static final String SUCCESS_TITLE = "Thread created";
-	private static final String SUCCESS_MESSAGE = "A new thread has been created.";
-	private DiscussionThreadModalView view;
+	private static final String EDIT_REPLY_MODAL_TITLE = "Edit Reply";
+	private static final String SUCCESS_TITLE = "Reply edited";
+	private static final String SUCCESS_MESSAGE = "A reply has been edited.";
+	private ReplyModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
-	private String forumId;
-	Callback newThreadCallback;
+	private String replyId;
+	private String message;
+	Callback editReplyCallback;
 
 	@Inject
-	public NewDiscussionThreadModal(
-			DiscussionThreadModalView view,
+	public EditReplyModal(
+			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert
 			) {
@@ -36,17 +37,19 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
-		view.setModalTitle(NEW_THREAD_MODAL_TITLE);
+		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
 	}
 
-	public void configure(String forumId, Callback newThreadCallback) {
-		this.forumId = forumId;
-		this.newThreadCallback = newThreadCallback;
+	public void configure(String replyId, String message, Callback editReplyCallback) {
+		this.replyId = replyId;
+		this.message = message;
+		this.editReplyCallback = editReplyCallback;
 	}
 
 	@Override
 	public void show() {
 		view.clear();
+		view.setMessage(message);
 		view.showDialog();
 	}
 
@@ -58,21 +61,17 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		String threadTitle = view.getThreadTitle();
 		String messageMarkdown = view.getMessageMarkdown();
 		ValidationResult result = new ValidationResult();
-		result.requiredField("Title", threadTitle)
-				.requiredField("Message", messageMarkdown);
+		result.requiredField("Message", messageMarkdown);
 		if (!result.isValid()) {
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
 		view.showSaving();
-		CreateDiscussionThread toCreate = new CreateDiscussionThread();
-		toCreate.setForumId(forumId);
-		toCreate.setTitle(threadTitle);
-		toCreate.setMessageMarkdown(messageMarkdown);
-		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>(){
+		UpdateReplyMessage updateReply = new UpdateReplyMessage();
+		updateReply.setMessageMarkdown(messageMarkdown);
+		discussionForumClient.updateReplyMessage(replyId, updateReply, new AsyncCallback<DiscussionReplyBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				view.resetButton();
@@ -80,14 +79,13 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			}
 
 			@Override
-			public void onSuccess(DiscussionThreadBundle result) {
+			public void onSuccess(DiscussionReplyBundle result) {
 				view.hideDialog();
 				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
-				if (newThreadCallback != null) {
-					newThreadCallback.invoke();
+				if (editReplyCallback != null) {
+					editReplyCallback.invoke();
 				}
 			}
-
 		});
 	}
 

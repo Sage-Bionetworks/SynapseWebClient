@@ -12,6 +12,8 @@ public interface ReplyWidgetView extends IsWidget{
 		Widget asWidget();
 
 		void onClickDeleteReply();
+
+		void onClickEditReply();
 	}
 
 	void setPresenter(ReplyWidget presenter);
@@ -29,4 +31,10 @@ public interface ReplyWidgetView extends IsWidget{
 	void setDeleteButtonVisibility(Boolean visible);
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback callback);
+
+	void setEditIconVisible(boolean visible);
+
+	void setEditReplyModal(Widget widget);
+
+	void setEditedVisible(Boolean visible);
 }

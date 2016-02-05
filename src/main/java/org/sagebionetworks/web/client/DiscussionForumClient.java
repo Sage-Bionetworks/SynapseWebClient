@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -29,6 +30,9 @@ public interface DiscussionForumClient extends RemoteService {
 
 	PaginatedResults<DiscussionThreadBundle> getThreadsForForum(String forumId,
 			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending)
+			throws RestServiceException;
+
+	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
 			throws RestServiceException;
 
 	DiscussionThreadBundle updateThreadTitle(String threadId, UpdateThreadTitle newTitle)

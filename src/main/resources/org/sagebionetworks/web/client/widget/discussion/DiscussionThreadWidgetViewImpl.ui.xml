@@ -35,7 +35,7 @@
 			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
 				<b:Row>
 					<b:Column size="SM_9">
-						<g:SimplePanel ui:field="author"></g:SimplePanel>
+						<bh:Span ui:field="author"></bh:Span>
 					</b:Column>
 					<b:Column size="SM_3">
 						<bh:Div pull="RIGHT">
@@ -43,7 +43,17 @@
 						</bh:Div>
 					</b:Column>
 				</b:Row>
-				<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
+				<b:Row>
+					<b:Column size="SM_9">
+						<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
+					</b:Column>
+					<b:Column size="SM_3">
+						<bh:Div pull="RIGHT">
+							<b:Label text="Edited" ui:field="edited" visible="false"/>
+							<b:Icon ui:field="editIcon" type="PENCIL" title="Edit thread" size="LARGE" addStyleNames="imageButton margin-left-10" visible="false"/>
+						</bh:Div>
+					</b:Column>
+				</b:Row>
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
 					<bh:Div addStyleNames="link">
 						<bh:Span ui:field="clickToViewReplies" addStyleNames="margin-right-10"></bh:Span>
@@ -66,6 +76,7 @@
 			</bh:Div>
 		</b:Collapse>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>
+		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>
