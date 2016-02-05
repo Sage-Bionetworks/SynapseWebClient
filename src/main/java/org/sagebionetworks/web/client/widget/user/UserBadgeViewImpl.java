@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -96,7 +97,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void setSize(BadgeSize size) {
-		defaultUserPicture.addStyleName(size.getDefaultPictureStyle());
+		if (DisplayUtils.isDefined(size.getDefaultPictureStyle())) {
+			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
+		}
 		usernameLink.setStyleName(size.textStyle());
 		userPicture.setHeight(size.pictureHeight());
 		usernameLink.setVisible(size.isTextVisible());
