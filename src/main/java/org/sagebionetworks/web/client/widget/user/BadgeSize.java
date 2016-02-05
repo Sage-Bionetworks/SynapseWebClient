@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.user;
 
 
 public enum BadgeSize {
-    LARGE("font-size-5x", "font-size-20", "64px", true),
+    LARGE("font-size-2x", "font-size-20", "64px", true),
     DEFAULT("font-size-2x", "font-size-17", "32px", true),
     SMALL("font-size-lg", "font-size-15", "27px", true),
     LARGER_PICTURE_ONLY("font-size-12x", "", "128px", false),
