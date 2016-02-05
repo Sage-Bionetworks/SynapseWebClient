@@ -15,17 +15,19 @@
 				</bh:Div>
 			</b:Column>
 		</b:Row>
-		<b:Row>
-			<b:Column size="SM_9">
-				<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
-			</b:Column>
-			<b:Column size="SM_3">
-				<bh:Div pull="RIGHT">
-					<b:Label text="Edited" ui:field="edited" visible="false"/>
-					<b:Icon ui:field="editIcon" type="PENCIL" title="Edit reply" size="LARGE" addStyleNames="imageButton margin-left-10" visible="false"/>
-				</bh:Div>
-			</b:Column>
-		</b:Row>
+		<t:Table width="100%">
+			<t:TableRow>
+				<t:TableData>
+					<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
+				</t:TableData>
+				<t:TableData width="150px">
+					<b:Tooltip title="Edit reply">
+						<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-left-10" visible="false"/>
+					</b:Tooltip>
+					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT"/>
+				</t:TableData>
+			</t:TableRow>
+		</t:Table>
 		<bh:Div>
 			<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5">Delete Reply</b:Button>
 		</bh:Div>
