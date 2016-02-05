@@ -112,8 +112,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 		.setMessage(deleteConfirmMessage)
 		.setCloseButton(false)
 		.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
-		.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 		.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
+		.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 		.show();
 	}
 
