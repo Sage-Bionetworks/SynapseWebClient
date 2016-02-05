@@ -415,8 +415,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).showReplyDetails();
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setLoadingRepliesVisible(true);
+		verify(mockView).setLoadingRepliesVisible(false);
 		verify(mockView).setDeleteButtonVisible(false);
 	}
 
@@ -443,8 +443,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView, never()).addReply(any(Widget.class));
 		verify(mockGinInjector, never()).createReplyWidget();
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setLoadingRepliesVisible(true);
+		verify(mockView).setLoadingRepliesVisible(false);
 		verify(mockView).setDeleteButtonVisible(false);
 	}
 
@@ -476,8 +476,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setLoadingRepliesVisible(true);
+		verify(mockView).setLoadingRepliesVisible(false);
 		verify(mockView).setDeleteButtonVisible(false);
 	}
 
@@ -497,6 +497,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
@@ -517,6 +519,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
 		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
@@ -540,6 +544,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setMessage(message);
 		verify(mockView).setDeleteButtonVisible(false);
 		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test

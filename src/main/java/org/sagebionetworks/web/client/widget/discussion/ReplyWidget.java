@@ -82,18 +82,21 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	public void configureMessage() {
 		synAlert.clear();
+		view.setLoadingMessageVisible(true);
 		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.REPLY_TYPE);
 		requestBuilder.configure(RequestBuilder.GET, url);
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {
+					view.setLoadingMessageVisible(false);
 					synAlert.handleException(e);
 				}
 				public void onResponseReceived(final Request request, final Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
+						view.setLoadingMessageVisible(false);
 						view.setMessage(message);
 						configureEditReplyModal(message);
 					} else {
@@ -102,6 +105,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 				}
 			});
 		} catch (final Exception e) {
+			view.setLoadingMessageVisible(false);
 			synAlert.handleException(e);
 		}
 	}

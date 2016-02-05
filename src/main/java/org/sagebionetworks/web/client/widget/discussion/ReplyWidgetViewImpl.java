@@ -15,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -41,6 +42,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	SimplePanel editReplyModalContainer;
 	@UiField
 	Label edited;
+	@UiField
+	HTMLPanel loadingMessage;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -128,5 +131,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setEditedVisible(Boolean visible) {
 		edited.setVisible(visible);
+	}
+
+	@Override
+	public void setLoadingMessageVisible(Boolean visible) {
+		loadingMessage.setVisible(visible);
 	}
 }

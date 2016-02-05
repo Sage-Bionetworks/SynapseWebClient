@@ -89,9 +89,9 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteButtonVisibility(false);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView).setEditedVisible(isEdited);
+		verify(mockView).setEditedVisible(false);
 	}
 
 	@Test
@@ -129,7 +129,7 @@ public class ReplyWidgetTest {
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView, never()).setEditedVisible(isEdited);
+		verify(mockView, never()).setEditedVisible(false);
 	}
 
 	@Test
@@ -143,18 +143,17 @@ public class ReplyWidgetTest {
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView, never()).setEditedVisible(isEdited);
+		verify(mockView, never()).setEditedVisible(false);
 	}
 
 	@Test
 	public void testConfigureWithModerator() {
 		boolean isDeleted = false;
-		boolean canModerate = true;
 		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, true);
 		verify(mockView).setDeleteButtonVisibility(true);
 	}
 
@@ -178,7 +177,9 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
@@ -197,7 +198,9 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
@@ -218,8 +221,10 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteButtonVisibility(false);
 		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
@@ -320,7 +325,7 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteButtonVisibility(false);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 

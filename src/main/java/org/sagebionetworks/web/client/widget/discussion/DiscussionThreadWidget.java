@@ -178,18 +178,21 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	public void configureMessage() {
 		synAlert.clear();
+		view.setLoadingMessageVisible(true);
 		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.THREAD_TYPE);
 		requestBuilder.configure(RequestBuilder.GET, url);
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {
+					view.setLoadingMessageVisible(false);
 					synAlert.handleException(e);
 				}
 				public void onResponseReceived(final Request request, final Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
+						view.setLoadingMessageVisible(false);
 						view.setMessage(message);
 						configureEditThreadModal(message);
 					} else {
@@ -198,6 +201,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 				}
 			});
 		} catch (final Exception e) {
+			view.setLoadingMessageVisible(false);
 			synAlert.handleException(e);
 		}
 	}
@@ -257,13 +261,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	@Override
 	public void loadMore() {
 		synAlert.clear();
-		view.setLoadingVisible(true);
+		view.setLoadingRepliesVisible(true);
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.setLoadingVisible(false);
+						view.setLoadingRepliesVisible(false);
 						synAlert.handleException(caught);
 					}
 
@@ -277,7 +281,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							replyWidget.configure(bundle, isCurrentUserModerator);
 							view.addReply(replyWidget.asWidget());
 						}
-						view.setLoadingVisible(false);
+						view.setLoadingRepliesVisible(false);
 						view.setNumberOfReplies(""+result.getTotalNumberOfResults());
 						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 						view.showReplyDetails();

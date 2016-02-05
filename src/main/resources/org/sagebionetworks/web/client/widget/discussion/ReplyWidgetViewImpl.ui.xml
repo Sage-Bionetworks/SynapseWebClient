@@ -18,6 +18,10 @@
 		<t:Table width="100%">
 			<t:TableRow>
 				<t:TableData>
+					<g:HTMLPanel ui:field="loadingMessage" addStyleNames="min-height-500" visible="false">
+						<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+						&nbsp;Loading...
+					</g:HTMLPanel>
 					<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
 				</t:TableData>
 				<t:TableData width="150px">

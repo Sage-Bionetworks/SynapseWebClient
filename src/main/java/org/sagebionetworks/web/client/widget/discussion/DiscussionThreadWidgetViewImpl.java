@@ -81,7 +81,9 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Icon replyUpIcon;
 	@UiField
-	HTMLPanel loadingUI;
+	HTMLPanel loadingReplies;
+	@UiField
+	HTMLPanel loadingMessage;
 	@UiField
 	Button deleteButton;
 	@UiField
@@ -303,8 +305,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
+	public void setLoadingRepliesVisible(boolean visible) {
+		loadingReplies.setVisible(visible);
+	}
+
+	@Override
+	public void setLoadingMessageVisible(boolean visible) {
+		loadingMessage.setVisible(visible);
 	}
 
 	@Override
