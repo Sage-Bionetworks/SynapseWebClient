@@ -46,7 +46,7 @@
 				<t:Table width="100%">
 					<t:TableRow>
 						<t:TableData>
-						<g:HTMLPanel ui:field="loadingMessage" addStyleNames="min-height-500" visible="false">
+						<g:HTMLPanel ui:field="loadingMessage" visible="false">
 							<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 							&nbsp;Loading...
 						</g:HTMLPanel>
@@ -73,7 +73,7 @@
 			</bh:Div>
 			<b:Collapse ui:field="replyDetails" visible="false">
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
-				<g:HTMLPanel ui:field="loadingReplies" addStyleNames="min-height-500">
+				<g:HTMLPanel ui:field="loadingReplies">
 					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 					&nbsp;Loading...
 				</g:HTMLPanel>
