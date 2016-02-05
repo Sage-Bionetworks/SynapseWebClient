@@ -89,7 +89,7 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
 	}
@@ -154,7 +154,7 @@ public class ReplyWidgetTest {
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, true);
-		verify(mockView).setDeleteButtonVisibility(true);
+		verify(mockView).setDeleteIconVisibility(true);
 	}
 
 	@Test
@@ -177,7 +177,7 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
 	}
@@ -198,7 +198,7 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
 	}
@@ -221,7 +221,7 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
@@ -300,7 +300,7 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget, times(2)).configure(anyString());
 		verify(mockView, times(2)).setCreatedOn(anyString());
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
-		verify(mockView, times(2)).setDeleteButtonVisibility(false);
+		verify(mockView, times(2)).setDeleteIconVisibility(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -325,7 +325,7 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(false);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 

@@ -26,16 +26,16 @@
 					<bh:Paragraph ui:field="replyMessage" addStyleNames="margin-bottom-0-imp"></bh:Paragraph>
 				</t:TableData>
 				<t:TableData width="150px">
-					<b:Tooltip title="Edit reply">
-						<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-left-10" visible="false"/>
+					<b:Tooltip title="Delete reply" placement="LEFT">
+						<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10" visible="false"/>
 					</b:Tooltip>
-					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT"/>
+					<b:Tooltip title="Edit reply" placement="LEFT">
+						<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10" visible="false"/>
+					</b:Tooltip>
+					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10"/>
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>
-		<bh:Div>
-			<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5">Delete Reply</b:Button>
-		</bh:Div>
 		<g:SimplePanel ui:field="editReplyModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>

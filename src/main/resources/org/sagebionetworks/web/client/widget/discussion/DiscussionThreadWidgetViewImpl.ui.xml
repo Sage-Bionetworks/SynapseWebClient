@@ -53,10 +53,13 @@
 							<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
 						</t:TableData>
 						<t:TableData width="150px">
-							<b:Tooltip title="Edit thread">
-								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-left-10" visible="false"/>
+							<b:Tooltip title="Delete thread" placement="LEFT">
+								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10" visible="false"/>
 							</b:Tooltip>
-							<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT"/>
+							<b:Tooltip title="Edit thread" placement="LEFT">
+								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10" visible="false"/>
+							</b:Tooltip>
+							<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10"/>
 						</t:TableData>
 					</t:TableRow>
 				</t:Table>
@@ -78,7 +81,6 @@
 			<bh:Div width="95%" pull="RIGHT" addStyleNames="margin-bottom-5">
 				<b:Button ui:field="loadMoreButton" addStyleNames="margin-top-5" visible="false">Load more replies</b:Button>
 				<b:Button ui:field="replyButton" addStyleNames="margin-top-5">Reply</b:Button>
-				<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5 margin-left-10">Delete Thread</b:Button>
 			</bh:Div>
 		</b:Collapse>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>

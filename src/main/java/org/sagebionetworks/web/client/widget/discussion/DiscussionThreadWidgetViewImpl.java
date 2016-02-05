@@ -85,7 +85,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	HTMLPanel loadingMessage;
 	@UiField
-	Button deleteButton;
+	Icon deleteIcon;
 	@UiField
 	Icon editIcon;
 	@UiField
@@ -147,7 +147,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				presenter.onClickNewReply();
 			}
 		});
-		deleteButton.addClickHandler(new ClickHandler(){
+		deleteIcon.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteThread();
@@ -315,8 +315,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setDeleteButtonVisible(boolean visible) {
-		deleteButton.setVisible(visible);
+	public void setDeleteIconVisible(boolean visible) {
+		deleteIcon.setVisible(visible);
 	}
 
 	@Override

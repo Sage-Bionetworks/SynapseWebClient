@@ -76,7 +76,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setLoadingRepliesVisible(boolean visible);
 
-	void setDeleteButtonVisible(boolean visible);
+	void setDeleteIconVisible(boolean visible);
 
 	void setTitleAsDeleted();
 

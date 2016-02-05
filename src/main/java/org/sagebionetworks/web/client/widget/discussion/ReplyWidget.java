@@ -69,12 +69,12 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		if (bundle.getIsDeleted()) {
-			view.setDeleteButtonVisibility(false);
+			view.setDeleteIconVisibility(false);
 			view.setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 			view.setEditIconVisible(false);
 		} else {
 			view.setEditedVisible(bundle.getIsEdited());
-			view.setDeleteButtonVisibility(isCurrentUserModerator);
+			view.setDeleteIconVisibility(isCurrentUserModerator);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			configureMessage();
 		}

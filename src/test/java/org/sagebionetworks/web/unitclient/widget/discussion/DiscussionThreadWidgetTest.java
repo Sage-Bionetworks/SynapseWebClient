@@ -137,7 +137,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
 	}
@@ -183,7 +183,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setTitleAsDeleted();
-		verify(mockView).setDeleteButtonVisible(canModerate);
+		verify(mockView).setDeleteIconVisible(canModerate);
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setShowRepliesVisibility(false);
 		verify(mockGinInjector).getUserBadgeWidget();
@@ -229,7 +229,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setDeleteButtonVisible(true);
+		verify(mockView).setDeleteIconVisible(true);
 		verify(mockView).setEditedVisible(false);
 	}
 
@@ -254,7 +254,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 	}
 
 	@Test
@@ -277,7 +277,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadDownIconVisible(false);
 		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).toggleThread();
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView, times(2)).setTitle(anyString());
 	}
 
@@ -296,7 +296,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadDownIconVisible(false);
 		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).toggleThread();
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView, times(2)).setTitle(title);
 	}
 
@@ -385,7 +385,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(AsyncCallback.class));
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -417,7 +417,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setLoadingRepliesVisible(true);
 		verify(mockView).setLoadingRepliesVisible(false);
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -445,7 +445,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).setLoadingRepliesVisible(true);
 		verify(mockView).setLoadingRepliesVisible(false);
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -478,7 +478,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setLoadingRepliesVisible(true);
 		verify(mockView).setLoadingRepliesVisible(false);
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 	}
 
 	@Test
@@ -496,7 +496,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
 	}
@@ -518,7 +518,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
 	}
@@ -542,7 +542,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
-		verify(mockView).setDeleteButtonVisible(false);
+		verify(mockView).setDeleteIconVisible(false);
 		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);

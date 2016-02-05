@@ -28,7 +28,7 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setAlert(Widget w);
 
-	void setDeleteButtonVisibility(Boolean visible);
+	void setDeleteIconVisibility(Boolean visible);
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback callback);
 

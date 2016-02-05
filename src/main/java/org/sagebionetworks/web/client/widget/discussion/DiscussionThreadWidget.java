@@ -127,11 +127,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		if (isThreadDeleted) {
 			view.setTitleAsDeleted();
 			view.setShowRepliesVisibility(false);
-			view.setDeleteButtonVisible(false);
+			view.setDeleteIconVisible(false);
 			view.setReplyButtonVisible(false);
 			view.setEditIconVisible(false);
 		} else {
-			view.setDeleteButtonVisible(isCurrentUserModerator);
+			view.setDeleteIconVisible(isCurrentUserModerator);
 			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		}
