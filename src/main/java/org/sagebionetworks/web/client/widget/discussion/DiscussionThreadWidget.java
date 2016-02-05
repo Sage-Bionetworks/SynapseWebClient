@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -46,6 +47,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
 	EditDiscussionThreadModal editThreadModal;
+	MarkdownWidget markdownWidget;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -67,7 +69,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			EditDiscussionThreadModal editThreadModal
+			EditDiscussionThreadModal editThreadModal,
+			MarkdownWidget markdownWidget
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -80,11 +83,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.editThreadModal = editThreadModal;
+		this.markdownWidget = markdownWidget;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
 		view.setEditThreadModal(editThreadModal.asWidget());
+		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
 	@Override
@@ -178,6 +183,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	public void configureMessage() {
 		synAlert.clear();
+		markdownWidget.clear();
 		view.setLoadingMessageVisible(true);
 		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.THREAD_TYPE);
 		requestBuilder.configure(RequestBuilder.GET, url);
@@ -193,7 +199,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
 						view.setLoadingMessageVisible(false);
-						view.setMessage(message);
+						markdownWidget.configure(message);
 						configureEditThreadModal(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId + ". Reason: " + response.getStatusText()));

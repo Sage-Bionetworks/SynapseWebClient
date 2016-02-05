@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -52,6 +53,8 @@ public class ReplyWidgetTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	EditReplyModal mockEditReplyModal;
+	@Mock
+	MarkdownWidget mockMarkdownWidget;
 
 	ReplyWidget replyWidget;
 
@@ -64,7 +67,7 @@ public class ReplyWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockJsniUtils,
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
-				mockAuthController, mockEditReplyModal);
+				mockAuthController, mockEditReplyModal, mockMarkdownWidget);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 	}
 
@@ -197,7 +200,7 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView, never()).setMessage(anyString());
+		verify(mockMarkdownWidget, never()).configure(anyString());
 		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
@@ -220,7 +223,7 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
-		verify(mockView).setMessage(message);
+		verify(mockMarkdownWidget).configure(message);
 		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);

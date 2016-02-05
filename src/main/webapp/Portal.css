@@ -2080,6 +2080,10 @@ iframe[seamless] {
 	overflow-x: hidden;
 }
 
+.line-height-1em {
+	line-height: 1em;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
