@@ -5,12 +5,15 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -36,17 +39,19 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseClientAsync synapseClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private CookieProvider cookies;
 	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils) {
+			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.favWidget = favWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.cookies = cookies;
 		view.clear();
 		view.setProjectFavoriteWidget(favWidget);
 		view.setPresenter(this);
@@ -142,6 +147,15 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	@Override
 	public void onRegisterClick() {
 		globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));	
+	}
+	
+	@Override
+	public void onHelpForumClick() {
+		if(DisplayUtils.isInTestWebsite(cookies)) {
+			globalApplicationState.getPlaceChanger().goTo(new SynapseForumPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+		} else {
+			view.openNewWindow("http://support.sagebase.org");
+		}
 	}
 
 	@Override
