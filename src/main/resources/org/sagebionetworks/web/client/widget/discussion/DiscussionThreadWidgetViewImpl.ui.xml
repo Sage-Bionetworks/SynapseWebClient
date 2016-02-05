@@ -43,17 +43,26 @@
 						</bh:Div>
 					</b:Column>
 				</b:Row>
-				<b:Row>
-					<b:Column size="SM_9">
-						<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
-					</b:Column>
-					<b:Column size="SM_3">
-						<bh:Div pull="RIGHT">
-							<b:Label text="Edited" ui:field="edited" visible="false"/>
-							<b:Icon ui:field="editIcon" type="PENCIL" title="Edit thread" size="LARGE" addStyleNames="imageButton margin-left-10" visible="false"/>
-						</bh:Div>
-					</b:Column>
-				</b:Row>
+				<t:Table width="100%">
+					<t:TableRow>
+						<t:TableData>
+						<g:HTMLPanel ui:field="loadingMessage" visible="false">
+							<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+							&nbsp;Loading...
+						</g:HTMLPanel>
+							<bh:Paragraph ui:field="threadMessage" addStyleNames="margin-top-10"></bh:Paragraph>
+						</t:TableData>
+						<t:TableData width="150px">
+							<b:Tooltip title="Delete thread" placement="LEFT">
+								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10" visible="false"/>
+							</b:Tooltip>
+							<b:Tooltip title="Edit thread" placement="LEFT">
+								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10" visible="false"/>
+							</b:Tooltip>
+							<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10"/>
+						</t:TableData>
+					</t:TableRow>
+				</t:Table>
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
 					<bh:Div addStyleNames="link">
 						<bh:Span ui:field="clickToViewReplies" addStyleNames="margin-right-10"></bh:Span>
@@ -64,15 +73,14 @@
 			</bh:Div>
 			<b:Collapse ui:field="replyDetails" visible="false">
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
-				<g:HTMLPanel ui:field="loadingUI" addStyleNames="min-height-500">
+				<g:HTMLPanel ui:field="loadingReplies">
 					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 					&nbsp;Loading...
 				</g:HTMLPanel>
 			</b:Collapse>
-			<bh:Div width="100%" pull="RIGHT" addStyleNames="margin-bottom-5">
+			<bh:Div width="95%" pull="RIGHT" addStyleNames="margin-bottom-5">
 				<b:Button ui:field="loadMoreButton" addStyleNames="margin-top-5" visible="false">Load more replies</b:Button>
-				<b:Button ui:field="replyButton" addStyleNames="margin-top-5 margin-left-10">Reply</b:Button>
-				<b:Button ui:field="deleteButton" type="DANGER" icon="TRASH_O" visible="false" addStyleNames="margin-top-5 margin-left-10">Delete Thread</b:Button>
+				<b:Button ui:field="replyButton" addStyleNames="margin-top-5">Reply</b:Button>
 			</bh:Div>
 		</b:Collapse>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>

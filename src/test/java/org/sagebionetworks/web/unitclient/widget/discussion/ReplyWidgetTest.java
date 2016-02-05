@@ -3,7 +3,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.discussion.ReplyWidget.*;
 
 import java.util.Date;
 
@@ -55,11 +54,10 @@ public class ReplyWidgetTest {
 	EditReplyModal mockEditReplyModal;
 
 	ReplyWidget replyWidget;
-	boolean isDeleted = false;
-	boolean canModerate = false;
-	String userId = "123";
-	String nonAuthor = "456";
-	boolean isEdited = false;
+
+	private static final String CREATED_BY = "123";
+	private static final String NON_AUTHOR = "456";
+
 
 	@Before
 	public void before() {
@@ -67,7 +65,7 @@ public class ReplyWidgetTest {
 		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockJsniUtils,
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
 				mockAuthController, mockEditReplyModal);
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(nonAuthor);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 	}
 
 	@Test
@@ -80,99 +78,83 @@ public class ReplyWidgetTest {
 
 	@Test
 	public void testConfigure() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView).setEditedVisible(isEdited);
+		verify(mockView).setEditedVisible(false);
 	}
 
 	@Test
 	public void testConfigureEdited() {
-		isEdited = true;
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = true;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
-		verify(mockView).clear();
-		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
-		verify(mockView).setEditIconVisible(false);
-		verify(mockView).setEditedVisible(isEdited);
+		verify(mockView).setEditedVisible(true);
 	}
 
 	@Test
 	public void testConfigureWithAuthor() {
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CREATED_BY);
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
-		verify(mockView).clear();
-		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
 		verify(mockView).setEditIconVisible(true);
-		verify(mockView).setEditedVisible(isEdited);
 	}
 
 	@Test
 	public void testConfigureDeletedReply() {
-		isDeleted = true;
+		boolean isDeleted = true;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
-		verify(mockView).clear();
-		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
-		verify(mockView).setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView, never()).setEditedVisible(isEdited);
+		verify(mockView, never()).setEditedVisible(false);
 	}
 
 	@Test
 	public void testConfigureDeletedReplyNonAuthor() {
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
-		isDeleted = true;
+		boolean isDeleted = true;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CREATED_BY);
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate);
-		verify(mockView).clear();
-		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
-		verify(mockView).setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView, never()).setEditedVisible(isEdited);
+		verify(mockView, never()).setEditedVisible(false);
 	}
 
 	@Test
 	public void testConfigureWithModerator() {
-		canModerate = true;
+		boolean isDeleted = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
-		verify(mockView).clear();
-		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
-		verify(mockView).setEditedVisible(isEdited);
+		replyWidget.configure(bundle, true);
+		verify(mockView).setDeleteIconVisibility(true);
 	}
 
 	@Test
@@ -183,8 +165,11 @@ public class ReplyWidgetTest {
 
 	@Test
 	public void testConfigureMessageFailToGetMessage() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate);
@@ -192,13 +177,18 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteIconVisibility(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
 	public void testConfigureMessageFailToGetMessageCase2() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
@@ -208,13 +198,18 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView, never()).setMessage(anyString());
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteIconVisibility(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
 	public void testConfigureMessageSuccess() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -226,8 +221,10 @@ public class ReplyWidgetTest {
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).setMessage(message);
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
 	}
 
 	@Test
@@ -239,8 +236,11 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteReplySuccess() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -258,8 +258,11 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteReplyFailure() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -278,8 +281,11 @@ public class ReplyWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testReconfigureSuccess() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -294,14 +300,17 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget, times(2)).configure(anyString());
 		verify(mockView, times(2)).setCreatedOn(anyString());
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
-		verify(mockView, times(2)).setDeleteButtonVisibility(false);
+		verify(mockView, times(2)).setDeleteIconVisibility(false);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testReconfigureFailure() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, userId, isEdited);
+				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
@@ -316,7 +325,7 @@ public class ReplyWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockJsniUtils).getRelativeTime(any(Date.class));
-		verify(mockView).setDeleteButtonVisibility(canModerate);
+		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 

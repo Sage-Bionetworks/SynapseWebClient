@@ -81,9 +81,11 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Icon replyUpIcon;
 	@UiField
-	HTMLPanel loadingUI;
+	HTMLPanel loadingReplies;
 	@UiField
-	Button deleteButton;
+	HTMLPanel loadingMessage;
+	@UiField
+	Icon deleteIcon;
 	@UiField
 	Icon editIcon;
 	@UiField
@@ -145,7 +147,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				presenter.onClickNewReply();
 			}
 		});
-		deleteButton.addClickHandler(new ClickHandler(){
+		deleteIcon.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteThread();
@@ -303,13 +305,18 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
+	public void setLoadingRepliesVisible(boolean visible) {
+		loadingReplies.setVisible(visible);
 	}
 
 	@Override
-	public void setDeleteButtonVisible(boolean visible) {
-		deleteButton.setVisible(visible);
+	public void setLoadingMessageVisible(boolean visible) {
+		loadingMessage.setVisible(visible);
+	}
+
+	@Override
+	public void setDeleteIconVisible(boolean visible) {
+		deleteIcon.setVisible(visible);
 	}
 
 	@Override
@@ -318,8 +325,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				.setMessage(deleteConfirmMessage)
 				.setCloseButton(false)
 				.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
-				.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
+				.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 				.show();
 	}
 

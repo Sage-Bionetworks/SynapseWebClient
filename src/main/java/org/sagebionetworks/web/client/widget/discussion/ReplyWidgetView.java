@@ -28,7 +28,7 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setAlert(Widget w);
 
-	void setDeleteButtonVisibility(Boolean visible);
+	void setDeleteIconVisibility(Boolean visible);
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback callback);
 
@@ -37,4 +37,6 @@ public interface ReplyWidgetView extends IsWidget{
 	void setEditReplyModal(Widget widget);
 
 	void setEditedVisible(Boolean visible);
+
+	void setLoadingMessageVisible(Boolean visible);
 }

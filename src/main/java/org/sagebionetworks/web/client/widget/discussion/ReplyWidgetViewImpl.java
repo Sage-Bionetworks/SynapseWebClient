@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.DisplayConstants.*;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -15,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,13 +34,15 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Button deleteButton;
+	Icon deleteIcon;
 	@UiField
 	Icon editIcon;
 	@UiField
 	SimplePanel editReplyModalContainer;
 	@UiField
 	Label edited;
+	@UiField
+	HTMLPanel loadingMessage;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -48,7 +50,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Inject
 	public ReplyWidgetViewImpl (Binder binder) {
 		widget = binder.createAndBindUi(this);
-		deleteButton.addClickHandler(new ClickHandler(){
+		deleteIcon.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteReply();
@@ -100,8 +102,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void setDeleteButtonVisibility(Boolean visible) {
-		deleteButton.setVisible(visible);
+	public void setDeleteIconVisibility(Boolean visible) {
+		deleteIcon.setVisible(visible);
 	}
 
 	@Override
@@ -110,8 +112,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 		.setMessage(deleteConfirmMessage)
 		.setCloseButton(false)
 		.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
+		.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
 		.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
-		.addButton(BUTTON_CANCEL, PRIMARY_BUTTON_STYLE)
 		.show();
 	}
 
@@ -128,5 +130,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setEditedVisible(Boolean visible) {
 		edited.setVisible(visible);
+	}
+
+	@Override
+	public void setLoadingMessageVisible(Boolean visible) {
+		loadingMessage.setVisible(visible);
 	}
 }
