@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetVi
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -87,6 +88,8 @@ public class DiscussionThreadWidgetTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	EditDiscussionThreadModal mockEditThreadModal;
+	@Mock
+	MarkdownWidget mockMarkdownWidget;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -101,7 +104,7 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
-				mockGlobalApplicationState, mockEditThreadModal);
+				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
@@ -517,7 +520,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView, never()).setMessage(anyString());
+		verify(mockMarkdownWidget, never()).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
@@ -541,7 +544,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
-		verify(mockView).setMessage(message);
+		verify(mockMarkdownWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);

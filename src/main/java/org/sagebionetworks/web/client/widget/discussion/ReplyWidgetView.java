@@ -22,7 +22,7 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setCreatedOn(String createdOn);
 
-	void setMessage(String message);
+	void setMarkdownWidget(Widget widget);
 
 	void clear();
 

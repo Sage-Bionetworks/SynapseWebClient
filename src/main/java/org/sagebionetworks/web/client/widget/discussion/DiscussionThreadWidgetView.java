@@ -32,7 +32,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setTitle(String title);
 
-	void setMessage(String message);
+	void setMarkdownWidget(Widget widget);
 
 	void setNumberOfReplies(String numberOfReplies);
 

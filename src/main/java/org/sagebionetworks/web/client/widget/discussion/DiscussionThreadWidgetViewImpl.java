@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
@@ -41,7 +40,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Span threadTitle;
 	@UiField
-	Paragraph threadMessage;
+	Div threadMessage;
 	@UiField
 	Span activeUsers;
 	@UiField
@@ -180,7 +179,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void clear() {
 		threadTitle.clear();
-		threadMessage.clear();
 		activeUsers.clear();
 		numberOfReplies.clear();
 		clickToViewReplies.clear();
@@ -199,8 +197,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setMessage(String message) {
-		threadMessage.setText(message);
+	public void setMarkdownWidget(Widget widget) {
+		threadMessage.add(widget);
 	}
 
 	@Override

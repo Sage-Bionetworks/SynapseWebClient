@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -32,6 +33,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	DiscussionForumClientAsync discussionForumClientAsync;
 	AuthenticationController authController;
 	EditReplyModal editReplyModal;
+	MarkdownWidget markdownWidget;
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
@@ -45,7 +47,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			RequestBuilderWrapper requestBuilder,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			AuthenticationController authController,
-			EditReplyModal editReplyModal
+			EditReplyModal editReplyModal,
+			MarkdownWidget markdownWidget
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -55,14 +58,17 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.authController = authController;
 		this.editReplyModal = editReplyModal;
+		this.markdownWidget = markdownWidget;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setEditReplyModal(editReplyModal.asWidget());
+		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
 	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator) {
 		view.clear();
+		markdownWidget.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.isCurrentUserModerator = isCurrentUserModerator;
@@ -70,7 +76,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		if (bundle.getIsDeleted()) {
 			view.setDeleteIconVisibility(false);
-			view.setMessage(DELETED_REPLY_DEFAULT_MESSAGE);
+			markdownWidget.configure(DELETED_REPLY_DEFAULT_MESSAGE);
 			view.setEditIconVisible(false);
 		} else {
 			view.setEditedVisible(bundle.getIsEdited());
@@ -97,7 +103,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
 						view.setLoadingMessageVisible(false);
-						view.setMessage(message);
+						markdownWidget.configure(message);
 						configureEditReplyModal(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
