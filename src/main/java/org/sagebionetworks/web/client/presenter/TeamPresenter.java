@@ -139,7 +139,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				team = result.getTeam();
 				TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
 				boolean isAdmin = result.isUserAdmin();
-				isAdmin=true;
 				Callback refreshCallback = new Callback() {
 					@Override
 					public void invoke() {
