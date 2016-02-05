@@ -2,12 +2,12 @@ package org.sagebionetworks.web.client.widget.user;
 
 
 public enum BadgeSize {
-    LARGE("font-size-2x", "font-size-20", "64px", true),
-    DEFAULT("font-size-2x", "font-size-17", "32px", true),
-    SMALL("font-size-lg", "font-size-15", "27px", true),
+    LARGE("fa-2x", "font-size-20", "64px", true),
+    DEFAULT("fa-lg", "font-size-17", "32px", true),
+    SMALL("", "font-size-15", "27px", true),
     LARGER_PICTURE_ONLY("font-size-12x", "", "128px", false),
-    DEFAULT_PICTURE_ONLY("font-size-2x", "", "32px", false),
-    SMALL_PICTURE_ONLY("font-size-lg", "", "27px", false),
+    DEFAULT_PICTURE_ONLY("fa-lg", "", "32px", false),
+    SMALL_PICTURE_ONLY("", "", "27px", false),
     EXTRA_SMALL("font-size-1x", "", "16px", false);
     
     private String defaultPictureStyle;
