@@ -21,6 +21,7 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 				&nbsp;Loading...
 			</g:HTMLPanel>
+			<bh:Paragraph ui:field="deletedMessage" visible="false">This reply has been deleted.</bh:Paragraph>
 			<bh:Div ui:field="replyMessage"></bh:Div>
 		</bh:Div>
 		<bh:Div width="100%">

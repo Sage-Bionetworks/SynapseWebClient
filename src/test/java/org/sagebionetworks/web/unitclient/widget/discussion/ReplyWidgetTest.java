@@ -95,6 +95,8 @@ public class ReplyWidgetTest {
 		verify(mockView).setDeleteIconVisibility(false);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
+		verify(mockView).setMessageVisible(true);
+		verify(mockView).setDeletedMessageVisible(false);
 	}
 
 	@Test
@@ -133,6 +135,8 @@ public class ReplyWidgetTest {
 		replyWidget.configure(bundle, canModerate);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView, never()).setEditedVisible(false);
+		verify(mockView).setMessageVisible(false);
+		verify(mockView).setDeletedMessageVisible(true);
 	}
 
 	@Test

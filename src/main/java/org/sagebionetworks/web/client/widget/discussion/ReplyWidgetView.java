@@ -39,4 +39,8 @@ public interface ReplyWidgetView extends IsWidget{
 	void setEditedVisible(Boolean visible);
 
 	void setLoadingMessageVisible(Boolean visible);
+
+	void setMessageVisible(boolean visible);
+
+	void setDeletedMessageVisible(boolean visible);
 }
