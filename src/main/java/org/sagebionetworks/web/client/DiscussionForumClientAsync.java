@@ -30,6 +30,14 @@ public interface DiscussionForumClientAsync{
 			DiscussionThreadOrder order, Boolean ascending,
 			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
 
+	void getAvailableThreadsForForum(String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending,
+			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
+
+	void getDeletedThreadsForForum(String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending,
+			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
+
 	void updateThread(String threadId, UpdateThread newThread,
 			AsyncCallback<DiscussionThreadBundle> callback);
 

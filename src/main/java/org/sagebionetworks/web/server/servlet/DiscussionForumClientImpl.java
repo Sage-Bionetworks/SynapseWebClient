@@ -77,6 +77,32 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
+	public PaginatedResults<DiscussionThreadBundle> getAvailableThreadsForForum(
+			String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return convertPaginated(synapseClient.getAvailableThreadsForForum(forumId, limit, offset, order, ascending));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public PaginatedResults<DiscussionThreadBundle> getDeletedThreadsForForum(
+			String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return convertPaginated(synapseClient.getDeletedThreadsForForum(forumId, limit, offset, order, ascending));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
 	public DiscussionThreadBundle updateThreadTitle(String threadId,
 			UpdateThreadTitle newTitle) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

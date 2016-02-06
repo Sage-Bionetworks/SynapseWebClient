@@ -6,7 +6,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -90,6 +89,8 @@ public class DiscussionThreadWidgetTest {
 	EditDiscussionThreadModal mockEditThreadModal;
 	@Mock
 	MarkdownWidget mockMarkdownWidget;
+	@Mock
+	Callback mockCallback;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -127,7 +128,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
@@ -153,7 +154,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).setEditedVisible(true);
 	}
 
@@ -166,7 +167,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).setEditIconVisible(true);
 	}
 
@@ -178,7 +179,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
@@ -207,7 +208,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).setEditedVisible(false);
 	}
 
@@ -219,7 +220,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
@@ -244,7 +245,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
@@ -274,7 +275,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		when(mockView.isThreadCollapsed()).thenReturn(true);
 		discussionThreadWidget.toggleThread();
 		verify(mockView).setThreadDownIconVisible(false);
@@ -293,7 +294,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", title,
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		when(mockView.isThreadCollapsed()).thenReturn(true);
 		discussionThreadWidget.toggleThread();
 		verify(mockView).setThreadDownIconVisible(false);
@@ -311,7 +312,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		when(mockView.isThreadCollapsed()).thenReturn(false);
 		discussionThreadWidget.toggleThread();
 		verify(mockView).setThreadDownIconVisible(true);
@@ -328,7 +329,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		when(mockView.isThreadCollapsed()).thenReturn(false);
 		discussionThreadWidget.toggleThread();
 		verify(mockView).setThreadDownIconVisible(true);
@@ -381,7 +382,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		discussionThreadWidget.configureReplies();
 		verify(mockSynAlert).clear();
 		verify(mockView).clearReplies();
@@ -400,7 +401,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
@@ -432,7 +433,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
 						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
@@ -460,7 +461,7 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 2L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		bundleList = createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(LIMIT+1);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
@@ -493,7 +494,7 @@ public class DiscussionThreadWidgetTest {
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited);
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle, canModerate);
+		discussionThreadWidget.configure(bundle, canModerate, mockCallback);
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
@@ -514,7 +515,7 @@ public class DiscussionThreadWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle, canModerate);
+		discussionThreadWidget.configure(bundle, canModerate, mockCallback);
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
@@ -538,7 +539,7 @@ public class DiscussionThreadWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle, canModerate);
+		discussionThreadWidget.configure(bundle, canModerate, mockCallback);
 		discussionThreadWidget.configureMessage();
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
@@ -566,13 +567,13 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.deleteThread();
-		verify(mockSynAlert, times(2)).clear();
+		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(eq("1"), any(AsyncCallback.class));
-		verify(mockView, atLeast(1)).clear();
+		verify(mockCallback).invoke();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -584,29 +585,13 @@ public class DiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.deleteThread();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(eq("1"), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
-	}
-
-	@Test
-	public void testResetCollapsed() {
-		when(mockView.isThreadCollapsed()).thenReturn(true);
-		discussionThreadWidget.reset();
-		verify(mockView).clear();
-		verify(mockView, never()).toggleThread();
-	}
-
-	@Test
-	public void testResetExpanded() {
-		when(mockView.isThreadCollapsed()).thenReturn(false);
-		discussionThreadWidget.reset();
-		verify(mockView).clear();
-		verify(mockView).toggleThread();
 	}
 
 	@Test

@@ -4,10 +4,10 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -65,7 +65,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	public void loadMore() {
 		synAlert.clear();
 		view.setLoadingVisible(true);
-		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset, order, ascending,
+		discussionForumClientAsync.getAvailableThreadsForForum(forumId, LIMIT, offset, order, ascending,
 				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
 					@Override
@@ -78,7 +78,13 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
 						for(DiscussionThreadBundle bundle: result.getResults()) {
 							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
-							thread.configure(bundle, isCurrentUserModerator);
+							thread.configure(bundle, isCurrentUserModerator, new Callback(){
+
+								@Override
+								public void invoke() {
+									configure(forumId, isCurrentUserModerator);
+								}
+							});
 							view.addThread(thread.asWidget());
 						}
 						offset += LIMIT;

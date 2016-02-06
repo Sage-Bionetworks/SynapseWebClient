@@ -232,7 +232,7 @@ public class DiscussionTabTest {
 		assertEquals(areaToken, place.getAreaToken());
 		
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
-		verify(mockDiscussionThreadWidget).configure(mockDiscussionThreadBundle, canModerate);
+		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(canModerate), any(Callback.class));
 		verify(mockDiscussionThreadWidget).toggleThread();
 		verify(mockDiscussionThreadListWidget, never()).configure(anyString(), anyBoolean());
 		verify(mockView).setSingleThreadUIVisible(true);

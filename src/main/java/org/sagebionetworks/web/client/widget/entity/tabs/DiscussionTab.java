@@ -119,7 +119,14 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				singleThreadWidget.configure(result, isCurrentUserModerator);
+				singleThreadWidget.configure(result, isCurrentUserModerator, new Callback(){
+
+					@Override
+					public void invoke() {
+						// TODO Ask Jay about what should happen here
+						
+					}
+				});
 				if (singleThreadWidget.isThreadCollapsed()) {
 					singleThreadWidget.toggleThread();	
 				}

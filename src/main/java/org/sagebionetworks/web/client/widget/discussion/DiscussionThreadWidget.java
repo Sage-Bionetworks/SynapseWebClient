@@ -56,6 +56,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private Boolean isCurrentUserModerator;
 	private Boolean isThreadDeleted;
 	private String title;
+	private Callback deleteCallback;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -97,12 +98,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator) {
+	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Callback deleteCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.isThreadDeleted = bundle.getIsDeleted();
 		this.threadId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
+		this.deleteCallback = deleteCallback;
 		configureView(bundle);
 		authorWidget.configure(bundle.getCreatedBy());
 		newReplyModal.configure(bundle.getId(), new Callback(){
@@ -153,7 +155,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result, isCurrentUserModerator);
+				configure(result, isCurrentUserModerator, deleteCallback);
 			}
 		});
 	}
@@ -317,20 +319,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void onSuccess(Void result) {
-				reset();
-				reconfigure();
+				if (deleteCallback != null) {
+					deleteCallback.invoke();
+				}
 			}
 		});
-	}
-
-	public void reset() {
-		view.clear();
-		if (!view.isThreadCollapsed()) {
-			view.toggleThread();
-		}
-		if (!view.isReplyCollapsed()) {
-			view.toggleReplies();
-		}
 	}
 
 	@Override

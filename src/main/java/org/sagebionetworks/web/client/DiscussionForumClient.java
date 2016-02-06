@@ -32,6 +32,14 @@ public interface DiscussionForumClient extends RemoteService {
 			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending)
 			throws RestServiceException;
 
+	PaginatedResults<DiscussionThreadBundle> getAvailableThreadsForForum(String forumId,
+			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending)
+			throws RestServiceException;
+
+	PaginatedResults<DiscussionThreadBundle> getDeletedThreadsForForum(String forumId,
+			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending)
+			throws RestServiceException;
+
 	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
 			throws RestServiceException;
 
