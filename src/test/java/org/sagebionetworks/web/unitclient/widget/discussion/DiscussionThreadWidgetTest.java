@@ -144,6 +144,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
+		verify(mockView).setDeletedVisible(false);
 	}
 	
 	@Test
@@ -186,10 +187,10 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfReplies("1");
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
-		verify(mockView).setTitleAsDeleted();
+		verify(mockView).setDeletedVisible(true);
 		verify(mockView).setDeleteIconVisible(canModerate);
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).setShowRepliesVisibility(false);
+		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
@@ -336,7 +337,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadUpIconVisible(false);
 		verify(mockView).toggleThread();
 		verify(mockView).setTitle(anyString());
-		verify(mockView, times(2)).setTitleAsDeleted();
+		verify(mockView).setDeletedVisible(true);
 	}
 
 	@Test

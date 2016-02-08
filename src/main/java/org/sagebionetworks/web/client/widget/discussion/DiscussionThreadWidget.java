@@ -131,15 +131,15 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedVisible(bundle.getIsEdited());
+		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		if (isThreadDeleted) {
-			view.setTitleAsDeleted();
-			view.setShowRepliesVisibility(false);
+			view.setDeletedVisible(true);
 			view.setDeleteIconVisible(false);
 			view.setReplyButtonVisible(false);
 			view.setEditIconVisible(false);
 		} else {
+			view.setDeletedVisible(false);
 			view.setDeleteIconVisible(isCurrentUserModerator);
-			view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		}
 	}
@@ -176,9 +176,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			// collapse
 			view.setThreadDownIconVisible(true);
 			view.setThreadUpIconVisible(false);
-			if (isThreadDeleted) {
-				view.setTitleAsDeleted();
-			}
 		}
 		view.toggleThread();
 	}

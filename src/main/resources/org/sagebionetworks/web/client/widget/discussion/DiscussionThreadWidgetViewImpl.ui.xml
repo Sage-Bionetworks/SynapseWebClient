@@ -60,6 +60,7 @@
 						<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 margin-bottom-5 line-height-1em" visible="false"/>
 					</b:Tooltip>
 					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
+					<b:Label text="Deleted" ui:field="deleted" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
 				</bh:Div>
 
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
