@@ -5,8 +5,10 @@ import java.util.HashMap;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
@@ -45,6 +47,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	MarkdownWidget wikiPage;
 	WikiPageKey pageKey;
 	Boolean isCurrentUserModerator;
+	CookieProvider cookies;
 	
 	@Inject
 	public SynapseForumPresenter(
@@ -56,7 +59,8 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
 			MarkdownWidget wikiPage,
-			SynapseClientAsync synapseClient
+			SynapseClientAsync synapseClient,
+			CookieProvider cookies
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -67,12 +71,13 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		this.globalApplicationState = globalApplicationState;
 		this.wikiPage = wikiPage;
 		this.synapseClient = synapseClient;
-		
+		this.cookies = cookies;
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setWikiWidget(wikiPage.asWidget());
+		isCurrentUserModerator = DiscussionTab.DEFAULT_MODERATOR_MODE;
 	}
 
 
@@ -90,11 +95,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		this.place = place;
 		this.view.setPresenter(this);
 //		String threadId = place.getParam(DiscussionTab.THREAD_ID_KEY);
-		String moderatorModeString = place.getParam("moderator");
-		isCurrentUserModerator = false;
-		if (moderatorModeString != null) {
-			isCurrentUserModerator = Boolean.parseBoolean(moderatorModeString);
-		}
+		isCurrentUserModerator = DisplayUtils.isInTestWebsite(cookies);
 	}
 	
 	

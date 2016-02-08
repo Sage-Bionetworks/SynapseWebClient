@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
 
 	public static enum MenuItems {
@@ -154,7 +155,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		if(DisplayUtils.isInTestWebsite(cookies)) {
 			globalApplicationState.getPlaceChanger().goTo(new SynapseForumPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 		} else {
-			view.openNewWindow("http://support.sagebase.org");
+			view.openNewWindow(GET_SATISFACTION_SUPPORT_SITE);
 		}
 	}
 
