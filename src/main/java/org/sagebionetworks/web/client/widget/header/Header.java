@@ -153,6 +153,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	@Override
 	public void onHelpForumClick() {
 		if(DisplayUtils.isInTestWebsite(cookies)) {
+			//TODO: once Discussion is released, changed the ui.xml so that this menu item has an href instead (click event handled so that drop down menu is hidden).
+			//  More specifically, change to <b:AnchorListItem ui:field="forumLink" href="#!SynapseForum:default">Forum</b:AnchorListItem>
 			globalApplicationState.getPlaceChanger().goTo(new SynapseForumPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 		} else {
 			view.openNewWindow(GET_SATISFACTION_SUPPORT_SITE);
