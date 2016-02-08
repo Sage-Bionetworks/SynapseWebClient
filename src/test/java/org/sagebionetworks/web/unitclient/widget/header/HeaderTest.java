@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.header;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -15,18 +16,23 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -50,9 +56,12 @@ public class HeaderTest {
 	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
-
+	@Mock
+	CookieProvider mockCookies;
+	
 	@Before
 	public void setup(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(HeaderView.class);		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
@@ -63,7 +72,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockCookies);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -229,5 +238,18 @@ public class HeaderTest {
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
 		header.initStagingAlert();
 		verify(mockView).setStagingAlertVisible(true);
+	}
+	
+	@Test
+	public void testOnHelpForumClick(){
+		header.onHelpForumClick();
+		verify(mockView).openNewWindow(Header.GET_SATISFACTION_SUPPORT_SITE);
+	}
+	
+	@Test
+	public void testOnHelpForumClickInAlpha(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		header.onHelpForumClick();
+		verify(mockPlaceChanger).goTo(any(SynapseForumPlace.class));
 	}
 }
