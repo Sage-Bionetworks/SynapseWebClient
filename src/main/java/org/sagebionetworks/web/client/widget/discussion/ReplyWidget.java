@@ -24,7 +24,6 @@ import com.google.inject.Inject;
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply?";
-	public static final String DELETED_REPLY_DEFAULT_MESSAGE = "This reply has been deleted.";
 	ReplyWidgetView view;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
@@ -76,9 +75,12 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		if (bundle.getIsDeleted()) {
 			view.setDeleteIconVisibility(false);
-			markdownWidget.configure(DELETED_REPLY_DEFAULT_MESSAGE);
+			view.setMessageVisible(false);
+			view.setDeletedMessageVisible(true);
 			view.setEditIconVisible(false);
 		} else {
+			view.setMessageVisible(true);
+			view.setDeletedMessageVisible(false);
 			view.setEditedVisible(bundle.getIsEdited());
 			view.setDeleteIconVisibility(isCurrentUserModerator);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));

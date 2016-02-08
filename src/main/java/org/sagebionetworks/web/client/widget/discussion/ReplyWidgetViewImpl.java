@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.*;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
@@ -42,6 +43,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Label edited;
 	@UiField
 	HTMLPanel loadingMessage;
+	@UiField
+	Paragraph deletedMessage;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -133,5 +136,15 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setLoadingMessageVisible(Boolean visible) {
 		loadingMessage.setVisible(visible);
+	}
+
+	@Override
+	public void setMessageVisible(boolean visible) {
+		replyMessage.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedMessageVisible(boolean visible) {
+		deletedMessage.setVisible(visible);
 	}
 }
