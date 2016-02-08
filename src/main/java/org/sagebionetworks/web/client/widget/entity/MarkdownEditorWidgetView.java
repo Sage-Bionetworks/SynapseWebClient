@@ -23,18 +23,10 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setMarkdownFocus();
 	int getSelectionLength();
 	void setSelectionRange(int pos, int length);
-	
 	void setEditButtonEnabled(boolean enabled);
-	void setSaving(boolean isSaving);
 	public void setAttachmentCommandsVisible(boolean visible);
 	void setAlphaCommandsVisible(boolean visible);
-	void setTitleEditorVisible(boolean visible);
-	String getTitle();
-	void setTitle(String title);
-	
-	void showEditorModal();
-	void hideEditorModal();
-	
+	boolean isEditorAttachedAndVisible();
 	/**
 	 * Presenter interface
 	 */
@@ -47,21 +39,13 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 
 	void addTextAreaClickHandler(ClickHandler clickHandler);
 
-	void setDeleteClickHandler(ClickHandler deleteClickHandler);
-
-	boolean isEditorModalAttachedAndVisible();
-
 	void confirm(String string, ConfirmCallback confirmCallback);
 
 	int getScrollHeight(String text);
 
 	void setMarkdownHeight(String string);
 
-	void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
-
 	void setFormattingGuideWidget(Widget formattingGuideWidget);
 
 	void configure(String markdown);
-
-	void showPreviewModal();
 }

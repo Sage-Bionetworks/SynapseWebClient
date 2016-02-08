@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

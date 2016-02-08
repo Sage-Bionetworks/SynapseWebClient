@@ -5,131 +5,110 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<b:Modal ui:field="editorDialog" addStyleNames="modal-fullscreen" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
-			<b:ModalBody>
-				<b:TextBox ui:field="titleField" placeholder="Title" addStyleNames="font-size-32 margin-bottom-10" height="50px" />
-			    <bh:Div ui:field="mdCommands" styleName="view md-command-bar">
-			        <b:Tooltip placement="BOTTOM" title="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
-			        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
-			        </b:Tooltip>
-			        <b:Button ui:field="formattingGuideButton" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
-			        <b:ButtonGroup>
-					  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
-					  <b:DropDownMenu>
-					    <b:AnchorListItem ui:field="attachmentLink">Attachment</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="buttonLink">Button Link</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="entityListLink">Entity List</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="previewLink">File Preview</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="genomeBrowserLink">Genome Browser</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="imageLink">Image</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="joinTeamLink">Join Team Button</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="linkLink">Link</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="provenanceGraphLink">Provenance Graph</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="referenceLink">Reference</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="submitToEvaluationLink">Submit to Evaluation</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="tableLink">Table: Paste tabular data</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="synapseTableLink">Table: Query on a Synapse Table</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="queryLink">Table: Query on Files/Folders</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT">Video</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
-					  </b:DropDownMenu>
-					</b:ButtonGroup>
-			        <b:ButtonGroup>
-			            <b:Tooltip placement="BOTTOM" title="WARNING! These are unreleased widgets, whose syntax may change in the future.">
-							<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL">@ Insert</b:Button>
-						</b:Tooltip>
-						  <b:DropDownMenu>
-						    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="challengeParticipantsLink">Challenge Participants List</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="challengeTeamsLink">Challenge Teams List</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="cytoscapeJsLink">Cytoscape JS Graph</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="registerChallengeTeamLink">Register Challenge Team Button</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="entityBackgroundLink">Set Project Background Image</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
-						  </b:DropDownMenu>
-					</b:ButtonGroup>
-					
-			        <b:Tooltip placement="BOTTOM" title="Bold">
-			        	<b:Button ui:field="boldButton" icon="BOLD" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Italic">
-			        	<b:Button ui:field="italicButton" icon="ITALIC" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Strike-through">
-			        	<b:Button ui:field="strikeButton" icon="STRIKETHROUGH" size="EXTRA_SMALL" height="22px" />
-			        </b:Tooltip>
-			        
-			        <b:Tooltip placement="BOTTOM" title="Optionally specify the language for syntax highlighting.">
-			        	<b:Button ui:field="codeBlockButton" size="EXTRA_SMALL">Code Block</b:Button>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="LaTeX math equation.">
-			        	<b:Button ui:field="mathButton" size="EXTRA_SMALL">TeX</b:Button>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Subscript">
-			        	<b:Button ui:field="subscriptButton" icon="SUBSCRIPT" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Superscript">
-			        	<b:Button ui:field="superscriptButton" icon="SUPERSCRIPT" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        
-			        <b:ButtonGroup>
-					  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
-					  <b:DropDownMenu>
-					    <b:AnchorListItem ui:field="heading1Link">Heading 1</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="heading2Link">Heading 2</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="heading3Link">Heading 3</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="heading4Link">Heading 4</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="heading5Link">Heading 5</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="heading6Link">Heading 6</b:AnchorListItem>
-					  </b:DropDownMenu>
-					</b:ButtonGroup>
-			        <b:Tooltip placement="BOTTOM" title="Insert Attachment">
-			        	<b:Button ui:field="attachmentButton" icon="PAPERCLIP" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Insert Image">
-			        	<b:Button ui:field="imageButton" icon="CAMERA" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Insert Video">
-			        	<b:Button ui:field="videoButton" icon="VIDEO_CAMERA" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			        <b:Tooltip placement="BOTTOM" title="Insert Link">
-			        	<b:Button ui:field="linkButton" icon="LINK" size="EXTRA_SMALL" height="22px"/>
-			        </b:Tooltip>
-			    </bh:Div>
-			    <bh:Div>
-			        <b:TextArea ui:field="markdownTextArea" addStyleNames="hide-resize"/>
-			        <g:TextArea ui:field="resizingTextArea" addStyleNames="hide-resize padding-0 border-none" enabled="false" width="100%" height="0px"/>
-			    </bh:Div>
-			</b:ModalBody>
-			<b:ModalFooter>
-			    <b:Button ui:field="deleteButton" pull="LEFT" type="DANGER" >Delete Page</b:Button>
-			    <b:Button ui:field="previewButton" pull="LEFT" >Preview</b:Button>
-			    <b:Button ui:field="cancelButton" pull="RIGHT" dataDismiss="MODAL">Cancel</b:Button>
-			    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." pull="RIGHT">Save</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
-		
-	    <b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+	    <bh:Div ui:field="mdCommands" styleName="view md-command-bar">
+	        <b:Tooltip placement="BOTTOM" title="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
+	        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
+	        </b:Tooltip>
+	        <b:Button ui:field="formattingGuideButton" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
+	        <b:ButtonGroup>
+			  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
+			  <b:DropDownMenu>
+			    <b:AnchorListItem ui:field="attachmentLink">Attachment</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="buttonLink">Button Link</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="entityListLink">Entity List</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="previewLink">File Preview</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="genomeBrowserLink">Genome Browser</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="imageLink">Image</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="joinTeamLink">Join Team Button</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="linkLink">Link</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="provenanceGraphLink">Provenance Graph</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="referenceLink">Reference</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="submitToEvaluationLink">Submit to Evaluation</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="tableLink">Table: Paste tabular data</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="synapseTableLink">Table: Query on a Synapse Table</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="queryLink">Table: Query on Files/Folders</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT">Video</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
+			  </b:DropDownMenu>
+			</b:ButtonGroup>
+	        <b:ButtonGroup>
+	            <b:Tooltip placement="BOTTOM" title="WARNING! These are unreleased widgets, whose syntax may change in the future.">
+					<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL">@ Insert</b:Button>
+				</b:Tooltip>
+				  <b:DropDownMenu>
+				    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="challengeParticipantsLink">Challenge Participants List</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="challengeTeamsLink">Challenge Teams List</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="cytoscapeJsLink">Cytoscape JS Graph</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="registerChallengeTeamLink">Register Challenge Team Button</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="entityBackgroundLink">Set Project Background Image</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
+				  </b:DropDownMenu>
+			</b:ButtonGroup>
+			
+	        <b:Tooltip placement="BOTTOM" title="Bold">
+	        	<b:Button ui:field="boldButton" icon="BOLD" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Italic">
+	        	<b:Button ui:field="italicButton" icon="ITALIC" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Strike-through">
+	        	<b:Button ui:field="strikeButton" icon="STRIKETHROUGH" size="EXTRA_SMALL" height="22px" />
+	        </b:Tooltip>
+	        
+	        <b:Tooltip placement="BOTTOM" title="Optionally specify the language for syntax highlighting.">
+	        	<b:Button ui:field="codeBlockButton" size="EXTRA_SMALL">Code Block</b:Button>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="LaTeX math equation.">
+	        	<b:Button ui:field="mathButton" size="EXTRA_SMALL">TeX</b:Button>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Subscript">
+	        	<b:Button ui:field="subscriptButton" icon="SUBSCRIPT" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Superscript">
+	        	<b:Button ui:field="superscriptButton" icon="SUPERSCRIPT" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        
+	        <b:ButtonGroup>
+			  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
+			  <b:DropDownMenu>
+			    <b:AnchorListItem ui:field="heading1Link">Heading 1</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading2Link">Heading 2</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading3Link">Heading 3</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading4Link">Heading 4</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading5Link">Heading 5</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading6Link">Heading 6</b:AnchorListItem>
+			  </b:DropDownMenu>
+			</b:ButtonGroup>
+	        <b:Tooltip placement="BOTTOM" title="Insert Attachment">
+	        	<b:Button ui:field="attachmentButton" icon="PAPERCLIP" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Insert Image">
+	        	<b:Button ui:field="imageButton" icon="CAMERA" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Insert Video">
+	        	<b:Button ui:field="videoButton" icon="VIDEO_CAMERA" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" title="Insert Link">
+	        	<b:Button ui:field="linkButton" icon="LINK" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	    </bh:Div>
+	    <bh:Div>
+	        <b:TextArea ui:field="markdownTextArea" addStyleNames="hide-resize"/>
+	        <g:TextArea ui:field="resizingTextArea" addStyleNames="hide-resize padding-0 border-none" enabled="false" width="100%" height="0px"/>
+	    </bh:Div>
+		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:SimplePanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
 		  <b:ModalFooter>
 		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
-		  </b:ModalFooter>
-		</b:Modal>
-		
-	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
-		  <b:ModalBody>
-		    <g:SimplePanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
-		  </b:ModalBody>
-		  <b:ModalFooter>
-		    <b:Button ui:field="previewOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
 		  </b:ModalFooter>
 		</b:Modal>
 	</bh:Div>
