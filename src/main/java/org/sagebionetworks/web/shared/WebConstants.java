@@ -170,6 +170,8 @@ public class WebConstants {
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
 	
+	public static final String FORUM_SYNAPSE_ID_PROPERTY ="org.sagebionetworks.portal.forum_project_id";
+	
 	//Workshop
 	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.collaboratorium_synapse_id";
 	public static final String STAGE_I_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageI_synapse_id";
@@ -224,6 +226,7 @@ public class WebConstants {
 	
 	public static final String CERTIFICATION = "Certification";
 	public static final String VALIDATION = "Validation";
+	public static final String FORUM = "Forum";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
