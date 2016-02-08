@@ -70,6 +70,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.cookies = cookies;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
+		this.formattingGuide = formattingGuide;
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 		view.setFormattingGuideWidget(formattingGuide.asWidget());

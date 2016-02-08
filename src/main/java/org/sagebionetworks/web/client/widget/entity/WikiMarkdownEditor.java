@@ -16,6 +16,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Presenter{
 
@@ -28,6 +29,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	GlobalApplicationState globalApplicationState;
 	private MarkdownWidget markdownPreview;
 	
+	@Inject
 	public WikiMarkdownEditor(
 			WikiMarkdownEditorView view,
 			MarkdownEditorWidget editor,
@@ -39,6 +41,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.markdownPreview = markdownPreview;
+		view.setPresenter(this);
 		view.setMarkdownPreviewWidget(markdownPreview.asWidget());
 		view.setMarkdownEditorWidget(editor.asWidget());
 		editor.setFilesAddedCallback(new CallbackP<List<String>>() {
@@ -154,27 +157,11 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	
 	@Override
 	public Widget asWidget() {
-		return editor.asWidget();
+		return view.asWidget();
 	}
 	
 	public WikiPage getWikiPage() {
 		return currentPage;
-	}
-	
-	public void deleteConfirmed() {
-		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				globalApplicationState.setIsEditing(false);
-				view.hideEditorModal();
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});	
 	}
 	
 	public void previewClicked() {
@@ -201,8 +188,25 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 			@Override
 			public void callback(boolean isConfirmed) {
 				if (isConfirmed)
-					deleteClicked();
+					deleteConfirmed();
 			}
 		});
 	}
+	
+	public void deleteConfirmed() {
+		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				globalApplicationState.setIsEditing(false);
+				view.hideEditorModal();
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});	
+	}
+	
 }
