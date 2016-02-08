@@ -127,7 +127,6 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	public void configure(WikiPage page) {
 		currentPage = page;
 		view.clear();
-		view.setSaving(false);
 		editor.configure(currentPage.getMarkdown());
 		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
 		view.setTitle(currentPage.getTitle());
