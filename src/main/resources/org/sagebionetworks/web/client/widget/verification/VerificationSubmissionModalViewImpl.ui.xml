@@ -17,7 +17,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>First name</b:FormLabel>
-							<bh:Div addStyleNames="rounded">
+							<bh:Div addStyleNames="whiteBackground rounded">
 								<b:TextBox ui:field="firstName" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -25,7 +25,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Last name</b:FormLabel>
-							<bh:Div addStyleNames="rounded">
+							<bh:Div addStyleNames="whiteBackground rounded">
 								<b:TextBox ui:field="lastName" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -35,7 +35,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Affiliation</b:FormLabel>
-							<bh:Div addStyleNames="rounded">
+							<bh:Div addStyleNames="whiteBackground rounded">
 								<b:TextBox ui:field="currentAffiliation" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -43,7 +43,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Location</b:FormLabel>
-							<bh:Div addStyleNames="rounded">
+							<bh:Div addStyleNames="whiteBackground rounded">
 								<b:TextBox ui:field="location" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>

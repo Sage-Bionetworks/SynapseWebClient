@@ -126,6 +126,12 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 				dialog.hide();
 			}
 		});
+		recreateSubmissionButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.recreateVerification();
+			}
+		});
 	}
 
 	@Override
