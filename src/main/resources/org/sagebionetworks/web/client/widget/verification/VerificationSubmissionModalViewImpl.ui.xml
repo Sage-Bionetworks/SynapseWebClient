@@ -7,17 +7,17 @@
 	<b:Modal ui:field="dialog" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 		<b:ModalBody>
 			<b:Alert ui:field="reasonAlert" type="DANGER" addStyleNames="margin-bottom-10 margin-top-10">
-				<bh:Strong addStyleNames="margin-10">Reason</bh:Strong>
-				<bh:Text ui:field="reasonAlertText" />
+				<b:Heading size="H4" text="Why was my validated user application rejected?"/>
+				<bh:Paragraph ui:field="reasonAlertText" />
 			</b:Alert>
 			<bh:Div ui:field="wikiPageContainer" />
 			<bh:Div ui:field="publicallyVisible" addStyleNames="bg-primary padding-10 rounded">
-				<b:Heading size="H4" text="Publicly visible" addStyleNames="color-white"/>
+				<b:Heading size="H4" text="Publicly visible profile information" addStyleNames="color-white"/>
 				<b:Row>
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>First name</b:FormLabel>
-							<bh:Div addStyleNames="greyBackground rounded">
+							<bh:Div addStyleNames="rounded">
 								<b:TextBox ui:field="firstName" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -25,7 +25,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Last name</b:FormLabel>
-							<bh:Div addStyleNames="greyBackground rounded">
+							<bh:Div addStyleNames="rounded">
 								<b:TextBox ui:field="lastName" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -35,7 +35,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Affiliation</b:FormLabel>
-							<bh:Div addStyleNames="greyBackground rounded">
+							<bh:Div addStyleNames="rounded">
 								<b:TextBox ui:field="currentAffiliation" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -43,7 +43,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Location</b:FormLabel>
-							<bh:Div addStyleNames="greyBackground rounded">
+							<bh:Div addStyleNames="rounded">
 								<b:TextBox ui:field="location" addStyleNames="blackText-imp" enabled="false"/>
 							</bh:Div>
 						</b:FormGroup>
@@ -81,6 +81,7 @@
 		<b:ModalFooter>
 			<b:Button ui:field="submitButton" type="PRIMARY">Submit</b:Button>
 			<b:Button ui:field="okButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
+			<b:Button ui:field="recreateSubmissionButton" type="PRIMARY">Resubmit</b:Button>
 			<b:Button ui:field="approveButton" type="SUCCESS">Approve</b:Button>
 			<b:Button ui:field="rejectButton" type="DANGER">Reject</b:Button>
 			<b:Button ui:field="suspendButton" type="DANGER">Suspend</b:Button>

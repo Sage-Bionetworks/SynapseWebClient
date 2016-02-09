@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
@@ -113,6 +114,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public UserBundle currentUserBundle;
 	public Map<String, Boolean> isACTMemberMap;
 	public WikiModalWidget verificationMoreInfoWikiModal;
+	public Callback resubmitVerificationCallback;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -163,6 +165,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
 		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
 		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
+		resubmitVerificationCallback = new Callback() {
+			@Override
+			public void invoke() {
+				newVerificationSubmissionClicked();
+			}
+		};
+
 	}
 
 	
@@ -1127,16 +1136,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				currentUserBundle.getVerificationSubmission(), 
 				isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId()), 
 				true) //isModal
+			.setResubmitCallback(resubmitVerificationCallback)
 			.show();		
 	}
 	
 	@Override
 	public void newVerificationSubmissionClicked() {
+		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
+		if (currentUserBundle.getVerificationSubmission() != null) {
+			attachments = currentUserBundle.getVerificationSubmission().getAttachments();
+		}
+		
 		//create a new submission
 		verificationModal.configure(
 				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getORCID(), 
-				true) //isModal
+				true, //isModal
+				attachments) 
 			.show();
 	}
 	
