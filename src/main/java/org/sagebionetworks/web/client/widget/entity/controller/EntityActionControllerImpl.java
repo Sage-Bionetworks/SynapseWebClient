@@ -31,8 +31,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -91,7 +91,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
-	MarkdownEditorWidget wikiEditor;
+	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
 	
@@ -108,7 +108,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
-			MarkdownEditorWidget wikiEditor,
+			WikiMarkdownEditor wikiEditor,
 			ProvenanceEditorWidget provenanceEditor,
 			StorageLocationWidget storageLocationEditor) {
 		super();

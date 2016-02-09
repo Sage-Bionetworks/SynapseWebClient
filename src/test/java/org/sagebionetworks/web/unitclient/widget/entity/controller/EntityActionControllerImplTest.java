@@ -62,6 +62,7 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidg
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
@@ -109,7 +110,7 @@ public class EntityActionControllerImplTest {
 	String entityId;
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
-	MarkdownEditorWidget mockMarkdownEditorWidget;
+	WikiMarkdownEditor mockMarkdownEditorWidget;
 	ProvenanceEditorWidget mockProvenanceEditorWidget;
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
@@ -127,7 +128,7 @@ public class EntityActionControllerImplTest {
 		
 		mockAuthenticationController = Mockito
 				.mock(AuthenticationController.class);
-		mockMarkdownEditorWidget = Mockito.mock(MarkdownEditorWidget.class);
+		mockMarkdownEditorWidget = Mockito.mock(WikiMarkdownEditor.class);
 		mockAccessControlListModalWidget = Mockito
 				.mock(AccessControlListModalWidget.class);
 		mockProvenanceEditorWidget = Mockito.mock(ProvenanceEditorWidget.class);

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -31,11 +30,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public interface Binder extends UiBinder<Widget, MarkdownEditorWidgetViewImpl> {}
 	
 	private Presenter presenter;
-	
-	@UiField
-	public Modal editorDialog;
-	@UiField
-	public TextBox titleField;
 	//dialog for the formatting guide
 	@UiField
 	public Div mdCommands;
@@ -162,26 +156,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button linkButton;
 	
-	
-	//preview
-	@UiField
-	public SimplePanel previewHtmlContainer;
-	@UiField
-	public Modal previewModal;
-	@UiField
-	public Button previewButton;
-	
-	@UiField
-	public Button saveButton;
-	@UiField
-	public Button cancelButton;
-	@UiField
-	public Button deleteButton;
-	
 	//this UI widget
 	Widget widget;
-	
-	
 	
 	@Inject
 	public MarkdownEditorWidgetViewImpl(Binder binder) {
@@ -231,9 +207,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		attachmentButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
-		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
-		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
@@ -243,12 +216,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
-		editorDialog.addCloseHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.handleCommand(MarkdownEditorAction.CANCEL);
-			}
-		});
 		formattingGuideButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -260,11 +227,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override 
 	public void confirm(String text, ConfirmCallback callback) {
 		Bootbox.confirm(text, callback);
-	}
-	
-	@Override
-	public void setDeleteClickHandler(ClickHandler handler) {
-		deleteButton.addClickHandler(handler);
 	}
 	
 	@Override
@@ -284,14 +246,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				presenter.handleCommand(action);		
 			}
 		};
-	}
-	
-	@Override
-	public void setSaving(boolean isSaving) {
-		if (isSaving) 
-			saveButton.state().loading();
-		else
-			saveButton.state().reset();
 	}
 	
 	@Override
@@ -323,21 +277,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public boolean isEditorModalAttachedAndVisible() {
-		return editorDialog.isAttached() && editorDialog.isVisible();
-	}
-	
-	@Override
-	public void showEditorModal() {
-		editorDialog.show();
-	}
-	
-	@Override
-	public void hideEditorModal() {
-		editorDialog.hide();
-	}
-	
-	@Override
 	public void setEditButtonEnabled(boolean enabled) {
 		editWidgetButton.setEnabled(enabled);
 	}
@@ -364,7 +303,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@Override
 	public void clear() {
-		saveButton.state().reset();
 		markdownTextArea.setText("");
 	}
 
@@ -409,40 +347,18 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void setTitleEditorVisible(boolean visible) {
-		titleField.setVisible(visible);
-	}
-	
-	@Override
 	public int getScrollHeight(String text) {
 		resizingTextArea.setText("");
 		resizingTextArea.setText(text);
 		return resizingTextArea.getElement().getScrollHeight();
 	}
 
-	
-	@Override
-	public String getTitle() {
-		return titleField.getValue();
-	}
-	
-	@Override
-	public void setTitle(String title) {
-		titleField.setValue(title);
-	}
-
-	@Override
-	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
-		previewHtmlContainer.setWidget(markdownPreviewWidget);
-	}
-
 	@Override
 	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
 		formattingGuideContainer.setWidget(formattingGuideWidget);
 	}
-
 	@Override
-	public void showPreviewModal() {
-		previewModal.show();
+	public boolean isEditorAttachedAndVisible() {
+		return widget.isAttached() && widget.isVisible();
 	}
 }
