@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -61,7 +62,7 @@ public class WikiPageWidgetTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
-	SynapseAlert mockSynapseAlert;
+	StuAlert mockSynapseAlert;
 	@Mock
 	WikiHistoryWidget mockHistoryWidget;
 	@Mock

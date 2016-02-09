@@ -28,8 +28,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntitySelectedEvent;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -43,7 +41,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -69,7 +67,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	WikiPageWidget wikiPageWidget;
 	EntityUpdatedHandler handler;
 	PortalGinInjector ginInjector;
-	SynapseAlert synAlert;
+	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
 	Entity currentEntity;
@@ -96,7 +94,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			FilesBrowser filesBrowser,
 			PreviewWidget previewWidget,
 			WikiPageWidget wikiPageWidget,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
