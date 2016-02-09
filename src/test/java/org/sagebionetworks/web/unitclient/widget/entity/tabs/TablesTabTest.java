@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -76,7 +77,7 @@ public class TablesTabTest {
 	EntityMetadata mockEntityMetadata;
 	
 	@Mock
-	SynapseAlert mockSynapseAlert;
+	StuAlert mockSynapseAlert;
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock

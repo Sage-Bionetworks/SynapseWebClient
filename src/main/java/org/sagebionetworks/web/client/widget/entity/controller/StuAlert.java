@@ -33,6 +33,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.authController = authController;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 	}
@@ -56,7 +57,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 	public void show403(String entityId) {
 		show403();
 		this.entityId = entityId;
-		if (!synAlert.isUserLoggedIn()) {
+		if (!authController.isLoggedIn()) {
 			synAlert.showMustLogin();
 		} else {
 			view.showRequestAccessUI();	
@@ -99,7 +100,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 		} else if(ex instanceof SynapseDownException) {
 			view.showSynapseDown();
 		} else if(ex instanceof ForbiddenException) {			
-			if(!synAlert.isUserLoggedIn()) {
+			if(!authController.isLoggedIn()) {
 				synAlert.showMustLogin();
 			} else {
 				view.show403();
@@ -115,6 +116,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 	public void showError(String error) {
 		clear();
 		synAlert.showError(error);
+		view.setVisible(true);
 	}
 	
 	public void showMustLogin() {

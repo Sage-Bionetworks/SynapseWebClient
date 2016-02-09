@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -65,7 +66,7 @@ public class EntityPresenterTest {
 	CookieProvider mockCookies;
 	PlaceChanger mockPlaceChanger;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	SynapseAlert mockSynAlert;
+	StuAlert mockSynAlert;
 	OpenTeamInvitationsWidget mockOpenInviteWidget;
 	Header mockHeaderWidget;
 	EntityPageTop mockEntityPageTop;
@@ -91,7 +92,7 @@ public class EntityPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
-		mockSynAlert = mock(SynapseAlert.class);
+		mockSynAlert = mock(StuAlert.class);
 		mockOpenInviteWidget = mock(OpenTeamInvitationsWidget.class);
 		mockHeaderWidget = mock(Header.class);
 		mockEntityPageTop = mock(EntityPageTop.class);

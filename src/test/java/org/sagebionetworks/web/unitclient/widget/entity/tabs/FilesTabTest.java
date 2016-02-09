@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -85,7 +86,7 @@ public class FilesTabTest {
 	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
-	SynapseAlert mockSynapseAlert;
+	StuAlert mockSynapseAlert;
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock
