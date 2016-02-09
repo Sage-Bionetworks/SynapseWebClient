@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -28,7 +27,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -52,7 +51,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private SynapseAlert synAlert;
+	private StuAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
@@ -69,7 +68,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
 			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
 		this.headerWidget = headerWidget;
@@ -87,7 +86,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setFooterWidget(footerWidget);
 		view.setHeaderWidget(headerWidget);
 		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
-		view.setSynAlertWidget(synAlert);
+		view.setSynAlertWidget(synAlert.asWidget());
 		clear();
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
