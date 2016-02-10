@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -36,6 +37,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
+	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.NOT_DELETED_ONLY;
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -267,7 +269,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public void loadMore() {
 		synAlert.clear();
 		view.setLoadingRepliesVisible(true);
-		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset, order, ascending,
+		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset,
+				order, ascending, DEFAULT_FILTER,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
 					@Override

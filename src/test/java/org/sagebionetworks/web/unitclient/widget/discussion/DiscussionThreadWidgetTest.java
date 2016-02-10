@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -389,7 +390,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).clearReplies();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
-				any(AsyncCallback.class));
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).setDeleteIconVisible(false);
 	}
 
@@ -408,12 +409,13 @@ public class DiscussionThreadWidgetTest {
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
-						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), 
+						any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadWidget.configureReplies();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
-				any(AsyncCallback.class));
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
 		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
@@ -437,12 +439,13 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
-						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+						any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadWidget.configureReplies();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
-				any(AsyncCallback.class));
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
 		verify(mockView, never()).setLoadMoreButtonVisibility(anyBoolean());
 		verify(mockView, never()).addReply(any(Widget.class));
@@ -468,12 +471,13 @@ public class DiscussionThreadWidgetTest {
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
-						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), any(AsyncCallback.class));
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+						any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadWidget.configureReplies();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
-				any(AsyncCallback.class));
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
 		verify(mockView, atLeastOnce()).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
