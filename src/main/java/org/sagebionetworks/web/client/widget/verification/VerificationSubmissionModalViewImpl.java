@@ -62,9 +62,13 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Button cancelButton;
 	@UiField
+	Button closeButton;
+	@UiField
 	Button deleteButton;
 	@UiField
 	Button okButton;
+	@UiField
+	Button recreateSubmissionButton;
 	@UiField
 	Modal dialog;
 	@UiField
@@ -77,7 +81,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Alert reasonAlert;
 	@UiField
-	Text reasonAlertText;
+	Paragraph reasonAlertText;
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -124,6 +128,12 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 				dialog.hide();
 			}
 		});
+		recreateSubmissionButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.recreateVerification();
+			}
+		});
 	}
 
 	@Override
@@ -156,7 +166,9 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
 		deleteButton.setVisible(false);
+		closeButton.setVisible(false);
 		reasonAlert.setVisible(false);
+		recreateSubmissionButton.setVisible(false);
 		dialog.setTitle("");
 	}
 
@@ -263,6 +275,10 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	public void setSuspendButtonVisible(boolean visible) {
 		suspendButton.setVisible(visible);
 	}
+	@Override
+	public void setResubmitButtonVisible(boolean visible) {
+		recreateSubmissionButton.setVisible(visible);
+	}
 
 	@Override
 	public void setSuspendedAlertVisible(boolean visible) {
@@ -304,5 +320,34 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Override
 	public void setState(VerificationStateEnum state) {
 		//Not used in this view implementation
+	}
+	
+	@Override
+	public void setProfileFieldsEditable(boolean editable) {
+		firstName.setEnabled(editable);
+		lastName.setEnabled(editable);
+		currentAffiliation.setEnabled(editable);
+		location.setEnabled(editable);
+	}
+	
+	@Override
+	public String getFirstName() {
+		return firstName.getValue();
+	}
+	@Override
+	public String getLastName() {
+		return lastName.getValue();
+	}
+	@Override
+	public String getLocation() {
+		return location.getValue();
+	}
+	@Override
+	public String getOrganization() {
+		return currentAffiliation.getValue();
+	}
+	@Override
+	public void setCloseButtonVisible(boolean visible) {
+		closeButton.setVisible(visible);
 	}
 }
