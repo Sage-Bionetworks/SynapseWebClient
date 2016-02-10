@@ -1,27 +1,33 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public abstract class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter{
+public class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter{
 
 	public static final Long LIMIT = 10L;
 	public static final DiscussionThreadOrder DEFAULT_ORDER = DiscussionThreadOrder.LAST_ACTIVITY;
 	public static final Boolean DEFAULT_ASCENDING = false;
+	public static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.NOT_DELETED_ONLY;
 	DiscussionThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseAlert synAlert;
-	protected Long offset;
-	protected DiscussionThreadOrder order;
-	protected Boolean ascending;
-	protected String forumId;
-	protected Boolean isCurrentUserModerator;
+	private Long offset;
+	private DiscussionThreadOrder order;
+	private Boolean ascending;
+	private String forumId;
+	private Boolean isCurrentUserModerator;
 
 	@Inject
 	public DiscussionThreadListWidget(
@@ -57,5 +63,44 @@ public abstract class DiscussionThreadListWidget implements DiscussionThreadList
 		return view.asWidget();
 	}
 
-	public abstract void loadMore();
+	public void loadMore(){
+		synAlert.clear();
+		view.setLoadingVisible(true);
+		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset,
+				order, ascending, DEFAULT_FILTER,
+				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
+
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setLoadingVisible(false);
+						synAlert.handleException(caught);
+					}
+
+					@Override
+					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
+						for(DiscussionThreadBundle bundle: result.getResults()) {
+							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
+							thread.configure(bundle, isCurrentUserModerator, new Callback(){
+
+								@Override
+								public void invoke() {
+									configure(forumId, isCurrentUserModerator);
+								}
+							});
+							view.addThread(thread.asWidget());
+						}
+						offset += LIMIT;
+						long numberOfThreads = result.getTotalNumberOfResults();
+						view.setLoadingVisible(false);
+						view.setLoadMoreButtonVisibility(offset < numberOfThreads);
+						if (numberOfThreads > 0) {
+							view.setEmptyUIVisible(false);
+							view.setThreadHeaderVisible(true);
+						} else {
+							view.setEmptyUIVisible(true);
+							view.setThreadHeaderVisible(false);
+						}
+					}
+		});
+	};
 }
