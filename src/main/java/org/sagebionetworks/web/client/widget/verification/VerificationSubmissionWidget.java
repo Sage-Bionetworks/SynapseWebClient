@@ -375,6 +375,17 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	@Override
 	public void deleteVerification() {
 		//TODO: allow user to rescind own submission
+//		long verificationId = Long.parseLong(submission.getId());
+//		userProfileClient.deleteVerificationSubmission(verificationId,new AsyncCallback<Void>() {
+//			@Override
+//			public void onSuccess(Void result) {
+//				handleSuccess("Submission state has been deleted.");
+//			}
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				synAlert.handleException(caught);
+//			}
+//		});
 	}
 	
 	@Override
@@ -389,6 +400,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	@Override
 	public void recreateVerification() {
 		if (resubmitCallback != null) {
+			view.hide();
 			resubmitCallback.invoke();
 		}
 	}
