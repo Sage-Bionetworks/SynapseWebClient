@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +35,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
@@ -115,7 +117,12 @@ public class VerificationSubmissionWidgetTest {
 		AttachmentMetadata meta = new AttachmentMetadata();
 		meta.setId("12836");
 		meta.setFileName("abc.txt");
-		submissionAttachments = Collections.singletonList(meta);
+		submissionAttachments = new ArrayList<AttachmentMetadata>();
+		submissionAttachments.add(meta);
+		meta = new AttachmentMetadata();
+		meta.setId("789");
+		meta.setFileName("def.txt");
+		submissionAttachments.add(meta);
 		when(mockSubmission.getAttachments()).thenReturn(submissionAttachments);
 		
 		when(mockFileHandleList.configure(any(CallbackP.class))).thenReturn(mockFileHandleList);
@@ -130,12 +137,31 @@ public class VerificationSubmissionWidgetTest {
 		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
 		
 		AsyncMockStubber.callSuccessWith(mockWikiPageMap).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
+		when(mockView.getOrganization()).thenReturn(submissionCompany);
+		when(mockView.getFirstName()).thenReturn(submissionFirstName);
+		when(mockView.getLastName()).thenReturn(submissionLastName);
+		when(mockView.getLocation()).thenReturn(submissionLocation);
 	}
 	private void configureWithMockSubmission(){
 		boolean isACTMember = false;
 		boolean isModal = true;
 		widget.configure(mockSubmission, isACTMember, isModal);
 	}
+	
+	private void configureWithMockProfile() {
+		String orcId = "http://orcid.org/123";
+		UserProfile profile = getPopulatedProfile();
+		boolean isModal = true;
+		widget.configure(profile, orcId, isModal, submissionAttachments);
+	}
+	
+	private void submitVerificationWithMockProfile() {
+		configureWithMockProfile();
+		fileHandleIds.add("1");
+		fileHandleIds.add("2");
+		widget.submitVerification();
+	}
+
 
 	@Test
 	public void testConfigureEditAsModal() {
@@ -157,7 +183,7 @@ public class VerificationSubmissionWidgetTest {
 	public void testConfigureNewAsModal() {
 		boolean isModal = true;
 		String orcId = "http://orcid.org/123";
-		widget.configure(mockProfile, orcId, isModal);
+		widget.configure(mockProfile, orcId, isModal, submissionAttachments);
 		
 		assertTrue(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
@@ -240,7 +266,7 @@ public class VerificationSubmissionWidgetTest {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
 		boolean isModal = true;
-		widget.configure(profile, orcId, isModal);
+		widget.configure(profile, orcId, isModal, submissionAttachments);
 		widget.show();
 		verify(mockView).clear();
 		verify(mockView).setWikiPageVisible(true);
@@ -257,6 +283,7 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setOrganization(profile.getCompany());
 		verify(mockView).setOrcID(orcId);
 		verify(mockView).setEmails(profile.getEmails());
+		verify(mockFileHandleList, times(submissionAttachments.size())).addFileLink(anyString(), anyString());
 		verify(mockFileHandleList).refreshLinkUI();
 		verify(mockView).show();
 	}
@@ -291,7 +318,7 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockFileHandleList).configure(any(CallbackP.class));
 		verify(mockFileHandleList).setCanDelete(false);
 		verify(mockFileHandleList).setCanUpload(false);
-		verify(mockFileHandleList).addFileLink(anyString(), anyString());
+		verify(mockFileHandleList, times(submissionAttachments.size())).addFileLink(anyString(), anyString());
 		verify(mockFileHandleList).refreshLinkUI();
 		verify(mockView).setState(VerificationStateEnum.SUBMITTED);
 		verify(mockView).show();
@@ -334,8 +361,7 @@ public class VerificationSubmissionWidgetTest {
 		widget.show();
 		verify(mockView).setSuspendedAlertVisible(true);
 		verify(mockView).setSuspendedReason(reason);
-		verify(mockMarkdownWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class), eq(false));
-		verify(mockView).setWikiPageVisible(true);
+		verify(mockView).setResubmitButtonVisible(true);
 	}
 	
 	@Test
@@ -346,8 +372,7 @@ public class VerificationSubmissionWidgetTest {
 		widget.show();
 		verify(mockView).setSuspendedAlertVisible(true);
 		verify(mockView).setSuspendedReason(reason);
-		verify(mockMarkdownWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class), eq(false));
-		verify(mockView).setWikiPageVisible(true);
+		verify(mockView).setResubmitButtonVisible(true);
 	}
 
 	@Test
@@ -390,7 +415,7 @@ public class VerificationSubmissionWidgetTest {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
 		boolean isModal = true;
-		widget.configure(profile, orcId, isModal);
+		widget.configure(profile, orcId, isModal, submissionAttachments);
 		
 		//attach evidence
 		fileHandleIds.add("999");
@@ -409,7 +434,7 @@ public class VerificationSubmissionWidgetTest {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
 		boolean isModal = true;
-		widget.configure(profile, orcId, isModal);
+		widget.configure(profile, orcId, isModal, submissionAttachments);
 		
 		//no evidence
 		widget.submitVerification();
@@ -422,7 +447,7 @@ public class VerificationSubmissionWidgetTest {
 		String orcId = "http://orcid.org/123";
 		UserProfile profile = getPopulatedProfile();
 		boolean isModal = true;
-		widget.configure(profile, orcId, isModal);
+		widget.configure(profile, orcId, isModal, submissionAttachments);
 		
 		//attach evidence
 		fileHandleIds.add("999");
@@ -431,6 +456,54 @@ public class VerificationSubmissionWidgetTest {
 		//not enough evidence
 		verify(mockSynapseAlert).showError(anyString());
 		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
-
+	}
+	
+	@Test
+	public void testResubmitCallback() {
+		configureWithMockSubmission();
+		Callback callback = mock(Callback.class);
+		widget.setResubmitCallback(callback);
+		
+		widget.recreateVerification();
+		verify(mockView).hide();
+		verify(callback).invoke();
+	}
+	
+	@Test
+	public void testSubmitNothingMissing() {
+		submitVerificationWithMockProfile();
+		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testSubmitMissingFirstName() {
+		when(mockView.getFirstName()).thenReturn("");
+		submitVerificationWithMockProfile();
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).showError(VerificationSubmissionWidget.FILL_IN_PROFILE_FIELDS_MESSAGE);
+	}
+	
+	@Test
+	public void testSubmitMissingLastName() {
+		when(mockView.getLastName()).thenReturn("");
+		submitVerificationWithMockProfile();
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).showError(VerificationSubmissionWidget.FILL_IN_PROFILE_FIELDS_MESSAGE);
+	}
+	
+	@Test
+	public void testSubmitMissingOrganization() {
+		when(mockView.getOrganization()).thenReturn("");
+		submitVerificationWithMockProfile();
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).showError(VerificationSubmissionWidget.FILL_IN_PROFILE_FIELDS_MESSAGE);
+	}
+	
+	@Test
+	public void testSubmitMissingLocation() {
+		when(mockView.getLocation()).thenReturn("");
+		submitVerificationWithMockProfile();
+		verify(mockUserProfileClient, never()).createVerificationSubmission(any(VerificationSubmission.class), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).showError(VerificationSubmissionWidget.FILL_IN_PROFILE_FIELDS_MESSAGE);
 	}
 }

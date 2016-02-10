@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class VerificationSubmissionWidget implements VerificationSubmissionWidgetView.Presenter, IsWidget {
-	private static final String FILL_IN_PROFILE_FIELDS_MESSAGE = "Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.";
+	public static final String FILL_IN_PROFILE_FIELDS_MESSAGE = "Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.";
 	private UserProfileClientAsync userProfileClient;
 	private SynapseClientAsync synapseClient;
 	private MarkdownWidget helpWikiPage;
