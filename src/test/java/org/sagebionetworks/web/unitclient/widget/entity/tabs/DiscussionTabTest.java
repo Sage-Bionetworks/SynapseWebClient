@@ -40,7 +40,7 @@ public class DiscussionTabTest {
 	@Mock
 	DiscussionTabView mockView;
 	@Mock
-	DiscussionThreadListWidget mockDiscussionThreadListWidget;
+	DiscussionThreadListWidget mockAvailableThreadListWidget;
 	@Mock
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
@@ -71,7 +71,7 @@ public class DiscussionTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		tab = new DiscussionTab(mockView, mockTab, mockSynAlert, mockDiscussionForumClient,
-				mockDiscussionThreadListWidget, mockNewDiscussionThreadModal, mockCookies,
+				mockAvailableThreadListWidget, mockNewDiscussionThreadModal, mockCookies,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
@@ -118,7 +118,7 @@ public class DiscussionTabTest {
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
-		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
@@ -164,7 +164,7 @@ public class DiscussionTabTest {
 		String areaToken = "";
 		canModerate = true;
 		tab.configure(entityId, entityName, areaToken, canModerate);
-		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 	}
 
@@ -185,13 +185,13 @@ public class DiscussionTabTest {
 	}
 
 	@Test
-	public void onCLickNewThreadTest() {
+	public void onClickNewThreadTest() {
 		tab.onClickNewThread();
-		verify(mockNewDiscussionThreadModal).show();;
+		verify(mockNewDiscussionThreadModal).show();
 	}
 
 	@Test
-	public void onCLickNewThreadAnonymousTest() {
+	public void onClickNewThreadAnonymousTest() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		tab.onClickNewThread();
 		verify(mockNewDiscussionThreadModal, never()).show();
@@ -203,7 +203,7 @@ public class DiscussionTabTest {
 	public void testOnModeratorModeChange() {
 		when(mockView.getModeratorMode()).thenReturn(true);
 		tab.onModeratorModeChange();
-		verify(mockDiscussionThreadListWidget).configure(anyString(), eq(true));
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(true));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 	}
 	
@@ -234,11 +234,12 @@ public class DiscussionTabTest {
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(canModerate), any(Callback.class));
 		verify(mockDiscussionThreadWidget).toggleThread();
-		verify(mockDiscussionThreadListWidget, never()).configure(anyString(), anyBoolean());
+		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean());
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureSingleThreadFailure() {
 		Exception ex = new Exception("error");
@@ -265,7 +266,8 @@ public class DiscussionTabTest {
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnClickShowAllThreads() {
 		String entityId = "syn1"; 
