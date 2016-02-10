@@ -38,6 +38,7 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void setRejectButtonVisible(boolean visible);
 	void setSuspendButtonVisible(boolean visible);
 	void setResubmitButtonVisible(boolean visible);
+	void setCloseButtonVisible(boolean visible);
 	void setSuspendedReason(String reason);
 	void setSuspendedAlertVisible(boolean visible);
 	void setState(VerificationStateEnum state);

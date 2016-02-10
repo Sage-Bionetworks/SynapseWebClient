@@ -296,4 +296,8 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	public String getOrganization() {
 		return currentAffiliation.getText();
 	}
+	@Override
+	public void setCloseButtonVisible(boolean visible) {
+		//Not used in this view implementation
+	}
 }

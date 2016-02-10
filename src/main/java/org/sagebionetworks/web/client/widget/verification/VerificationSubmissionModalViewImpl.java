@@ -62,6 +62,8 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Button cancelButton;
 	@UiField
+	Button closeButton;
+	@UiField
 	Button deleteButton;
 	@UiField
 	Button okButton;
@@ -164,6 +166,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
 		deleteButton.setVisible(false);
+		closeButton.setVisible(false);
 		reasonAlert.setVisible(false);
 		recreateSubmissionButton.setVisible(false);
 		dialog.setTitle("");
@@ -342,5 +345,9 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Override
 	public String getOrganization() {
 		return currentAffiliation.getValue();
+	}
+	@Override
+	public void setCloseButtonVisible(boolean visible) {
+		closeButton.setVisible(visible);
 	}
 }

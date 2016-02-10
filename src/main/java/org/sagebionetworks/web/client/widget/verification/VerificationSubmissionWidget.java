@@ -213,7 +213,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		//marking own submission as rejected currently forbidden, and we don't want to actually delete the submission
 		view.setDeleteButtonVisible(false);
 		
-		view.setOKButtonVisible(true);
 		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
 		view.setState(currentState.getState());
 		if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
@@ -221,8 +220,10 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setApproveButtonVisible(isACTMember);
 			view.setRejectButtonVisible(isACTMember);
 			view.setTitle("Profile Validation Pending");
+			view.setCloseButtonVisible(true);
 		} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
 			//approved
+			view.setOKButtonVisible(true);
 			view.setSuspendButtonVisible(isACTMember);
 			view.setTitle("Profile Validated");
 		} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
@@ -230,6 +231,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setSuspendedReason(currentState.getReason());
 			view.setSuspendedAlertVisible(true);
 			view.setResubmitButtonVisible(true);
+			view.setCloseButtonVisible(true);
 		}
 		fileHandleList.configure(fileHandleClickedCallback)
 			.setCanDelete(false)

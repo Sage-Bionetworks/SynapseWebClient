@@ -309,7 +309,7 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setOrcID(submissionOrcId);
 		verify(mockView).setEmails(submissionEmails);
 		
-		verify(mockView).setOKButtonVisible(true);
+		verify(mockView).setCloseButtonVisible(true);
 		
 		//in the configureWithMockSubmission, the current user is not a member of the ACT
 		verify(mockView).setApproveButtonVisible(false);
@@ -362,6 +362,7 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setSuspendedAlertVisible(true);
 		verify(mockView).setSuspendedReason(reason);
 		verify(mockView).setResubmitButtonVisible(true);
+		verify(mockView).setCloseButtonVisible(true);
 	}
 	
 	@Test
@@ -373,6 +374,7 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setSuspendedAlertVisible(true);
 		verify(mockView).setSuspendedReason(reason);
 		verify(mockView).setResubmitButtonVisible(true);
+		verify(mockView).setCloseButtonVisible(true);
 	}
 
 	@Test
