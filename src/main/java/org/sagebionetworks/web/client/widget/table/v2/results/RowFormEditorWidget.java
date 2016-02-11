@@ -5,12 +5,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
-import org.sagebionetworks.web.shared.table.CellAddress;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,14 +19,14 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class RowFormWidget implements IsWidget, RowFormView.Presenter, KeyboardNavigationHandler.RowOfWidgets {
+public class RowFormEditorWidget implements IsWidget, RowFormView.Presenter {
 	
 	RowFormView view;
 	List<Cell> cells;
 	CellFactory cellFactory;
 	
 	@Inject
-	public RowFormWidget(RowFormView view, CellFactory cellFactory){
+	public RowFormEditorWidget(RowFormView view, CellFactory cellFactory){
 		this.view = view;
 		this.cellFactory = cellFactory;
 		view.setPresenter(this);
@@ -47,11 +44,6 @@ public class RowFormWidget implements IsWidget, RowFormView.Presenter, KeyboardN
 			Cell cell = cellFactory.createFormEditor(type);
 			this.cells.add(cell);
 			this.view.addCell(type.getName(), cell);
-			// Pass the address to cells the need it.
-			if(cell instanceof TakesAddressCell){
-				TakesAddressCell takesAddress = (TakesAddressCell) cell;
-				takesAddress.setCellAddresss(new CellAddress(tableId, type, null, null));
-			}
 		}
 	}
 
@@ -76,16 +68,6 @@ public class RowFormWidget implements IsWidget, RowFormView.Presenter, KeyboardN
 		return row;
 	}
 	
-	@Override
-	public IsWidget getWidget(int index) {
-		return cells.get(index);
-	}
-
-	@Override
-	public int getWidgetCount() {
-		return cells.size();
-	}
-
 	/**
 	 * Is this row valid?
 	 * Note: This must only be called on an editor.

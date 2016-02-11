@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.RowFormWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormEditorWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -52,7 +52,7 @@ public class SynapseTableFormWidgetTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	RowFormWidget mockRowFormWidget;
+	RowFormEditorWidget mockRowFormWidget;
 	@Mock
 	AsynchronousJobTracker mockAsynchronousJobTracker;
 	@Mock

@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.RowFormWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -33,7 +33,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private SynapseTableFormWidgetView view;
 	private Map<String, String> descriptor;
 	private SynapseAlert synAlert;
-	private RowFormWidget rowWidget;
+	private RowFormEditorWidget rowWidget;
 	private String tableId;
 	private List<ColumnModel> headers;
 	private SynapseClientAsync synapseClient;
@@ -43,7 +43,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	@Inject
 	public SynapseTableFormWidget(SynapseTableFormWidgetView view,
 			SynapseAlert synAlert,
-			RowFormWidget rowWidget,
+			RowFormEditorWidget rowWidget,
 			AsynchronousJobTracker jobTracker,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
