@@ -113,7 +113,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void invoke() {
-				reconfigure();
+				reconfigureThread();
 				configureReplies();
 			}
 		});
@@ -146,7 +146,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		}
 	}
 
-	private void reconfigure() {
+	private void reconfigureThread() {
 		synAlert.clear();
 		discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
@@ -218,13 +218,17 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void invoke() {
-				reconfigure();
-				configureMessage();
-				if (!view.isReplyCollapsed()) {
-					configureReplies();
-				}
+				reconfigureWidget();
 			}
 		});
+	}
+
+	private void reconfigureWidget() {
+		reconfigureThread();
+		configureMessage();
+		if (!view.isReplyCollapsed()) {
+			configureReplies();
+		}
 	}
 
 	@Override
@@ -289,7 +293,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){
 								@Override
 								public void invoke() {
-									configureReplies();
+									reconfigureWidget();
 								}
 							});
 							view.addReply(replyWidget.asWidget());
