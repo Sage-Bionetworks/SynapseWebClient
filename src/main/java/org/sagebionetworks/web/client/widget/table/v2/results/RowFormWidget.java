@@ -44,7 +44,7 @@ public class RowFormWidget implements IsWidget, RowFormView.Presenter, KeyboardN
 		// Setup each cell
 		for(ColumnModel type: types){
 			// Create each cell
-			Cell cell = cellFactory.createEditor(type);
+			Cell cell = cellFactory.createFormEditor(type);
 			this.cells.add(cell);
 			this.view.addCell(type.getName(), cell);
 			// Pass the address to cells the need it.

@@ -42,6 +42,7 @@ public class RowFormViewImpl implements RowFormView {
 	@Override
 	public void addCell(String labelText, Cell cell) {
 		FormGroup fg = new FormGroup();
+		fg.addStyleName("margin-top-30");
 		FormLabel label = new FormLabel();
 		label.setText(labelText);
 		fg.add(label);
