@@ -68,6 +68,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.showAllThreadsCallback = showAllThreadsCallback;
+		synAlert.clear();
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -80,7 +81,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void showThread(String threadId) {
 		view.setSingleThreadUIVisible(true);
 		view.setThreadListUIVisible(false);
+		configureSingleThread(threadId);
+	}
 
+	private void configureSingleThread(final String threadId) {
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -89,14 +93,20 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				singleThreadWidget.configure(result, isCurrentUserModerator, null);
+				singleThreadWidget.configure(result, isCurrentUserModerator, new Callback(){
+
+					@Override
+					public void invoke() {
+						configureSingleThread(threadId);
+					}
+				});
 				if (singleThreadWidget.isThreadCollapsed()) {
 					singleThreadWidget.toggleThread();
 				}
 			}
 		});
 	}
-	
+
 	public void showForum() {
 		view.setSingleThreadUIVisible(false);
 		view.setThreadListUIVisible(true);
@@ -123,6 +133,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	@Override
 	public void onClickShowAllThreads() {
+		synAlert.clear();
 		if (showAllThreadsCallback != null) {
 			showAllThreadsCallback.invoke();
 		}

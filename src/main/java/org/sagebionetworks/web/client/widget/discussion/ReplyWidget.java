@@ -36,6 +36,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
+	private Callback deleteReplyCallback;
 
 	@Inject
 	public ReplyWidget(
@@ -65,12 +66,13 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Callback deleteReplyCallback) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.deleteReplyCallback = deleteReplyCallback;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		if (bundle.getIsDeleted()) {
@@ -155,7 +157,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(Void result) {
-				reconfigure();
+				if (deleteReplyCallback != null) {
+					deleteReplyCallback.invoke();
+				}
 			}
 		});
 	}
@@ -171,7 +175,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator);
+				configure(result, isCurrentUserModerator, deleteReplyCallback);
 			}
 		});
 	}

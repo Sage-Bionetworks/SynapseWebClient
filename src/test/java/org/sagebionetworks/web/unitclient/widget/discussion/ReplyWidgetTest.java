@@ -55,6 +55,8 @@ public class ReplyWidgetTest {
 	EditReplyModal mockEditReplyModal;
 	@Mock
 	MarkdownWidget mockMarkdownWidget;
+	@Mock
+	Callback mockDeleteCallback;
 
 	ReplyWidget replyWidget;
 
@@ -87,7 +89,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
@@ -107,7 +109,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockView).setEditedVisible(true);
 	}
 
@@ -120,7 +122,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockView).setEditIconVisible(true);
 	}
 
@@ -132,7 +134,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView, never()).setEditedVisible(false);
 		verify(mockView).setMessageVisible(false);
@@ -148,7 +150,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView, never()).setEditedVisible(false);
 	}
@@ -160,7 +162,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, true);
+		replyWidget.configure(bundle, true, mockDeleteCallback);
 		verify(mockView).setDeleteIconVisibility(true);
 	}
 
@@ -179,7 +181,7 @@ public class ReplyWidgetTest {
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -199,7 +201,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -222,7 +224,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -253,13 +255,12 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockDiscussionForumClientAsync).markReplyAsDeleted(eq("123"), any(AsyncCallback.class));
-		verify(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -275,7 +276,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
@@ -298,7 +299,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		AsyncMockStubber.callSuccessWith(bundle)
 				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
@@ -323,7 +324,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate);
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();

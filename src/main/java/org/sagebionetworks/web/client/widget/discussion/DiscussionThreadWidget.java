@@ -286,7 +286,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 						offset += LIMIT;
 						for (DiscussionReplyBundle bundle : result.getResults()) {
 							ReplyWidget replyWidget = ginInjector.createReplyWidget();
-							replyWidget.configure(bundle, isCurrentUserModerator);
+							replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){
+								@Override
+								public void invoke() {
+									configureReplies();
+								}
+							});
 							view.addReply(replyWidget.asWidget());
 						}
 						view.setLoadingRepliesVisible(false);

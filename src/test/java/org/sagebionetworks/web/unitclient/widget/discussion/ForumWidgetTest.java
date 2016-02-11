@@ -3,9 +3,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.DEFAULT_MODERATOR_MODE;
 
 import org.junit.Before;
@@ -100,6 +98,7 @@ public class ForumWidgetTest {
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
+		verify(mockSynAlert).clear();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -120,6 +119,7 @@ public class ForumWidgetTest {
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
+		verify(mockSynAlert).clear();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -138,6 +138,7 @@ public class ForumWidgetTest {
 
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
+		verify(mockSynAlert).clear();
 	}
 
 	@Test
@@ -222,5 +223,6 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
+		verify(mockSynAlert, times(2)).clear();
 	}
 }
