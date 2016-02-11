@@ -165,6 +165,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getBiodallianceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.CYTOSCAPE_CONTENT_TYPE)) {
 			presenter = ginInjector.getCytoscapeRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableFormWidget();
 		}		
 		//TODO: add other widget descriptors to this mapping as they become available
 		
@@ -254,6 +256,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE, WidgetConstants.JOIN_TEAM_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE, WidgetConstants.BIODALLIANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.CYTOSCAPE_CONTENT_TYPE, WidgetConstants.CYTOSCAPE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE, WidgetConstants.SYNAPSE_FORM_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

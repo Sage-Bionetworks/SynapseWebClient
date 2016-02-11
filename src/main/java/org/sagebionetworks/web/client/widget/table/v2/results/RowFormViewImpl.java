@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -19,7 +18,7 @@ import com.google.inject.Inject;
  */
 public class RowFormViewImpl implements RowFormView {
 	
-	public interface Binder extends UiBinder<TableRow, RowFormViewImpl> {	}
+	public interface Binder extends UiBinder<Widget, RowFormViewImpl> {	}
 	
 	@UiField
 	Form form;

@@ -75,6 +75,10 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 		}
 	}
 	@Override
+	public void setSubmitButtonVisible(boolean visible) {
+		submitButton.setVisible(visible);
+	}
+	@Override
 	public void setSuccessMessage(String text) {
 		successMessageText.setText(text);
 	}

@@ -11,7 +11,9 @@ public interface SynapseTableFormWidgetView extends IsWidget {
 	void setProgressWidget(Widget w);
 	void setPresenter(Presenter p);
 	void setSubmitButtonLoading(boolean isLoading);
+	void setSubmitButtonVisible(boolean visible);
 	void setSuccessMessageVisible(boolean visible);
+	
 	void setSuccessMessage(String text);
 	/**
 	 * Presenter interface

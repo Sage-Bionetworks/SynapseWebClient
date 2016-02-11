@@ -28,6 +28,9 @@ public class WidgetConstants {
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
 	
+	public static final String SYNAPSE_FORM_CONTENT_TYPE = "synapseForm";
+	public static final String SYNAPSE_FORM_FRIENDLY_NAME = "Synapse Form";
+	
 	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs25";
 	public static final String CYTOSCAPE_FRIENDLY_NAME ="Cytoscape JS";
 

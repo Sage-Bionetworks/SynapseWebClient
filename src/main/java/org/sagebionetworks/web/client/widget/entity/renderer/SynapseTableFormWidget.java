@@ -61,9 +61,9 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		descriptor = widgetDescriptor;
 		synAlert.clear();
 		rowWidget.clear();
+		view.setSubmitButtonVisible(false);
 		view.setSuccessMessageVisible(false);
 		if (!synAlert.isUserLoggedIn()) {
-			//must login
 			synAlert.showMustLogin();
 			return;
 		}
@@ -77,11 +77,11 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		
 		//get the table schema and init row widget!
 		synapseClient.getColumnModelsForTableEntity(tableId, new AsyncCallback<List<ColumnModel>>() {
-			
 			@Override
 			public void onSuccess(List<ColumnModel> result) {
 				headers = result;
 				rowWidget.configure(tableId, headers);
+				view.setSubmitButtonVisible(true);
 			}
 			
 			@Override
