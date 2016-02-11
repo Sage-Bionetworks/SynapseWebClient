@@ -1,7 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.*;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,36 +17,28 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeView;
-import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowFormWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -58,6 +57,10 @@ public class SynapseTableFormWidgetTest {
 	AsynchronousJobTracker mockAsynchronousJobTracker;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	Row mockRow;
+	@Mock
+	AsynchronousResponseBody mockResponse;
 	
 	private static final String TABLE_ID = "syn7777777";
 	private static final String SUCCESS_MESSAGE = "Custom success message";
@@ -73,6 +76,8 @@ public class SynapseTableFormWidgetTest {
 		descriptor.put(WidgetConstants.TABLE_ID_KEY, TABLE_ID);
 		descriptor.put(WidgetConstants.SUCCESS_MESSAGE, SUCCESS_MESSAGE);
 		when(mockSynAlert.isUserLoggedIn()).thenReturn(true);
+		when(mockRowFormWidget.isValid()).thenReturn(true);
+		when(mockRowFormWidget.getRow()).thenReturn(mockRow);
 	}
 	
 	@Test
@@ -132,9 +137,54 @@ public class SynapseTableFormWidgetTest {
 	public void testOnSubmitInvalid() throws RequestException {
 		when(mockRowFormWidget.isValid()).thenReturn(false);
 		widget.onSubmit();
-		
+		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(QueryResultEditorWidget.SEE_THE_ERRORS_ABOVE);
 		verify(mockAsynchronousJobTracker, never()).startAndTrack(any(AsynchType.class), any(AsynchronousRequestBody.class), anyInt(), any(UpdatingAsynchProgressHandler.class));
+	}
+	
+	@Test
+	public void testOnSubmitOnFailure() throws RequestException {
+		widget.configure(wikiKey, descriptor, null, null);
+		
+		widget.onSubmit();
+		
+		ArgumentCaptor<UpdatingAsynchProgressHandler> captor = ArgumentCaptor.forClass(UpdatingAsynchProgressHandler.class);
+		verify(mockAsynchronousJobTracker).startAndTrack(any(AsynchType.class), any(AsynchronousRequestBody.class), anyInt(), captor.capture());
+		UpdatingAsynchProgressHandler handler = captor.getValue();
+		
+		assertTrue(handler.isAttached());
+		Exception ex = new Exception("error occurred during table update");
+		handler.onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testOnSubmitOnCancel() throws RequestException {
+		widget.configure(wikiKey, descriptor, null, null);
+		widget.onSubmit();
+		ArgumentCaptor<UpdatingAsynchProgressHandler> captor = ArgumentCaptor.forClass(UpdatingAsynchProgressHandler.class);
+		verify(mockAsynchronousJobTracker).startAndTrack(any(AsynchType.class), any(AsynchronousRequestBody.class), anyInt(), captor.capture());
+		UpdatingAsynchProgressHandler handler = captor.getValue();
+		
+		reset(mockView);
+		handler.onCancel();
+		verify(mockView).setSubmitButtonLoading(false);
+	}
+	
+	@Test
+	public void testOnSubmitOnComplete() throws RequestException {
+		widget.configure(wikiKey, descriptor, null, null);
+		widget.onSubmit();
+		ArgumentCaptor<UpdatingAsynchProgressHandler> captor = ArgumentCaptor.forClass(UpdatingAsynchProgressHandler.class);
+		verify(mockAsynchronousJobTracker).startAndTrack(any(AsynchType.class), any(AsynchronousRequestBody.class), anyInt(), captor.capture());
+		UpdatingAsynchProgressHandler handler = captor.getValue();
+		
+		reset(mockView, mockSynAlert, mockRowFormWidget);
+		handler.onComplete(mockResponse);
+		verify(mockSynAlert).clear();
+		verify(mockRowFormWidget).clear();
+		verify(mockView).setSubmitButtonVisible(false);
+		verify(mockView).setSuccessMessageVisible(true);
 	}
 
 }
