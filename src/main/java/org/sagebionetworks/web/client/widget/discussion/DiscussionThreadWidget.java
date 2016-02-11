@@ -37,7 +37,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
-	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.NOT_DELETED_ONLY;
+	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;

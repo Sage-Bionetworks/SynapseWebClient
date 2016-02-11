@@ -18,7 +18,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	public static final Long LIMIT = 10L;
 	public static final DiscussionThreadOrder DEFAULT_ORDER = DiscussionThreadOrder.LAST_ACTIVITY;
 	public static final Boolean DEFAULT_ASCENDING = false;
-	public static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.NOT_DELETED_ONLY;
+	public static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 	DiscussionThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;

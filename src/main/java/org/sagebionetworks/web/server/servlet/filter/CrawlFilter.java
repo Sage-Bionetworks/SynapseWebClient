@@ -244,7 +244,7 @@ public class CrawlFilter implements Filter {
 			if (forum != null) {
 				String forumId = forum.getId();
 				//index 100 of the most recent project thread titles
-				PaginatedResults<DiscussionThreadBundle> paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 100L, 0L, DiscussionThreadOrder.LAST_ACTIVITY, false, DiscussionFilter.NOT_DELETED_ONLY);
+				PaginatedResults<DiscussionThreadBundle> paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 100L, 0L, DiscussionThreadOrder.LAST_ACTIVITY, false, DiscussionFilter.EXCLUDE_DELETED);
 				List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
 				for (DiscussionThreadBundle thread : threadList) {
 					html.append("<a href=\"#!Synapse:"+entity.getId()+DISCUSSION_THREAD_ID+thread.getId()+"\">"+thread.getTitle() + "</a><br />");
@@ -286,7 +286,7 @@ public class CrawlFilter implements Filter {
 		PaginatedResults<DiscussionReplyBundle> replies = discussionForumClient
 				.getRepliesForThread(thread.getId(), 100L, 0L,
 						DiscussionReplyOrder.CREATED_ON, false,
-						DiscussionFilter.NOT_DELETED_ONLY);
+						DiscussionFilter.EXCLUDE_DELETED);
 		for (DiscussionReplyBundle reply : replies.getResults()) {
 			try {
 				String replyURL = discussionForumClient.getReplyUrl(reply
