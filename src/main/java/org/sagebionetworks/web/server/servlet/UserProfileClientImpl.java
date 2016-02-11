@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.net.URL;
-
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserBundle;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationState;
@@ -22,6 +20,14 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 	public VerificationSubmission createVerificationSubmission(VerificationSubmission verificationSubmission, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			//update user profile
+			UserProfile myProfile = synapseClient.getMyProfile();
+			myProfile.setFirstName(verificationSubmission.getFirstName());
+			myProfile.setLastName(verificationSubmission.getLastName());
+			myProfile.setLocation(verificationSubmission.getLocation());
+			myProfile.setCompany(verificationSubmission.getCompany());
+			synapseClient.updateMyProfile(myProfile);
+			
 			String notificationEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			return synapseClient.createVerificationSubmission(verificationSubmission, notificationEndpoint);
 		} catch (SynapseException e) {

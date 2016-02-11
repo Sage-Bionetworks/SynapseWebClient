@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.inject.Inject;
 

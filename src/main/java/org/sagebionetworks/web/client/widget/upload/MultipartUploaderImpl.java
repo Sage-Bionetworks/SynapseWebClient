@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -227,7 +228,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						public void updateProgress(double value) {
 							//Note:  0 <= value <= 1
 							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-							double currentProgress = (((double)(completedPartCount-1)) + value)/((double)totalPartCount);
+							double currentProgress = (((double)(completedPartCount)) + value)/((double)totalPartCount);
 							String progressText = percentFormat.format(currentProgress*100.0) + "%";
 							handler.updateProgress(currentProgress, progressText);
 						}

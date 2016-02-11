@@ -194,6 +194,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
@@ -235,6 +237,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDial
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlertViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
@@ -1205,6 +1209,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(SessionStorage.class).to(SessionStorageImpl.class);
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
-		
+		bind(WikiMarkdownEditorView.class).to(WikiMarkdownEditorViewImpl.class);
+		bind(StuAlertView.class).to(StuAlertViewImpl.class);
 	}
 }

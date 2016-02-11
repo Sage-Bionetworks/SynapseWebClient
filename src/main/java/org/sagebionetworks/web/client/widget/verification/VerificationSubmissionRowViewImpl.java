@@ -272,4 +272,32 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	public void setState(VerificationStateEnum s) {
 		state.setText(s.toString());
 	}
+	@Override
+	public void setProfileFieldsEditable(boolean editable) {
+		//Not used in this view implementation
+	}
+	@Override
+	public void setResubmitButtonVisible(boolean visible) {
+		//Not used in this view implementation
+	}
+	@Override
+	public String getFirstName() {
+		return firstName.getText();
+	}
+	@Override
+	public String getLastName() {
+		return lastName.getText();
+	}
+	@Override
+	public String getLocation() {
+		return location.getText();
+	}
+	@Override
+	public String getOrganization() {
+		return currentAffiliation.getText();
+	}
+	@Override
+	public void setCloseButtonVisible(boolean visible) {
+		//Not used in this view implementation
+	}
 }
