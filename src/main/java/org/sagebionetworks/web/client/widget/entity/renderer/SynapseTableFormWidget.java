@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -12,8 +13,9 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowFormWidget;
@@ -35,34 +37,37 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private String tableId;
 	private List<ColumnModel> headers;
 	private SynapseClientAsync synapseClient;
-	JobTrackingWidget editJobTrackingWidget;
+	private AsynchronousJobTracker jobTracker;
 	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded";
 	
 	@Inject
 	public SynapseTableFormWidget(SynapseTableFormWidgetView view,
 			SynapseAlert synAlert,
 			RowFormWidget rowWidget,
-			JobTrackingWidget editJobTrackingWidget,
+			AsynchronousJobTracker jobTracker,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.rowWidget = rowWidget;
-		this.editJobTrackingWidget = editJobTrackingWidget;
+		this.jobTracker = jobTracker;
 		this.synapseClient = synapseClient;
 		view.setRowFormWidget(rowWidget.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
-		view.setProgressWidget(editJobTrackingWidget.asWidget());
 		view.setPresenter(this);
+	}
+	
+	public void clear() {
+		synAlert.clear();
+		rowWidget.clear();
+		view.setSubmitButtonVisible(false);
+		view.setSuccessMessageVisible(false);
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		synAlert.clear();
-		rowWidget.clear();
-		view.setSubmitButtonVisible(false);
-		view.setSuccessMessageVisible(false);
+		clear();
 		if (!synAlert.isUserLoggedIn()) {
 			synAlert.showMustLogin();
 			return;
@@ -99,8 +104,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	@Override
 	public void onSubmit() {
 		synAlert.clear();
-		view.setSubmitButtonLoading(true);
-
+		
 		// Are the changes valid?
 		if (!rowWidget.isValid()) {
 			synAlert.showError(QueryResultEditorWidget.SEE_THE_ERRORS_ABOVE);
@@ -117,25 +121,33 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		AppendableRowSetRequest request = new AppendableRowSetRequest();
 		request.setToAppend(prs);
 		request.setEntityId(this.tableId);
-		editJobTrackingWidget.startAndTrackJob("Submitting...", false,
-				AsynchType.TableAppendRowSet, request,
-				new AsynchronousProgressHandler() {
+		view.setSubmitButtonLoading(true);
+		jobTracker.startAndTrack(AsynchType.TableAppendRowSet, request, AsynchronousProgressWidget.WAIT_MS,
+				new UpdatingAsynchProgressHandler() {
+					
 					@Override
-					public void onFailure(Throwable t) {
-						synAlert.handleException(t);
+					public void onFailure(Throwable failure) {
+						synAlert.handleException(failure);
 					}
-
+					
 					@Override
 					public void onComplete(AsynchronousResponseBody response) {
+						clear();
 						view.setSuccessMessageVisible(true);
-						view.setSubmitButtonLoading(false);
 					}
-
+					
 					@Override
 					public void onCancel() {
-						// If they cancel after the job starts, treat it as a
-						// change.
 						view.setSubmitButtonLoading(false);
+					}
+					
+					@Override
+					public void onUpdate(AsynchronousJobStatus status) {
+					}
+					
+					@Override
+					public boolean isAttached() {
+						return true;
 					}
 				});
 	}

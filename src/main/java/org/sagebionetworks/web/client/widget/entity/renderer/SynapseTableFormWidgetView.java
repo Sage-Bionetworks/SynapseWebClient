@@ -8,7 +8,6 @@ public interface SynapseTableFormWidgetView extends IsWidget {
 	
 	void setSynAlertWidget(Widget w);
 	void setRowFormWidget(Widget w);
-	void setProgressWidget(Widget w);
 	void setPresenter(Presenter p);
 	void setSubmitButtonLoading(boolean isLoading);
 	void setSubmitButtonVisible(boolean visible);

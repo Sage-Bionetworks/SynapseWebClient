@@ -4,8 +4,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 	    <bh:Div ui:field="rowWidgetContainer"/>
-	    <b:Button ui:field="submitButton"/>
-	    <bh:Div ui:field="progressWidgetContainer"/>
+	    <b:Button ui:field="submitButton" type="PRIMARY" text="Submit" dataLoadingText="Submitting..."/>
 	    <bh:Div ui:field="synAlertContainer"/>
 	    <b:Alert type="INFO" ui:field="successMessageUI" >
 			<bh:Span ui:field="successMessageText"/>

@@ -21,8 +21,6 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 	@UiField
 	Div rowWidgetContainer;
 	@UiField
-	Div progressWidgetContainer;
-	@UiField
 	Button submitButton;
 	@UiField
 	Span successMessageText;
@@ -61,11 +59,7 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	@Override
-	public void setProgressWidget(Widget w) {
-		progressWidgetContainer.clear();
-		progressWidgetContainer.add(w);
-	}
+	
 	@Override
 	public void setSubmitButtonLoading(boolean isLoading) {
 		if (isLoading) {
@@ -86,4 +80,5 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 	public void setSuccessMessageVisible(boolean visible) {
 		successMessageUI.setVisible(visible);
 	}
+	
 }
