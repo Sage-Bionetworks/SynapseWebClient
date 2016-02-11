@@ -2464,23 +2464,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public List<String> getColumnModelsForTableEntity(String tableEntityId)
+	public List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId)
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			List<ColumnModel> columns = synapseClient
+			return synapseClient
 					.getColumnModelsForTableEntity(tableEntityId);
-			List<String> stringList = new ArrayList<String>();
-			for (ColumnModel col : columns) {
-				stringList.add(col
-						.writeToJSONObject(adapterFactory.createNew())
-						.toJSONString());
-			}
-			return stringList;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 

@@ -105,6 +105,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
@@ -287,6 +288,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	public BiodallianceWidget getBiodallianceRenderer();
 	public CytoscapeWidget getCytoscapeRenderer();
+	public SynapseTableFormWidget getSynapseTableFormWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -377,4 +379,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public MarkdownCacheKey getMarkdownCacheKey();
 	public MarkdownCacheValue getMarkdownCacheValue();
+	
 }

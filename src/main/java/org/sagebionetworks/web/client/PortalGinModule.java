@@ -335,6 +335,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
@@ -469,6 +471,8 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormView;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
@@ -1211,5 +1215,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
 		bind(WikiMarkdownEditorView.class).to(WikiMarkdownEditorViewImpl.class);
 		bind(StuAlertView.class).to(StuAlertViewImpl.class);
+		
+		bind(SynapseTableFormWidgetView.class).to(SynapseTableFormWidgetViewImpl.class);
+		bind(RowFormView.class).to(RowFormViewImpl.class);
 	}
 }

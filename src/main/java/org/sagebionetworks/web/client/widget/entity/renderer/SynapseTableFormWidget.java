@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -32,17 +34,21 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private RowFormWidget rowWidget;
 	private String tableId;
 	private List<ColumnModel> headers;
+	private SynapseClientAsync synapseClient;
 	JobTrackingWidget editJobTrackingWidget;
+	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded";
 	
 	@Inject
 	public SynapseTableFormWidget(SynapseTableFormWidgetView view,
 			SynapseAlert synAlert,
 			RowFormWidget rowWidget,
-			JobTrackingWidget editJobTrackingWidget) {
+			JobTrackingWidget editJobTrackingWidget,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.rowWidget = rowWidget;
 		this.editJobTrackingWidget = editJobTrackingWidget;
+		this.synapseClient = synapseClient;
 		view.setRowFormWidget(rowWidget.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setProgressWidget(editJobTrackingWidget.asWidget());
@@ -63,8 +69,26 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		}
 		view.setSubmitButtonLoading(false);
 		tableId = descriptor.get(WidgetConstants.TABLE_ID_KEY);
-		//TODO: get the table schema and init row widget!
+		String successMessage = descriptor.get(WidgetConstants.SUCCESS_MESSAGE);
+		if (successMessage == null) {
+			successMessage = DEFAULT_SUCCESS_MESSAGE;
+		}
+		view.setSuccessMessage(successMessage);
 		
+		//get the table schema and init row widget!
+		synapseClient.getColumnModelsForTableEntity(tableId, new AsyncCallback<List<ColumnModel>>() {
+			
+			@Override
+			public void onSuccess(List<ColumnModel> result) {
+				headers = result;
+				rowWidget.configure(tableId, headers);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 
 	@Override
@@ -114,7 +138,5 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 						view.setSubmitButtonLoading(false);
 					}
 				});
-		
 	}
-
 }
