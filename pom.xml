@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2016-01-27-2064-f61b13b</synapse.version>
+		<synapse.version>122.0-4-gec91db6</synapse.version>
 		<gwtVersion>2.7.0</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
