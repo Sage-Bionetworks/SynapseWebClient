@@ -9,6 +9,7 @@ public interface ForumWidgetView extends IsWidget{
 		void onClickNewThread();
 		void onModeratorModeChange();
 		void onClickShowAllThreads();
+		Widget asWidget();
 	}
 
 	void setPresenter(Presenter presenter);

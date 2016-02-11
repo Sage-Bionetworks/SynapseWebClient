@@ -6,54 +6,6 @@
 	xmlns:b3="urn:import:org.gwtbootstrap3.extras.toggleswitch.client.ui"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<b:Row ui:field="threadListUI">
-			<b:Column size="XS_12">
-				<b:Button ui:field="newThreadButton" type="PRIMARY" pull="RIGHT">New Thread</b:Button>
-				<bh:Div ui:field="moderatorModeContainer" addStyleNames="margin-right-10" pull="RIGHT" visible="false">
-					<b3:ToggleSwitch ui:field="moderatorModeSwitch" labelText="Moderate" labelWidth="auto"/>
-				</bh:Div>
-			</b:Column>
-			<b:Column size="XS_12">
-				<g:SimplePanel addStyleNames="margin-top-10" ui:field="discussionContainer"/>
-			</b:Column>
-			<g:SimplePanel ui:field="newThreadModalContainer"/>
-		</b:Row>
-		<bh:Div ui:field="singleThreadUI" addStyleNames="highlight-box padding-top-0-imp margin-bottom-20">
-			<b:Row>
-				<b:Column size="XS_12">
-					<b:Button ui:field="showAllThreadsButton" type="DEFAULT" size="SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10">Show all threads</b:Button>
-				</b:Column>
-				<b:Column size="XS_12">
-					<bh:Div addStyleNames="padding-10 light-border-bottom">
-						<!-- Thread header -->
-						<t:Table width="100%">
-							<t:TableRow>
-								<t:TableHeader>
-									<bh:Span text="Topic"/>
-								</t:TableHeader>
-								<t:TableHeader width="310px" addStyleNames="visible-lg">
-									<bh:Span text="Active Users"/>
-								</t:TableHeader>
-								<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
-									<bh:Span text="Replies" />
-								</t:TableHeader>
-								<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
-									<bh:Span text="Views"/>
-								</t:TableHeader>
-								<t:TableHeader width="130px" addStyleNames="visible-lg visible-md">
-									<bh:Span text="Activity"/>
-								</t:TableHeader>
-							</t:TableRow>
-						</t:Table>
-					</bh:Div>
-				</b:Column>
-				<b:Column size="XS_12">
-					<g:SimplePanel addStyleNames="margin-top-10" ui:field="discussionThreadContainer"/>
-				</b:Column>
-			</b:Row>
-		</bh:Div>
-		
-		<bh:Div ui:field="synAlertContainer"></bh:Div>
+		<bh:Div ui:field="forumContainer"></bh:Div>
 	</bh:Div>
-	
 </ui:UiBinder>

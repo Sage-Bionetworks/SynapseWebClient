@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -14,31 +13,29 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public final static Boolean DEFAULT_MODERATOR_MODE = false;
 
-	//used to tell the discussion tab to show a single thread
+	//used to tell the discussion forum to show a single thread
 	public final static String THREAD_ID_KEY = "threadId";
 	ForumWidgetView view;
-	CookieProvider cookies;
-	//use this token to navigate between threads within the discussion tab
-	ParameterizedToken params;
 
 	NewDiscussionThreadModal newThreadModal;
 	DiscussionThreadListWidget threadListWidget;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
-
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
-	private String forumId;
-
 	DiscussionThreadWidget singleThreadWidget;
-	String entityName, entityId;
+
+	String forumId;
+	String entityId;
 	Boolean isCurrentUserModerator;
+	Callback showAllThreadsCallback;
 
 	@Inject
 	public ForumWidget(
@@ -47,7 +44,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
 			NewDiscussionThreadModal newThreadModal,
-			CookieProvider cookies,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
 			DiscussionThreadWidget singleThreadWidget
@@ -57,7 +53,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.threadListWidget = threadListWidget;
 		this.newThreadModal = newThreadModal;
 		this.discussionForumClient = discussionForumClient;
-		this.cookies = cookies;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.singleThreadWidget = singleThreadWidget;
@@ -68,11 +63,11 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setSingleThread(singleThreadWidget.asWidget());
 	}
 
-	public void configure(String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
+	public void configure(String entityId, ParameterizedToken params,
+			Boolean isCurrentUserModerator, Callback showAllThreadsCallback) {
 		this.entityId = entityId;
-		this.entityName = entityName;
 		this.isCurrentUserModerator = isCurrentUserModerator;
-		params = new ParameterizedToken(areaToken);
+		this.showAllThreadsCallback = showAllThreadsCallback;
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -125,11 +120,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		});
 		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
 	}
-	
+
 	@Override
 	public void onClickShowAllThreads() {
-		//clear parameters
-		params.clear();
+		if (showAllThreadsCallback != null) {
+			showAllThreadsCallback.invoke();
+		}
 		showForum();
 	}
 
@@ -153,8 +149,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			}
 		});
 	}
-	
-	public String getCurrentAreaToken() {
-		return params.toString();
+
+	@Override
+	public Widget asWidget(){
+		return view.asWidget();
 	}
 }

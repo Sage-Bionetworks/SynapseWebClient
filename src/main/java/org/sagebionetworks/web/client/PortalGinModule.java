@@ -117,6 +117,8 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
@@ -1206,6 +1208,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
+		bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
 		
 		bind(SessionStorage.class).to(SessionStorageImpl.class);
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);

@@ -16,10 +16,10 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -77,7 +77,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setWikiWidget(wikiPage.asWidget());
-		isCurrentUserModerator = DiscussionTab.DEFAULT_MODERATOR_MODE;
+		isCurrentUserModerator = ForumWidget.DEFAULT_MODERATOR_MODE;
 	}
 
 
@@ -136,10 +136,10 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forumId, DiscussionTab.DEFAULT_MODERATOR_MODE);
+						threadListWidget.configure(forumId, ForumWidget.DEFAULT_MODERATOR_MODE);
 					}
 				});
-				threadListWidget.configure(forumId, DiscussionTab.DEFAULT_MODERATOR_MODE);
+				threadListWidget.configure(forumId, ForumWidget.DEFAULT_MODERATOR_MODE);
 			}
 		});
 		view.setModeratorModeContainerVisibility(isCurrentUserModerator);

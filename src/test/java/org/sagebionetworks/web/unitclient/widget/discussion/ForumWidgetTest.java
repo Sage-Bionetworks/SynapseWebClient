@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -7,7 +6,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab.DEFAULT_MODERATOR_MODE;
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.DEFAULT_MODERATOR_MODE;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,10 +15,9 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -45,8 +43,6 @@ public class ForumWidgetTest {
 	@Mock
 	NewDiscussionThreadModal mockNewDiscussionThreadModal;
 	@Mock
-	CookieProvider mockCookies;
-	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
@@ -70,9 +66,8 @@ public class ForumWidgetTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
-				mockAvailableThreadListWidget, mockNewDiscussionThreadModal, mockCookies,
+				mockAvailableThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
@@ -94,9 +89,10 @@ public class ForumWidgetTest {
 				.getForumMetadata(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
-		String entityName = "discussion project test";
 		String areaToken = "a=b&c=d";
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
@@ -114,9 +110,11 @@ public class ForumWidgetTest {
 				.getForumMetadata(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
-		String entityName = "discussion project test";
 		String areaToken = "foo=bar";
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+
 
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
@@ -131,22 +129,15 @@ public class ForumWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
 				.getForumMetadata(anyString(), any(AsyncCallback.class));
 
-		String entityId = "syn1"; 
-		String entityName = "discussion project test";
+		String entityId = "syn1";
 		String areaToken = "";
 		canModerate = true;
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
-	}
-
-	@Test
-	public void testNotInTestWebsite() {
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		String entityId = "syn1"; 
-		String entityName = "discussion project test";
-		String areaToken = "";
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
 	}
 
 	@Test
@@ -180,11 +171,13 @@ public class ForumWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
 				.getThread(anyString(), any(AsyncCallback.class));
 
-		String entityId = "syn1"; 
-		String entityName = "discussion project test";
+		String entityId = "syn1";
 		String threadId = "007";
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+
 		
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(canModerate), any(Callback.class));
@@ -201,11 +194,13 @@ public class ForumWidgetTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockDiscussionForumClient)
 				.getThread(anyString(), any(AsyncCallback.class));
 
-		String entityId = "syn1"; 
-		String entityName = "discussion project test";
+		String entityId = "syn1";
 		String threadId = "007";
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+
 		
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).setSingleThreadUIVisible(true);
@@ -215,14 +210,12 @@ public class ForumWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnClickShowAllThreads() {
-		String entityId = "syn1"; 
-		String entityName = "discussion project test";
+		String entityId = "syn1";
 		String threadId = "007";
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
-		forumWidget.configure(entityId, entityName, areaToken, canModerate);
-		
-		assertEquals(areaToken, forumWidget.getCurrentAreaToken());
-		
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.onClickShowAllThreads();
 
 		//attempts to show full thread list
