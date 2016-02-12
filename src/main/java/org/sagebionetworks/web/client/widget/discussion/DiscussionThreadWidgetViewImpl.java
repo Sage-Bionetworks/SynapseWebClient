@@ -89,6 +89,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Label edited;
 	@UiField
 	Label deleted;
+	@UiField
+	Span threadAuthor;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -359,5 +361,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void showSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void setThreadAuthor(Widget widget){
+		threadAuthor.add(widget);
 	}
 }

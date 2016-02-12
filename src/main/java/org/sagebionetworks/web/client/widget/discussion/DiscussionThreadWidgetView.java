@@ -95,4 +95,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setDeletedVisible(Boolean visible);
 
 	void showSuccess(String successTitle, String successMessage);
+
+	void setThreadAuthor(Widget widget);
 }

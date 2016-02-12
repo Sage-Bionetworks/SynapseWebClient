@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -92,6 +93,8 @@ public class DiscussionThreadWidgetTest {
 	MarkdownWidget mockMarkdownWidget;
 	@Mock
 	Callback mockCallback;
+	@Mock
+	UserBadge mockAuthorIconWidget;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -106,7 +109,8 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
-				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget);
+				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
+				mockAuthorIconWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
@@ -119,6 +123,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setEditThreadModal(any(Widget.class));
+		verify(mockView).setThreadAuthor(any(Widget.class));
 	}
 
 	@Test
@@ -146,6 +151,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
 		verify(mockView).setDeletedVisible(false);
+		verify(mockAuthorIconWidget).configure(anyString());
+		verify(mockAuthorIconWidget).setSize(any(BadgeSize.class));
 	}
 	
 	@Test

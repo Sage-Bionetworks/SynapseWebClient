@@ -52,6 +52,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	GlobalApplicationState globalApplicationState;
 	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
+	UserBadge authorIconWidget;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -75,7 +76,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
 			EditDiscussionThreadModal editThreadModal,
-			MarkdownWidget markdownWidget
+			MarkdownWidget markdownWidget,
+			UserBadge authorIconWidget
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -89,12 +91,14 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.globalApplicationState = globalApplicationState;
 		this.editThreadModal = editThreadModal;
 		this.markdownWidget = markdownWidget;
+		this.authorIconWidget = authorIconWidget;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
 		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
+		view.setThreadAuthor(authorIconWidget.asWidget());
 	}
 
 	@Override
@@ -124,6 +128,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private void configureView(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(title);
+		authorIconWidget.configure(bundle.getCreatedBy());
+		authorIconWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
 			user.configure(userId);
