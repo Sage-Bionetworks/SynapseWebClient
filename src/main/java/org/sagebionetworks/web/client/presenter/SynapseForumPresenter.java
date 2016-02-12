@@ -2,22 +2,15 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.HashMap;
 
-import org.sagebionetworks.repo.model.discussion.Forum;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SynapseForumView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -34,50 +27,40 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	SynapseForumView view;
 	//use this token to navigate between threads within the discussion tab
 	ParameterizedToken params;
-	 
-	NewDiscussionThreadModal newThreadModal;
-	DiscussionThreadListWidget threadListWidget;
+
 	SynapseAlert synAlert;
-	DiscussionForumClientAsync discussionForumClient;
 	SynapseClientAsync synapseClient;
-	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
-	private String forumId;
 	
 	MarkdownWidget wikiPage;
 	WikiPageKey pageKey;
 	Boolean isCurrentUserModerator;
 	CookieProvider cookies;
-	
+	ForumWidget forumWidget;
+
+	private String areaToken = null;
+
 	@Inject
 	public SynapseForumPresenter(
 			SynapseForumView view,
 			SynapseAlert synAlert,
-			DiscussionForumClientAsync discussionForumClient,
-			DiscussionThreadListWidget threadListWidget,
-			NewDiscussionThreadModal newThreadModal,
-			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
 			MarkdownWidget wikiPage,
 			SynapseClientAsync synapseClient,
-			CookieProvider cookies
+			CookieProvider cookies,
+			ForumWidget forumWidget
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
-		this.threadListWidget = threadListWidget;
-		this.newThreadModal = newThreadModal;
-		this.discussionForumClient = discussionForumClient;
-		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.wikiPage = wikiPage;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
+		this.forumWidget = forumWidget;
 		view.setPresenter(this);
-		view.setThreadList(threadListWidget.asWidget());
-		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setWikiWidget(wikiPage.asWidget());
-		isCurrentUserModerator = ForumWidget.DEFAULT_MODERATOR_MODE;
+		view.setForumWidget(forumWidget.asWidget());
 	}
 
 
@@ -89,6 +72,17 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		showForum(globalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
 	}
 	
+
+	public void showForum(String entityId) {
+		this.params = new ParameterizedToken(areaToken);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
+			@Override
+			public void invoke() {
+				params.clear();
+			}
+		});
+	}
+
 
 	@Override
 	public void setPlace(SynapseForumPlace place) {
@@ -122,50 +116,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		boolean isIgnoreLoadingFailure = false;
 		wikiPage.loadMarkdownFromWikiPage(key, isIgnoreLoadingFailure);
 	}
-	
-	public void showForum(String entityId) {
-		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
 
-			@Override
-			public void onSuccess(final Forum forum) {
-				forumId = forum.getId();
-				newThreadModal.configure(forumId, new Callback(){
-					@Override
-					public void invoke() {
-						threadListWidget.configure(forumId, ForumWidget.DEFAULT_MODERATOR_MODE);
-					}
-				});
-				threadListWidget.configure(forumId, ForumWidget.DEFAULT_MODERATOR_MODE);
-			}
-		});
-		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
-	}
-	
-	@Override
-	public void onClickNewThread() {
-		if (!authController.isLoggedIn()) {
-			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		} else {
-			newThreadModal.show();
-		}
-	}
-
-	@Override
-	public void onModeratorModeChange() {
-		threadListWidget.configure(forumId, view.getModeratorMode());
-		newThreadModal.configure(forumId, new Callback(){
-			@Override
-			public void invoke() {
-				threadListWidget.configure(forumId, view.getModeratorMode());
-			}
-		});
-	}
-	
 	public String getCurrentAreaToken() {
 		return params.toString();
 	}
