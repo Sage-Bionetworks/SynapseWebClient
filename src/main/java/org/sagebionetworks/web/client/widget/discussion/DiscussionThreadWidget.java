@@ -293,22 +293,26 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 					@Override
 					public void onSuccess(
 							PaginatedResults<DiscussionReplyBundle> result) {
-						view.setShowRepliesVisibility(true);
 						offset += LIMIT;
-						for (DiscussionReplyBundle bundle : result.getResults()) {
-							ReplyWidget replyWidget = ginInjector.createReplyWidget();
-							replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){
-								@Override
-								public void invoke() {
-									reconfigureWidget();
-								}
-							});
-							view.addReply(replyWidget.asWidget());
+						if (result.getResults().isEmpty()) {
+							view.setShowRepliesVisibility(false);
+						} else {
+							view.setShowRepliesVisibility(true);
+							for (DiscussionReplyBundle bundle : result.getResults()) {
+								ReplyWidget replyWidget = ginInjector.createReplyWidget();
+								replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){
+									@Override
+									public void invoke() {
+										reconfigureWidget();
+									}
+								});
+								view.addReply(replyWidget.asWidget());
+							}
+							view.setLoadingRepliesVisible(false);
+							view.setNumberOfReplies(""+result.getTotalNumberOfResults());
+							view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
+							view.showReplyDetails();
 						}
-						view.setLoadingRepliesVisible(false);
-						view.setNumberOfReplies(""+result.getTotalNumberOfResults());
-						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
-						view.showReplyDetails();
 					}
 		});
 	}

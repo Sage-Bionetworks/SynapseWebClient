@@ -432,6 +432,32 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 	}
 
+	@Test
+	public void testLoadmoreEmpty() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback);
+		bundleList = createReplyBundleList(0);
+		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
+		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
+		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
+				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), 
+						any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadWidget.configureReplies();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		verify(mockView).clearReplies();
+		verify(mockView, atLeastOnce()).setShowRepliesVisibility(false);
+		verify(mockView, never()).setShowRepliesVisibility(true);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadmoreFailure() {
