@@ -22,4 +22,8 @@ public interface ForumWidgetView extends IsWidget{
 	void showErrorMessage(String errorMessage);
 	void setSingleThreadUIVisible(boolean visible);
 	void setThreadListUIVisible(boolean visible);
+	void setEmptyUIVisible(boolean visible);
+	void setThreadHeaderVisible(boolean visible);
+	void setNewThreadButtonVisible(boolean visible);
+	void setShowAllThreadsButtonVisible(boolean visible);
 }

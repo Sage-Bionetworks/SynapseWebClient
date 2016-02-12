@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -28,6 +29,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private Boolean ascending;
 	private String forumId;
 	private Boolean isCurrentUserModerator;
+	private CallbackP<Boolean> emptyListCallback;
 
 	@Inject
 	public DiscussionThreadListWidget(
@@ -44,9 +46,10 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		view.setAlert(synAlert.asWidget());
 	}
 
-	public void configure(String forumId, Boolean isCurrentUserModerator) {
+	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
 		view.clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.emptyListCallback = emptyListCallback;
 		offset = 0L;
 		if (order == null) {
 			order = DEFAULT_ORDER;
@@ -84,7 +87,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 								@Override
 								public void invoke() {
-									configure(forumId, isCurrentUserModerator);
+									configure(forumId, isCurrentUserModerator, emptyListCallback);
 								}
 							});
 							view.addThread(thread.asWidget());
@@ -93,13 +96,9 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						long numberOfThreads = result.getTotalNumberOfResults();
 						view.setLoadingVisible(false);
 						view.setLoadMoreButtonVisibility(offset < numberOfThreads);
-						if (numberOfThreads > 0) {
-							view.setEmptyUIVisible(false);
-							view.setThreadHeaderVisible(true);
-						} else {
-							view.setEmptyUIVisible(true);
-							view.setThreadHeaderVisible(false);
-						}
+						if (emptyListCallback != null) {
+							emptyListCallback.invoke(numberOfThreads > 0);
+						};
 					}
 		});
 	};

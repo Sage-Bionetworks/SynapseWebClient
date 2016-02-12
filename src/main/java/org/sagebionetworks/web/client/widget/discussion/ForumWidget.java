@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -36,10 +37,11 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	String entityId;
 	Boolean isCurrentUserModerator;
 	Callback showAllThreadsCallback;
+	CallbackP<Boolean> emptyListCallback;
 
 	@Inject
 	public ForumWidget(
-			ForumWidgetView view,
+			final ForumWidgetView view,
 			SynapseAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
@@ -61,6 +63,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setSingleThread(singleThreadWidget.asWidget());
+		emptyListCallback = new CallbackP<Boolean>(){
+			@Override
+			public void invoke(Boolean param) {
+				view.setEmptyUIVisible(!param);
+				view.setThreadHeaderVisible(param);
+			}
+		};
 	}
 
 	public void configure(String entityId, ParameterizedToken params,
@@ -78,26 +87,30 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		}
 	}
 
-	public void showThread(String threadId) {
+	public void showThread(final String threadId) {
 		view.setSingleThreadUIVisible(true);
 		view.setThreadListUIVisible(false);
-		configureSingleThread(threadId);
-	}
-
-	private void configureSingleThread(final String threadId) {
+		view.setNewThreadButtonVisible(false);
+		view.setShowAllThreadsButtonVisible(true);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setEmptyUIVisible(true);
+				view.setThreadHeaderVisible(false);
+				view.setSingleThreadUIVisible(false);
 				synAlert.handleException(caught);
 			}
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
+				view.setEmptyUIVisible(false);
+				view.setThreadHeaderVisible(true);
 				singleThreadWidget.configure(result, isCurrentUserModerator, new Callback(){
 
 					@Override
 					public void invoke() {
-						configureSingleThread(threadId);
+						showAllThreadsCallback.invoke();
+						configure(entityId, new ParameterizedToken(null), isCurrentUserModerator, showAllThreadsCallback);
 					}
 				});
 				if (singleThreadWidget.isThreadCollapsed()) {
@@ -110,6 +123,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void showForum() {
 		view.setSingleThreadUIVisible(false);
 		view.setThreadListUIVisible(true);
+		view.setNewThreadButtonVisible(true);
+		view.setShowAllThreadsButtonVisible(false);
 		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -122,10 +137,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
+						threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE, emptyListCallback);
 					}
 				});
-				threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE);
+				threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE, emptyListCallback);
 			}
 		});
 		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
@@ -152,11 +167,11 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	@Override
 	public void onModeratorModeChange() {
-		threadListWidget.configure(forumId, view.getModeratorMode());
+		threadListWidget.configure(forumId, view.getModeratorMode(), emptyListCallback);
 		newThreadModal.configure(forumId, new Callback(){
 			@Override
 			public void invoke() {
-				threadListWidget.configure(forumId, view.getModeratorMode());
+				threadListWidget.configure(forumId, view.getModeratorMode(), emptyListCallback);
 			}
 		});
 	}

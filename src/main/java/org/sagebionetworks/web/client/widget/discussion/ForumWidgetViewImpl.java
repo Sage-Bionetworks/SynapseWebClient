@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.toggleswitch.client.ui.ToggleSwitch;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -21,7 +22,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	Button newThreadButton;
 	@UiField
-	SimplePanel discussionContainer;
+	SimplePanel threadListContainer;
 	@UiField
 	SimplePanel newThreadModalContainer;
 	@UiField
@@ -30,15 +31,14 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	ToggleSwitch moderatorModeSwitch;
 	@UiField
 	Div moderatorModeContainer;
-
-	@UiField
-	Div singleThreadUI;
-	@UiField
-	Row threadListUI;
 	@UiField
 	Button showAllThreadsButton;
 	@UiField
-	SimplePanel discussionThreadContainer;
+	SimplePanel singleThreadContainer;
+	@UiField
+	Span emptyUI;
+	@UiField
+	Table threadHeader;
 
 	private Presenter presenter;
 
@@ -70,7 +70,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	
 	@Override
 	public void setSingleThread(Widget w) {
-		discussionThreadContainer.setWidget(w);
+		singleThreadContainer.setWidget(w);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
 	@Override
 	public void setThreadList(Widget w) {
-		discussionContainer.setWidget(w);
+		threadListContainer.setWidget(w);
 	}
 
 	@Override
@@ -116,11 +116,31 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	
 	@Override
 	public void setSingleThreadUIVisible(boolean visible) {
-		singleThreadUI.setVisible(visible);
+		singleThreadContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setThreadListUIVisible(boolean visible) {
-		threadListUI.setVisible(visible);
+		threadListContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setEmptyUIVisible(boolean visible) {
+		emptyUI.setVisible(visible);
+	}
+
+	@Override
+	public void setThreadHeaderVisible(boolean visible) {
+		threadHeader.setVisible(visible);
+	}
+
+	@Override
+	public void setNewThreadButtonVisible(boolean visible) {
+		newThreadButton.setVisible(visible);
+	}
+
+	@Override
+	public void setShowAllThreadsButtonVisible(boolean visible) {
+		showAllThreadsButton.setVisible(visible);
 	}
 }
