@@ -263,6 +263,11 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
+	public void hideReplyDetails() {
+		replyDetails.hide();
+	}
+
+	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
 	}

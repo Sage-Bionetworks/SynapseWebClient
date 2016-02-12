@@ -296,6 +296,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 						offset += LIMIT;
 						if (result.getResults().isEmpty()) {
 							view.setShowRepliesVisibility(false);
+							view.hideReplyDetails();
 						} else {
 							view.setShowRepliesVisibility(true);
 							for (DiscussionReplyBundle bundle : result.getResults()) {

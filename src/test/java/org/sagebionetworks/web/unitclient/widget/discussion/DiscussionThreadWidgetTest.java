@@ -456,6 +456,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).clearReplies();
 		verify(mockView, atLeastOnce()).setShowRepliesVisibility(false);
 		verify(mockView, never()).setShowRepliesVisibility(true);
+		verify(mockView).hideReplyDetails();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -97,4 +97,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void showSuccess(String successTitle, String successMessage);
 
 	void setThreadAuthor(Widget widget);
+
+	void hideReplyDetails();
 }
