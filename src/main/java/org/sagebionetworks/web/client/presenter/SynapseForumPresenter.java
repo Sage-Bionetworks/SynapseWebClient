@@ -38,8 +38,6 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	CookieProvider cookies;
 	ForumWidget forumWidget;
 
-	private String areaToken = null;
-
 	@Inject
 	public SynapseForumPresenter(
 			SynapseForumView view,
@@ -74,7 +72,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	
 
 	public void showForum(String entityId) {
-		this.params = new ParameterizedToken(areaToken);
+		this.params = new ParameterizedToken(place.toToken());
 		forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
 			@Override
 			public void invoke() {

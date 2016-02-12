@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SynapseForumView;
@@ -51,6 +52,8 @@ public class SynapseForumPresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	ForumWidget mockForumWidget;
+	@Mock
+	SynapseForumPlace mockPlace;
 
 	SynapseForumPresenter presenter;
 
@@ -62,6 +65,7 @@ public class SynapseForumPresenterTest {
 				mockCookies, mockForumWidget);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockPlace.toToken()).thenReturn("fake token");
 	}
 
 	@Test
@@ -98,7 +102,8 @@ public class SynapseForumPresenterTest {
 
 	@Test
 	public void testShowForum() {
-		String entityId = "syn1"; 
+		String entityId = "syn1";
+		presenter.setPlace(mockPlace);
 		presenter.showForum(entityId);
 
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
