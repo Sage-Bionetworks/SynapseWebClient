@@ -38,8 +38,6 @@ public class EnumFormCellEditorImpl implements EnumFormCellEditor {
 	public void setValue(String value) {
 		value = StringUtils.trimWithEmptyAsNull(value);
 		if (value == null) {
-			// null means the first item: 'nothing selected'
-			view.setValue(0);
 			return;
 		}
 		/*
@@ -58,9 +56,8 @@ public class EnumFormCellEditorImpl implements EnumFormCellEditor {
 
 	@Override
 	public String getValue() {
-		int index = view.getValue();
-		if (index == 0) {
-			 //The first item 'nothing selected' means null.
+		Integer index = view.getValue();
+		if (index == null) {
 			return null;
 		} else {
 			return this.items.get(index);
@@ -100,11 +97,9 @@ public class EnumFormCellEditorImpl implements EnumFormCellEditor {
 	@Override
 	public void configure(List<String> validValues) {
 		/*
-		 * The items include all passed values plus the first item is 'nothing
-		 * selected' for null and empty values.
+		 * The items include all passed values
 		 */
-		this.items = new ArrayList<String>(validValues.size() + 1);
-		this.items.add(NOTHING_SELECTED);
+		this.items = new ArrayList<String>(validValues.size());
 		for (String value : validValues) {
 			this.items.add(value);
 		}

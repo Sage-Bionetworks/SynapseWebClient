@@ -12,19 +12,18 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 /**
  * The boolean cell editor allows for nothing, true, and false.
- * @author John
+ * @author Jay
  *
  */
 public class BooleanFormCellEditorImpl implements BooleanFormCellEditor {
 	
-	public static final String NOTHING_SELECTED = "nothing selected";
 	public static final String FALSE = "false";
 	public static final String TRUE = "true";
 
 	/**
 	 * The possible values for this editor.
 	 */
-	private static final List<String> VALUES = Arrays.asList(NOTHING_SELECTED, TRUE, FALSE);
+	private static final List<String> VALUES = Arrays.asList(TRUE, FALSE);
 		
 	RadioCellEditorView view;
 	
@@ -48,26 +47,26 @@ public class BooleanFormCellEditorImpl implements BooleanFormCellEditor {
 	@Override
 	public void setValue(String value) {
 		value = StringUtils.trimWithEmptyAsNull(value);
-		if(value == null){
-			view.setValue(0);
-		}else{
+		if(value != null){
 			if(Boolean.parseBoolean(value)){
-				view.setValue(1);
+				view.setValue(0);
 			}else{
-				view.setValue(2);
+				view.setValue(1);
 			}
 		}
 	}
 
 	@Override
 	public String getValue() {
-		switch (view.getValue()){
-		case 0:
+		Integer value = view.getValue();
+		if (value == null) {
 			return null;
-		case 1:
-			return TRUE;
-		default:
-			return FALSE;
+		}
+		switch (value){
+			case 0:
+				return TRUE;
+			default:
+				return FALSE;
 		}
 	}
 

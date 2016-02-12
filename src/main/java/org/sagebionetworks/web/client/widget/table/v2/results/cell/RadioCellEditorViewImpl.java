@@ -31,12 +31,12 @@ public class RadioCellEditorViewImpl implements RadioCellEditorView {
 	Widget widget;
 	
 	List<Radio> radioButtons;
-	int selectedIndex;
+	Integer selectedIndex;
 	@Inject
 	public RadioCellEditorViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
 		radioButtons = new ArrayList<Radio>();
-		selectedIndex = -1;
+		selectedIndex = null;
 		
 	}
 
