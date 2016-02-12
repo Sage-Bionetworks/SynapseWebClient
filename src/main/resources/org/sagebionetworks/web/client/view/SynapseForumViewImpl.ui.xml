@@ -11,18 +11,7 @@
 		<bh:Div addStyleNames="min-height-200 margin-top-30 margin-10">
 			<bh:Div ui:field="synAlertContainer" />
 			<bh:Div ui:field="wikiContainer" />
-			<b:Row>
-				<b:Column size="XS_12">
-					<b:Button ui:field="newThreadButton" type="PRIMARY" pull="RIGHT">New Thread</b:Button>
-					<bh:Div ui:field="moderatorModeContainer" addStyleNames="margin-right-10" pull="RIGHT" visible="false">
-						<b3:ToggleSwitch ui:field="moderatorModeSwitch" labelText="Moderate" labelWidth="auto"/>
-					</bh:Div>
-				</b:Column>
-				<b:Column size="XS_12">
-					<g:SimplePanel addStyleNames="margin-top-10" ui:field="discussionContainer"/>
-				</b:Column>
-				<g:SimplePanel ui:field="newThreadModalContainer"/>
-			</b:Row>
+			<bh:Div ui:field="forumWidgetContainer" />
 		</bh:Div>
 		<g:SimplePanel ui:field="footer" />
 	</bh:Div>

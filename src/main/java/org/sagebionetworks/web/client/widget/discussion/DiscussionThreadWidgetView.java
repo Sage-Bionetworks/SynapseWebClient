@@ -78,8 +78,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setDeleteIconVisible(boolean visible);
 
-	void setTitleAsDeleted();
-
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
 
 	void setReplyButtonVisible(boolean visible);
@@ -93,4 +91,12 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setEditedVisible(Boolean visible);
 
 	void setLoadingMessageVisible(boolean visible);
+
+	void setDeletedVisible(Boolean visible);
+
+	void showSuccess(String successTitle, String successMessage);
+
+	void setThreadAuthor(Widget widget);
+
+	void hideReplyDetails();
 }

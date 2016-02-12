@@ -32,4 +32,8 @@ public class ParameterizedPlace extends Place {
 	public String toToken() {
 		return token;
 	}
+
+	public ParameterizedToken getParameterizedToken(){
+		return parameterizedToken;
+	}
 }

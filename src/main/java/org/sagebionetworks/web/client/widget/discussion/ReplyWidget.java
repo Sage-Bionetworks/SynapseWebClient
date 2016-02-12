@@ -24,6 +24,8 @@ import com.google.inject.Inject;
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply?";
+	private static final String DELETE_SUCCESS_TITLE = "Reply deleted";
+	private static final String DELETE_SUCCESS_MESSAGE = "A reply has been deleted.";
 	ReplyWidgetView view;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
@@ -36,6 +38,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
+	private Callback deleteReplyCallback;
 
 	@Inject
 	public ReplyWidget(
@@ -65,12 +68,13 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Callback deleteReplyCallback) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.deleteReplyCallback = deleteReplyCallback;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		if (bundle.getIsDeleted()) {
@@ -155,7 +159,10 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(Void result) {
-				reconfigure();
+				view.showSuccess(DELETE_SUCCESS_TITLE, DELETE_SUCCESS_MESSAGE);
+				if (deleteReplyCallback != null) {
+					deleteReplyCallback.invoke();
+				}
 			}
 		});
 	}
@@ -171,7 +178,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator);
+				configure(result, isCurrentUserModerator, deleteReplyCallback);
 			}
 		});
 	}

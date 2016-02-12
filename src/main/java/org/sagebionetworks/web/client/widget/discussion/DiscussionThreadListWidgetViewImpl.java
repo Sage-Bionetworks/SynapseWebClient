@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,10 +22,6 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	Div synAlertContainer;
 	@UiField
 	Button loadMoreButton;
-	@UiField
-	Span emptyUI;
-	@UiField
-	Table threadHeader;
 	@UiField
 	HTMLPanel loadingUI;
 
@@ -74,16 +68,6 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Override
 	public void setLoadMoreButtonVisibility(boolean visible) {
 		loadMoreButton.setVisible(visible);
-	}
-
-	@Override
-	public void setEmptyUIVisible(boolean visible) {
-		emptyUI.setVisible(visible);
-	}
-
-	@Override
-	public void setThreadHeaderVisible(boolean visible) {
-		threadHeader.setVisible(visible);
 	}
 
 	@Override

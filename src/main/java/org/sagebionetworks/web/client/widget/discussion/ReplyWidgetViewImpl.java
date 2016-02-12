@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -146,5 +147,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setDeletedMessageVisible(boolean visible) {
 		deletedMessage.setVisible(visible);
+	}
+
+	@Override
+	public void showSuccess(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 }

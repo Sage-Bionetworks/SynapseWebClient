@@ -8,8 +8,6 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	public interface Presenter {
 
 		Widget asWidget();
-
-		void loadMore();
 	}
 
 	void setPresenter(DiscussionThreadListWidget presenter);
@@ -21,10 +19,6 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	void setAlert(Widget w);
 
 	void setLoadMoreButtonVisibility(boolean visible);
-
-	void setEmptyUIVisible(boolean visible);
-
-	void setThreadHeaderVisible(boolean visible);
 
 	void setLoadingVisible(boolean visible);
 }

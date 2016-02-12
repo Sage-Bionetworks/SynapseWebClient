@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -29,8 +30,8 @@ public interface DiscussionForumClient extends RemoteService {
 			throws RestServiceException;
 
 	PaginatedResults<DiscussionThreadBundle> getThreadsForForum(String forumId,
-			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending)
-			throws RestServiceException;
+			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending,
+			DiscussionFilter filter) throws RestServiceException;
 
 	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
 			throws RestServiceException;
@@ -50,8 +51,8 @@ public interface DiscussionForumClient extends RemoteService {
 			throws RestServiceException;
 
 	PaginatedResults<DiscussionReplyBundle> getRepliesForThread(String threadId,
-			Long limit, Long offset, DiscussionReplyOrder order, Boolean ascending)
-			throws RestServiceException;
+			Long limit, Long offset, DiscussionReplyOrder order, Boolean ascending,
+			DiscussionFilter filter) throws RestServiceException;
 
 	DiscussionReplyBundle updateReplyMessage(String replyId, UpdateReplyMessage newMessage)
 			throws RestServiceException;

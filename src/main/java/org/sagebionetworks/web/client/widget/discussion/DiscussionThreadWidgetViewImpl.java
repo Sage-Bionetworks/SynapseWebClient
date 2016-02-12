@@ -25,10 +25,6 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
 
-	private static final String DELETED_THREAD_TITLE = "<Deleted>";
-
-	private static final String DELETED_THREAD_TOOLTIP = "This thread has been deleted.";
-
 	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
 	public static final String REPLIES = "replies";
@@ -91,6 +87,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	SimplePanel editThreadModalContainer;
 	@UiField
 	Label edited;
+	@UiField
+	Label deleted;
+	@UiField
+	Span threadAuthor;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -263,6 +263,11 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
+	public void hideReplyDetails() {
+		replyDetails.hide();
+	}
+
+	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
 	}
@@ -329,12 +334,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setTitleAsDeleted() {
-		threadTitle.setText(DELETED_THREAD_TITLE);
-		threadTitle.setTitle(DELETED_THREAD_TOOLTIP);
-	}
-
-	@Override
 	public void setReplyButtonVisible(boolean visible) {
 		replyButton.setVisible(visible);
 	}
@@ -357,5 +356,20 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setEditedVisible(Boolean visible) {
 		edited.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedVisible(Boolean visible) {
+		deleted.setVisible(visible);
+	}
+
+	@Override
+	public void showSuccess(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void setThreadAuthor(Widget widget){
+		threadAuthor.add(widget);
 	}
 }

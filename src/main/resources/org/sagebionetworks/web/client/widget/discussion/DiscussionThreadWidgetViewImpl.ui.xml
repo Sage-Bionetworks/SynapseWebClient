@@ -17,6 +17,9 @@
 						</bh:Div>
 					</g:FocusPanel>
 				</t:TableData>
+				<t:TableData width="60px" addStyleNames="visible-lg">
+					<bh:Span ui:field="threadAuthor"></bh:Span>
+				</t:TableData>
 				<t:TableData width="310px" addStyleNames="visible-lg">
 					<bh:Span ui:field="activeUsers" addStyleNames="imageButton"></bh:Span>
 				</t:TableData>
@@ -60,6 +63,7 @@
 						<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 margin-bottom-5 line-height-1em" visible="false"/>
 					</b:Tooltip>
 					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
+					<b:Label text="Deleted" ui:field="deleted" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
 				</bh:Div>
 
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
