@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SynapseForumView;
@@ -25,8 +24,6 @@ import com.google.inject.Inject;
 public class SynapseForumPresenter extends AbstractActivity implements SynapseForumView.Presenter, Presenter<SynapseForumPlace> {
 	private SynapseForumPlace place;
 	SynapseForumView view;
-	//use this token to navigate between threads within the discussion tab
-	ParameterizedToken params;
 
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
@@ -72,11 +69,10 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	
 
 	public void showForum(String entityId) {
-		this.params = new ParameterizedToken(place.toToken());
-		forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
+		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, new Callback(){
 			@Override
 			public void invoke() {
-				params.clear();
+				place.getParameterizedToken().clear();
 			}
 		});
 	}
@@ -116,6 +112,6 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	}
 
 	public String getCurrentAreaToken() {
-		return params.toString();
+		return place.getParameterizedToken().toString();
 	}
 }
