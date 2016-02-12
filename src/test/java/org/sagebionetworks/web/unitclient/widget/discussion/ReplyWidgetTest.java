@@ -261,6 +261,7 @@ public class ReplyWidgetTest {
 		replyWidget.deleteReply();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockDiscussionForumClientAsync).markReplyAsDeleted(eq("123"), any(AsyncCallback.class));
+		verify(mockView).showSuccess(anyString(), anyString());
 	}
 
 	@SuppressWarnings("unchecked")

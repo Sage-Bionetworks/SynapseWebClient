@@ -24,6 +24,8 @@ import com.google.inject.Inject;
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply?";
+	private static final String DELETE_SUCCESS_TITLE = "Reply deleted";
+	private static final String DELETE_SUCCESS_MESSAGE = "A reply has been deleted.";
 	ReplyWidgetView view;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
@@ -157,6 +159,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(Void result) {
+				view.showSuccess(DELETE_SUCCESS_TITLE, DELETE_SUCCESS_MESSAGE);
 				if (deleteReplyCallback != null) {
 					deleteReplyCallback.invoke();
 				}
