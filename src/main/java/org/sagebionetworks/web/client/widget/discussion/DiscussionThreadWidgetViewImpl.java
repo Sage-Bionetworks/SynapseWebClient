@@ -355,4 +355,9 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	public void setDeletedVisible(Boolean visible) {
 		deleted.setVisible(visible);
 	}
+
+	@Override
+	public void showSuccess(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
 }

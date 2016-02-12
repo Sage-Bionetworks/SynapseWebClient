@@ -579,6 +579,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(eq("1"), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
+		verify(mockView).showSuccess(anyString(), anyString());
 	}
 
 	@SuppressWarnings("unchecked")

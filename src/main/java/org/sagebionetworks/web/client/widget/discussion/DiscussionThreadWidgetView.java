@@ -93,4 +93,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setLoadingMessageVisible(boolean visible);
 
 	void setDeletedVisible(Boolean visible);
+
+	void showSuccess(String successTitle, String successMessage);
 }

@@ -38,6 +38,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public static final Long LIMIT = 20L;
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
+	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
+	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -165,7 +167,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public boolean isThreadCollapsed() {
 		return view.isThreadCollapsed();
 	}
-	
+
 	@Override
 	public void toggleThread() {
 		if (view.isThreadCollapsed()) {
@@ -328,6 +330,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void onSuccess(Void result) {
+				view.showSuccess(DELETE_SUCCESS_TITLE, DELETE_SUCCESS_MESSAGE);
 				if (deleteCallback != null) {
 					deleteCallback.invoke();
 				}
