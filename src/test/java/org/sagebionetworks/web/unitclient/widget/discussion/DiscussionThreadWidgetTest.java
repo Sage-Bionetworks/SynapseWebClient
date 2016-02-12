@@ -291,7 +291,6 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).toggleThread();
 		verify(mockView).setDeleteIconVisible(false);
-		verify(mockView, times(2)).setTitle(anyString());
 	}
 
 	@Test
@@ -310,7 +309,6 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).toggleThread();
 		verify(mockView).setDeleteIconVisible(false);
-		verify(mockView, times(2)).setTitle(title);
 	}
 
 	@Test

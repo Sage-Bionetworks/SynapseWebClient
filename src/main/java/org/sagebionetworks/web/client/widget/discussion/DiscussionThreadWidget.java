@@ -180,7 +180,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			// expand
 			view.setThreadDownIconVisible(false);
 			view.setThreadUpIconVisible(true);
-			view.setTitle(title);
 			configureMessage();
 		} else {
 			// collapse
