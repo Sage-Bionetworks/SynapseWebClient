@@ -101,7 +101,7 @@ public class SynapseTableFormWidgetTest {
 		//verify all is cleared
 		verify(mockSynAlert).clear();
 		verify(mockRowFormWidget).clear();
-		verify(mockView).setSubmitButtonVisible(false);
+		verify(mockView).setFormUIVisible(false);
 		verify(mockView).setSuccessMessageVisible(false);
 		
 		verify(mockSynAlert).showMustLogin();
@@ -114,13 +114,13 @@ public class SynapseTableFormWidgetTest {
 		//verify all is cleared
 		verify(mockSynAlert).clear();
 		verify(mockRowFormWidget).clear();
-		verify(mockView).setSubmitButtonVisible(false);
+		verify(mockView).setFormUIVisible(false);
 		verify(mockView).setSuccessMessageVisible(false);
 		
 		verify(mockView).setSuccessMessage(SUCCESS_MESSAGE);
 		verify(mockSynapseClient).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
 		verify(mockRowFormWidget).configure(TABLE_ID, columnModels);
-		verify(mockView).setSubmitButtonVisible(true);
+		verify(mockView).setFormUIVisible(true);
 	}
 	
 	@Test
@@ -183,7 +183,7 @@ public class SynapseTableFormWidgetTest {
 		handler.onComplete(mockResponse);
 		verify(mockSynAlert).clear();
 		verify(mockRowFormWidget).clear();
-		verify(mockView).setSubmitButtonVisible(false);
+		verify(mockView).setFormUIVisible(false);
 		verify(mockView).setSuccessMessageVisible(true);
 	}
 

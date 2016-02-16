@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for a table row.
  * 
- * @author John
+ * @author Jay
  * 
  */
 public interface RowFormView extends IsWidget {

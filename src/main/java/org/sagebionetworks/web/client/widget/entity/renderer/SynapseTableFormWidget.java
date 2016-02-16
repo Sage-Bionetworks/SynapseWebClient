@@ -59,7 +59,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	public void clear() {
 		synAlert.clear();
 		rowWidget.clear();
-		view.setSubmitButtonVisible(false);
+		view.setFormUIVisible(false);
 		view.setSuccessMessageVisible(false);
 	}
 	
@@ -86,7 +86,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 			public void onSuccess(List<ColumnModel> result) {
 				headers = result;
 				rowWidget.configure(tableId, headers);
-				view.setSubmitButtonVisible(true);
+				view.setFormUIVisible(true);
 			}
 			
 			@Override

@@ -26,6 +26,9 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 	Span successMessageText;
 	@UiField
 	Alert successMessageUI;
+	@UiField
+	Div formUI;
+	
 	Widget w;
 	Presenter presenter;
 	@Inject
@@ -69,8 +72,8 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 		}
 	}
 	@Override
-	public void setSubmitButtonVisible(boolean visible) {
-		submitButton.setVisible(visible);
+	public void setFormUIVisible(boolean visible) {
+		formUI.setVisible(visible);
 	}
 	@Override
 	public void setSuccessMessage(String text) {

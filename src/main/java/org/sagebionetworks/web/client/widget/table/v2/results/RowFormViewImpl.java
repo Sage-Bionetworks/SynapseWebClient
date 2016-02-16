@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 /**
  * The UiBound implementation of RowView with zero business logic.
  * 
- * @author John
+ * @author Jay
  *
  */
 public class RowFormViewImpl implements RowFormView {
@@ -21,7 +21,7 @@ public class RowFormViewImpl implements RowFormView {
 	public interface Binder extends UiBinder<Widget, RowFormViewImpl> {	}
 	
 	@UiField
-	Form form;
+	Div form;
 	
 	Widget w;
 	
