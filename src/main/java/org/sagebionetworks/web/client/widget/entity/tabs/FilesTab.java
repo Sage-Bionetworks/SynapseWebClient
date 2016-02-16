@@ -263,9 +263,19 @@ public class FilesTab implements FilesTabView.Presenter{
 		shownVersionNumber = versionNumber;
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME;
-		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
+
 			@Override
-			public void onSuccess(EntityBundle bundle) {
+			public void onFailure(Throwable caught) {
+				showError(caught);
+				tab.setEntityNameAndPlace(currentEntityId, new Synapse(currentEntityId, shownVersionNumber, null, null));
+				tab.showTab();
+			}
+
+			@Override
+			public void onSuccess(EntityBundlePlus result) {
+				EntityBundle bundle = result.getEntityBundle();
+				isMostRecentVersion = bundle.getEntity() instanceof Versionable && versionNumber == result.getLatestVersionNumber();
 				if (bundle.getEntity() instanceof Link) {
 					//short circuit.  redirect to target entity
 					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
@@ -279,34 +289,11 @@ public class FilesTab implements FilesTabView.Presenter{
 				tab.showTab();
 			}
 			
-			@Override
-			public void onFailure(Throwable caught) {
-				showError(caught);
-				tab.setEntityNameAndPlace(currentEntityId, new Synapse(currentEntityId, shownVersionNumber, null, null));
-				tab.showTab();
-			}	
-		};
-		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-
-			@Override
-			public void onSuccess(EntityBundlePlus result) {
-				EntityBundle bundle = result.getEntityBundle();
-				isMostRecentVersion = bundle.getEntity() instanceof Versionable && versionNumber == result.getLatestVersionNumber();
-				callback.onSuccess(bundle);
-			}
-			
 		};
 		if (versionNumber == null) {
 			this.isMostRecentVersion = true;
-			synapseClient.getEntityBundle(entityId, mask, callback);
-		} else {
-			synapseClient.getEntityBundlePlusForVersion(entityId, versionNumber, mask, ebpCallback);
 		}
+		synapseClient.getEntityBundlePlusForVersion(entityId, versionNumber, mask, ebpCallback);
 	}
 	
 	
