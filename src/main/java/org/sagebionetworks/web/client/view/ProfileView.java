@@ -74,6 +74,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setOrcId(String href);
 	void setVerificationAlertVisible(boolean isVisible);
 	void setVerificationButtonVisible(boolean isVisible);
+	void setResubmitVerificationButtonVisible(boolean isVisible);
 	void setVerificationSuspendedButtonVisible(boolean isVisible);
 	void setVerificationRejectedButtonVisible(boolean isVisible);
 	void setVerificationSubmittedButtonVisible(boolean isVisible);

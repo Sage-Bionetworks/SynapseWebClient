@@ -8,7 +8,7 @@
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
-			<h2 style="margin-bottom: 0px;">
+			<h2 style="margin-bottom: 8px;">
 			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/>
 			 	<b:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT"/>
 			 	<b:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT" />
@@ -17,11 +17,15 @@
 			 	<g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
 			<g:HTMLPanel ui:field="fileNameContainer">
-				<span class="boldText">File:</span>
+				<span class="boldText">Download file as:</span>
 				<span ui:field="fileName"/>
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileSize" />
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileLocation" />
 				<g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
+				<div ui:field="externalUrlUI">
+					<span class="boldText">URL:</span>
+					<span ui:field="externalUrl"/>
+				</div>
 			</g:HTMLPanel>
 		</g:HTMLPanel>
 	</g:HTMLPanel>

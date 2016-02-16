@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -55,9 +55,11 @@ public class UserAccountServiceImplTest {
 		userAccountService.setServiceUrlProvider(mockUrlProvider);
 		Session testSession = new Session();
 		testSession.setSessionToken(testSessionToken);
+		testSession.setAcceptsTermsOfUse(true);
 		when(mockSynapse.createNewAccount(any(AccountSetupInfo.class))).thenReturn(testSession);
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(testProfile);
+		when(mockUserSessionData.getSession()).thenReturn(testSession);
 	}
 
 	@Test
@@ -95,6 +97,18 @@ public class UserAccountServiceImplTest {
 		userAccountService.getUserLoginBundle(testSessionToken);
 		verify(mockSynapse).getUserSessionData();
 		verify(mockSynapse).getUserBundle(Long.valueOf(testProfile.getOwnerId()), 63);
+	}
+	
+	@Test
+	public void testGetUserLoginBundleNotSignedToU() throws Exception {
+		Session testSession = new Session();
+		testSession.setSessionToken(testSessionToken);
+		testSession.setAcceptsTermsOfUse(false);
+		when(mockUserSessionData.getSession()).thenReturn(testSession);
+		
+		userAccountService.getUserLoginBundle(testSessionToken);
+		verify(mockSynapse).getUserSessionData();
+		verify(mockSynapse, never()).getUserBundle(anyLong(), anyInt());
 	}
 
 }

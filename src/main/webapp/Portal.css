@@ -1126,6 +1126,10 @@ span.font-size-13,
 i.font-size-1x {
 	font-size:1em;
 }
+.font-size-1-5x,
+i.font-size-1-5x {
+	font-size:1.5em;
+}
 .font-size-lg,
 i.font-size-lg {
 	font-size:1.33em;
@@ -1370,6 +1374,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .greyBackground {
 	background-color: #ccc;
+}
+
+.lightGreyBackground {
+	background-color: #F9F9F9;
 }
 
 .sidebarMenu { 
@@ -1730,13 +1738,18 @@ ol.lowerroman {
 	position: relative;
 	top: -4px;
 }
-
+.moveup-3 {
+	position: relative;
+	top: -3px;
+}
 .moveup-2 {
 	position: relative;
 	top: -2px;
 }
-
-
+.moveup-1 {
+	position: relative;
+	top: -1px;
+}
 .movedown-1 {
 	position: relative;
 	top: 1px;
@@ -1917,6 +1930,10 @@ a.projectTitle:hover {
     overflow: hidden;
 }
 
+.table-layout-fixed {
+    table-layout: fixed;
+}
+
 .colAdaptiveHeight{ 
     margin-bottom: -99999px;
     padding-bottom: 99999px;  
@@ -2033,6 +2050,10 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	width: 95%;
 }
 
+.gwt-TreeItem-selected [class*="link"] {
+	text-decoration: underline;
+}
+
 /* Prevent body from scrolling when modal is open
 http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
 */
@@ -2057,6 +2078,10 @@ iframe[seamless] {
 
 .overflow-x-hidden {
 	overflow-x: hidden;
+}
+
+.line-height-1em {
+	line-height: 1em;
 }
 
 /*==================================*/

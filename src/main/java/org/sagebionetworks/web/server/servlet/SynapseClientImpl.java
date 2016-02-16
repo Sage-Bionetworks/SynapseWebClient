@@ -80,6 +80,7 @@ import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
@@ -89,10 +90,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
-import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -281,11 +278,19 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundle eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, 1, 1).getResults().get(0).getVersionNumber();
+			EntityBundle eb = null;
+			if (versionNumber == null) {
+				eb = synapseClient.getEntityBundle(entityId, partsMask);
+			} else {
+				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			}
+			
 			EntityBundlePlus ebp = new EntityBundlePlus();
 			ebp.setEntityBundle(eb);
-			ebp.setLatestVersionNumber(latestVersionNumber);
+			if (eb.getEntity() instanceof Versionable) {
+				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, 1, 1).getResults().get(0).getVersionNumber();
+				ebp.setLatestVersionNumber(latestVersionNumber);
+			}
 			return ebp;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -366,18 +371,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	 */
 	public <T extends JSONEntity> PaginatedResults<T> convertPaginated(org.sagebionetworks.reflection.model.PaginatedResults<T> in){
 		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
-	}
-
-	@Override
-	public PaginatedResults<EntityHeader> getEntityReferencedBy(String entityId)
-			throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return convertPaginated(synapseClient
-					.getEntityReferencedBy(entityId, null));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 
 	@Override
@@ -2211,62 +2204,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return url.toString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
-		}
-
-	}
-
-
-	@Override
-	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType,
-			String contentMD5, Long storageLocationId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
-			ccftr.setFileName(fileName);
-			ccftr.setContentType(contentType);
-			ccftr.setContentMD5(contentMD5);
-			ccftr.setStorageLocationId(storageLocationId);
-			// Start the upload
-			return synapseClient.createChunkedFileUploadToken(ccftr);
-
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public String getChunkedPresignedUrl(ChunkRequest request)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.createChunkedPresignedUrl(request).toString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			// reconstruct all part numbers, and token
-			ChunkedFileToken token = null;
-			List<Long> parts = new ArrayList<Long>();
-
-			for (ChunkRequest request : requests) {
-				token = request.getChunkedFileToken();
-				parts.add(request.getChunkNumber());
-			}
-
-			CompleteAllChunksRequest cacr = new CompleteAllChunksRequest();
-			cacr.setChunkedFileToken(token);
-			cacr.setChunkNumbers(parts);
-
-			// Start the daemon
-			return synapseClient.startUploadDeamon(cacr);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 

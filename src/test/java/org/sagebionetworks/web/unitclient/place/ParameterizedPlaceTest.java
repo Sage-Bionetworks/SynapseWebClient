@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.unitclient.place;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.place.ParameterizedPlace;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Wiki;
 
 /**
@@ -34,7 +36,7 @@ public class ParameterizedPlaceTest {
 		ParameterizedPlace place = new ParameterizedPlace(testToken);
 		//revert to the default token
 		String newToken = place.toToken();
-		assertEquals(newToken, "0");
+		assertEquals(newToken, ParameterizedToken.DEFAULT_TOKEN);
 	}
 	
 }

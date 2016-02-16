@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -36,8 +35,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -105,17 +102,12 @@ public class UploaderTest {
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
 		testEntity.setId("syn99");
-		ChunkedFileToken token = new ChunkedFileToken();
-		token.setFileName("testFile.txt");
-		String tokenJson = token.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		UserSessionData sessionData = new UserSessionData();
 		sessionData.setProfile(new UserProfile());
 		when(authenticationController.isLoggedIn()).thenReturn(true);
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		
 		S3UploadDestination d = new S3UploadDestination();
 		d.setUploadType(UploadType.S3);
@@ -127,7 +119,6 @@ public class UploaderTest {
 		status.setState(State.COMPLETED);
 		status.setFileHandleId("fake handle");
 		String completedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(completedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		

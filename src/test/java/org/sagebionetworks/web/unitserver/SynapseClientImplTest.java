@@ -55,7 +55,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
-import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -99,7 +98,6 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -191,7 +189,6 @@ public class SynapseClientImplTest {
 	V2WikiPage v2Page;
 	S3FileHandle handle;
 	Evaluation mockEvaluation;
-	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
@@ -376,10 +373,6 @@ public class SynapseClientImplTest {
 		handle.setFileName(testFileName);
 		handle.setKey("key");
 		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
-		when(
-				mockSynapse
-						.completeChunkFileUpload(any(CompleteChunkedFileRequest.class)))
-				.thenReturn(handle);
 		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> ars = new org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
@@ -399,14 +392,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
-		mockParticipant = Mockito.mock(Participant.class);
-		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(
-				mockParticipant);
-
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
-		when(mockSynapse.createParticipant(anyString())).thenReturn(
-				mockParticipant);
-
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		String fileHandleId = "myFileHandleId";
 		status.setFileHandleId(fileHandleId);
@@ -1120,28 +1106,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
 	}
 
-	private List<ChunkRequest> getTestChunkRequestJson()
-			throws JSONObjectAdapterException {
-		ChunkRequest chunkRequest = new ChunkRequest();
-		ChunkedFileToken token = new ChunkedFileToken();
-		token.setKey("test key");
-		chunkRequest.setChunkedFileToken(token);
-		chunkRequest.setChunkNumber(1l);
-		List<ChunkRequest> chunkRequests = new ArrayList<ChunkRequest>();
-		chunkRequests.add(chunkRequest);
-		return chunkRequests;
-	}
-
-	@Test
-	public void testCombineChunkedFileUpload()
-			throws JSONObjectAdapterException, SynapseException,
-			RestServiceException {
-		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
-		synapseClient.combineChunkedFileUpload(chunkRequests);
-		verify(mockSynapse).startUploadDeamon(
-				any(CompleteAllChunksRequest.class));
-	}
-
 	@Test
 	public void testGetUploadDaemonStatus() throws JSONObjectAdapterException,
 			SynapseException, RestServiceException {
@@ -1240,62 +1204,6 @@ public class SynapseClientImplTest {
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 		assertEquals(fileEntityId, file.getId());
-	}
-
-	@Test
-	public void testCompleteChunkedFileUploadExistingEntity()
-			throws JSONObjectAdapterException, SynapseException,
-			RestServiceException {
-		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
-		FileEntity testFileEntity = getTestFileEntity();
-		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
-		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(
-				new AssertionError("No need to create a new entity!"));
-		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(
-				testFileEntity);
-		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId");
-
-		// it should have tried to find the entity
-		verify(mockSynapse).getEntityById(anyString());
-		// update the data file handle id
-		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
-	}
-
-	@Test
-	public void testGetChunkedFileToken() throws SynapseException,
-			RestServiceException, JSONObjectAdapterException {
-		String fileName = "test file.zip";
-		String contentType = "application/test";
-		String md5 = "0123456789abcdef";
-		ChunkedFileToken testToken = new ChunkedFileToken();
-		testToken.setFileName(fileName);
-		testToken.setKey("a key 42");
-		testToken.setUploadId("upload ID 123");
-		testToken.setContentMD5(md5);
-		testToken.setStorageLocationId(storageLocationId);
-		when(
-				mockSynapse
-						.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class)))
-				.thenReturn(testToken);
-
-		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName,
-				contentType, md5, storageLocationId);
-		verify(mockSynapse).createChunkedFileUploadToken(
-				any(CreateChunkedFileTokenRequest.class));
-		assertEquals(testToken, token);
-	}
-
-	@Test
-	public void testGetChunkedPresignedUrl() throws SynapseException,
-			RestServiceException, MalformedURLException,
-			JSONObjectAdapterException {
-		URL testUrl = new URL("http://test.presignedurl.com/foo");
-		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class)))
-				.thenReturn(testUrl);
-		String presignedUrl = synapseClient
-				.getChunkedPresignedUrl(getTestChunkRequestJson().get(0));
-		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
-		assertEquals(testUrl.toString(), presignedUrl);
 	}
 
 	@Test

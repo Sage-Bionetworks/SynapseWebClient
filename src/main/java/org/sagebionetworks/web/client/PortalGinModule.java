@@ -9,6 +9,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.ClientCacheImpl;
+import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cache.SessionStorageImpl;
 import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -71,6 +73,8 @@ import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
+import org.sagebionetworks.web.client.view.SynapseForumView;
+import org.sagebionetworks.web.client.view.SynapseForumViewImpl;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiViewImpl;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
@@ -109,6 +113,18 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -180,6 +196,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
@@ -221,6 +239,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDial
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlertViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
@@ -339,6 +359,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
@@ -555,8 +577,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidgetView;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -1174,11 +1194,25 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FilesTabView.class).to(FilesTabViewImpl.class);
 		bind(TablesTabView.class).to(TablesTabViewImpl.class);
 		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
+		bind(DiscussionTabView.class).to(DiscussionTabViewImpl.class);
 		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
 		bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
 		bind(ACTView.class).to(ACTViewImpl.class);
 		bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
 		bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
 		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
+
+		// discussion
+		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);
+		bind(ReplyModalView.class).to(ReplyModalViewImpl.class);
+		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
+		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
+		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
+		bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
+		
+		bind(SessionStorage.class).to(SessionStorageImpl.class);
+		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
+		bind(WikiMarkdownEditorView.class).to(WikiMarkdownEditorViewImpl.class);
+		bind(StuAlertView.class).to(StuAlertViewImpl.class);
 	}
 }

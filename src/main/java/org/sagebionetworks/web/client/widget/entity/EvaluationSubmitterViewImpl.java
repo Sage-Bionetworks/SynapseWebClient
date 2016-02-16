@@ -97,6 +97,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	SimplePanel teamSelectSynAlertPanel;
 	@UiField
 	SimplePanel contributorSynAlertPanel;
+	@UiField
+	FormGroup evaluationListUI;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -376,5 +378,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void setContributorsSynAlertWidget(Widget synAlert) {
 		this.contributorSynAlertPanel.setWidget(synAlert);
+	}
+	@Override
+	public void setEvaluationListVisible(boolean visible) {
+		evaluationListUI.setVisible(visible);	
 	}
 }

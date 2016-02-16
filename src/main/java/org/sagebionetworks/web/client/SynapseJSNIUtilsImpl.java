@@ -19,6 +19,7 @@ import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
@@ -89,13 +90,39 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _bindBootstrapPopover(String id) /*-{
 		$wnd.jQuery('#'+id).popover();
 	}-*/;
+	
+	private static native String _getRelativeTime(String s) /*-{
+		return $wnd.moment(s).fromNow();
+	}-*/;
+	private static native String _getCalendarTime(String s) /*-{
+		return $wnd.moment(s).calendar();
+	}-*/;
+	
+	private static native String _getLongFriendlyDate(String s) /*-{
+		return $wnd.moment(s).format('LLLL');
+	}-*/;
 
 	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
+	private static DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
+	
 	@Override
 	public String convertDateToSmallString(Date toFormat) {
 		return smallDateFormat.format(toFormat);
 	}
-
+	@Override
+	public String getRelativeTime(Date toFormat) {
+		return _getRelativeTime(iso8601Format.format(toFormat));
+	}
+	@Override
+	public String getCalendarTime(Date toFormat) {
+		return _getCalendarTime(iso8601Format.format(toFormat));
+	}
+	
+	@Override
+	public String getLongFriendlyDate(Date toFormat) {
+		return _getLongFriendlyDate(iso8601Format.format(toFormat));
+	}
+	
 	@Override
 	public String getBaseFileHandleUrl() {
 		return GWT.getModuleBaseURL()+"filehandle";
@@ -204,9 +231,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-  		if(contentType) {
-  			xhr.setRequestHeader('Content-type', contentType);
-  		}
+  		//explicitly set content type
+  		xhr.setRequestHeader('Content-type', contentType);
   		xhr.send(fileSliceToUpload);
 	}-*/;
 	
@@ -267,6 +293,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    return out;
 	}-*/;
 	
+	public boolean isElementExists(String elementId) {
+		return Document.get().getElementById(elementId) != null;
+	};
+	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
 	 */
@@ -308,12 +338,47 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	        var start = currentChunk * chunkSize,
 	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-	
+			console.log("MD5 full file: loading next chunk: start=", start, " end=", end);
 	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
 		};
        $wnd.loadNext();
 	}-*/;
 
+	/**
+	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
+	 */
+	@Override
+	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback) {
+		_getFilePartMd5(fileFieldId, currentChunk, chunkSize.doubleValue(), fileIndex, md5Callback);
+	}
+	private final static native void _getFilePartMd5(String fileFieldId, int currentChunk, double chunkSize, int fileIndex, MD5Callback md5Callback) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var file = fileToUploadElement.files[fileIndex];
+		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
+		spark = new $wnd.SparkMD5.ArrayBuffer();
+        $wnd.frOnload = function(e) {
+            spark.append(e.target.result); // append array buffer
+           // Call instance method setMD5() on md5Callback with the final md5
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+        };
+        $wnd.frOnerror = function () {
+        	console.warn("unable to calculate file part md5");
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+        };
+        
+        $wnd.loadPart = function() { 
+            var fileReader = new FileReader();
+	        fileReader.onload = $wnd.frOnload;
+	        fileReader.onerror = $wnd.frOnerror;
+			var start = currentChunk * chunkSize,
+	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+	        
+	        console.log("MD5 file part: loading chunk: start=", start, " end=", end);
+	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		};
+       $wnd.loadPart();
+	}-*/;
+	
 	@Override
 	public boolean isFileAPISupported() {
 		return _isFileAPISupported();

@@ -53,7 +53,6 @@ public class EvaluationSubmitter implements Presenter {
 	private Team selectedTeam;
 	private String selectedTeamMemberStateHash;
 	private List<Long> selectedTeamEligibleMembers;
-	private PortalGinInjector ginInjector;
 	private SynapseAlert challengeListSynAlert;
 	private SynapseAlert teamSelectSynAlert;
 	private SynapseAlert contributorSynAlert;
@@ -74,7 +73,6 @@ public class EvaluationSubmitter implements Presenter {
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
 		this.gwt = gwt;
-		this.ginInjector = ginInjector;
 		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();
 		this.teamSelectSynAlert = ginInjector.getSynapseAlertWidget();
 		this.contributorSynAlert = ginInjector.getSynapseAlertWidget();

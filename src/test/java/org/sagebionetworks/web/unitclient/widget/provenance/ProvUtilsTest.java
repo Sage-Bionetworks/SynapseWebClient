@@ -314,7 +314,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+			@Override
+			public String getLongFriendlyDate(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void bindBootstrapTooltip(String id) {
 				// TODO Auto-generated method stub
@@ -366,7 +370,16 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
-
+			@Override
+			public String getRelativeTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public String getCalendarTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void uploadUrlToGenomeSpace(String url, String filename) {
 				// TODO Auto-generated method stub
@@ -411,12 +424,23 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
-
+			@Override
+			public void getFilePartMd5(String fileFieldId, int currentChunk,
+					Long chunkSize, int fileIndex, MD5Callback md5Callback) {
+				// TODO Auto-generated method stub
+				
+			}
 			@Override
 			public void getFileMd5(String fileFieldId, int index,
 					MD5Callback callback) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public boolean isElementExists(String elementId) {
+				// TODO Auto-generated method stub
+				return false;
 			}
 
 			@Override

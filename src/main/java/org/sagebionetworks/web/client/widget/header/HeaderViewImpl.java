@@ -131,6 +131,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
 		myDashboardButtonContents = new HorizontalPanel();
+		myDashboardButtonContents.addStyleName("moveup-1");
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		myDashboardButtonContents.add(userBadge.asWidget());
 		userBadgeText = new Span();
@@ -248,7 +249,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		forumLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("http://support.sagebase.org", "", "");
+				presenter.onHelpForumClick();
 			}
 		});
 		rLink.addClickHandler(new ClickHandler() {
@@ -322,6 +323,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		searchBox.setVisible(searchVisible);
 	}
 
+	@Override
+	public void openNewWindow(String url) {
+		DisplayUtils.newWindow(url, "", "");	
+	}
+	
 	@Override
 	public void setUser(UserSessionData userData) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);

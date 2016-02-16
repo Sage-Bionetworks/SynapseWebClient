@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -42,6 +42,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class UserBadgeTest {
 
+	private static final String DOEBOY = "doeboy";
+	private static final String DOE = "Doe";
+	private static final String FIRST_NAME = "John";
+	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -59,9 +63,9 @@ public class UserBadgeTest {
 	@Before
 	public void before(){
 		profile = new UserProfile();
-		profile.setFirstName("John");
-		profile.setLastName("Doe");
-		profile.setUserName("doeboy");
+		profile.setFirstName(FIRST_NAME);
+		profile.setLastName(DOE);
+		profile.setUserName(DOEBOY);
 		profile.setProfilePicureFileHandleId("1234");
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
@@ -165,5 +169,29 @@ public class UserBadgeTest {
 		verify(mockSynapseClient, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
 	}
-
+	
+	@Test
+	public void testGetDefaultPictureLetter() {
+		//first name is "John"
+		assertEquals("J", userBadge.getDefaultPictureLetter(profile));
+		profile.setFirstName(null);
+		//username is "doeboy"
+		assertEquals("D", userBadge.getDefaultPictureLetter(profile));
+		//null profile?
+		assertEquals(UserBadge.DEFAULT_LETTER, userBadge.getDefaultPictureLetter(null));
+	}
+	
+	@Test
+	public void testGetDefaultPictureColor() {
+		assertEquals(UserBadge.DEFAULT_COLOR, userBadge.getDefaultPictureColor(null));
+		
+		//verify no errors when trying to get the color for a range of values 
+		//(like an array index out of bounds, or a null color response)
+		for (int i = 0; i < 100; i++) {
+			assertNotNull(userBadge.getColor(i));
+		}
+		
+		//test negative hashcode
+		assertNotNull(userBadge.getColor(-418745608));
+	}
 }

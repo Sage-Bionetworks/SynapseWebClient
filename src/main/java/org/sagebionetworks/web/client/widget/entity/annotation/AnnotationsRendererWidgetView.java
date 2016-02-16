@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 public interface AnnotationsRendererWidgetView extends IsWidget{
 	
 	public interface Presenter {
-		 void configure(EntityBundle bundle, boolean canEdit);
 		 void onEdit();
 	}
 

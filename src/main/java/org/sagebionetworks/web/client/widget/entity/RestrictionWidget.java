@@ -196,8 +196,13 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		if ((isChangeLink && showChangeLink) || isRestricted) {
 			if (isChangeLink)
 				view.showChangeLink(aboutLinkClickHandler);
-			else
-				view.showShowLink(aboutLinkClickHandler);
+			else {
+				if (hasUnmetDownloadAccessRequirements()) {
+					view.showShowUnmetLink(aboutLinkClickHandler);
+				} else {
+					view.showShowLink(aboutLinkClickHandler);
+				}
+			}
 		}
 		
 		if (showFlagLink) {

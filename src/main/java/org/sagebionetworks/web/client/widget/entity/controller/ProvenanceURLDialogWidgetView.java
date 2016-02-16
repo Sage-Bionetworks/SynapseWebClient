@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetView.Presenter;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

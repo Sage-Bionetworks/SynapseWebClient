@@ -31,6 +31,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	void showAnonymousFlagUI();
 	void showChangeLink(ClickHandler changeLinkClickHandler);
 	void showShowLink(ClickHandler showLinkClickHandler);
+	void showShowUnmetLink(ClickHandler showLinkClickHandler);
 	
 	void showFlagModal();
 	void showAnonymousFlagModal();

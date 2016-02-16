@@ -29,6 +29,25 @@ public interface SynapseJSNIUtils {
 	public void tablesorter(String id);
 	
 	public String convertDateToSmallString(Date toFormat);
+	/**
+	 * Return a friendly relative date string.  Like "4 hours ago"
+	 * @param toFormat
+	 * @return
+	 */
+	public String getRelativeTime(Date toFormat);
+	/**
+	 * Return a friendly calendar date string.  Like "Yesterday at 3:32 PM"
+	 * @param toFormat
+	 * @return
+	 */
+	public String getCalendarTime(Date toFormat);
+	/**
+	 * Return a friendly calendar date string.  Like "January 20, 2016 3:47 PM"
+	 * @param toFormat
+	 * @return
+	 */
+	public String getLongFriendlyDate(Date toFormat);
+	
 	
 	public String getBaseFileHandleUrl();
 	
@@ -52,8 +71,10 @@ public interface SynapseJSNIUtils {
 	
 	public String getContentType(String fileFieldId, int index);
 	public boolean isFileAPISupported();
+	public boolean isElementExists(String elementId);
 	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, int index, MD5Callback callback);
+	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback);
 	public double getFileSize(String fileFieldId, int index);
 	String[] getMultipleUploadFileNames(String fileFieldId);
 	public void consoleLog(String message);

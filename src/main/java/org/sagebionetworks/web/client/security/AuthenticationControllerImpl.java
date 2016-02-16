@@ -6,9 +6,8 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.shared.UserLoginBundle;
@@ -32,16 +31,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
-	private AdapterFactory adapterFactory;
-	private UserProfileClientAsync userProfileClient;
+	private SessionStorage sessionStorage;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory,
-			UserProfileClientAsync userProfileClient){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
-		this.adapterFactory = adapterFactory;
-		this.userProfileClient = userProfileClient;
+		this.sessionStorage = sessionStorage;
 	}
 
 	@Override
@@ -70,12 +66,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void logoutUser() {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		sessionStorage.clear();
 		currentUser = null;
 		userBundle = null;
 	}
 
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
+			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
@@ -88,12 +86,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(UserLoginBundle userLoginBundle) {
 				UserSessionData userSessionData = userLoginBundle.getUserSessionData();
 				UserBundle fetchedUserBundle = userLoginBundle.getUserBundle();
-				if (userSessionData != null && fetchedUserBundle != null) {					
+				if (userSessionData != null) {					
 					Date tomorrow = getDayFromNow();
 					cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 					currentUser = userSessionData;
-					userBundle = fetchedUserBundle;
+					if (fetchedUserBundle != null) {
+						userBundle = fetchedUserBundle;	
+					}
 					callback.onSuccess(userSessionData);
 				} else {
 					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));

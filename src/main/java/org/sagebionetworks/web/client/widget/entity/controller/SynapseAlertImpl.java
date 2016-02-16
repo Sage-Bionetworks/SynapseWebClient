@@ -2,12 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -25,25 +22,19 @@ import com.google.inject.Inject;
 public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
-	SynapseClientAsync synapseClient;
-	GWTWrapper gwt;
 	SynapseAlertView view;
 	Throwable ex;
-	String entityId;
 	
 	@Inject
 	public SynapseAlertImpl(
 			SynapseAlertView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authController,
-			SynapseClientAsync synapseClient,
 			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
-		this.synapseClient = synapseClient;
-		this.gwt = gwt;
 		view.setPresenter(this);
 		view.clearState();
 	}
@@ -149,53 +140,5 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void clear() {
 		view.clearState();
 		ex = null;
-		entityId = null;
-	}
-	
-	@Override
-	public void show403() {
-		clear();
-		view.show403();
-	}
-	@Override
-	public void show403(String entityId) {
-		clear();
-		this.entityId = entityId;
-		view.show403();
-		if (!authController.isLoggedIn()) {
-			view.showLoginAlert();
-		} else {
-			view.showRequestAccessUI();	
-		}
-	}
-	
-	@Override
-	public void show404() {
-		clear();
-		view.show404();
-	}
-	
-	@Override
-	public void onRequestAccess() {
-		view.showRequestAccessButtonLoading();
-		String hostPageURL = gwt.getHostPageBaseURL();
-		UserSessionData userData = authController.getCurrentUserSessionData();
-		String userDisplayName = DisplayUtils.getDisplayName(userData.getProfile());
-		String message = userDisplayName + " has requested access to an entity that you own. \nTo grant access, please visit " + gwt.getHostPageBaseURL() + "#!Synapse:" + entityId + " to change the Share settings.";
-		synapseClient.sendMessageToEntityOwner(entityId, "Requesting access to " + entityId, message, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				view.showInfo("Request sent", "");
-				view.hideRequestAccessUI();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				handleException(caught);
-			}
-		});
-	}
-	
-	public String getEntityId() {
-		return entityId;
 	}
 }
