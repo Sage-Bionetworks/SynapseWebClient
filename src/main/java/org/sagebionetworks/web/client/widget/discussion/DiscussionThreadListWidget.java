@@ -91,7 +91,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 								public void invoke() {
 									configure(forumId, isCurrentUserModerator, emptyListCallback);
 								}
-							}, SHOW_DETAILS_FOR_THREAD_LIST);
+							}, SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
 							view.addThread(thread.asWidget());
 						}
 						offset += LIMIT;
