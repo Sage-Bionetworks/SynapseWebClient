@@ -59,7 +59,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private String threadId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
-	private Boolean isThreadDeleted;
 	private String title;
 	private Callback deleteCallback;
 
@@ -106,26 +105,24 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Callback deleteCallback) {
+	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Callback deleteCallback, boolean showThreadDetails, boolean showReplyDetails) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
-		this.isThreadDeleted = bundle.getIsDeleted();
 		this.threadId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.deleteCallback = deleteCallback;
-		configureView(bundle);
+		configureView(bundle, showThreadDetails, showReplyDetails);
 		authorWidget.configure(bundle.getCreatedBy());
 		newReplyModal.configure(bundle.getId(), new Callback(){
 
 			@Override
 			public void invoke() {
 				reconfigureThread();
-				configureReplies();
 			}
 		});
 	}
 
-	private void configureView(DiscussionThreadBundle bundle) {
+	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
 		view.clear();
 		view.setTitle(title);
 		authorIconWidget.configure(bundle.getCreatedBy());
@@ -142,16 +139,31 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
-		if (isThreadDeleted) {
-			view.setDeletedVisible(true);
-			view.setDeleteIconVisible(false);
-			view.setReplyButtonVisible(false);
-			view.setEditIconVisible(false);
+		view.setDeleteIconVisible(isCurrentUserModerator);
+		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+		if (showThreadDetails) {
+			showThreadDetails();
 		} else {
-			view.setDeletedVisible(false);
-			view.setDeleteIconVisible(isCurrentUserModerator);
-			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			hideThreadDetails();
 		}
+		if (showReplyDetails) {
+			showReplyDetails();
+		} else {
+			hideReplyDetails();
+		}
+	}
+
+	private void hideThreadDetails() {
+		view.setThreadDownIconVisible(true);
+		view.setThreadUpIconVisible(false);
+		view.hideThreadDetails();
+	}
+
+	private void showThreadDetails() {
+		view.setThreadDownIconVisible(false);
+		view.setThreadUpIconVisible(true);
+		configureMessage();
+		view.showThreadDetails();
 	}
 
 	private void reconfigureThread() {
@@ -165,7 +177,9 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result, isCurrentUserModerator, deleteCallback);
+				boolean showThreadDetails = true;
+				boolean showReplyDetails = !view.isReplyCollapsed();
+				configure(result, isCurrentUserModerator, deleteCallback, showThreadDetails, showReplyDetails);
 			}
 		});
 	}
@@ -177,16 +191,10 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	@Override
 	public void toggleThread() {
 		if (view.isThreadCollapsed()) {
-			// expand
-			view.setThreadDownIconVisible(false);
-			view.setThreadUpIconVisible(true);
-			configureMessage();
+			showThreadDetails();
 		} else {
-			// collapse
-			view.setThreadDownIconVisible(true);
-			view.setThreadUpIconVisible(false);
+			hideThreadDetails();
 		}
-		view.toggleThread();
 	}
 
 	public void configureMessage() {
@@ -225,33 +233,32 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 			@Override
 			public void invoke() {
-				reconfigureWidget();
+				reconfigureThread();
 			}
 		});
-	}
-
-	private void reconfigureWidget() {
-		reconfigureThread();
-		configureMessage();
-		if (!view.isReplyCollapsed()) {
-			configureReplies();
-		}
 	}
 
 	@Override
 	public void toggleReplies() {
 		if (view.isReplyCollapsed()) {
-			// expand
-			view.setReplyDownIconVisible(false);
-			view.setReplyUpIconVisible(true);
-			configureReplies();
+			showReplyDetails();
 		} else {
-			// collapse
-			view.setReplyDownIconVisible(true);
-			view.setReplyUpIconVisible(false);
-			view.setLoadMoreButtonVisibility(false);
+			hideReplyDetails();
 		}
-		view.toggleReplies();
+	}
+
+	private void hideReplyDetails() {
+		view.setReplyDownIconVisible(true);
+		view.setReplyUpIconVisible(false);
+		view.setLoadMoreButtonVisibility(false);
+		view.hideReplyDetails();
+	}
+
+	private void showReplyDetails() {
+		view.setReplyDownIconVisible(false);
+		view.setReplyUpIconVisible(true);
+		configureReplies();
+		view.showReplyDetails();
 	}
 
 	public void configureReplies() {
@@ -304,7 +311,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 								replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){
 									@Override
 									public void invoke() {
-										reconfigureWidget();
+										reconfigureThread();
 									}
 								});
 								view.addReply(replyWidget.asWidget());

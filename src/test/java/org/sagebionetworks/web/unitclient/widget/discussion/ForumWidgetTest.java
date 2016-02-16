@@ -4,7 +4,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.DEFAULT_MODERATOR_MODE;
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -190,7 +190,9 @@ public class ForumWidgetTest {
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
-		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(canModerate), any(Callback.class));
+		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle),
+				eq(canModerate), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD),
+				eq(SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD));
 		verify(mockDiscussionThreadWidget).toggleThread();
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setEmptyUIVisible(false);
