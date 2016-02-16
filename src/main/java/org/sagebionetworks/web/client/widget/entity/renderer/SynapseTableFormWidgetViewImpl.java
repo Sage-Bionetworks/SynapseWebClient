@@ -28,6 +28,8 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 	Alert successMessageUI;
 	@UiField
 	Div formUI;
+	@UiField
+	Span userBadgeContainer;
 	
 	Widget w;
 	Presenter presenter;
@@ -84,4 +86,9 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 		successMessageUI.setVisible(visible);
 	}
 	
+	@Override
+	public void setUserBadge(Widget w) {
+		userBadgeContainer.clear();
+		userBadgeContainer.add(w);
+	}
 }

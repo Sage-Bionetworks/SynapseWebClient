@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowFormEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -38,6 +40,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private List<ColumnModel> headers;
 	private SynapseClientAsync synapseClient;
 	private AsynchronousJobTracker jobTracker;
+	private UserBadge ownerUserBadge;
 	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded";
 	
 	@Inject
@@ -45,14 +48,17 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 			SynapseAlert synAlert,
 			RowFormEditorWidget rowWidget,
 			AsynchronousJobTracker jobTracker,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			UserBadge ownerUserBadge) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.rowWidget = rowWidget;
 		this.jobTracker = jobTracker;
 		this.synapseClient = synapseClient;
+		this.ownerUserBadge = ownerUserBadge;
 		view.setRowFormWidget(rowWidget.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
+		view.setUserBadge(ownerUserBadge.asWidget());
 		view.setPresenter(this);
 	}
 	
@@ -80,6 +86,16 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		}
 		view.setSuccessMessage(successMessage);
 		
+		synapseClient.getEntity(tableId, new AsyncCallback<Entity>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			
+			public void onSuccess(Entity tableEntity) {
+				ownerUserBadge.configure(tableEntity.getCreatedBy());
+			};
+		});
 		//get the table schema and init row widget!
 		synapseClient.getColumnModelsForTableEntity(tableId, new AsyncCallback<List<ColumnModel>>() {
 			@Override

@@ -12,7 +12,7 @@ public interface SynapseTableFormWidgetView extends IsWidget {
 	void setSubmitButtonLoading(boolean isLoading);
 	void setFormUIVisible(boolean visible);
 	void setSuccessMessageVisible(boolean visible);
-	
+	void setUserBadge(Widget w);
 	void setSuccessMessage(String text);
 	/**
 	 * Presenter interface

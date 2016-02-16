@@ -4,6 +4,10 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div addStyleNames="margin-5">
 		<b:Panel ui:field="formUI">
+			<b:PanelHeader>
+				<bh:Span ui:field="userBadgeContainer" /> 
+				<bh:Italic text=" would like to gather some information from you:" addStyleNames="moveup-10"/>
+			</b:PanelHeader>
 			<b:PanelBody>
 			    <bh:Div ui:field="rowWidgetContainer"/>
 			    <b:Button ui:field="submitButton" type="PRIMARY" text="Submit" dataLoadingText="Submitting..."/>
@@ -12,7 +16,6 @@
 			<b:PanelFooter>
 				<bh:Span text="Powered by" addStyleNames="margin-right-5" />
 				<b:Anchor href="#!Help:SynapseForm" target="_blank">Synapse Forms</b:Anchor>
-				<bh:Italic text="This content is neither created nor endorsed by Sage Bionetworks." addStyleNames="right"/>
 			</b:PanelFooter>
 		</b:Panel>
 		<b:Alert type="INFO" ui:field="successMessageUI" >
