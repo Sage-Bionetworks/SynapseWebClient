@@ -255,9 +255,8 @@ public class FilesTab implements FilesTabView.Presenter{
 		if (equal(currentEntityId,entityId) && equal(shownVersionNumber, versionNumber)) {
 			return;
 		}
-		
-		currentEntityId = entityId;
 		shownVersionNumber = versionNumber;
+		currentEntityId = entityId;
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME;
 		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
@@ -272,7 +271,9 @@ public class FilesTab implements FilesTabView.Presenter{
 			@Override
 			public void onSuccess(EntityBundlePlus result) {
 				EntityBundle bundle = result.getEntityBundle();
-				isMostRecentVersion = bundle.getEntity() instanceof Versionable && (versionNumber == null || versionNumber == result.getLatestVersionNumber());
+				// either versionNumber and result.getLatestVersionNumber will both be null if non-Versionable
+				isMostRecentVersion = versionNumber == null || versionNumber == result.getLatestVersionNumber();
+				// will be null for non-Versionable entities
 				if (bundle.getEntity() instanceof Link) {
 					//short circuit.  redirect to target entity
 					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
