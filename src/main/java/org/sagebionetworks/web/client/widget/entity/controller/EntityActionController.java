@@ -20,7 +20,7 @@ public interface EntityActionController extends IsWidget {
 	 * 
 	 * @param actionMenu
 	 * @param entityBundle
-	 * @param isCurrentVersion TODO
+	 * @param isCurrentVersion
 	 */
 	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageKey, EntityUpdatedHandler handler);
 

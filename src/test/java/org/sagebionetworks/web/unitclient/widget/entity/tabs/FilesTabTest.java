@@ -318,7 +318,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockFolderEntity, mockEntityUpdatedHandler, version);
 		
-		verify(mockSynapseClientAsync).getEntityBundle(eq(folderEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).getEntityBundlePlusForVersion(eq(folderEntityId), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);

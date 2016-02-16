@@ -278,19 +278,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundle eb = null;
-			if (versionNumber == null) {
-				eb = synapseClient.getEntityBundle(entityId, partsMask);
-			} else {
-				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			}
-			
+			EntityBundle eb = synapseClient.getEntityBundle(entityId, partsMask);
 			EntityBundlePlus ebp = new EntityBundlePlus();
-			ebp.setEntityBundle(eb);
 			if (eb.getEntity() instanceof Versionable) {
+				// Get the correct version, now that we now it's Versionable
+				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
 				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, 1, 1).getResults().get(0).getVersionNumber();
 				ebp.setLatestVersionNumber(latestVersionNumber);
 			}
+			ebp.setEntityBundle(eb);
 			return ebp;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

@@ -272,14 +272,14 @@ public class FilesTab implements FilesTabView.Presenter{
 			@Override
 			public void onSuccess(EntityBundlePlus result) {
 				EntityBundle bundle = result.getEntityBundle();
-				isMostRecentVersion = bundle.getEntity() instanceof Versionable && versionNumber == result.getLatestVersionNumber();
+				isMostRecentVersion = bundle.getEntity() instanceof Versionable && (versionNumber == null || versionNumber == result.getLatestVersionNumber());
 				if (bundle.getEntity() instanceof Link) {
 					//short circuit.  redirect to target entity
 					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
 					//go to link target
 					String entityId = ref.getTargetId();
-					Long versionNumber = ref.getTargetVersionNumber();
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
+					shownVersionNumber = ref.getTargetVersionNumber();
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, shownVersionNumber, null, null));
 					return;
 				}
 				setTargetBundle(bundle);
