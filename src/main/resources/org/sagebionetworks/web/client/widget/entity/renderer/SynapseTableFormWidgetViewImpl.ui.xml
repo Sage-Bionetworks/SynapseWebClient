@@ -10,9 +10,9 @@
 			    <bh:Div ui:field="synAlertContainer"/>
 			</b:PanelBody>
 			<b:PanelFooter>
-				<bh:Span>&nbsp;</bh:Span>
-				<b:Anchor href="#!Help:SynapseForm" target="_blank" pull="RIGHT" >Synapse Forms</b:Anchor>
-				<bh:Span text="Powered by" addStyleNames="right margin-right-5" />
+				<bh:Span text="Powered by" addStyleNames="margin-right-5" />
+				<b:Anchor href="#!Help:SynapseForm" target="_blank">Synapse Forms</b:Anchor>
+				<bh:Italic text="This content is neither created nor endorsed by Sage Bionetworks." addStyleNames="right"/>
 			</b:PanelFooter>
 		</b:Panel>
 		<b:Alert type="INFO" ui:field="successMessageUI" >
