@@ -20,6 +20,8 @@ import com.google.inject.Inject;
 public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public final static Boolean DEFAULT_MODERATOR_MODE = false;
+	public final static Boolean SHOW_DETAILS_FOR_THREAD_LIST = false;
+	public final static Boolean SHOW_DETAILS_FOR_SINGLE_THREAD = true;
 
 	//used to tell the discussion forum to show a single thread
 	public final static String THREAD_ID_KEY = "threadId";
@@ -93,6 +95,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setNewThreadButtonVisible(false);
 		view.setShowAllThreadsButtonVisible(true);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setEmptyUIVisible(true);
@@ -112,7 +115,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 						showAllThreadsCallback.invoke();
 						configure(entityId, new ParameterizedToken(null), isCurrentUserModerator, showAllThreadsCallback);
 					}
-				});
+				}, SHOW_DETAILS_FOR_SINGLE_THREAD);
 				if (singleThreadWidget.isThreadCollapsed()) {
 					singleThreadWidget.toggleThread();
 				}

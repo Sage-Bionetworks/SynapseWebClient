@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
+
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
@@ -89,7 +91,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 								public void invoke() {
 									configure(forumId, isCurrentUserModerator, emptyListCallback);
 								}
-							});
+							}, SHOW_DETAILS_FOR_THREAD_LIST);
 							view.addThread(thread.asWidget());
 						}
 						offset += LIMIT;

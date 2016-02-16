@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -88,8 +87,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Label edited;
 	@UiField
-	Label deleted;
-	@UiField
 	Span threadAuthor;
 
 	private Widget widget;
@@ -117,26 +114,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.toggleReplies();
-			}
-		});
-		threadDetails.addAttachHandler(new AttachEvent.Handler(){
-
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					threadDetails.hide();
-					threadDetails.setVisible(true);
-				}
-			}
-		});
-		replyDetails.addAttachHandler(new AttachEvent.Handler(){
-
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					replyDetails.hide();
-					replyDetails.setVisible(true);
-				}
 			}
 		});
 		replyButton.addClickHandler(new ClickHandler(){
@@ -225,16 +202,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setCreatedOn(String createdOn) {
 		this.createdOn.setText(createdOn);
-	}
-
-	@Override
-	public void toggleThread() {
-		threadDetails.toggle();
-	}
-
-	@Override
-	public void toggleReplies() {
-		replyDetails.toggle();
 	}
 
 	@Override
@@ -359,11 +326,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setDeletedVisible(Boolean visible) {
-		deleted.setVisible(visible);
-	}
-
-	@Override
 	public void showSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
@@ -371,5 +333,15 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setThreadAuthor(Widget widget){
 		threadAuthor.add(widget);
+	}
+
+	@Override
+	public void showThreadDetails() {
+		threadDetails.show();
+	}
+
+	@Override
+	public void hideThreadDetails() {
+		threadDetails.hide();
 	}
 }

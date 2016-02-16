@@ -44,10 +44,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setCreatedOn(String createdOn);
 
-	void toggleThread();
-
-	void toggleReplies();
-
 	void setNewReplyModal(Widget w);
 
 	void setAlert(Widget w);
@@ -55,8 +51,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setLoadMoreButtonVisibility(boolean visible);
 
 	void setShowRepliesVisibility(boolean visible);
-
-	void showReplyDetails();
 
 	void clearReplies();
 
@@ -92,11 +86,15 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setLoadingMessageVisible(boolean visible);
 
-	void setDeletedVisible(Boolean visible);
-
 	void showSuccess(String successTitle, String successMessage);
 
 	void setThreadAuthor(Widget widget);
+
+	void showThreadDetails();
+
+	void hideThreadDetails();
+
+	void showReplyDetails();
 
 	void hideReplyDetails();
 }

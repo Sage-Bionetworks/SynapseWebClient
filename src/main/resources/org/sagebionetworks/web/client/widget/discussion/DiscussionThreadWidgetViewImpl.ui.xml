@@ -34,7 +34,7 @@
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>
-		<b:Collapse ui:field="threadDetails" visible="false" addStyleNames="overflow-x-hidden">
+		<b:Collapse ui:field="threadDetails" addStyleNames="overflow-x-hidden">
 			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
 				<b:Row>
 					<b:Column size="SM_9">
@@ -63,7 +63,6 @@
 						<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 margin-bottom-5 line-height-1em" visible="false"/>
 					</b:Tooltip>
 					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
-					<b:Label text="Deleted" ui:field="deleted" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
 				</bh:Div>
 
 				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
@@ -74,7 +73,7 @@
 					</bh:Div>
 				</g:FocusPanel>
 			</bh:Div>
-			<b:Collapse ui:field="replyDetails" visible="false">
+			<b:Collapse ui:field="replyDetails">
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 				<g:HTMLPanel ui:field="loadingReplies">
 					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
