@@ -172,6 +172,27 @@ public class ReplyWidgetTest {
 		verify(mockView).asWidget();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureMessageFailToGetMessageURL() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
+				new Date(), isDeleted, CREATED_BY, isEdited);
+		AsyncMockStubber.callFailureWith(new Exception())
+				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
+		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		verify(mockSynAlert).clear();
+		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
+		verify(mockRequestBuilder, never()).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).setDeleteIconVisibility(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
+	}
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureMessageFailToGetMessage() throws RequestException {
 		boolean isDeleted = false;
@@ -179,27 +200,11 @@ public class ReplyWidgetTest {
 		boolean isEdited = false;
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
-		RequestBuilderMockStubber.callOnError(null, new Exception())
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
-		verify(mockSynAlert).clear();
-		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
-		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteIconVisibility(false);
-		verify(mockView).setLoadingMessageVisible(true);
-		verify(mockView).setLoadingMessageVisible(false);
-	}
-
-	@Test
-	public void testConfigureMessageFailToGetMessageCase2() throws RequestException {
-		boolean isDeleted = false;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
+		String url = "url";
+		AsyncMockStubber.callSuccessWith(url)
+				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
+		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockSynAlert).clear();
@@ -212,6 +217,7 @@ public class ReplyWidgetTest {
 		verify(mockView).setLoadingMessageVisible(false);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureMessageSuccess() throws RequestException {
 		boolean isDeleted = false;
@@ -222,6 +228,9 @@ public class ReplyWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
+		String url = "url";
+		AsyncMockStubber.callSuccessWith(url)
+				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, mockDeleteCallback);

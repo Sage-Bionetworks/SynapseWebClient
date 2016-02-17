@@ -475,6 +475,29 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureMessageFailToGetMessageURL() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited);
+		AsyncMockStubber.callFailureWith(new Exception())
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+		discussionThreadWidget.configure(bundle, canModerate, mockCallback,
+				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+		discussionThreadWidget.configureMessage();
+		verify(mockSynAlert).clear();
+		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
+		verify(mockRequestBuilder, never()).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).setDeleteIconVisible(false);
+		verify(mockView).setLoadingMessageVisible(true);
+		verify(mockView).setLoadingMessageVisible(false);
+	}
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureMessageFailToGetMessage() throws RequestException {
 		boolean isDeleted = false;
@@ -482,29 +505,11 @@ public class DiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited);
-		RequestBuilderMockStubber.callOnError(null, new Exception())
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle, canModerate, mockCallback,
-				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
-		discussionThreadWidget.configureMessage();
-		verify(mockSynAlert).clear();
-		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
-		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setDeleteIconVisible(false);
-		verify(mockView).setLoadingMessageVisible(true);
-		verify(mockView).setLoadingMessageVisible(false);
-	}
-
-	@Test
-	public void testConfigureMessageFailToGetMessageCase2() throws RequestException {
-		boolean isDeleted = false;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
-				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
+		String url = "url";
+		AsyncMockStubber.callSuccessWith(url)
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		discussionThreadWidget.configure(bundle, canModerate, mockCallback,
 				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
@@ -519,6 +524,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setLoadingMessageVisible(false);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureMessageSuccess() throws RequestException {
 		boolean isDeleted = false;
@@ -529,6 +535,9 @@ public class DiscussionThreadWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
+		String url = "url";
+		AsyncMockStubber.callSuccessWith(url)
+				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		discussionThreadWidget.configure(bundle, canModerate, mockCallback,

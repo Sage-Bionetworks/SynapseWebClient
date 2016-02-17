@@ -182,6 +182,7 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
 	public String getThreadUrl(String messageKey) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -191,6 +192,7 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
 	public String getReplyUrl(String messageKey) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
