@@ -58,8 +58,4 @@ public interface DiscussionForumClient extends RemoteService {
 			throws RestServiceException;
 
 	void markReplyAsDeleted(String replyId) throws RestServiceException;
-
-	String getThreadMessage(String messageKey) throws RestServiceException;
-
-	String getReplyMessage(String messageKey) throws RestServiceException;
 }
