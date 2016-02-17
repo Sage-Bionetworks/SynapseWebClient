@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -27,7 +26,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	@UiField
 	TextBox threadTitle;
 	@UiField
-	TextArea messageMarkdown;
+	Div markdownEditorContainer;
 	@UiField
 	Div synAlertContainer;
 
@@ -77,14 +76,8 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	}
 
 	@Override
-	public String getMessageMarkdown() {
-		return messageMarkdown.getText();
-	}
-
-	@Override
 	public void clear() {
 		threadTitle.setText("");
-		messageMarkdown.setText("");
 		saveButton.state().reset();
 	}
 
@@ -114,12 +107,12 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	}
 
 	@Override
-	public void setThreadMessage(String currentMessage) {
-		messageMarkdown.setText(currentMessage);
+	public void setModalTitle(String title) {
+		threadModal.setTitle(title);
 	}
 
 	@Override
-	public void setModalTitle(String title) {
-		threadModal.setTitle(title);
+	public void setMarkdownEditor(Widget widget) {
+		markdownEditorContainer.add(widget);
 	}
 }

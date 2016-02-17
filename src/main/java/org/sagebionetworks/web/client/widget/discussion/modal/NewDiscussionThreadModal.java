@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,6 +23,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private DiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
+	private MarkdownEditorWidget markdownEditor;
 	private String forumId;
 	Callback newThreadCallback;
 
@@ -29,19 +31,23 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public NewDiscussionThreadModal(
 			DiscussionThreadModalView view,
 			DiscussionForumClientAsync discussionForumClient,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			MarkdownEditorWidget markdownEditor
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
+		this.markdownEditor = markdownEditor;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_THREAD_MODAL_TITLE);
+		view.setMarkdownEditor(markdownEditor.asWidget());
 	}
 
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
+		markdownEditor.hideAttachmentCommands();
 	}
 
 	@Override
@@ -59,7 +65,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public void onSave() {
 		synAlert.clear();
 		String threadTitle = view.getThreadTitle();
-		String messageMarkdown = view.getMessageMarkdown();
+		String messageMarkdown = markdownEditor.getMarkdown();
 		ValidationResult result = new ValidationResult();
 		result.requiredField("Title", threadTitle)
 				.requiredField("Message", messageMarkdown);

@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -33,13 +34,16 @@ public class NewDiscussionThreadModalTest {
 	Callback mockCallback;
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
+	@Mock
+	MarkdownEditorWidget mockMarkdownEditor;
 	String forumId = "123";
 	NewDiscussionThreadModal modal;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient,
+				mockSynAlert, mockMarkdownEditor);
 		modal.configure(forumId, mockCallback);
 	}
 
@@ -48,6 +52,7 @@ public class NewDiscussionThreadModalTest {
 		verify(mockView).setPresenter(modal);
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setModalTitle(anyString());
+		verify(mockView).setMarkdownEditor(any(Widget.class));
 	}
 
 	@Test
@@ -72,7 +77,7 @@ public class NewDiscussionThreadModalTest {
 	@Test
 	public void testOnSaveInvalidArgument() {
 		when(mockView.getThreadTitle()).thenReturn(null);
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(anyString());
@@ -84,7 +89,7 @@ public class NewDiscussionThreadModalTest {
 	@Test
 	public void testOnSaveSuccess() {
 		when(mockView.getThreadTitle()).thenReturn("title");
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
 			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
 					any(AsyncCallback.class));
@@ -101,7 +106,7 @@ public class NewDiscussionThreadModalTest {
 	@Test
 	public void testOnSaveFailure() {
 		when(mockView.getThreadTitle()).thenReturn("title");
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockDiscussionForumClient).createThread(any(CreateDiscussionThread.class),
 					any(AsyncCallback.class));

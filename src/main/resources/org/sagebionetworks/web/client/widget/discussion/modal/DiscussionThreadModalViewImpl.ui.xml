@@ -6,7 +6,7 @@
 	<b:Modal ui:field="threadModal" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 			<b:TextBox ui:field="threadTitle" placeholder="Title" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
-			<b:TextArea ui:field="messageMarkdown" placeholder="Message" addStyleNames="hide-resize" height="250px"/>
+			<bh:Div ui:field="markdownEditorContainer"></bh:Div>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
