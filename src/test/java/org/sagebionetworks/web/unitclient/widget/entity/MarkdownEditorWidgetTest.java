@@ -556,5 +556,12 @@ public class MarkdownEditorWidgetTest {
 		presenter.handleCommand(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD);
 		assertTrue(getNewMarkdown().contains(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE));
 	}
-	
+
+	@Test
+	public void testHideAttachmentCommands(){
+		presenter.hideAttachmentCommands();
+		verify(mockView).setAttachmentCommandsVisible(false);
+		verify(mockView).setImageCommandsVisible(false);
+		verify(mockView).setVideoCommandsVisible(false);
+	}
 }
