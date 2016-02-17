@@ -337,6 +337,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
@@ -471,6 +473,8 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormView;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
@@ -485,6 +489,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -505,6 +511,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
@@ -519,6 +527,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
@@ -1214,5 +1224,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
 		bind(WikiMarkdownEditorView.class).to(WikiMarkdownEditorViewImpl.class);
 		bind(StuAlertView.class).to(StuAlertViewImpl.class);
+		
+		bind(SynapseTableFormWidgetView.class).to(SynapseTableFormWidgetViewImpl.class);
+		bind(RowFormView.class).to(RowFormViewImpl.class);
+		bind(RadioCellEditorView.class).to(RadioCellEditorViewImpl.class);
+		bind(BooleanFormCellEditor.class).to(BooleanFormCellEditorImpl.class);
+		bind(EnumFormCellEditor.class).to(EnumFormCellEditorImpl.class);
 	}
 }

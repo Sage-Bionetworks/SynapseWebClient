@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -280,6 +281,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case INSERT_CHALLENGE_PARTICIPANTS:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY + "=123&"+ WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY +"=false" + WidgetConstants.WIDGET_END_MARKDOWN);
+			break;
+		case INSERT_SYNAPSE_FORM:
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE + "?"+WidgetConstants.TABLE_ID_KEY + "=syn123&"+ WidgetConstants.SUCCESS_MESSAGE +"=" + SynapseTableFormWidget.DEFAULT_SUCCESS_MESSAGE + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
 		case INSERT_PREVIEW:
 			insertNewWidget(WidgetConstants.PREVIEW_CONTENT_TYPE);

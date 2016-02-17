@@ -105,6 +105,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
@@ -124,12 +125,14 @@ import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
@@ -287,6 +290,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	public BiodallianceWidget getBiodallianceRenderer();
 	public CytoscapeWidget getCytoscapeRenderer();
+	public SynapseTableFormWidget getSynapseTableFormWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -323,7 +327,9 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityIdCellEditor createEntityIdCellEditor();
 	public EntityIdCellRenderer createEntityIdCellRenderer();
 	public EnumCellEditor createEnumCellEditor();
+	public EnumFormCellEditor createEnumFormCellEditor();
 	public BooleanCellEditor createBooleanCellEditor();
+	public BooleanFormCellEditor createBooleanFormCellEditor();
 	public DateCellEditor createDateCellEditor();
 	public DateCellRenderer createDateCellRenderer();
 	public DoubleCellEditor createDoubleCellEditor();
@@ -377,4 +383,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public MarkdownCacheKey getMarkdownCacheKey();
 	public MarkdownCacheValue getMarkdownCacheValue();
+	
 }

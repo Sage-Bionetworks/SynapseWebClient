@@ -28,6 +28,9 @@ public class WidgetConstants {
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
 	
+	public static final String SYNAPSE_FORM_CONTENT_TYPE = "synapseForm";
+	public static final String SYNAPSE_FORM_FRIENDLY_NAME = "Synapse Form";
+	
 	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs25";
 	public static final String CYTOSCAPE_FRIENDLY_NAME ="Cytoscape JS";
 
@@ -117,7 +120,7 @@ public class WidgetConstants {
 	public static final String JOIN_TEAM_OPEN_REQUEST_TEXT = "requestOpenText";
 	public static final String JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON = "isSimpleRequestButton";
 	public static final String JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT = "Your request to join this team has been sent.";
-	public static final String JOIN_TEAM_SUCCESS_MESSAGE = "successMessage";
+	public static final String SUCCESS_MESSAGE = "successMessage";
 	public static final String JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE = "Successfully joined";
 	public static final String JOIN_WIDGET_SHOW_PROFILE_FORM_KEY = "showProfileForm";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY = "subchallengeIdList";
@@ -137,6 +140,7 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_DISPLAY_HEIGHT_KEY = "displayHeightPx";
 	public static final int PROV_WIDGET_HEIGHT_DEFAULT = 275;
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
+	public static final String TABLE_ID_KEY = "tableId";
 	public static final String VIMEO_WIDGET_VIDEO_ID_KEY = "vimeoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";

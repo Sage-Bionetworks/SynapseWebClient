@@ -81,6 +81,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem userTeamLink;
 	@UiField
+	public AnchorListItem synapseFormLink;
+	@UiField
 	public AnchorListItem videoLink;
 	@UiField
 	public AnchorListItem youTubeLink;
@@ -178,6 +180,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		tableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TABLE));
 		tableOfContentsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TOC));
 		userTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
+		synapseFormLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM));
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
 		vimeoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIMEO));

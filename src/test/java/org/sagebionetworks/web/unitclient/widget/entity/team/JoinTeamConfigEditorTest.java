@@ -71,7 +71,7 @@ public class JoinTeamConfigEditorTest {
 		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, String.valueOf(showProfileFormKey));
 		descriptor.put(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON, String.valueOf(isSimpleRequest));
 		descriptor.put(WidgetConstants.IS_MEMBER_MESSAGE, isMemberMessage);
-		descriptor.put(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE, successMessage);
+		descriptor.put(WidgetConstants.SUCCESS_MESSAGE, successMessage);
 		descriptor.put(WidgetConstants.JOIN_TEAM_BUTTON_TEXT, joinTeamButtonText);
 		descriptor.put(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT, openRequestText);
 		testTeam = new Team();

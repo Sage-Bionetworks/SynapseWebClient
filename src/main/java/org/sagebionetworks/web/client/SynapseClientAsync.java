@@ -307,7 +307,7 @@ public interface SynapseClientAsync {
 	
 	void getAPIKey(AsyncCallback<String> callback);
 
-	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);
+	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	

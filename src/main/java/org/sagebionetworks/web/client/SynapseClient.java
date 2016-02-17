@@ -379,7 +379,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
 	
-	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
+	public List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;
 

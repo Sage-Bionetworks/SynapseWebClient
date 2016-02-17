@@ -95,7 +95,7 @@ public class RowSetUtils {
 	 *            updated.
 	 * @return A new PartialRow will be returned if the 
 	 */
-	private static PartialRow buildPartialRow(List<ColumnModel> headers,
+	public static PartialRow buildPartialRow(List<ColumnModel> headers,
 			Row toUpdate, Row original) {
 		if (toUpdate.getValues() == null) {
 			return null;
