@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.net.URL;
+
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -18,6 +20,13 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 
 @SuppressWarnings("serial")
 public class DiscussionForumClientImpl extends SynapseClientBase implements
@@ -198,5 +207,54 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+
+	@Override
+	public String getThreadMessage(String messageKey) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			URL presignedURL = synapseClient.getThreadUrl(messageKey);
+			return doGet(presignedURL);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (RequestException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getReplyMessage(String messageKey) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			URL presignedURL = synapseClient.getReplyUrl(messageKey);
+			return doGet(presignedURL);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (RequestException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	public String doGet(URL url) throws RequestException{
+		final StringBuilder message = new StringBuilder();
+		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, url.toString());
+		requestBuilder.sendRequest(null, new RequestCallback(){
+
+			@Override
+			public void onResponseReceived(Request request,
+					Response response) {
+				if (response.getStatusCode() == Response.SC_OK) {
+					message.append(response.getText());
+				} else {
+					onError(null, new IllegalArgumentException(response.getStatusText()));
+				}
+			}
+
+			@Override
+			public void onError(Request request, Throwable exception) {
+				throw new IllegalArgumentException(exception.getMessage());
+			}
+		});
+		return message.toString();
 	}
 }
