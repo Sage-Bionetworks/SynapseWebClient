@@ -55,4 +55,8 @@ public interface DiscussionForumClientAsync{
 			AsyncCallback<DiscussionReplyBundle> callback);
 
 	void markReplyAsDeleted(String replyId, AsyncCallback<Void> callback);
+
+	void getThreadUrl(String messageKey, AsyncCallback<String> callback);
+
+	void getReplyUrl(String messageKey, AsyncCallback<String> callback);
 }

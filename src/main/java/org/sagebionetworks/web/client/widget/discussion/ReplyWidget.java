@@ -95,16 +95,30 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	public void configureMessage() {
 		synAlert.clear();
 		view.setLoadingMessageVisible(true);
-		String url = DiscussionMessageURLUtil.buildMessageUrl(messageKey, WebConstants.REPLY_TYPE);
+		discussionForumClientAsync.getReplyUrl(messageKey, new AsyncCallback<String>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setLoadingMessageVisible(false);
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				getMessage(result);
+			}
+		});
+	}
+
+	public void getMessage(String url) {
 		requestBuilder.configure(RequestBuilder.GET, url);
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
-				public void onError(final Request request, final Throwable e) {
-					view.setLoadingMessageVisible(false);
-					synAlert.handleException(e);
-				}
-				public void onResponseReceived(final Request request, final Response response) {
+
+				@Override
+				public void onResponseReceived(Request request,
+						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
@@ -114,6 +128,12 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
 					}
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					view.setLoadingMessageVisible(false);
+					synAlert.handleException(exception);
 				}
 			});
 		} catch (final Exception e) {
