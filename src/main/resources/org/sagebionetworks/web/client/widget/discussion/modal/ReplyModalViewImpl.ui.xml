@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:Modal ui:field="replyModal" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
-			<b:TextArea ui:field="messageMarkdown" placeholder="Message" addStyleNames="hide-resize" height="250px"/>
+			<bh:Div ui:field="markdownEditorContainer"></bh:Div>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>

@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -33,6 +34,8 @@ public class EditReplyModalTest {
 	Callback mockCallback;
 	@Mock
 	DiscussionReplyBundle mockDiscussionReplyBundle;
+	@Mock
+	MarkdownEditorWidget mockMarkdownEditor;
 	String replyId = "123";
 	String message = "message";
 	EditReplyModal modal;
@@ -40,7 +43,7 @@ public class EditReplyModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor);
 		modal.configure(replyId, message, mockCallback);
 	}
 
@@ -49,13 +52,14 @@ public class EditReplyModalTest {
 		verify(mockView).setPresenter(modal);
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setModalTitle(anyString());
+		verify(mockView).setMarkdownEditor(any(Widget.class));
 	}
 
 	@Test
 	public void testShowDialog() {
 		modal.show();
 		verify(mockView).clear();
-		verify(mockView).setMessage(message);
+		verify(mockMarkdownEditor).configure(anyString());
 		verify(mockView).showDialog();
 	}
 
@@ -73,7 +77,7 @@ public class EditReplyModalTest {
 
 	@Test
 	public void testOnSaveInvalidArgument() {
-		when(mockView.getMessageMarkdown()).thenReturn("");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("");
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(anyString());
@@ -84,7 +88,7 @@ public class EditReplyModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
 			.when(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 		modal.onSave();
@@ -99,7 +103,7 @@ public class EditReplyModalTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveFailure() {
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 
