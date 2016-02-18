@@ -34,13 +34,15 @@
 		
 		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
-		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" media="print">
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" media="print" />
 		<link rel="stylesheet" type="text/css" href="Portal.css" />
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css"/>
 				
 		<!-- head.js -->
 		<script src="js/head.load.min.js"></script>
 		<script>
 	            head
+	            .js("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js")
 		        .js("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
 		        .js("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js")
  		        .js("js/slides.min.jquery.js")
@@ -51,7 +53,10 @@
 		        .js("js/highlight.pack.js")
 		        .js("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js")
 		        .js("js/init-nchart.js")
-		        .js("js/moment_min.js");
+		        .js("js/moment_min.js")
+		        .js("js/markdown-it/markdown-it-sup.min.js")
+		        .js("js/markdown-it/markdown-it-sub.min.js")
+		        ;
 	   	</script>    
 	
 		<title>Sage Synapse : Contribute to the Cure</title>

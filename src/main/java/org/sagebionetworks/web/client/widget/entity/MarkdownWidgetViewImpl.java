@@ -49,7 +49,6 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	@Override
 	public void setMarkdown(final String result) {
 		contentPanel.getElement().setInnerHTML(result);
-		jsniUtils.highlightCodeBlocks();
 	}
 	
 	@Override
@@ -89,5 +88,4 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 		contentPanel.clear();
 		setMarkdown("");
 	}
-	
 }
