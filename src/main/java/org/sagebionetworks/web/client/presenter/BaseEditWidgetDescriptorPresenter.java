@@ -84,9 +84,6 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	
 	@Override
 	public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor) {
-		if(wikiKey == null) throw new IllegalArgumentException("wiki key cannot be null");
-		if(wikiKey.getOwnerObjectId() == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
-		if(wikiKey.getOwnerObjectType() == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
 		if(contentTypeKey == null) throw new IllegalArgumentException("content type key cannot be null");
 		cleanInit();
 		this.contentTypeKey = contentTypeKey;
