@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -119,6 +121,9 @@ public class MarkdownWidgetTest {
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());
 		
+		//verify highlight code blocks applied
+		verify(mockSynapseJSNIUtils).highlightCodeBlocks();
+				
 		//verify loadWidgets
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
@@ -188,6 +193,25 @@ public class MarkdownWidgetTest {
 		verify(mockView).setEmptyVisible(false);
 		verify(mockView).setEmptyVisible(true);
 		verify(mockView).clearMarkdown();
+	}
+	
+	@Test
+	public void testMarkdownIt2Html() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
+		when(mockSynapseJSNIUtils.markdown2Html(anyString())).thenReturn(sampleHTML);
+		String markdown="input markdown that is transformed";
+		presenter.configure(markdown, mockWikiPageKey, 1L);
+		
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockSynapseJSNIUtils).markdown2Html(anyString());
+		verify(mockView).setMarkdown(sampleHTML);
+		//verify highlight code blocks never called (part of parsing)
+		verify(mockSynapseJSNIUtils, never()).highlightCodeBlocks();
+
 	}
 	
 	
