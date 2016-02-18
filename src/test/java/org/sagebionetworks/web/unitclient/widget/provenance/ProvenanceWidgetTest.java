@@ -548,6 +548,11 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
+			@Override
+			public String markdown2Html(String md) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 	}
 
