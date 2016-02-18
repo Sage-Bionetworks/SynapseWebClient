@@ -1,4 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
+
+import static org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -59,6 +61,7 @@ public class NewDiscussionThreadModalTest {
 	public void testShowDialog() {
 		modal.show();
 		verify(mockView).clear();
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
 		verify(mockView).showDialog();
 	}
 

@@ -20,6 +20,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private static final String NEW_THREAD_MODAL_TITLE = "New Thread";
 	private static final String SUCCESS_TITLE = "Thread created";
 	private static final String SUCCESS_MESSAGE = "A new thread has been created.";
+	public static final String DEFAULT_MARKDOWN = "";
 	private DiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
@@ -47,12 +48,13 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
-		markdownEditor.hideAttachmentCommands();
+		markdownEditor.hideUploadRelatedCommands();
 	}
 
 	@Override
 	public void show() {
 		view.clear();
+		markdownEditor.configure(DEFAULT_MARKDOWN);
 		view.showDialog();
 	}
 

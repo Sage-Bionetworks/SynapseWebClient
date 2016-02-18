@@ -51,7 +51,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		this.editThreadCallback = editThreadCallback;
 		this.title = currentTitle;
 		this.message = currentMessage;
-		markdownEditor.hideAttachmentCommands();
+		markdownEditor.hideUploadRelatedCommands();
 	}
 
 	@Override

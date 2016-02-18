@@ -559,7 +559,7 @@ public class MarkdownEditorWidgetTest {
 
 	@Test
 	public void testHideAttachmentCommands(){
-		presenter.hideAttachmentCommands();
+		presenter.hideUploadRelatedCommands();
 		verify(mockView).setAttachmentCommandsVisible(false);
 		verify(mockView).setImageCommandsVisible(false);
 		verify(mockView).setVideoCommandsVisible(false);
