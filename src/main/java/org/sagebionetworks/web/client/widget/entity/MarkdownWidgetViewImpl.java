@@ -89,5 +89,4 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 		contentPanel.clear();
 		setMarkdown("");
 	}
-	
 }

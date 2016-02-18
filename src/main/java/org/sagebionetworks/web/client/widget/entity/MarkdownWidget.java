@@ -99,23 +99,37 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		final String key = getKey(md, hostPrefix, isInTestWebsite);
 		final MarkdownCacheValue cachedValue = getValueFromCache(key);
 		if(cachedValue == null) {
-			synapseClient.markdown2Html(md, uniqueSuffix, isInTestWebsite, hostPrefix, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(final String result) {
-					view.callbackWhenAttached(new Callback() {
-						@Override
-						public void invoke() {
-							//save in cache
-							sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
-							loadHtml(uniqueSuffix, result);
-						}
-					});
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
+			//if in test website, use the new client-side markdown processor
+			if (isInTestWebsite) {
+				view.callbackWhenAttached(new Callback() {
+					@Override
+					public void invoke() {
+						//save in cache
+						String result = synapseJSNIUtils.markdown2Html(md);
+						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+						loadHtml(uniqueSuffix, result);
+					}
+				});
+			}
+			else {
+				synapseClient.markdown2Html(md, uniqueSuffix, isInTestWebsite, hostPrefix, new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(final String result) {
+						view.callbackWhenAttached(new Callback() {
+							@Override
+							public void invoke() {
+								//save in cache
+								sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+								loadHtml(uniqueSuffix, result);
+							}
+						});
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+				});
+			}
 		} else {
 			//used cached value
 			view.callbackWhenAttached(new Callback() {

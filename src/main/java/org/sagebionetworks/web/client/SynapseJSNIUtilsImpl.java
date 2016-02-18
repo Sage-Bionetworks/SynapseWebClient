@@ -579,4 +579,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return Location.getHostName();
 	}
 	
+	@Override
+	public String markdown2Html(String md) {
+		return _markdown2Html(md);
+	}
+	
+	private final static native String _markdown2Html(String md) /*-{
+		if (!$wnd.markdownitSingleton) {
+			$wnd.markdownitSingleton = $wnd.markdownit()
+				.set({ html: false, breaks: true });
+			$wnd.markdownitSingleton.use($wnd.markdownitSub);
+			$wnd.markdownitSingleton.use($wnd.markdownitSup);
+		}
+		
+		return $wnd.markdownitSingleton.render(md);
+	}-*/;
 }
