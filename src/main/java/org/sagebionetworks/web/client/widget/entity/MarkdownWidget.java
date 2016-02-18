@@ -166,6 +166,14 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		if(result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
+			boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+
+			//TODO: remove highlightCodeBlocks call once markdown-it has replaced the server-side processor
+			// (because code highlighting is does in the new parser)
+			if (!isInTestWebsite) {
+				synapseJSNIUtils.highlightCodeBlocks();
+			}
+				
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();

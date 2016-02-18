@@ -588,8 +588,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		if (!$wnd.markdownitSingleton) {
 			$wnd.markdownitSingleton = $wnd.markdownit()
 				.set({ html: false, breaks: true });
-			$wnd.markdownitSingleton.use($wnd.markdownitSub);
-			$wnd.markdownitSingleton.use($wnd.markdownitSup);
+			$wnd.markdownitSingleton
+				.use($wnd.markdownitSub)
+				.use($wnd.markdownitSup);
+			
+			$wnd.markdownitSingleton
+				.set({
+				  highlight: function (str, lang) {
+				    if (lang && $wnd.hljs.getLanguage(lang)) {
+				      try {
+				      	return $wnd.hljs.highlight(lang, str).value;
+				      } catch (__) {}
+				    }
+				    return ''; // use external default escaping
+				  }
+				});
+			
 		}
 		
 		return $wnd.markdownitSingleton.render(md);
