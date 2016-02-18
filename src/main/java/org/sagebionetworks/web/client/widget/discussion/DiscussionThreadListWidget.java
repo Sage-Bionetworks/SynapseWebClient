@@ -103,5 +103,39 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						};
 					}
 		});
+	}
+
+	public void sortByReplies() {
+		if (order != null && order == DiscussionThreadOrder.NUMBER_OF_REPLIES) {
+			ascending = !ascending;
+		} else {
+			order = DiscussionThreadOrder.NUMBER_OF_REPLIES;
+			ascending = true;
+		}
+		configure(forumId, isCurrentUserModerator, emptyListCallback);
+	}
+
+	public void sortByViews() {
+		if (order != null && order == DiscussionThreadOrder.NUMBER_OF_VIEWS) {
+			ascending = !ascending;
+		} else {
+			order = DiscussionThreadOrder.NUMBER_OF_VIEWS;
+			ascending = true;
+		}
+		configure(forumId, isCurrentUserModerator, emptyListCallback);
+	}
+
+	public void sortByActivity() {
+		if (order != null && order == DiscussionThreadOrder.LAST_ACTIVITY) {
+			if (ascending != null) {
+				ascending = !ascending;
+			} else {
+				ascending = true;
+			}
+		} else {
+			order = DiscussionThreadOrder.LAST_ACTIVITY;
+			ascending = true;
+		}
+		configure(forumId, isCurrentUserModerator, emptyListCallback);
 	};
 }

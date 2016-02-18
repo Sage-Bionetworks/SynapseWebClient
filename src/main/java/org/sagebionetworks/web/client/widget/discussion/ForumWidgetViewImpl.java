@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.toggleswitch.client.ui.ToggleSwitch;
@@ -13,6 +14,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,6 +41,18 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Span emptyUI;
 	@UiField
 	Table threadHeader;
+	@UiField
+	FocusPanel sortByReplies;
+	@UiField
+	FocusPanel sortByViews;
+	@UiField
+	FocusPanel sortByActivity;
+	@UiField
+	Icon sortByRepliesIcon;
+	@UiField
+	Icon sortByViewsIcon;
+	@UiField
+	Icon sortByActivityIcon;
 
 	private Presenter presenter;
 
@@ -64,6 +78,24 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickShowAllThreads();
+			}
+		});
+		sortByReplies.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortByReplies();
+			}
+		});
+		sortByViews.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortByViews();
+			}
+		});
+		sortByActivity.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortByActivity();
 			}
 		});
 	}
@@ -142,5 +174,20 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
+	}
+
+	@Override
+	public void setSortByRepliesIconVisible(boolean visible) {
+		sortByRepliesIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setSortByViewsIconVisible(boolean visible) {
+		sortByViewsIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setSortByActivityIconVisible(boolean visible) {
+		sortByActivityIcon.setVisible(visible);
 	}
 }

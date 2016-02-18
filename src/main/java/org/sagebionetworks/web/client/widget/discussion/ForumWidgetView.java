@@ -10,6 +10,9 @@ public interface ForumWidgetView extends IsWidget{
 		void onModeratorModeChange();
 		void onClickShowAllThreads();
 		Widget asWidget();
+		void sortByReplies();
+		void sortByViews();
+		void sortByActivity();
 	}
 
 	void setPresenter(Presenter presenter);
@@ -26,4 +29,7 @@ public interface ForumWidgetView extends IsWidget{
 	void setThreadHeaderVisible(boolean visible);
 	void setNewThreadButtonVisible(boolean visible);
 	void setShowAllThreadsButtonVisible(boolean visible);
+	void setSortByRepliesIconVisible(boolean visible);
+	void setSortByViewsIconVisible(boolean visible);
+	void setSortByActivityIconVisible(boolean visible);
 }

@@ -42,6 +42,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	Boolean isCurrentUserModerator;
 	Callback showAllThreadsCallback;
 	CallbackP<Boolean> emptyListCallback;
+	Boolean isSingleThread;
 
 	@Inject
 	public ForumWidget(
@@ -86,8 +87,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
 			showThread(threadId);
+			isSingleThread = true;
 		} else {
 			showForum();
+			isSingleThread = false;
 		}
 	}
 
@@ -96,6 +99,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(false);
 		view.setNewThreadButtonVisible(false);
 		view.setShowAllThreadsButtonVisible(true);
+		view.setSortByRepliesIconVisible(false);
+		view.setSortByViewsIconVisible(false);
+		view.setSortByActivityIconVisible(false);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
@@ -130,6 +136,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
 		view.setShowAllThreadsButtonVisible(false);
+		view.setSortByRepliesIconVisible(true);
+		view.setSortByViewsIconVisible(true);
+		view.setSortByActivityIconVisible(true);
 		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -184,5 +193,26 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Override
 	public Widget asWidget(){
 		return view.asWidget();
+	}
+
+	@Override
+	public void sortByReplies() {
+		if (!isSingleThread) {
+			threadListWidget.sortByReplies();
+		}
+	}
+
+	@Override
+	public void sortByViews() {
+		if (!isSingleThread) {
+			threadListWidget.sortByViews();
+		}
+	}
+
+	@Override
+	public void sortByActivity() {
+		if (!isSingleThread) {
+			threadListWidget.sortByActivity();
+		}
 	}
 }
