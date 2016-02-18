@@ -19,13 +19,12 @@ public interface ReplyModalView extends IsWidget{
 	void setPresenter(Presenter presenter);
 	void showDialog();
 	void hideDialog();
-	String getMessageMarkdown();
 	void clear();
 	void setAlert(Widget w);
 	void showSuccess(String title, String message);
 	void showSaving();
 	void resetButton();
-	void setMessage(String message);
 	void setModalTitle(String title);
+	void setMarkdownEditor(Widget widget);
 
 }

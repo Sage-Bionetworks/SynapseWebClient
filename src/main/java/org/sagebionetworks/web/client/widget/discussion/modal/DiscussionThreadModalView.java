@@ -20,14 +20,13 @@ public interface DiscussionThreadModalView extends IsWidget{
 	void showDialog();
 	void hideDialog();
 	String getThreadTitle();
-	String getMessageMarkdown();
 	void clear();
 	void setAlert(Widget w);
 	void showSuccess(String title, String message);
 	void showSaving();
 	void resetButton();
 	void setThreadTitle(String currentTitle);
-	void setThreadMessage(String currentMessage);
 	void setModalTitle(String title);
+	void setMarkdownEditor(Widget widget);
 
 }

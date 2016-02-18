@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -24,7 +23,7 @@ public class ReplyModalViewImpl implements ReplyModalView {
 	@UiField
 	Modal replyModal;
 	@UiField
-	TextArea messageMarkdown;
+	Div markdownEditorContainer;
 	@UiField
 	Div synAlertContainer;
 
@@ -69,13 +68,12 @@ public class ReplyModalViewImpl implements ReplyModalView {
 	}
 
 	@Override
-	public String getMessageMarkdown() {
-		return messageMarkdown.getText();
+	public void setMarkdownEditor(Widget widget) {
+		markdownEditorContainer.add(widget);
 	}
 
 	@Override
 	public void clear() {
-		messageMarkdown.setText("");
 		saveButton.state().reset();
 	}
 
@@ -97,11 +95,6 @@ public class ReplyModalViewImpl implements ReplyModalView {
 	@Override
 	public void resetButton() {
 		saveButton.state().reset();
-	}
-
-	@Override
-	public void setMessage(String message) {
-		messageMarkdown.setText(message);
 	}
 
 	@Override

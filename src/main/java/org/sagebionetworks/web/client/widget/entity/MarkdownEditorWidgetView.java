@@ -48,4 +48,8 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setFormattingGuideWidget(Widget formattingGuideWidget);
 
 	void configure(String markdown);
+
+	void setImageCommandsVisible(boolean visible);
+
+	void setVideoCommandsVisible(boolean visible);
 }

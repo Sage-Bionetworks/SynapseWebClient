@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -34,6 +35,8 @@ public class EditDiscussionThreadModalTest {
 	Callback mockCallback;
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
+	@Mock
+	MarkdownEditorWidget mockMarkdownEditor;
 	String threadId = "123";
 	String title = "title";
 	String message = "message";
@@ -42,7 +45,8 @@ public class EditDiscussionThreadModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient, mockSynAlert);
+		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient,
+				mockSynAlert, mockMarkdownEditor);
 		modal.configure(threadId, title, message, mockCallback);
 	}
 
@@ -51,6 +55,8 @@ public class EditDiscussionThreadModalTest {
 		verify(mockView).setPresenter(modal);
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setModalTitle(anyString());
+		verify(mockView).setMarkdownEditor(any(Widget.class));
+		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 	}
 
 	@Test
@@ -58,7 +64,7 @@ public class EditDiscussionThreadModalTest {
 		modal.show();
 		verify(mockView).clear();
 		verify(mockView).setThreadTitle(title);
-		verify(mockView).setThreadMessage(message);
+		verify(mockMarkdownEditor).configure(message);
 		verify(mockView).showDialog();
 	}
 
@@ -77,7 +83,7 @@ public class EditDiscussionThreadModalTest {
 	@Test
 	public void testOnSaveInvalidArgument() {
 		when(mockView.getThreadTitle()).thenReturn(null);
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).showError(anyString());
@@ -89,7 +95,7 @@ public class EditDiscussionThreadModalTest {
 	@Test
 	public void testOnSaveSuccess() {
 		when(mockView.getThreadTitle()).thenReturn("title");
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
 			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
 					any(AsyncCallback.class));
@@ -107,7 +113,7 @@ public class EditDiscussionThreadModalTest {
 	@Test
 	public void testOnSaveFailure() {
 		when(mockView.getThreadTitle()).thenReturn("title");
-		when(mockView.getMessageMarkdown()).thenReturn("message");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
 					any(AsyncCallback.class));

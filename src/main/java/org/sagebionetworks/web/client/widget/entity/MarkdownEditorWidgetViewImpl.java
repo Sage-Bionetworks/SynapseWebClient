@@ -267,7 +267,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		});
 	}
 	
-	
+
 	@Override
 	public void setAttachmentCommandsVisible(boolean visible) {
 		attachmentLink.setVisible(visible);
@@ -363,5 +363,17 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public boolean isEditorAttachedAndVisible() {
 		return widget.isAttached() && widget.isVisible();
+	}
+
+	@Override
+	public void setImageCommandsVisible(boolean visible) {
+		imageLink.setVisible(visible);
+		imageButton.setVisible(visible);
+	}
+
+	@Override
+	public void setVideoCommandsVisible(boolean visible) {
+		videoLink.setVisible(visible);
+		videoButton.setVisible(visible);
 	}
 }

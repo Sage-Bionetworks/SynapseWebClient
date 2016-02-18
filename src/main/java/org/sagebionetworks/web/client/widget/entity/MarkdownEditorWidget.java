@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -75,12 +74,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 		view.setFormattingGuideWidget(formattingGuide.asWidget());
+		view.setAttachmentCommandsVisible(true);
 	}
 	
 	public void configure(String markdown) {
 		//clear view state
 		view.clear();
-		view.setAttachmentCommandsVisible(true);
 		view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.configure(markdown);
 		if (formattingGuideWikiPageKey == null) {
@@ -448,5 +447,11 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void setWikiKey(WikiPageKey wikiKey) {
 		this.wikiKey = wikiKey;
+	}
+
+	public void hideUploadRelatedCommands(){
+		view.setAttachmentCommandsVisible(false);
+		view.setImageCommandsVisible(false);
+		view.setVideoCommandsVisible(false);
 	}
 }

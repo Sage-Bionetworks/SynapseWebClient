@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,6 +23,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	private ReplyModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
+	private MarkdownEditorWidget markdownEditor;
 	private String replyId;
 	private String message;
 	Callback editReplyCallback;
@@ -30,14 +32,18 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	public EditReplyModal(
 			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			MarkdownEditorWidget markdownEditor
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
+		this.markdownEditor = markdownEditor;
+		markdownEditor.hideUploadRelatedCommands();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
+		view.setMarkdownEditor(markdownEditor.asWidget());
 	}
 
 	public void configure(String replyId, String message, Callback editReplyCallback) {
@@ -49,7 +55,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	@Override
 	public void show() {
 		view.clear();
-		view.setMessage(message);
+		markdownEditor.configure(message);
 		view.showDialog();
 	}
 
@@ -61,7 +67,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		String messageMarkdown = view.getMessageMarkdown();
+		String messageMarkdown = markdownEditor.getMarkdown();
 		ValidationResult result = new ValidationResult();
 		result.requiredField("Message", messageMarkdown);
 		if (!result.isValid()) {
