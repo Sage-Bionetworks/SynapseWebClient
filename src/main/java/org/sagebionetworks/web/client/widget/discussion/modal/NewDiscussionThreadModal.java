@@ -39,6 +39,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		markdownEditor.hideUploadRelatedCommands();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_THREAD_MODAL_TITLE);
@@ -48,7 +49,6 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
-		markdownEditor.hideUploadRelatedCommands();
 	}
 
 	@Override

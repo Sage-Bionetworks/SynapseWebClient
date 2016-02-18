@@ -40,6 +40,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		markdownEditor.hideUploadRelatedCommands();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_THREAD_MODAL_TITLE);
@@ -51,7 +52,6 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		this.editThreadCallback = editThreadCallback;
 		this.title = currentTitle;
 		this.message = currentMessage;
-		markdownEditor.hideUploadRelatedCommands();
 	}
 
 	@Override

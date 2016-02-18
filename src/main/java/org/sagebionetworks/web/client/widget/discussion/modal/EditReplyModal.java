@@ -39,6 +39,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		markdownEditor.hideUploadRelatedCommands();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
@@ -49,7 +50,6 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		this.replyId = replyId;
 		this.message = message;
 		this.editReplyCallback = editReplyCallback;
-		markdownEditor.hideUploadRelatedCommands();
 	}
 
 	@Override

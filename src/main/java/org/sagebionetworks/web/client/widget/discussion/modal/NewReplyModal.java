@@ -39,6 +39,7 @@ public class NewReplyModal implements ReplyModalView.Presenter{
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		markdownEditor.hideUploadRelatedCommands();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_REPLY_MODAL_TITLE);
@@ -48,7 +49,6 @@ public class NewReplyModal implements ReplyModalView.Presenter{
 	public void configure(String threadId, Callback newReplyCallback) {
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
-		markdownEditor.hideUploadRelatedCommands();
 	}
 
 	@Override
