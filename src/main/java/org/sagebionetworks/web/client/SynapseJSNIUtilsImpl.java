@@ -604,6 +604,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				  }
 				});
 		}
+		//load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
 		$wnd.markdownitSingleton.use($wnd.markdownitSynapse, uniqueSuffix);
 		
 		return $wnd.markdownitSingleton.render(md);
