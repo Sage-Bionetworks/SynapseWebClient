@@ -26,8 +26,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
 
-	public static final String REPLIES = "replies";
-
 	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
 	@UiField
@@ -179,9 +177,9 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setNumberOfReplies(String numberOfReplies) {
+	public void setNumberOfReplies(String numberOfReplies, String descriptiveText) {
 		this.numberOfReplies.setText(numberOfReplies);
-		this.clickToViewReplies.setText(numberOfReplies + " " + REPLIES);
+		this.clickToViewReplies.setText(numberOfReplies + " " + descriptiveText);
 	}
 
 	@Override

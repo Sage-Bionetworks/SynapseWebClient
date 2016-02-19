@@ -34,7 +34,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setMarkdownWidget(Widget widget);
 
-	void setNumberOfReplies(String numberOfReplies);
+	void setNumberOfReplies(String numberOfReplies, String descriptiveText);
 
 	void setNumberOfViews(String numberOfViews);
 

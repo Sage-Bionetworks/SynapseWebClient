@@ -140,7 +140,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
-		verify(mockView).setNumberOfReplies("1");
+		verify(mockView).setNumberOfReplies("1", REPLY);
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
@@ -212,7 +212,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
-		verify(mockView).setNumberOfReplies("1");
+		verify(mockView).setNumberOfReplies("1", REPLY);
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
@@ -238,7 +238,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).addActiveAuthor(any(Widget.class));
-		verify(mockView).setNumberOfReplies("0");
+		verify(mockView).setNumberOfReplies("0", REPLIES);
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
@@ -373,7 +373,7 @@ public class DiscussionThreadWidgetTest {
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
 		verify(mockView).setShowRepliesVisibility(true);
-		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
+		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString(), anyString());
 		verify(mockView).showReplyDetails();
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
@@ -465,7 +465,7 @@ public class DiscussionThreadWidgetTest {
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
 		verify(mockView, atLeastOnce()).setShowRepliesVisibility(true);
-		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString());
+		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString(), anyString());
 		verify(mockView).showReplyDetails();
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
