@@ -77,19 +77,11 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.deleteReplyCallback = deleteReplyCallback;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
-		if (bundle.getIsDeleted()) {
-			view.setDeleteIconVisibility(false);
-			view.setMessageVisible(false);
-			view.setDeletedMessageVisible(true);
-			view.setEditIconVisible(false);
-		} else {
-			view.setMessageVisible(true);
-			view.setDeletedMessageVisible(false);
-			view.setEditedVisible(bundle.getIsEdited());
-			view.setDeleteIconVisibility(isCurrentUserModerator);
-			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
-			configureMessage();
-		}
+		view.setMessageVisible(true);
+		view.setEditedVisible(bundle.getIsEdited());
+		view.setDeleteIconVisibility(isCurrentUserModerator);
+		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+		configureMessage();
 	}
 
 	public void configureMessage() {

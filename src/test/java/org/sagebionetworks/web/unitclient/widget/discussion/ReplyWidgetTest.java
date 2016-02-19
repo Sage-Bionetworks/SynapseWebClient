@@ -98,7 +98,6 @@ public class ReplyWidgetTest {
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
 		verify(mockView).setMessageVisible(true);
-		verify(mockView).setDeletedMessageVisible(false);
 	}
 
 	@Test
@@ -124,35 +123,6 @@ public class ReplyWidgetTest {
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
 		verify(mockView).setEditIconVisible(true);
-	}
-
-	@Test
-	public void testConfigureDeletedReply() {
-		boolean isDeleted = true;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
-		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
-		verify(mockView).setEditIconVisible(false);
-		verify(mockView, never()).setEditedVisible(false);
-		verify(mockView).setMessageVisible(false);
-		verify(mockView).setDeletedMessageVisible(true);
-	}
-
-	@Test
-	public void testConfigureDeletedReplyNonAuthor() {
-		boolean isDeleted = true;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CREATED_BY);
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
-		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
-		verify(mockView).setEditIconVisible(false);
-		verify(mockView, never()).setEditedVisible(false);
 	}
 
 	@Test
