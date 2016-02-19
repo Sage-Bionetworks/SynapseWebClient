@@ -580,11 +580,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public String markdown2Html(String md) {
-		return _markdown2Html(md);
+	public String markdown2Html(String md, String uniqueSuffix) {
+		return _markdown2Html(md, uniqueSuffix);
 	}
 	
-	private final static native String _markdown2Html(String md) /*-{
+	private final static native String _markdown2Html(String md, String uniqueSuffix) /*-{
 		if (!$wnd.markdownitSingleton) {
 			$wnd.markdownitSingleton = $wnd.markdownit()
 				.set({ html: false, breaks: true });
@@ -603,8 +603,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    return ''; // use external default escaping
 				  }
 				});
-			
 		}
+		$wnd.markdownitSingleton.use($wnd.markdownitSynapse, uniqueSuffix);
 		
 		return $wnd.markdownitSingleton.render(md);
 	}-*/;

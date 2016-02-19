@@ -47,6 +47,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	 */
 	@UiField
 	public Button editWidgetButton;
+	@UiField
+	public Button formattingGuideOkButton;
+	
 	//insert widget menu commands
 	@UiField
 	public AnchorListItem attachmentLink;
@@ -223,6 +226,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				formattingGuideModal.show();
+			}
+		});
+		formattingGuideOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				formattingGuideModal.hide();
 			}
 		});
 	}
