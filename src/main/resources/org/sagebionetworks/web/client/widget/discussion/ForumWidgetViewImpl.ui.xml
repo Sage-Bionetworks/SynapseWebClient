@@ -36,28 +36,19 @@
 								<t:TableHeader width="310px" addStyleNames="visible-lg">
 									<bh:Span text="Active Users"/>
 								</t:TableHeader>
-								<t:TableHeader width="70px" addStyleNames="visible-lg visible-md">
+								<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
 									<g:FocusPanel ui:field="sortByReplies" addStyleNames="imageButton">
-										<bh:Div>
-											<bh:Span text="Replies" addStyleNames="margin-right-5"/>
-											<b:Icon ui:field="sortByRepliesIcon" type="SORT_DESC"/>
-										</bh:Div>
+										<bh:Span text="Replies" addStyleNames="margin-right-5"/>
 									</g:FocusPanel>
 								</t:TableHeader>
 								<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
 									<g:FocusPanel ui:field="sortByViews" addStyleNames="imageButton">
-										<bh:Div>
-											<bh:Span text="Views" addStyleNames="margin-right-5"/>
-											<b:Icon ui:field="sortByViewsIcon" type="SORT_DESC"/>
-										</bh:Div>
+										<bh:Span text="Views" addStyleNames="margin-right-5"/>
 									</g:FocusPanel>
 								</t:TableHeader>
 								<t:TableHeader width="130px" addStyleNames="visible-lg visible-md">
 									<g:FocusPanel ui:field="sortByActivity" addStyleNames="imageButton">
-										<bh:Div>
-											<bh:Span text="Activity" addStyleNames="margin-right-5"/>
-											<b:Icon ui:field="sortByActivityIcon" type="SORT_DESC"/>
-										</bh:Div>
+										<bh:Span text="Activity" addStyleNames="margin-right-5"/>
 									</g:FocusPanel>
 								</t:TableHeader>
 							</t:TableRow>

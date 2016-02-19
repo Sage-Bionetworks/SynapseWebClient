@@ -29,7 +29,4 @@ public interface ForumWidgetView extends IsWidget{
 	void setThreadHeaderVisible(boolean visible);
 	void setNewThreadButtonVisible(boolean visible);
 	void setShowAllThreadsButtonVisible(boolean visible);
-	void setSortByRepliesIconVisible(boolean visible);
-	void setSortByViewsIconVisible(boolean visible);
-	void setSortByActivityIconVisible(boolean visible);
 }

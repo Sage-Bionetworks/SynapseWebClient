@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.toggleswitch.client.ui.ToggleSwitch;
@@ -47,12 +46,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	FocusPanel sortByViews;
 	@UiField
 	FocusPanel sortByActivity;
-	@UiField
-	Icon sortByRepliesIcon;
-	@UiField
-	Icon sortByViewsIcon;
-	@UiField
-	Icon sortByActivityIcon;
 
 	private Presenter presenter;
 
@@ -174,20 +167,5 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
-	}
-
-	@Override
-	public void setSortByRepliesIconVisible(boolean visible) {
-		sortByRepliesIcon.setVisible(visible);
-	}
-
-	@Override
-	public void setSortByViewsIconVisible(boolean visible) {
-		sortByViewsIcon.setVisible(visible);
-	}
-
-	@Override
-	public void setSortByActivityIconVisible(boolean visible) {
-		sortByActivityIcon.setVisible(visible);
 	}
 }

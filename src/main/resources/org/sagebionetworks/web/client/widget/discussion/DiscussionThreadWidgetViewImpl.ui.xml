@@ -23,7 +23,7 @@
 				<t:TableData width="310px" addStyleNames="visible-lg">
 					<bh:Span ui:field="activeUsers" addStyleNames="imageButton"></bh:Span>
 				</t:TableData>
-				<t:TableData width="70px" addStyleNames="visible-lg visible-md">
+				<t:TableData width="60px" addStyleNames="visible-lg visible-md">
 					<bh:Span ui:field="numberOfReplies"></bh:Span>
 				</t:TableData>
 				<t:TableData width="60px" addStyleNames="visible-lg visible-md">

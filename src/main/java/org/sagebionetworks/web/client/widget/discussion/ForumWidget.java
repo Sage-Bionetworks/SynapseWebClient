@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -99,9 +100,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(false);
 		view.setNewThreadButtonVisible(false);
 		view.setShowAllThreadsButtonVisible(true);
-		view.setSortByRepliesIconVisible(false);
-		view.setSortByViewsIconVisible(false);
-		view.setSortByActivityIconVisible(false);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
@@ -136,9 +134,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
 		view.setShowAllThreadsButtonVisible(false);
-		view.setSortByRepliesIconVisible(true);
-		view.setSortByViewsIconVisible(true);
-		view.setSortByActivityIconVisible(true);
 		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
