@@ -6,6 +6,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,5 +208,80 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByRepliesRepeated() {
+		boolean canModerate = false;
+		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(!DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByViewsRepeated() {
+		boolean canModerate = false;
+		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(!DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByLatActivityRepeated() {
+		boolean canModerate = false;
+		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.LAST_ACTIVITY), eq(!DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.LAST_ACTIVITY), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSort() {
+		boolean canModerate = false;
+		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
+
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 }
