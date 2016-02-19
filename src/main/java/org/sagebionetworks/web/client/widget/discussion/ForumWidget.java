@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -42,6 +43,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	Boolean isCurrentUserModerator;
 	Callback showAllThreadsCallback;
 	CallbackP<Boolean> emptyListCallback;
+	Boolean isSingleThread;
 
 	@Inject
 	public ForumWidget(
@@ -86,8 +88,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
 			showThread(threadId);
+			isSingleThread = true;
 		} else {
 			showForum();
+			isSingleThread = false;
 		}
 	}
 
@@ -184,5 +188,26 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Override
 	public Widget asWidget(){
 		return view.asWidget();
+	}
+
+	@Override
+	public void sortByReplies() {
+		if (!isSingleThread) {
+			threadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		}
+	}
+
+	@Override
+	public void sortByViews() {
+		if (!isSingleThread) {
+			threadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		}
+	}
+
+	@Override
+	public void sortByActivity() {
+		if (!isSingleThread) {
+			threadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		}
 	}
 }

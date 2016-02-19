@@ -46,6 +46,8 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
+		order = DEFAULT_ORDER;
+		ascending = DEFAULT_ASCENDING;
 	}
 
 	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
@@ -53,12 +55,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		offset = 0L;
-		if (order == null) {
-			order = DEFAULT_ORDER;
-		}
-		if (ascending == null) {
-			ascending = DEFAULT_ASCENDING;
-		}
 		this.forumId = forumId;
 		loadMore();
 	}
@@ -103,5 +99,15 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						};
 					}
 		});
-	};
+	}
+
+	public void sortBy(DiscussionThreadOrder newOrder) {
+		if (order == newOrder) {
+			ascending = !ascending;
+		} else {
+			order = newOrder;
+			ascending = DEFAULT_ASCENDING;
+		}
+		configure(forumId, isCurrentUserModerator, emptyListCallback);
+	}
 }

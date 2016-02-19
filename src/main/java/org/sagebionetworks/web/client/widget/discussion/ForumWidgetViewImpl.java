@@ -13,6 +13,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,6 +40,12 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Span emptyUI;
 	@UiField
 	Table threadHeader;
+	@UiField
+	FocusPanel sortByReplies;
+	@UiField
+	FocusPanel sortByViews;
+	@UiField
+	FocusPanel sortByActivity;
 
 	private Presenter presenter;
 
@@ -64,6 +71,24 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickShowAllThreads();
+			}
+		});
+		sortByReplies.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortByReplies();
+			}
+		});
+		sortByViews.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortByViews();
+			}
+		});
+		sortByActivity.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortByActivity();
 			}
 		});
 	}

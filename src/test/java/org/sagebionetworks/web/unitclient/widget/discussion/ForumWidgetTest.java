@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -240,5 +241,105 @@ public class ForumWidgetTest {
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockSynAlert, times(2)).clear();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByRepliesForum() {
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1"; 
+		String areaToken = "a=b&c=d";
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+		forumWidget.sortByReplies();
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByRepliesThread() {
+		when(mockDiscussionThreadWidget.isThreadCollapsed()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
+				.getThread(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1";
+		String threadId = "007";
+		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+		forumWidget.sortByReplies();
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByViewsForum() {
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1"; 
+		String areaToken = "a=b&c=d";
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+		forumWidget.sortByViews();
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByViewsThread() {
+		when(mockDiscussionThreadWidget.isThreadCollapsed()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
+				.getThread(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1";
+		String threadId = "007";
+		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+		forumWidget.sortByViews();
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+	}
+
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByActivityForum() {
+		when(mockForum.getId()).thenReturn("123");
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumMetadata(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1"; 
+		String areaToken = "a=b&c=d";
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+		forumWidget.sortByActivity();
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSortByActivityThread() {
+		when(mockDiscussionThreadWidget.isThreadCollapsed()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
+				.getThread(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1";
+		String threadId = "007";
+		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		Callback callback = null;
+		forumWidget.configure(entityId, param, canModerate, callback);
+		forumWidget.sortByActivity();
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
 	}
 }
