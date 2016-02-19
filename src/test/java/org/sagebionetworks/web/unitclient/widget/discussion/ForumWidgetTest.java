@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -97,9 +98,6 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
-		verify(mockView).setSortByRepliesIconVisible(true);
-		verify(mockView).setSortByViewsIconVisible(true);
-		verify(mockView).setSortByActivityIconVisible(true);
 		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE), any(CallbackP.class));
@@ -192,9 +190,6 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
-		verify(mockView).setSortByRepliesIconVisible(false);
-		verify(mockView).setSortByViewsIconVisible(false);
-		verify(mockView).setSortByActivityIconVisible(false);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle),
 				eq(canModerate), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD),
@@ -261,7 +256,7 @@ public class ForumWidgetTest {
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByReplies();
-		verify(mockAvailableThreadListWidget).sortByReplies();
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -278,7 +273,7 @@ public class ForumWidgetTest {
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByReplies();
-		verify(mockAvailableThreadListWidget, never()).sortByReplies();
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -294,7 +289,7 @@ public class ForumWidgetTest {
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByViews();
-		verify(mockAvailableThreadListWidget).sortByViews();
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -311,7 +306,7 @@ public class ForumWidgetTest {
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByViews();
-		verify(mockAvailableThreadListWidget, never()).sortByViews();
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
 	}
 
 
@@ -328,7 +323,7 @@ public class ForumWidgetTest {
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByActivity();
-		verify(mockAvailableThreadListWidget).sortByActivity();
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -345,6 +340,6 @@ public class ForumWidgetTest {
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByActivity();
-		verify(mockAvailableThreadListWidget, never()).sortByActivity();
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
 	}
 }

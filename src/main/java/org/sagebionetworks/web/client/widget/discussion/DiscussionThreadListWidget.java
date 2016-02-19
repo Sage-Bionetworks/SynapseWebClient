@@ -46,6 +46,8 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
+		order = DEFAULT_ORDER;
+		ascending = DEFAULT_ASCENDING;
 	}
 
 	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
@@ -53,12 +55,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		offset = 0L;
-		if (order == null) {
-			order = DEFAULT_ORDER;
-		}
-		if (ascending == null) {
-			ascending = DEFAULT_ASCENDING;
-		}
 		this.forumId = forumId;
 		loadMore();
 	}
@@ -105,37 +101,13 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		});
 	}
 
-	public void sortByReplies() {
-		if (order != null && order == DiscussionThreadOrder.NUMBER_OF_REPLIES) {
+	public void sortBy(DiscussionThreadOrder newOrder) {
+		if (order == newOrder) {
 			ascending = !ascending;
 		} else {
-			order = DiscussionThreadOrder.NUMBER_OF_REPLIES;
-			ascending = true;
+			order = newOrder;
+			ascending = DEFAULT_ASCENDING;
 		}
 		configure(forumId, isCurrentUserModerator, emptyListCallback);
 	}
-
-	public void sortByViews() {
-		if (order != null && order == DiscussionThreadOrder.NUMBER_OF_VIEWS) {
-			ascending = !ascending;
-		} else {
-			order = DiscussionThreadOrder.NUMBER_OF_VIEWS;
-			ascending = true;
-		}
-		configure(forumId, isCurrentUserModerator, emptyListCallback);
-	}
-
-	public void sortByActivity() {
-		if (order != null && order == DiscussionThreadOrder.LAST_ACTIVITY) {
-			if (ascending != null) {
-				ascending = !ascending;
-			} else {
-				ascending = true;
-			}
-		} else {
-			order = DiscussionThreadOrder.LAST_ACTIVITY;
-			ascending = true;
-		}
-		configure(forumId, isCurrentUserModerator, emptyListCallback);
-	};
 }

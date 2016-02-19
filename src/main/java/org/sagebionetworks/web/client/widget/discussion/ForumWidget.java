@@ -193,21 +193,21 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Override
 	public void sortByReplies() {
 		if (!isSingleThread) {
-			threadListWidget.sortByReplies();
+			threadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
 		}
 	}
 
 	@Override
 	public void sortByViews() {
 		if (!isSingleThread) {
-			threadListWidget.sortByViews();
+			threadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
 		}
 	}
 
 	@Override
 	public void sortByActivity() {
 		if (!isSingleThread) {
-			threadListWidget.sortByActivity();
+			threadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
 		}
 	}
 }
