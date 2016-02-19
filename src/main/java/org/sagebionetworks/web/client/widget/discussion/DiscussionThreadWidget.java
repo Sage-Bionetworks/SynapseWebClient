@@ -40,6 +40,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
+	public static final String REPLY = "reply";
+	public static final String REPLIES = "replies";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -133,7 +135,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			user.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 			view.addActiveAuthor(user.asWidget());
 		}
-		view.setNumberOfReplies(bundle.getNumberOfReplies().toString());
+		Long numberOfReplies = bundle.getNumberOfReplies();
+		view.setNumberOfReplies(numberOfReplies.toString(), getDescriptiveReplyText(numberOfReplies));
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
@@ -150,6 +153,14 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			showReplyDetails();
 		} else {
 			hideReplyDetails();
+		}
+	}
+
+	private String getDescriptiveReplyText(Long numberOfReplies) {
+		if (numberOfReplies == 1) {
+			return REPLY;
+		} else {
+			return REPLIES;
 		}
 	}
 
@@ -337,7 +348,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 								view.addReply(replyWidget.asWidget());
 							}
 							view.setLoadingRepliesVisible(false);
-							view.setNumberOfReplies(""+result.getTotalNumberOfResults());
+							Long totalReplies = result.getTotalNumberOfResults();
+							view.setNumberOfReplies(""+totalReplies, getDescriptiveReplyText(totalReplies));
 							view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 							view.showReplyDetails();
 						}

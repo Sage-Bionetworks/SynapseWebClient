@@ -21,16 +21,25 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 				&nbsp;Loading...
 			</g:HTMLPanel>
-			<bh:Paragraph ui:field="deletedMessage" visible="false">This reply has been deleted.</bh:Paragraph>
-			<bh:Div ui:field="replyMessage"></bh:Div>
+			<t:Table width="100%">
+				<t:TableRow>
+					<t:TableData>
+						<bh:Div ui:field="replyMessage"></bh:Div>
+					</t:TableData>
+					<t:TableData width="80px" addStyleNames="vertical-align-top">
+						<bh:Div>
+							<b:Tooltip title="Delete reply" placement="LEFT">
+								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+							</b:Tooltip>
+							<b:Tooltip title="Edit reply" placement="LEFT">
+								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+							</b:Tooltip>
+						</bh:Div>
+					</t:TableData>
+				</t:TableRow>
+			</t:Table>
 		</bh:Div>
 		<bh:Div width="100%">
-			<b:Tooltip title="Delete reply" placement="LEFT">
-				<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
-			</b:Tooltip>
-			<b:Tooltip title="Edit reply" placement="LEFT">
-				<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
-			</b:Tooltip>
 			<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10 line-height-1em"/>
 		</bh:Div>
 		<g:SimplePanel ui:field="editReplyModalContainer"/>
