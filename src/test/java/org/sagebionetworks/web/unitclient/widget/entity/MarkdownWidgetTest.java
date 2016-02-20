@@ -199,7 +199,7 @@ public class MarkdownWidgetTest {
 	public void testMarkdownIt2Html() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
-		when(mockSynapseJSNIUtils.markdown2Html(anyString())).thenReturn(sampleHTML);
+		when(mockSynapseJSNIUtils.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		String markdown="input markdown that is transformed";
 		presenter.configure(markdown, mockWikiPageKey, 1L);
 		
@@ -207,7 +207,7 @@ public class MarkdownWidgetTest {
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockSynapseJSNIUtils).markdown2Html(anyString());
+		verify(mockSynapseJSNIUtils).markdown2Html(anyString(),anyString());
 		verify(mockView).setMarkdown(sampleHTML);
 		//verify highlight code blocks never called (part of parsing)
 		verify(mockSynapseJSNIUtils, never()).highlightCodeBlocks();
