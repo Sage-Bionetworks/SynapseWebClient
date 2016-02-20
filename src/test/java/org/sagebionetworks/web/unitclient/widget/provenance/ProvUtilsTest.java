@@ -498,7 +498,7 @@ public class ProvUtilsTest {
 				return null;
 			}
 			@Override
-			public String markdown2Html(String md) {
+			public String markdown2Html(String md, String uniqueSuffix) {
 				// TODO Auto-generated method stub
 				return null;
 			}
