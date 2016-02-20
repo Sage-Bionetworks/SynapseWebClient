@@ -231,7 +231,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				TablesTab.this.metadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
+		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
 		return actionMenu;
 	}
 	

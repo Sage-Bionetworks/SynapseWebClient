@@ -64,6 +64,7 @@ import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -539,5 +540,8 @@ public interface SynapseClient extends RemoteService {
 	String hexEncodeLogEntry(LogEntry logEntry);
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
+			throws RestServiceException;
+
+	EntityBundlePlus getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask)
 			throws RestServiceException;
 	}

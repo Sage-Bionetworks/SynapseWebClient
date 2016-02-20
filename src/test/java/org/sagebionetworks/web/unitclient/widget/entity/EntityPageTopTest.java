@@ -193,7 +193,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate);
-		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, projectWikiId, mockEntityUpdatedHandler);
+		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, true, projectWikiId, mockEntityUpdatedHandler);
 	}
 	
 	@Test
@@ -211,7 +211,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, null);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
-		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, areaToken, mockEntityUpdatedHandler);
+		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, true, areaToken, mockEntityUpdatedHandler);
 	}
 	
 	@Test

@@ -20,8 +20,9 @@ public interface EntityActionController extends IsWidget {
 	 * 
 	 * @param actionMenu
 	 * @param entityBundle
+	 * @param isCurrentVersion
 	 */
-	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, String wikiPageKey, EntityUpdatedHandler handler);
+	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageKey, EntityUpdatedHandler handler);
 
 	/**
 	 * Delete action selected

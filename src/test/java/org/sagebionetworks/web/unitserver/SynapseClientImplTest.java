@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -91,6 +92,7 @@ import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
@@ -139,6 +141,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -2104,5 +2107,35 @@ public class SynapseClientImplTest {
 		AccessControlList returnedAcl = synapseClient.getTeamAcl(teamId);
 		verify(mockSynapse).getTeamACL(teamId);
 		assertEquals(acl, returnedAcl);
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForVersionVersionable() throws RestServiceException, SynapseException {
+		EntityBundle eb = new EntityBundle();
+		eb.setEntity(new FileEntity());
+		eb.getEntity().setId("syn123");
+		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
+		when(mockSynapse.getEntityBundle(anyString(), anyLong(), anyInt())).thenReturn(eb);
+		PaginatedResults<VersionInfo> versionInfoPaginatedResults = new PaginatedResults<VersionInfo>();
+		List<VersionInfo> versionInfoList = new LinkedList<VersionInfo>();
+		VersionInfo versionInfo = new VersionInfo();
+		versionInfo.setVersionNumber(1L);
+		versionInfoList.add(versionInfo);
+		versionInfoPaginatedResults.setResults(versionInfoList);
+		when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionInfoPaginatedResults);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 1L, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), new Long(1L));
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForVersionNonVersionable() throws RestServiceException, SynapseException {
+		EntityBundle eb = new EntityBundle();
+		eb.setEntity(new Folder());
+		eb.getEntity().setId("syn123");
+		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 123L, 1);
+		assertNull(returnedEntityBundle.getLatestVersionNumber());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
 	}
 }

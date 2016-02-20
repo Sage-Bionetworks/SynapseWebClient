@@ -88,6 +88,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UserEntityPermissions permissions;
 	String enityTypeDisplay;
 	boolean isUserAuthenticated;
+	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
@@ -135,7 +136,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, String wikiPageId, EntityUpdatedHandler handler) {
+			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityUpdatedHandler handler) {
 		this.entityBundle = entityBundle;
 		this.wikiPageId = wikiPageId;
 		this.entityUpdateHandler = handler;
@@ -143,6 +144,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
+		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
@@ -796,10 +798,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onEditFileMetadata() {
-		Synapse place = ((Synapse)globalApplicationState.getCurrentPlace());
-		Long version = place.getVersionNumber();
 		// Can only edit file metadata of the current file version
-		if (version == null) {
+		if (isCurrentVersion) {
 			// Validate the user can update this entity.
 			preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
 				@Override

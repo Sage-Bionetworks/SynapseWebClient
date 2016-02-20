@@ -80,6 +80,7 @@ import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
@@ -89,10 +90,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
-import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -146,6 +143,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -273,6 +271,29 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public EntityBundlePlus getEntityBundlePlusForVersion(String entityId,
+			Long versionNumber, int partsMask) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			EntityBundlePlus ebp = new EntityBundlePlus();
+			EntityBundle eb;
+			Entity en = synapseClient.getEntityById(entityId);
+			if (en instanceof Versionable) {
+				// Get the correct version, now that we now it's Versionable
+				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, 1, 1).getResults().get(0).getVersionNumber();
+				eb = getEntityBundleForVersion(entityId, versionNumber, partsMask);
+				ebp.setLatestVersionNumber(latestVersionNumber);
+			} else {
+				eb = synapseClient.getEntityBundle(entityId, partsMask);
+			}
+			ebp.setEntityBundle(eb);
+			return ebp;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}		
 	}
 
 	@Override
@@ -3003,5 +3024,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+
 
 }
