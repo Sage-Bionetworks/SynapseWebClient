@@ -105,7 +105,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 					@Override
 					public void invoke() {
 						//save in cache
-						String result = synapseJSNIUtils.markdown2Html(md);
+						String result = synapseJSNIUtils.markdown2Html(md, uniqueSuffix);
 						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
 						loadHtml(uniqueSuffix, result);
 					}

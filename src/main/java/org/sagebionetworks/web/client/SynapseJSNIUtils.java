@@ -109,5 +109,5 @@ public interface SynapseJSNIUtils {
 	public String getCurrentURL();
 	public String getCurrentHostName();
 	
-	public String markdown2Html(String md);
+	public String markdown2Html(String md, String uniqueSuffix);
 }
