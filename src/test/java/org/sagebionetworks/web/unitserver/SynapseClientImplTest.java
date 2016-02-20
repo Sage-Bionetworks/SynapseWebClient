@@ -29,7 +29,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,6 +61,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
@@ -97,10 +97,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -2112,7 +2109,8 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetEntityBundlePlusForVersionVersionable() throws RestServiceException, SynapseException {
 		EntityBundle eb = new EntityBundle();
-		eb.setEntity(new FileEntity());
+		Entity file = new FileEntity();
+		eb.setEntity(file);
 		eb.getEntity().setId("syn123");
 		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
 		when(mockSynapse.getEntityBundle(anyString(), anyLong(), anyInt())).thenReturn(eb);
@@ -2123,6 +2121,7 @@ public class SynapseClientImplTest {
 		versionInfoList.add(versionInfo);
 		versionInfoPaginatedResults.setResults(versionInfoList);
 		when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionInfoPaginatedResults);
+		when(mockSynapse.getEntityById(anyString())).thenReturn(file);
 		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 1L, 1);
 		assertEquals(returnedEntityBundle.getLatestVersionNumber(), new Long(1L));
 		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
