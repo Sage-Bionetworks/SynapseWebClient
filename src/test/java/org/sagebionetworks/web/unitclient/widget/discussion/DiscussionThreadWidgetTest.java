@@ -643,7 +643,7 @@ public class DiscussionThreadWidgetTest {
 		String threadId = "456";
 		String hostURL = "hostURL/";
 		when(mockGwtWrapper.getHostPageBaseURL()).thenReturn(hostURL);
-		assertEquals("hostURL/Portal.html#!Synapse:syn123/discussion/threadId=456",
+		assertEquals("hostURL/#!Synapse:syn123/discussion/threadId=456",
 				DiscussionThreadWidget.buildThreadLink(projectId, threadId, mockGwtWrapper));
 	}
 }

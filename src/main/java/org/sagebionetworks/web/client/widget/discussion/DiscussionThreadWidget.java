@@ -38,7 +38,6 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presenter{
 
-	private static final String PORTAL_ENTRY = "Portal.html";
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
@@ -138,8 +137,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public static String buildThreadLink(String projectId, String threadId, GWTWrapper gwtWrapper) {
 		String token = THREAD_ID_KEY+"="+threadId;
 		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
-		String link = gwtWrapper.getHostPageBaseURL() + PORTAL_ENTRY
-				+ SYNAPSE_ENTITY_PREFIX + place.toToken();
+		String link = gwtWrapper.getHostPageBaseURL() + SYNAPSE_ENTITY_PREFIX + place.toToken();
 		return link;
 	}
 
