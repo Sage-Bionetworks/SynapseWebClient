@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
+import static org.sagebionetworks.web.client.place.Synapse.*;
+
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -7,6 +10,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -18,6 +22,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -33,6 +38,7 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presenter{
 
+	private static final String PORTAL_ENTRY = "Portal.html";
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 20L;
@@ -55,6 +61,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
 	UserBadge authorIconWidget;
+	GWTWrapper gwtWrapper;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -63,6 +70,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private Boolean isCurrentUserModerator;
 	private String title;
 	private Callback deleteCallback;
+	private String projectId;
 
 	@Inject
 	public DiscussionThreadWidget(
@@ -78,7 +86,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			GlobalApplicationState globalApplicationState,
 			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
-			UserBadge authorIconWidget
+			UserBadge authorIconWidget,
+			GWTWrapper gwtWrapper
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -93,6 +102,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.editThreadModal = editThreadModal;
 		this.markdownWidget = markdownWidget;
 		this.authorIconWidget = authorIconWidget;
+		this.gwtWrapper = gwtWrapper;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -113,6 +123,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.threadId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.deleteCallback = deleteCallback;
+		this.projectId = bundle.getProjectId();
 		configureView(bundle, showThreadDetails, showReplyDetails);
 		authorWidget.configure(bundle.getCreatedBy());
 		newReplyModal.configure(bundle.getId(), new Callback(){
@@ -122,6 +133,14 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 				reconfigureThread();
 			}
 		});
+	}
+
+	public static String buildThreadLink(String projectId, String threadId, GWTWrapper gwtWrapper) {
+		String token = THREAD_ID_KEY+"="+threadId;
+		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
+		String link = gwtWrapper.getHostPageBaseURL() + PORTAL_ENTRY
+				+ SYNAPSE_ENTITY_PREFIX + place.toToken();
+		return link;
 	}
 
 	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
@@ -144,6 +163,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		view.setDeleteIconVisible(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+		view.setThreadLink(buildThreadLink(projectId, threadId, gwtWrapper));
 		if (showThreadDetails) {
 			showThreadDetails();
 		} else {

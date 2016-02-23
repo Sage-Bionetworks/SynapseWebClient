@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.discussion;
 
 import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -28,6 +29,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -96,6 +98,8 @@ public class DiscussionThreadWidgetTest {
 	Callback mockCallback;
 	@Mock
 	UserBadge mockAuthorIconWidget;
+	@Mock
+	GWTWrapper mockGwtWrapper;
 
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -111,7 +115,7 @@ public class DiscussionThreadWidgetTest {
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
-				mockAuthorIconWidget);
+				mockAuthorIconWidget, mockGwtWrapper);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
@@ -156,6 +160,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockAuthorIconWidget).setSize(any(BadgeSize.class));
 		verify(mockView).hideThreadDetails();
 		verify(mockView).hideReplyDetails();
+		verify(mockView).setThreadLink(anyString());
 	}
 
 	@Test
@@ -630,5 +635,15 @@ public class DiscussionThreadWidgetTest {
 			list.add(bundle);
 		}
 		return list;
+	}
+
+	@Test
+	public void testBuildThreadLink() {
+		String projectId = "syn123";
+		String threadId = "456";
+		String hostURL = "hostURL/";
+		when(mockGwtWrapper.getHostPageBaseURL()).thenReturn(hostURL);
+		assertEquals("hostURL/Portal.html#!Synapse:syn123/discussion/threadId=456",
+				DiscussionThreadWidget.buildThreadLink(projectId, threadId, mockGwtWrapper));
 	}
 }

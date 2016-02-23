@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.DisplayConstants.*;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -86,6 +87,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Label edited;
 	@UiField
 	Span threadAuthor;
+	@UiField
+	Anchor threadLink;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -341,5 +344,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void hideThreadDetails() {
 		threadDetails.hide();
+	}
+
+	@Override
+	public void setThreadLink(String link){
+		threadLink.setHref(link);
 	}
 }
