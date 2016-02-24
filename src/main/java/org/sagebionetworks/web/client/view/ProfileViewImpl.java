@@ -606,6 +606,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void showTabs(boolean isOwner) {
 		DisplayUtils.hide(settingsListItem);
 		openInvitesContainer.setVisible(isOwner);
+		settingsPresenter.resetView();
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
