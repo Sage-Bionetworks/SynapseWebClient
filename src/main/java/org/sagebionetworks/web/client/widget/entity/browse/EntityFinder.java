@@ -13,6 +13,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -114,30 +115,28 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	@Override
 	public void show() {
-		if (!view.isShowing()) {
-			view.clear();
-			//get the area from the cache, if available
-			String areaString = cache.get(ENTITY_FINDER_AREA_KEY);
-			//default to browse
-			EntityFinderArea area = EntityFinderArea.BROWSE;
-			if (areaString != null) {
-				area = EntityFinderArea.valueOf(areaString);
-			}
-			view.initFinderComponents();
-			switch (area) {
-				case SEARCH:
-					view.setSearchAreaVisible();
-					break;
-				case SYNAPSE_ID:
-					view.setSynapseIdAreaVisible();
-					break;
-				case BROWSE:
-				default:
-					view.setBrowseAreaVisible();
-					break;
-			}
-			view.show();
+		view.clear();
+		//get the area from the cache, if available
+		String areaString = cache.get(ENTITY_FINDER_AREA_KEY);
+		//default to browse
+		EntityFinderArea area = EntityFinderArea.BROWSE;
+		if (areaString != null) {
+			area = EntityFinderArea.valueOf(areaString);
 		}
+		view.initFinderComponents();
+		switch (area) {
+			case SEARCH:
+				view.setSearchAreaVisible();
+				break;
+			case SYNAPSE_ID:
+				view.setSynapseIdAreaVisible();
+				break;
+			case BROWSE:
+			default:
+				view.setBrowseAreaVisible();
+				break;
+		}
+		view.show();
 	}
 	
 	@Override
