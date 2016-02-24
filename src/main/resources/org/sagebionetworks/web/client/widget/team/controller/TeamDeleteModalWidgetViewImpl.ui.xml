@@ -12,7 +12,7 @@
 			<g:SimplePanel ui:field="synAlertPanel"/>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Confirming..." >OK</b:Button>
+			<b:Button ui:field="primaryButton" type="DANGER" dataLoadingText="Deleting..." >Delete</b:Button>
 			<b:Button ui:field="cancelButton" type="DEFAULT"
 				dataDismiss="MODAL">Cancel</b:Button>
 		</b:ModalFooter>
