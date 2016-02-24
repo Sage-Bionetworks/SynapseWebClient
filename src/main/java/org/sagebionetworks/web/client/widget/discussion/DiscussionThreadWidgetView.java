@@ -97,4 +97,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void showReplyDetails();
 
 	void hideReplyDetails();
+
+	void setThreadLink(String link);
 }

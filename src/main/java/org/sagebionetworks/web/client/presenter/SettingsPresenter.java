@@ -244,7 +244,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 
 	// configuration
-	private void updateView() {
+	public void resetView() {
 		view.hideAPIKey();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
@@ -328,7 +328,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.notificationSynAlert.clear();
 		this.addressSynAlert.clear();
 		this.view.render();		
-		updateView();
+		resetView();
 		return view.asWidget();
 	}
 	

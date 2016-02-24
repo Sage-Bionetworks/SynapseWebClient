@@ -2106,25 +2106,44 @@ public class SynapseClientImplTest {
 		assertEquals(acl, returnedAcl);
 	}
 	
-	@Test
-	public void testGetEntityBundlePlusForVersionVersionable() throws RestServiceException, SynapseException {
+	private void setupVersionedEntityBundle(String entityId, Long latestVersionNumber) throws SynapseException {
 		EntityBundle eb = new EntityBundle();
 		Entity file = new FileEntity();
 		eb.setEntity(file);
-		eb.getEntity().setId("syn123");
+		eb.getEntity().setId(entityId);
 		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
 		when(mockSynapse.getEntityBundle(anyString(), anyLong(), anyInt())).thenReturn(eb);
 		PaginatedResults<VersionInfo> versionInfoPaginatedResults = new PaginatedResults<VersionInfo>();
 		List<VersionInfo> versionInfoList = new LinkedList<VersionInfo>();
 		VersionInfo versionInfo = new VersionInfo();
-		versionInfo.setVersionNumber(1L);
+		versionInfo.setVersionNumber(latestVersionNumber);
 		versionInfoList.add(versionInfo);
 		versionInfoPaginatedResults.setResults(versionInfoList);
 		when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionInfoPaginatedResults);
 		when(mockSynapse.getEntityById(anyString())).thenReturn(file);
-		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 1L, 1);
-		assertEquals(returnedEntityBundle.getLatestVersionNumber(), new Long(1L));
-		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
+	}
+	@Test
+	public void testGetEntityBundlePlusForVersionVersionable() throws RestServiceException, SynapseException {
+		String entityId = "syn123";
+		Long targetVersionNumber = 1L;
+		Long latestVersionNumber = 2L;
+		setupVersionedEntityBundle(entityId, latestVersionNumber);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
+		verify(mockSynapse).getEntityBundle(anyString(), eq(targetVersionNumber), anyInt());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForNullVersionVersionable() throws RestServiceException, SynapseException {
+		String entityId = "syn123";
+		Long targetVersionNumber = null;
+		Long latestVersionNumber = 2L;
+		setupVersionedEntityBundle(entityId, latestVersionNumber);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
+		verify(mockSynapse).getEntityBundle(anyString(), eq(latestVersionNumber), anyInt());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
 	}
 	
 	@Test

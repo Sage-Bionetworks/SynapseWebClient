@@ -161,12 +161,6 @@ public class EntityFinderTest {
 		entityFinder.okClicked();
 		verify(mockHandler).onSelected(mockReference);
 	}	
-	@Test
-	public void testShowAlreadyShowing() {
-		when(mockView.isShowing()).thenReturn(true);
-		entityFinder.show();
-		verify(mockView, never()).show();
-	}
 	
 	@Test
 	public void testShowDefaultArea() {
