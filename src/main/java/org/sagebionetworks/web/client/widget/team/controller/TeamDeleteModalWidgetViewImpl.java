@@ -42,12 +42,6 @@ public class TeamDeleteModalWidgetViewImpl implements TeamDeleteModalWidgetView 
 				presenter.onConfirm();
 			}
 		});
-		primaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
-		});
 	}
 	
 	@Override

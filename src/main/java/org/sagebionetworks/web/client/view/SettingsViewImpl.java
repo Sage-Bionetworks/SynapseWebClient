@@ -401,6 +401,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void hideAPIKey() {
+		apiKeyContainer.setText("");
 		apiKeyUI.setVisible(false);
 		changeApiKey.setVisible(false);
 		showApiKey.setVisible(true);
