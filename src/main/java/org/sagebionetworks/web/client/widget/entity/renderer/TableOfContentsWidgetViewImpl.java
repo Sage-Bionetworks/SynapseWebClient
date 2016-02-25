@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -24,9 +27,15 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 
 	private Presenter presenter;
 	private boolean hasLoaded;
+	private Map<String, String> tagName2Style;
 	
 	@Inject
 	public TableOfContentsWidgetViewImpl() {
+		//build up the tag name to css class name here
+		tagName2Style = new HashMap<String, String>();
+		for (int i = 0; i < 6; i++) {
+			tagName2Style.put("H" + (i+1), "toc-indent" + i);
+		}
 	}
 	@Override
 	protected void onAttach() {
@@ -45,8 +54,9 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 			}
 			for (int j = 0; j < headingElements.length(); j++) {
 				Element heading = headingElements.get(j);
-				String tocStyle = heading.getAttribute("toc-style");
-				if (DisplayUtils.isDefined(tocStyle)) {
+				String tagName = heading.getTagName();
+				String tocStyle = tagName2Style.get(tagName);
+				if (heading.hasAttribute("toc-style") || heading.hasAttribute("toc")) {
 					String text = heading.getInnerHTML();
 					//create links to all headers in the page
 					final Element scrollToElement = heading;
