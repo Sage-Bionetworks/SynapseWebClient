@@ -837,7 +837,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnMoveCanUpdateFailed(){
 		String error = "An error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
@@ -851,7 +851,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnMoveCanUpdateSuccess(){
-		AsyncMockStubber.callSuccessWith(new Folder()).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new Folder()).when(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
@@ -859,7 +859,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();
-		verify(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 		verify(mockView, never()).showErrorMessage(anyString());
 	}
