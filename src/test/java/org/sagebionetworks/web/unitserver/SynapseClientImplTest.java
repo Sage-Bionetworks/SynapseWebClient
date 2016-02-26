@@ -644,6 +644,35 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).updateAnnotations(out.getId(), annos);
 	}
 
+	
+
+	@Test
+	public void testMoveEntity()
+			throws JSONObjectAdapterException, RestServiceException,
+			SynapseException {
+		String entityId = "syn123";
+		String oldParentId = "syn1", newParentId = "syn2";
+		ExampleEntity in = new ExampleEntity();
+		in.setName("some name");
+		in.setParentId(oldParentId);
+		in.setId(entityId);
+		in.setEntityType(ExampleEntity.class.getName());
+
+		ExampleEntity out = new ExampleEntity();
+		out.setName("some name");
+		out.setEntityType(ExampleEntity.class.getName());
+		out.setId(entityId);
+		out.setParentId(newParentId);
+		out.setEtag("45");
+
+		// when in comes in then return out.
+		when(mockSynapse.putEntity(in)).thenReturn(out);
+		when(mockSynapse.getEntityById(entityId)).thenReturn(in);
+		Entity result = synapseClient.moveEntity(entityId, newParentId);
+		assertEquals(newParentId, result.getParentId());
+		verify(mockSynapse).getEntityById(entityId);
+		verify(mockSynapse).putEntity(any(Entity.class));
+	}
 	@Test
 	public void testGetEntityBenefactorAcl() throws Exception {
 		EntityBundle bundle = new EntityBundle();

@@ -544,4 +544,7 @@ public interface SynapseClient extends RemoteService {
 
 	EntityBundlePlus getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask)
 			throws RestServiceException;
+
+	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
+	
 	}

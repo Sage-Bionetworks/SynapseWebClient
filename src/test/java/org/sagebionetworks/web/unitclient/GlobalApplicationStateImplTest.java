@@ -22,6 +22,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
@@ -292,5 +293,15 @@ public class GlobalApplicationStateImplTest {
 	
 		globalApplicationState.refreshPage();
 		verify(mockPlaceController).goTo(mockPlace);
+		
+		reset(mockPlaceController, mockAppPlaceHistoryMapper);
+		when(mockPlaceController.getWhere()).thenReturn(place);
+		historyToken = "";
+		currentUrl = "https://www.synapse.org/"+historyToken;
+		when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
+		globalApplicationState.refreshPage();
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockAppPlaceHistoryMapper).getPlace(captor.capture());
+		assertEquals(GlobalApplicationStateImpl.DEFAULT_REFRESH_PLACE, captor.getValue());
 	}
 }

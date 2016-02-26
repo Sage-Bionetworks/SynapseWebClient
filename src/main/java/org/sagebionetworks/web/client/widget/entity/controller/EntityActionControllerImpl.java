@@ -44,6 +44,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -681,9 +682,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @param target
 	 */
 	private void moveEntity(String target){
-		Entity entity = entityBundle.getEntity();
-		entity.setParentId(target);
-		synapseClient.updateEntity(entity, new AsyncCallback<Entity>() {
+		String entityId = entityBundle.getEntity().getId();
+		synapseClient.moveEntity(entityId, target, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {
