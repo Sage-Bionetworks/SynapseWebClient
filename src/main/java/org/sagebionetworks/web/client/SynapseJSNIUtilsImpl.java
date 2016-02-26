@@ -592,7 +592,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			$wnd.markdownitSingleton
 				.use($wnd.markdownitSub)
 				.use($wnd.markdownitSup)
-				.use($wnd.markdownitSynapseHeading);
+				.use($wnd.markdownitCentertext)
+				.use($wnd.markdownitSynapseHeading)
+				;
 			
 			$wnd.markdownitSingleton
 				.set({
