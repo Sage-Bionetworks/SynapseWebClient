@@ -464,6 +464,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
+	public Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			Entity entity = synapseClient.getEntityById(entityId);
+			entity.setParentId(newParentEntityId);
+			return synapseClient.putEntity(entity);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		
+	}
 	/**
 	 * Create or update an entity
 	 * 

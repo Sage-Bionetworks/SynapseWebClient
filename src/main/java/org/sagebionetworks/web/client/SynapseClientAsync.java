@@ -417,7 +417,9 @@ public interface SynapseClientAsync {
 			AsyncCallback<TableFileHandleResults> callback);
 
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
-
+	
+	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
+	
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
 	void getOrCreateActivityForEntityVersion(String entityId,
