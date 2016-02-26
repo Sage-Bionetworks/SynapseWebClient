@@ -101,7 +101,6 @@ function blockParser(state, startLine, endLine, silent) {
         // only contain $$
         nextLine--;
         haveEndMarker = true;
-        // pos -= close.length;
       } else {
         // isn't closed by the last line
         return false;
@@ -132,7 +131,7 @@ function blockParser(state, startLine, endLine, silent) {
 function makeRenderer(suffix) {
   return function(tokens, idx) {
     return '<span id="' + prefix + divIndex++ + suffix +
-     '" class="math inline">' + tokens[idx].content + '</span>';
+     '" class="math">' + tokens[idx].content + '</span>';
   };
 }
 
