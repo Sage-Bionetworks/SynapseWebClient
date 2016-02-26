@@ -588,10 +588,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		if (!$wnd.markdownitSingleton) {
 			$wnd.markdownitSingleton = $wnd.markdownit()
 				.set({ html: false, breaks: true });
+			$wnd.markdownitSingleton.disable([ 'heading' ]);
 			$wnd.markdownitSingleton
 				.use($wnd.markdownitSub)
 				.use($wnd.markdownitSup)
 				.use($wnd.markdownitCentertext)
+				.use($wnd.markdownitSynapseHeading)
 				;
 			
 			$wnd.markdownitSingleton

@@ -1432,10 +1432,6 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 
 /**table of contents styling **/
 /** .8em to 1.2em **/
-.toc-indent4 {
-	font-size: .8em;
-	margin-left: 125px;
-}
 .toc-indent0 {
 	font-size: 1.2em;
 	margin-left: 5px;
@@ -1451,7 +1447,16 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 .toc-indent3 {
 	font-size: 0.9em;
 	margin-left: 95px;
-}	
+}
+.toc-indent4 {
+	font-size: .8em;
+	margin-left: 125px;
+}
+.toc-indent5 {
+	font-size: .8em;
+	margin-left: 150px;
+}
+
 
 strong {
 	font-weight: bold;
