@@ -41,6 +41,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_THREAD_MODAL_TITLE);

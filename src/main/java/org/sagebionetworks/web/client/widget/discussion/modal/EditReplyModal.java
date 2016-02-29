@@ -40,6 +40,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);

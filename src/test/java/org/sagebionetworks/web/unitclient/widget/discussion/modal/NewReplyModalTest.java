@@ -55,6 +55,7 @@ public class NewReplyModalTest {
 		verify(mockView).setModalTitle(anyString());
 		verify(mockView).setMarkdownEditor(any(Widget.class));
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
+		verify(mockMarkdownEditor).showExternalImageButton();
 	}
 
 	@Test
