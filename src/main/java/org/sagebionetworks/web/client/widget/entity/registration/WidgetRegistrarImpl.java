@@ -61,6 +61,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getExternalImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {
@@ -241,6 +243,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.VIMEO_CONTENT_TYPE, WidgetConstants.VIMEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE, WidgetConstants.EXTERNAL_IMAGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, WidgetConstants.TABBED_TABLE_FRIENDLY_NAME);

@@ -40,6 +40,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_THREAD_MODAL_TITLE);

@@ -56,6 +56,7 @@ public class NewDiscussionThreadModalTest {
 		verify(mockView).setModalTitle(anyString());
 		verify(mockView).setMarkdownEditor(any(Widget.class));
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
+		verify(mockMarkdownEditor).showExternalImageButton();
 	}
 
 	@Test
