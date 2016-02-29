@@ -35,7 +35,7 @@ public class ExternalImageConfigEditor implements ExternalImageConfigView.Presen
 
 	@Override
 	public void updateDescriptorFromView() {
-		view.checkParams();
+		checkParams();
 	}
 	
 	@Override
@@ -55,7 +55,6 @@ public class ExternalImageConfigEditor implements ExternalImageConfigView.Presen
 		return null;
 	}
 
-	@Override
 	public void checkParams() {
 		if (!ValidationUtils.isValidUrl(view.getImageUrl(), false))
 			throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);

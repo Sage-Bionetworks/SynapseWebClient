@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -42,7 +40,6 @@ public class ExternalImageConfigViewImpl implements ExternalImageConfigView {
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		presenter.checkParams();
 	}
 
 	@Override

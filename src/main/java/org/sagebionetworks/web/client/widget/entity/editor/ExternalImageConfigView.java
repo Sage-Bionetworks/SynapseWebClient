@@ -18,7 +18,5 @@ public interface ExternalImageConfigView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		void checkParams();
 	}
 }
