@@ -319,6 +319,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void clear() {
 		markdownTextArea.setText("");
+		externalImageButton.setVisible(false);
 	}
 
 	@Override
