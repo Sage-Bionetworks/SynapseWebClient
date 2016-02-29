@@ -42,10 +42,7 @@ public class ExternalImageConfigViewImpl implements ExternalImageConfigView {
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
-			throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);
-		if (!DisplayUtils.isDefined(nameField.getValue()))
-			throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE);
+		presenter.checkParams();
 	}
 
 	@Override

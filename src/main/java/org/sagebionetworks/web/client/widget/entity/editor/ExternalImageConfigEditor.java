@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -50,5 +53,13 @@ public class ExternalImageConfigEditor implements ExternalImageConfigView.Presen
 	public List<String> getDeletedFileHandleIds() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void checkParams() {
+		if (!ValidationUtils.isValidUrl(view.getImageUrl(), false))
+			throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);
+		if (!DisplayUtils.isDefined(view.getAltText()))
+			throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE);
 	}
 }
