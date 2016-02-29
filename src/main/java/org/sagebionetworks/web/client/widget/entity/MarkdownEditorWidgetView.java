@@ -52,4 +52,6 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setImageCommandsVisible(boolean visible);
 
 	void setVideoCommandsVisible(boolean visible);
+
+	void setExternalImageButtonVisible(boolean visible);
 }

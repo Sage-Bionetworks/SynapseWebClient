@@ -350,6 +350,13 @@ public class MarkdownEditorWidgetTest {
 		presenter.handleCommand(MarkdownEditorAction.INSERT_IMAGE);
 		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
+
+	@Test
+	public void testHandleCommandInsertExternalImage(){
+		String contentType = WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_EXTERNAL_IMAGE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
+	}
 	
 	@Test
 	public void testHandleCommandInsertLink(){
@@ -563,5 +570,11 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).setAttachmentCommandsVisible(false);
 		verify(mockView).setImageCommandsVisible(false);
 		verify(mockView).setVideoCommandsVisible(false);
+	}
+
+	@Test
+	public void testShowExternalImageButton() {
+		presenter.showExternalImageButton();
+		verify(mockView).setExternalImageButtonVisible(true);
 	}
 }

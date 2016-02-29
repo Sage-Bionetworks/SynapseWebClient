@@ -61,6 +61,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getExternalImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {

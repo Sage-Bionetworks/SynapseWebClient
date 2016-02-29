@@ -44,6 +44,8 @@ public class WidgetRegistrarImplTest {
 		verify(mockGinInjector).getYouTubeConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getImageConfigEditor();
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE, null, null);
+		verify(mockGinInjector).getExternalImageConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}

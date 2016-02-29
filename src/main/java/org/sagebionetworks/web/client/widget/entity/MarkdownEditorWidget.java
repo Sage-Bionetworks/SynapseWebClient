@@ -215,6 +215,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_IMAGE:
 			insertNewWidget(WidgetConstants.IMAGE_CONTENT_TYPE);
 			break;
+		case INSERT_EXTERNAL_IMAGE:
+			insertNewWidget(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE);
+			break;
 		case INSERT_JOIN_TEAM:
 			insertNewWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE);
 			break;
@@ -453,5 +456,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setAttachmentCommandsVisible(false);
 		view.setImageCommandsVisible(false);
 		view.setVideoCommandsVisible(false);
+	}
+
+	public void showExternalImageButton() {
+		view.setExternalImageButtonVisible(true);
 	}
 }
