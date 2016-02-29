@@ -587,7 +587,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native String _markdown2Html(String md, String uniqueSuffix) /*-{
 		if (!$wnd.markdownitSingleton) {
 			$wnd.markdownitSingleton = $wnd.markdownit()
-				.set({ html: false, breaks: true });
+				.set({ 
+					html: false, 
+					breaks: true,
+					maxNesting: 100 });
 			$wnd.markdownitSingleton.disable([ 'heading' ]);
 			$wnd.markdownitSingleton
 				.use($wnd.markdownitSub)

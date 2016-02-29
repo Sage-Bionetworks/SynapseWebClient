@@ -162,7 +162,7 @@ public class CrawlFilter implements Filter {
 		while(results.getHits().size() > 0) {
 			for (Hit hit : results.getHits()) {
 				//add links
-				html.append("<a href=\"#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
+				html.append("<a href=\"https://www.synapse.org/#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
 			}
 			long newStart = results.getStart() + results.getHits().size();
 			query.setStart(newStart);
@@ -247,7 +247,7 @@ public class CrawlFilter implements Filter {
 				PaginatedResults<DiscussionThreadBundle> paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 100L, 0L, DiscussionThreadOrder.LAST_ACTIVITY, false, DiscussionFilter.EXCLUDE_DELETED);
 				List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
 				for (DiscussionThreadBundle thread : threadList) {
-					html.append("<a href=\"#!Synapse:"+entity.getId()+DISCUSSION_THREAD_ID+thread.getId()+"\">"+thread.getTitle() + "</a><br />");
+					html.append("<a href=\"https://www.synapse.org/#!Synapse:"+entity.getId()+DISCUSSION_THREAD_ID+thread.getId()+"\">"+thread.getTitle() + "</a><br />");
 				}
 			}
 		}
@@ -256,7 +256,7 @@ public class CrawlFilter implements Filter {
 		try {
 			EntityQueryResults childList = synapseClient.executeEntityQuery(createGetChildrenQuery(entityId));
 			for (EntityQueryResult childId : childList.getEntities()) {
-				html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getName()+"</a><br />");
+				html.append("<a href=\"https://www.synapse.org/#!Synapse:"+childId.getId()+"\">"+childId.getName()+"</a><br />");
 			}} catch(Exception e) {};
 		html.append("</body></html>");
 		return html.toString();
@@ -335,13 +335,13 @@ public class CrawlFilter implements Filter {
 		html.append("<!DOCTYPE html><html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head><body>");
 		for (Hit hit : results.getHits()) {
 			//add links
-			html.append("<a href=\"#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
+			html.append("<a href=\"https://www.synapse.org/#!Synapse:"+hit.getId()+"\">"+hit.getName()+"</a><br />");
 		}
 		//add another link for the next page of results
 		long newStart = results.getStart() + results.getHits().size();
 		inputQuery.setStart(newStart);
 		String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
-		html.append("<a href=\"#!Search:"+URLEncoder.encode(newJson)+"\">Next Page</a><br />");
+		html.append("<a href=\"https://www.synapse.org/#!Search:"+URLEncoder.encode(newJson)+"\">Next Page</a><br />");
 		
 		html.append("</body></html>");
 		return html.toString();
