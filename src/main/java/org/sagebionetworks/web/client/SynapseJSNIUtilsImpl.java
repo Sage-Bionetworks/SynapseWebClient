@@ -75,7 +75,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	public static native void _highlightCodeBlocks() /*-{
-	  $wnd.jQuery('code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+	  $wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
 	}-*/;
 	
 	@Override
