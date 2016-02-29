@@ -285,10 +285,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				// Get the correct version, now that we now it's Versionable
 				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, 1, 1)
 						.getResults().get(0).getVersionNumber();
-				if (versionNumber == null) {
+				if (versionNumber == null || latestVersionNumber.equals(versionNumber)) {
 					versionNumber = latestVersionNumber;
+					eb = getEntityBundle(entityId, partsMask);
+				} else {
+					eb = getEntityBundleForVersion(entityId, versionNumber, partsMask);	
 				}
-				eb = getEntityBundleForVersion(entityId, versionNumber, partsMask);
 				ebp.setLatestVersionNumber(latestVersionNumber);
 			} else {
 				eb = synapseClient.getEntityBundle(entityId, partsMask);
