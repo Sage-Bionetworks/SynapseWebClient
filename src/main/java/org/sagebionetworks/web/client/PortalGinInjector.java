@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -69,6 +70,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ExternalImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
@@ -245,6 +247,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
+	public ExternalImageConfigEditor getExternalImageConfigEditor();
 	public AttachmentConfigEditor getAttachmentConfigEditor();
 	public LinkConfigEditor getLinkConfigEditor();
 	public APITableConfigEditor getSynapseAPICallConfigEditor();
@@ -383,5 +386,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public MarkdownCacheKey getMarkdownCacheKey();
 	public MarkdownCacheValue getMarkdownCacheValue();
-	
+
 }
