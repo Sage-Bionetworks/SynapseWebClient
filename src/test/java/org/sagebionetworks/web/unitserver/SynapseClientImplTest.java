@@ -2171,7 +2171,19 @@ public class SynapseClientImplTest {
 		setupVersionedEntityBundle(entityId, latestVersionNumber);
 		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
 		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
-		verify(mockSynapse).getEntityBundle(anyString(), eq(latestVersionNumber), anyInt());
+		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForVersionLatestVersion() throws RestServiceException, SynapseException {
+		String entityId = "syn123";
+		Long targetVersionNumber = 2L;
+		Long latestVersionNumber = 2L;
+		setupVersionedEntityBundle(entityId, latestVersionNumber);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
+		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
 		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
 	}
 	
