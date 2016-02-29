@@ -1011,6 +1011,11 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
+
+.markdown img {
+	max-width: 100%;
+}
+
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }
