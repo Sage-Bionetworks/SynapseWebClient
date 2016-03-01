@@ -129,6 +129,7 @@ public class MarkdownItImpl implements MarkdownIt {
 				start = pos;
 				res = parseLinkDestination(state.src, pos, state.posMax);
 				if (res.ok) {
+					//!!!!!!!!!!!!!!!!!! Changed for Synapse  !!!!!!!!!!!!!!!!!!!!!!!!!/
 					var testString = res.str;
 					if ($wnd.md.utils.synapseRE.test(testString)) {
 						//this is a synapse ID
@@ -136,6 +137,7 @@ public class MarkdownItImpl implements MarkdownIt {
 					} else if ($wnd.md.utils.wwwRE.test(testString)) {
 						res.str = 'http://' + testString;
 					}
+					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
 					href = state.md.normalizeLink(res.str);
 					if (state.md.validateLink(href)) {
 						pos = res.pos;
