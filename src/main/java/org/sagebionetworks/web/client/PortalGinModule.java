@@ -1230,5 +1230,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RadioCellEditorView.class).to(RadioCellEditorViewImpl.class);
 		bind(BooleanFormCellEditor.class).to(BooleanFormCellEditorImpl.class);
 		bind(EnumFormCellEditor.class).to(EnumFormCellEditorImpl.class);
+		
+		bind(MarkdownIt.class).to(MarkdownItImpl.class);
 	}
 }

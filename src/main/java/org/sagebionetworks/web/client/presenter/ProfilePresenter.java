@@ -879,10 +879,30 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
 				editMyProfile();
 			} else {
-				//otherwise, this is a user id
-				updateProfileView(place.getUserId(), place.getArea());
+				//if this is a number, then treat it as a a user id
+				try{
+					Long.parseLong(place.getUserId());
+					updateProfileView(place.getUserId(), place.getArea());
+				} catch (NumberFormatException nfe) {
+					getUserIdAndGotoPlace(place.getUserId());
+				}
 			}
 		}
+	}
+	
+	public void getUserIdAndGotoPlace(String userName) {
+		synapseClient.getUserIdFromUsername(userName, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userId) {
+				place.setUserId(userId);
+				globalApplicationState.getPlaceChanger().goTo(place);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				profileSynAlert.handleException(caught);
+			}
+		});
 	}
 	
 	@Override

@@ -546,5 +546,7 @@ public interface SynapseClient extends RemoteService {
 			throws RestServiceException;
 
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
+
+	String getUserIdFromUsername(String username) throws RestServiceException;
 	
 	}

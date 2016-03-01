@@ -578,44 +578,4 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String getCurrentHostName() {
 		return Location.getHostName();
 	}
-	
-	@Override
-	public String markdown2Html(String md, String uniqueSuffix) {
-		return _markdown2Html(md, uniqueSuffix);
-	}
-	
-	private final static native String _markdown2Html(String md, String uniqueSuffix) /*-{
-		if (!$wnd.markdownitSingleton) {
-			$wnd.markdownitSingleton = $wnd.markdownit()
-				.set({ 
-					html: false, 
-					breaks: true,
-					maxNesting: 100 });
-			$wnd.markdownitSingleton.disable([ 'heading' ]);
-			$wnd.markdownitSingleton
-				.use($wnd.markdownitSub)
-				.use($wnd.markdownitSup)
-				.use($wnd.markdownitCentertext)
-				.use($wnd.markdownitSynapseHeading)
-				;
-			
-			$wnd.markdownitSingleton
-				.set({
-				  highlight: function (str, lang) {
-				    if (lang && $wnd.hljs.getLanguage(lang)) {
-				      try {
-				      	return $wnd.hljs.highlight(lang, str).value;
-				      } catch (__) {}
-				    }
-				    return ''; // use external default escaping
-				  }
-				});
-		}
-		//load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
-		$wnd.markdownitSingleton
-			.use($wnd.markdownitSynapse, uniqueSuffix)
-			.use($wnd.markdownitMath, uniqueSuffix);
-		
-		return $wnd.markdownitSingleton.render(md);
-	}-*/;
 }

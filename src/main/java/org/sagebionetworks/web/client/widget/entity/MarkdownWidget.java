@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -42,6 +43,7 @@ import com.google.inject.Inject;
 public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	private SynapseClientAsync synapseClient;
+	private MarkdownIt markdownIt;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private CookieProvider cookies;
@@ -64,7 +66,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			PortalGinInjector ginInjector,
 			MarkdownWidgetView view,
 			SynapseAlert synAlert,
-			SessionStorage sessionStorage) {
+			SessionStorage sessionStorage,
+			MarkdownIt markdownIt) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -76,6 +79,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.sessionStorage = sessionStorage;
+		this.markdownIt = markdownIt;
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
 	
@@ -105,7 +109,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 					@Override
 					public void invoke() {
 						//save in cache
-						String result = synapseJSNIUtils.markdown2Html(md, uniqueSuffix);
+						String result = markdownIt.markdown2Html(md, uniqueSuffix);
 						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
 						loadHtml(uniqueSuffix, result);
 					}
