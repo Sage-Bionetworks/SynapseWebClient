@@ -133,6 +133,7 @@ public class ProfilePresenterTest {
 	SynapseAlert mockSynAlert;
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
 	String targetUserId = "12345";
+	String targetUsername = "jediknight";
 	List<VerificationState> verificationStateList;
 	
 	@Mock
@@ -187,7 +188,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
-		
+		AsyncMockStubber.callSuccessWith(targetUserId).when(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
@@ -345,6 +346,36 @@ public class ProfilePresenterTest {
 		//not logged in, should not ask for this user favs
 		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
 	}
+	
+	@Test
+	public void testViewUsername() {
+		//view another user profile based on username
+		userProfile.setOwnerId(targetUserId);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn(targetUsername);
+		profilePresenter.setPlace(place);
+		
+		verify(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
+		verify(mockUserProfileClient).getUserBundle(eq(Long.parseLong(targetUserId)), anyInt(), any(AsyncCallback.class));
+		verify(place).setUserId(targetUserId);
+	}
+	
+	@Test
+	public void testViewUsernameFailure() {
+		//view another user profile based on username
+		userProfile.setOwnerId(targetUserId);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn(targetUsername);
+		Exception ex = new Exception("an error");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient)
+			.getUserIdFromUsername(anyString(), any(AsyncCallback.class));
+		
+		profilePresenter.setPlace(place);
+		
+		verify(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+	}
+
 
 	@Test
 	public void testViewMyProfileNoRedirect() throws JSONObjectAdapterException{
@@ -354,7 +385,7 @@ public class ProfilePresenterTest {
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(myPrincipalId);
-		when(place.toToken()).thenReturn(myPrincipalId);
+		when(place.getUserId()).thenReturn(myPrincipalId);
 		profilePresenter.setPlace(place);
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
@@ -378,7 +409,7 @@ public class ProfilePresenterTest {
 		//view another user profile
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("1");
-		when(place.toToken()).thenReturn("2");
+		when(place.getUserId()).thenReturn("2");
 		profilePresenter.setPlace(place);
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 	}

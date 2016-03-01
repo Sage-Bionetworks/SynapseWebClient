@@ -884,18 +884,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					Long.parseLong(place.getUserId());
 					updateProfileView(place.getUserId(), place.getArea());
 				} catch (NumberFormatException nfe) {
-					getUserIdAndGotoPlace(place.getUserId());
+					getUserIdFromUsername(token);
 				}
 			}
 		}
 	}
 	
-	public void getUserIdAndGotoPlace(String userName) {
+	public void getUserIdFromUsername(String userName) {
 		synapseClient.getUserIdFromUsername(userName, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String userId) {
 				place.setUserId(userId);
-				globalApplicationState.getPlaceChanger().goTo(place);
+				updateProfileView(userId, place.getArea());
 			}
 			
 			@Override
