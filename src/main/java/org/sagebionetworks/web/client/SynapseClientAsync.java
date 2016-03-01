@@ -442,4 +442,6 @@ public interface SynapseClientAsync {
 	
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
+
+	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
 }

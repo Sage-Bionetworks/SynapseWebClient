@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -68,6 +69,9 @@ public class MarkdownWidgetTest {
 	MarkdownCacheKey mockMarkdownCacheKey;
 	@Mock
 	MarkdownCacheValue mockMarkdownCacheValue;
+	@Mock
+	MarkdownIt mockMarkdownIt;
+	
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -90,7 +94,7 @@ public class MarkdownWidgetTest {
 		when(mockElementWrapper.getAttribute("widgetParams")).thenReturn(elementContentType);
 		when(mockInjector.getMarkdownCacheKey()).thenReturn(mockMarkdownCacheKey);
 		when(mockInjector.getMarkdownCacheValue()).thenReturn(mockMarkdownCacheValue);
-		presenter = new MarkdownWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockCookies, mockResourceLoader, mockGwt, mockInjector, mockView, mockSynAlert, mockSessionStorage);
+		presenter = new MarkdownWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockCookies, mockResourceLoader, mockGwt, mockInjector, mockView, mockSynAlert, mockSessionStorage, mockMarkdownIt);
 	}
 	
 	@Test
@@ -199,7 +203,7 @@ public class MarkdownWidgetTest {
 	public void testMarkdownIt2Html() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
-		when(mockSynapseJSNIUtils.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
+		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		String markdown="input markdown that is transformed";
 		presenter.configure(markdown, mockWikiPageKey, 1L);
 		
@@ -207,7 +211,7 @@ public class MarkdownWidgetTest {
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockSynapseJSNIUtils).markdown2Html(anyString(),anyString());
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
 		verify(mockView).setMarkdown(sampleHTML);
 		//verify highlight code blocks never called (part of parsing)
 		verify(mockSynapseJSNIUtils, never()).highlightCodeBlocks();
