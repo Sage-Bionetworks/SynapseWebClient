@@ -120,7 +120,7 @@ public class MarkdownWidgetTest {
 		verify(mockView, Mockito.times(6)).getElementById(anyString());
 		
 		//verify tablesorter applied
-		verify(mockSynapseJSNIUtils).tablesorter(anyString());
+		verify(mockSynapseJSNIUtils).loadTableSorters();
 		
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());
@@ -169,7 +169,7 @@ public class MarkdownWidgetTest {
 		verify(mockView, Mockito.times(6)).getElementById(anyString());
 		
 		//verify tablesorter applied
-		verify(mockSynapseJSNIUtils).tablesorter(anyString());
+		verify(mockSynapseJSNIUtils).loadTableSorters();
 		
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());

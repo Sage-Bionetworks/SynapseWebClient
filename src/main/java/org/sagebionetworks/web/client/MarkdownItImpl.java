@@ -33,6 +33,26 @@ public class MarkdownItImpl implements MarkdownIt {
 				return defaultRender(tokens, idx, options, env, self);
 			};
 		}
+		
+		function initMarkdownTableStyle() {
+			var defaultRender = $wnd.md.renderer.rules.table_open
+					|| function(tokens, idx, options, env, self) {
+						return self.renderToken(tokens, idx, options);
+					};
+
+			$wnd.md.renderer.rules.table_open = function(tokens, idx, options,
+					env, self) {
+				var aIndex = tokens[idx].attrIndex('class');
+				if (aIndex < 0) {
+					tokens[idx].attrPush([ 'class', 'markdowntable' ]); // add new attribute
+				} else {
+					tokens[idx].attrs[aIndex][1] += 'markdowntable'; // add value to existing attr
+				}
+
+				// pass token to default renderer.
+				return defaultRender(tokens, idx, options, env, self);
+			};
+		}
 
 		function initLinkify() {
 			$wnd.md.linkify.add('@', {
@@ -264,6 +284,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			});
 			sendLinksToNewWindow();
 			initLinkify();
+			initMarkdownTableStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 		}

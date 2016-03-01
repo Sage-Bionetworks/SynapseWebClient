@@ -79,12 +79,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void tablesorter(String id) {
-		_tablesorter(id);
+	public void loadTableSorters() {
+		_tablesorter();
 	}
 	
-	private static native void _tablesorter(String id) /*-{
-		$wnd.jQuery('#'+id).tablesorter();
+	private static native void _tablesorter() /*-{
+		$wnd.jQuery('table.markdowntable').tablesorter();
 	}-*/;
 	
 	private static native void _bindBootstrapPopover(String id) /*-{

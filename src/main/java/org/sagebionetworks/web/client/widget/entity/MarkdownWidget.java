@@ -193,16 +193,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		view.setEmptyVisible(false);
 	}
 	
-	
 	public void loadTableSorters() {
-		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
-		int i = 0;
-		ElementWrapper table = view.getElementById(id + i);
-		while (table != null) {
-			synapseJSNIUtils.tablesorter(id+i);
-			i++;
-			table = view.getElementById(id + i);
-		}
+		synapseJSNIUtils.loadTableSorters();
 	}
 	
 	public void loadMath(String suffix) {

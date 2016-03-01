@@ -360,7 +360,7 @@ public class ProvUtilsTest {
 				
 			}
 			@Override
-			public void tablesorter(String id) {
+			public void loadTableSorters() {
 				// TODO Auto-generated method stub
 				
 			}

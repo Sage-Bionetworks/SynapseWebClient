@@ -26,7 +26,7 @@ public interface SynapseJSNIUtils {
 	
 	public void highlightCodeBlocks();
 	
-	public void tablesorter(String id);
+	public void loadTableSorters();
 	
 	public String convertDateToSmallString(Date toFormat);
 	/**

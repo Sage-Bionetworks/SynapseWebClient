@@ -423,7 +423,7 @@ public class ProvenanceWidgetTest {
 			public void setPageTitle(String newTitle) {};
 			
 			@Override
-			public void tablesorter(String id) {}
+			public void loadTableSorters() {}
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url) {
