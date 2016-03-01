@@ -750,8 +750,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public String getUserIdFromUsername(String username) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//try to find it
-			UserGroupHeaderResponsePage responsePage = synapseClient.getUserGroupHeadersByPrefix(username, 1000, 0);
+			//try to find the user id based on the given username
+			UserGroupHeaderResponsePage responsePage = synapseClient.getUserGroupHeadersByPrefix(username);
 			for (UserGroupHeader header : responsePage.getChildren()) {
 				if (username.equals(header.getUserName())){
 					return header.getOwnerId();
