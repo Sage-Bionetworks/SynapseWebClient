@@ -1243,7 +1243,8 @@ h1, h2, h3, h4, h5, h6 {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 1.1em;
 }
 
 /* Markdown table styles */

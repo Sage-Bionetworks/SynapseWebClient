@@ -106,10 +106,10 @@ public class MarkdownItImpl implements MarkdownIt {
 				$wnd.md.utils.urlWithoutProtocolRE = new RegExp('^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)');
 			}
 			if (!$wnd.md.utils.tableClassStartRE) {
-				$wnd.md.utils.tableClassStartRE = new RegExp('^\s*{[|]{1}\s+class\s*=\s*"\s*(.*)"\s*$');
+				$wnd.md.utils.tableClassStartRE = new RegExp('^\\s*{[|]{1}\\s+class\\s*=\\s*"\\s*(.*)"\\s*');
 			}
 			if (!$wnd.md.utils.tableClassEndRE) {
-				$wnd.md.utils.tableClassEndRE = new RegExp('^\s*[|]{1}}\s*$');
+				$wnd.md.utils.tableClassEndRE = new RegExp('^\\s*[|]{1}}\\s*');
 			}
 		}
 
@@ -304,9 +304,8 @@ public class MarkdownItImpl implements MarkdownIt {
 			return result;
 		}
 		function table(state, startLine, endLine, silent) {
-			var ch, lineText, pos, i, nextLine, columns, columnCount, token, t, tableLines, tbodyLines, classNames, tableBodyStartLine;
-
-			// should have at least two lines (!!! Synapse change, used to be 3 due to required ---|---|--- line
+			var ch, lineText, pos, i, nextLine, columns, columnCount, token, t, tableLines, tbodyLines, classNames, tableBodyStartLine, headerLine;
+			// should have at least two lines (!!! Synapse change, used to be 3 due to required ---|---|--- line).  Header and single row.
 			if (startLine + 1 > endLine) {
 				return false;
 			}
@@ -318,27 +317,26 @@ public class MarkdownItImpl implements MarkdownIt {
 			ch = state.src.charCodeAt(pos);
 
 			lineText = getLine(state, startLine);
+			//look for optional class definition start, like '{| class="border"'
 			if ($wnd.md.utils.tableClassStartRE.test(lineText)) {
-				//we have a match!  
 				//this table definition includes class names, so the start marker is {| and end marker will be |} 
 				classNames = lineText.match($wnd.md.utils.tableClassStartRE)[1];
-				//start line of the table is really the second line.
-				startLine++;
-			}			
+				headerLine = startLine + 1;
+			} else {
+				headerLine = startLine;
+			}
 
-			nextLine = startLine + 1;
-			if (state.sCount[nextLine] < state.blkIndent) {
+			if (state.sCount[headerLine] < state.blkIndent) {
 				return false;
 			}
 			
-			pos = state.bMarks[nextLine] + state.tShift[nextLine];
-			if (pos >= state.eMarks[nextLine]) {
+			pos = state.bMarks[headerLine] + state.tShift[headerLine];
+			if (pos >= state.eMarks[headerLine]) {
 				return false;
 			}
 			
-			//!!!!!!!! Synapse - skip over ---|---|--- line if present
-
-			lineText = getLine(state, startLine).trim();
+			//read column headers
+			lineText = getLine(state, headerLine).trim();
 			if (lineText.indexOf('|') === -1) {
 				return false;
 			}
@@ -347,10 +345,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			// header row will define an amount of columns in the entire table,
 			// and align row shouldn't be smaller than that (the rest of the rows can)
 			columnCount = columns.length;
-			if (columnCount > aligns.length) {
-				return false;
-			}
-
+			
 			if (silent) {
 				return true;
 			}
@@ -358,7 +353,9 @@ public class MarkdownItImpl implements MarkdownIt {
 			token = state.push('table_open', 'table', 1);
 			token.map = tableLines = [ startLine, 0 ];
 			if (classNames) {
-				token.attrs = [ [ 'class', classNames ] ];
+				token.attrs = [ [ 'class', ' ' + classNames + ' ' ] ];
+				//start line of the table (header) is really the second line.
+				startLine++;
 			}
 
 			token = state.push('thead_open', 'thead', 1);
@@ -382,11 +379,14 @@ public class MarkdownItImpl implements MarkdownIt {
 			token = state.push('tr_close', 'tr', -1);
 			token = state.push('thead_close', 'thead', -1);
 
-			//If the second line is of the form ---|---|---, then the table body starts on the 3rd line.  Else, it starts on the second
+			nextLine = headerLine + 1;
+			lineText = getLine(state, nextLine).trim();
+			
+			//If this line is of the form ---|---|---, then we need to skip.  Else, it starts here
 			if (/^[-:| ]+$/.test(lineText)) {
-				tableBodyStartLine = startLine + 2;
+				tableBodyStartLine = headerLine + 2;
 			} else {
-				tableBodyStartLine = startLine + 1;
+				tableBodyStartLine = headerLine + 1;
 			}
 			token = state.push('tbody_open', 'tbody', 1);
 			token.map = tbodyLines = [ tableBodyStartLine, 0 ];
