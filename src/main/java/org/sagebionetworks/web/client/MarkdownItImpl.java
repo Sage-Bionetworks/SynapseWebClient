@@ -358,36 +358,37 @@ public class MarkdownItImpl implements MarkdownIt {
 				startLine++;
 			}
 
-			token = state.push('thead_open', 'thead', 1);
-			token.map = [ startLine, startLine + 1 ];
-
-			token = state.push('tr_open', 'tr', 1);
-			token.map = [ startLine, startLine + 1 ];
-
-			for (i = 0; i < columns.length; i++) {
-				token = state.push('th_open', 'th', 1);
-				token.map = [ startLine, startLine + 1 ];
-				
-				token = state.push('inline', '', 0);
-				token.content = columns[i].trim();
-				token.map = [ startLine, startLine + 1 ];
-				token.children = [];
-
-				token = state.push('th_close', 'th', -1);
-			}
-
-			token = state.push('tr_close', 'tr', -1);
-			token = state.push('thead_close', 'thead', -1);
-
-			nextLine = headerLine + 1;
-			lineText = getLine(state, nextLine).trim();
+			lineText = getLine(state, headerLine + 1).trim();
 			
-			//If this line is of the form ---|---|---, then we need to skip.  Else, it starts here
+			//If this line is of the form ---|---|---, then we have column headers and we should skip this line.  Else, no column headers and we should skip to the body.
 			if (/^[-:| ]+$/.test(lineText)) {
+				//we have column headers
 				tableBodyStartLine = headerLine + 2;
+				token = state.push('thead_open', 'thead', 1);
+				token.map = [ startLine, startLine + 1 ];
+	
+				token = state.push('tr_open', 'tr', 1);
+				token.map = [ startLine, startLine + 1 ];
+	
+				for (i = 0; i < columns.length; i++) {
+					token = state.push('th_open', 'th', 1);
+					token.map = [ startLine, startLine + 1 ];
+					
+					token = state.push('inline', '', 0);
+					token.content = columns[i].trim();
+					token.map = [ startLine, startLine + 1 ];
+					token.children = [];
+	
+					token = state.push('th_close', 'th', -1);
+				}
+	
+				token = state.push('tr_close', 'tr', -1);
+				token = state.push('thead_close', 'thead', -1);
 			} else {
-				tableBodyStartLine = headerLine + 1;
+				//no column headers
+				tableBodyStartLine = headerLine;
 			}
+			
 			token = state.push('tbody_open', 'tbody', 1);
 			token.map = tbodyLines = [ tableBodyStartLine, 0 ];
 			
