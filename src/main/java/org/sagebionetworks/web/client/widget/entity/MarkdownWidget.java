@@ -101,21 +101,21 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 		String hostPrefix = gwt.getHostPrefix();
 		final String key = getKey(md, hostPrefix, isInTestWebsite);
-		final MarkdownCacheValue cachedValue = getValueFromCache(key);
-		if(cachedValue == null) {
-			//if in test website, use the new client-side markdown processor
-			if (isInTestWebsite) {
-				view.callbackWhenAttached(new Callback() {
-					@Override
-					public void invoke() {
-						//save in cache
-						String result = markdownIt.markdown2Html(md, uniqueSuffix);
-						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
-						loadHtml(uniqueSuffix, result);
-					}
-				});
-			}
-			else {
+		
+		if (isInTestWebsite) {
+			//avoid cache for new md processor until it is in good shape.
+			view.callbackWhenAttached(new Callback() {
+				@Override
+				public void invoke() {
+					//save in cache
+					String result = markdownIt.markdown2Html(md, uniqueSuffix);
+					sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+					loadHtml(uniqueSuffix, result);
+				}
+			});
+		} else {
+			final MarkdownCacheValue cachedValue = getValueFromCache(key);
+			if(cachedValue == null) {
 				synapseClient.markdown2Html(md, uniqueSuffix, isInTestWebsite, hostPrefix, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(final String result) {
@@ -133,15 +133,15 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						synAlert.handleException(caught);
 					}
 				});
+			} else {
+				//used cached value
+				view.callbackWhenAttached(new Callback() {
+					@Override
+					public void invoke() {
+						loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
+					}
+				});
 			}
-		} else {
-			//used cached value
-			view.callbackWhenAttached(new Callback() {
-				@Override
-				public void invoke() {
-					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
-				}
-			});
 		}
 	}
 	

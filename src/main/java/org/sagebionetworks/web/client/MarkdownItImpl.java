@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client;
 
-
 public class MarkdownItImpl implements MarkdownIt {
 	@Override
 	public String markdown2Html(String md, String uniqueSuffix) {
 		return _markdown2Html(md, uniqueSuffix);
 	}
-	
-	private final static native String _markdown2Html(String md, String uniqueSuffix) /*-{
+
+	private final static native String _markdown2Html(String md,
+			String uniqueSuffix) /*-{
 		function sendLinksToNewWindow() {
 			var defaultRender = $wnd.md.renderer.rules.link_open
 					|| function(tokens, idx, options, env, self) {
@@ -33,7 +33,7 @@ public class MarkdownItImpl implements MarkdownIt {
 				return defaultRender(tokens, idx, options, env, self);
 			};
 		}
-		
+
 		function initMarkdownTableStyle() {
 			var defaultRender = $wnd.md.renderer.rules.table_open
 					|| function(tokens, idx, options, env, self) {
@@ -102,12 +102,14 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
 			}
-			if (!$wnd.md.utils.wwwRE) {
-				$wnd.md.utils.wwwRE = new RegExp('^www[.]{1}[a-zA-Z0-9_]+');
+			if (!$wnd.md.utils.urlWithoutProtocolRE) {
+				$wnd.md.utils.urlWithoutProtocolRE = new RegExp('^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)');
 			}
-			
-			if (!$wnd.md.utils.usernameRE) {
-				$wnd.md.utils.usernameRE = new RegExp('^@([a-zA-Z0-9_]){1,150}');
+			if (!$wnd.md.utils.tableClassStartRE) {
+				$wnd.md.utils.tableClassStartRE = new RegExp('^\s*{[|]{1}\s+class\s*=\s*"\s*(.*)"\s*$');
+			}
+			if (!$wnd.md.utils.tableClassEndRE) {
+				$wnd.md.utils.tableClassEndRE = new RegExp('^\s*[|]{1}}\s*$');
 			}
 		}
 
@@ -153,8 +155,9 @@ public class MarkdownItImpl implements MarkdownIt {
 					var testString = res.str;
 					if ($wnd.md.utils.synapseRE.test(testString)) {
 						//this is a synapse ID
-						res.str = '#!Synapse:' + testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.wwwRE.test(testString)) {
+						res.str = '#!Synapse:'
+								+ testString.replace(/[.]/, '/version/');
+					} else if ($wnd.md.utils.urlWithoutProtocolRE.test(testString)) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
@@ -257,7 +260,173 @@ public class MarkdownItImpl implements MarkdownIt {
 			state.pos = pos;
 			state.posMax = max;
 			return true;
-		};
+		}
+		;
+
+		function getLine(state, line) {
+			var pos = state.bMarks[line] + state.blkIndent, max = state.eMarks[line];
+
+			return state.src.substr(pos, max - pos);
+		}
+
+		function escapedSplit(str) {
+			var result = [], pos = 0, max = str.length, ch, escapes = 0, lastPos = 0, backTicked = false, lastBackTick = 0;
+
+			ch = str.charCodeAt(pos);
+
+			while (pos < max) {
+				if (ch === 0x60 && (escapes % 2 === 0)) { // `
+					backTicked = !backTicked;
+					lastBackTick = pos;
+				} else if (ch === 0x7c && (escapes % 2 === 0) && !backTicked) { // |
+					result.push(str.substring(lastPos, pos));
+					lastPos = pos + 1;
+				} else if (ch === 0x5c) { // \
+					escapes++;
+				} else {
+					escapes = 0;
+				}
+
+				pos++;
+
+				// If there was an un-closed backtick, go back to just after
+				// the last backtick, but as if it was a normal character
+				if (pos === max && backTicked) {
+					backTicked = false;
+					pos = lastBackTick + 1;
+				}
+
+				ch = str.charCodeAt(pos);
+			}
+
+			result.push(str.substring(lastPos));
+
+			return result;
+		}
+		function table(state, startLine, endLine, silent) {
+			var ch, lineText, pos, i, nextLine, columns, columnCount, token, t, tableLines, tbodyLines, classNames, tableBodyStartLine;
+
+			// should have at least two lines (!!! Synapse change, used to be 3 due to required ---|---|--- line
+			if (startLine + 1 > endLine) {
+				return false;
+			}
+
+			pos = state.bMarks[startLine] + state.tShift[startLine];
+			if (pos >= state.eMarks[startLine]) {
+				return false;
+			}
+			ch = state.src.charCodeAt(pos);
+
+			lineText = getLine(state, startLine);
+			if ($wnd.md.utils.tableClassStartRE.test(lineText)) {
+				//we have a match!  
+				//this table definition includes class names, so the start marker is {| and end marker will be |} 
+				classNames = lineText.match($wnd.md.utils.tableClassStartRE)[1];
+				//start line of the table is really the second line.
+				startLine++;
+			}			
+
+			nextLine = startLine + 1;
+			if (state.sCount[nextLine] < state.blkIndent) {
+				return false;
+			}
+			
+			pos = state.bMarks[nextLine] + state.tShift[nextLine];
+			if (pos >= state.eMarks[nextLine]) {
+				return false;
+			}
+			
+			//!!!!!!!! Synapse - skip over ---|---|--- line if present
+
+			lineText = getLine(state, startLine).trim();
+			if (lineText.indexOf('|') === -1) {
+				return false;
+			}
+			columns = escapedSplit(lineText.replace(/^\||\|$/g, ''));
+
+			// header row will define an amount of columns in the entire table,
+			// and align row shouldn't be smaller than that (the rest of the rows can)
+			columnCount = columns.length;
+			if (columnCount > aligns.length) {
+				return false;
+			}
+
+			if (silent) {
+				return true;
+			}
+
+			token = state.push('table_open', 'table', 1);
+			token.map = tableLines = [ startLine, 0 ];
+			if (classNames) {
+				token.attrs = [ [ 'class', classNames ] ];
+			}
+
+			token = state.push('thead_open', 'thead', 1);
+			token.map = [ startLine, startLine + 1 ];
+
+			token = state.push('tr_open', 'tr', 1);
+			token.map = [ startLine, startLine + 1 ];
+
+			for (i = 0; i < columns.length; i++) {
+				token = state.push('th_open', 'th', 1);
+				token.map = [ startLine, startLine + 1 ];
+				
+				token = state.push('inline', '', 0);
+				token.content = columns[i].trim();
+				token.map = [ startLine, startLine + 1 ];
+				token.children = [];
+
+				token = state.push('th_close', 'th', -1);
+			}
+
+			token = state.push('tr_close', 'tr', -1);
+			token = state.push('thead_close', 'thead', -1);
+
+			//If the second line is of the form ---|---|---, then the table body starts on the 3rd line.  Else, it starts on the second
+			if (/^[-:| ]+$/.test(lineText)) {
+				tableBodyStartLine = startLine + 2;
+			} else {
+				tableBodyStartLine = startLine + 1;
+			}
+			token = state.push('tbody_open', 'tbody', 1);
+			token.map = tbodyLines = [ tableBodyStartLine, 0 ];
+			
+			for (nextLine = tableBodyStartLine; nextLine < endLine; nextLine++) {
+				if (state.sCount[nextLine] < state.blkIndent) {
+					break;
+				}
+
+				lineText = getLine(state, nextLine).trim();
+				if ($wnd.md.utils.tableClassEndRE.test(lineText)) {
+					//end of table with class definitions. Include this line in the table definition
+					nextLine++;
+					break;
+				}
+				if (lineText.indexOf('|') === -1) {
+					break;
+				}
+				columns = escapedSplit(lineText.replace(/^\||\|$/g, ''));
+
+				token = state.push('tr_open', 'tr', 1);
+				for (i = 0; i < columnCount; i++) {
+					token = state.push('td_open', 'td', 1);
+					
+					token = state.push('inline', '', 0);
+					token.content = columns[i] ? columns[i].trim() : '';
+					token.children = [];
+
+					token = state.push('td_close', 'td', -1);
+				}
+				token = state.push('tr_close', 'tr', -1);
+			}
+			token = state.push('tbody_close', 'tbody', -1);
+			token = state.push('table_close', 'table', -1);
+
+			tableLines[1] = tbodyLines[1] = nextLine;
+			state.line = nextLine;
+			return true;
+		}
+		;
 
 		function initMarkdownIt() {
 			$wnd.md = $wnd.markdownit().set({
@@ -287,6 +456,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			initMarkdownTableStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
+			$wnd.md.block.ruler.at('table', table);
 		}
 
 		if (!$wnd.md) {
@@ -298,5 +468,5 @@ public class MarkdownItImpl implements MarkdownIt {
 
 		return $wnd.md.render(md);
 	}-*/;
-	
+
 }
