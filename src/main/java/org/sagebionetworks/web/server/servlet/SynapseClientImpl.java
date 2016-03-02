@@ -77,6 +77,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -745,6 +746,25 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
+	public String getUserIdFromUsername(String username) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//try to find the user id based on the given username
+			UserGroupHeaderResponsePage responsePage = synapseClient.getUserGroupHeadersByPrefix(username);
+			for (UserGroupHeader header : responsePage.getChildren()) {
+				if (username.equals(header.getUserName())){
+					return header.getOwnerId();
+				}
+			}
+			throw new NotFoundException(username + " not found");
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public void updateUserProfile(UserProfile profile)
 			throws RestServiceException {

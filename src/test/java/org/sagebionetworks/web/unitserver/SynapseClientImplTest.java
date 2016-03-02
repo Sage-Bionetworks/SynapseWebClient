@@ -28,6 +28,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +50,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -90,6 +94,7 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -205,6 +210,11 @@ public class SynapseClientImplTest {
 	JoinTeamSignedToken joinTeamToken;
 	String encodedJoinTeamToken, encodedNotificationSettingsToken;
 	
+	@Mock
+	UserGroupHeaderResponsePage mockUserGroupHeaderResponsePage;
+	@Mock
+	UserGroupHeader mockUserGroupHeader;
+	
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
@@ -217,6 +227,7 @@ public class SynapseClientImplTest {
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
@@ -2196,5 +2207,33 @@ public class SynapseClientImplTest {
 		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 123L, 1);
 		assertNull(returnedEntityBundle.getLatestVersionNumber());
 		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
+	}
+	
+	@Test
+	public void testGetUserIdFromUsername() throws UnsupportedEncodingException, SynapseException, RestServiceException {
+		//find the user id based on user name
+		String targetUserName = "lukeskywalker";
+		String targetUserId = "4";
+		when(mockUserGroupHeader.getUserName()).thenReturn(targetUserName);
+		when(mockUserGroupHeader.getOwnerId()).thenReturn(targetUserId);
+		when(mockSynapse.getUserGroupHeadersByPrefix(anyString())).thenReturn(mockUserGroupHeaderResponsePage);
+		when(mockUserGroupHeaderResponsePage.getChildren()).thenReturn(Collections.singletonList(mockUserGroupHeader));
+		String userId = synapseClient.getUserIdFromUsername(targetUserName);
+		assertEquals(targetUserId, userId);
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void testGetUserIdFromUsernameNotFound() throws UnsupportedEncodingException, SynapseException, RestServiceException {
+		//test user name not found
+		when(mockSynapse.getUserGroupHeadersByPrefix(anyString())).thenReturn(mockUserGroupHeaderResponsePage);
+		when(mockUserGroupHeaderResponsePage.getChildren()).thenReturn(Collections.EMPTY_LIST);
+		synapseClient.getUserIdFromUsername("max_power");
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testGetUserIdFromUsernameBackendError() throws UnsupportedEncodingException, SynapseException, RestServiceException {
+		//test error from backend
+		when(mockSynapse.getUserGroupHeadersByPrefix(anyString())).thenThrow(new SynapseBadRequestException());
+		synapseClient.getUserIdFromUsername("bad-request");
 	}
 }
