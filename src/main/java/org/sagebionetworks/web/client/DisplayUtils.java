@@ -1499,17 +1499,6 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
-		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
-		int i = 0;
-		Element table = panel.getElementById(id + i);
-		while (table != null) {
-			synapseJSNIUtils.tablesorter(id+i);
-			i++;
-			table = panel.getElementById(id + i);
-		}
-	}
-
 	public static Widget getShareSettingsDisplay(boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
 		final SimplePanel lc = new SimplePanel();
 		lc.addStyleName(STYLE_DISPLAY_INLINE);

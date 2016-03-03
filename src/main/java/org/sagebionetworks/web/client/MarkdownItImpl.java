@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client;
 
-
 public class MarkdownItImpl implements MarkdownIt {
 	@Override
 	public String markdown2Html(String md, String uniqueSuffix) {
 		return _markdown2Html(md, uniqueSuffix);
 	}
-	
-	private final static native String _markdown2Html(String md, String uniqueSuffix) /*-{
+
+	private final static native String _markdown2Html(String md,
+			String uniqueSuffix) /*-{
 		function sendLinksToNewWindow() {
 			var defaultRender = $wnd.md.renderer.rules.link_open
 					|| function(tokens, idx, options, env, self) {
@@ -27,6 +27,26 @@ public class MarkdownItImpl implements MarkdownIt {
 					}
 				} else {
 					tokens[idx].attrs[aIndex][1] = '_blank'; // replace value of existing attr
+				}
+
+				// pass token to default renderer.
+				return defaultRender(tokens, idx, options, env, self);
+			};
+		}
+
+		function initMarkdownTableStyle() {
+			var defaultRender = $wnd.md.renderer.rules.table_open
+					|| function(tokens, idx, options, env, self) {
+						return self.renderToken(tokens, idx, options);
+					};
+
+			$wnd.md.renderer.rules.table_open = function(tokens, idx, options,
+					env, self) {
+				var aIndex = tokens[idx].attrIndex('class');
+				if (aIndex < 0) {
+					tokens[idx].attrPush([ 'class', 'markdowntable' ]); // add new attribute
+				} else {
+					tokens[idx].attrs[aIndex][1] += 'markdowntable'; // add value to existing attr
 				}
 
 				// pass token to default renderer.
@@ -82,12 +102,9 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
 			}
-			if (!$wnd.md.utils.wwwRE) {
-				$wnd.md.utils.wwwRE = new RegExp('^www[.]{1}[a-zA-Z0-9_]+');
-			}
-			
-			if (!$wnd.md.utils.usernameRE) {
-				$wnd.md.utils.usernameRE = new RegExp('^@([a-zA-Z0-9_]){1,150}');
+			if (!$wnd.md.utils.urlWithoutProtocolRE) {
+				$wnd.md.utils.urlWithoutProtocolRE = new RegExp(
+						'^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)');
 			}
 		}
 
@@ -133,8 +150,10 @@ public class MarkdownItImpl implements MarkdownIt {
 					var testString = res.str;
 					if ($wnd.md.utils.synapseRE.test(testString)) {
 						//this is a synapse ID
-						res.str = '#!Synapse:' + testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.wwwRE.test(testString)) {
+						res.str = '#!Synapse:'
+								+ testString.replace(/[.]/, '/version/');
+					} else if ($wnd.md.utils.urlWithoutProtocolRE
+							.test(testString)) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
@@ -240,16 +259,19 @@ public class MarkdownItImpl implements MarkdownIt {
 		};
 
 		function initMarkdownIt() {
-			$wnd.md = $wnd.markdownit().set({
+			$wnd.md = $wnd.markdownit();
+			$wnd.md.set({
 				html : false,
 				breaks : true,
 				linkify : true,
 				maxNesting : 100
 			});
 			$wnd.md.disable([ 'heading' ]);
-			$wnd.md.use($wnd.markdownitSub).use($wnd.markdownitSup).use(
-					$wnd.markdownitCentertext).use(
-					$wnd.markdownitSynapseHeading);
+			$wnd.md.use($wnd.markdownitSub)
+				.use($wnd.markdownitSup)
+				.use($wnd.markdownitCentertext)
+				.use($wnd.markdownitSynapseHeading)
+				.use($wnd.markdownitSynapseTable);
 
 			$wnd.md.set({
 				highlight : function(str, lang) {
@@ -264,6 +286,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			});
 			sendLinksToNewWindow();
 			initLinkify();
+			initMarkdownTableStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 		}
@@ -274,8 +297,8 @@ public class MarkdownItImpl implements MarkdownIt {
 		//load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
 		$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix).use(
 				$wnd.markdownitMath, uniqueSuffix);
-
+				
 		return $wnd.md.render(md);
 	}-*/;
-	
+
 }

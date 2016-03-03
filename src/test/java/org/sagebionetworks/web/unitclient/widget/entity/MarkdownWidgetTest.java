@@ -115,12 +115,11 @@ public class MarkdownWidgetTest {
 		verify(mockView).setMarkdown(sampleHTML);
 		verify(mockSessionStorage).setItem(anyString(), anyString());
 		
-		// Called three times between tablesorter, loadMath, and loadWidgets, 
-		// then another three to determine null
-		verify(mockView, Mockito.times(6)).getElementById(anyString());
+		// Called by loadMath and loadWidgets, 
+		verify(mockView, Mockito.times(4)).getElementById(anyString());
 		
 		//verify tablesorter applied
-		verify(mockSynapseJSNIUtils).tablesorter(anyString());
+		verify(mockSynapseJSNIUtils).loadTableSorters();
 		
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());
@@ -164,12 +163,11 @@ public class MarkdownWidgetTest {
 		verify(mockView, Mockito.times(2)).setEmptyVisible(false);
 		verify(mockView).clearMarkdown();
 		verify(mockView).setMarkdown(sampleHTML);
-		// Called three times between tablesorter, loadMath, and loadWidgets, 
-		// then another three to determine null
-		verify(mockView, Mockito.times(6)).getElementById(anyString());
+		// Called by loadMath, and loadWidgets, 
+		verify(mockView, Mockito.times(4)).getElementById(anyString());
 		
 		//verify tablesorter applied
-		verify(mockSynapseJSNIUtils).tablesorter(anyString());
+		verify(mockSynapseJSNIUtils).loadTableSorters();
 		
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());
