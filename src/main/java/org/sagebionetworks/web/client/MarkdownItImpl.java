@@ -53,6 +53,27 @@ public class MarkdownItImpl implements MarkdownIt {
 				return defaultRender(tokens, idx, options, env, self);
 			};
 		}
+		
+		//TODO: remove extra style once we remove the old markdown processor, and just change the ".markdown p" css class instead
+		function initParagraphStyle() {
+			var defaultRender = $wnd.md.renderer.rules.paragraph_open
+					|| function(tokens, idx, options, env, self) {
+						return self.renderToken(tokens, idx, options);
+					};
+
+			$wnd.md.renderer.rules.paragraph_open = function(tokens, idx, options,
+					env, self) {
+				var aIndex = tokens[idx].attrIndex('style');
+				if (aIndex < 0) {
+					tokens[idx].attrPush([ 'style', 'margin: 20px 0 0 0;' ]); // add new attribute
+				} else {
+					tokens[idx].attrs[aIndex][1] += ' margin: 20px 0 0 0; '; // add value to existing attr
+				}
+
+				// pass token to default renderer.
+				return defaultRender(tokens, idx, options, env, self);
+			};
+		}
 
 		function initLinkify() {
 			$wnd.md.linkify.add('@', {
@@ -287,6 +308,8 @@ public class MarkdownItImpl implements MarkdownIt {
 			sendLinksToNewWindow();
 			initLinkify();
 			initMarkdownTableStyle();
+			//TODO: remove special paragraph renderer after release
+			initParagraphStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 		}
