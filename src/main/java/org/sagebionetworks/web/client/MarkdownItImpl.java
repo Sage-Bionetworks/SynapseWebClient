@@ -103,10 +103,12 @@ public class MarkdownItImpl implements MarkdownIt {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
 			}
 			if (!$wnd.md.utils.urlWithoutProtocolRE) {
-				$wnd.md.utils.urlWithoutProtocolRE = new RegExp('^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)');
+				$wnd.md.utils.urlWithoutProtocolRE = new RegExp(
+						'^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)');
 			}
 			if (!$wnd.md.utils.tableClassStartRE) {
-				$wnd.md.utils.tableClassStartRE = new RegExp('^\\s*{[|]{1}\\s+class\\s*=\\s*"\\s*(.*)"\\s*');
+				$wnd.md.utils.tableClassStartRE = new RegExp(
+						'^\\s*{[|]{1}\\s+class\\s*=\\s*"\\s*(.*)"\\s*');
 			}
 			if (!$wnd.md.utils.tableClassEndRE) {
 				$wnd.md.utils.tableClassEndRE = new RegExp('^\\s*[|]{1}}\\s*');
@@ -157,7 +159,8 @@ public class MarkdownItImpl implements MarkdownIt {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.urlWithoutProtocolRE.test(testString)) {
+					} else if ($wnd.md.utils.urlWithoutProtocolRE
+							.test(testString)) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
@@ -303,6 +306,7 @@ public class MarkdownItImpl implements MarkdownIt {
 
 			return result;
 		}
+
 		function table(state, startLine, endLine, silent) {
 			var ch, lineText, pos, i, nextLine, columns, columnCount, token, t, tableLines, tbodyLines, classNames, tableBodyStartLine, headerLine;
 			// should have at least two lines (!!! Synapse change, used to be 3 due to required ---|---|--- line).  Header and single row.
@@ -329,12 +333,12 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (state.sCount[headerLine] < state.blkIndent) {
 				return false;
 			}
-			
+
 			pos = state.bMarks[headerLine] + state.tShift[headerLine];
 			if (pos >= state.eMarks[headerLine]) {
 				return false;
 			}
-			
+
 			//read column headers
 			lineText = getLine(state, headerLine).trim();
 			if (lineText.indexOf('|') === -1) {
@@ -345,7 +349,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			// header row will define an amount of columns in the entire table,
 			// and align row shouldn't be smaller than that (the rest of the rows can)
 			columnCount = columns.length;
-			
+
 			if (silent) {
 				return true;
 			}
@@ -359,39 +363,39 @@ public class MarkdownItImpl implements MarkdownIt {
 			}
 
 			lineText = getLine(state, headerLine + 1).trim();
-			
+
 			//If this line is of the form ---|---|---, then we have column headers and we should skip this line.  Else, no column headers and we should skip to the body.
 			if (/^[-:| ]+$/.test(lineText)) {
 				//we have column headers
 				tableBodyStartLine = headerLine + 2;
 				token = state.push('thead_open', 'thead', 1);
 				token.map = [ startLine, startLine + 1 ];
-	
+
 				token = state.push('tr_open', 'tr', 1);
 				token.map = [ startLine, startLine + 1 ];
-	
+
 				for (i = 0; i < columns.length; i++) {
 					token = state.push('th_open', 'th', 1);
 					token.map = [ startLine, startLine + 1 ];
-					
+
 					token = state.push('inline', '', 0);
 					token.content = columns[i].trim();
 					token.map = [ startLine, startLine + 1 ];
 					token.children = [];
-	
+
 					token = state.push('th_close', 'th', -1);
 				}
-	
+
 				token = state.push('tr_close', 'tr', -1);
 				token = state.push('thead_close', 'thead', -1);
 			} else {
 				//no column headers
 				tableBodyStartLine = headerLine;
 			}
-			
+
 			token = state.push('tbody_open', 'tbody', 1);
 			token.map = tbodyLines = [ tableBodyStartLine, 0 ];
-			
+
 			for (nextLine = tableBodyStartLine; nextLine < endLine; nextLine++) {
 				if (state.sCount[nextLine] < state.blkIndent) {
 					break;
@@ -411,7 +415,7 @@ public class MarkdownItImpl implements MarkdownIt {
 				token = state.push('tr_open', 'tr', 1);
 				for (i = 0; i < columnCount; i++) {
 					token = state.push('td_open', 'td', 1);
-					
+
 					token = state.push('inline', '', 0);
 					token.content = columns[i] ? columns[i].trim() : '';
 					token.children = [];
@@ -426,15 +430,15 @@ public class MarkdownItImpl implements MarkdownIt {
 			tableLines[1] = tbodyLines[1] = nextLine;
 			state.line = nextLine;
 			return true;
-		}
-		;
+		};
 
 		function initMarkdownIt() {
-			$wnd.md = $wnd.markdownit().set({
+			$wnd.md = $wnd.markdownit();
+			$wnd.md.set({
+				linkify : true,
 				html : false,
 				breaks : true,
-				linkify : true,
-				maxNesting : 100
+				typographer: true
 			});
 			$wnd.md.disable([ 'heading' ]);
 			$wnd.md.use($wnd.markdownitSub).use($wnd.markdownitSup).use(
@@ -457,7 +461,9 @@ public class MarkdownItImpl implements MarkdownIt {
 			initMarkdownTableStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
-			$wnd.md.block.ruler.at('table', table);
+			var rulesCanBeTerminated = [ 'paragraph', 'reference' ];
+			$wnd.md.block.ruler.at('table', table, { alt: (rulesCanBeTerminated).slice() });
+			
 		}
 
 		if (!$wnd.md) {
@@ -466,7 +472,7 @@ public class MarkdownItImpl implements MarkdownIt {
 		//load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
 		$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix).use(
 				$wnd.markdownitMath, uniqueSuffix);
-
+				
 		return $wnd.md.render(md);
 	}-*/;
 
