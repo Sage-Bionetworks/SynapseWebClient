@@ -261,10 +261,10 @@ public class MarkdownItImpl implements MarkdownIt {
 		function initMarkdownIt() {
 			$wnd.md = $wnd.markdownit();
 			$wnd.md.set({
-				linkify : true,
 				html : false,
 				breaks : true,
-				typographer: true
+				linkify : true,
+				maxNesting : 100
 			});
 			$wnd.md.disable([ 'heading' ]);
 			$wnd.md.use($wnd.markdownitSub)
