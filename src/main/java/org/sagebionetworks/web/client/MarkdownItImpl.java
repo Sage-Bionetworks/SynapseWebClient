@@ -288,6 +288,7 @@ public class MarkdownItImpl implements MarkdownIt {
 				maxNesting : 100
 			});
 			$wnd.md.disable([ 'heading' ]);
+			$wnd.md.disable([ 'lheading' ]);
 			$wnd.md.use($wnd.markdownitSub)
 				.use($wnd.markdownitSup)
 				.use($wnd.markdownitCentertext)
