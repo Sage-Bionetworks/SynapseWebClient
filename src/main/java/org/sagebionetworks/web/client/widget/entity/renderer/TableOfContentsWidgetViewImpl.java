@@ -57,7 +57,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 				String tagName = heading.getTagName();
 				String tocStyle = tagName2Style.get(tagName);
 				if (heading.hasAttribute("toc-style") || heading.hasAttribute("toc")) {
-					String text = heading.getInnerHTML();
+					String text = heading.getInnerText();
 					//create links to all headers in the page
 					final Element scrollToElement = heading;
 					SimplePanel wrapper = new SimplePanel();
