@@ -323,6 +323,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void clear() {
+		hideAPIKey();
 		resetChangePasswordUI();
 		storageUsageSpan.setText("");
 		resetAddEmailUI();
