@@ -117,15 +117,29 @@ public class MarkdownItImpl implements MarkdownIt {
 							+ match.url.replace(/[.]/, '/version/');
 				}
 			});
+			
+			$wnd.md.linkify.add('doi:10.', {
+				validate : function(text, pos, self) {
+					var tail = text.slice(pos);
+					if (!self.re.doi) {
+						self.re.doi = new RegExp(
+								'^[0-9]+[/]{1}[a-zA-Z0-9_.]+(?!_)(?=$|'
+										+ self.re.src_ZPCc + ')');
+					}
+					if (self.re.doi.test(tail)) {
+						return tail.match(self.re.doi)[0].length;
+					}
+					return 0;
+				},
+				normalize : function(match) {
+					match.url = 'http://dx.doi.org/' + match.url;
+				}
+			});
 		}
 
 		function initREs() {
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
-			}
-			if (!$wnd.md.utils.urlWithoutProtocolRE) {
-				$wnd.md.utils.urlWithoutProtocolRE = new RegExp(
-						'^(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)');
 			}
 		}
 
@@ -173,8 +187,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.urlWithoutProtocolRE
-							.test(testString)) {
+					} else if (testString.toLowerCase().lastIndexOf('www.', 0) === 0) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
