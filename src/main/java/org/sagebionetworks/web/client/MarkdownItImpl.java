@@ -324,7 +324,6 @@ public class MarkdownItImpl implements MarkdownIt {
 		var results = $wnd.md.render(md);
 		// Were footnotes found (and exported)?  If so, run the processor on the footnotes, and append to the results.
 		var footnotes = $wnd.markdownitSynapse.footnotes();
-		debugger;
 		if(footnotes.length !== 0) {
 			//reset footnote id and rerun on footnotes that were discovered in the first pass
 			$wnd.markdownitSynapse.resetFootnoteId();
