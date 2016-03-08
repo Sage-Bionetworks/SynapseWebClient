@@ -329,7 +329,17 @@ public class SettingsPresenterTest {
 	public void testAsWidget() {
 		profilePresenter.asWidget();
 		verify(mockSynAlert, times(8)).clear();
-		verify(mockView).hideAPIKey();
+		verify(mockView).clear();
+		verify(mockView).asWidget();
+	}
+	
+	@Test
+	public void testAsWidgetAnonymousSWC2943() {
+		//used to result in NPE before fix for SWC-2943
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		profilePresenter.asWidget();
+		verify(mockView).clear();
 		verify(mockView).asWidget();
 	}
 	

@@ -245,14 +245,16 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	// configuration
 	public void resetView() {
-		view.hideAPIKey();
+		view.clear();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
-		updateUserStorage();
-		getUserNotificationEmail();
-		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+		if (authenticationController.isLoggedIn()) {
+			updateUserStorage();
+			getUserNotificationEmail();
+			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+		}
 	}
 
 	@Override
