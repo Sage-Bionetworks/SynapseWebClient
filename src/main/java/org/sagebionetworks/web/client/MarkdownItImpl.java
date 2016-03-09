@@ -319,6 +319,40 @@ public class MarkdownItImpl implements MarkdownIt {
 					return ''; // use external default escaping
 				}
 			});
+			$wnd.md.use($wnd.markdownitContainer, 'row', 
+				{
+					marker: '{row}',
+					minMarkerCount: 1,
+					render: function (tokens, idx) {
+						if (tokens[idx].nesting === 1) {
+							// opening tag
+							return '<div class="row">';
+						} else {
+							// closing tag
+							return '</div>\n';
+						}
+					},
+					validate: function(params) {
+						return true;
+					}
+				});
+			$wnd.md.use($wnd.markdownitContainer, 'column', 
+				{
+					marker: '{column',
+					minMarkerCount: 1,
+					render: function (tokens, idx) {
+						if (tokens[idx].nesting === 1) {
+							// opening tag
+							return '<div class="col-sm-4">';
+						} else {
+							// closing tag
+							return '</div>\n';
+						}
+					},
+					validate: function(params) {
+						return true;
+					}
+				});
 			sendLinksToNewWindow();
 			initLinkify();
 			initMarkdownTableStyle();
