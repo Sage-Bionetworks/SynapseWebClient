@@ -138,8 +138,14 @@ public class MarkdownItImpl implements MarkdownIt {
 		}
 
 		function initREs() {
+			if (!$wnd.md.utils.gridLayoutColumnParamRE) {
+				$wnd.md.utils.gridLayoutColumnParamRE = new RegExp("^\\s*(width[=]{1})?\\s*(.*)[}]{1}\\s*$");
+			}
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
+			}
+			if (!$wnd.md.utils.urlRE) {
+				$wnd.md.utils.urlRE = new RegExp("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
 			}
 		}
 
@@ -187,7 +193,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if (testString.toLowerCase().lastIndexOf('www.', 0) === 0) {
+					} else if ($wnd.md.utils.urlRE.test(testString)) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
@@ -339,18 +345,20 @@ public class MarkdownItImpl implements MarkdownIt {
 			$wnd.md.use($wnd.markdownitContainer, 'column', 
 				{
 					marker: '{column',
+					endMarker: '{column}',
 					minMarkerCount: 1,
 					render: function (tokens, idx) {
 						if (tokens[idx].nesting === 1) {
 							// opening tag
-							return '<div class="col-sm-4">';
+							var m = $wnd.md.utils.gridLayoutColumnParamRE.exec(tokens[idx].info);
+							return '<div class="col-sm-' + $wnd.md.utils.escapeHtml(m[2]) + '">';
 						} else {
 							// closing tag
 							return '</div>\n';
 						}
 					},
 					validate: function(params) {
-						return true;
+						return $wnd.md.utils.gridLayoutColumnParamRE.test(params);
 					}
 				});
 			sendLinksToNewWindow();
