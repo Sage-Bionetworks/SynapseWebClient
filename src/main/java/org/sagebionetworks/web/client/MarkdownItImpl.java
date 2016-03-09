@@ -65,9 +65,30 @@ public class MarkdownItImpl implements MarkdownIt {
 					env, self) {
 				var aIndex = tokens[idx].attrIndex('style');
 				if (aIndex < 0) {
-					tokens[idx].attrPush([ 'style', 'margin: 20px 0 0 0;' ]); // add new attribute
+					tokens[idx].attrPush([ 'style', 'margin: 10px 0 10px 0;' ]); // add new attribute
 				} else {
-					tokens[idx].attrs[aIndex][1] += ' margin: 20px 0 0 0; '; // add value to existing attr
+					tokens[idx].attrs[aIndex][1] += ' margin: 10px 0 10px 0; '; // add value to existing attr
+				}
+
+				// pass token to default renderer.
+				return defaultRender(tokens, idx, options, env, self);
+			};
+		}
+		
+		//TODO: remove extra style once we remove the old markdown processor, and just change the ".markdown heading" css classes instead
+		function initSynapseHeadingStyle() {
+			var defaultRender = $wnd.md.renderer.rules.synapse_heading_open
+					|| function(tokens, idx, options, env, self) {
+						return self.renderToken(tokens, idx, options);
+					};
+
+			$wnd.md.renderer.rules.synapse_heading_open = function(tokens, idx, options,
+					env, self) {
+				var aIndex = tokens[idx].attrIndex('style');
+				if (aIndex < 0) {
+					tokens[idx].attrPush([ 'style', 'padding: 20px 0 0 0;' ]); // add new attribute
+				} else {
+					tokens[idx].attrs[aIndex][1] += ' padding: 20px 0 0 0; '; // add value to existing attr
 				}
 
 				// pass token to default renderer.
@@ -366,6 +387,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			initMarkdownTableStyle();
 			//TODO: remove special paragraph renderer after release
 			initParagraphStyle();
+			initSynapseHeadingStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 		}
