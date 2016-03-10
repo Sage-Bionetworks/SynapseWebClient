@@ -65,9 +65,30 @@ public class MarkdownItImpl implements MarkdownIt {
 					env, self) {
 				var aIndex = tokens[idx].attrIndex('style');
 				if (aIndex < 0) {
-					tokens[idx].attrPush([ 'style', 'margin: 20px 0 0 0;' ]); // add new attribute
+					tokens[idx].attrPush([ 'style', 'margin: 10px 0 10px 0;' ]); // add new attribute
 				} else {
-					tokens[idx].attrs[aIndex][1] += ' margin: 20px 0 0 0; '; // add value to existing attr
+					tokens[idx].attrs[aIndex][1] += ' margin: 10px 0 10px 0; '; // add value to existing attr
+				}
+
+				// pass token to default renderer.
+				return defaultRender(tokens, idx, options, env, self);
+			};
+		}
+		
+		//TODO: remove extra style once we remove the old markdown processor, and just change the ".markdown heading" css classes instead
+		function initSynapseHeadingStyle() {
+			var defaultRender = $wnd.md.renderer.rules.synapse_heading_open
+					|| function(tokens, idx, options, env, self) {
+						return self.renderToken(tokens, idx, options);
+					};
+
+			$wnd.md.renderer.rules.synapse_heading_open = function(tokens, idx, options,
+					env, self) {
+				var aIndex = tokens[idx].attrIndex('style');
+				if (aIndex < 0) {
+					tokens[idx].attrPush([ 'style', 'padding: 20px 0 0 0;' ]); // add new attribute
+				} else {
+					tokens[idx].attrs[aIndex][1] += ' padding: 20px 0 0 0; '; // add value to existing attr
 				}
 
 				// pass token to default renderer.
@@ -144,9 +165,6 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
 			}
-			if (!$wnd.md.utils.urlRE) {
-				$wnd.md.utils.urlRE = new RegExp("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
-			}
 		}
 
 		function link(state, silent) {
@@ -193,7 +211,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.urlRE.test(testString)) {
+					} else if (testString.toLowerCase().lastIndexOf('www.', 0) === 0) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
@@ -366,6 +384,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			initMarkdownTableStyle();
 			//TODO: remove special paragraph renderer after release
 			initParagraphStyle();
+			initSynapseHeadingStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 		}

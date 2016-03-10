@@ -13,7 +13,7 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 				<bh:Text> Loading...</bh:Text>
 			</t:TableData>
-			<t:TableData paddingRight="2">
+			<t:TableData paddingRight="2" addStyleNames="min-width-25">
 				<g:FocusPanel ui:field="defaultUserPicture" addStyleNames="margin-right-2 imageButton">
 					<g:HTMLPanel>
 						<span class="fa-stack">
