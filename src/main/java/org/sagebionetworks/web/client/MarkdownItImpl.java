@@ -165,9 +165,6 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
 			}
-			if (!$wnd.md.utils.urlRE) {
-				$wnd.md.utils.urlRE = new RegExp("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
-			}
 		}
 
 		function link(state, silent) {
@@ -214,7 +211,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.urlRE.test(testString)) {
+					} else if (testString.toLowerCase().lastIndexOf('www.', 0) === 0) {
 						res.str = 'http://' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
