@@ -73,6 +73,8 @@ import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
+import org.sagebionetworks.web.client.view.SubscriptionView;
+import org.sagebionetworks.web.client.view.SubscriptionViewImpl;
 import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.view.SynapseForumViewImpl;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
@@ -423,6 +425,7 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
 import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -593,6 +596,8 @@ import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.inject.client.AbstractGinModule;
+import com.google.inject.Singleton;
+ogle.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
 
 public class PortalGinModule extends AbstractGinModule {
@@ -1235,5 +1240,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EnumFormCellEditor.class).to(EnumFormCellEditorImpl.class);
 		
 		bind(MarkdownIt.class).to(MarkdownItImpl.class);
+		bind(SubscriptionView.class).to(SubscriptionViewImpl.class);
+		bind(TopicWidgetView.class).to(TopicWidgetViewImpl.class);
 	}
 }

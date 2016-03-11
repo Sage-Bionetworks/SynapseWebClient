@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
@@ -69,12 +70,14 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	public void setPlace(SubscriptionPlace place) {
 		this.place = place;
 		this.view.setPresenter(this);
+		synAlert.clear();
 		String subscriptionIdParam = place.getParam(SubscriptionPlace.SUBSCRIPTION_ID_FILTER_PARAM);
 		String objectIdParam =  place.getParam(SubscriptionPlace.OBJECT_ID_PARAM);
 		String objectTypeParam =  place.getParam(SubscriptionPlace.OBJECT_TYPE_PARAM);
 		
 		if (subscriptionIdParam != null) {
 			//assume subscribed.  look for subscription...
+			view.selectFollow();
 			subscriptionClient.getSubscription(Long.parseLong(subscriptionIdParam), new AsyncCallback<Subscription>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -91,6 +94,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 		} else if (objectIdParam != null && objectTypeParam != null){
 			//not subscribed, but have enough info to subscribe
 			//configure the topic renderer
+			view.selectUnfollow();
 			topicWidget.configure(SubscriptionObjectType.valueOf(objectTypeParam), objectIdParam);
 			
 		} else {
@@ -137,6 +141,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	
 	@Override
 	public void onUnfollow() {
+		synAlert.clear();
 		String subscriptionIdParam = place.getParam(SubscriptionPlace.SUBSCRIPTION_ID_FILTER_PARAM);
 		final Long subscriptionId = Long.parseLong(subscriptionIdParam);
 		//unsubscribe does not have the object id/type, get it first.
@@ -155,6 +160,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	}
 	
 	private void unsubscribe(Long subscriptionId, final String objectId, final SubscriptionObjectType objectType) {
+		synAlert.clear();
 		subscriptionClient.unsubscribe(subscriptionId, new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

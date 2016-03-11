@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -25,6 +28,10 @@ public class SubscriptionViewImpl implements SubscriptionView {
 	Div synAlertContainer;
 	@UiField
 	Div topicWidgetContainer;
+	@UiField
+	Radio followButton;
+	@UiField
+	Radio unfollowButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -42,6 +49,19 @@ public class SubscriptionViewImpl implements SubscriptionView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		followButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onFollow();
+			}
+		});
+		unfollowButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onUnfollow();
+			}
+		});
+
 	}
 	
 	@Override
@@ -89,4 +109,14 @@ public class SubscriptionViewImpl implements SubscriptionView {
 		topicWidgetContainer.clear();
 		topicWidgetContainer.add(w);
 	}
+	
+	@Override
+	public void selectFollow() {
+		followButton.setValue(true, false);
+		unfollowButton.setValue(false, false);
+	}
+	public void selectUnfollow() {
+		followButton.setValue(false, false);
+		unfollowButton.setValue(true, false);
+	};
 }
