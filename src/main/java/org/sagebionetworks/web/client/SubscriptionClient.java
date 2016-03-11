@@ -14,7 +14,7 @@ public interface SubscriptionClient extends RemoteService {
 	
 	SubscriptionPagedResults getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset) throws RestServiceException;
 	
-	Subscription getSubscription(String subscriptionId) throws RestServiceException;
+	Subscription getSubscription(Long subscriptionId) throws RestServiceException;
 	
 	Subscription subscribe(Topic toSubscribe) throws RestServiceException;
 	

@@ -19,6 +19,6 @@ public interface SubscriptionClientAsync{
 
 	void unsubscribeAll(AsyncCallback<Void> callback);
 
-	void getSubscription(String subscriptionId,
+	void getSubscription(Long subscriptionId,
 			AsyncCallback<Subscription> callback);
 }
