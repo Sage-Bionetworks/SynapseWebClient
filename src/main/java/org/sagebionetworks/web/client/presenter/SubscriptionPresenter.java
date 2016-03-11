@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTView;
+import org.sagebionetworks.web.client.view.SubscriptionView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
@@ -38,26 +39,21 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	private SubscriptionPlace place;
 	private SubscriptionView view;
 	private SubscriptionClientAsync subscriptionClient;
-	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	private GlobalApplicationState globalAppState;
-	private Long submitterIdFilter;
 	
 	@Inject
 	public SubscriptionPresenter(SubscriptionView view,
 			SubscriptionClientAsync subscriptionClient,
 			SynapseAlert synAlert,
 			UserGroupSuggestionProvider provider,
-			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
 			TopicWidget topicWidget
 			) {
 		this.view = view;
 		this.subscriptionClient = subscriptionClient;
 		this.synAlert = synAlert;
-		this.ginInjector = ginInjector;
 		this.globalAppState = globalAppState;
-		
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 		view.setTopicWidget(topicWidget.asWidget());
@@ -78,19 +74,22 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 		String objectTypeParam =  place.getParam(SubscriptionPlace.OBJECT_TYPE_PARAM);
 		
 		if (subscriptionIdParam != null) {
-			//TODO: assume subscribed.  look for subscription...
+			//assume subscribed.  look for subscription...
+			subscriptionClient.getSubscription(Long.parseLong(subscriptionIdParam), new AsyncCallback<Subscription>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				public void onSuccess(Subscription result) {
+					//configure the topic renderer
+					//note, the topic widget knows how to render different types.  For Forum, for example, it will get the project ID from a servlet call.
+					topicWidget.configure(result.getObjectType(), result.getObjectId());
+				};
+			});
 			
-			//configure the topic renderer
-			topicWidget.configure(SubscriptionObjectType.valueOf(objectType, objectId);
-			//note, the topic widget knows how to render different types.  For Forum, for example, it will get the project ID from a servlet call.
 			
 		} else if (objectIdParam != null && objectTypeParam != null){
-			//TODO: not subscribed, but have enough info to subscribe
-			
-			clearPlaceParams();
-			place.putParam(SubscriptionPlace.OBJECT_ID_PARAM, objectIdParam);
-			place.putParam(SubscriptionPlace.OBJECT_TYPE_PARAM, objectTypeParam);
-			globalAppState.pushCurrentPlace(place);
+			//not subscribed, but have enough info to subscribe
 			//configure the topic renderer
 			topicWidget.configure(SubscriptionObjectType.valueOf(objectTypeParam), objectIdParam);
 			
@@ -131,7 +130,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 				place.putParam(SubscriptionPlace.SUBSCRIPTION_ID_FILTER_PARAM, subscription.getSubscriptionId());
 				globalAppState.pushCurrentPlace(place);
 				setPlace(place);
-				view.showInfo("Successfully followed the topic.");
+				view.showInfo("You are now following this topic.", "");
 			};
 		});
 	}
@@ -166,7 +165,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 				place.putParam(SubscriptionPlace.OBJECT_TYPE_PARAM, objectType.name());
 				globalAppState.pushCurrentPlace(place);
 				setPlace(place);
-				view.showInfo("Successfully unfollowed the topic");
+				view.showInfo("You are no longer following this topic.", "");
 			};
 		});
 	}
