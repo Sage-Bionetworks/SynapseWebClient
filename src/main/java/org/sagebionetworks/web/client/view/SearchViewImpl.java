@@ -9,9 +9,7 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.InputGroup;
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -58,7 +56,6 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -93,8 +90,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@UiField
 	SimplePanel resultsPanel;
 	@UiField
-	SimplePanel searchBoxPanel;
-	@UiField
 	SimplePanel facetPanel;
 	@UiField
 	SimplePanel currentFacetsPanel;
@@ -108,8 +103,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
-	private TextBox searchField;
-	private Button searchButton;
+	@UiField
+	TextBox searchField;
+	@UiField
+	Button searchButton;
 	private boolean loadShowing;
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -132,6 +129,20 @@ public class SearchViewImpl extends Composite implements SearchView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		loadShowing = false;
+		searchButton.addClickHandler(new ClickHandler() {				
+			@Override
+			public void onClick(ClickEvent event) {					
+				presenter.setSearchTerm(searchField.getText());
+			}
+		});
+		searchField.addKeyDownHandler(new KeyDownHandler() {				
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+	                searchButton.fireEvent(new ClickEvent() {});
+	            }					
+			}
+		});
 	}
 
 	@Override
@@ -145,8 +156,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page
-		
-		configureSearchBox();
 	}
 
 	@Override
@@ -357,47 +366,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	/*
 	 * Private Methods
 	 */	
-	private void configureSearchBox() {
-		// setup search box
-		SimplePanel container;
-		Row horizontalTable = new Row();
-		
-		// setup serachButton
-		searchButton = new Button(DisplayConstants.LABEL_SEARCH, IconType.SEARCH, new ClickHandler() {				
-			@Override
-			public void onClick(ClickEvent event) {					
-				presenter.setSearchTerm(searchField.getText());
-			}
-		});
-		searchButton.setSize(ButtonSize.LARGE);
-		searchButton.setBlock(true);
-
-		// setup field
-		searchField = new TextBox();
-		searchField.setStyleName("form-control input-lg search-textbox");
-		searchField.addKeyDownHandler(new KeyDownHandler() {				
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-	                searchButton.fireEvent(new ClickEvent() {});
-	            }					
-			}
-		});				
-		InputGroup searchFieldWrapper = new InputGroup();
-		searchFieldWrapper.add(searchField);
-		searchFieldWrapper.setWidth("100%");
-		// add to table and page
-		container = new SimplePanel(searchFieldWrapper);
-		container.addStyleName("col-md-9 padding-right-5");
-		horizontalTable.add(container);
-		container = new SimplePanel(searchButton);
-		container.addStyleName("col-md-3 padding-left-5");
-		horizontalTable.add(container);
-		searchBoxPanel.clear();
-		searchBoxPanel.add(horizontalTable);
-
-	}
-
+	
 	/**
 	 * stack-27 temporary change (until the index is updated, there may be usernames in the created_by and modified_by values).  Can remove
 	 * @param userId
