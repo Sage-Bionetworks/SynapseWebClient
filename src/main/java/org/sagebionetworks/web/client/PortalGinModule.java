@@ -426,6 +426,7 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.TopicWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
 import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -596,8 +597,6 @@ import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.inject.Singleton;
-ogle.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
 
 public class PortalGinModule extends AbstractGinModule {

@@ -641,9 +641,15 @@ public class DiscussionThreadWidgetTest {
 	public void testBuildThreadLink() {
 		String projectId = "syn123";
 		String threadId = "456";
-		String hostURL = "hostURL/";
-		when(mockGwtWrapper.getHostPageBaseURL()).thenReturn(hostURL);
-		assertEquals("hostURL/#!Synapse:syn123/discussion/threadId=456",
-				DiscussionThreadWidget.buildThreadLink(projectId, threadId, mockGwtWrapper));
+		assertEquals("/#!Synapse:syn123/discussion/threadId=456",
+				DiscussionThreadWidget.buildThreadLink(projectId, threadId));
 	}
+	
+	@Test
+	public void testBuildForumLink() {
+		String projectId = "syn123";
+		assertEquals("/#!Synapse:syn123/discussion",
+				DiscussionThreadWidget.buildForumLink(projectId));
+	}
+
 }

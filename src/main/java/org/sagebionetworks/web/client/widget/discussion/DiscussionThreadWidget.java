@@ -134,12 +134,19 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		});
 	}
 
-	public static String buildThreadLink(String projectId, String threadId, GWTWrapper gwtWrapper) {
+	public static String buildThreadLink(String projectId, String threadId) {
 		String token = THREAD_ID_KEY+"="+threadId;
 		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
-		String link = gwtWrapper.getHostPageBaseURL() + SYNAPSE_ENTITY_PREFIX + place.toToken();
+		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
 		return link;
 	}
+	
+	public static String buildForumLink(String projectId) {
+		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, null);
+		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
+		return link;
+	}
+
 
 	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
 		view.clear();
@@ -161,7 +168,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		view.setDeleteIconVisible(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
-		view.setThreadLink(buildThreadLink(projectId, threadId, gwtWrapper));
+		view.setThreadLink(buildThreadLink(projectId, threadId));
 		if (showThreadDetails) {
 			showThreadDetails();
 		} else {

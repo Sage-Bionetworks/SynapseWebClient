@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -200,5 +201,17 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public Project getForumProject(String forumId) {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		//TODO: need the service to resolve the project id from the forum id.
+//		try {
+//			return synapseClient.getForumProject(forumId);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
+		return null;
 	}
 }

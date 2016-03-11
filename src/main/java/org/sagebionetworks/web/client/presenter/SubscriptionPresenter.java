@@ -1,34 +1,15 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
-import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
-import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
-import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.place.SubscriptionPlace;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.view.SubscriptionView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.search.PaginationUtil;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -41,6 +22,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	private SubscriptionView view;
 	private SubscriptionClientAsync subscriptionClient;
 	private SynapseAlert synAlert;
+	private TopicWidget topicWidget;
 	private GlobalApplicationState globalAppState;
 	
 	@Inject
@@ -55,6 +37,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 		this.subscriptionClient = subscriptionClient;
 		this.synAlert = synAlert;
 		this.globalAppState = globalAppState;
+		this.topicWidget = topicWidget;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 		view.setTopicWidget(topicWidget.asWidget());

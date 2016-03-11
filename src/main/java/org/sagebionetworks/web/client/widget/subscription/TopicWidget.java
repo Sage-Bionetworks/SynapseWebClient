@@ -1,9 +1,15 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -11,11 +17,18 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 	
 	private TopicWidgetView view;
 	SubscriptionClientAsync subscriptionClient;
+	DiscussionForumClientAsync forumClient;
+	SynapseAlert synAlert;
 	
 	@Inject
-	public TopicWidget(TopicWidgetView view, SubscriptionClientAsync subscriptionClient) {
+	public TopicWidget(TopicWidgetView view, 
+			SubscriptionClientAsync subscriptionClient,
+			DiscussionForumClientAsync forumClient,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.subscriptionClient = subscriptionClient;
+		this.forumClient = forumClient;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
 	}
 	
@@ -24,12 +37,60 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 	 * @param id Topic subscription object id
 	 */
 	public void configure(SubscriptionObjectType type, String id) {
+		synAlert.clear();
 		
+		switch (type) {
+			case DISCUSSION_THREAD:
+				configureThread(id);
+				break;
+			case FORUM:
+				configureForum(id);
+				break;
+			default:
+				synAlert.showError("Unknown topic type: " + type);
+				break;
+		}
+	}
+	
+	public void configureThread(String threadId) {
+		//get the thread Project and thread title
+		forumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
+			@Override
+			public void onSuccess(DiscussionThreadBundle threadBundle) {
+				view.setTopicText(threadBundle.getTitle());
+				String href = DiscussionThreadWidget.buildThreadLink(threadBundle.getProjectId(), threadBundle.getId());
+				view.setTopicHref(href);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
+	
+	public void configureForum(String forumId) {
+		//get the forum Project
+		forumClient.getForumProject(forumId, new AsyncCallback<Project>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			public void onSuccess(Project result) {
+				view.setTopicText(result.getName());
+				String href = DiscussionThreadWidget.buildForumLink(result.getId());
+				view.setTopicHref(href);
+			};
+		});
 	}
 	
 	public void clearState() {
 	}
 
+	public void addStyleNames(String styleNames) {
+		view.addStyleNames(styleNames);
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

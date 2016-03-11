@@ -10,8 +10,10 @@ public interface TopicWidgetView extends IsWidget, SynapseView {
 	 * Set the presenter.
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
-	
+	void setPresenter(Presenter presenter);
+	void setTopicText(String text);
+	void setTopicHref(String href);
+	void addStyleNames(String styleNames);
 	/**
 	 * Presenter interface
 	 */

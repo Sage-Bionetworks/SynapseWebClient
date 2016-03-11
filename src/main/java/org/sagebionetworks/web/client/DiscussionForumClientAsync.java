@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -59,4 +60,6 @@ public interface DiscussionForumClientAsync{
 	void getThreadUrl(String messageKey, AsyncCallback<String> callback);
 
 	void getReplyUrl(String messageKey, AsyncCallback<String> callback);
+	
+	void getForumProject(String forumId, AsyncCallback<Project> callback);
 }
