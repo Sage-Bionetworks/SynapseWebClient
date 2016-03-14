@@ -1,38 +1,24 @@
 package org.sagebionetworks.web.unitclient.presenter;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.HashMap;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
-import org.sagebionetworks.web.client.place.SynapseForumPlace;
-import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SubscriptionView;
-import org.sagebionetworks.web.client.view.SynapseForumView;
-import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

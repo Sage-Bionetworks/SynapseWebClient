@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -16,17 +15,14 @@ import com.google.inject.Inject;
 public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPresenter {
 	
 	private TopicWidgetView view;
-	SubscriptionClientAsync subscriptionClient;
 	DiscussionForumClientAsync forumClient;
 	SynapseAlert synAlert;
 	
 	@Inject
 	public TopicWidget(TopicWidgetView view, 
-			SubscriptionClientAsync subscriptionClient,
 			DiscussionForumClientAsync forumClient,
 			SynapseAlert synAlert) {
 		this.view = view;
-		this.subscriptionClient = subscriptionClient;
 		this.forumClient = forumClient;
 		this.synAlert = synAlert;
 		view.setPresenter(this);
@@ -38,7 +34,6 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 	 */
 	public void configure(SubscriptionObjectType type, String id) {
 		synAlert.clear();
-		
 		switch (type) {
 			case DISCUSSION_THREAD:
 				configureThread(id);
@@ -84,9 +79,6 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 		});
 	}
 	
-	public void clearState() {
-	}
-
 	public void addStyleNames(String styleNames) {
 		view.addStyleNames(styleNames);
 	}
