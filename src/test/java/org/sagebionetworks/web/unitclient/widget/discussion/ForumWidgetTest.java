@@ -85,7 +85,7 @@ public class ForumWidgetTest {
 	public void testConfigureForumSuccess() {
 		when(mockForum.getId()).thenReturn("123");
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumMetadata(anyString(), any(AsyncCallback.class));
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
@@ -98,7 +98,7 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
-		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE), any(CallbackP.class));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
@@ -109,7 +109,7 @@ public class ForumWidgetTest {
 	public void testConfigureForumFailure() {
 		when(mockForum.getId()).thenReturn("123");
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockDiscussionForumClient)
-				.getForumMetadata(anyString(), any(AsyncCallback.class));
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
 		String areaToken = "foo=bar";
@@ -122,7 +122,7 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
-		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
@@ -133,7 +133,7 @@ public class ForumWidgetTest {
 	public void testConfigureForumSuccessWithModerator() {
 		when(mockForum.getId()).thenReturn("123");
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumMetadata(anyString(), any(AsyncCallback.class));
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1";
 		String areaToken = "";
@@ -237,7 +237,7 @@ public class ForumWidgetTest {
 		forumWidget.onClickShowAllThreads();
 
 		//attempts to show full thread list
-		verify(mockDiscussionForumClient).getForumMetadata(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockSynAlert, times(2)).clear();
@@ -248,7 +248,7 @@ public class ForumWidgetTest {
 	public void testSortByRepliesForum() {
 		when(mockForum.getId()).thenReturn("123");
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumMetadata(anyString(), any(AsyncCallback.class));
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
@@ -281,7 +281,7 @@ public class ForumWidgetTest {
 	public void testSortByViewsForum() {
 		when(mockForum.getId()).thenReturn("123");
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumMetadata(anyString(), any(AsyncCallback.class));
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
@@ -315,7 +315,7 @@ public class ForumWidgetTest {
 	public void testSortByActivityForum() {
 		when(mockForum.getId()).thenReturn("123");
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumMetadata(anyString(), any(AsyncCallback.class));
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";

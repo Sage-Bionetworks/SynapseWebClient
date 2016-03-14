@@ -38,13 +38,11 @@ public class SubscriptionClientImpl extends SynapseClientBase implements
 	public Subscription getSubscription(Long subscriptionId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		//TODO: replace with real call once available
-		return new Subscription();
-//		try {
-//			return synapseClient.getSubscription(subscriptionId);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
+		try {
+			return synapseClient.get(subscriptionId.toString());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	@Override
 	public void unsubscribe(Long subscriptionId) throws RestServiceException {

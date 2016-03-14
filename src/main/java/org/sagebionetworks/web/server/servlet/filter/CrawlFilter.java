@@ -240,7 +240,7 @@ public class CrawlFilter implements Filter {
 		}
 		//and link to the discussion forum (all threads and replies) if this is a project.
 		if (entity instanceof Project) {
-			Forum forum = discussionForumClient.getForumMetadata(entity.getId());
+			Forum forum = discussionForumClient.getForumByProjectId(entity.getId());
 			if (forum != null) {
 				String forumId = forum.getId();
 				//index 100 of the most recent project thread titles

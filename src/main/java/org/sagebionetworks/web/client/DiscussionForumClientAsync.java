@@ -21,7 +21,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("discussionforumclient")
 public interface DiscussionForumClientAsync{
 
-	void getForumMetadata(String projectId, AsyncCallback<Forum> callback);
+	void getForumByProjectId(String projectId, AsyncCallback<Forum> callback);
 
 	void createThread(CreateDiscussionThread toCreate,
 			AsyncCallback<DiscussionThreadBundle> callback);

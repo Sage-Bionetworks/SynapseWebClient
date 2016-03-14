@@ -22,7 +22,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("discussionforumclient")	
 public interface DiscussionForumClient extends RemoteService {
 
-	Forum getForumMetadata(String projectId) throws RestServiceException;
+	Forum getForumByProjectId(String projectId) throws RestServiceException;
 
 	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
 			throws RestServiceException;
@@ -64,5 +64,5 @@ public interface DiscussionForumClient extends RemoteService {
 
 	String getReplyUrl(String messageKey) throws RestServiceException;
 
-	Project getForumProject(String forumId);
+	Project getForumProject(String forumId) throws RestServiceException;
 }

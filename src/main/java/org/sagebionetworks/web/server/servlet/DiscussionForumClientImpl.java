@@ -34,10 +34,10 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Forum getForumMetadata(String projectId) throws RestServiceException {
+	public Forum getForumByProjectId(String projectId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getForumMetadata(projectId);
+			return synapseClient.getForumByProjectId(projectId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -204,14 +204,13 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public Project getForumProject(String forumId) {
+	public Project getForumProject(String forumId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		//TODO: need the service to resolve the project id from the forum id.
-//		try {
-//			return synapseClient.getForumProject(forumId);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
-		return null;
+		try {
+			Forum forum = synapseClient.getForum(forumId);
+			return (Project)synapseClient.getEntityById(forum.getProjectId());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 }

@@ -134,7 +134,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
 		view.setShowAllThreadsButtonVisible(false);
-		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
+		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
