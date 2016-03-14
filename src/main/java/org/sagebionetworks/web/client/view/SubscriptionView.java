@@ -10,10 +10,10 @@ public interface SubscriptionView extends IsWidget, SynapseView {
 	void setPresenter(Presenter presenter);
 	void setSynAlert(Widget w);
 	void setTopicWidget(Widget w);
-	void selectFollow();
-	void selectUnfollow();
+	void selectSubscribedButton();
+	void selectUnsubscribedButton();
 	public interface Presenter extends SynapsePresenter {
-		void onFollow();
-		void onUnfollow();
+		void onSubscribe();
+		void onUnsubscribe();
 	}
 }

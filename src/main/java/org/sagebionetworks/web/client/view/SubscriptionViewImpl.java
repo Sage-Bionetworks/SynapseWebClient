@@ -52,13 +52,13 @@ public class SubscriptionViewImpl implements SubscriptionView {
 		followButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onFollow();
+				presenter.onSubscribe();
 			}
 		});
 		unfollowButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onUnfollow();
+				presenter.onUnsubscribe();
 			}
 		});
 
@@ -111,11 +111,11 @@ public class SubscriptionViewImpl implements SubscriptionView {
 	}
 	
 	@Override
-	public void selectFollow() {
+	public void selectSubscribedButton() {
 		followButton.setValue(true, false);
 		unfollowButton.setValue(false, false);
 	}
-	public void selectUnfollow() {
+	public void selectUnsubscribedButton() {
 		followButton.setValue(false, false);
 		unfollowButton.setValue(true, false);
 	};
