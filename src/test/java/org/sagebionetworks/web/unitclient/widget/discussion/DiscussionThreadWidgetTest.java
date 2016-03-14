@@ -648,7 +648,7 @@ public class DiscussionThreadWidgetTest {
 	@Test
 	public void testBuildForumLink() {
 		String projectId = "syn123";
-		assertEquals("/#!Synapse:syn123/discussion",
+		assertEquals("/#!Synapse:syn123/discussion/",
 				DiscussionThreadWidget.buildForumLink(projectId));
 	}
 
