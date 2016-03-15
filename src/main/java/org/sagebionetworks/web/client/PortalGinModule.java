@@ -425,6 +425,8 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
@@ -1241,5 +1243,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(MarkdownIt.class).to(MarkdownItImpl.class);
 		bind(SubscriptionView.class).to(SubscriptionViewImpl.class);
 		bind(TopicWidgetView.class).to(TopicWidgetViewImpl.class);
+		bind(SubscribeButtonWidgetView.class).to(SubscribeButtonWidgetViewImpl.class);
 	}
 }

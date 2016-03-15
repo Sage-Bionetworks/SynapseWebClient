@@ -8,7 +8,11 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -24,18 +28,26 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	SubscriptionObjectType type;
 	String id;
 	Subscription currentSubscription;
-	
+	AuthenticationController authController;
+	GlobalApplicationState globalApplicationState;
 	@Inject
 	public SubscribeButtonWidget(SubscribeButtonWidgetView view, 
 			SubscriptionClientAsync subscribeClient,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			AuthenticationController authController,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.subscribeClient = subscribeClient;
+		this.authController = authController;
+		this.globalApplicationState = globalApplicationState;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
 	
+	public void clear() {
+		view.clear();
+	}
 	
 	/**
 	 * @param type Topic subscription object type
@@ -44,7 +56,11 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	public void configure(SubscriptionObjectType type, String id) {
 		this.id = id;
 		this.type = type;
-		getSubscriptionState();
+		if (!authController.isLoggedIn()) {
+			view.setUnsubscribed();
+		} else {
+			getSubscriptionState();	
+		}
 	}
 	
 	public void getSubscriptionState() {
@@ -77,22 +93,28 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	
 	@Override
 	public void onSubscribe() {
-		view.showLoading();
-		Topic topic = new Topic();
-		topic.setObjectId(id);
-		topic.setObjectType(type);
-		subscribeClient.subscribe(topic, new AsyncCallback<Subscription>() {
-			public void onFailure(Throwable caught) {
-				view.hideLoading();
-				synAlert.handleException(caught);
-			};
-			@Override
-			public void onSuccess(Subscription result) {
-				//success
-				currentSubscription = result;
-				view.setSubscribed();
-			}
-		});
+		//if not logged in, then send to login first
+		if (!authController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		} else {
+			view.showLoading();
+			Topic topic = new Topic();
+			topic.setObjectId(id);
+			topic.setObjectType(type);
+			subscribeClient.subscribe(topic, new AsyncCallback<Subscription>() {
+				public void onFailure(Throwable caught) {
+					view.hideLoading();
+					synAlert.handleException(caught);
+				};
+				@Override
+				public void onSuccess(Subscription result) {
+					//success
+					currentSubscription = result;
+					view.setSubscribed();
+				}
+			});
+		}
 	}
 	
 	@Override
