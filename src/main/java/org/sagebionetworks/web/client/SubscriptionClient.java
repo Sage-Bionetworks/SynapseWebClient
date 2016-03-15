@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -21,4 +22,7 @@ public interface SubscriptionClient extends RemoteService {
 	void unsubscribe(Long subscriptionId) throws RestServiceException;
 	
 	void unsubscribeAll() throws RestServiceException;
+
+	SubscriptionPagedResults listSubscription(SubscriptionRequest request)
+			throws RestServiceException;
 }

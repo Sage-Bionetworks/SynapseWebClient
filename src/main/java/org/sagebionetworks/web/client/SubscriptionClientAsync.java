@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,4 +22,7 @@ public interface SubscriptionClientAsync{
 
 	void getSubscription(Long subscriptionId,
 			AsyncCallback<Subscription> callback);
+
+	void listSubscription(SubscriptionRequest request,
+			AsyncCallback<SubscriptionPagedResults> callback);
 }
