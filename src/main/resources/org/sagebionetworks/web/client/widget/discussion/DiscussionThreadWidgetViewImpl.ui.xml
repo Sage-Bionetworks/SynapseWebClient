@@ -68,6 +68,7 @@
 									<b:Tooltip title="Open this thread in a new window" placement="LEFT">
 										<b:Anchor ui:field="threadLink" icon="EXTERNAL_LINK" href="#" target="_blank" text=" " pull="RIGHT" addStyleNames="margin-right-10 line-height-1em"/>
 									</b:Tooltip>
+									<bh:Span ui:field="subscribeButtonContainer" addStyleNames="right" />
 								</bh:Div>
 							</t:TableData>
 						</t:TableRow>

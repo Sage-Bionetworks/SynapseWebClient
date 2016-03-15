@@ -5,6 +5,13 @@
 	<bh:Span>
 		<b:Button ui:field="followButton" type="PRIMARY" visible="false" dataLoadingText="Updating..." icon="EYE">Follow</b:Button>
 		<b:Button ui:field="unfollowButton" type="DEFAULT" visible="false" dataLoadingText="Updating..." icon="EYE_SLASH">Unfollow</b:Button>
+		<b:Tooltip title="Not currently following, click to follow." placement="LEFT">
+			<b:Icon ui:field="followIcon" type="EYE_SLASH" size="LARGE" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+		</b:Tooltip>
+		<b:Tooltip title="Currently following, click to unfollow." placement="LEFT">
+			<b:Icon ui:field="unfollowIcon" type="EYE" size="LARGE" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+		</b:Tooltip>
+
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Span>
 </ui:UiBinder>

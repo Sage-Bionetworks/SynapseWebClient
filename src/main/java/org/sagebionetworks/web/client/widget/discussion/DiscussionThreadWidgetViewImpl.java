@@ -89,6 +89,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Span threadAuthor;
 	@UiField
 	Anchor threadLink;
+	@UiField
+	Span subscribeButtonContainer;
 
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -349,5 +351,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setThreadLink(String link){
 		threadLink.setHref(link);
+	}
+	@Override
+	public void setSubscribeButtonWidget(Widget widget) {
+		subscribeButtonContainer.clear();
+		subscribeButtonContainer.add(widget);
 	}
 }

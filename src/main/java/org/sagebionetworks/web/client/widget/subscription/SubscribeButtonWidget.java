@@ -30,6 +30,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	Subscription currentSubscription;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
+	boolean iconOnly;
 	@Inject
 	public SubscribeButtonWidget(SubscribeButtonWidgetView view, 
 			SubscriptionClientAsync subscribeClient,
@@ -41,13 +42,36 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		this.subscribeClient = subscribeClient;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
+		iconOnly = false;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
+	}
+	
+	public SubscribeButtonWidget showIconOnly() {
+		iconOnly = true;
+		return this;
 	}
 	
 	public void clear() {
 		view.clear();
 	}
+	
+	public void showFollowButton() {
+		if (iconOnly) {
+			view.showFollowIcon();
+		} else {
+			view.showFollowButton();
+		}
+	}
+	
+	public void showUnfollowButton() {
+		if (iconOnly) {
+			view.showUnfollowIcon();
+		} else {
+			view.showUnfollowButton();
+		}
+	}
+
 	
 	/**
 	 * @param type Topic subscription object type
@@ -57,10 +81,20 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		this.id = id;
 		this.type = type;
 		if (!authController.isLoggedIn()) {
-			view.setUnsubscribed();
+			showFollowButton();
 		} else {
 			getSubscriptionState();	
 		}
+	}
+	
+	/**
+	 * @param subscription Can be configured with an existing subscription.  Will not look for subscription, and will render with a way to unsubscribe.
+	 */
+	public void configure(Subscription subscription) {
+		this.id = subscription.getObjectId();
+		this.type = subscription.getObjectType();
+		this.currentSubscription = subscription;
+		showUnfollowButton();
 	}
 	
 	public void getSubscriptionState() {
@@ -77,10 +111,10 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 				if (results.getTotalNumberOfResults() > 0) {
 					//currently subscribed.
 					currentSubscription = results.getResults().get(0);
-					view.setSubscribed();
+					showUnfollowButton();
 				} else {
 					//not currently subscribed
-					view.setUnsubscribed();
+					showFollowButton();
 				}
 			}
 			
@@ -111,7 +145,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 				public void onSuccess(Subscription result) {
 					//success
 					currentSubscription = result;
-					view.setSubscribed();
+					showUnfollowButton();
 				}
 			});
 		}
@@ -128,7 +162,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 			@Override
 			public void onSuccess(Void result) {
 				currentSubscription = null;
-				view.setUnsubscribed();
+				showFollowButton();
 			}
 		});
 	}

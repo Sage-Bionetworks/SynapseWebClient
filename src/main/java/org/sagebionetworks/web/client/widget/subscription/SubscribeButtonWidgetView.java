@@ -12,8 +12,10 @@ public interface SubscribeButtonWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	void setSubscribed();
-	void setUnsubscribed();
+	void showUnfollowButton();
+	void showFollowButton();
+	void showUnfollowIcon();
+	void showFollowIcon();
 	void addStyleNames(String styleNames);
 	void setSynAlert(Widget w);
 	void showLoading();

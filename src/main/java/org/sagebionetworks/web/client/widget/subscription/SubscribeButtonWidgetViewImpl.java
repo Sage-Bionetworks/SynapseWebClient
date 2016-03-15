@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.subscription;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -19,6 +20,11 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	@UiField
 	Button unfollowButton;
 	@UiField
+	Icon followIcon;
+	@UiField
+	Icon unfollowIcon;
+	
+	@UiField
 	Div synAlertContainer;
 	public interface Binder extends UiBinder<Widget, SubscribeButtonWidgetViewImpl> {
 	}
@@ -29,18 +35,23 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	@Inject
 	public SubscribeButtonWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-		followButton.addClickHandler(new ClickHandler() {
+		ClickHandler followClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onSubscribe();
 			}
-		});
-		unfollowButton.addClickHandler(new ClickHandler() {
+		};
+		followIcon.addClickHandler(followClickHandler);
+		followButton.addClickHandler(followClickHandler);
+		
+		ClickHandler unfollowClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onUnsubscribe();
 			}
-		});
+		};
+		unfollowIcon.addClickHandler(unfollowClickHandler);
+		unfollowButton.addClickHandler(unfollowClickHandler);
 	}
 	@Override
 	public void addStyleNames(String styleNames) {
@@ -72,16 +83,18 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	public void clear() {
 		followButton.setVisible(false);
 		unfollowButton.setVisible(false);
+		followIcon.setVisible(false);
+		unfollowIcon.setVisible(false);
 		hideLoading();
 	}
 	
 	@Override
-	public void setSubscribed() {
+	public void showUnfollowButton() {
 		clear();
 		unfollowButton.setVisible(true);
 	}
 	@Override
-	public void setUnsubscribed() {
+	public void showFollowButton() {
 		clear();
 		followButton.setVisible(true);
 	}
@@ -100,5 +113,17 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	public void hideLoading() {
 		followButton.state().reset();
 		unfollowButton.state().reset();
+	}
+	
+	@Override
+	public void showFollowIcon() {
+		clear();
+		followIcon.setVisible(true);
+	}
+	
+	@Override
+	public void showUnfollowIcon() {
+		clear();
+		unfollowIcon.setVisible(true);
 	}
 }
