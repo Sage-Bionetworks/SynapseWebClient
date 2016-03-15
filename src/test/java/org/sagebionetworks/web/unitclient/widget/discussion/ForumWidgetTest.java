@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -57,6 +59,8 @@ public class ForumWidgetTest {
 	DiscussionThreadWidget mockDiscussionThreadWidget;
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
+	@Mock
+	SubscribeButtonWidget mockSubscribeButtonWidget;
 	
 	ForumWidget forumWidget;
 	private boolean canModerate = false;
@@ -66,7 +70,8 @@ public class ForumWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockNewDiscussionThreadModal,
-				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget);
+				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
+				mockSubscribeButtonWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
@@ -78,12 +83,14 @@ public class ForumWidgetTest {
 		verify(mockView).setPresenter(forumWidget);
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setSingleThread(any(Widget.class));
+		verify(mockView).setSubscribeButton(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureForumSuccess() {
-		when(mockForum.getId()).thenReturn("123");
+		String forumId = "123";
+		when(mockForum.getId()).thenReturn(forumId);
 		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
 				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
@@ -92,7 +99,8 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
 		forumWidget.configure(entityId, param, canModerate, callback);
-
+		verify(mockSubscribeButtonWidget).clear();
+		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
 		verify(mockSynAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
