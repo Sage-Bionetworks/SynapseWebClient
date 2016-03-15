@@ -127,6 +127,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	
 	@Override
 	public void onSubscribe() {
+		synAlert.clear();
 		//if not logged in, then send to login first
 		if (!authController.isLoggedIn()) {
 			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
@@ -153,6 +154,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	
 	@Override
 	public void onUnsubscribe() {
+		synAlert.clear();
 		view.showLoading();
 		subscribeClient.unsubscribe(Long.parseLong(currentSubscription.getSubscriptionId()), new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
@@ -174,5 +176,17 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	/**
+	 * For testing
+	 * @return
+	 */
+	public boolean isIconOnly(){
+		return iconOnly;
+	}
+	
+	public Subscription getCurrentSubscription() {
+		return currentSubscription;
 	}
 }
