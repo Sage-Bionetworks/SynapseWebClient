@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -266,10 +267,18 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testAdditionalEmailValidationFailure() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		Exception ex = new Exception("unexpected exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		profilePresenter.additionalEmailValidation(email);
 		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showEmailChangeFailed(anyString());
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testAdditionalEmailValidationInvalidEmail() throws JSONObjectAdapterException {
+		String email = "invalidEmailAddress";
+		profilePresenter.additionalEmailValidation(email);
+		verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
 	}
 	
 	@Test (expected=IllegalStateException.class)

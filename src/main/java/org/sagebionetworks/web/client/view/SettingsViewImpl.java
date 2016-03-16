@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -67,10 +66,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	FlowPanel emailsPanel;
 	@UiField
 	TextBox newEmailField;
-	@UiField
-	Span newEmailError;
-	@UiField
-	Div newEmailAlert;
 	@UiField
 	Button addEmailButton;
 
@@ -172,10 +167,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		addEmailButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (checkEmailFormat()) {
-					addEmailButton.setEnabled(false);
-					presenter.addEmail(newEmailField.getValue());
-				}
+				presenter.addEmail(newEmailField.getValue());
 			}
 		});
 		editProfileButton.addClickHandler(new ClickHandler() {
@@ -329,20 +321,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		resetAddEmailUI();
 	}
 	
-	@Override
-	public void showEmailChangeFailed(String error) {
-		addEmailButton.setEnabled(true);
-		DisplayUtils.show(newEmailError);
-		newEmailError.setTitle(error);
-	}
-	
 	private void resetAddEmailUI() {
 		emailsPanel.clear();
 		newEmailField.setValue("");
-		DisplayUtils.hide(newEmailError);
 		addEmailButton.setEnabled(true);
 		DisplayUtils.hide(changeEmailUI);
-		DisplayUtils.hide(newEmailAlert);
 	}
 	
 	@Override
@@ -355,24 +338,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		setPassword1InError(false);
 		setPassword2InError(false);
 	}
-
-	private boolean checkEmailFormat(){
-		DisplayUtils.hide(newEmailError);
-		if (ValidationUtils.isValidEmail(newEmailField.getValue())) {
-			return true;
-		}
-		else {
-			DisplayUtils.show(newEmailError);
-			newEmailError.setTitle(WebConstants.INVALID_EMAIL_MESSAGE);
-			return false;
-		}
-	}
 	
 	@Override
 	public void showEmailChangeSuccess(String message) {
 		DisplayUtils.hide(changeEmailUI);
-		DisplayUtils.show(newEmailAlert);
-		newEmailAlert.setTitle(message);
+		DisplayUtils.showInfoDialog("", message, null);
 	}
 
 	@Override

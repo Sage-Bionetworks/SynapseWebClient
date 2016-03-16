@@ -25,9 +25,7 @@
 						           <b:Button ui:field="addEmailButton">Change Email</b:Button>
 						      </bh:Span>
 						    </bh:Span>
-						    <bh:Span ui:field="newEmailError" visible="false" addStyleNames="text-danger margin-left-5"></bh:Span>
 						</bh:Div>
-						<bh:Div ui:field="newEmailAlert" addStyleNames="alert alert-info" visible="false"></bh:Div>
 						<g:SimplePanel ui:field="addressSynAlertPanel"/>
 					</bh:Div>
 					<bh:Div ui:field="editProfilePanel" addStyleNames="highlight-box">
