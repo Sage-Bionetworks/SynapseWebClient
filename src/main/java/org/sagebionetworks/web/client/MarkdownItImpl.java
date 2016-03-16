@@ -315,6 +315,78 @@ public class MarkdownItImpl implements MarkdownIt {
 			state.posMax = max;
 			return true;
 		};
+		
+		//Define custom scanDelims that does not conclude that a token can open or close based on whitespace
+		function scanDelims(src, posMax, start) {
+		  var pos = start, count, can_open, can_close,
+		      max = posMax,
+		      marker = src.charCodeAt(start);
+		  while (pos < max && src.charCodeAt(pos) === marker) { pos++; }
+		  count = pos - start;
+		  can_open  = true;
+		  can_close = true;
+		  return {
+		    can_open:  can_open,
+		    can_close: can_close,
+		    length:    count
+		  };
+		};
+		
+		//Copy of markdown-it emphasis function, but uses the scanDelims function above instead of StateInline.prototype.scanDelims()
+		function emphasis(state, silent) {
+		  var i, scanned, token,
+		      start = state.pos,
+		      marker = state.src.charCodeAt(start);
+		
+		  if (silent) { return false; }
+		
+		  if (marker !== 0x5F && marker !== 0x2A ) { return false; } // '_' or '*'
+		
+		  scanned = scanDelims(state.src, state.posMax, state.pos);
+		
+		  for (i = 0; i < scanned.length; i++) {
+		    token         = state.push('text', '', 0);
+		    token.content = String.fromCharCode(marker);
+		
+		    state.delimiters.push({
+		      // Char code of the starting marker (number).
+		      //
+		      marker: marker,
+		
+		      // An amount of characters before this one that's equivalent to
+		      // current one. In plain English: if this delimiter does not open
+		      // an emphasis, neither do previous `jump` characters.
+		      //
+		      // Used to skip sequences like "*****" in one step, for 1st asterisk
+		      // value will be 0, for 2nd it's 1 and so on.
+		      //
+		      jump:   i,
+		
+		      // A position of the token this delimiter corresponds to.
+		      //
+		      token:  state.tokens.length - 1,
+		
+		      // Token level.
+		      //
+		      level:  state.level,
+		
+		      // If this delimiter is matched as a valid opener, `end` will be
+		      // equal to its position, otherwise it's `-1`.
+		      //
+		      end:    -1,
+		
+		      // Boolean flags that determine if this delimiter could open or close
+		      // an emphasis.
+		      //
+		      open:   scanned.can_open,
+		      close:  scanned.can_close
+		    });
+		  }
+		
+		  state.pos += scanned.length;
+		
+		  return true;
+		};
 
 		function initMarkdownIt() {
 			$wnd.md = $wnd.markdownit();
@@ -387,6 +459,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			initSynapseHeadingStyle();
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
+			$wnd.md.inline.ruler.at('emphasis', emphasis);
 		}
 
 		if (!$wnd.md) {
