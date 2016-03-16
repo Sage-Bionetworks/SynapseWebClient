@@ -84,11 +84,15 @@ public class MarkdownItImpl implements MarkdownIt {
 
 			$wnd.md.renderer.rules.synapse_heading_open = function(tokens, idx, options,
 					env, self) {
+				var level = tokens[idx].markup.length;
+				var paddingTop = 70 - (level * 10);  //map to 10-60 px top 
+				var paddingBottom = 14 - (level * 2);  //map to 2-12
+				var styleValue = 'padding-top: ' + paddingTop + 'px;' + ' padding-bottom: ' + paddingBottom + 'px;';
 				var aIndex = tokens[idx].attrIndex('style');
 				if (aIndex < 0) {
-					tokens[idx].attrPush([ 'style', 'padding: 20px 0 0 0;' ]); // add new attribute
+					tokens[idx].attrPush([ 'style', styleValue ]); // add new attribute
 				} else {
-					tokens[idx].attrs[aIndex][1] += ' padding: 20px 0 0 0; '; // add value to existing attr
+					tokens[idx].attrs[aIndex][1] += styleValue; // add value to existing attr
 				}
 
 				// pass token to default renderer.
