@@ -165,6 +165,12 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.synapseRE) {
 				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
 			}
+			if (!$wnd.md.utils.urlWithoutProtocolRE) {
+				$wnd.md.utils.urlWithoutProtocolRE = new RegExp('^([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\w \\.-]*)*\\/?.*$');
+			}
+			if (!$wnd.md.utils.doiRE) {
+				$wnd.md.utils.doiRE = new RegExp('^doi:10[.]{1}[0-9]+[/]{1}[a-zA-Z0-9_.]+$');
+			}
 		}
 
 		function link(state, silent) {
@@ -211,8 +217,10 @@ public class MarkdownItImpl implements MarkdownIt {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if (testString.toLowerCase().lastIndexOf('www.', 0) === 0) {
+					} else if ($wnd.md.utils.urlWithoutProtocolRE.test(testString)) {
 						res.str = 'http://' + testString;
+					} else if ($wnd.md.utils.doiRE.test(testString)) {
+						res.str = 'http://dx.doi.org/' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
 					href = state.md.normalizeLink(res.str);
