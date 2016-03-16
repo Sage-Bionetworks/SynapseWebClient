@@ -7,11 +7,13 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -20,7 +22,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -289,6 +293,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	@Override
 	public void addEmail(String emailAddress) {
+		addressSynAlert.clear();
 		// Is this email already in the profile email list?
 		// If so, just update it as the new notification email. Otherwise, kick
 		// off the verification process.
@@ -308,6 +313,12 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	public void additionalEmailValidation(String emailAddress) {
 		// need to validate
+		//first, does it look like an email address?
+		if (!ValidationUtils.isValidEmail(emailAddress)) {
+			addressSynAlert.showError(WebConstants.INVALID_EMAIL_MESSAGE);
+			return;
+		}
+
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
 		synapseClient.additionalEmailValidation(
 				authenticationController.getCurrentUserPrincipalId(),
@@ -319,7 +330,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showEmailChangeFailed(caught.getMessage());
+						addressSynAlert.handleException(caught);
 					}
 				});
 	}
