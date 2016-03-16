@@ -57,7 +57,7 @@
 							<t:TableData>
 								<bh:Div ui:field="threadMessage"></bh:Div>
 							</t:TableData>
-							<t:TableData width="100px" addStyleNames="vertical-align-top">
+							<t:TableData width="140px" addStyleNames="vertical-align-top">
 								<bh:Div>
 									<b:Tooltip title="Delete thread" placement="LEFT">
 										<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
@@ -65,8 +65,8 @@
 									<b:Tooltip title="Edit thread" placement="LEFT">
 										<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
 									</b:Tooltip>
-									<b:Tooltip title="Open this thread in a new window" placement="LEFT">
-										<b:Anchor ui:field="threadLink" icon="EXTERNAL_LINK" href="#" target="_blank" text=" " pull="RIGHT" addStyleNames="margin-right-10 line-height-1em"/>
+									<b:Tooltip title="Open this thread in a new window" placement="LEFT" ui:field="threadLinkTooltip">
+										<b:Icon ui:field="threadLink" type="EXTERNAL_LINK" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em"/>
 									</b:Tooltip>
 									<bh:Span ui:field="subscribeButtonContainer" addStyleNames="right" />
 								</bh:Div>

@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -88,10 +89,12 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Span threadAuthor;
 	@UiField
-	Anchor threadLink;
+	Icon threadLink;
 	@UiField
 	Span subscribeButtonContainer;
-
+	@UiField
+	Tooltip threadLinkTooltip;
+	String threadLinkHref;
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
 
@@ -137,6 +140,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickEditThread();
+			}
+		});
+		threadLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				threadLinkTooltip.hide();
+				DisplayUtils.newWindow(threadLinkHref, "_blank", "");
 			}
 		});
 	}
@@ -350,7 +360,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	@Override
 	public void setThreadLink(String link){
-		threadLink.setHref(link);
+		threadLinkHref = link;
 	}
 	@Override
 	public void setSubscribeButtonWidget(Widget widget) {

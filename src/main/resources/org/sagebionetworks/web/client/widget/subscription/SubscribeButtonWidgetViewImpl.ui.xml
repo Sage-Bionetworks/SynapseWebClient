@@ -5,10 +5,10 @@
 	<bh:Span>
 		<b:Button ui:field="followButton" type="PRIMARY" visible="false" dataLoadingText="Updating...">Follow</b:Button>
 		<b:Button ui:field="unfollowButton" type="DEFAULT" visible="false" dataLoadingText="Updating...">Unfollow</b:Button>
-		<b:Tooltip title="Not currently following, click to follow." placement="LEFT">
+		<b:Tooltip title="You are not following this topic. Click to follow." placement="LEFT">
 			<b:Icon ui:field="followIcon" type="EYE_SLASH" size="LARGE" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
 		</b:Tooltip>
-		<b:Tooltip title="Currently following, click to unfollow." placement="LEFT">
+		<b:Tooltip title="You are following this topic.  Click to stop following." placement="LEFT">
 			<b:Icon ui:field="unfollowIcon" type="EYE" size="LARGE" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
 		</b:Tooltip>
 
