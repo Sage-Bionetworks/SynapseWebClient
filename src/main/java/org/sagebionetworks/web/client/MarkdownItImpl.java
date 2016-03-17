@@ -415,7 +415,8 @@ public class MarkdownItImpl implements MarkdownIt {
 				.use($wnd.markdownitSup)
 				.use($wnd.markdownitCentertext)
 				.use($wnd.markdownitSynapseHeading)
-				.use($wnd.markdownitSynapseTable);
+				.use($wnd.markdownitSynapseTable)
+				.use($wnd.markdownitStrikethroughAlt);
 
 			$wnd.md.set({
 				highlight : function(str, lang) {
