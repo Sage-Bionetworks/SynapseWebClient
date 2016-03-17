@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
@@ -74,8 +74,10 @@ public class TopicWidgetTest {
 			.getThread(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, TEST_OBJECT_ID);
+		verify(mockForumClient)
+			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTopicText(THREAD_TITLE);
-		String expectedHref = DiscussionThreadWidget.buildThreadLink(THREAD_PROJECT_ID, TEST_OBJECT_ID);
+		String expectedHref = TopicUtils.buildThreadLink(THREAD_PROJECT_ID, TEST_OBJECT_ID);
 		verify(mockView).setTopicHref(expectedHref);
 	}
 	
@@ -86,6 +88,8 @@ public class TopicWidgetTest {
 			.getThread(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, TEST_OBJECT_ID);
+		verify(mockForumClient)
+			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}
 
@@ -95,8 +99,10 @@ public class TopicWidgetTest {
 			.getForumProject(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.FORUM, TEST_OBJECT_ID);
+		verify(mockForumClient)
+			.getForumProject(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTopicText(PROJECT_TITLE);
-		String expectedHref = DiscussionThreadWidget.buildForumLink(TEST_OBJECT_ID);
+		String expectedHref = TopicUtils.buildForumLink(TEST_OBJECT_ID);
 		verify(mockView).setTopicHref(expectedHref);
 	}
 

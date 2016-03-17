@@ -24,9 +24,9 @@ import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -141,20 +141,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		});
 	}
 
-	public static String buildThreadLink(String projectId, String threadId) {
-		String token = THREAD_ID_KEY+"="+threadId;
-		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
-		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
-		return link;
-	}
-	
-	public static String buildForumLink(String projectId) {
-		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, null);
-		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
-		return link;
-	}
-
-
 	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
 		view.clear();
 		view.setTitle(title);
@@ -175,7 +161,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		view.setDeleteIconVisible(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
-		view.setThreadLink(buildThreadLink(projectId, threadId));
+		view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
 		if (showThreadDetails) {
 			showThreadDetails();
 		} else {

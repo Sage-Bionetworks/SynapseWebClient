@@ -4,8 +4,8 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -53,7 +53,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 			@Override
 			public void onSuccess(DiscussionThreadBundle threadBundle) {
 				view.setTopicText(threadBundle.getTitle());
-				String href = DiscussionThreadWidget.buildThreadLink(threadBundle.getProjectId(), threadBundle.getId());
+				String href = TopicUtils.buildThreadLink(threadBundle.getProjectId(), threadBundle.getId());
 				view.setTopicHref(href);
 			}
 			
@@ -73,7 +73,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 			}
 			public void onSuccess(Project result) {
 				view.setTopicText(result.getName());
-				String href = DiscussionThreadWidget.buildForumLink(result.getId());
+				String href = TopicUtils.buildForumLink(result.getId());
 				view.setTopicHref(href);
 			};
 		});
