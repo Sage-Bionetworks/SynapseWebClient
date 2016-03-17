@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -44,6 +45,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -100,7 +102,9 @@ public class DiscussionThreadWidgetTest {
 	UserBadge mockAuthorIconWidget;
 	@Mock
 	GWTWrapper mockGwtWrapper;
-
+	@Mock
+	SubscribeButtonWidget mockSubscribeButtonWidget;
+	
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
 	private static final String CREATED_BY = "123";
@@ -115,7 +119,7 @@ public class DiscussionThreadWidgetTest {
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
-				mockAuthorIconWidget, mockGwtWrapper);
+				mockAuthorIconWidget, mockGwtWrapper, mockSubscribeButtonWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
@@ -129,6 +133,8 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setThreadAuthor(any(Widget.class));
+		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
+		verify(mockSubscribeButtonWidget).showIconOnly();
 	}
 
 	@Test
@@ -486,7 +492,8 @@ public class DiscussionThreadWidgetTest {
 		boolean isDeleted = false;
 		boolean canModerate = false;
 		boolean isEdited = false;
-		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+		String threadId = "123";
+		DiscussionThreadBundle bundle = createThreadBundle(threadId, "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
@@ -500,6 +507,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
+		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.DISCUSSION_THREAD, threadId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -641,9 +649,15 @@ public class DiscussionThreadWidgetTest {
 	public void testBuildThreadLink() {
 		String projectId = "syn123";
 		String threadId = "456";
-		String hostURL = "hostURL/";
-		when(mockGwtWrapper.getHostPageBaseURL()).thenReturn(hostURL);
-		assertEquals("hostURL/#!Synapse:syn123/discussion/threadId=456",
-				DiscussionThreadWidget.buildThreadLink(projectId, threadId, mockGwtWrapper));
+		assertEquals("/#!Synapse:syn123/discussion/threadId=456",
+				DiscussionThreadWidget.buildThreadLink(projectId, threadId));
 	}
+	
+	@Test
+	public void testBuildForumLink() {
+		String projectId = "syn123";
+		assertEquals("/#!Synapse:syn123/discussion/",
+				DiscussionThreadWidget.buildForumLink(projectId));
+	}
+
 }

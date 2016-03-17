@@ -20,6 +20,7 @@ public interface ForumWidgetView extends IsWidget{
 	void setSingleThread(Widget w);
 	void setNewThreadModal(Widget w);
 	void setAlert(Widget w);
+	void setSubscribeButton(Widget w);
 	void setModeratorModeContainerVisibility(Boolean visible);
 	Boolean getModeratorMode();
 	void showErrorMessage(String errorMessage);

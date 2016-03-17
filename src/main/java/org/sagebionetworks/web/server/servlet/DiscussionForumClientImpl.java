@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -33,10 +34,10 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Forum getForumMetadata(String projectId) throws RestServiceException {
+	public Forum getForumByProjectId(String projectId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getForumMetadata(projectId);
+			return synapseClient.getForumByProjectId(projectId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -197,6 +198,17 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getReplyUrl(messageKey).toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public Project getForumProject(String forumId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Forum forum = synapseClient.getForum(forumId);
+			return (Project)synapseClient.getEntityById(forum.getProjectId());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

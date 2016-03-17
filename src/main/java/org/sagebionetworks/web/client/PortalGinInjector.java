@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
+import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
@@ -237,6 +238,8 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityActionController createEntityActionController();
 	public ACTPresenter getACTPresenter();
 	public SynapseForumPresenter getSynapseForumPresenter();
+	public SubscriptionPresenter getSubscriptionPresenter();
+	
 	/*
 	 *  Markdown Widgets
 	 */

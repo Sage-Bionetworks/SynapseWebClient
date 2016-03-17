@@ -46,7 +46,9 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	FocusPanel sortByViews;
 	@UiField
 	FocusPanel sortByActivity;
-
+	@UiField
+	Span subscribeButtonContainer;
+	
 	private Presenter presenter;
 
 	Widget widget;
@@ -167,5 +169,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
+	}
+	@Override
+	public void setSubscribeButton(Widget w) {
+		subscribeButtonContainer.clear();
+		subscribeButtonContainer.add(w);
 	}
 }

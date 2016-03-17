@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,7 +46,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	Callback showAllThreadsCallback;
 	CallbackP<Boolean> emptyListCallback;
 	Boolean isSingleThread;
-
+	SubscribeButtonWidget subscribeToForumButton;
+	
 	@Inject
 	public ForumWidget(
 			final ForumWidgetView view,
@@ -54,7 +57,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			NewDiscussionThreadModal newThreadModal,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			DiscussionThreadWidget singleThreadWidget
+			DiscussionThreadWidget singleThreadWidget,
+			SubscribeButtonWidget subscribeToForumButton
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -64,11 +68,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.singleThreadWidget = singleThreadWidget;
+		this.subscribeToForumButton = subscribeToForumButton;
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setSingleThread(singleThreadWidget.asWidget());
+		view.setSubscribeButton(subscribeToForumButton.asWidget());
 		emptyListCallback = new CallbackP<Boolean>(){
 			@Override
 			public void invoke(Boolean param) {
@@ -84,6 +90,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.showAllThreadsCallback = showAllThreadsCallback;
 		synAlert.clear();
+		subscribeToForumButton.clear();
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -134,7 +141,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
 		view.setShowAllThreadsButtonVisible(false);
-		discussionForumClient.getForumMetadata(entityId, new AsyncCallback<Forum>(){
+		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -143,6 +150,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			@Override
 			public void onSuccess(final Forum forum) {
 				forumId = forum.getId();
+				subscribeToForumButton.configure(SubscriptionObjectType.FORUM, forumId);
 				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -21,7 +22,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("discussionforumclient")	
 public interface DiscussionForumClient extends RemoteService {
 
-	Forum getForumMetadata(String projectId) throws RestServiceException;
+	Forum getForumByProjectId(String projectId) throws RestServiceException;
 
 	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
 			throws RestServiceException;
@@ -62,4 +63,6 @@ public interface DiscussionForumClient extends RemoteService {
 	String getThreadUrl(String messageKey) throws RestServiceException;
 
 	String getReplyUrl(String messageKey) throws RestServiceException;
+
+	Project getForumProject(String forumId) throws RestServiceException;
 }

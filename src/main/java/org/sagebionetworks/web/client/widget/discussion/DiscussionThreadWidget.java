@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -61,6 +63,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	MarkdownWidget markdownWidget;
 	UserBadge authorIconWidget;
 	GWTWrapper gwtWrapper;
+	SubscribeButtonWidget subscribeButtonWidget;
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -86,7 +89,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
 			UserBadge authorIconWidget,
-			GWTWrapper gwtWrapper
+			GWTWrapper gwtWrapper,
+			SubscribeButtonWidget subscribeButtonWidget
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -102,6 +106,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.markdownWidget = markdownWidget;
 		this.authorIconWidget = authorIconWidget;
 		this.gwtWrapper = gwtWrapper;
+		this.subscribeButtonWidget = subscribeButtonWidget;
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -109,6 +114,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setThreadAuthor(authorIconWidget.asWidget());
+		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
+		subscribeButtonWidget.showIconOnly();
 	}
 
 	@Override
@@ -134,12 +141,19 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		});
 	}
 
-	public static String buildThreadLink(String projectId, String threadId, GWTWrapper gwtWrapper) {
+	public static String buildThreadLink(String projectId, String threadId) {
 		String token = THREAD_ID_KEY+"="+threadId;
 		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
-		String link = gwtWrapper.getHostPageBaseURL() + SYNAPSE_ENTITY_PREFIX + place.toToken();
+		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
 		return link;
 	}
+	
+	public static String buildForumLink(String projectId) {
+		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, null);
+		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
+		return link;
+	}
+
 
 	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
 		view.clear();
@@ -161,7 +175,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		view.setDeleteIconVisible(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
-		view.setThreadLink(buildThreadLink(projectId, threadId, gwtWrapper));
+		view.setThreadLink(buildThreadLink(projectId, threadId));
 		if (showThreadDetails) {
 			showThreadDetails();
 		} else {
@@ -230,6 +244,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		synAlert.clear();
 		markdownWidget.clear();
 		view.setLoadingMessageVisible(true);
+		subscribeButtonWidget.configure(SubscriptionObjectType.DISCUSSION_THREAD, threadId);
 		discussionForumClientAsync.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
 			@Override
