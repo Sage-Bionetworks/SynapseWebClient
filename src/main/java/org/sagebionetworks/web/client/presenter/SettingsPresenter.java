@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.shared.GWT;
@@ -44,7 +45,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseAlert passwordSynAlert;
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
-	
+	private SubscriptionListWidget subscriptionListWidget;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
@@ -52,7 +53,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient, GWTWrapper gwt,
 			PortalGinInjector ginInjector,
-			UserProfileModalWidget userProfileModalWidget) {
+			UserProfileModalWidget userProfileModalWidget,
+			SubscriptionListWidget subscriptionListWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -61,6 +63,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.ginInjector = ginInjector;
 		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
+		this.subscriptionListWidget = subscriptionListWidget;
+		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
@@ -258,6 +262,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			updateUserStorage();
 			getUserNotificationEmail();
 			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+			subscriptionListWidget.configure();
 		}
 	}
 

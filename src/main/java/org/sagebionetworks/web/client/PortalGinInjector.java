@@ -118,6 +118,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
+import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -389,5 +391,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public MarkdownCacheKey getMarkdownCacheKey();
 	public MarkdownCacheValue getMarkdownCacheValue();
-
+	
+	public SubscribeButtonWidget getSubscribeButtonWidget();
+	public TopicWidget getTopicWidget();
 }
