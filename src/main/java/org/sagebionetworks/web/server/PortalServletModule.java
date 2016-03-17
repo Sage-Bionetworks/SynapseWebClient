@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.SubscriptionClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
+import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
@@ -78,6 +80,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
+		
+		// Subscription service
+		bind(SubscriptionClientImpl.class).in(Singleton.class);
+		serve("/Portal/subscriptionclient").with(SubscriptionClientImpl.class);
 		
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
@@ -148,7 +154,6 @@ public class PortalServletModule extends ServletModule {
 		bind(DiscussionMessageServlet.class).in(Singleton.class);
 		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
 
-		
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);
 		serve("/Portal/jira").with(JiraClientImpl.class);

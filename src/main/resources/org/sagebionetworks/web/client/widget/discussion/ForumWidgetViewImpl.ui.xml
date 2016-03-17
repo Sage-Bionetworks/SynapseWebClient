@@ -9,6 +9,7 @@
 		<b:Row>
 			<b:Column size="XS_12">
 				<b:Button ui:field="newThreadButton" type="PRIMARY" pull="RIGHT">New Thread</b:Button>
+				<bh:Span ui:field="subscribeButtonContainer" addStyleNames="right margin-right-10" />
 				<bh:Div ui:field="moderatorModeContainer" addStyleNames="margin-right-10" pull="RIGHT" visible="false">
 					<b3:ToggleSwitch ui:field="moderatorModeSwitch" labelText="Moderate" labelWidth="auto"/>
 				</bh:Div>

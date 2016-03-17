@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
@@ -110,6 +111,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(Trash.class);
 		excludeFromLastPlace.add(Certificate.class);
 		excludeFromLastPlace.add(SignedToken.class);
+		excludeFromLastPlace.add(SubscriptionPlace.class);
 	}
 
 	@Override

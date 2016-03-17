@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
@@ -219,6 +220,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 				} else if (place instanceof SynapseForumPlace) {
 					SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();
 					presenter.setPlace((SynapseForumPlace) place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof SubscriptionPlace) {
+					SubscriptionPresenter presenter = ginjector.getSubscriptionPresenter();
+					presenter.setPlace((SubscriptionPlace) place);
 					presenter.start(panel, eventBus);
 
 				} else {

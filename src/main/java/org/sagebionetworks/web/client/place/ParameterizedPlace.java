@@ -23,6 +23,10 @@ public class ParameterizedPlace extends Place {
 		parameterizedToken.put(key, value);
 		updateToken();
 	}
+	public void clearParams(){
+		parameterizedToken.clear();
+		updateToken();
+	}
 	
 	private void updateToken() {
 		token = parameterizedToken.toString();
