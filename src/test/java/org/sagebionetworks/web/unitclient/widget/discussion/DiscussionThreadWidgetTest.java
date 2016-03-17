@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
@@ -644,20 +645,4 @@ public class DiscussionThreadWidgetTest {
 		}
 		return list;
 	}
-
-	@Test
-	public void testBuildThreadLink() {
-		String projectId = "syn123";
-		String threadId = "456";
-		assertEquals("/#!Synapse:syn123/discussion/threadId=456",
-				DiscussionThreadWidget.buildThreadLink(projectId, threadId));
-	}
-	
-	@Test
-	public void testBuildForumLink() {
-		String projectId = "syn123";
-		assertEquals("/#!Synapse:syn123/discussion/",
-				DiscussionThreadWidget.buildForumLink(projectId));
-	}
-
 }
