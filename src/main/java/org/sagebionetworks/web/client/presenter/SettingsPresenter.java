@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -54,7 +55,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			SynapseClientAsync synapseClient, GWTWrapper gwt,
 			PortalGinInjector ginInjector,
 			UserProfileModalWidget userProfileModalWidget,
-			SubscriptionListWidget subscriptionListWidget) {
+			SubscriptionListWidget subscriptionListWidget,
+			CookieProvider cookies) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -64,6 +66,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
+		view.setSubscriptionsVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();

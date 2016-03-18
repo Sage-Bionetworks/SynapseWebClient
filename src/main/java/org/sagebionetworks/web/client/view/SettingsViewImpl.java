@@ -388,7 +388,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changePasswordBtn.setEnabled(isEnabled);
 	}
 
-
 	@Override
 	public void setPasswordSynAlertWidget(IsWidget synAlert) {
 		passwordSynAlertPanel.setWidget(synAlert);
@@ -397,5 +396,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setSubscriptionsListWidget(Widget w) {
 		subscriptionsContainer.clear();
 		subscriptionsContainer.add(w);
+	}
+	
+	@Override
+	public void setSubscriptionsVisible(boolean visible) {
+		subscriptionsContainer.setVisible(visible);
 	}
 }

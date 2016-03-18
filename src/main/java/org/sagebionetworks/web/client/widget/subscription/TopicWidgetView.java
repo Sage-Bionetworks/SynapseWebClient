@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,6 +15,7 @@ public interface TopicWidgetView extends IsWidget, SynapseView {
 	void setTopicText(String text);
 	void setTopicHref(String href);
 	void addStyleNames(String styleNames);
+	void setIcon(IconType type);
 	/**
 	 * Presenter interface
 	 */

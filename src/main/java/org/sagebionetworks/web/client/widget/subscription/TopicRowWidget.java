@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -21,6 +22,8 @@ public class TopicRowWidget implements TopicRowWidgetView.Presenter, SynapseWidg
 		view.setSubscribeButtonWidget(subscribeButton.asWidget());
 		view.setTopicWidget(topic.asWidget());
 		view.setPresenter(this);
+		topic.addStyleNames("font-size-17");
+		subscribeButton.setButtonSize(ButtonSize.EXTRA_SMALL);
 	}
 	
 	public void configure(Subscription subscription) {

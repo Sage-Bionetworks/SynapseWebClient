@@ -42,6 +42,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 		view.setTopicWidget(topicWidget.asWidget());
+		topicWidget.addStyleNames("font-size-20");
 	}
 
 	@Override

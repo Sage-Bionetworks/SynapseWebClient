@@ -36,6 +36,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void showNotificationEmailAddress(String primaryEmailAddress);
 	void showEmailChangeSuccess(String message);
 	void setSubscriptionsListWidget(Widget w);
+	void setSubscriptionsVisible(boolean visible);
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);
