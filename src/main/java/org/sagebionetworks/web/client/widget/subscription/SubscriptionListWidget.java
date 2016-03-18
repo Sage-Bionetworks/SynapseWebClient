@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,7 +21,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	SubscriptionObjectType filter;
 	PortalGinInjector ginInjector;
 	AuthenticationController authController;
-	private static final Long LIMIT = 20L;
+	private static final Long LIMIT = 10L;
 	private Long currentOffset;
 	
 	@Inject
@@ -49,6 +48,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	private void reloadSubscriptions() {
 		currentOffset = 0L;
 		view.clearSubscriptions();
+		view.setNoItemsMessageVisible(true);
 		if (authController.isLoggedIn()) {
 			getMoreSubscriptions();	
 		}
@@ -59,17 +59,17 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		subscribeClient.getAllSubscriptions(filter, LIMIT, currentOffset, new AsyncCallback<SubscriptionPagedResults>() {
 			@Override
 			public void onSuccess(SubscriptionPagedResults results) {
-				boolean isMore = results.getTotalNumberOfResults() > currentOffset + results.getResults().size();
-				view.setMoreButtonVisible(isMore);
+				int currentResultSize = results.getResults().size();
+				if (currentResultSize > 0) {
+					view.setNoItemsMessageVisible(false);	
+				}
+				view.setMoreButtonVisible(currentResultSize == LIMIT );
 				currentOffset += LIMIT;
 				//for each subscription, add a row.
-				GWT.debugger();
 				for (Subscription subscription : results.getResults()) {
-					SubscribeButtonWidget subscribeButton = ginInjector.getSubscribeButtonWidget();
-					subscribeButton.configure(subscription);
-					TopicWidget topicWidget = ginInjector.getTopicWidget();
-					topicWidget.configure(subscription.getObjectType(), subscription.getObjectId());
-					view.addNewSubscription(subscribeButton.asWidget(), topicWidget.asWidget());
+					TopicRowWidget topicRow = ginInjector.getTopicRowWidget();
+					topicRow.configure(subscription);
+					view.addNewSubscription(topicRow.asWidget());
 				}
 			}
 			

@@ -9,12 +9,12 @@ import com.google.gwt.user.client.ui.Widget;
 public interface SubscriptionListWidgetView extends IsWidget {
 
 	void setPresenter(Presenter presenter);
-	void addNewSubscription(Widget subscribeButton, Widget topicWidget);
+	void addNewSubscription(Widget topicRow);
 	void setSynAlert(Widget w);
 	void setMoreButtonVisible(boolean visible);
 	void clearSubscriptions();
 	void clearFilter();
-	
+	void setNoItemsMessageVisible(boolean visible);
 	/**
 	 * Presenter interface
 	 */

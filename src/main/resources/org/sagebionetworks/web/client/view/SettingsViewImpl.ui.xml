@@ -18,7 +18,7 @@
 			    	<bh:Div ui:field="editProfilePanel" addStyleNames="highlight-box">
 						<b:Button ui:field="editProfileButton" icon="EDIT" >Edit Profile</b:Button>
 					</bh:Div>
-			        <bh:Div ui:field="emailSettingsPanel" addStyleNames="highlight-box">
+					<bh:Div ui:field="emailSettingsPanel" addStyleNames="highlight-box">
 					    <g:FlowPanel ui:field="emailsPanel" addStyleNames="margin-left-10">
 					    </g:FlowPanel>
 					    <bh:Div ui:field="changeEmailUI" visible="false" addStyleNames="margin-top-10">
@@ -35,7 +35,9 @@
 					    </g:FlowPanel>
 					    <g:SimplePanel ui:field="notificationSynAlertPanel"/>
 					</bh:Div>
-					<bh:Div ui:field="changeSynapsePasswordUI">
+			    </b:Column>
+   			    <b:Column size="LG_6">
+   			    	<bh:Div ui:field="changeSynapsePasswordUI">
 					    <bh:Div ui:field="changeSynapsePasswordHighlightBox" addStyleNames="highlight-box margin-bottom-20" >
 					        <bh:Div addStyleNames="form-horizontal">
 					            <b:Row ui:field="currentPassword" addStyleNames="form-group">
@@ -77,11 +79,8 @@
 						</bh:Div>
 					</bh:Div>
 			    </b:Column>
-   			    <b:Column size="LG_6">
-   			    	<bh:Div ui:field="subscriptionsContainer" addStyleNames="highlight-box margin-bottom-20"/>
-			    </b:Column>
 			</b:Row>
-			
+			<bh:Div ui:field="subscriptionsContainer" addStyleNames="highlight-box margin-bottom-20"/>
 			
 			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box">
 				<p>Using an API key allows you to authenticate your scripts for an

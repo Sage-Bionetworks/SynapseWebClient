@@ -4,11 +4,13 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
-import org.sagebionetworks.web.client.view.bootstrap.table.*;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,6 +28,8 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	SimplePanel emptyUI;
 	@UiField
 	Table subscriptionsContainer;
 	public interface Binder extends UiBinder<Widget, SubscriptionListWidgetViewImpl> {
@@ -79,18 +83,8 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 		synAlertContainer.add(w);
 	}
 	@Override
-	public void addNewSubscription(Widget subscribeButton, Widget topicWidget) {
-		TableRow tr = new TableRow();
-		tr.setHeight("45px");
-		TableData td = new TableData();
-		td.add(subscribeButton);
-		td.setWidth("95px");
-		tr.add(td);
-		
-		td = new TableData();
-		td.add(topicWidget);
-		tr.add(td);
-		subscriptionsContainer.add(tr);
+	public void addNewSubscription(Widget topicRow) {
+		subscriptionsContainer.add(topicRow);
 	}
 	public void clearSubscriptions() {
 		subscriptionsContainer.clear();
@@ -104,4 +98,8 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 		moreButton.setVisible(visible);
 	};
 	
+	@Override
+	public void setNoItemsMessageVisible(boolean visible) {
+		emptyUI.setVisible(visible);
+	}
 }

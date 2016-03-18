@@ -429,6 +429,8 @@ import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetV
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
@@ -1247,5 +1249,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TopicWidgetView.class).to(TopicWidgetViewImpl.class);
 		bind(SubscribeButtonWidgetView.class).to(SubscribeButtonWidgetViewImpl.class);
 		bind(SubscriptionListWidgetView.class).to(SubscriptionListWidgetViewImpl.class);
+		bind(TopicRowWidgetView.class).to(TopicRowWidgetViewImpl.class);
 	}
 }
