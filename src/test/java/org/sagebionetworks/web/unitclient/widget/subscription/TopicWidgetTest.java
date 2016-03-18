@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -77,6 +78,7 @@ public class TopicWidgetTest {
 		verify(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTopicText(THREAD_TITLE);
+		verify(mockView).setIcon(IconType.COMMENTS);
 		String expectedHref = TopicUtils.buildThreadLink(THREAD_PROJECT_ID, TEST_OBJECT_ID);
 		verify(mockView).setTopicHref(expectedHref);
 	}
@@ -102,6 +104,7 @@ public class TopicWidgetTest {
 		verify(mockForumClient)
 			.getForumProject(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTopicText(PROJECT_TITLE);
+		verify(mockView).setIcon(IconType.LIST_ALT);
 		String expectedHref = TopicUtils.buildForumLink(TEST_OBJECT_ID);
 		verify(mockView).setTopicHref(expectedHref);
 	}

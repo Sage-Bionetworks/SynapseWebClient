@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface SettingsView extends IsWidget, SynapseView {
 	
@@ -34,7 +35,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	void showNotificationEmailAddress(String primaryEmailAddress);
 	void showEmailChangeSuccess(String message);
-	
+	void setSubscriptionsListWidget(Widget w);
+	void setSubscriptionsVisible(boolean visible);
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);

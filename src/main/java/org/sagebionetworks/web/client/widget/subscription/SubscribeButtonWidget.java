@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.subscription;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
@@ -189,5 +190,9 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	
 	public Subscription getCurrentSubscription() {
 		return currentSubscription;
+	}
+	
+	public void setButtonSize(ButtonSize size) {
+		view.setButtonSize(size);
 	}
 }

@@ -94,8 +94,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	TextBox apiKeyContainer;
 	
 	@UiField
-	HTMLPanel notificationsPanel;
-	@UiField
 	CheckBox emailNotificationsCheckbox;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button changeApiKey;
@@ -108,6 +106,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel notificationSynAlertPanel;
 	@UiField
 	SimplePanel apiSynAlertPanel;
+	@UiField
+	Div subscriptionsContainer;
 	
 	private Presenter presenter;
 	
@@ -150,11 +150,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		});
 		forgotPasswordContainer.addStyleName("inline-block");
 		forgotPasswordContainer.add(forgotPasswordLink);
-		emailSettingsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Address");
-		notificationsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Settings");
+		emailSettingsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email");
 		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
+		subscriptionsContainer.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Following");
 		
 		newEmailField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
@@ -388,9 +388,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changePasswordBtn.setEnabled(isEnabled);
 	}
 
-
 	@Override
 	public void setPasswordSynAlertWidget(IsWidget synAlert) {
 		passwordSynAlertPanel.setWidget(synAlert);
+	}
+	@Override
+	public void setSubscriptionsListWidget(Widget w) {
+		subscriptionsContainer.clear();
+		subscriptionsContainer.add(w);
+	}
+	
+	@Override
+	public void setSubscriptionsVisible(boolean visible) {
+		subscriptionsContainer.setVisible(visible);
 	}
 }

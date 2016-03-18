@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -22,9 +23,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,7 +45,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseAlert passwordSynAlert;
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
-	
+	private SubscriptionListWidget subscriptionListWidget;
+	private CookieProvider cookies;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
@@ -52,7 +54,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient, GWTWrapper gwt,
 			PortalGinInjector ginInjector,
-			UserProfileModalWidget userProfileModalWidget) {
+			UserProfileModalWidget userProfileModalWidget,
+			SubscriptionListWidget subscriptionListWidget,
+			CookieProvider cookies) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -61,6 +65,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.ginInjector = ginInjector;
 		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
+		this.subscriptionListWidget = subscriptionListWidget;
+		this.cookies = cookies;
+		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
@@ -254,10 +261,12 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
+		view.setSubscriptionsVisible(DisplayUtils.isInTestWebsite(cookies));
 		if (authenticationController.isLoggedIn()) {
 			updateUserStorage();
 			getUserNotificationEmail();
 			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+			subscriptionListWidget.configure();
 		}
 	}
 
@@ -337,11 +346,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	// The entry point of this class, called from the ProfilePresenter
 	public Widget asWidget() {
-		this.apiSynAlert.clear();
-		this.notificationSynAlert.clear();
-		this.addressSynAlert.clear();
-		this.view.render();		
 		resetView();
+		this.view.render();
 		return view.asWidget();
 	}
 	

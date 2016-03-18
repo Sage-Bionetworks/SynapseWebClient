@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
@@ -55,6 +56,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 				view.setTopicText(threadBundle.getTitle());
 				String href = TopicUtils.buildThreadLink(threadBundle.getProjectId(), threadBundle.getId());
 				view.setTopicHref(href);
+				view.setIcon(IconType.COMMENTS);
 			}
 			
 			@Override
@@ -75,6 +77,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 				view.setTopicText(result.getName());
 				String href = TopicUtils.buildForumLink(result.getId());
 				view.setTopicHref(href);
+				view.setIcon(IconType.LIST_ALT);
 			};
 		});
 	}

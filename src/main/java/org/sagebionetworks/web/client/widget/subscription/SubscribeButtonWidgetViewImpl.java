@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.subscription;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -125,5 +126,10 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	public void showUnfollowIcon() {
 		clear();
 		unfollowIcon.setVisible(true);
+	}
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		followButton.setSize(size);
+		unfollowButton.setSize(size);
 	}
 }

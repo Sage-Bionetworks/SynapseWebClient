@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,7 +21,8 @@ public interface SubscribeButtonWidgetView extends IsWidget, SynapseView {
 	void setSynAlert(Widget w);
 	void showLoading();
 	void hideLoading();
-	 
+	void setButtonSize(ButtonSize size);
+	
 	/**
 	 * Presenter interface
 	 */

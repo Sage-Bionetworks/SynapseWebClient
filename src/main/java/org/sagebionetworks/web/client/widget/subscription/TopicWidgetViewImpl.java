@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -64,5 +65,9 @@ public class TopicWidgetViewImpl implements TopicWidgetView{
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	@Override
+	public void setIcon(IconType type) {
+		topicLink.setIcon(type);
 	}
 }
