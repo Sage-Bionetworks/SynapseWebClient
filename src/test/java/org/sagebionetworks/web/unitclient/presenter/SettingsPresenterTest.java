@@ -19,7 +19,9 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -44,11 +46,13 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class SettingsPresenterTest {
 	
@@ -74,8 +78,12 @@ public class SettingsPresenterTest {
 	String email = "testuser@test.com";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
+	@Mock
+	SubscriptionListWidget mockSubscriptionListWidget;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(SettingsView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -89,8 +97,9 @@ public class SettingsPresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWT, mockInjector, mockUserProfileModalWidget);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget, mockCookieProvider);	
 		verify(mockView).setPresenter(profilePresenter);
+		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -337,9 +346,10 @@ public class SettingsPresenterTest {
 	@Test
 	public void testAsWidget() {
 		profilePresenter.asWidget();
-		verify(mockSynAlert, times(8)).clear();
+		verify(mockSynAlert, times(5)).clear();
 		verify(mockView).clear();
 		verify(mockView).asWidget();
+		verify(mockSubscriptionListWidget).configure();
 	}
 	
 	@Test

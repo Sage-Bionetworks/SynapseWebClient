@@ -21,7 +21,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	SubscriptionObjectType filter;
 	PortalGinInjector ginInjector;
 	AuthenticationController authController;
-	private static final Long LIMIT = 10L;
+	public static final Long LIMIT = 10L;
 	private Long currentOffset;
 	
 	@Inject
@@ -41,6 +41,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	}
 	
 	public void configure() {
+		filter = null;
 		view.clearFilter();
 		reloadSubscriptions();
 	}

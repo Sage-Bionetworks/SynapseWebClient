@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +61,7 @@ public class SubscriptionPresenterTest {
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setTopicWidget(any(Widget.class));
+		verify(mockTopicWidget).addStyleNames(anyString());
 	}
 
 	@Test

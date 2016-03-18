@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,6 +46,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
+	private CookieProvider cookies;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
@@ -66,7 +66,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
-		view.setSubscriptionsVisible(DisplayUtils.isInTestWebsite(cookies));
+		this.cookies = cookies;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();
@@ -261,6 +261,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
+		view.setSubscriptionsVisible(DisplayUtils.isInTestWebsite(cookies));
 		if (authenticationController.isLoggedIn()) {
 			updateUserStorage();
 			getUserNotificationEmail();
@@ -345,11 +346,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	// The entry point of this class, called from the ProfilePresenter
 	public Widget asWidget() {
-		this.apiSynAlert.clear();
-		this.notificationSynAlert.clear();
-		this.addressSynAlert.clear();
-		this.view.render();		
 		resetView();
+		this.view.render();
 		return view.asWidget();
 	}
 	

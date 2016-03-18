@@ -5,6 +5,7 @@ import static junit.framework.Assert.*;
 
 import java.util.Collections;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -209,5 +210,11 @@ public class SubscribeButtonWidgetTest {
 		assertEquals(mockSubscription, widget.getCurrentSubscription());
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).hideLoading();
+	}
+	
+	@Test
+	public void testSetButtonSize() {
+		widget.setButtonSize(ButtonSize.LARGE);
+		verify(mockView).setButtonSize(ButtonSize.LARGE);
 	}
 }
