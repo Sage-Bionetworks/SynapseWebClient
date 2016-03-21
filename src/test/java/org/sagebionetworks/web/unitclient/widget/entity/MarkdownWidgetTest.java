@@ -40,6 +40,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -71,7 +72,8 @@ public class MarkdownWidgetTest {
 	MarkdownCacheValue mockMarkdownCacheValue;
 	@Mock
 	MarkdownIt mockMarkdownIt;
-	
+	@Mock
+	RuntimeException mockJsException;
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -214,6 +216,24 @@ public class MarkdownWidgetTest {
 		//verify highlight code blocks never called (part of parsing)
 		verify(mockSynapseJSNIUtils, never()).highlightCodeBlocks();
 
+	}
+	
+	@Test
+	public void testMarkdownIt2HtmlError() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		String errorMessage = "a js exception";
+		when(mockJsException.getMessage()).thenReturn(errorMessage);
+		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenThrow(mockJsException);
+		
+		String markdown="input markdown that is transformed";
+		presenter.configure(markdown, mockWikiPageKey, 1L);
+		
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
+		verify(mockSynAlert).showError(errorMessage);
 	}
 	
 	
