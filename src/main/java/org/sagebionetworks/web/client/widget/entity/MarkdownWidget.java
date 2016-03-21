@@ -108,7 +108,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				@Override
 				public void invoke() {
 					try {
-						//save in cache
 						String result = markdownIt.markdown2Html(md, uniqueSuffix);
 						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
 						loadHtml(uniqueSuffix, result);
