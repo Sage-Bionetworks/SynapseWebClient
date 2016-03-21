@@ -107,10 +107,14 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			view.callbackWhenAttached(new Callback() {
 				@Override
 				public void invoke() {
-					//save in cache
-					String result = markdownIt.markdown2Html(md, uniqueSuffix);
-					sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
-					loadHtml(uniqueSuffix, result);
+					try {
+						//save in cache
+						String result = markdownIt.markdown2Html(md, uniqueSuffix);
+						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+						loadHtml(uniqueSuffix, result);
+					} catch (RuntimeException e) { //JavaScriptException
+						synAlert.showError(e.getMessage());
+					}
 				}
 			});
 		} else {
