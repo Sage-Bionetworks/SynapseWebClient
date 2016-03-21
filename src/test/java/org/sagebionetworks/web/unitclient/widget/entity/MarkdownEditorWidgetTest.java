@@ -63,7 +63,6 @@ public class MarkdownEditorWidgetTest {
 	WikiPage testPage;
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
-	int EDITOR_BOTTOM_MARGIN, MIN_EDITOR_HEIGHT;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -78,8 +77,6 @@ public class MarkdownEditorWidgetTest {
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockMarkdownWidget = mock(MarkdownWidget.class);
 		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockMarkdownWidget);
-		MIN_EDITOR_HEIGHT = presenter.MIN_EDITOR_HEIGHT;
-		EDITOR_BOTTOM_MARGIN = presenter.EDITOR_BOTTOM_MARGIN;
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		initialMarkdown = "Hello Markdown";
 		presenter.configure(initialMarkdown);
@@ -177,47 +174,24 @@ public class MarkdownEditorWidgetTest {
 	}
 	
 	@Test
-	public void testResizeMarkdownEmpty() {
+	public void testResizeMarkdown() {
 		String markdown = "";
-		String minSize = (MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px";
-		when(mockView.getMarkdown()).thenReturn(markdown);
-		when(mockView.getScrollHeight(anyString())).thenReturn(0);
+		
+		when(mockView.getClientHeight()).thenReturn(0);
 		presenter.resizeMarkdownTextArea();
-		verify(mockView).setMarkdownHeight(minSize);
-		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT / 2);
+		verify(mockView).setMarkdownTextAreaHeight(MarkdownEditorWidget.MIN_TEXTAREA_HEIGHT);
+		
+		reset(mockView);
+		when(mockView.getClientHeight()).thenReturn(MarkdownEditorWidget.MIN_TEXTAREA_HEIGHT);
 		presenter.resizeMarkdownTextArea();
-		verify(mockView, Mockito.times(2)).setMarkdownHeight(minSize);
-		//should resize after minEditorLines line threshold
-		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 2);
+		verify(mockView).setMarkdownTextAreaHeight(MarkdownEditorWidget.MIN_TEXTAREA_HEIGHT);
+		
+		reset(mockView);
+		when(mockView.getClientHeight()).thenReturn(1000);
 		presenter.resizeMarkdownTextArea();
-		verify(mockView).setMarkdownHeight((MIN_EDITOR_HEIGHT * 2 + EDITOR_BOTTOM_MARGIN) + "px");
+		verify(mockView).setMarkdownTextAreaHeight(1000-MarkdownEditorWidget.OTHER_EDITOR_COMPONENTS_HEIGHT);
 	}
 		
-	@Test
-	public void testResizeMarkdownOnDelete() {
-		String minSize = (MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px";
-		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 50);
-		presenter.resizeMarkdownTextArea();
-		verify(mockView).setMarkdownHeight((50*MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px");
-		
-		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 25);
-		presenter.resizeMarkdownTextArea();
-		verify(mockView).setMarkdownHeight((25*MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px");
-		
-		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT / 2);
-		presenter.resizeMarkdownTextArea();
-		verify(mockView).setMarkdownHeight(minSize);
-
-	}
-	
-	public String getMultilineText(int numLines) {
-		String text = "";
-		for (int i = 0; i < numLines; i++) {
-			text += String.valueOf(i) + "\n";
-		}
-		return text;
-	}
-	
 	@Test
 	public void testInsertMarkdownMiddle() {
 		String markdown = "1 2  5";

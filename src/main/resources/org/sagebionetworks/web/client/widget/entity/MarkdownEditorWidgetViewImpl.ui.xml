@@ -105,7 +105,6 @@
 	    </bh:Div>
 	    <bh:Div>
 	        <b:TextArea ui:field="markdownTextArea" addStyleNames="hide-resize"/>
-	        <g:TextArea ui:field="resizingTextArea" addStyleNames="hide-resize padding-0 border-none" enabled="false" width="100%" height="0px"/>
 	    </bh:Div>
 		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>

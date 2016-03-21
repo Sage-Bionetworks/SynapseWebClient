@@ -24,6 +24,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,8 +38,8 @@ import com.google.inject.Inject;
 public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter, SynapseWidgetPresenter {
 	
 	// units are px
-	public final int MIN_EDITOR_HEIGHT = 160;
-	public final int EDITOR_BOTTOM_MARGIN = 40;
+	public static final int MIN_TEXTAREA_HEIGHT = 100;
+	public static final int OTHER_EDITOR_COMPONENTS_HEIGHT = 270;
 	
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -126,10 +127,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	public void resizeMarkdownTextArea() {
-		long height = view.getScrollHeight(view.getMarkdown());
-		if (height < MIN_EDITOR_HEIGHT)
-			height = MIN_EDITOR_HEIGHT;
-		view.setMarkdownHeight((height + EDITOR_BOTTOM_MARGIN) + "px");
+		int newHeight = view.getClientHeight() - OTHER_EDITOR_COMPONENTS_HEIGHT;
+		newHeight = newHeight > MIN_TEXTAREA_HEIGHT ? newHeight : MIN_TEXTAREA_HEIGHT;
+		view.setMarkdownTextAreaHeight(newHeight);
 	}
 	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {

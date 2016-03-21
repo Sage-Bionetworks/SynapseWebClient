@@ -36,8 +36,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@UiField
 	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
-	@UiField 
-	public com.google.gwt.user.client.ui.TextArea resizingTextArea;
 	
 	@UiField
 	public SimplePanel formattingGuideContainer;
@@ -347,11 +345,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void setMarkdownHeight(String height) {
-		markdownTextArea.setHeight(height);
-	}
-	
-	@Override
 	public int getSelectionLength() {
 		return markdownTextArea.getSelectionLength();
 	}
@@ -362,12 +355,15 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public int getScrollHeight(String text) {
-		resizingTextArea.setText("");
-		resizingTextArea.setText(text);
-		return resizingTextArea.getElement().getScrollHeight();
+	public int getClientHeight() {
+		return Window.getClientHeight();
+	};
+	
+	@Override
+	public void setMarkdownTextAreaHeight(int heightPx) {
+		markdownTextArea.setHeight(heightPx + "px");
 	}
-
+	
 	@Override
 	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
 		formattingGuideContainer.setWidget(formattingGuideWidget);

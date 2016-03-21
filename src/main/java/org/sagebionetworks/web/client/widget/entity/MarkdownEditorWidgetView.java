@@ -27,6 +27,8 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	public void setAttachmentCommandsVisible(boolean visible);
 	void setAlphaCommandsVisible(boolean visible);
 	boolean isEditorAttachedAndVisible();
+	int getClientHeight();
+	void setMarkdownTextAreaHeight(int heightPx);
 	/**
 	 * Presenter interface
 	 */
@@ -40,10 +42,6 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void addTextAreaClickHandler(ClickHandler clickHandler);
 
 	void confirm(String string, ConfirmCallback confirmCallback);
-
-	int getScrollHeight(String text);
-
-	void setMarkdownHeight(String string);
 
 	void setFormattingGuideWidget(Widget formattingGuideWidget);
 
