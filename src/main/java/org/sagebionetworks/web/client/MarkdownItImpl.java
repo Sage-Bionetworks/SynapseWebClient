@@ -474,6 +474,12 @@ public class MarkdownItImpl implements MarkdownIt {
 			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 			$wnd.md.inline.ruler.at('emphasis', emphasis);
+			
+			// SWC-2956: list rule can now also be terminated by a table.
+			// Get the list rule, define the rules (name) list of the rules that can terminate, then replace. 
+			var listRule = $wnd.md.block.ruler.getRules('list')[0];
+			var rulesCanBeTerminated = [ 'paragraph', 'reference', 'blockquote', 'table' ];
+			$wnd.md.block.ruler.at('list', listRule, { alt: (rulesCanBeTerminated).slice() });
 		}
 
 		if (!$wnd.md) {
