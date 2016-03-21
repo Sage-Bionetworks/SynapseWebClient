@@ -1,16 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +26,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -41,6 +38,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -49,6 +47,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -82,9 +81,12 @@ public class EntityPresenterTest {
 	
 	String rootWikiId = "12333";
 	FileHandleResults rootWikiAttachments;
+	GWTWrapper gwtWrapper;
+	
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(EntityView.class);
+		gwtWrapper = mock(GWTWrapper.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -98,7 +100,7 @@ public class EntityPresenterTest {
 		mockEntityPageTop = mock(EntityPageTop.class);
 		mockFooterWidget = mock(Footer.class);
 		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
-				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
+				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget, gwtWrapper);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -222,6 +224,22 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
+	public void testInvalidEntityIdInPlace() {
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
+		String entityId = "syn";
+		Synapse place = new Synapse(entityId, null, area, areaToken);
+		entityPresenter.setPlace(place);
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(gwtWrapper).scheduleDeferred(captor.capture());
+		//invoke callback
+		captor.getValue().invoke();
+		
+		verify(mockSynAlert).show404();
+		//header should be reconfigured to set back to Synapse
+		verify(mockHeaderWidget).configure(false);
+	}
+	
+	@Test
 	public void testClear() {
 		entityPresenter.clear();
 		verify(mockView, times(2)).clear();
@@ -275,5 +293,15 @@ public class EntityPresenterTest {
 		captor.getValue().onPersistSuccess(null);
 		
 		verify(mockGlobalApplicationState).refreshPage();
+	}
+	
+	@Test
+	public void testIsValidEntityId() {
+		assertFalse(entityPresenter.isValidEntityId(""));
+		assertFalse(entityPresenter.isValidEntityId(null));
+		assertFalse(entityPresenter.isValidEntityId("syn"));
+		assertFalse(entityPresenter.isValidEntityId("sy"));
+		assertFalse(entityPresenter.isValidEntityId("synFOOBAR"));
+		assertTrue(entityPresenter.isValidEntityId("SyN198327"));
 	}
 }
