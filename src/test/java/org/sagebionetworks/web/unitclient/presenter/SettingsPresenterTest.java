@@ -31,6 +31,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -349,6 +350,16 @@ public class SettingsPresenterTest {
 		verify(mockSynAlert, times(5)).clear();
 		verify(mockView).clear();
 		verify(mockView).asWidget();
+		//TODO: remove "never()" once subscription list is out of alpha
+		verify(mockSubscriptionListWidget, never()).configure();
+		verify(mockView).setSubscriptionsVisible(false);
+	}
+	
+	@Test
+	public void testConfigureSubscriptionListInAlpha() {
+		when(mockCookieProvider.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		profilePresenter.asWidget();
+		verify(mockView).setSubscriptionsVisible(true);
 		verify(mockSubscriptionListWidget).configure();
 	}
 	

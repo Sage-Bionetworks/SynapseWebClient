@@ -85,14 +85,15 @@ public class TopicWidgetTest {
 	
 	@Test
 	public void testConfigureDiscussionThreadFailure() {
-		Exception ex = new Exception("error");
+		String errorMessage = "error";
+		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, TEST_OBJECT_ID);
 		verify(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
+		verify(mockSynAlert).showError(errorMessage);
 	}
 
 	@Test
@@ -111,12 +112,13 @@ public class TopicWidgetTest {
 
 	@Test
 	public void testConfigureForumFailure() {
-		Exception ex = new Exception("error");
+		String errorMessage = "error";
+		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockForumClient)
 			.getForumProject(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.FORUM, TEST_OBJECT_ID);
-		verify(mockSynAlert).handleException(ex);
+		verify(mockSynAlert).showError(errorMessage);
 	}
 
 	@Test
