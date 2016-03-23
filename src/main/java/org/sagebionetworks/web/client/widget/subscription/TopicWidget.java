@@ -61,7 +61,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				synAlert.showError(caught.getMessage());
 			}
 		});
 	}
@@ -71,7 +71,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 		forumClient.getForumProject(forumId, new AsyncCallback<Project>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				synAlert.showError(caught.getMessage());
 			}
 			public void onSuccess(Project result) {
 				view.setTopicText(result.getName());
