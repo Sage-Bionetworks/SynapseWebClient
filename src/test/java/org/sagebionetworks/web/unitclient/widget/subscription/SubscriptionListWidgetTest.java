@@ -21,11 +21,13 @@ import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.springframework.mock.web.MockPageContext;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,11 +50,13 @@ public class SubscriptionListWidgetTest {
 	SubscriptionPagedResults mockSubscriptionPagedResults;
 	@Mock
 	TopicRowWidget mockTopicRowWidget;
+	@Mock
+	DetailedPaginationWidget mockDetailedPaginationWidget;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController);
+		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget);
 		AsyncMockStubber.callSuccessWith(mockSubscriptionPagedResults).when(mockSubscriptionClient)
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -63,6 +67,7 @@ public class SubscriptionListWidgetTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSynAlert(any(Widget.class));
+		verify(mockView).setPagination(any(Widget.class));
 	}
 
 	@Test
@@ -71,7 +76,6 @@ public class SubscriptionListWidgetTest {
 		widget.configure();
 		verify(mockView).clearFilter();
 		verify(mockView).clearSubscriptions();
-		verify(mockView).setNoItemsMessageVisible(true);
 		verify(mockSubscriptionClient, never())
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(AsyncCallback.class));
 	}
@@ -80,23 +84,26 @@ public class SubscriptionListWidgetTest {
 	public void testConfigure() {
 		//simulate returning a full result, and then less than a full page result.
 		Long expectedOffset = 0L;
-		SubscriptionObjectType expectedFilter = null;
+		Long expectedTotalCount = SubscriptionListWidget.LIMIT*2;
+		//default FORUM type
+		SubscriptionObjectType expectedFilter = SubscriptionObjectType.FORUM;
 		List<Subscription> results = new ArrayList<Subscription>();
 		for (int i = 0; i < SubscriptionListWidget.LIMIT; i++) {
 			results.add(new Subscription());
 		}
 		when(mockSubscriptionPagedResults.getResults()).thenReturn(results);
+		when(mockSubscriptionPagedResults.getTotalNumberOfResults()).thenReturn(expectedTotalCount);
 		widget.configure();
 		verify(mockView).clearFilter();
-		verify(mockView).clearSubscriptions();
-		verify(mockView).setNoItemsMessageVisible(true);
+		verify(mockView, times(2)).clearSubscriptions();
+		verify(mockView, times(2)).setNoItemsMessageVisible(false);
+		verify(mockView).setLoadingVisible(true);
 		verify(mockSubscriptionClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 		
-		//full result set.  show more button, and create a TopicRowWidget for each subscription
-		verify(mockView).setNoItemsMessageVisible(false);
-		verify(mockView).setMoreButtonVisible(true);
+		//full result set.  create a TopicRowWidget for each subscription
+		verify(mockDetailedPaginationWidget).configure(SubscriptionListWidget.LIMIT, expectedOffset, expectedTotalCount, widget);
 		verify(mockTopicRowWidget, times(SubscriptionListWidget.LIMIT.intValue())).configure(any(Subscription.class));
 		verify(mockView, times(SubscriptionListWidget.LIMIT.intValue())).addNewSubscription(any(Widget.class));
 		
@@ -105,11 +112,11 @@ public class SubscriptionListWidgetTest {
 		results.clear();
 		reset(mockView);
 		reset(mockTopicRowWidget);
-		widget.onMore();
+		//simulate the pagination widget going to the second page
+		widget.onPageChange(expectedOffset);
 		verify(mockSubscriptionClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), any(AsyncCallback.class));
 	
-		verify(mockView).setMoreButtonVisible(false);
 		verify(mockTopicRowWidget, never()).configure(any(Subscription.class));
 		verify(mockView, never()).addNewSubscription(any(Widget.class));
 	}
@@ -118,18 +125,20 @@ public class SubscriptionListWidgetTest {
 	public void testOnFilter() {
 		//simulate returning a full result, and then less than a full page result.
 		Long expectedOffset = 0L;
-		SubscriptionObjectType expectedFilter = SubscriptionObjectType.FORUM;
+		Long expectedTotalCount = 0L;
+		SubscriptionObjectType expectedFilter = null;
 		when(mockSubscriptionPagedResults.getResults()).thenReturn(new ArrayList<Subscription>());
+		when(mockSubscriptionPagedResults.getTotalNumberOfResults()).thenReturn(expectedTotalCount);
 		widget.onFilter(expectedFilter);
 		verify(mockView).clearSubscriptions();
+		verify(mockView).setNoItemsMessageVisible(false);
 		verify(mockView).setNoItemsMessageVisible(true);
 		verify(mockSubscriptionClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 		
-		//empty set, should never hide the message
-		verify(mockView, never()).setNoItemsMessageVisible(false);
-		verify(mockView).setMoreButtonVisible(false);
+		//empty set
+		verify(mockDetailedPaginationWidget).configure(SubscriptionListWidget.LIMIT, expectedOffset, expectedTotalCount, widget);
 		verify(mockTopicRowWidget, never()).configure(any(Subscription.class));
 		verify(mockView, never()).addNewSubscription(any(Widget.class));
 	}

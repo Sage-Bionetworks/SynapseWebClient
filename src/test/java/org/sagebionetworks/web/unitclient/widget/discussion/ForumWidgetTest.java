@@ -5,9 +5,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
+import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -84,6 +86,17 @@ public class ForumWidgetTest {
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setSingleThread(any(Widget.class));
 		verify(mockView).setSubscribeButton(any(Widget.class));
+		
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockSubscribeButtonWidget).setOnSubscribeCallback(captor.capture());
+		Callback onSubscribeCallback = captor.getValue();
+		verify(mockSubscribeButtonWidget).setOnUnsubscribeCallback(captor.capture());
+		Callback onUnsubscribeCallback = captor.getValue();
+		
+		assertTrue(onSubscribeCallback.equals(onUnsubscribeCallback));
+		//invoke callback to verify thread list is reconfigured
+		onSubscribeCallback.invoke();
+		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), any(CallbackP.class));
 	}
 
 	@SuppressWarnings("unchecked")

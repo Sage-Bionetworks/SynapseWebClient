@@ -366,9 +366,6 @@ public interface PortalGinInjector extends Ginjector {
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();
 
-	public BasicPaginationWidget createBasicPaginationWidget();
-
-
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 
 	public SortableTableHeader createSortableTableHeader();

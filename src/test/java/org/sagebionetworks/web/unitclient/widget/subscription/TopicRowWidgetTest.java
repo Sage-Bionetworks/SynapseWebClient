@@ -60,7 +60,6 @@ public class TopicRowWidgetTest {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockView).setTopicWidget(any(Widget.class));
-		verify(mockTopicWidget).addStyleNames(anyString());
 		verify(mockSubscribeButtonWidget).setButtonSize(ButtonSize.EXTRA_SMALL);
 	}
 

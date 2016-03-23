@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -32,6 +33,8 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	Subscription currentSubscription;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
+	Callback onSubscribeCallback, onUnsubscribeCallback;
+	
 	boolean iconOnly;
 	@Inject
 	public SubscribeButtonWidget(SubscribeButtonWidgetView view, 
@@ -48,6 +51,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
+	
 	
 	public SubscribeButtonWidget showIconOnly() {
 		iconOnly = true;
@@ -72,6 +76,14 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		} else {
 			view.showUnfollowButton();
 		}
+	}
+	
+	public void setOnSubscribeCallback(Callback c) {
+		onSubscribeCallback = c;
+	}
+	
+	public void setOnUnsubscribeCallback(Callback c) {
+		onUnsubscribeCallback = c;
 	}
 
 	
@@ -149,6 +161,9 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 					//success
 					currentSubscription = result;
 					showUnfollowButton();
+					if (onSubscribeCallback != null) {
+						onSubscribeCallback.invoke();
+					}
 				}
 			});
 		}
@@ -167,6 +182,9 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 			public void onSuccess(Void result) {
 				currentSubscription = null;
 				showFollowButton();
+				if (onUnsubscribeCallback != null) {
+					onUnsubscribeCallback.invoke();
+				}
 			}
 		});
 	}

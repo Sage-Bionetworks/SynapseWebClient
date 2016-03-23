@@ -77,11 +77,10 @@
 								</b:Row>
 							</bh:Div>
 						</bh:Div>
-					</bh:Div>
+					</bh:Div>	
 			    </b:Column>
 			</b:Row>
 			<bh:Div ui:field="subscriptionsContainer" addStyleNames="highlight-box margin-bottom-20"/>
-			
 			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API

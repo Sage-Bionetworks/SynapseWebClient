@@ -82,6 +82,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				view.setThreadHeaderVisible(param);
 			}
 		};
+		Callback refreshThreadsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshThreads();
+			}
+		};
+		subscribeToForumButton.setOnSubscribeCallback(refreshThreadsCallback);
+		subscribeToForumButton.setOnUnsubscribeCallback(refreshThreadsCallback);
 	}
 
 	public void configure(String entityId, ParameterizedToken params,
@@ -182,9 +190,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		}
 	}
 
+	private void refreshThreads() {
+		threadListWidget.configure(forumId, view.getModeratorMode(), emptyListCallback);
+	}
+	
 	@Override
 	public void onModeratorModeChange() {
-		threadListWidget.configure(forumId, view.getModeratorMode(), emptyListCallback);
+		refreshThreads();
 		newThreadModal.configure(forumId, new Callback(){
 			@Override
 			public void invoke() {
