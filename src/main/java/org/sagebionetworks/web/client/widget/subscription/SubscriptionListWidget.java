@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +39,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		this.subscribeClient = subscribeClient;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
+		this.paginationWidget = paginationWidget;
 		
 		view.setSynAlert(synAlert.asWidget());
 		view.setPagination(paginationWidget.asWidget());
@@ -45,7 +47,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	}
 	
 	public void configure() {
-		filter = null;
+		filter = SubscriptionObjectType.FORUM;
 		view.clearFilter();
 		view.clearSubscriptions();
 		if (authController.isLoggedIn()) {

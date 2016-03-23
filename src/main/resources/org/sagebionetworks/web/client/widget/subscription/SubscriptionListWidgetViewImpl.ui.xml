@@ -6,10 +6,6 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div>
-		<bh:Span ui:field="loadingUI" visible="false">
-			<g:Image resource='{sageImageBundle.loading31}' />
-			<bh:Text>&nbsp;Loading...</bh:Text>
-		</bh:Span>
 		<bh:Div addStyleNames="light-border-bottom">
 			<b:ButtonGroup dataToggle="BUTTONS">
 				<b:RadioButton name="filters" ui:field="projectFilter">Projects</b:RadioButton>
@@ -17,6 +13,10 @@
 				<b:RadioButton name="filters" ui:field="noFilter">All</b:RadioButton>
 			</b:ButtonGroup>
 		</bh:Div>
+		<bh:Span ui:field="loadingUI" visible="false">
+			<g:Image resource='{sageImageBundle.loading16}' />
+			<bh:Text>&nbsp;Loading...</bh:Text>
+		</bh:Span>
 		<bh:Div ui:field="synAlertContainer"/>
 		<g:SimplePanel ui:field="emptyUI" addStyleNames="smallGreyText padding-15" visible="false">
 			<bh:Text>- No items found</bh:Text>

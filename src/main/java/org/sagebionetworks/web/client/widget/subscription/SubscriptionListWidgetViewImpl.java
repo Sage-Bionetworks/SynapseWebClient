@@ -86,8 +86,8 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	};
 	@Override
 	public void clearFilter() {
-		noFilter.setValue(true, false);
-		noFilter.setActive(true);
+		projectFilter.setValue(true, false);
+		projectFilter.setActive(true);
 	}
 	
 	@Override
