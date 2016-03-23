@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SubscriptionView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -50,6 +51,11 @@ public class SubscribeButtonWidgetTest {
 	@Mock
 	SubscriptionPagedResults mockSubscriptionPagedResults;
 	
+	@Mock
+	Callback mockSubscribeCallback;
+	@Mock
+	Callback mockUnsubscribeCallback;
+	
 	SubscribeButtonWidget widget;
 	@Mock
 	Subscription mockSubscription;
@@ -72,6 +78,8 @@ public class SubscribeButtonWidgetTest {
 		//by default, return a single Subscription
 		when(mockSubscriptionPagedResults.getTotalNumberOfResults()).thenReturn(1L);
 		when(mockSubscriptionPagedResults.getResults()).thenReturn(Collections.singletonList(mockSubscription));
+		widget.setOnSubscribeCallback(mockSubscribeCallback);
+		widget.setOnUnsubscribeCallback(mockUnsubscribeCallback);
 	}
 
 	@Test
@@ -166,6 +174,7 @@ public class SubscribeButtonWidgetTest {
 			.subscribe(any(Topic.class), any(AsyncCallback.class));
 		assertEquals(mockSubscription, widget.getCurrentSubscription());
 		verify(mockView).showUnfollowButton();
+		verify(mockSubscribeCallback).invoke();
 	}
 	
 	@Test
@@ -180,6 +189,7 @@ public class SubscribeButtonWidgetTest {
 		assertNull(widget.getCurrentSubscription());
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).hideLoading();
+		verify(mockSubscribeCallback, never()).invoke();
 	}
 	
 	
@@ -195,6 +205,7 @@ public class SubscribeButtonWidgetTest {
 			.unsubscribe(anyLong(), any(AsyncCallback.class));
 		assertNull(widget.getCurrentSubscription());
 		verify(mockView).showFollowButton();
+		verify(mockUnsubscribeCallback).invoke();
 	}
 	
 	@Test
@@ -210,6 +221,7 @@ public class SubscribeButtonWidgetTest {
 		assertEquals(mockSubscription, widget.getCurrentSubscription());
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).hideLoading();
+		verify(mockUnsubscribeCallback, never()).invoke();
 	}
 	
 	@Test
