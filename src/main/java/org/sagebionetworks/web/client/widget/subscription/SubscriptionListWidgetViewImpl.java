@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
@@ -17,9 +17,6 @@ import com.google.inject.Inject;
 public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetView{
 
 	@UiField
-	Button moreButton;
-	
-	@UiField
 	RadioButton noFilter;
 	@UiField
 	RadioButton projectFilter;
@@ -31,6 +28,10 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	@UiField
 	SimplePanel emptyUI;
 	@UiField
+	Div paginationWidgetContainer;
+	@UiField
+	Span loadingUI;
+	@UiField
 	Table subscriptionsContainer;
 	public interface Binder extends UiBinder<Widget, SubscriptionListWidgetViewImpl> {
 	}
@@ -41,12 +42,6 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	@Inject
 	public SubscriptionListWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-		moreButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onMore();
-			}
-		});
 		noFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -94,12 +89,18 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 		noFilter.setValue(true, false);
 		noFilter.setActive(true);
 	}
-	public void setMoreButtonVisible(boolean visible) {
-		moreButton.setVisible(visible);
-	};
 	
 	@Override
 	public void setNoItemsMessageVisible(boolean visible) {
 		emptyUI.setVisible(visible);
+	}
+	@Override
+	public void setPagination(Widget w) {
+		paginationWidgetContainer.clear();
+		paginationWidgetContainer.add(w);
+	}
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
 }
