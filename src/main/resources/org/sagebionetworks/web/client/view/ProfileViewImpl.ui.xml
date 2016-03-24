@@ -60,13 +60,13 @@
 										<bh:Paragraph>
 											<bh:OrderedList>
 												<b:ListItem>
-													<b:Anchor ui:field="reviewProfileLink" text="Review/Complete your profile."/>
+													<b:Anchor ui:field="reviewProfileLink" text="Review and complete your profile."/>
 												</b:ListItem>
 												<b:ListItem>
-													<b:Anchor ui:field="createOrcIdLink" text="Create an ORCID or link to your existing one."/>
+													<b:Anchor ui:field="createOrcIdLink" text="Create/populate a public ORCID profile or link to your existing one."/>
 												</b:ListItem>
 												<b:ListItem>
-													<b:Anchor ui:field="requestProfileValidationLink2" text="Request Profile validation."/>
+													<b:Anchor ui:field="requestProfileValidationLink2" text="Request profile validation."/>
 												</b:ListItem>
 											</bh:OrderedList>
 										</bh:Paragraph>
