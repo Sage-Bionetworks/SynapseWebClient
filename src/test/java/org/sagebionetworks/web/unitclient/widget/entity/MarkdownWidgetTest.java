@@ -103,7 +103,7 @@ public class MarkdownWidgetTest {
 	public void testConfigureSuccess() {
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 		
-		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		//only the first getElementById called by each getElementById finds its target so it doesn't look forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
 		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0"))).thenReturn(mockElementWrapper);
@@ -113,7 +113,7 @@ public class MarkdownWidgetTest {
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
-		verify(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
 		verify(mockView).setMarkdown(sampleHTML);
 		verify(mockSessionStorage).setItem(anyString(), anyString());
 		
@@ -137,18 +137,10 @@ public class MarkdownWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureFailure() {
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		presenter.configure(testMarkdown, mockWikiPageKey, null);
-		
-		verify(mockSynAlert).handleException(caught);
-	}
-	
-	@Test
 	public void testLoadMarkdownFromWikiPageSuccess() {
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 		AsyncMockStubber.callSuccessWith(mockWikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		//only the first getElementById called by each getElementById finds its target so it doesn't look forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
 		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0"))).thenReturn(mockElementWrapper);
@@ -161,7 +153,7 @@ public class MarkdownWidgetTest {
 		callbackCaptor.getValue().invoke();
 		verify(mockWikiPageKey).setWikiPageId(anyString());
 		
-		verify(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
 		verify(mockView, Mockito.times(2)).setEmptyVisible(false);
 		verify(mockView).clearMarkdown();
 		verify(mockView).setMarkdown(sampleHTML);
@@ -179,24 +171,6 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), anyMap(), any(Callback.class), any(Long.class));
 		verify(mockView).addWidget(any(Widget.class), Mockito.contains(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"));
-	}
-	
-
-	@Test
-	public void testLoadMarkdownFromWikiEmpty() {
-		String sampleHTML = "";
-		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		String markdown="input markdown that is transformed into empty html";
-		presenter.configure(markdown, mockWikiPageKey, 1L);
-		
-		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
-		callbackCaptor.getValue().invoke();
-		
-		verify(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).setEmptyVisible(false);
-		verify(mockView).setEmptyVisible(true);
-		verify(mockView).clearMarkdown();
 	}
 	
 	@Test
@@ -257,7 +231,7 @@ public class MarkdownWidgetTest {
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
-		verify(mockSynapseClient, never()).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockMarkdownIt, never()).markdown2Html(anyString(), anyString());
 		verify(mockSessionStorage, never()).setItem(anyString(), anyString());
 		verify(mockView).setMarkdown(sampleHTML);
 		

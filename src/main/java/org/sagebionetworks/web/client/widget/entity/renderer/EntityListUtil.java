@@ -84,46 +84,6 @@ public class EntityListUtil {
 		}
 	}
 	
-	/**
-	 * Gets a plain text description from the wiki associated with the Entity of the given
-	 * bundle. Creates a record display with that description.
-	 * 
-	 * Note: access modifier public for unit test
-	 */
-	public static void createDisplayWithWikiDescription(
-			final SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
-			final boolean isLoggedIn, final RowLoadedHandler handler,
-			final EntityBundle bundle, final EntityGroupRecord record,
-			final Reference ref) {
-		String entityId = bundle.getEntity().getId();
-		String objectType = ObjectType.ENTITY.toString();
-		WikiPageKey key = new WikiPageKey(entityId, objectType, null);
-		
-		synapseClient.getPlainTextWikiPage(key, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String resultDesc) {
-				try {
-					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record, synapseJSNIUtils, resultDesc));
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (caught instanceof NotFoundException) {
-					// No wiki found. Put in blank description.
-					try {
-						handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record, synapseJSNIUtils, ""));
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				} else {
-					createFailureDisplay(caught, ref, handler);
-				}
-			}
-		});
-	}
-
 	public static String recordsToString(List<EntityGroupRecord> records) {		
 		// add record to descriptor
 		String recordStr = "";
