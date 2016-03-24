@@ -52,7 +52,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		authenticationController.loginUser(username, password, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
-				view.clear();
+				clear();
 				try {
 					fireUserChange(userSessionData);
 				} catch (Exception ex) {
@@ -77,6 +77,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	
 	public void clear() {
 		view.clear();
+		view.clearUsername();
 	}
 
 	// needed?
