@@ -102,6 +102,8 @@ public class MarkdownItImpl implements MarkdownIt {
 		}
 
 		function initLinkify() {
+			$wnd.md.linkify.set({ fuzzyLink: false });
+			
 			$wnd.md.linkify.add('@', {
 				validate : function(text, pos, self) {
 					var tail = text.slice(pos);
