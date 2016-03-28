@@ -178,8 +178,31 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.doiRE) {
 				$wnd.md.utils.doiRE = new RegExp('^doi:10[.]{1}[0-9]+[/]{1}[a-zA-Z0-9_.]+$');
 			}
+			if (!$wnd.md.utils.ulMarkerRE) {
+				$wnd.md.utils.ulMarkerRE = new RegExp("^\\s*[*-+]{1}.*$");
+			}
+			if (!$wnd.md.utils.olMarkerRE) {
+				$wnd.md.utils.olMarkerRE = new RegExp("^\\s*\\d+\\s*[.)]{1}.*$");
+			}
 		}
-
+		
+		function preprocessMarkdown(md) {
+			// add an extra newline after anything that looks like a list
+			var splitMD = md.split('\n');
+			md = '';
+			var isPreviousLineInList = false;
+			var isCurrentLineInList = false;
+			for(var i = 0; i < splitMD.length; i++) {
+				isCurrentLineInList = $wnd.md.utils.ulMarkerRE.test(splitMD[i]) || $wnd.md.utils.olMarkerRE.test(splitMD[i]);
+				if (isPreviousLineInList && !isCurrentLineInList) {
+					md += '\n';
+				}
+				md += splitMD[i] + '\n';
+				isPreviousLineInList = isCurrentLineInList;
+			}
+			return md;
+		}
+		
 		function link(state, silent) {
 			var attrs, code, label, labelEnd, labelStart, pos, res, ref, title, token, href = '', oldPos = state.pos, max = state.posMax, start = state.pos, parseLinkLabel = $wnd.md.helpers.parseLinkLabel, parseLinkDestination = $wnd.md.helpers.parseLinkDestination, parseLinkTitle = $wnd.md.helpers.parseLinkTitle, isSpace = $wnd.md.utils.isSpace, normalizeReference = $wnd.md.utils.normalizeReference;
 
@@ -484,7 +507,7 @@ public class MarkdownItImpl implements MarkdownIt {
 		// load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
 		$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix).use(
 				$wnd.markdownitMath, uniqueSuffix);
-		var results = $wnd.md.render(md);
+		var results = $wnd.md.render(preprocessMarkdown(md));
 		// Were footnotes found (and exported)?  If so, run the processor on the footnotes, and append to the results.
 		var footnotes = $wnd.markdownitSynapse.footnotes();
 		if(footnotes.length !== 0) {
