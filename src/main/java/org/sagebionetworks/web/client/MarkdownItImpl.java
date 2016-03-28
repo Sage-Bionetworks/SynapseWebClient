@@ -126,13 +126,14 @@ public class MarkdownItImpl implements MarkdownIt {
 					match.url = '#!Profile:' + match.url.replace(/^@/, '');
 				}
 			});
-
+			
+			//synapse (may have version or wiki page id)
 			$wnd.md.linkify.add('syn', {
 				validate : function(text, pos, self) {
 					var tail = text.slice(pos);
 					if (!self.re.synapse) {
 						self.re.synapse = new RegExp(
-								'^([0-9]+[.]?[0-9]*)+(?!_)(?=$|'
+								'^([0-9]+[.]?[0-9]*(\\/wiki\\/[0-9]+)?)+(?!_)(?=$|'
 										+ self.re.src_ZPCc + ')');
 					}
 					if (self.re.synapse.test(tail)) {
