@@ -17,8 +17,6 @@ import com.google.inject.Inject;
 public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetView{
 
 	@UiField
-	RadioButton noFilter;
-	@UiField
 	RadioButton projectFilter;
 	@UiField
 	RadioButton threadFilter;
@@ -42,12 +40,6 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	@Inject
 	public SubscriptionListWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-		noFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFilter(null);
-			}
-		});
 		projectFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -57,7 +49,7 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 		threadFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onFilter(SubscriptionObjectType.DISCUSSION_THREAD);
+				presenter.onFilter(SubscriptionObjectType.THREAD);
 			}
 		});
 	}

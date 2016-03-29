@@ -230,7 +230,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		synAlert.clear();
 		markdownWidget.clear();
 		view.setLoadingMessageVisible(true);
-		subscribeButtonWidget.configure(SubscriptionObjectType.DISCUSSION_THREAD, threadId);
+		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId);
 		discussionForumClientAsync.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
 			@Override
