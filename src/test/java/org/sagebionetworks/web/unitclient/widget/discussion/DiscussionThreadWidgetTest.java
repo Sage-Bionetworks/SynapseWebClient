@@ -508,7 +508,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
-		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.DISCUSSION_THREAD, threadId);
+		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.THREAD, threadId);
 	}
 
 	@SuppressWarnings("unchecked")
