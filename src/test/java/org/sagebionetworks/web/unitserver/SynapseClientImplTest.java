@@ -166,6 +166,8 @@ import com.google.common.cache.Cache;
  * 
  */
 public class SynapseClientImplTest {
+	private static final String BANNER_2 = "Another Banner";
+	private static final String BANNER_1 = "Banner 1";
 	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
 	
@@ -2008,18 +2010,23 @@ public class SynapseClientImplTest {
 		List<StorageLocationSetting> existingStorageLocations = new ArrayList<StorageLocationSetting>();
 		StorageLocationSetting storageLocation = new ExternalS3StorageLocationSetting();
 		storageLocation.setStorageLocationId(1L);
-		storageLocation.setBanner("Banner 1");
+		storageLocation.setBanner(BANNER_1);
 		existingStorageLocations.add(storageLocation);
 		
 		storageLocation = new ExternalStorageLocationSetting();
 		storageLocation.setStorageLocationId(2L);
-		storageLocation.setBanner("Another Banner");
+		storageLocation.setBanner(BANNER_2);
 		((ExternalStorageLocationSetting)storageLocation).setUrl("sftp://www.jayhodgson.com");
 		existingStorageLocations.add(storageLocation);
 		
 		storageLocation = new ExternalStorageLocationSetting();
 		storageLocation.setStorageLocationId(3L);
-		storageLocation.setBanner("Banner 1");
+		storageLocation.setBanner(BANNER_1);
+		existingStorageLocations.add(storageLocation);
+		
+		storageLocation = new ExternalStorageLocationSetting();
+		storageLocation.setStorageLocationId(4L);
+		storageLocation.setBanner(null);
 		existingStorageLocations.add(storageLocation);
 		
 		when(mockSynapse.getMyStorageLocationSettings()).thenReturn(existingStorageLocations);
@@ -2032,8 +2039,8 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getMyStorageLocationSettings();
 		//should be 2 (only returns unique values)
 		assertEquals(2, banners.size());
-		//and alphabetically sorted
-		assertEquals(Arrays.asList("Another Banner", "Banner 1"), banners);
+		assertTrue(banners.contains(BANNER_1));
+		assertTrue(banners.contains(BANNER_2));
 	}
 	
 	@Test(expected = Exception.class)
@@ -2082,7 +2089,7 @@ public class SynapseClientImplTest {
 		
 		//test the case when it finds a duplicate storage location.
 		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-		setting.setBanner("Another Banner");
+		setting.setBanner(BANNER_2);
 		setting.setUrl("sftp://www.jayhodgson.com");
 		
 		synapseClient.createStorageLocationSetting(entityId, setting);
@@ -2104,7 +2111,7 @@ public class SynapseClientImplTest {
 		
 		//test the case when it does not find duplicate storage location setting.
 		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-		setting.setBanner("Another Banner");
+		setting.setBanner(BANNER_2);
 		setting.setUrl("sftp://www.google.com");
 		
 		Long newStorageLocationId = 1007L;
