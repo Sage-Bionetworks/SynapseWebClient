@@ -175,6 +175,7 @@ import com.google.gwt.core.server.StackTraceDeobfuscator;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
+	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
@@ -3070,7 +3071,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException{
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getEtag(objectId, objectType);
+			//PLFM-3800: manually strip off the "syn" prefix if entity type (until fixed)
+			String id = objectId;
+			if (ObjectType.ENTITY.equals(objectType) && objectId.toLowerCase().startsWith(SYN_PREFIX)) {
+				id = objectId.substring(SYN_PREFIX.length());
+			}
+			return synapseClient.getEtag(id, objectType);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

@@ -24,7 +24,7 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	private String objectId;
 	private ObjectType objectType;
 	private Callback invokeCheckEtag;
-	public static final int DELAY = 10000; // recheck every 10 seconds
+	public static final int DELAY = 15000; // check every 15 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public RefreshAlert(RefreshAlertView view, 
 			SynapseClientAsync synapseClient, 
@@ -36,8 +36,6 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.utils = utils;
-		etag = null;
-		objectId = null;
 		view.setPresenter(this);
 		invokeCheckEtag = new Callback() {
 			@Override
@@ -47,7 +45,15 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 		};
 	}
 	
+	public void clear() {
+		view.setVisible(false);
+		etag = null;
+		objectId = null;
+		objectType = null;
+	}
+	
 	public void configure(String objectId, ObjectType objectType) {
+		clear();
 		this.objectId = objectId;
 		this.objectType = objectType;
 		checkEtag();

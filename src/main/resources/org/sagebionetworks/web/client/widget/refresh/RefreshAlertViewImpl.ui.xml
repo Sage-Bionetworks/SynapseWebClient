@@ -7,8 +7,8 @@
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
   	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
   		<b:Alert type="INFO">
-  			<bh:Strong text="This view is out of date and a refresh is needed." />
-  			<b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="margin-left-10">Refresh</b:Button>
+  			<bh:Strong text="This view is out of date and needs to be refreshed." />
+  			<b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="margin-left-15" size="SMALL">Refresh</b:Button>
   		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>

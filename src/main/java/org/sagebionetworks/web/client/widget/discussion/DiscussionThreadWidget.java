@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
 import static org.sagebionetworks.web.client.place.Synapse.*;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -64,6 +66,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	UserBadge authorIconWidget;
 	GWTWrapper gwtWrapper;
 	SubscribeButtonWidget subscribeButtonWidget;
+	RefreshAlert refreshAlert;
+	
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -90,7 +94,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			MarkdownWidget markdownWidget,
 			UserBadge authorIconWidget,
 			GWTWrapper gwtWrapper,
-			SubscribeButtonWidget subscribeButtonWidget
+			SubscribeButtonWidget subscribeButtonWidget,
+			RefreshAlert refreshAlert
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -107,6 +112,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.authorIconWidget = authorIconWidget;
 		this.gwtWrapper = gwtWrapper;
 		this.subscribeButtonWidget = subscribeButtonWidget;
+		this.refreshAlert = refreshAlert;
+		
 		view.setPresenter(this);
 		view.setNewReplyModal(newReplyModal.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -115,6 +122,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setThreadAuthor(authorIconWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
+		view.setRefreshAlert(refreshAlert.asWidget());
 		subscribeButtonWidget.showIconOnly();
 	}
 
@@ -130,6 +138,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		this.messageKey = bundle.getMessageKey();
 		this.deleteCallback = deleteCallback;
 		this.projectId = bundle.getProjectId();
+		refreshAlert.clear();
 		configureView(bundle, showThreadDetails, showReplyDetails);
 		authorWidget.configure(bundle.getCreatedBy());
 		newReplyModal.configure(bundle.getId(), new Callback(){
@@ -139,6 +148,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 				reconfigureThread();
 			}
 		});
+	}
+	
+	/**
+	 * After configuring this widget, call this method to pop up an alert when the thread etag changes upstream.
+	 */
+	public void watchEtag() {
+		refreshAlert.configure(threadId, ObjectType.THREAD);
 	}
 
 	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
