@@ -442,8 +442,7 @@ public class MarkdownItImpl implements MarkdownIt {
 				.use($wnd.markdownitCentertext)
 				.use($wnd.markdownitSynapseHeading)
 				.use($wnd.markdownitSynapseTable)
-				.use($wnd.markdownitStrikethroughAlt)
-				.use($wnd.markdownitEmphasisAlt);
+				.use($wnd.markdownitStrikethroughAlt);
 
 			$wnd.md.set({
 				highlight : function(str, lang) {
@@ -507,8 +506,9 @@ public class MarkdownItImpl implements MarkdownIt {
 			initMarkdownIt();
 		}
 		// load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
-		$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix).use(
-				$wnd.markdownitMath, uniqueSuffix);
+		$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix)
+			.use($wnd.markdownitMath, uniqueSuffix)
+			.use($wnd.markdownitEmphasisAlt);
 		var results = $wnd.md.render(preprocessMarkdown(md));
 		// Were footnotes found (and exported)?  If so, run the processor on the footnotes, and append to the results.
 		var footnotes = $wnd.markdownitSynapse.footnotes();
