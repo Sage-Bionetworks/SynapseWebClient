@@ -185,6 +185,9 @@ public class MarkdownItImpl implements MarkdownIt {
 			if (!$wnd.md.utils.olMarkerRE) {
 				$wnd.md.utils.olMarkerRE = new RegExp("^\\s*\\d+\\s*[.)]{1}.*$");
 			}
+			if (!$wnd.md.utils.spacesRE) {
+				$wnd.md.utils.spacesRE = new RegExp("[ ]{7}", 'g');
+			}
 		}
 		
 		function preprocessMarkdown(md) {
@@ -195,12 +198,17 @@ public class MarkdownItImpl implements MarkdownIt {
 			var isCurrentLineInList = false;
 			for(var i = 0; i < splitMD.length; i++) {
 				isCurrentLineInList = $wnd.md.utils.ulMarkerRE.test(splitMD[i]) || $wnd.md.utils.olMarkerRE.test(splitMD[i]);
+				if (isCurrentLineInList) {
+					// SWC-2988: and replace each group of 7 spaces with 3 (so that markdown-it list rule recognizes sublists).
+					splitMD[i] = splitMD[i].replace($wnd.md.utils.spacesRE, '   ');
+				}
 				if (isPreviousLineInList && !isCurrentLineInList) {
 					md += '\n';
 				}
 				md += splitMD[i] + '\n';
 				isPreviousLineInList = isCurrentLineInList;
 			}
+			
 			return md;
 		}
 		
