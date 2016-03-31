@@ -114,6 +114,7 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
@@ -174,6 +175,7 @@ import com.google.gwt.core.server.StackTraceDeobfuscator;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
+	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
@@ -3055,6 +3057,21 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				projectSetting.setLocations(locationIds);
 				synapseClient.createProjectSetting(projectSetting);
 			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			//PLFM-3800: manually strip off the "syn" prefix if entity type (until fixed)
+			String id = objectId;
+			if (ObjectType.ENTITY.equals(objectType) && objectId.toLowerCase().startsWith(SYN_PREFIX)) {
+				id = objectId.substring(SYN_PREFIX.length());
+			}
+			return synapseClient.getEtag(id, objectType);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

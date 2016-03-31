@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -71,6 +72,8 @@ public class FilesTab implements FilesTabView.Presenter{
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	RefreshAlert refreshAlert;
+	
 	Entity currentEntity;
 	String currentEntityId;
 	Long shownVersionNumber;
@@ -100,7 +103,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy
+			ModifiedCreatedByWidget modifiedCreatedBy,
+			RefreshAlert refreshAlert
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -116,6 +120,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
 		this.modifiedCreatedBy = modifiedCreatedBy;
+		this.refreshAlert = refreshAlert;
 		view.setPresenter(this);
 		
 		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
@@ -128,6 +133,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
+		view.setRefreshAlert(refreshAlert.asWidget());
 		
 		tab.configure("Files", view.asWidget());
 		
@@ -181,6 +187,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	
 	public void resetView() {
 		synAlert.clear();
+		refreshAlert.clear();
 		view.setFileTitlebarVisible(false);
 		view.setFolderTitlebarVisible(false);
 		view.setPreviewVisible(false);
@@ -202,7 +209,6 @@ public class FilesTab implements FilesTabView.Presenter{
 	
 	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
 		this.handler = handler;
-		synAlert.clear();
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
 		filesBrowser.setEntityUpdatedHandler(handler);
@@ -212,13 +218,13 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
-		
 		tab.setEntityNameAndPlace(targetEntity.getName(), new Synapse(currentEntityId, shownVersionNumber, null, null));
 		//if we are not being configured with a file or folder, then project level should be shown
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
 			showProjectLevelUI();
 		} else {
+			refreshAlert.configure(targetEntity.getId(), ObjectType.ENTITY);
 			getTargetBundleAndDisplay(targetEntity.getId(), versionNumber);
 		}
 	}
