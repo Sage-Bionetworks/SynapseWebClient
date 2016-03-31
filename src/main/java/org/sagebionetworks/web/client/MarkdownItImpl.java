@@ -199,8 +199,8 @@ public class MarkdownItImpl implements MarkdownIt {
 			for(var i = 0; i < splitMD.length; i++) {
 				isCurrentLineInList = $wnd.md.utils.ulMarkerRE.test(splitMD[i]) || $wnd.md.utils.olMarkerRE.test(splitMD[i]);
 				if (isCurrentLineInList) {
-					// SWC-2988: and replace each group of 7 spaces with 3 (so that markdown-it list rule recognizes sublists).
-					splitMD[i] = splitMD[i].replace($wnd.md.utils.spacesRE, '   ');
+					// SWC-2988: and replace each group of 7 spaces with 4 (so that markdown-it list rule recognizes sublists).
+					splitMD[i] = splitMD[i].replace($wnd.md.utils.spacesRE, '    ');
 				}
 				if (isPreviousLineInList && !isCurrentLineInList) {
 					md += '\n';
