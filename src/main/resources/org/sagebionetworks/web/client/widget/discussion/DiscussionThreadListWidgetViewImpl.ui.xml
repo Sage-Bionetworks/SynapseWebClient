@@ -6,7 +6,6 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div>
 		<b:Row>
-			<bh:Div ui:field="refreshAlertContainer" />
 			<b:Column size="XS_12" ui:field="threadListContainer"></b:Column>
 			<g:HTMLPanel ui:field="loadingUI">
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
