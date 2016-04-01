@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
 
-import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.*;
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -10,9 +7,17 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.LIMIT;
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.REPLIES;
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.REPLY;
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD;
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_THREAD_LIST;
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD;
+import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_THREAD_LIST;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +44,6 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
@@ -141,6 +145,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
+		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 	}
 
 	@Test
@@ -189,8 +194,6 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).showThreadDetails();
 		verify(mockView).showReplyDetails();
 		verify(mockRefreshAlert).clear();
-		verify(mockRefreshAlert, never()).configure(threadId, ObjectType.THREAD);
-		discussionThreadWidget.watchEtag();
 		verify(mockRefreshAlert).configure(threadId, ObjectType.THREAD);
 	}
 
@@ -283,13 +286,16 @@ public class DiscussionThreadWidgetTest {
 		boolean isDeleted = false;
 		boolean canModerate = false;
 		boolean isEdited = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
 		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
 				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
 		when(mockView.isThreadCollapsed()).thenReturn(true);
+		verify(mockRefreshAlert, never()).configure(threadId, ObjectType.THREAD);
 		discussionThreadWidget.toggleThread();
+		verify(mockRefreshAlert).configure(threadId, ObjectType.THREAD);
 		verify(mockView).setThreadDownIconVisible(false);
 		verify(mockView).setThreadUpIconVisible(true);
 		verify(mockView).showThreadDetails();
@@ -310,7 +316,9 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadUpIconVisible(false);
 		verify(mockView).hideThreadDetails();
 		when(mockView.isThreadCollapsed()).thenReturn(false);
+		reset(mockRefreshAlert);
 		discussionThreadWidget.toggleThread();
+		verify(mockRefreshAlert).clear();
 		verify(mockView, times(2)).setThreadDownIconVisible(true);
 		verify(mockView, times(2)).setThreadUpIconVisible(false);
 		verify(mockView, times(2)).hideThreadDetails();

@@ -21,8 +21,6 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Div refreshAlertContainer;
-	@UiField
 	Button loadMoreButton;
 	@UiField
 	HTMLPanel loadingUI;
@@ -76,9 +74,4 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(false);
 	}
-	
-	public void setRefreshAlert(Widget w) {
-		refreshAlertContainer.clear();
-		refreshAlertContainer.add(w);
-	};
 }
