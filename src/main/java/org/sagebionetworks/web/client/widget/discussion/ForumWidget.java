@@ -140,6 +140,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				if (singleThreadWidget.isThreadCollapsed()) {
 					singleThreadWidget.toggleThread();
 				}
+				singleThreadWidget.watchEtag();
 			}
 		});
 	}

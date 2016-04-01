@@ -409,6 +409,8 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlertViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
@@ -1250,5 +1252,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SubscribeButtonWidgetView.class).to(SubscribeButtonWidgetViewImpl.class);
 		bind(SubscriptionListWidgetView.class).to(SubscriptionListWidgetViewImpl.class);
 		bind(TopicRowWidgetView.class).to(TopicRowWidgetViewImpl.class);
+		bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
 	}
 }

@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -105,6 +107,8 @@ public class DiscussionThreadWidgetTest {
 	GWTWrapper mockGwtWrapper;
 	@Mock
 	SubscribeButtonWidget mockSubscribeButtonWidget;
+	@Mock
+	RefreshAlert mockRefreshAlert;
 	
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -120,7 +124,7 @@ public class DiscussionThreadWidgetTest {
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
-				mockAuthorIconWidget, mockGwtWrapper, mockSubscribeButtonWidget);
+				mockAuthorIconWidget, mockGwtWrapper, mockSubscribeButtonWidget, mockRefreshAlert);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
@@ -135,6 +139,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setThreadAuthor(any(Widget.class));
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
+		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
 	}
 
@@ -175,13 +180,18 @@ public class DiscussionThreadWidgetTest {
 		boolean isDeleted = false;
 		boolean canModerate = false;
 		boolean isEdited = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
 		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
 				SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
 		verify(mockView).showThreadDetails();
 		verify(mockView).showReplyDetails();
+		verify(mockRefreshAlert).clear();
+		verify(mockRefreshAlert, never()).configure(threadId, ObjectType.THREAD);
+		discussionThreadWidget.watchEtag();
+		verify(mockRefreshAlert).configure(threadId, ObjectType.THREAD);
 	}
 
 	@Test
@@ -508,7 +518,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
-		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.DISCUSSION_THREAD, threadId);
+		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.THREAD, threadId);
 	}
 
 	@SuppressWarnings("unchecked")

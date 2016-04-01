@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -48,6 +50,8 @@ public class DiscussionThreadListWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	CallbackP<Boolean> mockEmptyListCallback;
+	@Mock
+	RefreshAlert mockRefreshAlert;
 
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
@@ -56,22 +60,26 @@ public class DiscussionThreadListWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createThreadWidget()).thenReturn(mockDiscussionThreadWidget);
-		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert);
+		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockRefreshAlert);
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadListWidget);
 		verify(mockView).setAlert(any(Widget.class));
+		verify(mockView).setRefreshAlert(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigure() {
 		boolean canModerate = false;
-		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
+		String forumId = "123";
+		discussionThreadListWidget.configure(forumId, canModerate, mockEmptyListCallback);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
+		verify(mockRefreshAlert).clear();
+		verify(mockRefreshAlert).configure(forumId, ObjectType.FORUM);
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));

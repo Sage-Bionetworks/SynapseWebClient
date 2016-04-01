@@ -67,6 +67,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Div synAlertContainer;
 	@UiField
+	Div refreshAlertContainer;
+	@UiField
 	Icon threadDownIcon;
 	@UiField
 	Icon threadUpIcon;
@@ -366,5 +368,11 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	public void setSubscribeButtonWidget(Widget widget) {
 		subscribeButtonContainer.clear();
 		subscribeButtonContainer.add(widget);
+	}
+	
+	@Override
+	public void setRefreshAlert(Widget w) {
+		refreshAlertContainer.clear();
+		refreshAlertContainer.add(w);
 	}
 }

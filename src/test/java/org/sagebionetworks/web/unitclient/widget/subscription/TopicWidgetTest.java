@@ -74,7 +74,7 @@ public class TopicWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		
-		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, TEST_OBJECT_ID);
+		widget.configure(SubscriptionObjectType.THREAD, TEST_OBJECT_ID);
 		verify(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTopicText(THREAD_TITLE);
@@ -90,7 +90,7 @@ public class TopicWidgetTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		
-		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, TEST_OBJECT_ID);
+		widget.configure(SubscriptionObjectType.THREAD, TEST_OBJECT_ID);
 		verify(mockForumClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).showError(errorMessage);

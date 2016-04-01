@@ -43,7 +43,7 @@ public class TopicRowWidgetTest {
 	
 	private static final String TEST_OBJECT_ID = "3";
 	private static final String TEST_SUBSCRIPTION_ID = "8837";
-	private static final SubscriptionObjectType TEST_TYPE = SubscriptionObjectType.DISCUSSION_THREAD;
+	private static final SubscriptionObjectType TEST_TYPE = SubscriptionObjectType.THREAD;
 	
 	@Before
 	public void setUp() throws Exception {

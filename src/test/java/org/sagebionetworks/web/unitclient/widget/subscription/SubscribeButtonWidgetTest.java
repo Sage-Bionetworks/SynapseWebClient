@@ -126,7 +126,7 @@ public class SubscribeButtonWidgetTest {
 	@Test
 	public void testAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123");
 		//show the follow button.  on click, send to the login place
 		verify(mockView).showFollowButton();
 		
@@ -138,7 +138,7 @@ public class SubscribeButtonWidgetTest {
 	
 	@Test
 	public void testConfigureSubscribed() {
-		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123");
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockView).showUnfollowButton();
@@ -147,7 +147,7 @@ public class SubscribeButtonWidgetTest {
 	@Test
 	public void testConfigureUnsubscribed() {
 		when(mockSubscriptionPagedResults.getTotalNumberOfResults()).thenReturn(0L);
-		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123");
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockView).showFollowButton();
@@ -158,7 +158,7 @@ public class SubscribeButtonWidgetTest {
 		Exception ex = new Exception("error");
 		AsyncMockStubber.callFailureWith(ex).when(mockSubscriptionClient)
 			.listSubscription(any(SubscriptionRequest.class), any(AsyncCallback.class));
-		widget.configure(SubscriptionObjectType.DISCUSSION_THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123");
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).handleException(ex);

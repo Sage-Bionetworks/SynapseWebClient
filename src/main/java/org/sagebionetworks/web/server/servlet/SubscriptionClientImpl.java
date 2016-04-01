@@ -6,9 +6,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.SubscriptionClient;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -41,7 +39,7 @@ public class SubscriptionClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.get(subscriptionId.toString());
+			return synapseClient.getSubscription(subscriptionId.toString());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

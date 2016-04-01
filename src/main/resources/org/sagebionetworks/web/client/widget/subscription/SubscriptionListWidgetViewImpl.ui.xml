@@ -8,9 +8,8 @@
 	<bh:Div>
 		<bh:Div addStyleNames="light-border-bottom">
 			<b:ButtonGroup dataToggle="BUTTONS">
-				<b:RadioButton name="filters" ui:field="projectFilter">Projects</b:RadioButton>
+				<b:RadioButton name="filters" ui:field="projectFilter">Project Forums</b:RadioButton>
 				<b:RadioButton name="filters" ui:field="threadFilter">Threads</b:RadioButton>
-				<b:RadioButton name="filters" ui:field="noFilter">All</b:RadioButton>
 			</b:ButtonGroup>
 		</bh:Div>
 		<bh:Span ui:field="loadingUI" visible="false">
