@@ -5,10 +5,10 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
-  	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
+  	<bh:Div visible="false">
   		<b:Alert type="INFO">
   			<bh:Strong text="This view is out of date and needs to be refreshed." />
-  			<b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="margin-left-15" size="SMALL">Refresh</b:Button>
+  			<b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="margin-left-15" size="EXTRA_SMALL">Refresh</b:Button>
   		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>

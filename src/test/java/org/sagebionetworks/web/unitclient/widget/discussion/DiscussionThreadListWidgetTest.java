@@ -50,9 +50,7 @@ public class DiscussionThreadListWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	CallbackP<Boolean> mockEmptyListCallback;
-	@Mock
-	RefreshAlert mockRefreshAlert;
-
+	
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
 
@@ -60,14 +58,13 @@ public class DiscussionThreadListWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createThreadWidget()).thenReturn(mockDiscussionThreadWidget);
-		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockRefreshAlert);
+		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert);
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadListWidget);
 		verify(mockView).setAlert(any(Widget.class));
-		verify(mockView).setRefreshAlert(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,8 +75,6 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure(forumId, canModerate, mockEmptyListCallback);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
-		verify(mockRefreshAlert).clear();
-		verify(mockRefreshAlert).configure(forumId, ObjectType.FORUM);
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));

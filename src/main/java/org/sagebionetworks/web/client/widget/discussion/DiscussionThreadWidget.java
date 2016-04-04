@@ -124,6 +124,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		view.setRefreshAlert(refreshAlert.asWidget());
 		subscribeButtonWidget.showIconOnly();
+		refreshAlert.setRefreshCallback(new Callback() {
+			@Override
+			public void invoke() {
+				reconfigureThread();
+			}
+		});
 	}
 
 	@Override
@@ -156,6 +162,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public void watchEtag() {
 		refreshAlert.configure(threadId, ObjectType.THREAD);
 	}
+
+	public void unwatchEtag() {
+		refreshAlert.clear();
+	}
+
 
 	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
 		view.clear();
@@ -202,6 +213,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setThreadDownIconVisible(true);
 		view.setThreadUpIconVisible(false);
 		view.hideThreadDetails();
+		unwatchEtag();
 	}
 
 	private void showThreadDetails() {
@@ -209,6 +221,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setThreadUpIconVisible(true);
 		configureMessage();
 		view.showThreadDetails();
+		watchEtag();
 	}
 
 	private void reconfigureThread() {
