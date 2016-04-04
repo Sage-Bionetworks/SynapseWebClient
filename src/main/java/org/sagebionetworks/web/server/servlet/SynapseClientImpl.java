@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -3066,12 +3065,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException{
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			//PLFM-3800: manually strip off the "syn" prefix if entity type (until fixed)
-			String id = objectId;
-			if (ObjectType.ENTITY.equals(objectType) && objectId.toLowerCase().startsWith(SYN_PREFIX)) {
-				id = objectId.substring(SYN_PREFIX.length());
-			}
-			return synapseClient.getEtag(id, objectType);
+			return synapseClient.getEtag(objectId, objectType);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
