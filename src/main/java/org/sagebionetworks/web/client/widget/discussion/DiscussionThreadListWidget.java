@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadListAlert;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,7 +28,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseAlert synAlert;
-	DiscussionThreadListAlert threadCountAlert;
+	DiscussionThreadCountAlert threadCountAlert;
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
@@ -42,7 +42,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			PortalGinInjector ginInjector,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			SynapseAlert synAlert,
-			DiscussionThreadListAlert threadCountAlert
+			DiscussionThreadCountAlert threadCountAlert
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;

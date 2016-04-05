@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -64,7 +65,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	UserBadge authorIconWidget;
 	GWTWrapper gwtWrapper;
 	SubscribeButtonWidget subscribeButtonWidget;
-	RefreshAlert refreshAlert;
+	ReplyCountAlert refreshAlert;
 	private CallbackP<String> threadIdClickedCallback; 
 	
 	private Long offset;
@@ -94,7 +95,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			UserBadge authorIconWidget,
 			GWTWrapper gwtWrapper,
 			SubscribeButtonWidget subscribeButtonWidget,
-			RefreshAlert refreshAlert
+			ReplyCountAlert refreshAlert
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -159,7 +160,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	 * After configuring this widget, call this method to pop up an alert when the thread etag changes upstream.
 	 */
 	public void watchEtag() {
-		refreshAlert.configure(threadId, ObjectType.THREAD);
+		refreshAlert.configure(threadId);
 	}
 
 	public void unwatchEtag() {

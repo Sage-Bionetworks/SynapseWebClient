@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -50,6 +51,8 @@ public class DiscussionThreadListWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	CallbackP<Boolean> mockEmptyListCallback;
+	@Mock
+	DiscussionThreadCountAlert mockDiscussionThreadListAlert;
 	
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
@@ -58,7 +61,7 @@ public class DiscussionThreadListWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createThreadWidget()).thenReturn(mockDiscussionThreadWidget);
-		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert);
+		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockDiscussionThreadListAlert);
 	}
 
 	@Test

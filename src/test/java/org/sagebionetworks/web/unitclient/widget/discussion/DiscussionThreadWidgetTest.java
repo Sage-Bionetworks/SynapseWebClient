@@ -52,6 +52,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -112,7 +113,7 @@ public class DiscussionThreadWidgetTest {
 	@Mock
 	SubscribeButtonWidget mockSubscribeButtonWidget;
 	@Mock
-	RefreshAlert mockRefreshAlert;
+	ReplyCountAlert mockRefreshAlert;
 	
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -165,7 +166,6 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
@@ -194,7 +194,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).showThreadDetails();
 		verify(mockView).showReplyDetails();
 		verify(mockRefreshAlert).clear();
-		verify(mockRefreshAlert).configure(threadId, ObjectType.THREAD);
+		verify(mockRefreshAlert).configure(threadId);
 	}
 
 	@Test
@@ -241,7 +241,6 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
@@ -267,7 +266,6 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockView).setShowRepliesVisibility(false);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
@@ -280,68 +278,8 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.asWidget();
 		verify(mockView).asWidget();
 	}
-
-	@Test
-	public void testToggleThreadWithThreadDetailsCollapsed() {
-		boolean isDeleted = false;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		String threadId = "1";
-		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
-				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
-				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
-				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
-		when(mockView.isThreadCollapsed()).thenReturn(true);
-		verify(mockRefreshAlert, never()).configure(threadId, ObjectType.THREAD);
-		discussionThreadWidget.toggleThread();
-		verify(mockRefreshAlert).configure(threadId, ObjectType.THREAD);
-		verify(mockView).setThreadDownIconVisible(false);
-		verify(mockView).setThreadUpIconVisible(true);
-		verify(mockView).showThreadDetails();
-		verify(mockView).setDeleteIconVisible(false);
-	}
-
-	@Test
-	public void testToggleThreadWithThreadDetailsExpanded() {
-		boolean isDeleted = false;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
-				CREATED_BY, isEdited);
-		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
-				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
-		verify(mockView).setThreadDownIconVisible(true);
-		verify(mockView).setThreadUpIconVisible(false);
-		verify(mockView).hideThreadDetails();
-		when(mockView.isThreadCollapsed()).thenReturn(false);
-		reset(mockRefreshAlert);
-		discussionThreadWidget.toggleThread();
-		verify(mockRefreshAlert).clear();
-		verify(mockView, times(2)).setThreadDownIconVisible(true);
-		verify(mockView, times(2)).setThreadUpIconVisible(false);
-		verify(mockView, times(2)).hideThreadDetails();
-	}
-
-	@Test
-	public void testToggleRepliesWithReplyDetailsCollapsed() {
-		when(mockView.isReplyCollapsed()).thenReturn(true);
-		discussionThreadWidget.toggleReplies();
-		verify(mockView).setReplyDownIconVisible(false);
-		verify(mockView).setReplyUpIconVisible(true);
-		verify(mockView).showReplyDetails();
-	}
-
-	@Test
-	public void testToggleRepliesWithReplyDetailsExpanded() {
-		when(mockView.isReplyCollapsed()).thenReturn(false);
-		discussionThreadWidget.toggleReplies();
-		verify(mockView).setReplyDownIconVisible(true);
-		verify(mockView).setReplyUpIconVisible(false);
-		verify(mockView).hideReplyDetails();
-		verify(mockView).setLoadMoreButtonVisibility(false);
-	}
+	
+	//Note: The discussion thread widget no longer supports toggling.  It is initially configured to show message/replies.
 
 	@Test
 	public void testOnClickNewReply() {
@@ -402,7 +340,6 @@ public class DiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
-		verify(mockView).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString(), anyString());
 		verify(mockView).showReplyDetails();
 		verify(mockView, times(2)).addReply(any(Widget.class));
@@ -436,8 +373,6 @@ public class DiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
-		verify(mockView, atLeastOnce()).setShowRepliesVisibility(false);
-		verify(mockView, never()).setShowRepliesVisibility(true);
 		verify(mockView, times(2)).hideReplyDetails();
 	}
 
@@ -494,7 +429,6 @@ public class DiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
-		verify(mockView, atLeastOnce()).setShowRepliesVisibility(true);
 		verify(mockView, atLeastOnce()).setNumberOfReplies(anyString(), anyString());
 		verify(mockView).showReplyDetails();
 		verify(mockView).setLoadMoreButtonVisibility(true);

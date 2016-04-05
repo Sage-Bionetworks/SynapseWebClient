@@ -75,6 +75,7 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	
 	@Override
 	public void onRefresh() {
+		clear();
 		if (refreshCallback == null) {
 			globalAppState.refreshPage();	
 		} else {

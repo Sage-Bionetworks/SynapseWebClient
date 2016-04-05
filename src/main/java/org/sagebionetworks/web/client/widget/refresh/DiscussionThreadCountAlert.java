@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DiscussionThreadListAlert implements RefreshAlertView.Presenter, SynapseWidgetPresenter {
+public class DiscussionThreadCountAlert implements RefreshAlertView.Presenter, SynapseWidgetPresenter {
 	
 	private RefreshAlertView view;
 	private DiscussionForumClientAsync discussionForumClient;
@@ -26,7 +26,7 @@ public class DiscussionThreadListAlert implements RefreshAlertView.Presenter, Sy
 	private Callback invokeCheck;
 	public static final int DELAY = 25000; // check every 25 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
-	public DiscussionThreadListAlert(RefreshAlertView view, 
+	public DiscussionThreadCountAlert(RefreshAlertView view, 
 			DiscussionForumClientAsync discussionForumClient, 
 			GWTWrapper gwt,
 			GlobalApplicationState globalAppState,

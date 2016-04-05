@@ -225,4 +225,17 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 //			throw ExceptionUtil.convertSynapseException(e);
 //		}
 	}
+	
+	@Override
+	public Long getReplyCount(String threadId) {
+		//TODO: replace with real service call once available
+		return 10L;
+//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//		try {
+//			return synapseClient.replyCount(threadId);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
+
+	}
 }

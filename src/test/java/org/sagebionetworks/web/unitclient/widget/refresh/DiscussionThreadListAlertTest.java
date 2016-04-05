@@ -30,8 +30,8 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
-import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadListAlert;
-import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadListAlertView;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -57,12 +57,12 @@ public class DiscussionThreadListAlertTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
 	Long count = 5L;
-	DiscussionThreadListAlert refreshAlert;
+	DiscussionThreadCountAlert refreshAlert;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		refreshAlert = new DiscussionThreadListAlert(mockView, mockDiscussionForum, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils);
+		refreshAlert = new DiscussionThreadCountAlert(mockView, mockDiscussionForum, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils);
 		when(mockView.isAttached()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(count).when(mockDiscussionForum).getThreadCount(anyString(), any(AsyncCallback.class));
 		
@@ -95,7 +95,7 @@ public class DiscussionThreadListAlertTest {
 		
 		verify(mockDiscussionForum).getThreadCount(anyString(), any(AsyncCallback.class));
 		//and will call this again later
-		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(RefreshAlert.DELAY));
+		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(DiscussionThreadCountAlert.DELAY));
 	}
 	
 	@Test

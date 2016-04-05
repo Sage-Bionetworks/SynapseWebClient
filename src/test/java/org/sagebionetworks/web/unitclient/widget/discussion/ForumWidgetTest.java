@@ -215,7 +215,6 @@ public class ForumWidgetTest {
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle),
 				eq(canModerate), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD),
 				eq(SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD));
-		verify(mockDiscussionThreadWidget).toggleThread();
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setEmptyUIVisible(false);
 		verify(mockView).setThreadHeaderVisible(true);
