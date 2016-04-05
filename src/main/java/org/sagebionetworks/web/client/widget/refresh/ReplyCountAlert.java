@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -78,7 +79,7 @@ public class ReplyCountAlert implements RefreshAlertView.Presenter, SynapseWidge
 	
 	private void checkCount() {
 		if (view.isAttached() && threadId != null) {
-			discussionForumClient.getReplyCount(threadId, new AsyncCallback<Long>() {
+			discussionForumClient.getReplyCountForThread(threadId, DiscussionFilter.NO_FILTER, new AsyncCallback<Long>() {
 				@Override
 				public void onSuccess(Long result) {
 					if (count == null) {

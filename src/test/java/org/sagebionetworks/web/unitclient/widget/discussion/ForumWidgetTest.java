@@ -214,6 +214,7 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockSynAlert).clear();
+		verify(mockView).setModeratorModeContainerVisibility(false);
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -267,7 +268,7 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
-		verify(mockSynAlert, times(2)).clear();
+		verify(mockSynAlert, times(3)).clear();
 	}
 
 	@SuppressWarnings("unchecked")

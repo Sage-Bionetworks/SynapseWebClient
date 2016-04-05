@@ -31,6 +31,11 @@
 				<t:TableData width="130px" addStyleNames="hidden-xs">
 					<bh:Span ui:field="lastActivity"></bh:Span>
 				</t:TableData>
+				<t:TableData width="25px">
+					<b:Tooltip title="Delete thread" placement="LEFT">
+						<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+					</b:Tooltip>
+				</t:TableData>
 			</t:TableRow>
 		</t:Table>
 		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
@@ -58,9 +63,6 @@
 							</t:TableData>
 							<t:TableData width="140px" addStyleNames="vertical-align-top">
 								<bh:Div>
-									<b:Tooltip title="Delete thread" placement="LEFT">
-										<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
-									</b:Tooltip>
 									<b:Tooltip title="Edit thread" placement="LEFT">
 										<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
 									</b:Tooltip>
