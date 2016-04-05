@@ -10,10 +10,12 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 		Widget asWidget();
 	}
 
+	void setThreadCountAlert(Widget w);
+	
 	void setPresenter(DiscussionThreadListWidget presenter);
 
 	void addThread(Widget w);
-
+	
 	void clear();
 
 	void setAlert(Widget w);

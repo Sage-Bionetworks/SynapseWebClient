@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
-import static org.sagebionetworks.web.client.place.Synapse.*;
-
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -17,6 +14,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -25,10 +27,6 @@ import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -67,6 +65,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	GWTWrapper gwtWrapper;
 	SubscribeButtonWidget subscribeButtonWidget;
 	RefreshAlert refreshAlert;
+	private CallbackP<String> threadIdClickedCallback; 
 	
 	private Long offset;
 	private DiscussionReplyOrder order;
@@ -185,7 +184,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedVisible(bundle.getIsEdited());
-		view.setShowRepliesVisibility(bundle.getNumberOfReplies() > 0);
 		view.setDeleteIconVisible(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
@@ -200,6 +198,19 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			hideReplyDetails();
 		}
 	}
+	
+	@Override
+	public void onClickThread() {
+		if (threadIdClickedCallback == null) {
+			globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(projectId, threadId));	
+		} else {
+			threadIdClickedCallback.invoke(threadId);
+		}
+	}
+	
+	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
+		this.threadIdClickedCallback = threadIdClickedCallback;
+	}
 
 	private String getDescriptiveReplyText(Long numberOfReplies) {
 		if (numberOfReplies == 1) {
@@ -210,15 +221,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	}
 
 	private void hideThreadDetails() {
-		view.setThreadDownIconVisible(true);
-		view.setThreadUpIconVisible(false);
 		view.hideThreadDetails();
 		unwatchEtag();
 	}
 
 	private void showThreadDetails() {
-		view.setThreadDownIconVisible(false);
-		view.setThreadUpIconVisible(true);
 		configureMessage();
 		view.showThreadDetails();
 		watchEtag();
@@ -244,15 +251,6 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	public boolean isThreadCollapsed() {
 		return view.isThreadCollapsed();
-	}
-
-	@Override
-	public void toggleThread() {
-		if (view.isThreadCollapsed()) {
-			showThreadDetails();
-		} else {
-			hideThreadDetails();
-		}
 	}
 
 	public void configureMessage() {
@@ -317,25 +315,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		});
 	}
 
-	@Override
-	public void toggleReplies() {
-		if (view.isReplyCollapsed()) {
-			showReplyDetails();
-		} else {
-			hideReplyDetails();
-		}
-	}
-
 	private void hideReplyDetails() {
-		view.setReplyDownIconVisible(true);
-		view.setReplyUpIconVisible(false);
 		view.setLoadMoreButtonVisibility(false);
 		view.hideReplyDetails();
 	}
 
 	private void showReplyDetails() {
-		view.setReplyDownIconVisible(false);
-		view.setReplyUpIconVisible(true);
 		configureReplies();
 		view.showReplyDetails();
 	}
@@ -381,10 +366,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 							PaginatedResults<DiscussionReplyBundle> result) {
 						offset += LIMIT;
 						if (result.getResults().isEmpty()) {
-							view.setShowRepliesVisibility(false);
 							view.hideReplyDetails();
 						} else {
-							view.setShowRepliesVisibility(true);
 							for (DiscussionReplyBundle bundle : result.getResults()) {
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
 								replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){

@@ -21,6 +21,8 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@UiField
 	Div synAlertContainer;
 	@UiField
+	Div threadCountAlertContainer;
+	@UiField
 	Button loadMoreButton;
 	@UiField
 	HTMLPanel loadingUI;
@@ -54,7 +56,7 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	public void addThread(Widget w) {
 		threadListContainer.add(w);
 	}
-
+	
 	@Override
 	public void clear() {
 		threadListContainer.clear();
@@ -72,6 +74,12 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 
 	@Override
 	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(false);
+		loadingUI.setVisible(visible);
 	}
+	
+	@Override
+	public void setThreadCountAlert(Widget w) {
+		threadCountAlertContainer.clear();
+		threadCountAlertContainer.add(w);
+	};
 }

@@ -47,17 +47,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	FocusPanel showThread;
 	@UiField
-	Collapse threadDetails;
+	Div threadDetails;
 	@UiField
-	FocusPanel showReplies;
-	@UiField
-	Collapse replyDetails;
+	Div replyDetails;
 	@UiField
 	Span author;
 	@UiField
 	Span createdOn;
-	@UiField
-	Span clickToViewReplies;
 	@UiField
 	Button loadMoreButton;
 	@UiField
@@ -68,14 +64,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Div synAlertContainer;
 	@UiField
 	Div refreshAlertContainer;
-	@UiField
-	Icon threadDownIcon;
-	@UiField
-	Icon threadUpIcon;
-	@UiField
-	Icon replyDownIcon;
-	@UiField
-	Icon replyUpIcon;
 	@UiField
 	HTMLPanel loadingReplies;
 	@UiField
@@ -91,11 +79,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Span threadAuthor;
 	@UiField
-	Icon threadLink;
-	@UiField
 	Span subscribeButtonContainer;
-	@UiField
-	Tooltip threadLinkTooltip;
 	String threadLinkHref;
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -111,17 +95,9 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			}
 		});
 		showThread.addClickHandler(new ClickHandler() {
-
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.toggleThread();
-			}
-		});
-		showReplies.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.toggleReplies();
+				presenter.onClickThread();
 			}
 		});
 		replyButton.addClickHandler(new ClickHandler(){
@@ -142,13 +118,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickEditThread();
-			}
-		});
-		threadLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				threadLinkTooltip.hide();
-				DisplayUtils.newWindow(threadLinkHref, "_blank", "");
 			}
 		});
 	}
@@ -173,14 +142,9 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		threadTitle.clear();
 		activeUsers.clear();
 		numberOfReplies.clear();
-		clickToViewReplies.clear();
 		lastActivity.clear();
 		createdOn.clear();
 		replyListContainer.clear();
-		threadDownIcon.setVisible(true);
-		threadUpIcon.setVisible(false);
-		replyDownIcon.setVisible(true);
-		replyUpIcon.setVisible(false);
 	}
 
 	@Override
@@ -196,7 +160,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setNumberOfReplies(String numberOfReplies, String descriptiveText) {
 		this.numberOfReplies.setText(numberOfReplies);
-		this.clickToViewReplies.setText(numberOfReplies + " " + descriptiveText);
 	}
 
 	@Override
@@ -235,18 +198,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setShowRepliesVisibility(boolean visible) {
-		showReplies.setVisible(visible);
-	}
-
-	@Override
 	public void showReplyDetails() {
-		replyDetails.show();
+		replyDetails.setVisible(true);
 	}
 
 	@Override
 	public void hideReplyDetails() {
-		replyDetails.hide();
+		replyDetails.setVisible(false);
 	}
 
 	@Override
@@ -261,32 +219,13 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	@Override
 	public boolean isThreadCollapsed() {
-		return threadDetails.isHidden();
+		return threadDetails.isVisible();
 	}
 
-	@Override
-	public void setThreadUpIconVisible(boolean visible) {
-		threadUpIcon.setVisible(visible);
-	}
-
-	@Override
-	public void setThreadDownIconVisible(boolean visible) {
-		threadDownIcon.setVisible(visible);
-	}
 
 	@Override
 	public boolean isReplyCollapsed() {
-		return replyDetails.isHidden();
-	}
-
-	@Override
-	public void setReplyUpIconVisible(boolean visible) {
-		replyUpIcon.setVisible(visible);
-	}
-
-	@Override
-	public void setReplyDownIconVisible(boolean visible) {
-		replyDownIcon.setVisible(visible);
+		return replyDetails.isVisible();
 	}
 
 	@Override
@@ -352,12 +291,12 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 
 	@Override
 	public void showThreadDetails() {
-		threadDetails.show();
+		threadDetails.setVisible(true);
 	}
 
 	@Override
 	public void hideThreadDetails() {
-		threadDetails.hide();
+		threadDetails.setVisible(false);
 	}
 
 	@Override
