@@ -28,7 +28,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseAlert synAlert;
-	DiscussionThreadCountAlert threadCountAlert;
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
@@ -41,29 +40,27 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			DiscussionThreadListWidgetView view,
 			PortalGinInjector ginInjector,
 			DiscussionForumClientAsync discussionForumClientAsync,
-			SynapseAlert synAlert,
-			DiscussionThreadCountAlert threadCountAlert
+			SynapseAlert synAlert
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.synAlert = synAlert;
-		this.threadCountAlert = threadCountAlert;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
-		view.setThreadCountAlert(threadCountAlert.asWidget());
 		order = DEFAULT_ORDER;
 		ascending = DEFAULT_ASCENDING;
 	}
 
 	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
 		clear();
-		threadCountAlert.clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		offset = 0L;
 		this.forumId = forumId;
 		loadMore();
+		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
+		view.setThreadCountAlert(threadCountAlert.asWidget());
 		threadCountAlert.configure(forumId);
 	}
 

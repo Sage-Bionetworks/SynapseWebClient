@@ -117,6 +117,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
@@ -391,4 +394,7 @@ public interface PortalGinInjector extends Ginjector {
 	public MarkdownCacheValue getMarkdownCacheValue();
 	
 	public TopicRowWidget getTopicRowWidget();
+	public RefreshAlert getRefreshAlert();
+	public ReplyCountAlert getReplyCountAlert();
+	public DiscussionThreadCountAlert getDiscussionThreadCountAlert();
 }

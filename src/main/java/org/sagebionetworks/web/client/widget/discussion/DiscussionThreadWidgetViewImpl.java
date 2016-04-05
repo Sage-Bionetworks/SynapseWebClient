@@ -314,4 +314,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 		refreshAlertContainer.clear();
 		refreshAlertContainer.add(w);
 	}
+	@Override
+	public void removeRefreshAlert() {
+		refreshAlertContainer.clear();
+	}
 }

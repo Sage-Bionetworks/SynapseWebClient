@@ -24,7 +24,7 @@ public class DiscussionThreadCountAlert implements RefreshAlertView.Presenter, S
 	private String forumId;
 	
 	private Callback invokeCheck;
-	public static final int DELAY = 25000; // check every 25 seconds (until detached, configuration cleared, or a change has been detected)
+	public static final int DELAY = 16000; // check every 16 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public DiscussionThreadCountAlert(RefreshAlertView view, 
 			DiscussionForumClientAsync discussionForumClient, 
@@ -92,7 +92,9 @@ public class DiscussionThreadCountAlert implements RefreshAlertView.Presenter, S
 						view.setVisible(true);
 					} else {
 						//no change, reschedule
-						gwt.scheduleExecution(invokeCheck, DELAY);		
+						if (view.isAttached()) {
+							gwt.scheduleExecution(invokeCheck, DELAY);	
+						}
 					}
 				}
 				@Override

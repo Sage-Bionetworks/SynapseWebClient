@@ -129,11 +129,12 @@ public class DiscussionThreadWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
 		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
-				mockAuthorIconWidget, mockGwtWrapper, mockSubscribeButtonWidget, mockRefreshAlert);
+				mockAuthorIconWidget, mockGwtWrapper, mockSubscribeButtonWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
@@ -148,9 +149,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setThreadAuthor(any(Widget.class));
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
-		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
-		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 	}
 
 	@Test
@@ -185,10 +184,12 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setThreadLink(anyString());
 		
 		discussionThreadWidget.watchReplyCount();
+		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 		verify(mockRefreshAlert).configure(threadId);
-		reset(mockRefreshAlert);
+		reset(mockView);
 		discussionThreadWidget.unwatchReplyCount();
-		verify(mockRefreshAlert).clear();
+		verify(mockView).removeRefreshAlert();
 	}
 
 	@Test
@@ -204,7 +205,6 @@ public class DiscussionThreadWidgetTest {
 				SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
 		verify(mockView).showThreadDetails();
 		verify(mockView).showReplyDetails();
-		verify(mockRefreshAlert).clear();
 		verify(mockRefreshAlert).configure(threadId);
 	}
 
