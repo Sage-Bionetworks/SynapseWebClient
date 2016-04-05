@@ -106,8 +106,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.showAllThreadsCallback = showAllThreadsCallback;
-		synAlert.clear();
-		subscribeToForumButton.clear();
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -119,6 +117,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public void showThread(final String threadId) {
 		isSingleThread = true;
+		synAlert.clear();
+		subscribeToForumButton.clear();
 		globalApplicationState.pushCurrentPlace(TopicUtils.getThreadPlace(entityId, threadId));
 		view.setSingleThreadUIVisible(true);
 		view.setThreadListUIVisible(false);
@@ -148,10 +148,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				}, SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
 			}
 		});
+		view.setModeratorModeContainerVisibility(false);
 	}
 
 	public void showForum() {
 		isSingleThread = false;
+		synAlert.clear();
+		subscribeToForumButton.clear();
 		globalApplicationState.pushCurrentPlace(TopicUtils.getForumPlace(entityId));
 		threadListWidget.clear();
 		view.setSingleThreadUIVisible(false);

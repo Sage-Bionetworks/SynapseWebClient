@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -63,7 +64,7 @@ public class ReplyCountAlertTest {
 		MockitoAnnotations.initMocks(this);
 		refreshAlert = new ReplyCountAlert(mockView, mockDiscussionForum, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils);
 		when(mockView.isAttached()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(count).when(mockDiscussionForum).getReplyCount(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(count).when(mockDiscussionForum).getReplyCountForThread(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -76,14 +77,14 @@ public class ReplyCountAlertTest {
 		when(mockView.isAttached()).thenReturn(false);
 		refreshAlert.configure("123");
 		//not ready to ask for the current count
-		verify(mockDiscussionForum, never()).getReplyCount(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForum, never()).getReplyCountForThread(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 	@Test
 	public void testAttachedNotConfigured() {
 		when(mockView.isAttached()).thenReturn(true);
 		refreshAlert.onAttach();
 		//not ready to ask for the current etag
-		verify(mockDiscussionForum, never()).getReplyCount(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForum, never()).getReplyCountForThread(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -91,7 +92,7 @@ public class ReplyCountAlertTest {
 		when(mockView.isAttached()).thenReturn(true);
 		refreshAlert.configure("123");
 		
-		verify(mockDiscussionForum).getReplyCount(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForum).getReplyCountForThread(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		//and will call this again later
 		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(ReplyCountAlert.DELAY));
 	}

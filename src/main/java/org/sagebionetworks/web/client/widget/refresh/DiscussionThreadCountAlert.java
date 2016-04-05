@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -81,7 +82,7 @@ public class DiscussionThreadCountAlert implements RefreshAlertView.Presenter, S
 	
 	private void checkThreadCount() {
 		if (view.isAttached() && forumId != null) {
-			discussionForumClient.getThreadCount(forumId, new AsyncCallback<Long>() {
+			discussionForumClient.getThreadCountForForum(forumId, DiscussionFilter.NO_FILTER, new AsyncCallback<Long>() {
 				@Override
 				public void onSuccess(Long result) {
 					if (count == null) {
