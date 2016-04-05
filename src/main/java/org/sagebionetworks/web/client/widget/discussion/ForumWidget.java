@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -111,14 +112,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
 			showThread(threadId);
-			isSingleThread = true;
 		} else {
 			showForum();
-			isSingleThread = false;
 		}
 	}
 
 	public void showThread(final String threadId) {
+		isSingleThread = true;
 		globalApplicationState.pushCurrentPlace(TopicUtils.getThreadPlace(entityId, threadId));
 		view.setSingleThreadUIVisible(true);
 		view.setThreadListUIVisible(false);
@@ -151,6 +151,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	public void showForum() {
+		isSingleThread = false;
 		globalApplicationState.pushCurrentPlace(TopicUtils.getForumPlace(entityId));
 		threadListWidget.clear();
 		view.setSingleThreadUIVisible(false);
