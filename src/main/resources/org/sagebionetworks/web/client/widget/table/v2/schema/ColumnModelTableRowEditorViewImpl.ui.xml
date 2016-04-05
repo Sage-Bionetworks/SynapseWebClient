@@ -24,6 +24,7 @@
 			  <g:item>File</g:item>
 			  <g:item>Entity</g:item>
 			  <g:item>Link</g:item>
+			  <g:item>LargeText</g:item>
 			</g:ListBox>
 		</t:TableData>
 		<t:TableData>

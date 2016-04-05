@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -61,6 +62,7 @@ public class TopicWidgetTest {
 		verify(mockView).setPresenter(widget);
 	}
 
+	@Ignore
 	@Test
 	public void testConfigureAllTypesTest() {
 		for (SubscriptionObjectType type : SubscriptionObjectType.values()) {
