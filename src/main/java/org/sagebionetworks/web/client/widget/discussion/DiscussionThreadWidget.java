@@ -159,11 +159,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	/**
 	 * After configuring this widget, call this method to pop up an alert when the thread etag changes upstream.
 	 */
-	public void watchEtag() {
+	public void watchReplyCount() {
 		refreshAlert.configure(threadId);
 	}
 
-	public void unwatchEtag() {
+	public void unwatchReplyCount() {
 		refreshAlert.clear();
 	}
 
@@ -223,13 +223,13 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 
 	private void hideThreadDetails() {
 		view.hideThreadDetails();
-		unwatchEtag();
+		unwatchReplyCount();
 	}
 
 	private void showThreadDetails() {
 		configureMessage();
 		view.showThreadDetails();
-		watchEtag();
+		watchReplyCount();
 	}
 
 	private void reconfigureThread() {

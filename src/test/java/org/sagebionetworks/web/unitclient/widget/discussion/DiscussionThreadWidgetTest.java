@@ -42,8 +42,10 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
@@ -114,6 +116,8 @@ public class DiscussionThreadWidgetTest {
 	SubscribeButtonWidget mockSubscribeButtonWidget;
 	@Mock
 	ReplyCountAlert mockRefreshAlert;
+	@Mock
+	CallbackP<String> mockThreadIdClickedCallback;
 	
 	DiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -154,7 +158,8 @@ public class DiscussionThreadWidgetTest {
 		boolean isDeleted = false;
 		boolean canModerate = false;
 		boolean isEdited = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited);
 		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
@@ -178,6 +183,12 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).hideThreadDetails();
 		verify(mockView).hideReplyDetails();
 		verify(mockView).setThreadLink(anyString());
+		
+		discussionThreadWidget.watchReplyCount();
+		verify(mockRefreshAlert).configure(threadId);
+		reset(mockRefreshAlert);
+		discussionThreadWidget.unwatchReplyCount();
+		verify(mockRefreshAlert).clear();
 	}
 
 	@Test
@@ -569,6 +580,19 @@ public class DiscussionThreadWidgetTest {
 	public void testOnClickEditThread() {
 		discussionThreadWidget.onClickEditThread();
 		verify(mockEditThreadModal).show();
+	}
+	
+	@Test
+	public void testOnClickThreadNoCallback() {
+		discussionThreadWidget.onClickThread();
+		verify(mockPlaceChanger).goTo(any(Synapse.class));
+	}
+	
+	@Test
+	public void testOnClickThreadWithCallback() {
+		discussionThreadWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
+		discussionThreadWidget.onClickThread();
+		verify(mockThreadIdClickedCallback).invoke(anyString());
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,

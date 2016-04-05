@@ -52,7 +52,9 @@ public class DiscussionThreadListWidgetTest {
 	@Mock
 	CallbackP<Boolean> mockEmptyListCallback;
 	@Mock
-	DiscussionThreadCountAlert mockDiscussionThreadListAlert;
+	CallbackP<String> mockThreadIdClickedCallback;
+	@Mock
+	DiscussionThreadCountAlert mockDiscussionThreadCountAlert;
 	
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
@@ -61,7 +63,7 @@ public class DiscussionThreadListWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createThreadWidget()).thenReturn(mockDiscussionThreadWidget);
-		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockDiscussionThreadListAlert);
+		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockDiscussionThreadCountAlert);
 	}
 
 	@Test
@@ -81,6 +83,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
+		verify(mockDiscussionThreadCountAlert).clear();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -94,6 +97,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
 		discussionThreadBundleList.add(new DiscussionThreadBundle());
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
+		discussionThreadListWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
@@ -103,6 +107,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class),
 				eq(canModerate), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_THREAD_LIST),
 				eq(SHOW_REPLY_DETAILS_FOR_THREAD_LIST));
+		verify(mockDiscussionThreadWidget).setThreadIdClickedCallback(mockThreadIdClickedCallback);
 	}
 
 	@Test

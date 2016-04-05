@@ -97,6 +97,13 @@ public class ForumWidgetTest {
 		//invoke callback to verify thread list is reconfigured
 		onSubscribeCallback.invoke();
 		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), any(CallbackP.class));
+		
+		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(captorP.capture());
+		CallbackP<String> threadIdClickedCallback = captorP.getValue();
+		String threadId = "9584";
+		threadIdClickedCallback.invoke(threadId);
+		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")

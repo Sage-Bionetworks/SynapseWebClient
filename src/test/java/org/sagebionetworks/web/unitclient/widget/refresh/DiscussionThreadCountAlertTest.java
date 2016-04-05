@@ -44,7 +44,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public class DiscussionThreadListAlertTest {
+public class DiscussionThreadCountAlertTest {
 	@Mock
 	RefreshAlertView mockView;
 	@Mock
