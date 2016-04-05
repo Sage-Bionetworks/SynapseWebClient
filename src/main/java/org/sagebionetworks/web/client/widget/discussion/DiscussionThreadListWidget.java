@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -33,7 +34,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private String forumId;
 	private Boolean isCurrentUserModerator;
 	private CallbackP<Boolean> emptyListCallback;
-
+	private CallbackP<String> threadIdClickedCallback;
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,
@@ -52,12 +53,23 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	}
 
 	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
-		view.clear();
+		clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		offset = 0L;
 		this.forumId = forumId;
 		loadMore();
+		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
+		view.setThreadCountAlert(threadCountAlert.asWidget());
+		threadCountAlert.configure(forumId);
+	}
+
+	public void clear() {
+		view.clear();
+	}
+	
+	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
+		this.threadIdClickedCallback = threadIdClickedCallback;
 	}
 
 	@Override
@@ -65,7 +77,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		return view.asWidget();
 	}
 
-	public void loadMore(){
+	public void loadMore() {
 		synAlert.clear();
 		view.setLoadingVisible(true);
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset,
@@ -89,8 +101,10 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 									configure(forumId, isCurrentUserModerator, emptyListCallback);
 								}
 							}, SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+							thread.setThreadIdClickedCallback(threadIdClickedCallback);
 							view.addThread(thread.asWidget());
 						}
+						
 						offset += LIMIT;
 						long numberOfThreads = result.getTotalNumberOfResults();
 						view.setLoadingVisible(false);

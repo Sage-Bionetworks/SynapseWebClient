@@ -13,8 +13,6 @@
 					<g:FocusPanel ui:field="showThread" addStyleNames="imageButton">
 						<bh:Div>
 							<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
-							<b:Icon ui:field="threadDownIcon" type="ANGLE_DOUBLE_DOWN"/>
-							<b:Icon ui:field="threadUpIcon" type="ANGLE_DOUBLE_UP"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</t:TableData>
@@ -35,7 +33,7 @@
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>
-		<b:Collapse ui:field="threadDetails" addStyleNames="overflow-x-hidden">
+		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
 			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
 				<b:Row>
 					<b:Column size="SM_9">
@@ -66,9 +64,6 @@
 									<b:Tooltip title="Edit thread" placement="LEFT">
 										<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
 									</b:Tooltip>
-									<b:Tooltip title="Open this thread in a new window" placement="LEFT" ui:field="threadLinkTooltip">
-										<b:Icon ui:field="threadLink" type="EXTERNAL_LINK" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em"/>
-									</b:Tooltip>
 									<bh:Span ui:field="subscribeButtonContainer" addStyleNames="right" />
 								</bh:Div>
 							</t:TableData>
@@ -79,27 +74,19 @@
 				<bh:Div width="100%">
 					<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10 margin-bottom-5 line-height-1em"/>
 				</bh:Div>
-
-				<g:FocusPanel ui:field="showReplies" addStyleNames="imageButton">
-					<bh:Div addStyleNames="link">
-						<bh:Span ui:field="clickToViewReplies" addStyleNames="margin-right-10"></bh:Span>
-						<b:Icon ui:field="replyDownIcon" type="ANGLE_DOUBLE_DOWN"/>
-						<b:Icon ui:field="replyUpIcon" type="ANGLE_DOUBLE_UP"/>
-					</bh:Div>
-				</g:FocusPanel>
 			</bh:Div>
-			<b:Collapse ui:field="replyDetails">
+			<bh:Div ui:field="replyDetails">
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 				<g:HTMLPanel ui:field="loadingReplies">
 					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 					&nbsp;Loading...
 				</g:HTMLPanel>
-			</b:Collapse>
+			</bh:Div>
 			<bh:Div width="95%" pull="RIGHT" addStyleNames="margin-bottom-5">
 				<b:Button ui:field="loadMoreButton" addStyleNames="margin-top-5" visible="false">Load more replies</b:Button>
 				<b:Button ui:field="replyButton" addStyleNames="margin-top-5">Reply</b:Button>
 			</bh:Div>
-		</b:Collapse>
+		</bh:Div>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>

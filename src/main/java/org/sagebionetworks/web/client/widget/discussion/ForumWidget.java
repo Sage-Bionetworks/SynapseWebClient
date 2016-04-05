@@ -12,10 +12,12 @@ import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -90,6 +92,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		};
 		subscribeToForumButton.setOnSubscribeCallback(refreshThreadsCallback);
 		subscribeToForumButton.setOnUnsubscribeCallback(refreshThreadsCallback);
+		
+		threadListWidget.setThreadIdClickedCallback(new CallbackP<String>() {
+			@Override
+			public void invoke(String threadId) {
+				showThread(threadId);
+			}
+		});
 	}
 
 	public void configure(String entityId, ParameterizedToken params,
@@ -103,14 +112,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
 			showThread(threadId);
-			isSingleThread = true;
 		} else {
 			showForum();
-			isSingleThread = false;
 		}
 	}
 
 	public void showThread(final String threadId) {
+		isSingleThread = true;
+		globalApplicationState.pushCurrentPlace(TopicUtils.getThreadPlace(entityId, threadId));
 		view.setSingleThreadUIVisible(true);
 		view.setThreadListUIVisible(false);
 		view.setNewThreadButtonVisible(false);
@@ -137,14 +146,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 						configure(entityId, new ParameterizedToken(null), isCurrentUserModerator, showAllThreadsCallback);
 					}
 				}, SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
-				if (singleThreadWidget.isThreadCollapsed()) {
-					singleThreadWidget.toggleThread();
-				}
 			}
 		});
 	}
 
 	public void showForum() {
+		isSingleThread = false;
+		globalApplicationState.pushCurrentPlace(TopicUtils.getForumPlace(entityId));
+		threadListWidget.clear();
 		view.setSingleThreadUIVisible(false);
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
