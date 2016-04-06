@@ -231,7 +231,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		watchReplyCount();
 	}
 
-	private void reconfigureThread() {
+	public void reconfigureThread() {
 		synAlert.clear();
 		discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
@@ -243,7 +243,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
 				boolean showThreadDetails = true;
-				boolean showReplyDetails = !view.isReplyCollapsed();
+				boolean showReplyDetails = true;
 				configure(result, isCurrentUserModerator, deleteCallback, showThreadDetails, showReplyDetails);
 			}
 		});

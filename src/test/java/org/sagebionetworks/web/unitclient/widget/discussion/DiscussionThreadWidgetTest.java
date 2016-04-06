@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -53,7 +52,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThre
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
@@ -593,6 +591,23 @@ public class DiscussionThreadWidgetTest {
 		discussionThreadWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadWidget.onClickThread();
 		verify(mockThreadIdClickedCallback).invoke(anyString());
+	}
+	
+	@Test
+	public void testReconfigureThread() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		String threadId = "123";
+		DiscussionThreadBundle bundle = createThreadBundle(threadId, "title", Arrays.asList("1"),
+				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited);
+		discussionThreadWidget.configure(bundle, canModerate, mockCallback,
+				SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
+		reset(mockView);
+		AsyncMockStubber.callSuccessWith(bundle)
+		.when(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+		discussionThreadWidget.reconfigureThread();
+		verify(mockView).showReplyDetails();
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,
