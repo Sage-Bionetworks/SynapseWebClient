@@ -65,4 +65,8 @@ public interface DiscussionForumClient extends RemoteService {
 	String getReplyUrl(String messageKey) throws RestServiceException;
 
 	Project getForumProject(String forumId) throws RestServiceException;
+
+	Long getThreadCountForForum(String forumId, DiscussionFilter filter) throws RestServiceException;
+
+	Long getReplyCountForThread(String threadId, DiscussionFilter filter) throws RestServiceException;
 }

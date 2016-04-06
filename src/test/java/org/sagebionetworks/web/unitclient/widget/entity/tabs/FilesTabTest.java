@@ -143,11 +143,10 @@ public class FilesTabTest {
 		when(mockProjectEntity.getId()).thenReturn(entityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
-		
+		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
 		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
 				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
-				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy,
-				mockRefreshAlert);
+				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -181,7 +180,6 @@ public class FilesTabTest {
 		verify(mockView).setMetadata(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
-		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockFilesBrowser).setEntityClickedHandler(any(CallbackP.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
 	}
@@ -235,7 +233,6 @@ public class FilesTabTest {
 		assertEquals(EntityArea.FILES, place.getArea());
 		assertNull(place.getAreaToken());
 		
-		verify(mockRefreshAlert).clear();
 		verify(mockRefreshAlert, never()).configure(anyString(), any(ObjectType.class));
 	}
 	
@@ -290,7 +287,7 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockPortalGinInjector).getProvenanceRenderer();
 
-		verify(mockRefreshAlert).clear();
+		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
@@ -337,7 +334,7 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 
-		verify(mockRefreshAlert).clear();
+		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockRefreshAlert).configure(folderEntityId, ObjectType.ENTITY);
 
 		verify(mockBasicTitleBar).configure(mockEntityBundle);
@@ -403,7 +400,6 @@ public class FilesTabTest {
 		verify(mockBreadcrumb).clear();
 		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
-		verify(mockRefreshAlert).clear();
 		verify(mockModifiedCreatedBy).setVisible(false);
 	}
 	

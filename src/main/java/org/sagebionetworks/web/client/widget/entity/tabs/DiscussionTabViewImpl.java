@@ -21,6 +21,10 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 		widget = binder.createAndBindUi(this);
 	}
 	
+	public void updateWidth(Tab tab) {
+		tab.getTabListItem().setWidth("150px");
+	};
+	
 	@Override
 	public void setForum(Widget w) {
 		forumContainer.add(w);

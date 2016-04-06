@@ -42,7 +42,7 @@ public class TabViewImpl implements TabView {
 	
 	@Override
 	public void configure(String tabTitle, Widget content) {
-		tabItem.setText(tabTitle);
+		tabItem.setHTML(tabTitle);
 		contentDiv.clear();
 		contentDiv.add(content);
 	}

@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import org.gwtbootstrap3.client.ui.TabListItem;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionTabTest {
@@ -36,7 +38,7 @@ public class DiscussionTabTest {
 	CookieProvider mockCookies;
 	@Mock
 	ForumWidget mockForumWidget;
-
+	
 	DiscussionTab tab;
 
 	@Before

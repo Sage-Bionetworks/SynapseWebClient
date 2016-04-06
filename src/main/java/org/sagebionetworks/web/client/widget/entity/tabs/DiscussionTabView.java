@@ -11,4 +11,10 @@ public interface DiscussionTabView extends IsWidget{
 	void setPresenter(Presenter presenter);
 	void showErrorMessage(String errorMessage);
 	void setForum(Widget w);
+	
+	/**
+	 * TODO: delete this method after taking the Discussion feature out of beta.
+	 * @param t
+	 */
+	void updateWidth(Tab t);
 }

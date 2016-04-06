@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -51,8 +52,10 @@ public class DiscussionThreadListWidgetTest {
 	@Mock
 	CallbackP<Boolean> mockEmptyListCallback;
 	@Mock
-	RefreshAlert mockRefreshAlert;
-
+	CallbackP<String> mockThreadIdClickedCallback;
+	@Mock
+	DiscussionThreadCountAlert mockDiscussionThreadCountAlert;
+	
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
 
@@ -60,14 +63,14 @@ public class DiscussionThreadListWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.createThreadWidget()).thenReturn(mockDiscussionThreadWidget);
-		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockRefreshAlert);
+		when(mockGinInjector.getDiscussionThreadCountAlert()).thenReturn(mockDiscussionThreadCountAlert);
+		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert);
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadListWidget);
 		verify(mockView).setAlert(any(Widget.class));
-		verify(mockView).setRefreshAlert(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,8 +81,6 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure(forumId, canModerate, mockEmptyListCallback);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
-		verify(mockRefreshAlert).clear();
-		verify(mockRefreshAlert).configure(forumId, ObjectType.FORUM);
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
@@ -96,6 +97,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
 		discussionThreadBundleList.add(new DiscussionThreadBundle());
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
+		discussionThreadListWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
@@ -105,6 +107,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class),
 				eq(canModerate), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_THREAD_LIST),
 				eq(SHOW_REPLY_DETAILS_FOR_THREAD_LIST));
+		verify(mockDiscussionThreadWidget).setThreadIdClickedCallback(mockThreadIdClickedCallback);
 	}
 
 	@Test
