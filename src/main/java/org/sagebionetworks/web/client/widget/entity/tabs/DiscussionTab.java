@@ -34,7 +34,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.cookies = cookies;
 		this.forumWidget = forumWidget;
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
-		tab.getTabListItem().setWidth("150px");
+		view.updateWidth(tab);
 		tab.configure("Discussion " + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
 		view.setPresenter(this);
 		view.setForum(forumWidget.asWidget());
