@@ -42,7 +42,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 				break;
 			case FORUM:
 				configureForum(id);
-				break;
+				break;			
 			default:
 				synAlert.showError("Unknown topic type: " + type);
 				break;
