@@ -69,7 +69,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	
 
 	public void showForum(String entityId) {
-		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, new Callback(){
+		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, DisplayUtils.isInTestWebsite(cookies), new Callback(){
 			@Override
 			public void invoke() {
 				place.getParameterizedToken().clear();

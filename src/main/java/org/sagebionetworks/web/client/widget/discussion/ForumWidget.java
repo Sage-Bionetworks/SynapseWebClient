@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -102,16 +101,19 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	public void configure(String entityId, ParameterizedToken params,
-			Boolean isCurrentUserModerator, Callback showAllThreadsCallback) {
+			Boolean isCurrentUserModerator, boolean isInTestWebsite,
+			Callback showAllThreadsCallback) {
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.showAllThreadsCallback = showAllThreadsCallback;
-		//are we just showing a single thread, or the full list?
-		if (params.containsKey(THREAD_ID_KEY)) {
-			String threadId = params.get(THREAD_ID_KEY);
-			showThread(threadId);
-		} else {
-			showForum();
+		if (isInTestWebsite) {
+			//are we just showing a single thread, or the full list?
+			if (params.containsKey(THREAD_ID_KEY)) {
+				String threadId = params.get(THREAD_ID_KEY);
+				showThread(threadId);
+			} else {
+				showForum();
+			}
 		}
 	}
 
@@ -143,7 +145,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 					@Override
 					public void invoke() {
 						showAllThreadsCallback.invoke();
-						configure(entityId, new ParameterizedToken(null), isCurrentUserModerator, showAllThreadsCallback);
+						configure(entityId, new ParameterizedToken(null), isCurrentUserModerator, true, showAllThreadsCallback);
 					}
 				}, SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
 			}

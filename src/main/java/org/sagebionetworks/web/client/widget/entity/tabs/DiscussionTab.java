@@ -49,7 +49,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
+		forumWidget.configure(entityId, params, isCurrentUserModerator, DisplayUtils.isInTestWebsite(cookies), new Callback(){
 			@Override
 			public void invoke() {
 				params.clear();
