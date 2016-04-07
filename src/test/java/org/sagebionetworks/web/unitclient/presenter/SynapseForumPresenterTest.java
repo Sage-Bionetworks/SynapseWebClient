@@ -107,6 +107,6 @@ public class SynapseForumPresenterTest {
 		presenter.showForum(entityId);
 
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
-				anyBoolean(), anyBoolean(), any(Callback.class));
+				anyBoolean(), any(Callback.class));
 	}
 }

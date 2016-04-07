@@ -118,7 +118,7 @@ public class ForumWidgetTest {
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		verify(mockSubscribeButtonWidget).clear();
 		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
 		verify(mockSynAlert).clear();
@@ -143,7 +143,7 @@ public class ForumWidgetTest {
 		String areaToken = "foo=bar";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockSynAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
@@ -168,7 +168,7 @@ public class ForumWidgetTest {
 		canModerate = true;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE), any(CallbackP.class));
 		verify(mockView).setModeratorModeContainerVisibility(canModerate);
@@ -211,7 +211,7 @@ public class ForumWidgetTest {
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockSynAlert).clear();
 		verify(mockView).setModeratorModeContainerVisibility(false);
@@ -240,7 +240,7 @@ public class ForumWidgetTest {
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockSynAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
@@ -261,7 +261,7 @@ public class ForumWidgetTest {
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.onClickShowAllThreads();
 
 		//attempts to show full thread list
@@ -282,7 +282,7 @@ public class ForumWidgetTest {
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByReplies();
 		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
 	}
@@ -299,7 +299,7 @@ public class ForumWidgetTest {
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByReplies();
 		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
 	}
@@ -315,7 +315,7 @@ public class ForumWidgetTest {
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByViews();
 		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
 	}
@@ -332,7 +332,7 @@ public class ForumWidgetTest {
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByViews();
 		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
 	}
@@ -349,7 +349,7 @@ public class ForumWidgetTest {
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByActivity();
 		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
 	}
@@ -366,7 +366,7 @@ public class ForumWidgetTest {
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		Callback callback = null;
-		forumWidget.configure(entityId, param, canModerate, true, callback);
+		forumWidget.configure(entityId, param, canModerate, callback);
 		forumWidget.sortByActivity();
 		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
 	}
