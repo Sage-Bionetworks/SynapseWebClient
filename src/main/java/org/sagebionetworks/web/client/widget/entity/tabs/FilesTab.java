@@ -72,7 +72,6 @@ public class FilesTab implements FilesTabView.Presenter{
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
-	RefreshAlert refreshAlert;
 	
 	Entity currentEntity;
 	String currentEntityId;
@@ -103,8 +102,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy,
-			RefreshAlert refreshAlert
+			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -120,7 +118,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
 		this.modifiedCreatedBy = modifiedCreatedBy;
-		this.refreshAlert = refreshAlert;
 		view.setPresenter(this);
 		
 		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
@@ -133,7 +130,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		view.setRefreshAlert(refreshAlert.asWidget());
 		
 		tab.configure("Files", view.asWidget());
 		
@@ -187,7 +183,6 @@ public class FilesTab implements FilesTabView.Presenter{
 	
 	public void resetView() {
 		synAlert.clear();
-		refreshAlert.clear();
 		view.setFileTitlebarVisible(false);
 		view.setFolderTitlebarVisible(false);
 		view.setPreviewVisible(false);
@@ -224,6 +219,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			//configure based on the project bundle
 			showProjectLevelUI();
 		} else {
+			RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
+			view.setRefreshAlert(refreshAlert.asWidget());
 			refreshAlert.configure(targetEntity.getId(), ObjectType.ENTITY);
 			getTargetBundleAndDisplay(targetEntity.getId(), versionNumber);
 		}

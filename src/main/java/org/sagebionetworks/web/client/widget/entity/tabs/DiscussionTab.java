@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
@@ -32,7 +33,9 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.tab = tab;
 		this.cookies = cookies;
 		this.forumWidget = forumWidget;
-		tab.configure("Discussion", view.asWidget());
+		// Necessary for "beta" badge.  Remove when bringing out of beta.
+		view.updateWidth(tab);
+		tab.configure("Discussion " + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
 		view.setPresenter(this);
 		view.setForum(forumWidget.asWidget());
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));

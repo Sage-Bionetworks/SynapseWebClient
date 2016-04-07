@@ -62,4 +62,8 @@ public interface DiscussionForumClientAsync{
 	void getReplyUrl(String messageKey, AsyncCallback<String> callback);
 	
 	void getForumProject(String forumId, AsyncCallback<Project> callback);
+	
+	void getThreadCountForForum(String forumId, DiscussionFilter filter, AsyncCallback<Long> callback);
+
+	void getReplyCountForThread(String threadId, DiscussionFilter filter, AsyncCallback<Long> asyncCallback);
 }

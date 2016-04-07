@@ -6,15 +6,23 @@ import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.THREA
 import org.sagebionetworks.web.client.place.Synapse;
 
 public class TopicUtils {
+	
+	public static Synapse getForumPlace(String projectId) {
+		return new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, null);
+	}
 	public static String buildForumLink(String projectId) {
-		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, null);
+		Synapse place = getForumPlace(projectId);
 		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
 		return link;
 	}
 
-	public static String buildThreadLink(String projectId, String threadId) {
+	public static Synapse getThreadPlace(String projectId, String threadId) {
 		String token = THREAD_ID_KEY+"="+threadId;
-		Synapse place = new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
+		return new Synapse(projectId, null, Synapse.EntityArea.DISCUSSION, token);
+	}
+	
+	public static String buildThreadLink(String projectId, String threadId) {
+		Synapse place = getThreadPlace(projectId, threadId);
 		String link = "/" + SYNAPSE_ENTITY_PREFIX + place.toToken();
 		return link;
 	}

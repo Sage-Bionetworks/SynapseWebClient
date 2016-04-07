@@ -11,10 +11,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 		Widget asWidget();
 
-		void toggleReplies();
-
-		void toggleThread();
-
 		void onClickNewReply();
 
 		void loadMore();
@@ -22,6 +18,8 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void onClickDeleteThread();
 
 		void onClickEditThread();
+		
+		void onClickThread();
 	}
 
 	void setPresenter(DiscussionThreadWidget presenter);
@@ -52,21 +50,11 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void setLoadMoreButtonVisibility(boolean visible);
 
-	void setShowRepliesVisibility(boolean visible);
-
 	void clearReplies();
 
 	void addActiveAuthor(Widget user);
 
 	boolean isThreadCollapsed();
-
-	void setThreadUpIconVisible(boolean visible);
-
-	void setThreadDownIconVisible(boolean visible);
-
-	void setReplyUpIconVisible(boolean visible);
-
-	void setReplyDownIconVisible(boolean visible);
 
 	boolean isReplyCollapsed();
 
@@ -103,4 +91,5 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setThreadLink(String link);
 	
 	void setRefreshAlert(Widget w);
+	void removeRefreshAlert();
 }

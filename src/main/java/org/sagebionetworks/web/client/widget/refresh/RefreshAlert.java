@@ -24,7 +24,8 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	private String objectId;
 	private ObjectType objectType;
 	private Callback invokeCheckEtag;
-	public static final int DELAY = 15000; // check every 15 seconds (until detached, configuration cleared, or a change has been detected)
+	private Callback refreshCallback;
+	public static final int DELAY = 17000; // check every 17 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public RefreshAlert(RefreshAlertView view, 
 			SynapseClientAsync synapseClient, 
@@ -59,6 +60,14 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 		checkEtag();
 	}
 	
+	/**
+	 * If you set this callback, it will be invoked when the user elects to refresh the data (instead of causing a page refresh)
+	 * @param c
+	 */
+	public void setRefreshCallback(Callback c) {
+		refreshCallback = c;
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -66,7 +75,12 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	
 	@Override
 	public void onRefresh() {
-		globalAppState.refreshPage();
+		clear();
+		if (refreshCallback == null) {
+			globalAppState.refreshPage();	
+		} else {
+			refreshCallback.invoke();
+		}
 	}
 	
 	@Override
@@ -87,7 +101,9 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 						view.setVisible(true);
 					} else {
 						//no etag change, reschedule
-						gwt.scheduleExecution(invokeCheckEtag, DELAY);		
+						if (view.isAttached()) {
+							gwt.scheduleExecution(invokeCheckEtag, DELAY);
+						}
 					}
 				}
 				@Override

@@ -97,6 +97,13 @@ public class ForumWidgetTest {
 		//invoke callback to verify thread list is reconfigured
 		onSubscribeCallback.invoke();
 		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), any(CallbackP.class));
+		
+		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(captorP.capture());
+		CallbackP<String> threadIdClickedCallback = captorP.getValue();
+		String threadId = "9584";
+		threadIdClickedCallback.invoke(threadId);
+		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -207,6 +214,7 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, callback);
 
 		verify(mockSynAlert).clear();
+		verify(mockView).setModeratorModeContainerVisibility(false);
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -215,7 +223,6 @@ public class ForumWidgetTest {
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle),
 				eq(canModerate), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD),
 				eq(SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD));
-		verify(mockDiscussionThreadWidget).toggleThread();
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setEmptyUIVisible(false);
 		verify(mockView).setThreadHeaderVisible(true);
@@ -261,7 +268,7 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
-		verify(mockSynAlert, times(2)).clear();
+		verify(mockSynAlert, times(3)).clear();
 	}
 
 	@SuppressWarnings("unchecked")
