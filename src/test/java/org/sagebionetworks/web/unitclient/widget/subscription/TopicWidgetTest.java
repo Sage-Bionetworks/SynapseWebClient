@@ -62,7 +62,6 @@ public class TopicWidgetTest {
 		verify(mockView).setPresenter(widget);
 	}
 
-	@Ignore
 	@Test
 	public void testConfigureAllTypesTest() {
 		for (SubscriptionObjectType type : SubscriptionObjectType.values()) {
