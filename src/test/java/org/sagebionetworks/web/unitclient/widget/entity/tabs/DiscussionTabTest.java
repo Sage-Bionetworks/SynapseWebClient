@@ -78,8 +78,6 @@ public class DiscussionTabTest {
 		assertEquals(EntityArea.DISCUSSION, place.getArea());
 		assertTrue(place.getAreaToken().contains("a=b"));
 		assertTrue(place.getAreaToken().contains("c=d"));
-
-		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), any(Callback.class));
 	}
 
 	@Test

@@ -21,6 +21,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	ParameterizedToken params;
 	ForumWidget forumWidget;
 	String entityName, entityId;
+	Boolean isCurrentUserModerator;
 
 	@Inject
 	public DiscussionTab(
@@ -43,20 +44,28 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
+		tab.addTabClickedCallback(new CallbackP<Tab>(){
+
+			@Override
+			public void invoke(Tab param) {
+				forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
+					@Override
+					public void invoke() {
+						params.clear();
+						updatePlace();
+						tab.showTab();
+					}
+				});
+			}
+			
+		});
 	}
 
 	public void configure(String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
-			@Override
-			public void invoke() {
-				params.clear();
-				updatePlace();
-				tab.showTab();
-			}
-		});
+		this.isCurrentUserModerator = isCurrentUserModerator;
 		updatePlace();
 		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
