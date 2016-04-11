@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -35,37 +34,39 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.forumWidget = forumWidget;
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		view.updateWidth(tab);
-		tab.configure("Discussion " + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
+		tab.configure("Discussion&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
 		view.setPresenter(this);
 		view.setForum(forumWidget.asWidget());
-		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
+	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, params, isCurrentUserModerator, new Callback(){
+		CallbackP<ParameterizedToken> updateParamsCallback = new CallbackP<ParameterizedToken>(){
+			@Override
+			public void invoke(ParameterizedToken token) {
+				updatePlace(new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, token.toString()));
+			}
+		};
+		Callback updateURLCallback = new Callback() {
 			@Override
 			public void invoke() {
-				params.clear();
-				updatePlace();
 				tab.showTab();
 			}
-		});
-		updatePlace();
-		tab.setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
+		};
+		forumWidget.configure(entityId, params, isCurrentUserModerator, updateParamsCallback, updateURLCallback);
 	}
 
 	/**
 	 * Based on the current area parameters, update the address bar (push the url in to the browser history).
 	 */
-	public void updatePlace(){
-		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, getCurrentAreaToken()));
+	public void updatePlace(Synapse newPlace){
+		tab.setEntityNameAndPlace(entityName, newPlace);
 	}
 
 	public Tab asTab(){
