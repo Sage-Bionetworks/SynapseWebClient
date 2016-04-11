@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SynapseForumPresenter extends AbstractActivity implements SynapseForumView.Presenter, Presenter<SynapseForumPlace> {
-	public static final Boolean DEFAULT_MODERATOR = false;
+	public static final Boolean DEFAULT_IS_MODERATOR = false;
 	private SynapseForumPlace place;
 	SynapseForumView view;
 
@@ -83,7 +83,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 				globalApplicationState.pushCurrentPlace(place);
 			}
 		};
-		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_MODERATOR, paramChangeCallback, urlChangeCallback);
+		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, paramChangeCallback, urlChangeCallback);
 	}
 
 
