@@ -21,6 +21,14 @@
 	<inherits name="com.google.gwt.logging.Logging" />
 	<inherits name="com.google.gwt.inject.Inject" />
 	
+	<!-- inherit these modules to activate GWT internationalization -->
+	<inherits name='com.google.gwt.i18n.I18N' />
+	<!-- add the various locales you wish to support 
+	<extend-property name="locale" values="en"/>
+	<extend-property name="locale" values="es"/>
+	<extend-property name="locale" values="de"/>
+	-->
+	
 	<!-- The gwtbootsrap dependencies must come before the portal entry point.  -->
 	<inherits name="org.gwtbootstrap3.GwtBootstrap3PaperTheme"/>
     <inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
