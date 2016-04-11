@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.HashMap;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -24,6 +23,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SynapseForumPresenter extends AbstractActivity implements SynapseForumView.Presenter, Presenter<SynapseForumPlace> {
+	public static final Boolean DEFAULT_MODERATOR = false;
 	private SynapseForumPlace place;
 	SynapseForumView view;
 
@@ -33,7 +33,6 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	
 	MarkdownWidget wikiPage;
 	WikiPageKey pageKey;
-	Boolean isCurrentUserModerator;
 	CookieProvider cookies;
 	ForumWidget forumWidget;
 
@@ -68,22 +67,21 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		loadWikiHelpContent();
 		showForum(globalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
 	}
-	
 
-	public void showForum(String entityId) {
-		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
+	public void showForum(final String entityId) {
+		final CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
 			@Override
 			public void invoke(ParameterizedToken token) {
 				// TODO: make the synapse forum a parameterized place, and handle these token changes
 			}
 		};
-		Callback urlChangeCallback = new Callback() {
+		final Callback urlChangeCallback = new Callback() {
 			@Override
 			public void invoke() {
 				// TODO: push the new place up to the url (with params that may have been updated)
 			}
 		};
-		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, paramChangeCallback, urlChangeCallback);
+		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_MODERATOR, paramChangeCallback, urlChangeCallback);
 	}
 
 
@@ -91,10 +89,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	public void setPlace(SynapseForumPlace place) {
 		this.place = place;
 		this.view.setPresenter(this);
-//		String threadId = place.getParam(DiscussionTab.THREAD_ID_KEY);
-		isCurrentUserModerator = DisplayUtils.isInTestWebsite(cookies);
 	}
-	
 	
 	public void loadWikiHelpContent() {
 		if (pageKey == null) {
