@@ -72,13 +72,15 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		final CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
 			@Override
 			public void invoke(ParameterizedToken token) {
-				// TODO: make the synapse forum a parameterized place, and handle these token changes
+				// handle token changes
+				place.setParameterizedToken(token);
 			}
 		};
 		final Callback urlChangeCallback = new Callback() {
 			@Override
 			public void invoke() {
-				// TODO: push the new place up to the url (with params that may have been updated)
+				// push the new place up to the url (with params that may have been updated)
+				globalApplicationState.pushCurrentPlace(place);
 			}
 		};
 		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_MODERATOR, paramChangeCallback, urlChangeCallback);

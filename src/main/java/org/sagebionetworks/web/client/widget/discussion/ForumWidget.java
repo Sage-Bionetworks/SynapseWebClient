@@ -47,7 +47,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	CallbackP<Boolean> emptyListCallback;
 	Boolean isSingleThread;
 	SubscribeButtonWidget subscribeToForumButton;
-	//use this token to navigate between threads within the discussion tab
 	
 	@Inject
 	public ForumWidget(
