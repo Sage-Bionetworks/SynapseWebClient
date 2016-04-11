@@ -6,8 +6,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -69,12 +71,21 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	
 
 	public void showForum(String entityId) {
-		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, new Callback(){
+		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
+			@Override
+			public void invoke(ParameterizedToken token) {
+				// handle token changes
+				place.setParameterizedToken(token);
+			}
+		};
+		Callback urlChangeCallback = new Callback() {
 			@Override
 			public void invoke() {
-				place.getParameterizedToken().clear();
+				// push the new place up to the url (with params that may have been updated)
+				globalApplicationState.pushCurrentPlace(place);
 			}
-		});
+		};
+		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, paramChangeCallback, urlChangeCallback);
 	}
 
 
