@@ -68,15 +68,15 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		showForum(globalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
 	}
 
-	public void showForum(final String entityId) {
-		final CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
+	public void showForum(String entityId) {
+		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
 			@Override
 			public void invoke(ParameterizedToken token) {
 				// handle token changes
 				place.setParameterizedToken(token);
 			}
 		};
-		final Callback urlChangeCallback = new Callback() {
+		Callback urlChangeCallback = new Callback() {
 			@Override
 			public void invoke() {
 				// push the new place up to the url (with params that may have been updated)
