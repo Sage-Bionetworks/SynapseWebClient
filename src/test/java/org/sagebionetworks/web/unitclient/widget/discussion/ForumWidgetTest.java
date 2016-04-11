@@ -82,6 +82,7 @@ public class ForumWidgetTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 
+	@SuppressWarnings({ "unchecked" })
 	@Test
 	public void testConstruction() {
 		verify(mockView).setThreadList(any(Widget.class));
@@ -103,7 +104,7 @@ public class ForumWidgetTest {
 		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), any(CallbackP.class));
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void testConfigureForumSuccess() {
 		String forumId = "123";
@@ -124,8 +125,7 @@ public class ForumWidgetTest {
 		verify(mockView).setShowAllThreadsButtonVisible(false);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
-		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE), any(CallbackP.class));
-		verify(mockView).setModeratorModeContainerVisibility(canModerate);
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), any(CallbackP.class));
 		ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(ParameterizedToken.class);
 		verify(mockParamChangeCallback).invoke(captorToken.capture());
 		assertEquals(ParameterizedToken.DEFAULT_TOKEN, captorToken.getValue().toString());
@@ -137,6 +137,7 @@ public class ForumWidgetTest {
 		String threadId = "9584";
 		threadIdClickedCallback.invoke(threadId);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -158,7 +159,6 @@ public class ForumWidgetTest {
 		verify(mockView).setShowAllThreadsButtonVisible(false);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
-		verify(mockView).setModeratorModeContainerVisibility(canModerate);
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
@@ -175,8 +175,7 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockURLChangeCallback);
 
-		verify(mockAvailableThreadListWidget).configure(anyString(), eq(DEFAULT_MODERATOR_MODE), any(CallbackP.class));
-		verify(mockView).setModeratorModeContainerVisibility(canModerate);
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), any(CallbackP.class));
 	}
 
 	@Test
@@ -192,15 +191,6 @@ public class ForumWidgetTest {
 		verify(mockNewDiscussionThreadModal, never()).show();
 		verify(mockGlobalApplicationState).getPlaceChanger();
 		verify(mockView).showErrorMessage(anyString());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testOnModeratorModeChange() {
-		when(mockView.getModeratorMode()).thenReturn(true);
-		forumWidget.onModeratorModeChange();
-		verify(mockAvailableThreadListWidget).configure(anyString(), eq(true), any(CallbackP.class));
-		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -218,7 +208,6 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockURLChangeCallback);
 
 		verify(mockSynAlert).clear();
-		verify(mockView).setModeratorModeContainerVisibility(false);
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
