@@ -22,7 +22,6 @@ import com.google.inject.Inject;
 
 public class ForumWidget implements ForumWidgetView.Presenter{
 
-	public final static Boolean DEFAULT_MODERATOR_MODE = false;
 	public final static Boolean SHOW_THREAD_DETAILS_FOR_THREAD_LIST = false;
 	public final static Boolean SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD = true;
 	public final static Boolean SHOW_REPLY_DETAILS_FOR_THREAD_LIST = false;
@@ -159,7 +158,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				}, SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
 			}
 		});
-		view.setModeratorModeContainerVisibility(false);
 	}
 
 	public void showForum() {
@@ -185,13 +183,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE, emptyListCallback);
+						threadListWidget.configure(forumId, isCurrentUserModerator, emptyListCallback);
 					}
 				});
-				threadListWidget.configure(forumId, DEFAULT_MODERATOR_MODE, emptyListCallback);
+				threadListWidget.configure(forumId, isCurrentUserModerator, emptyListCallback);
 			}
 		});
-		view.setModeratorModeContainerVisibility(isCurrentUserModerator);
 	}
 
 	@Override
@@ -211,18 +208,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	private void refreshThreads() {
-		threadListWidget.configure(forumId, view.getModeratorMode(), emptyListCallback);
-	}
-	
-	@Override
-	public void onModeratorModeChange() {
-		refreshThreads();
-		newThreadModal.configure(forumId, new Callback(){
-			@Override
-			public void invoke() {
-				threadListWidget.configure(forumId, view.getModeratorMode(), emptyListCallback);
-			}
-		});
+		threadListWidget.configure(forumId, isCurrentUserModerator, emptyListCallback);
 	}
 
 	@Override

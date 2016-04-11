@@ -7,7 +7,6 @@ public interface ForumWidgetView extends IsWidget{
 
 	public interface Presenter {
 		void onClickNewThread();
-		void onModeratorModeChange();
 		void onClickShowAllThreads();
 		Widget asWidget();
 		void sortByReplies();
@@ -21,8 +20,6 @@ public interface ForumWidgetView extends IsWidget{
 	void setNewThreadModal(Widget w);
 	void setAlert(Widget w);
 	void setSubscribeButton(Widget w);
-	void setModeratorModeContainerVisibility(Boolean visible);
-	Boolean getModeratorMode();
 	void showErrorMessage(String errorMessage);
 	void setSingleThreadUIVisible(boolean visible);
 	void setThreadListUIVisible(boolean visible);

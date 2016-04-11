@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.HashMap;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -24,6 +23,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SynapseForumPresenter extends AbstractActivity implements SynapseForumView.Presenter, Presenter<SynapseForumPlace> {
+	public static final Boolean DEFAULT_IS_MODERATOR = false;
 	private SynapseForumPlace place;
 	SynapseForumView view;
 
@@ -33,7 +33,6 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	
 	MarkdownWidget wikiPage;
 	WikiPageKey pageKey;
-	Boolean isCurrentUserModerator;
 	CookieProvider cookies;
 	ForumWidget forumWidget;
 
@@ -68,7 +67,6 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		loadWikiHelpContent();
 		showForum(globalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
 	}
-	
 
 	public void showForum(String entityId) {
 		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
@@ -85,7 +83,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 				globalApplicationState.pushCurrentPlace(place);
 			}
 		};
-		forumWidget.configure(entityId, place.getParameterizedToken(), isCurrentUserModerator, paramChangeCallback, urlChangeCallback);
+		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, paramChangeCallback, urlChangeCallback);
 	}
 
 
@@ -93,10 +91,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 	public void setPlace(SynapseForumPlace place) {
 		this.place = place;
 		this.view.setPresenter(this);
-//		String threadId = place.getParam(DiscussionTab.THREAD_ID_KEY);
-		isCurrentUserModerator = DisplayUtils.isInTestWebsite(cookies);
 	}
-	
 	
 	public void loadWikiHelpContent() {
 		if (pageKey == null) {
