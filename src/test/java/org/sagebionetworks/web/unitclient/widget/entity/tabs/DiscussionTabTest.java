@@ -68,8 +68,12 @@ public class DiscussionTabTest {
 		boolean canModerate = false;
 		tab.configure(entityId, entityName, areaToken, canModerate);
 
-		verify(mockTab).setTabListItemVisible(true);
-
+		ArgumentCaptor<CallbackP> paramCaptor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), paramCaptor.capture(), any(Callback.class));
+		
+		//simulate the forum calling back to the tab with the parameter
+		paramCaptor.getValue().invoke(new ParameterizedToken(areaToken));
+		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
 		Synapse place = captor.getValue();
@@ -79,19 +83,6 @@ public class DiscussionTabTest {
 		assertTrue(place.getAreaToken().contains("a=b"));
 		assertTrue(place.getAreaToken().contains("c=d"));
 
-		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), any(Callback.class));
-	}
-
-	@Test
-	public void testNotInTestWebsite() {
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		String entityId = "syn1"; 
-		String entityName = "discussion project test";
-		String areaToken = "";
-		boolean canModerate = false;
-		reset(mockTab);
-		tab.configure(entityId, entityName, areaToken, canModerate);
-		verify(mockTab).setTabListItemVisible(false);
 	}
 
 	@Test
