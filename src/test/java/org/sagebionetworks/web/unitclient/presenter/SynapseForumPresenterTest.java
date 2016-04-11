@@ -104,8 +104,6 @@ public class SynapseForumPresenterTest {
 	@Test
 	public void testShowForum() {
 		String entityId = "syn1";
-		when(mockPlace.getParameterizedToken()).thenReturn(new ParameterizedToken("fake token"));
-		
 		presenter.setPlace(mockPlace);
 		presenter.showForum(entityId);
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
