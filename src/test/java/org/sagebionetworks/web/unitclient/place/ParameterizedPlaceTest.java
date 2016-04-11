@@ -31,6 +31,19 @@ public class ParameterizedPlaceTest {
 	}
 	
 	@Test
+	public void testReplaceToken() {
+		String token = "a=1";
+		ParameterizedPlace place = new ParameterizedPlace(token);
+		assertEquals("1", place.getParam("a"));
+		ParameterizedToken newToken = new ParameterizedToken("");
+		newToken.put("b", "2");
+		
+		place.setParameterizedToken(newToken);
+		assertEquals("2", place.getParam("b"));
+		assertEquals(null, place.getParam("a"));
+	}
+	
+	@Test
 	public void testNoParams() {
 		String testToken = "";
 		ParameterizedPlace place = new ParameterizedPlace(testToken);
