@@ -12,12 +12,10 @@ import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,10 +43,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	String forumId;
 	String entityId;
 	Boolean isCurrentUserModerator;
-	Callback showAllThreadsCallback;
+	CallbackP<ParameterizedToken> paramChangeCallback;
+	Callback urlChangeCallback;
 	CallbackP<Boolean> emptyListCallback;
 	Boolean isSingleThread;
 	SubscribeButtonWidget subscribeToForumButton;
+	//use this token to navigate between threads within the discussion tab
 	
 	@Inject
 	public ForumWidget(
@@ -97,15 +97,28 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			@Override
 			public void invoke(String threadId) {
 				showThread(threadId);
+				urlChangeCallback.invoke();
 			}
 		});
 	}
-
+	
+	public void updatePlaceToSingleThread(String threadId) {
+		ParameterizedToken params = new ParameterizedToken("");
+		params.put(THREAD_ID_KEY, threadId);
+		paramChangeCallback.invoke(params);
+	}
+	
+	public void updatePlaceToForum() {
+		ParameterizedToken params = new ParameterizedToken("");
+		paramChangeCallback.invoke(params);
+	}
+	
 	public void configure(String entityId, ParameterizedToken params,
-			Boolean isCurrentUserModerator, Callback showAllThreadsCallback) {
+			Boolean isCurrentUserModerator, CallbackP<ParameterizedToken> paramChangeCallback, Callback urlChangeCallback) {
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
-		this.showAllThreadsCallback = showAllThreadsCallback;
+		this.paramChangeCallback = paramChangeCallback;
+		this.urlChangeCallback = urlChangeCallback;
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -119,7 +132,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		isSingleThread = true;
 		synAlert.clear();
 		subscribeToForumButton.clear();
-		globalApplicationState.pushCurrentPlace(TopicUtils.getThreadPlace(entityId, threadId));
+		updatePlaceToSingleThread(threadId);
 		view.setSingleThreadUIVisible(true);
 		view.setThreadListUIVisible(false);
 		view.setNewThreadButtonVisible(false);
@@ -139,11 +152,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				view.setEmptyUIVisible(false);
 				view.setThreadHeaderVisible(true);
 				singleThreadWidget.configure(result, isCurrentUserModerator, new Callback(){
-
 					@Override
 					public void invoke() {
-						showAllThreadsCallback.invoke();
-						configure(entityId, new ParameterizedToken(null), isCurrentUserModerator, showAllThreadsCallback);
+						showForum();
+						urlChangeCallback.invoke();
 					}
 				}, SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
 			}
@@ -155,8 +167,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		isSingleThread = false;
 		synAlert.clear();
 		subscribeToForumButton.clear();
-		globalApplicationState.pushCurrentPlace(TopicUtils.getForumPlace(entityId));
 		threadListWidget.clear();
+		updatePlaceToForum();
 		view.setSingleThreadUIVisible(false);
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
@@ -185,11 +197,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	@Override
 	public void onClickShowAllThreads() {
-		synAlert.clear();
-		if (showAllThreadsCallback != null) {
-			showAllThreadsCallback.invoke();
-		}
 		showForum();
+		urlChangeCallback.invoke();
 	}
 
 	@Override

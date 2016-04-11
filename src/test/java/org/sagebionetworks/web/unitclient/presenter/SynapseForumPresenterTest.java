@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -107,6 +108,6 @@ public class SynapseForumPresenterTest {
 		presenter.showForum(entityId);
 
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
-				anyBoolean(), any(Callback.class));
+				anyBoolean(), any(CallbackP.class), any(Callback.class));
 	}
 }
