@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 
+import com.google.gwt.user.client.ui.HasHTML;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -24,7 +25,7 @@ Use:
 </h:HelpButton> 
 
  */
-public class HelpButton extends Div {
+public class HelpButton extends Div implements HasHTML {
 	
     private final Icon helpButton = new Icon(IconType.QUESTION_CIRCLE);
     private final Popover popover = new Popover(helpButton);
@@ -47,13 +48,28 @@ public class HelpButton extends Div {
     
     @Override
     public void add(final Widget w) {
-    	// user should specify content
-        if (w instanceof Text) {
+    	if (w instanceof Text) {
         	popover.setTitle(((Text)w).getText());
         } else {
             super.add(w);
         }
     }
 
+    @Override
+    public String getHTML() {
+    	return popover.getTitle();
+    }
+    @Override
+    public String getText() {
+    	return popover.getTitle();
+    }
+    @Override
+    public void setHTML(String html) {
+    	popover.setTitle(html);
+    }
+    @Override
+    public void setText(String text) {
+    	popover.setTitle(text);
+    }
 
 }
