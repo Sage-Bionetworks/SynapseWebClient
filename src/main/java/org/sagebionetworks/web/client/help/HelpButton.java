@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Context-sensitive help button/modal combination.
- * https://sagebionetworks.jira.com/wiki/pages/createpage.action?spaceKey=SWC&fromPageId=6357131
+ * https://sagebionetworks.jira.com/wiki/display/SWC/Context-sensitive+help
  *  
 
 Import:
