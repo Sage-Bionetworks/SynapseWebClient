@@ -32,20 +32,16 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Context-sensitive help button/modal combination.
- * 
-Recipe for Context-Sensitive Help dialog
-<b:Modal title="Help" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="discussionForum">
-  <b:ModalBody>
-    <bh:Text><ui:text from='{help.discussionForum}'/></bh:Text>
-  </b:ModalBody>
-  <b:ModalFooter>
-  	<b:Anchor href="https://docs.synapse.org/discussionForum" target="_blank">
-  		<button class="btn btn-primary margin-right-10">Learn More...</button>
-  	</b:Anchor>
-    <b:Button dataDismiss="MODAL">Close</b:Button>
-  </b:ModalFooter>
-</b:Modal>
-<b:Button dataTarget="#discussionForum" dataToggle="MODAL" icon="QUESTION" type="PRIMARY" size="EXTRA_SMALL" />
+ * https://sagebionetworks.jira.com/wiki/pages/createpage.action?spaceKey=SWC&fromPageId=6357131
+ *  
+
+Import:
+xmlns:h="urn:import:org.sagebionetworks.web.client.help"
+
+Use:
+<h:HelpButton href="https://docs.synapse.org/discussionForum" placement="RIGHT">
+         <bh:Text><ui:text from='{help.discussionForum}'/></bh:Text>
+</h:HelpButton> 
 
  */
 public class HelpButton extends Div {
