@@ -12,7 +12,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionTabViewImpl implements DiscussionTabView {
-	public static final String DISCUSSION_LEARN_MORE_URL = "#!Synapse:syn2305384/wiki/61139";
 	@UiField
 	Div forumContainer;
 	@UiField
@@ -28,7 +27,7 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 		learnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(DISCUSSION_LEARN_MORE_URL, "", "");
+				DisplayUtils.newWindow(TablesTabViewImpl.TABLES_LEARN_MORE_URL, "", "");
 			}
 		});
 	}
