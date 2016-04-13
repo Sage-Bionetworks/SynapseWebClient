@@ -13,7 +13,7 @@
 				<b:Heading text="Synapse Discussions" size="H4" />
 				<bh:Text text="The Synapse team is happy to announce the release of the new Discussion feature to help your team create a record of communications within your project. We will continue to improve and extend this feature area based on your feedback. Please let us know how you're using this feature and any problems or ideas for improvements by emailing us at discussion@synapse.org."></bh:Text>
 				<bh:Div addStyleNames="margin-10">
-					<b:Button ui:field="learnMoreButton" text="Learn More" type="PRIMARY"  />
+					<b:Button ui:field="learnMoreButton" text="Learn More" type="PRIMARY"/>
 				</bh:Div>
 			</b:BlockQuote>
 		</g:FlowPanel>
