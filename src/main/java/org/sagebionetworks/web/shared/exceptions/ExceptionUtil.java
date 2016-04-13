@@ -7,6 +7,7 @@ import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
+import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
@@ -31,6 +32,8 @@ public class ExceptionUtil {
 			return new NotFoundException(ex.getMessage());
 		} else if(ex instanceof SynapseUnauthorizedException) {
 			return new UnauthorizedException(ex.getMessage());
+		} else if(ex instanceof SynapseLockedException) {
+			return new LockedException(ex.getMessage());
 		} else if (ex instanceof SynapseServerException) {
 			SynapseServerException sse = (SynapseServerException)ex;
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {

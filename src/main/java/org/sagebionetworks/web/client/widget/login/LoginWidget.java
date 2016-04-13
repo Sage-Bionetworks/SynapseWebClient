@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
@@ -67,6 +68,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
 				} else if(caught instanceof SynapseDownException) {
 					view.showError(DisplayConstants.LOGIN_DOWN_MODE);
+				} else if(caught instanceof LockedException) {
+					view.showError(caught.getMessage());
 				} else {
 					synapseJsniUtils.consoleError(caught.getMessage());
 					view.showAuthenticationFailed();
