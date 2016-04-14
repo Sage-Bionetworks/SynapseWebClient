@@ -5,13 +5,14 @@ import com.google.inject.Inject;
 
 public class PasswordStrengthWidget implements PasswordStrengthWidgetView.Presenter {
 
+	public static final int MIN_PASSWORD_LENGTH = 8;
+	public static final String TOO_SHORT_MESSAGE = "Too short";
 	private PasswordStrengthWidgetView view;
-	private int score;
-	private String feedback;
-	
+	private ZxcvbnWrapper zxcvbn;
 	@Inject
-	public PasswordStrengthWidget(PasswordStrengthWidgetView view) {
+	public PasswordStrengthWidget(PasswordStrengthWidgetView view, ZxcvbnWrapper zxcvbn) {
 		this.view = view;
+		this.zxcvbn = zxcvbn;
 		view.setPresenter(this);
 	}
 
@@ -28,13 +29,13 @@ public class PasswordStrengthWidget implements PasswordStrengthWidgetView.Presen
 			view.setVisible(false);
 			return;
 		}
-		if (password.length() < 8) {
-			view.showWeakPasswordUI("Too short");	
+		if (password.length() < MIN_PASSWORD_LENGTH) {
+			view.showWeakPasswordUI(TOO_SHORT_MESSAGE);	
 		} else {
-			_scorePassword(this, password);
-			if (score == 0) {
-				view.showWeakPasswordUI(feedback);
-			} else if (score == 1) {
+			zxcvbn.scorePassword(password);
+			int score = zxcvbn.getScore();
+			String feedback = zxcvbn.getFeedback();
+			if (score < 2) {
 				view.showWeakPasswordUI(feedback);
 			} else if (score == 2) {
 				view.showFairPasswordUI(feedback);
@@ -47,17 +48,5 @@ public class PasswordStrengthWidget implements PasswordStrengthWidgetView.Presen
 		view.setVisible(true);
 	};
 	
-	/**
-	 * 
-	 * @param password
-	 * @return
-	 */
-	private static native void _scorePassword(PasswordStrengthWidget x, String password) /*-{
-		// Write instance field on x
-		var result = $wnd.zxcvbn(password);
-		x.@org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget::score = result.score;
-		if (result.score <= 2) {
-			x.@org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget::feedback = result.feedback.warning;
-		}
-	}-*/; 
+	 
 }

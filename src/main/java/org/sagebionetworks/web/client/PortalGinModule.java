@@ -389,6 +389,8 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidgetView;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.login.ZxcvbnWrapper;
+import org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
@@ -1256,5 +1258,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TopicRowWidgetView.class).to(TopicRowWidgetViewImpl.class);
 		bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
 		bind(PasswordStrengthWidgetView.class).to(PasswordStrengthWidgetViewImpl.class);
+		bind(ZxcvbnWrapper.class).to(ZxcvbnWrapperImpl.class);
 	}
 }
