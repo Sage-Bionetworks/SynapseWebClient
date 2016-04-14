@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -34,6 +35,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private GlobalApplicationState globalApplicationState;
+	private PasswordStrengthWidget passwordStrengthWidget;
 	
 	private String sessionToken = null;
 	
@@ -42,7 +44,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			CookieProvider cookieProvider, UserAccountServiceAsync userService,
 			AuthenticationController authenticationController,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			PasswordStrengthWidget passwordStrengthWidget) {
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -51,7 +54,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
-		
+		this.passwordStrengthWidget = passwordStrengthWidget;
+		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
 	}
 
@@ -150,4 +154,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
                 }
         });
 	}
+	
+	@Override
+	public void passwordChanged(String password) {
+		passwordStrengthWidget.scorePassword(password);
+	}
+
 }

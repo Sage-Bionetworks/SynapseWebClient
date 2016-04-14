@@ -134,7 +134,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			@Override
 			public void onBlur(BlurEvent event) {
 				checkPassword1();
-				presenter.passwordChanged(password1Field.getValue());
 			}
 		});
 		
@@ -206,6 +205,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	}
 
 	private boolean checkPassword1() {
+		presenter.passwordChanged(password1Field.getText());
 		DisplayUtils.hideFormError(password1, password1Error);
 		if (!DisplayUtils.isDefined(password1Field.getText())){
 			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
