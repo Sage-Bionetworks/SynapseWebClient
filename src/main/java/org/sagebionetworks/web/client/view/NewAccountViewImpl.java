@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -71,7 +72,9 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@UiField
 	DivElement password2Error;
 	
-
+	@UiField
+	Div passwordStrengthContainer;
+	
 	@UiField
 	Button registerBtn;
 	
@@ -131,6 +134,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			@Override
 			public void onBlur(BlurEvent event) {
 				checkPassword1();
+				presenter.passwordChanged(password1Field.getValue());
 			}
 		});
 		
@@ -234,5 +238,11 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@Override
 	public void setEmail(String email) {
 		emailField.setValue(email);
+	}
+	
+	@Override
+	public void setPasswordStrengthWidget(Widget w) {
+		passwordStrengthContainer.clear();
+		passwordStrengthContainer.add(w);
 	}
 }

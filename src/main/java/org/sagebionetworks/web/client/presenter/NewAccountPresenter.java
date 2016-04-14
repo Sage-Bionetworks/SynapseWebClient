@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -31,6 +32,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	private UserAccountServiceAsync userAccountService;
 	private AuthenticationController authController;
 	private GWTWrapper gwt;
+	PasswordStrengthWidget passwordStrengthWidget;
 	private String emailValidationToken;
 	private Map<String, String> emailValidationTokenParams;
 	
@@ -40,13 +42,16 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			GlobalApplicationState globalAppState,
 			UserAccountServiceAsync userAccountService,
 			AuthenticationController authController,
-			GWTWrapper gwt){
+			GWTWrapper gwt,
+			PasswordStrengthWidget passwordStrengthWidget){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.userAccountService = userAccountService;
 		this.authController = authController;
 		this.gwt = gwt;
+		this.passwordStrengthWidget = passwordStrengthWidget;
+		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
 	}
 
@@ -153,6 +158,11 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	 */
 	public void setEmailValidationToken(String emailValidationToken) {
 		this.emailValidationToken = emailValidationToken;
+	}
+	
+	@Override
+	public void passwordChanged(String password) {
+		passwordStrengthWidget.scorePassword(password);
 	}
 	
 	@Override
