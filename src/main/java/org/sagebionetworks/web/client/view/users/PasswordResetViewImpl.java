@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -74,6 +75,9 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	@UiField
 	SpanElement contentHtml;
 
+	@UiField
+	Div passwordStrengthContainer;
+
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -114,6 +118,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	}
 	
 	private boolean checkPassword1() {
+		presenter.passwordChanged(password1Field.getText());
 		DisplayUtils.hideFormError(password1, password1Error);
 		if (!DisplayUtils.isDefined(password1Field.getText())){
 			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
@@ -292,5 +297,12 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		loadingPanel.setVisible(false);
 		pageTitle.setInnerHTML(DisplayConstants.REQUEST_EXPIRED);
 		contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
-	}  
+	}
+	
+	@Override
+	public void setPasswordStrengthWidget(Widget w) {
+		passwordStrengthContainer.clear();
+		passwordStrengthContainer.add(w);
+	}
+
 }
