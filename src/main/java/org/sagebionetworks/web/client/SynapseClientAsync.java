@@ -194,8 +194,6 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
-	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
 	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
@@ -240,8 +238,6 @@ public interface SynapseClientAsync {
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
-	
-	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);

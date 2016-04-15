@@ -102,13 +102,15 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		String hostPrefix = gwt.getHostPrefix();
 		final String key = getKey(md, hostPrefix, isInTestWebsite);
 		
-		if (isInTestWebsite) {
-			//avoid cache for new md processor until it is in good shape.
+		//avoid cache for new md processor until it is in good shape.
+		final MarkdownCacheValue cachedValue = getValueFromCache(key);
+		if(cachedValue == null) {
 			view.callbackWhenAttached(new Callback() {
 				@Override
 				public void invoke() {
 					try {
 						String result = markdownIt.markdown2Html(md, uniqueSuffix);
+						//avoid cache for new md processor until it is in good shape.
 						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
 						loadHtml(uniqueSuffix, result);
 					} catch (RuntimeException e) { //JavaScriptException
@@ -117,34 +119,13 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				}
 			});
 		} else {
-			final MarkdownCacheValue cachedValue = getValueFromCache(key);
-			if(cachedValue == null) {
-				synapseClient.markdown2Html(md, uniqueSuffix, isInTestWebsite, hostPrefix, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(final String result) {
-						view.callbackWhenAttached(new Callback() {
-							@Override
-							public void invoke() {
-								//save in cache
-								sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
-								loadHtml(uniqueSuffix, result);
-							}
-						});
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						synAlert.handleException(caught);
-					}
-				});
-			} else {
-				//used cached value
-				view.callbackWhenAttached(new Callback() {
-					@Override
-					public void invoke() {
-						loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
-					}
-				});
-			}
+			//used cached value
+			view.callbackWhenAttached(new Callback() {
+				@Override
+				public void invoke() {
+					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
+				}
+			});
 		}
 	}
 	

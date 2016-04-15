@@ -282,13 +282,6 @@ public interface SynapseClient extends RemoteService {
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
 	PaginatedResults<AccessRequirement> getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
-	/**
-	 * convenience method for converting markdown to html
-	 * @param markdown
-	 * @return
-	 */
-	public String markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString) throws RestServiceException;
-	
 	public Activity getActivityForEntity(String entityId) throws RestServiceException;
 	
 	public Activity getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
@@ -327,8 +320,6 @@ public interface SynapseClient extends RemoteService {
 	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
-	
-	public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	
 	public String getFileEndpoint() throws RestServiceException;
 	

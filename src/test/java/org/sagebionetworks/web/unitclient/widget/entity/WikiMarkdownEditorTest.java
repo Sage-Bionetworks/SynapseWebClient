@@ -111,14 +111,6 @@ public class WikiMarkdownEditorTest {
 	
 	@Test
 	public void testPreview() throws Exception {
-		String htmlReturned = "<h1>Html returned</h2>";
-		final String testMarkdown = "HTML Returns\n----------";
-		AsyncMockStubber
-				.callSuccessWith(htmlReturned)
-				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyString(), anyBoolean(),anyString(),
-						any(AsyncCallback.class));
-		
 		presenter.previewClicked();
 		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).showPreviewModal();

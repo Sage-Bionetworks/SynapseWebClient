@@ -44,7 +44,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
-import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
@@ -181,10 +180,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			.create("text/html", MESSAGE_CHARSET);
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-	static {// kick off initialization (like pattern compilation) by referencing
-			// it
-		SynapseMarkdownProcessor.getInstance();
-	}
 
 	private static StackTraceDeobfuscator deobfuscator = null;
 	
@@ -1122,24 +1117,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public String markdown2Html(String markdown, String suffix,
-			Boolean isAlphaMode, String clientHostString)
-			throws RestServiceException {
-		try {
-			long startTime = System.currentTimeMillis();
-			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
-					markdown, suffix, clientHostString);
-			long endTime = System.currentTimeMillis();
-			float elapsedTime = endTime - startTime;
-			logInfo("Markdown processing took " + (elapsedTime / 1000f)
-					+ " seconds.  In alpha mode? " + isAlphaMode);
-			return html;
-		} catch (IOException e) {
-			throw new RestServiceException(e.getMessage());
-		}
-	}
-
-	@Override
 	public Activity getActivityForEntity(String entityId)
 			throws RestServiceException {
 		return getActivityForEntityVersion(entityId, null);
@@ -1369,18 +1346,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-
-	@Override
-	public String getPlainTextWikiPage(
-			org.sagebionetworks.web.shared.WikiPageKey key)
-			throws RestServiceException, IOException {
-		String markdown = getMarkdown(key);
-		String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
-				markdown, "", null);
-		String plainText = Jsoup.clean(html, "", Whitelist.none(),
-				new Document.OutputSettings().prettyPrint(false));
-		return plainText;
 	}
 
 	@Override
