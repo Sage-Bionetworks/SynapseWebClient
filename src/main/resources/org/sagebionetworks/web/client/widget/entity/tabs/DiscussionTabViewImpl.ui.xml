@@ -21,7 +21,7 @@
 				</h:HelpButton>  -->
 				
 				<bh:Div addStyleNames="margin-10">
-					<b:Button ui:field="learnMoreButton" text="Learn More" type="PRIMARY"  />
+					<b:Button ui:field="learnMoreButton" text="Learn More" type="PRIMARY"/>
 				</bh:Div>
 			</b:BlockQuote>
 		</g:FlowPanel>
