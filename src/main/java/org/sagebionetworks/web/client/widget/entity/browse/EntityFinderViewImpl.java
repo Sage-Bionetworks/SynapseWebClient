@@ -136,13 +136,14 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	@Override
-	public void initFinderComponents() {
+	public void initFinderComponents(EntityFilter filter) {
 		if (!isFinderComponentsInitialized) {
 			isFinderComponentsInitialized = true;
 			createMyEntityBrowserWidget();		
 			createSearchBoxWidget();			
 			createEnterIdWidget();
 		}
+		myEntitiesBrowser.setEntityFilter(filter);
 	}
 	
 	private void hideAllRightTopWidgets() {

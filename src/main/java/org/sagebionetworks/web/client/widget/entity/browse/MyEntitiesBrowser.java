@@ -221,6 +221,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			}
 		});
 	}
+	
+	public void setEntityFilter(EntityFilter filter) {
+		getEntityTreeBrowser().setEntityFilter(filter);
+		getFavoritesTreeBrowser().setEntityFilter(filter);
+	}
 
 	
 	/*

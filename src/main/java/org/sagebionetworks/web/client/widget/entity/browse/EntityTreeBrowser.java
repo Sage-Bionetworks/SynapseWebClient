@@ -29,8 +29,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
-
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -50,6 +48,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private final int MAX_FOLDER_LIMIT = 100;
 	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
+	EntityFilter filter = EntityFilter.ALL;
 	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
@@ -295,7 +294,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		Condition parentCondition = EntityQueryUtils.buildCondition(
 				EntityFieldName.parentId, Operator.EQUALS, parentId);
 		Condition typeCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.nodeType, Operator.IN, new String[]{"folder", "file", "link"});
+				EntityFieldName.nodeType, Operator.IN, filter.getEntityQueryValues());
 		newQuery.setConditions(Arrays.asList(parentCondition, typeCondition));
 		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
 		newQuery.setOffset(offset);
@@ -327,8 +326,15 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	
 	public boolean isExpandable(EntityQueryResult header) {
+		if (filter.equals(EntityFilter.PROJECT)) {
+			return false;
+		}
 		String entityType = header.getEntityType();
-		return entityType.equals("folder") || entityType.equals("project");
+		return entityType.equals("folder") || entityType.equals("project");	
+	}
+	
+	public void setEntityFilter(EntityFilter filter) {
+		this.filter = filter;
 	}
 	
 	public void clearSelection() {

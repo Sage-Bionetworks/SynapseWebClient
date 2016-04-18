@@ -21,7 +21,7 @@ public interface EntityFinderView extends SynapseView {
 
 	public void setVersions(List<VersionInfo> versions);
 	
-	void initFinderComponents();
+	void initFinderComponents(EntityFilter filter);
 	void setBrowseAreaVisible();
 	void setSynapseIdAreaVisible();
 	void setSearchAreaVisible();

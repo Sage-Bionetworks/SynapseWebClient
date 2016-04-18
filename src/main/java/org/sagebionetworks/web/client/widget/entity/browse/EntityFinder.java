@@ -29,6 +29,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	AuthenticationController authenticationController;
 	ClientCache cache;
 	private SelectedHandler<Reference> selectedHandler;
+	private EntityFilter filter;
 	
 	@Inject
 	public EntityFinder(EntityFinderView view,
@@ -50,6 +51,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 
 	public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
+		configure(EntityFilter.ALL, showVersions, handler);
+	}
+	
+
+	public void configure(EntityFilter filter, boolean showVersions, SelectedHandler<Reference> handler) {
+		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
 	}
@@ -123,7 +130,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		if (areaString != null) {
 			area = EntityFinderArea.valueOf(areaString);
 		}
-		view.initFinderComponents();
+		view.initFinderComponents(filter);
 		switch (area) {
 			case SEARCH:
 				view.setSearchAreaVisible();
