@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -32,7 +33,7 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	}		
 
 	private void configureEntityFinder() {
-		entityFinder.configure(true, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				if(selected.getTargetId() != null) {

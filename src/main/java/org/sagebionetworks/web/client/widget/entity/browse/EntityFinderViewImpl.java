@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
@@ -87,6 +88,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	TextBox synapseIdTextBox;
 	@UiField
 	Button lookupSynapseIdButton;
+	@UiField
+	Div synAlertContainer;
 	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private Long maxVersion = 0L;
@@ -405,6 +408,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@Override
 	public boolean isShowing() {
 		return modal.isAttached() && modal.isVisible();
+	}
+	
+	@Override
+	public void setSynAlert(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }
 

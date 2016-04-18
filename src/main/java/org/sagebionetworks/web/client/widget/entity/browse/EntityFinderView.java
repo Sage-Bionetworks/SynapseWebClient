@@ -29,6 +29,7 @@ public interface EntityFinderView extends SynapseView {
 	void show();
 	void hide();
 	EntityFinderArea getCurrentArea();
+	void setSynAlert(Widget w);
 	/**
 	 * Presenter interface
 	 */
