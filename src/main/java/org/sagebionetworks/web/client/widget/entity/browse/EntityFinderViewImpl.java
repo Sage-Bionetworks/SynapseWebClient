@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -140,13 +141,13 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	@Override
 	public void initFinderComponents(EntityFilter filter) {
-		if (!isFinderComponentsInitialized) {
+		if (!isFinderComponentsInitialized || !filter.equals(myEntitiesBrowser.getEntityFilter())) {
 			isFinderComponentsInitialized = true;
 			createMyEntityBrowserWidget();		
 			createSearchBoxWidget();			
 			createEnterIdWidget();
+			myEntitiesBrowser.setEntityFilter(filter);
 		}
-		myEntitiesBrowser.setEntityFilter(filter);
 	}
 	
 	private void hideAllRightTopWidgets() {
@@ -213,7 +214,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(selectedEntityId);
 			}
 		});
-
+		
 		myEntitiesBrowserContainer.setWidget(myEntitiesBrowser.asWidget());
 
 		// list entry
