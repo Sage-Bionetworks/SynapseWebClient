@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
@@ -194,5 +195,27 @@ public class MyEntitiesBrowserTest {
 		verify(mockView).setCurrentContextTabVisible(true);
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
+	}
+	
+	@Test
+	public void testSetEntityFilter() {
+		Synapse s = new Synapse("syn123");
+		String userId = "12345";
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		widget.updateContext();
+		assertEquals(s, widget.getCachedCurrentPlace());
+		assertEquals(userId, widget.getCachedUserId());
+
+		//verify that context is updated when the filter is set.
+		s = new Synapse("syn321");
+		userId = "54321";
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		EntityFilter filter = EntityFilter.FILE;
+		widget.setEntityFilter(filter);
+		verify(mockEntityTreeBrowser, times(2)).setEntityFilter(filter);
+		assertEquals(s, widget.getCachedCurrentPlace());
+		assertEquals(userId, widget.getCachedUserId());
 	}
 }
