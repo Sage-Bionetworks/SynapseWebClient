@@ -84,14 +84,14 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public void changePassword(String sessionToken, String newPassword) {
+	public void changePassword(String sessionToken, String newPassword) throws RestServiceException {
 		validateService();
 		
 		SynapseClient client = createAnonymousSynapseClient();
 		try {
 			client.changePassword(sessionToken, newPassword);
 		} catch (SynapseException e) {
-			throw new RestClientException("Password change failed", e);
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
