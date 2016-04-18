@@ -77,7 +77,9 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@UiField
 	Div passwordStrengthContainer;
-
+	@UiField
+	Div synAlertContainer;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -303,6 +305,16 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void setPasswordStrengthWidget(Widget w) {
 		passwordStrengthContainer.clear();
 		passwordStrengthContainer.add(w);
+	}
+	
+	public void setSynAlertWidget(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	};
+	
+	@Override
+	public void setSubmitButtonEnabled(boolean enabled) {
+		submitBtn.setEnabled(enabled);
 	}
 
 }
