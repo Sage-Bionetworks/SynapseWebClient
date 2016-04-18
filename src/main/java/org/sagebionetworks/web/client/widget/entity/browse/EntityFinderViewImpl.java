@@ -214,7 +214,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(selectedEntityId);
 			}
 		});
-		
+		myEntitiesBrowserContainer.clear();
 		myEntitiesBrowserContainer.setWidget(myEntitiesBrowser.asWidget());
 
 		// list entry
@@ -224,6 +224,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	        	setBrowseAreaVisible();
 	        }
 	    });
+		browseMyEntitiesContainer.clear();
 		browseMyEntitiesContainer.setWidget(entry);
 	}
 	@Override
@@ -261,6 +262,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	        	setSearchAreaVisible();
 	        }
 	    });
+		searchContainer.clear();
 		searchContainer.setWidget(entry);
 	}	
 
@@ -298,6 +300,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	        	setSynapseIdAreaVisible();
 	        }
 	    });
+		enterSynapseIdContainer.clear();
 		enterSynapseIdContainer.setWidget(entry);
 	}
 				
