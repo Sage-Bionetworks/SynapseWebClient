@@ -147,11 +147,12 @@ public class SettingsPresenterTest {
 	@Test
 	public void testResetPasswordFailChangePw() throws RestServiceException {		
 		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		Exception ex = new Exception("pw change failed");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockSynAlert).showError("Password Change failed. Please try again.");
-		verify(mockView).setCurrentPasswordInError(true);
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test

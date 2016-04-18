@@ -104,6 +104,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Override
 	public void resetPassword(final String existingPassword,
 			final String newPassword) {
+		clearPasswordErrors();
 		if (authenticationController.isLoggedIn()) {
 			if (authenticationController.getCurrentUserSessionData() != null
 					&& authenticationController.getCurrentUserSessionData().getProfile() != null
@@ -134,8 +135,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 									@Override
 									public void onFailure(
 											Throwable caught) {
-										passwordSynAlert.showError("Password Change failed. Please try again.");
-										view.setCurrentPasswordInError(true);
+										passwordSynAlert.handleException(caught);
 										view.setChangePasswordEnabled(true);
 									}
 								});

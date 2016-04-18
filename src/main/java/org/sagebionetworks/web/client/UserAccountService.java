@@ -15,7 +15,7 @@ public interface UserAccountService extends RemoteService {
 
 	public void sendPasswordResetEmail(String emailAddress) throws RestServiceException;
 	
-	public void changePassword(String sessionToken, String newPassword);
+	public void changePassword(String sessionToken, String newPassword) throws RestServiceException;
 
 	public Session initiateSession(String username, String password) throws RestServiceException;
 	
