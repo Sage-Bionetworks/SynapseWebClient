@@ -63,6 +63,7 @@ import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
@@ -176,11 +177,11 @@ public class EntityActionControllerImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation)
 					throws Throwable {
-				SelectedHandler<Reference> handler = (SelectedHandler<Reference>) invocation.getArguments()[1];
+				SelectedHandler<Reference> handler = (SelectedHandler<Reference>) invocation.getArguments()[2];
 				handler.onSelected(selected);
 				return null;
 			}
-		}).when(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		}).when(mockEntityFinder).configure(any(EntityFilter.class), anyBoolean(), any(SelectedHandler.class));
 	}
 
 	@Test
@@ -842,7 +843,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
@@ -856,7 +857,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();
 		verify(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
@@ -934,7 +935,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
 		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
 	}
