@@ -48,6 +48,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
 	public static final String REPLY = "reply";
 	public static final String REPLIES = "replies";
+	public static final String CREATED_ON_PREFIX = "posted ";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -182,7 +183,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setNumberOfReplies(numberOfReplies.toString(), getDescriptiveReplyText(numberOfReplies));
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
 		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
-		view.setCreatedOn(jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setDeleteIconVisible(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));

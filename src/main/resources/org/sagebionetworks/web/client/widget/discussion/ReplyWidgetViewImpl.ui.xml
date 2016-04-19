@@ -6,16 +6,9 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div width="95%" pull="RIGHT" addStyleNames="lightGreyBackground padding-5 margin-bottom-5">
-		<b:Row>
-			<b:Column size="SM_9">
-				<bh:Span ui:field="author"></bh:Span>
-			</b:Column>
-			<b:Column size="SM_3">
-				<bh:Div pull="RIGHT">
-					<bh:Span ui:field="createdOn"></bh:Span>
-				</bh:Div>
-			</b:Column>
-		</b:Row>
+		<bh:Div>
+			<bh:Span ui:field="author"></bh:Span>
+		</bh:Div>
 		<bh:Div width="100%">
 			<g:HTMLPanel ui:field="loadingMessage" visible="false">
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
@@ -25,6 +18,9 @@
 				<t:TableRow>
 					<t:TableData>
 						<bh:Div ui:field="replyMessage"></bh:Div>
+						<bh:Div addStyleNames="margin-left-10 small">
+							<bh:Span ui:field="createdOn"></bh:Span>
+						</bh:Div>
 					</t:TableData>
 					<t:TableData width="80px" addStyleNames="vertical-align-top">
 						<bh:Div>
