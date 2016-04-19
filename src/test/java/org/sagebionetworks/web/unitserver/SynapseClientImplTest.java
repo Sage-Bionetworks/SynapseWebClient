@@ -1110,6 +1110,38 @@ public class SynapseClientImplTest {
 		assertEquals(md5, handle.getContentMd5());
 //		assertEquals(fileSize, handle.getContentSize());
 	}
+	
+	@Test
+	public void testCreateExternalFileAutoname() throws Exception {
+		// test setting file handle name
+		String parentEntityId = "syn123333";
+		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String expectedAutoFilename = "test.txt";
+		String fileName = null;
+		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		Long fileSize = 1024L;
+		when(
+				mockSynapse
+						.createExternalFileHandle(any(ExternalFileHandle.class)))
+				.thenReturn(new ExternalFileHandle());
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
+				new FileEntity());
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, fileSize, md5, storageLocationId);
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
+				.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle handle = captor.getValue();
+		// verify name is set
+		assertEquals(expectedAutoFilename, handle.getFileName());
+		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(storageLocationId, handle.getStorageLocationId());
+		assertEquals(md5, handle.getContentMd5());
+		
+		//also check the entity name
+		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
+		verify(mockSynapse).createEntity(entityCaptor.capture());
+		assertEquals(expectedAutoFilename, entityCaptor.getValue().getName());
+	}
 
 	@Test
 	public void testGetEntityDoi() throws Exception {
