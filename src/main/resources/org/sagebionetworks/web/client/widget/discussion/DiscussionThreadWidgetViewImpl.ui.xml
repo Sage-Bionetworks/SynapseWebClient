@@ -40,17 +40,10 @@
 		</t:Table>
 		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
 			<bh:Div addStyleNames="margin-top-10 light-border-bottom" width="100%" pull="RIGHT" >
-				<b:Row>
-					<b:Column size="SM_9">
-						<bh:Span ui:field="author"></bh:Span>
-					</b:Column>
-					<b:Column size="SM_3">
-						<bh:Div pull="RIGHT">
-							<bh:Span ui:field="createdOn"></bh:Span>
-						</bh:Div>
-					</b:Column>
-				</b:Row>
-
+				<bh:Div width="100%">
+					<bh:Span ui:field="author"></bh:Span>
+				</bh:Div>
+				
 				<bh:Div width="100%">
 					<g:HTMLPanel ui:field="loadingMessage" visible="false">
 						<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
@@ -60,6 +53,9 @@
 						<t:TableRow>
 							<t:TableData>
 								<bh:Div ui:field="threadMessage"></bh:Div>
+								<bh:Div addStyleNames="margin-left-10 small">
+									<bh:Span ui:field="createdOn"></bh:Span>
+								</bh:Div>
 							</t:TableData>
 							<t:TableData width="140px" addStyleNames="vertical-align-top">
 								<bh:Div>
