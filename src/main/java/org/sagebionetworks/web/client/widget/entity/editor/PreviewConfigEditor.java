@@ -36,19 +36,15 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					view.setEntityId(selected.getTargetId());
-					Long version = selected.getTargetVersionNumber();
-					if (version != null) {
-						view.setVersion(version.toString());
-					} else {
-						view.setVersion("");
-					}
-						
-					entityFinder.hide();
+				view.setEntityId(selected.getTargetId());
+				Long version = selected.getTargetVersionNumber();
+				if (version != null) {
+					view.setVersion(version.toString());
 				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+					view.setVersion("");
 				}
+					
+				entityFinder.hide();
 			}
 		});
 	}

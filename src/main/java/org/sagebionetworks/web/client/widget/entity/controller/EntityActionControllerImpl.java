@@ -602,12 +602,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					createLink(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				createLink(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();
@@ -667,12 +663,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					moveEntity(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				moveEntity(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();

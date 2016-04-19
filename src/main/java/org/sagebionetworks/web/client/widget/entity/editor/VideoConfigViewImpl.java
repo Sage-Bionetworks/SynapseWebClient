@@ -67,12 +67,8 @@ public class VideoConfigViewImpl implements VideoConfigView {
 				entityFinder.configure(EntityFilter.FILE, false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {					
-							textBox.setValue(selected.getTargetId());
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+						textBox.setValue(selected.getTargetId());
+						entityFinder.hide();
 					}
 				});
 				entityFinder.show();

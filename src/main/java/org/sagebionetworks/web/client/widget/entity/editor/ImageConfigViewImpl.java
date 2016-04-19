@@ -103,12 +103,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				entityFinder.configure(EntityFilter.FILE, false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							entityField.setValue(DisplayUtils.createEntityVersionString(selected));
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
+						entityFinder.hide();
 					}
 				});
 				entityFinder.show();
