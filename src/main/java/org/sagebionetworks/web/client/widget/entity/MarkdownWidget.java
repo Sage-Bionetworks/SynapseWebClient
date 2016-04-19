@@ -103,8 +103,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		final String key = getKey(md, hostPrefix, isInTestWebsite);
 		
 		//avoid cache for new md processor until it is in good shape.
-		final MarkdownCacheValue cachedValue = getValueFromCache(key);
-		if(cachedValue == null) {
+//		final MarkdownCacheValue cachedValue = getValueFromCache(key);
+//		if(cachedValue == null) {
 			view.callbackWhenAttached(new Callback() {
 				@Override
 				public void invoke() {
@@ -118,15 +118,15 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 					}
 				}
 			});
-		} else {
-			//used cached value
-			view.callbackWhenAttached(new Callback() {
-				@Override
-				public void invoke() {
-					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
-				}
-			});
-		}
+//		} else {
+//			//used cached value
+//			view.callbackWhenAttached(new Callback() {
+//				@Override
+//				public void invoke() {
+//					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
+//				}
+//			});
+//		}
 	}
 	
 	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {

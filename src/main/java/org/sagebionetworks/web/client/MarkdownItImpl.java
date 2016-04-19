@@ -180,10 +180,10 @@ public class MarkdownItImpl implements MarkdownIt {
 				$wnd.md.utils.doiRE = new RegExp('^doi:10[.]{1}[0-9]+[/]{1}[a-zA-Z0-9_.]+$');
 			}
 			if (!$wnd.md.utils.ulMarkerRE) {
-				$wnd.md.utils.ulMarkerRE = new RegExp("^\\s*[*-+]{1}.*$");
+				$wnd.md.utils.ulMarkerRE = new RegExp("^\\s*[*-+>]{1}[^|]*$");
 			}
 			if (!$wnd.md.utils.olMarkerRE) {
-				$wnd.md.utils.olMarkerRE = new RegExp("^\\s*\\d+\\s*[.)]{1}.*$");
+				$wnd.md.utils.olMarkerRE = new RegExp("^\\s*\\d+\\s*[.)]{1}[^|]*$");
 			}
 			if (!$wnd.md.utils.spacesRE) {
 				$wnd.md.utils.spacesRE = new RegExp("[ ]{7}", 'g');

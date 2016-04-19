@@ -1080,40 +1080,25 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			efh.setExternalURL(externalUrl);
 			efh.setContentMd5(md5);
 			efh.setContentSize(fileSize);
-			if (isManuallySettingName)
-				efh.setFileName(name);
+			String fileName;
+			if (isManuallySettingName) {
+				fileName = name;
+			} else {
+				fileName = DisplayUtils.getFileNameFromExternalUrl(externalUrl);
+			}
+			efh.setFileName(fileName);
 			efh.setStorageLocationId(storageLocationId);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());
 			newEntity.setParentId(parentEntityId);
-			if (isManuallySettingName)
-				newEntity.setName(name);
-			Entity updatedEntity = synapseClient.createEntity(newEntity);
-			if (!isManuallySettingName)
-				updatedEntity = updateExternalFileName(updatedEntity,
-						externalUrl, synapseClient);
-			return updatedEntity;
+			newEntity.setName(fileName);
+			return synapseClient.createEntity(newEntity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-
-	private Entity updateExternalFileName(Entity entity, String externalUrl,
-			org.sagebionetworks.client.SynapseClient synapseClient) {
-		String oldName = entity.getName();
-		try {
-			// also try to rename to something reasonable, ignore if anything
-			// goes wrong
-			entity.setName(DisplayUtils.getFileNameFromExternalUrl(externalUrl));
-			entity = synapseClient.putEntity(entity);
-		} catch (Throwable t) {
-			// if anything goes wrong, send back the actual name
-			entity.setName(oldName);
-		}
-		return entity;
 	}
 
 	@Override
