@@ -80,7 +80,7 @@
 					&nbsp;Loading...
 				</g:HTMLPanel>
 			</bh:Div>
-			<bh:Div width="95%" pull="RIGHT" addStyleNames="margin-bottom-5">
+			<bh:Div ui:field="threadButtonContainer" width="95%" pull="RIGHT" addStyleNames="margin-bottom-5">
 				<b:Button ui:field="loadMoreButton" addStyleNames="margin-top-5" visible="false">Load more replies</b:Button>
 				<b:Button ui:field="replyButton" addStyleNames="margin-top-5">Reply</b:Button>
 			</bh:Div>

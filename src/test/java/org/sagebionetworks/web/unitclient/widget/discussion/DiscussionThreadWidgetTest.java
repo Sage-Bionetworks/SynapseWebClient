@@ -11,9 +11,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.LIMIT;
-import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.REPLIES;
-import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.REPLY;
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_THREAD_LIST;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD;
@@ -180,6 +178,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).hideThreadDetails();
 		verify(mockView).hideReplyDetails();
 		verify(mockView).setThreadLink(anyString());
+		verify(mockView).setButtonContainerWidth(INDENTATION_WIDTH);
 		
 		discussionThreadWidget.watchReplyCount();
 		verify(mockView).setRefreshAlert(any(Widget.class));
@@ -280,6 +279,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
+		verify(mockView).setButtonContainerWidth(NO_INDENTATION_WIDTH);
 	}
 
 	@Test
@@ -593,6 +593,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockThreadIdClickedCallback).invoke(anyString());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testReconfigureThread() throws RequestException {
 		boolean isDeleted = false;
