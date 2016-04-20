@@ -92,4 +92,6 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	
 	void setRefreshAlert(Widget w);
 	void removeRefreshAlert();
+
+	void setButtonContainerWidth(String width);
 }
