@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
@@ -45,16 +46,11 @@ public class PreviewConfigEditorTest {
 		verify(mockView).initView();
 		//verify entity finder is configured
 		ArgumentCaptor<SelectedHandler> captor = ArgumentCaptor.forClass(SelectedHandler.class);
-		verify(mockEntityFinder).configure(eq(true), captor.capture());
+		verify(mockEntityFinder).configure(eq(EntityFilter.FILE), eq(true), captor.capture());
 		SelectedHandler selectedHandler = captor.getValue();
 		Reference selected = new Reference();
 		
-		//invoke invalid selection
-		selectedHandler.onSelected(selected);
-		verify(mockView).showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-		
-		//invoke valid selection without version
-		reset(mockView);
+		//invalid selection is handled by the entity finder
 		String targetId = "syn314";
 		selected.setTargetId(targetId);
 		selectedHandler.onSelected(selected);

@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidg
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -598,15 +599,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckLink(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					createLink(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				createLink(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();
@@ -663,15 +660,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					moveEntity(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				moveEntity(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();

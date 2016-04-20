@@ -11,7 +11,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -23,9 +25,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -44,7 +48,8 @@ public class EntityFinderTest {
 	EntityFinder entityFinder;	
 	@Mock
 	ClientCache mockClientCache;
-	
+	@Mock
+	SynapseAlert mockSynAlert;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -54,7 +59,7 @@ public class EntityFinderTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		
-		entityFinder = new EntityFinder(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockClientCache);
+		entityFinder = new EntityFinder(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockClientCache, mockSynAlert);
 		verify(mockView).setPresenter(entityFinder);
 		reset(mockView);
 		when(mockView.isShowing()).thenReturn(false);
@@ -86,29 +91,11 @@ public class EntityFinderTest {
 		entity.setName(name);
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);
 
-		// 404
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));			
+		Exception ex = new NotFoundException();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));			
 		entityFinder.lookupEntity(id, mockCallback);		
 		verify(mockCallback).onFailure(any(Throwable.class));
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);		
-		reset(mockCallback);
-		reset(mockView);
-		
-		// 403
-		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));			
-		entityFinder.lookupEntity(id, mockCallback);
-		verify(mockCallback).onFailure(any(Throwable.class));
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
-		reset(mockCallback);
-		reset(mockView);
-
-		// other
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
-		entityFinder.lookupEntity(id, mockCallback);
-		verify(mockCallback).onFailure(any(Throwable.class));
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		reset(mockCallback);
-		reset(mockView);
+		verify(mockSynAlert).handleException(ex);		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -134,15 +121,16 @@ public class EntityFinderTest {
 		PaginatedResults<VersionInfo> paginated = new PaginatedResults<VersionInfo>();		
 		List<VersionInfo> results = new ArrayList<VersionInfo>();
 		paginated.setResults(results);
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
 		
 		entityFinder.loadVersions(id);
 		
-		verify(mockView).showErrorMessage(DisplayConstants.UNABLE_TO_LOAD_VERSIONS);
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
-	public void testSelectionHandler() throws Exception {
+	public void testSelectionHandlerAnyType() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
 		
@@ -151,16 +139,73 @@ public class EntityFinderTest {
 		//no selection
 		entityFinder.okClicked();
 		//verify the error
-		verify(mockView).showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+		verify(mockSynAlert).showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		
 		//now with selection
 		Reference mockReference = mock(Reference.class);
 		when(mockReference.getTargetId()).thenReturn("syn99");
+		Entity entity = new Folder();
+		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		//the view usually sets the selected entity in the presenter
 		entityFinder.setSelectedEntity(mockReference);
 		entityFinder.okClicked();
 		verify(mockHandler).onSelected(mockReference);
-	}	
+	}
+	
+	private void verifyWrongEntityTypeSelected(Entity entitySelected, SelectedHandler mockSelectionHandler) {
+		reset(mockSynAlert, mockSelectionHandler);
+		AsyncMockStubber.callSuccessWith(entitySelected).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		entityFinder.okClicked();
+		verify(mockSynAlert).showError(anyString());
+		verify(mockSelectionHandler, never()).onSelected(any(Reference.class));
+	}
+	
+	private void verifyCorrectEntityTypeSelected(Entity entitySelected, SelectedHandler mockSelectionHandler) {
+		reset(mockSynAlert, mockSelectionHandler);
+		AsyncMockStubber.callSuccessWith(entitySelected).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		entityFinder.okClicked();
+		verify(mockSynAlert, never()).showError(anyString());
+		verify(mockSelectionHandler).onSelected(any(Reference.class));
+	}
+	
+	@Test
+	public void testProjectFilter() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configure(EntityFilter.PROJECT, true, mockHandler);
+		Reference mockReference = mock(Reference.class);
+		when(mockReference.getTargetId()).thenReturn("syn99");
+		entityFinder.setSelectedEntity(mockReference);
+		
+		verifyWrongEntityTypeSelected(new Folder(), mockHandler);
+		verifyWrongEntityTypeSelected(new FileEntity(), mockHandler);
+		verifyCorrectEntityTypeSelected(new Project(), mockHandler);
+	}
+	
+	@Test
+	public void testFileFilter() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configure(EntityFilter.FILE, true, mockHandler);
+		Reference mockReference = mock(Reference.class);
+		when(mockReference.getTargetId()).thenReturn("syn99");
+		entityFinder.setSelectedEntity(mockReference);
+		
+		verifyWrongEntityTypeSelected(new Folder(), mockHandler);
+		verifyWrongEntityTypeSelected(new Project(), mockHandler);
+		verifyCorrectEntityTypeSelected(new FileEntity(), mockHandler);
+	}
+	
+	@Test
+	public void testContainerFilter() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configure(EntityFilter.CONTAINER, true, mockHandler);
+		Reference mockReference = mock(Reference.class);
+		when(mockReference.getTargetId()).thenReturn("syn99");
+		entityFinder.setSelectedEntity(mockReference);
+		
+		verifyWrongEntityTypeSelected(new FileEntity(), mockHandler);
+		verifyCorrectEntityTypeSelected(new Folder(), mockHandler);
+		verifyCorrectEntityTypeSelected(new Project(), mockHandler);
+	}
 	
 	@Test
 	public void testShowDefaultArea() {

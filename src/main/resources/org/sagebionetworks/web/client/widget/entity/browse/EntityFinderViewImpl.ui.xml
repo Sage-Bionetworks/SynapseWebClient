@@ -69,6 +69,7 @@
 								</b:Heading>
 							</b:PanelBody>
 						</b:Panel>
+						<bh:Div ui:field="synAlertContainer"/>
 					</t:TableData>
 				</t:TableRow>
 			</t:Table>

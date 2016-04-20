@@ -110,6 +110,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		cachedUserId = authenticationController.getCurrentUserPrincipalId();
 	}
 	
+	public void clearCurrentContent() {
+		cachedPlace = null;
+		cachedUserId = null;
+	}
+	
 	public Place getCachedCurrentPlace() {
 		return cachedPlace;
 	}
@@ -220,6 +225,17 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
+	}
+	
+	public void setEntityFilter(EntityFilter filter) {
+		getEntityTreeBrowser().setEntityFilter(filter);
+		getFavoritesTreeBrowser().setEntityFilter(filter);
+		clearCurrentContent();
+		refresh();
+	}
+	
+	public EntityFilter getEntityFilter() {
+		return getEntityTreeBrowser().getEntityFilter();
 	}
 
 	
