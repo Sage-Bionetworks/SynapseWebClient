@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -57,11 +58,14 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -128,6 +132,18 @@ public class CrawlFilter implements Filter {
 					//index all projects
 					String searchQueryJson = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
 					html=getAllProjectsHtml(URLDecoder.decode(searchQueryJson));
+				} else if (fixedQueryString.contains("#!TeamSearch")) {
+					//index all teams
+					String startIndex = fixedQueryString.substring(fixedQueryString.indexOf(TeamSearch.START_DELIMITER,fixedQueryString.indexOf("#!"))+TeamSearch.START_DELIMITER.length());
+					html=getAllTeamsHtml(startIndex);
+				} else if (fixedQueryString.contains("#!Team")) {
+					//index team (including members)
+					String teamId = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
+					html=getTeamHtml(teamId);
+				} else if (fixedQueryString.contains("#!Profile")) {
+					//index team (including members)
+					String profileId = fixedQueryString.substring(fixedQueryString.indexOf(":",fixedQueryString.indexOf("#!"))+1);
+					html=getProfileHtml(profileId);
 				}
 				
 				URL url = new URL(scheme, domain, port, fixedQueryString);
@@ -155,9 +171,9 @@ public class CrawlFilter implements Filter {
 		//add direct links to all public projects in the system
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		html.append("<h1>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
-		
+		//add link to team search
+		html.append("<h3><a href=\"https://www.synapse.org/#!TeamSearch:"+TeamSearch.START_DELIMITER+"0\">Teams</a></h3><br />");
 		SearchResults results = synapseClient.search(query);
-		
 		//append this set to the list
 		while(results.getHits().size() > 0) {
 			for (Hit hit : results.getHits()) {
@@ -168,14 +184,18 @@ public class CrawlFilter implements Filter {
 			query.setStart(newStart);
 			results = synapseClient.search(query);
 		}
-		
 		html.append("</body></html>");
 		return html.toString();
 	}
 	
 	private String getCreatedByString(String userId) throws RestServiceException {
 		UserProfile profile = synapseClient.getUserProfile(userId);
+		return getUserProfileString(profile);
+	}
+	
+	private String getUserProfileString(UserProfile profile) {
 		StringBuilder createdByBuilder = new StringBuilder();
+		createdByBuilder.append("<a href=\"https://www.synapse.org/#!Profile:" + profile.getOwnerId()+"\">");
 		if (profile.getFirstName() != null) {
 			createdByBuilder.append(profile.getFirstName() + " ");
 		}
@@ -183,7 +203,7 @@ public class CrawlFilter implements Filter {
 			createdByBuilder.append(profile.getLastName() + " ");
 		}
 		createdByBuilder.append(profile.getUserName());
-
+		createdByBuilder.append("</a>");
 		return createdByBuilder.toString();
 	}
 	
@@ -294,9 +314,51 @@ public class CrawlFilter implements Filter {
 				html.append(getURLContents(replyURL) + "<br>");
 			} catch (Exception e) {}
 		}
+		html.append("</body></html>");
 		return html.toString();
 	}
-
+	
+	private String getTeamHtml(String teamId)
+			throws JSONObjectAdapterException, RestServiceException,
+			IOException {
+		StringBuilder html = new StringBuilder();
+		Team team = synapseClient.getTeam(teamId);
+		
+		html.append("<!DOCTYPE html><html><head><title>" + team.getName()
+				+ "</title></head><body>");
+		html.append("<h1>" + team.getName() + "</h1>");
+		html.append("<h3>" + team.getDescription() + "</h3>");
+		TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(team.getId(), "", 3000, 0);
+		for (TeamMemberBundle teamMember : teamMembers.getResults()) {
+			try {
+				html.append(getUserProfileString(teamMember.getUserProfile()) + "<br>");
+			} catch (Exception e) {}
+		}
+		html.append("</body></html>");
+		return html.toString();
+	}
+	
+	
+	private String getProfileHtml(String profileId)
+			throws JSONObjectAdapterException, RestServiceException,
+			IOException {
+		StringBuilder html = new StringBuilder();
+		UserProfile profile = synapseClient.getUserProfile(profileId);
+		String display = profile.getFirstName() + " " + profile.getLastName() + " " + profile.getUserName();
+		html.append("<!DOCTYPE html><html><head><title>" + display
+				+ "</title></head><body>");
+		html.append("<h1>" + display + "</h1>");
+		if (profile.getSummary() != null) {
+			html.append("<h4>" + profile.getSummary() + "</h4>");	
+		}
+		html.append("<p>" + profile.getLocation() + "</p>");
+		html.append("<p>" + profile.getPosition() + "</p>");
+		html.append("<p>" + profile.getIndustry() + "</p>");
+		html.append("<p>" + profile.getCompany() + "</p>");
+		html.append("</body></html>");
+		return html.toString();
+	}
+	
 	private String getURLContents(String urlTarget) throws IOException {
 		URL url = new URL(urlTarget);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -342,6 +404,25 @@ public class CrawlFilter implements Filter {
 		inputQuery.setStart(newStart);
 		String newJson = EntityFactory.createJSONStringForEntity(inputQuery);
 		html.append("<a href=\"https://www.synapse.org/#!Search:"+URLEncoder.encode(newJson)+"\">Next Page</a><br />");
+		
+		html.append("</body></html>");
+		return html.toString();
+	}
+	
+	private String getAllTeamsHtml(String startIndex) throws RestServiceException{
+		int start = Integer.parseInt(startIndex);
+		PaginatedResults<Team> teams = synapseClient.getTeamsBySearch("", 200, start);
+		
+		//append this set to the list
+		StringBuilder html = new StringBuilder();
+		html.append("<!DOCTYPE html><html><head><title>Sage Synapse: All Teams - from "+startIndex+"</title><meta name=\"description\" content=\"\" /></head><body>");
+		for (Team team : teams.getResults()) {
+			//add links
+			html.append("<a href=\"https://www.synapse.org/#!Team:"+team.getId()+"\">"+team.getName()+"</a><br />");
+		}
+		//add another link for the next page of results
+		long newStart = start + teams.getResults().size();
+		html.append("<h4><a href=\"https://www.synapse.org/#!TeamSearch:"+TeamSearch.START_DELIMITER+newStart+"\">Next Page</a></h4><br />");
 		
 		html.append("</body></html>");
 		return html.toString();
