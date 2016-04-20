@@ -97,13 +97,14 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 				presenter.updateFolderName(folderNameField.getText());
 			}
 		});
-
-		cancelNewFolderButton.addClickHandler(new ClickHandler() {
+		ClickHandler deleteCancelledHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.deleteFolder(true);
 			}
-		});
+		};
+		newFolderDialog.addCloseHandler(deleteCancelledHandler);
+		cancelNewFolderButton.addClickHandler(deleteCancelledHandler);
 
 		folderNameField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
