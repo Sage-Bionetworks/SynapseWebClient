@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.DisplayConstants.*;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
+import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -80,6 +80,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Span threadAuthor;
 	@UiField
 	Span subscribeButtonContainer;
+	@UiField
+	Div threadButtonContainer;
 	String threadLinkHref;
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -317,5 +319,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void removeRefreshAlert() {
 		refreshAlertContainer.clear();
+	}
+
+	@Override
+	public void setButtonContainerWidth(String width){
+		threadButtonContainer.setWidth(width);
 	}
 }

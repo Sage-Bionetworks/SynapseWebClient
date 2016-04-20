@@ -49,6 +49,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public static final String REPLY = "reply";
 	public static final String REPLIES = "replies";
 	public static final String CREATED_ON_PREFIX = "posted ";
+	public static final String NO_INDENTATION_WIDTH = "100%";
+	public static final String INDENTATION_WIDTH = "95%";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
@@ -197,6 +199,11 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			showReplyDetails();
 		} else {
 			hideReplyDetails();
+		}
+		if (numberOfReplies == 0) {
+			view.setButtonContainerWidth(NO_INDENTATION_WIDTH);
+		} else {
+			view.setButtonContainerWidth(INDENTATION_WIDTH);
 		}
 	}
 	
