@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -14,8 +16,7 @@ public interface UserAccountServiceAsync {
 
 	void changePassword(String sessionToken, String newPassword, AsyncCallback<Void> callback);
 
-	void initiateSession(String username, String password,
-			AsyncCallback<Session> callback);
+	void initiateSession(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback);
 	
 	void getUserSessionData(String sessionToken, AsyncCallback<UserSessionData> callback);
 	
