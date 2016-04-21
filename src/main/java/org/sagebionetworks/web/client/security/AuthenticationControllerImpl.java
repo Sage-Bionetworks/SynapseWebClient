@@ -5,8 +5,11 @@ import java.util.Date;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -25,6 +28,7 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
+	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
 	private static UserBundle userBundle;
@@ -32,20 +36,24 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private SessionStorage sessionStorage;
+	private ClientCache localStorage;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage, ClientCache localStorage){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
+		this.localStorage = localStorage;
 	}
 
 	@Override
 	public void loginUser(final String username, String password, final AsyncCallback<UserSessionData> callback) {
-		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
-		userAccountService.initiateSession(username, password, new AsyncCallback<Session>() {		
+		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+		LoginRequest loginRequest = getLoginRequest(username, password);
+		userAccountService.initiateSession(loginRequest, new AsyncCallback<LoginResponse>() {		
 			@Override
-			public void onSuccess(Session session) {				
+			public void onSuccess(LoginResponse session) {
+				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
 				revalidateSession(session.getSessionToken(), callback);
 			}
 			
@@ -55,6 +63,18 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				callback.onFailure(caught);
 			}
 		});
+	}
+	
+	public void storeAuthenticationReceipt(String username, String receipt) {
+		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt);
+	}
+	public LoginRequest getLoginRequest(String username, String password) {
+		LoginRequest request = new LoginRequest();
+		request.setUsername(username);
+		request.setPassword(password);
+		String authenticationReceipt = localStorage.get(username + USER_AUTHENTICATION_RECEIPT);
+		request.setAuthenticationReceipt(authenticationReceipt);
+		return request;
 	}
 	
 	@Override

@@ -27,6 +27,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -49,6 +50,8 @@ public class AuthenticationControllerImplTest {
 	UserSessionData sessionData;
 	@Mock
 	SessionStorage mockSessionStorage;
+	@Mock
+	ClientCache mockClientCache;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -66,7 +69,7 @@ public class AuthenticationControllerImplTest {
 		
 		AsyncMockStubber.callSuccessWith(new UserLoginBundle(sessionData, new UserBundle())).when(mockUserAccountService).getUserLoginBundle(anyString(), any(AsyncCallback.class));
 
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache);
 	}
 	
 	@Test
