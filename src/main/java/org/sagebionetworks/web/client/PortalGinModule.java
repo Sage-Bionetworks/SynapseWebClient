@@ -319,8 +319,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsView;
-import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeView;
@@ -1184,7 +1184,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
 		
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
-		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
+		bind(UserListView.class).to(UserListViewImpl.class);
 		
 		bind(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);

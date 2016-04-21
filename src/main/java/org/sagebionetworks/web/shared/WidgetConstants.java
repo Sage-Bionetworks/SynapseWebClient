@@ -114,7 +114,7 @@ public class WidgetConstants {
 	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
 	
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
-	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
+	public static final String TEAM_ID_KEY = "teamId";
 	public static final String JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY = "requestExpiresInXDays";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
 	public static final String IS_MEMBER_MESSAGE = "isMemberMessage";

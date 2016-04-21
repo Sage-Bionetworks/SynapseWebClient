@@ -20,7 +20,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
@@ -33,7 +33,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ChallengeParticipantsWidgetTest {
 	
-	ChallengeParticipantsView mockView;
+	UserListView mockView;
 	DetailedPaginationWidget mockPaginationWidget;
 	ChallengeClientAsync mockChallengeClient;
 	ChallengeParticipantsWidget widget;
@@ -44,7 +44,7 @@ public class ChallengeParticipantsWidgetTest {
 	
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
-		mockView = mock(ChallengeParticipantsView.class);
+		mockView = mock(UserListView.class);
 		mockPaginationWidget = mock(DetailedPaginationWidget.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		widget = new ChallengeParticipantsWidget(mockView, mockPaginationWidget, mockChallengeClient);
@@ -80,12 +80,12 @@ public class ChallengeParticipantsWidgetTest {
 		
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
-		verify(mockView).clearParticipants();
+		verify(mockView).clearUsers();
 		verify(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
 		verify(mockPaginationWidget).configure(anyLong(), anyLong(), anyLong(), eq(widget));
 		
-		verify(mockView).addParticipant(testProfile);
+		verify(mockView).addUser(testProfile);
 	}
 	
 
@@ -96,10 +96,10 @@ public class ChallengeParticipantsWidgetTest {
 		
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
-		verify(mockView).clearParticipants();
+		verify(mockView).clearUsers();
 		verify(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
-		verify(mockView).showNoParticipants();
+		verify(mockView).showNoUsers();
 	}
 	
 	@Test
@@ -109,7 +109,7 @@ public class ChallengeParticipantsWidgetTest {
 		
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
-		verify(mockView).clearParticipants();
+		verify(mockView).clearUsers();
 		verify(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
 		verify(mockView).showErrorMessage(anyString());

@@ -9,6 +9,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -17,25 +19,24 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ChallengeParticipantsWidget implements UserListView.Presenter, WidgetRendererPresenter, PageChangeListener {
+public class TeamMembersWidget implements UserListView.Presenter, WidgetRendererPresenter, PageChangeListener {
 	
 	private UserListView view;
 	private Map<String,String> descriptor;
-	private ChallengeClientAsync challengeClient;
-	private String challengeId;
-	private boolean isInTeam;
-	private Callback widgetRefreshRequired;
+	private SynapseClientAsync synapseClient;
+	private String teamId;
+	
 	private DetailedPaginationWidget paginationWidget;
 	public static final Long DEFAULT_PARTICIPANT_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
 	
 	@Inject
-	public ChallengeParticipantsWidget(UserListView view, 
+	public TeamMembersWidget(UserListView view, 
 			DetailedPaginationWidget paginationWidget, 
-			ChallengeClientAsync synapseClient) {
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
-		this.challengeClient = synapseClient;
+		this.synapseClient = synapseClient;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setPresenter(this);
 	}
@@ -43,18 +44,12 @@ public class ChallengeParticipantsWidget implements UserListView.Presenter, Widg
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
-		this.widgetRefreshRequired = widgetRefreshRequired;
-		challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
-		isInTeam = false;
-		String isInTeamString = descriptor.get(WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY);
-		if (isInTeamString != null) {
-			isInTeam = Boolean.parseBoolean(isInTeamString);
-		}
+		teamId = descriptor.get(WidgetConstants.TEAM_ID_KEY);
 		descriptor = widgetDescriptor;
-		if (challengeId == null) {
-			view.showErrorMessage(WidgetConstants.CHALLENGE_ID_KEY + " is required.");
+		if (teamId == null) {
+			view.showErrorMessage(WidgetConstants.TEAM_ID_KEY + " is required.");
 		} else {
-			//get the challenge team summaries
+			//get the team members
 			onPageChange(DEFAULT_OFFSET);
 		}
 	}
@@ -64,15 +59,15 @@ public class ChallengeParticipantsWidget implements UserListView.Presenter, Widg
 		view.hideErrors();
 		view.showLoading();
 		view.clearUsers();
-		challengeClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<UserProfilePagedResults>() {
+		synapseClient.getTeamMembers(teamId, "", DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
-			public void onSuccess(UserProfilePagedResults results) {
+			public void onSuccess(TeamMemberPagedResults results) {
 				view.hideLoading();
 				if (results.getTotalNumberOfResults() > 0) {
 					//configure the pager, and the participant list
-					paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, results.getTotalNumberOfResults(), ChallengeParticipantsWidget.this);
-					for (UserProfile userProfile : results.getResults()) {
-						view.addUser(userProfile);
+					paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, results.getTotalNumberOfResults(), TeamMembersWidget.this);
+					for (TeamMemberBundle bundle : results.getResults()) {
+						view.addUser(bundle.getUserProfile());
 					}
 				} else {
 					view.showNoUsers();
