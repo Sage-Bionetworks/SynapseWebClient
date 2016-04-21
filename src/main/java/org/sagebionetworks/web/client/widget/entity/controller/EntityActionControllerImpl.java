@@ -757,7 +757,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	            @Override
 	            public void onSuccess(WikiPage result) {
 	                view.showInfo("'" + name + "' Page Added", "");
-	                entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
+	                globalApplicationState.getPlaceChanger().goTo(newPlace);
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
