@@ -16,11 +16,14 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -44,7 +47,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class AuthenticationControllerImplTest {
 
-	AuthenticationController authenticationController;
+	AuthenticationControllerImpl authenticationController;
 	CookieProvider mockCookieProvider;
 	UserAccountServiceAsync mockUserAccountService;
 	UserSessionData sessionData;
@@ -195,5 +198,73 @@ public class AuthenticationControllerImplTest {
 		authenticationController.logoutUser();
 		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		verify(mockSessionStorage).clear();
+	}
+	
+	
+	@Test
+	public void testStoreLoginReceipt() {
+		String username = "testusername";
+		String receipt = "31416";
+		authenticationController.storeAuthenticationReceipt(username, receipt);
+		verify(mockClientCache).put(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT, receipt);
+	}
+	
+	@Test
+	public void testGetLoginRequest() {
+		String username = "testusername";
+		String password = "pw";
+		
+		LoginRequest request = authenticationController.getLoginRequest(username, password);
+		assertNull(request.getAuthenticationReceipt());
+		
+		String cachedReceipt = "12345";
+		when(mockClientCache.get(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT)).thenReturn(cachedReceipt);
+		request = authenticationController.getLoginRequest(username, password);
+		assertEquals(cachedReceipt, request.getAuthenticationReceipt());
+	}
+	
+	@Test
+	public void testLoginUser() {
+		String username = "testusername";
+		String password = "pw";
+		String oldAuthReceipt = "1234";
+		String newSessionToken = "abcdzxcvbn";
+		String newAuthReceipt = "5678";
+		when(mockClientCache.get(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
+		LoginResponse loginResponse = new LoginResponse();
+		loginResponse.setAcceptsTermsOfUse(true);
+		loginResponse.setAuthenticationReceipt(newAuthReceipt);
+		loginResponse.setSessionToken(newSessionToken);
+		AsyncMockStubber.callSuccessWith(loginResponse).when(mockUserAccountService).initiateSession(any(LoginRequest.class), any(AsyncCallback.class));
+		AsyncCallback loginCallback = mock(AsyncCallback.class);
+		
+		//make the actual call
+		authenticationController.loginUser(username, password, loginCallback);
+		
+		//verify input arguments (including the cached receipt)
+		ArgumentCaptor<LoginRequest> loginRequestCaptor = ArgumentCaptor.forClass(LoginRequest.class);
+		verify(mockUserAccountService).initiateSession(loginRequestCaptor.capture(), any(AsyncCallback.class));
+		LoginRequest request = loginRequestCaptor.getValue();
+		assertEquals(username, request.getUsername());
+		assertEquals(password, request.getPassword());
+		assertEquals(oldAuthReceipt, request.getAuthenticationReceipt());
+		
+		//verify the new receipt is cached
+		verify(mockClientCache).put(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT, newAuthReceipt);
+		verify(loginCallback).onSuccess(any(UserSessionData.class));
+	}
+	
+	@Test
+	public void testLoginUserFailure() {
+		Exception ex = new Exception("invalid login");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserAccountService).initiateSession(any(LoginRequest.class), any(AsyncCallback.class));
+		String username = "testusername";
+		String password = "pw";
+		AsyncCallback loginCallback = mock(AsyncCallback.class);
+		
+		//make the actual call
+		authenticationController.loginUser(username, password, loginCallback);
+		
+		verify(loginCallback).onFailure(ex);
 	}
 }
