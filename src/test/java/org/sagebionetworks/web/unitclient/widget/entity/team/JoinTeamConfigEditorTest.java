@@ -66,7 +66,7 @@ public class JoinTeamConfigEditorTest {
 		mockSynClient = mock(SynapseClientAsync.class);
 		mockJSNI = mock(SynapseJSNIUtils.class);
 		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamID);
+		descriptor.put(WidgetConstants.TEAM_ID_KEY, teamID);
 		descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, String.valueOf(isChallenge));
 		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, String.valueOf(showProfileFormKey));
 		descriptor.put(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON, String.valueOf(isSimpleRequest));

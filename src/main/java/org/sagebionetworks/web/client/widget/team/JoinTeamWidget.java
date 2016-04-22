@@ -164,8 +164,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.widgetRefreshRequired = widgetRefreshRequired;
 		this.teamId = null;
-		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) 
-			this.teamId = descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY);
+		if (descriptor.containsKey(WidgetConstants.TEAM_ID_KEY)) 
+			this.teamId = descriptor.get(WidgetConstants.TEAM_ID_KEY);
 		
 		//is the team associated with joining a challenge?
 		if (descriptor.containsKey(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY)) {

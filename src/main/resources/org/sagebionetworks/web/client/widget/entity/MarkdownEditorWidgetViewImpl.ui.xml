@@ -48,6 +48,7 @@
 				    <b:AnchorListItem ui:field="entityBackgroundLink">Set Project Background Image</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="synapseFormLink">Synapse Form</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="teamMembersLink">Team Members List</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
 				  </b:DropDownMenu>

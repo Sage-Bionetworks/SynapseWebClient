@@ -288,7 +288,7 @@ public class JoinTeamWidgetTest {
 		//configure using wiki widget renderer version
 		Date now = new Date();
 		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamId);
+		descriptor.put(WidgetConstants.TEAM_ID_KEY, teamId);
 		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.TRUE.toString());
 		Integer requestExpiresInXDays = 5;
 		descriptor.put(WidgetConstants.JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY, requestExpiresInXDays.toString());
@@ -312,7 +312,7 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testShowChallengeInfoParam() throws Exception {
 		Map<String, String> descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamId);
+		descriptor.put(WidgetConstants.TEAM_ID_KEY, teamId);
 		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.TRUE.toString());
 		Callback mockWidgetRefreshRequired = mock(Callback.class);
 		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);

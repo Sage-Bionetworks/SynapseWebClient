@@ -5,7 +5,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-public interface ChallengeParticipantsView extends IsWidget, SynapseView {
+public interface UserListView extends IsWidget, SynapseView {
 	
 	interface Presenter {
 	}
@@ -15,9 +15,9 @@ public interface ChallengeParticipantsView extends IsWidget, SynapseView {
 	 * @param string
 	 */
 	void setPaginationWidget(Widget paginationWidget);
-	void clearParticipants();
-	void addParticipant(UserProfile profile);
-	void showNoParticipants();
+	void clearUsers();
+	void addUser(UserProfile profile);
+	void showNoUsers();
 	void hideErrors();
 	void hideLoading();
 	

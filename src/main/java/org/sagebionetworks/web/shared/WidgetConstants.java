@@ -84,6 +84,10 @@ public class WidgetConstants {
 	public static final String BUTTON_LINK_CONTENT_TYPE = "buttonlink";
 	public static final String BUTTON_LINK_FRIENDLY_NAME ="Button Link";
 	
+	public static final String TEAM_MEMBERS_CONTENT_TYPE = "members";
+	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
+	
+	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	
@@ -114,7 +118,7 @@ public class WidgetConstants {
 	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
 	
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
-	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
+	public static final String TEAM_ID_KEY = "teamId";
 	public static final String JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY = "requestExpiresInXDays";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
 	public static final String IS_MEMBER_MESSAGE = "isMemberMessage";
