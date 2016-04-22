@@ -377,6 +377,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					if (wikiReloadHandler != null) {
 						wikiReloadHandler.invoke(currentPage.getId());
 					}
+					view.scrollWikiHeadingIntoView();
 				} catch (Exception e) {
 					onFailure(e);
 				}

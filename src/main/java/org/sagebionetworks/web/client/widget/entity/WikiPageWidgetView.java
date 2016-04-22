@@ -43,6 +43,7 @@ public interface WikiPageWidgetView extends IsWidget {
 	void setBreadcrumbWidget(IsWidget breadcrumb);
 	void setSynapseAlertWidget(IsWidget synapseAlert);
 	void setWikiHeadingText(String title);
+	void scrollWikiHeadingIntoView();
 	public void setRestoreButtonVisible(boolean isVisible);
 	public void setDiffVersionAlertVisible(boolean isVisible);
 	public void setBreadcrumbsVisible(boolean isVisible);

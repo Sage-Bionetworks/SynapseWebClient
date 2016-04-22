@@ -131,6 +131,7 @@ public class WikiPageWidgetTest {
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		// once to clear, once after loading shown
 		verify(mockView, times(2)).setLoadingVisible(false);
+		verify(mockView, never()).scrollWikiHeadingIntoView();
 	}
 	
 	@Test
@@ -260,6 +261,7 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).setDiffVersionAlertVisible(false);
+		verify(mockView).scrollWikiHeadingIntoView();
 		verify(mockCallbackP).invoke(anyString());
 		//also verify that the created by and modified by are updated when wiki page is reloaded
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
@@ -276,6 +278,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.reloadWikiPage();
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView, never()).scrollWikiHeadingIntoView();
 	}
 	
 	@Test

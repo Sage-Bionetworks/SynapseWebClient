@@ -1025,19 +1025,26 @@ public class EntityActionControllerImplTest {
 	public void testOnRootAddWikiSubpageCanUpdate(){
 		//Edge case.  User attempts to add a subpage on a project that does not yet have a wiki.  Verify a root page is created (and page refreshed)...
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		WikiPage newWikiPage = new WikiPage();
+		String newWikiPageId = "49382";
+		newWikiPage.setId(newWikiPageId);
+		AsyncMockStubber.callSuccessWith(newWikiPage).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, true,null, mockEntityUpdatedHandler);
 		controller.onAction(Action.ADD_WIKI_SUBPAGE);
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
 	}
 	
 	@Test
 	public void testOnAddWikiSubpageCanUpdate(){
 		//Set up so that we are on the root wiki page, and we run the add subpage command.
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		WikiPage newWikiPage = new WikiPage();
+		String newWikiPageId = "55555";
+		newWikiPage.setId(newWikiPageId);
+		
+		AsyncMockStubber.callSuccessWith(newWikiPage).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId("123");
 		controller.configure(mockActionMenu, entityBundle, true,"123", mockEntityUpdatedHandler);
 		controller.onAction(Action.ADD_WIKI_SUBPAGE);
@@ -1060,7 +1067,7 @@ public class EntityActionControllerImplTest {
 		capturedCallback.callback("a valid name");
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
 	}
 	
 	@Test
