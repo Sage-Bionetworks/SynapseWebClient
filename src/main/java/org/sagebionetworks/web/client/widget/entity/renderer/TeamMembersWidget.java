@@ -27,7 +27,7 @@ public class TeamMembersWidget implements UserListView.Presenter, WidgetRenderer
 	private String teamId;
 	
 	private DetailedPaginationWidget paginationWidget;
-	public static final Long DEFAULT_PARTICIPANT_LIMIT = 50L;
+	public static final Long DEFAULT_USER_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
 	
 	@Inject
@@ -59,13 +59,13 @@ public class TeamMembersWidget implements UserListView.Presenter, WidgetRenderer
 		view.hideErrors();
 		view.showLoading();
 		view.clearUsers();
-		synapseClient.getTeamMembers(teamId, "", DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
+		synapseClient.getTeamMembers(teamId, "", DEFAULT_USER_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults results) {
 				view.hideLoading();
 				if (results.getTotalNumberOfResults() > 0) {
 					//configure the pager, and the participant list
-					paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, results.getTotalNumberOfResults(), TeamMembersWidget.this);
+					paginationWidget.configure(DEFAULT_USER_LIMIT, newOffset, results.getTotalNumberOfResults(), TeamMembersWidget.this);
 					for (TeamMemberBundle bundle : results.getResults()) {
 						view.addUser(bundle.getUserProfile());
 					}

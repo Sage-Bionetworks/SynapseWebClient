@@ -169,7 +169,10 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getCytoscapeRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableFormWidget();
-		}		
+		} else if (contentTypeKey.equals(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE)) {
+			presenter = ginInjector.getTeamMembersWidget();
+		}	
+		
 		//TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
