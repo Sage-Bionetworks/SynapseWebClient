@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -81,6 +82,8 @@ public class SettingsPresenterTest {
 	
 	@Mock
 	SubscriptionListWidget mockSubscriptionListWidget;
+	@Mock
+	PasswordStrengthWidget mockPasswordStrengthWidget;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -98,7 +101,8 @@ public class SettingsPresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget, mockCookieProvider);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
+				mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget, mockCookieProvider,mockPasswordStrengthWidget);	
 		verify(mockView).setPresenter(profilePresenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);

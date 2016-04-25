@@ -46,6 +46,7 @@
 					                </b:Column>
 					                <b:Column size="SM_8">
 				                    	<g:PasswordTextBox ui:field="currentPasswordField" addStyleNames="form-control"/>
+				                    	<bh:Div ui:field="passwordStrengthContainer"/>
 					                </b:Column>
 					            </b:Row>
 					            <b:Row ui:field="password1" addStyleNames="form-group">

@@ -20,6 +20,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -108,7 +110,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel apiSynAlertPanel;
 	@UiField
 	Div subscriptionsContainer;
-	
+	@UiField
+	Div passwordStrengthContainer;
+
 	private Presenter presenter;
 	
 	@Inject
@@ -181,6 +185,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			@Override
 			public void onClick(ClickEvent event) {
 				apiKeyContainer.selectAll();
+			}
+		});
+		password1Field.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				presenter.passwordChanged(password1Field.getText());
 			}
 		});
 	}
@@ -401,5 +411,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setSubscriptionsVisible(boolean visible) {
 		subscriptionsContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void setPasswordStrengthWidget(Widget w) {
+		passwordStrengthContainer.clear();
+		passwordStrengthContainer.add(w);
 	}
 }
