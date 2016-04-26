@@ -72,6 +72,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.cookies = cookies;
 		this.passwordStrengthWidget = passwordStrengthWidget;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
+		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
