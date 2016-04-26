@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -47,6 +48,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
 	private CookieProvider cookies;
+	private PasswordStrengthWidget passwordStrengthWidget;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
@@ -56,7 +58,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			PortalGinInjector ginInjector,
 			UserProfileModalWidget userProfileModalWidget,
 			SubscriptionListWidget subscriptionListWidget,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			PasswordStrengthWidget passwordStrengthWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -67,7 +70,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
 		this.cookies = cookies;
+		this.passwordStrengthWidget = passwordStrengthWidget;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
+		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
@@ -399,4 +404,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		return password != null && !password.isEmpty();
 	}
 	
+	@Override
+	public void passwordChanged(String password) {
+		passwordStrengthWidget.scorePassword(password);
+	}
+
 }

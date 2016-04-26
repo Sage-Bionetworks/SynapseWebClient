@@ -37,6 +37,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void showEmailChangeSuccess(String message);
 	void setSubscriptionsListWidget(Widget w);
 	void setSubscriptionsVisible(boolean visible);
+	void setPasswordStrengthWidget(Widget w);
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);
@@ -52,6 +53,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void getAPIKey();
 
 		void changePassword();
+		void passwordChanged(String password);
 	}
 
 	public void setApiKey(String apiKey);

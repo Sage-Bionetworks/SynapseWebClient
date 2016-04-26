@@ -18,6 +18,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -134,6 +136,12 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			@Override
 			public void onBlur(BlurEvent event) {
 				checkPassword1();
+			}
+		});
+		password1Field.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				presenter.passwordChanged(password1Field.getText());
 			}
 		});
 		
