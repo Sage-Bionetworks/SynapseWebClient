@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -18,6 +21,7 @@ import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -95,6 +99,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
 		view.setLoadingVisible(true);
+		headers = filter.filterForBrowsing(headers);
 		EntityQueryResults results = getEntityQueryResultsFromHeaders(headers);
 		for (EntityQueryResult wrappedHeader : results.getEntities()) {
 			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(wrappedHeader, true,
@@ -103,41 +108,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.setLoadingVisible(false);
 	}
 	
-	public void configureWithPath(List<EntityHeader> pathHeaders) {
-		view.clear();
-		view.setLoadingVisible(true);
-		EntityQueryResults results = getEntityQueryResultsFromHeaders(pathHeaders);
-		List<EntityQueryResult> resultList = results.getEntities();
-		EntityTreeItem parent = null;
-		EntityQueryResult parentEntityQueryResult = null;
-		//if exists, process the first item (project).
-		if (resultList.size() > 0) {
-			EntityQueryResult entity = resultList.get(0);
-			parentEntityQueryResult = entity;
-			parent = makeTreeItemFromQueryResult(entity, true,
-					false);
-			view.appendRootEntityTreeItem(parent);
-			parent.setState(true, false);
-		}
-		//now process 1 to the last container (do not process the leaf)
-		for (int i = 1; i < resultList.size()-1; i++) {
-			EntityQueryResult entity = resultList.get(i);
-			EntityTreeItem childToAdd = makeTreeItemFromQueryResult(entity, false,
-					false);
-			view.appendChildEntityTreeItem(childToAdd, parent);
-			parent = childToAdd;
-			parentEntityQueryResult = entity;
-			parent.setState(true, false);
-		}
-		//start loading container siblings
-		if (parentEntityQueryResult != null && parent != null) {
-			getChildren(parentEntityQueryResult.getId(), parent, 0);	
-		}
-		
-		
-		view.setLoadingVisible(false);
-	}
-
 
 	public EntityQueryResults getEntityQueryResultsFromHeaders(
 			List<EntityHeader> headers) {
@@ -148,7 +118,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			EntityQueryResult result = new EntityQueryResult();
 			result.setId(header.getId());
 			result.setName(header.getName());
-			result.setEntityType(header.getType());
+			result.setEntityType(EntityTypeUtils.getEntityTypeForEntityClassName(header.getType()).name());
 			result.setVersionNumber(header.getVersionNumber());
 			resultList.add(result);
 		}
@@ -331,7 +301,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			return false;
 		}
 		String entityType = header.getEntityType();
-		return entityType.equals("folder") || entityType.equals("project");	
+		return entityType.equals(EntityType.folder.name()) || entityType.equals(EntityType.project.name());	
 	}
 	
 	public void setEntityFilter(EntityFilter filter) {

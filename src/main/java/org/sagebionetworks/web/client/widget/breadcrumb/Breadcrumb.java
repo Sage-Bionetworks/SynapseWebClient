@@ -8,7 +8,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -50,7 +50,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 					EntityHeader element = path.get(i);
 					String name = element.getName();
 					Synapse place = new Synapse(element.getId());
-					IconType icon = DisplayUtils.getIconTypeForEntityClassName(element.getType());
+					IconType icon = EntityTypeUtils.getIconTypeForEntityClassName(element.getType());
 					if(optionalArea == EntityArea.FILES && Project.class.getName().equals(element.getType())) {
 						// show files as root
 						name = DisplayConstants.FILES;

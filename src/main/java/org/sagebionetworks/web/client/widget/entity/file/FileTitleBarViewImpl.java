@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -139,7 +140,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 
-		entityIcon.setType(DisplayUtils.getIconTypeForEntity(entity));
+		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
 		
 		//fileHandle is null if user can't access the filehandle associated with this file entity
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
