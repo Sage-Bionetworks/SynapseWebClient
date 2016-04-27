@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
@@ -227,7 +229,7 @@ public class EntityTreeBrowserTest {
 	public void testConfigure() {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();
 		EntityHeader header = new EntityHeader();
-		header.setType("project");
+		header.setType(Project.class.getName());
 		headers.add(header);
 		
 		entityTreeBrowser.configure(headers);
@@ -269,7 +271,7 @@ public class EntityTreeBrowserTest {
 		Long versionNumber;
 		id = "12";
 		name = "project 1";
-		type = "project";
+		type = Project.class.getName();
 		versionNumber = 1L;
 		headers.add(createEntityHeader(id, name, type, versionNumber));
 		
@@ -279,7 +281,7 @@ public class EntityTreeBrowserTest {
 		EntityQueryResult result = results.getEntities().get(0);
 		assertEquals(id, result.getId());
 		assertEquals(name, result.getName());
-		assertEquals(type, result.getEntityType());
+		assertEquals(EntityType.project.name(), result.getEntityType());
 		assertEquals(versionNumber, result.getVersionNumber());
 		
 		id = "24";
