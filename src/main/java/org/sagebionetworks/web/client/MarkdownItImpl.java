@@ -133,7 +133,7 @@ public class MarkdownItImpl implements MarkdownIt {
 					var tail = text.slice(pos);
 					if (!self.re.synapse) {
 						self.re.synapse = new RegExp(
-								'^([0-9]+[.]?[0-9]*(\\/wiki\\/[0-9]+)?)+(?!_)(?=$|'
+								'^([0-9]{3,}[.]?[0-9]*(\\/wiki\\/[0-9]+)?)+(?!_)(?=$|'
 										+ self.re.src_ZPCc + ')');
 					}
 					if (self.re.synapse.test(tail)) {
