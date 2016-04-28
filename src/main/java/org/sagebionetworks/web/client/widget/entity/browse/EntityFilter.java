@@ -29,11 +29,11 @@ public enum EntityFilter {
 		}
 	}
 	
-	String[] getEntityQueryValues() {
+	public String[] getEntityQueryValues() {
 		return entityQueryValues;
 	}
 	
-	List<EntityHeader> filterForBrowsing(List<EntityHeader> headers) {
+	public List<EntityHeader> filterForBrowsing(List<EntityHeader> headers) {
 		List<EntityHeader> returnHeaders = new ArrayList<EntityHeader>();
 		for (EntityHeader entityHeader : headers) {
 			if (entityTypeClassNamesSet.contains(entityHeader.getType())) {
