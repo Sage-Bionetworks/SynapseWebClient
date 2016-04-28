@@ -24,6 +24,12 @@
 					<b:DropDownMenu addStyleNames="dropdown-menu-right">
 						<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Synapse tutorial</b:AnchorListItem>
 						<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
+						<b:ListItem>
+							<b:Anchor href="#!SynapseForum:default">
+								Synapse Forum
+								<span class="smallerText"><span class="label label-warning label-as-badge margin-left-5 moveup-2">beta</span></span>
+							</b:Anchor>
+						</b:ListItem>
 						<b:AnchorListItem ui:field="rLink">R client</b:AnchorListItem>
 						<b:AnchorListItem ui:field="pythonLink">Python client</b:AnchorListItem>
 						<b:AnchorListItem ui:field="commandLineLink">Command line client</b:AnchorListItem>

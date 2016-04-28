@@ -245,11 +245,4 @@ public class HeaderTest {
 		header.onHelpForumClick();
 		verify(mockView).openNewWindow(Header.GET_SATISFACTION_SUPPORT_SITE);
 	}
-	
-	@Test
-	public void testOnHelpForumClickInAlpha(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		header.onHelpForumClick();
-		verify(mockPlaceChanger).goTo(any(SynapseForumPlace.class));
-	}
 }
