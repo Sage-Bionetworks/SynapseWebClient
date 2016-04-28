@@ -8,7 +8,7 @@
 	
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
-		<b:Container>
+		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="XS_12">
 					<bh:Div ui:field="markdownContainer" addStyleNames="min-height-400"></bh:Div>
