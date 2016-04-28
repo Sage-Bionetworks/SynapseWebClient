@@ -470,10 +470,10 @@ public class MarkdownItImpl implements MarkdownIt {
 					render: function (tokens, idx) {
 						if (tokens[idx].nesting === 1) {
 							// opening tag
-							return '<div class="row">';
+							return '<div class="container-fluid"><div class="row">';
 						} else {
 							// closing tag
-							return '</div>\n';
+							return '</div></div>\n';
 						}
 					},
 					validate: function(params) {
