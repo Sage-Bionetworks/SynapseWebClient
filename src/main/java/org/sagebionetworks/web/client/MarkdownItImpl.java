@@ -450,8 +450,7 @@ public class MarkdownItImpl implements MarkdownIt {
 				.use($wnd.markdownitCentertext)
 				.use($wnd.markdownitSynapseHeading)
 				.use($wnd.markdownitSynapseTable)
-				.use($wnd.markdownitStrikethroughAlt)
-				.use($wnd.markdownitEmoji);
+				.use($wnd.markdownitStrikethroughAlt);
 
 			$wnd.md.set({
 				highlight : function(str, lang) {
