@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -177,7 +178,7 @@ public class ProvViewUtil {
 		}			
 		
 		// icon
-		Icon icon = DisplayUtils.getSynapseIconForEntityClassName(entityType, IconSize.TIMES2);
+		Icon icon = EntityTypeUtils.getSynapseIconForEntityClassName(entityType, IconSize.TIMES2);
 		container.add(new SimplePanel(icon));
 		
 		// name

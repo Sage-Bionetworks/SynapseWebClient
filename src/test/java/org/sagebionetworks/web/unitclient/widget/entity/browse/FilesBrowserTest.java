@@ -34,7 +34,6 @@ public class FilesBrowserTest {
 
 	FilesBrowserView mockView;
 	SynapseClientAsync mockSynapseClient;
-	AdapterFactory adapterFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	FilesBrowser filesBrowser;
@@ -47,9 +46,8 @@ public class FilesBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		adapterFactory = new AdapterFactoryImpl();
 		mockCookies = mock(CookieProvider.class);
-		filesBrowser = new FilesBrowser(mockView, mockSynapseClient, adapterFactory,
+		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
 				mockGlobalApplicationState, mockAuthenticationController, mockCookies);
 		verify(mockView).setPresenter(filesBrowser);
 		boolean isCertified = true;

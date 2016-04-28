@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
@@ -222,7 +221,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public IconType getIconForHit(Hit hit) {
 		if(hit == null) return null;
 		EntityType type = EntityType.valueOf(hit.getNode_type());
-		return DisplayUtils.getIconTypeForEntityClassName(EntityTypeUtils.getEntityTypeClassName(type));
+		return org.sagebionetworks.web.client.EntityTypeUtils.getIconTypeForEntityClassName(EntityTypeUtils.getEntityTypeClassName(type));
 	}
 	
 	@Override

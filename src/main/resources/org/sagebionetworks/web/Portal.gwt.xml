@@ -77,12 +77,6 @@
 	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
-	<inherits name="org.gwtbootstrap3.extras.cachemanifest.Offline"/>
-	
-	<!-- HTML5 offline support -->
-	<extend-configuration-property name="cachemanifest_static_files" value="/Portal.html" />
-	<extend-configuration-property name="cachemanifest_static_files" value="/Portal.css" />
-	<add-linker name="offline" />
 
 	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
 	<set-property name="user.agent" value="safari"/>
