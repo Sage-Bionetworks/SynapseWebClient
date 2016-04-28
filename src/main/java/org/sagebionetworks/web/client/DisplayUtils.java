@@ -32,7 +32,6 @@ import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -49,7 +48,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -998,38 +996,6 @@ public class DisplayUtils {
 		return panel;
 	}
 	
-	public static IconType getIconTypeForEntity(Entity entity) {
-		String className = entity == null ? null : entity.getClass().getName();
-		return getIconTypeForEntityClassName(className);
-	}
-	
-	public static IconType getIconTypeForEntityClassName(String className) {
-		// default
-		IconType icon = IconType.FILE_O;
-		
-		if(Link.class.getName().equals(className)) {
-			icon = IconType.LINK;
-		} else if(Folder.class.getName().equals(className)) {
-			// Folder
-			icon = IconType.FOLDER;
-		} else if(FileEntity.class.getName().equals(className)) {
-			// File
-			icon = IconType.FILE_O;			
-		} else if(Project.class.getName().equals(className)) {
-			// Project
-			icon = IconType.LIST_ALT;
-		} else if(TableEntity.class.getName().equals(className)) {
-			// TableEntity
-			icon = IconType.TABLE;
-		}
-		return icon;
-	}
-	public static Icon getSynapseIconForEntityClassName(String className, IconSize iconSize) {
-		Icon icon = new Icon(getIconTypeForEntityClassName(className));
-		icon.setSize(iconSize);
-		return icon;
-	}
-	
 	/**
 	 * Get the mime type from a file name.
 	 * @param fileName
@@ -1855,4 +1821,5 @@ public class DisplayUtils {
 			return "";
 		else return s;
 	 }
+
 }
