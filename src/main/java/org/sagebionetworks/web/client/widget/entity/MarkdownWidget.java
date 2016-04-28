@@ -247,7 +247,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
 						String message = innerText;
 						if (e.getMessage() != null)
-							message += "<br>" + e.getMessage();
+							message += ": " + e.getMessage();
 						view.addWidget(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)), currentWidgetDiv);
 					}
 				}
