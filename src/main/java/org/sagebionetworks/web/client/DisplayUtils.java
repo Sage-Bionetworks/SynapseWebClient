@@ -744,7 +744,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getAlertHtml(String title, String text, BootstrapAlertType type) {
-		return "<div class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</div>";
+		return "<div class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + SafeHtmlUtils.htmlEscape(text) + "</div>";
 	}
 	
 	public static String getBadgeHtml(String i) {
