@@ -1,13 +1,21 @@
 package org.sagebionetworks.web.client;
 
 public class MarkdownItImpl implements MarkdownIt {
-	@Override
-	public String markdown2Html(String md, String uniqueSuffix) {
-		return _markdown2Html(md, uniqueSuffix);
+	
+	//on first reference, initialize md library and regular expressions
+	static {
+		_staticMarkdownInit();
 	}
-
-	private final static native String _markdown2Html(String md,
-			String uniqueSuffix) /*-{
+	
+	private final static native String _staticMarkdownInit() /*-{
+		$wnd.gridLayoutColumnParamRE = new RegExp("^\\s*(width[=]{1})?\\s*(.*)[}]{1}\\s*$");
+		$wnd.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
+		$wnd.urlWithoutProtocolRE = new RegExp('^([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\w \\.-]*)*\\/?.*$');
+		$wnd.doiRE = new RegExp('^doi:10[.]{1}[0-9]+[/]{1}[a-zA-Z0-9_.]+$');
+		$wnd.ulMarkerRE = new RegExp("^\\s*[*-+>]{1}[^|]*$");
+		$wnd.olMarkerRE = new RegExp("^\\s*\\d+\\s*[.)]{1}[^|]*$");
+		$wnd.spacesRE = new RegExp("[ ]{7}", 'g');
+		
 		function sendLinksToNewWindow() {
 			var defaultRender = $wnd.md.renderer.rules.link_open
 					|| function(tokens, idx, options, env, self) {
@@ -166,52 +174,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			});
 		}
 
-		function initREs() {
-			if (!$wnd.md.utils.gridLayoutColumnParamRE) {
-				$wnd.md.utils.gridLayoutColumnParamRE = new RegExp("^\\s*(width[=]{1})?\\s*(.*)[}]{1}\\s*$");
-			}
-			if (!$wnd.md.utils.synapseRE) {
-				$wnd.md.utils.synapseRE = new RegExp('^syn([0-9]+[.]?[0-9]*)+');
-			}
-			if (!$wnd.md.utils.urlWithoutProtocolRE) {
-				$wnd.md.utils.urlWithoutProtocolRE = new RegExp('^([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\w \\.-]*)*\\/?.*$');
-			}
-			if (!$wnd.md.utils.doiRE) {
-				$wnd.md.utils.doiRE = new RegExp('^doi:10[.]{1}[0-9]+[/]{1}[a-zA-Z0-9_.]+$');
-			}
-			if (!$wnd.md.utils.ulMarkerRE) {
-				$wnd.md.utils.ulMarkerRE = new RegExp("^\\s*[*-+>]{1}[^|]*$");
-			}
-			if (!$wnd.md.utils.olMarkerRE) {
-				$wnd.md.utils.olMarkerRE = new RegExp("^\\s*\\d+\\s*[.)]{1}[^|]*$");
-			}
-			if (!$wnd.md.utils.spacesRE) {
-				$wnd.md.utils.spacesRE = new RegExp("[ ]{7}", 'g');
-			}
-		}
-		
-		function preprocessMarkdown(md) {
-			// add an extra newline after anything that looks like a list
-			var splitMD = md.split('\n');
-			md = '';
-			var isPreviousLineInList = false;
-			var isCurrentLineInList = false;
-			for(var i = 0; i < splitMD.length; i++) {
-				isCurrentLineInList = $wnd.md.utils.ulMarkerRE.test(splitMD[i]) || $wnd.md.utils.olMarkerRE.test(splitMD[i]);
-				if (isCurrentLineInList) {
-					// SWC-2988: and replace each group of 7 spaces with 4 (so that markdown-it list rule recognizes sublists).
-					splitMD[i] = splitMD[i].replace($wnd.md.utils.spacesRE, '    ');
-				}
-				if (isPreviousLineInList && !isCurrentLineInList) {
-					md += '\n';
-				}
-				md += splitMD[i] + '\n';
-				isPreviousLineInList = isCurrentLineInList;
-			}
-			
-			return md;
-		}
-		
+
 		function link(state, silent) {
 			var attrs, code, label, labelEnd, labelStart, pos, res, ref, title, token, href = '', oldPos = state.pos, max = state.posMax, start = state.pos, parseLinkLabel = $wnd.md.helpers.parseLinkLabel, parseLinkDestination = $wnd.md.helpers.parseLinkDestination, parseLinkTitle = $wnd.md.helpers.parseLinkTitle, isSpace = $wnd.md.utils.isSpace, normalizeReference = $wnd.md.utils.normalizeReference;
 
@@ -252,13 +215,13 @@ public class MarkdownItImpl implements MarkdownIt {
 				if (res.ok) {
 					//!!!!!!!!!!!!!!!!!! Changed for Synapse  !!!!!!!!!!!!!!!!!!!!!!!!!/
 					var testString = res.str;
-					if ($wnd.md.utils.synapseRE.test(testString)) {
+					if ($wnd.synapseRE.test(testString)) {
 						//this is a synapse ID
 						res.str = '#!Synapse:'
 								+ testString.replace(/[.]/, '/version/');
-					} else if ($wnd.md.utils.urlWithoutProtocolRE.test(testString)) {
+					} else if ($wnd.urlWithoutProtocolRE.test(testString)) {
 						res.str = 'http://' + testString;
-					} else if ($wnd.md.utils.doiRE.test(testString)) {
+					} else if ($wnd.doiRE.test(testString)) {
 						res.str = 'http://dx.doi.org/' + testString;
 					}
 					//!!!!!!!!!!!!!! End of change for Synapse  !!!!!!!!!!!!!!!!!!!!!!/
@@ -362,7 +325,8 @@ public class MarkdownItImpl implements MarkdownIt {
 			state.posMax = max;
 			return true;
 		};
-		
+
+
 		//Define custom scanDelims that does not conclude that a token can open or close based on whitespace
 		function scanDelims(src, posMax, start) {
 		  var pos = start, count, can_open, can_close,
@@ -488,7 +452,7 @@ public class MarkdownItImpl implements MarkdownIt {
 					render: function (tokens, idx) {
 						if (tokens[idx].nesting === 1) {
 							// opening tag
-							var m = $wnd.md.utils.gridLayoutColumnParamRE.exec(tokens[idx].info);
+							var m = $wnd.gridLayoutColumnParamRE.exec(tokens[idx].info);
 							return '<div class="col-sm-' + $wnd.md.utils.escapeHtml(m[2]) + '">';
 						} else {
 							// closing tag
@@ -496,7 +460,7 @@ public class MarkdownItImpl implements MarkdownIt {
 						}
 					},
 					validate: function(params) {
-						return $wnd.md.utils.gridLayoutColumnParamRE.test(params);
+						return $wnd.gridLayoutColumnParamRE.test(params);
 					}
 				});
 			sendLinksToNewWindow();
@@ -505,14 +469,44 @@ public class MarkdownItImpl implements MarkdownIt {
 			//TODO: remove special paragraph renderer after release
 			initParagraphStyle();
 			initSynapseHeadingStyle();
-			initREs();
 			$wnd.md.inline.ruler.at('link', link);
 			$wnd.md.inline.ruler.at('emphasis', emphasis);
 		}
+		
+		initMarkdownIt();
+		
+	}-*/;
+	
+	@Override
+	public String markdown2Html(String md, String uniqueSuffix) {
+		return _markdown2Html(md, uniqueSuffix);
+	}
 
-		if (!$wnd.md) {
-			initMarkdownIt();
+	private final static native String _markdown2Html(String md,
+			String uniqueSuffix) /*-{
+		
+		function preprocessMarkdown(md) {
+			// add an extra newline after anything that looks like a list
+			var splitMD = md.split('\n');
+			md = '';
+			var isPreviousLineInList = false;
+			var isCurrentLineInList = false;
+			for(var i = 0; i < splitMD.length; i++) {
+				isCurrentLineInList = $wnd.ulMarkerRE.test(splitMD[i]) || $wnd.olMarkerRE.test(splitMD[i]);
+				if (isCurrentLineInList) {
+					// SWC-2988: and replace each group of 7 spaces with 4 (so that markdown-it list rule recognizes sublists).
+					splitMD[i] = splitMD[i].replace($wnd.spacesRE, '    ');
+				}
+				if (isPreviousLineInList && !isCurrentLineInList) {
+					md += '\n';
+				}
+				md += splitMD[i] + '\n';
+				isPreviousLineInList = isCurrentLineInList;
+			}
+			
+			return md;
 		}
+		
 		// load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
 		$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix)
 			.use($wnd.markdownitMath, uniqueSuffix)
