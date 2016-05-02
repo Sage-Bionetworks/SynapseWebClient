@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	<bh:Div width="95%" pull="RIGHT" addStyleNames="lightGreyBackground padding-5 margin-bottom-5">
+	<bh:Div width="98%" pull="RIGHT" addStyleNames="light-border lightGreyBackground padding-5 margin-bottom-5">
 		<bh:Div>
 			<bh:Span ui:field="author"></bh:Span>
 		</bh:Div>
@@ -14,29 +14,27 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 				&nbsp;Loading...
 			</g:HTMLPanel>
-			<t:Table width="100%">
-				<t:TableRow>
-					<t:TableData>
+			<b:Container fluid="true">
+				<b:Row>
+					<b:Column size="XS_12">
 						<bh:Div ui:field="replyMessage"></bh:Div>
-						<bh:Div addStyleNames="margin-left-10 small">
+					</b:Column>
+					<b:Column size="XS_12">
+						<bh:Div addStyleNames="margin-left-10 small left">
 							<bh:Span ui:field="createdOn"></bh:Span>
+							<b:Label text="Edited" ui:field="edited" visible="false" addStyleNames="margin-left-10 moveup-1"/>
 						</bh:Div>
-					</t:TableData>
-					<t:TableData width="80px" addStyleNames="vertical-align-top">
 						<bh:Div>
 							<b:Tooltip title="Delete reply" placement="LEFT">
-								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton line-height-1em" visible="false"/>
 							</b:Tooltip>
 							<b:Tooltip title="Edit reply" placement="LEFT">
-								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em" visible="false"/>
 							</b:Tooltip>
 						</bh:Div>
-					</t:TableData>
-				</t:TableRow>
-			</t:Table>
-		</bh:Div>
-		<bh:Div width="100%">
-			<b:Label text="Edited" ui:field="edited" visible="false" pull="RIGHT" addStyleNames="margin-right-10 line-height-1em"/>
+					</b:Column>
+				</b:Row>
+			</b:Container>
 		</bh:Div>
 		<g:SimplePanel ui:field="editReplyModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>

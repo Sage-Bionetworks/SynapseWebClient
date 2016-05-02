@@ -48,9 +48,6 @@
 										<bh:Span text="Activity" addStyleNames="margin-right-5"/>
 									</g:FocusPanel>
 								</t:TableHeader>
-								<t:TableHeader width="25px">
-									<!-- Reserved for Delete Thread icon -->
-								</t:TableHeader>
 							</t:TableRow>
 						</t:Table>
 					</bh:Div>

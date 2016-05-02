@@ -50,7 +50,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public static final String REPLIES = "replies";
 	public static final String CREATED_ON_PREFIX = "posted ";
 	public static final String NO_INDENTATION_WIDTH = "100%";
-	public static final String INDENTATION_WIDTH = "95%";
+	public static final String INDENTATION_WIDTH = "98%";
 	DiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
