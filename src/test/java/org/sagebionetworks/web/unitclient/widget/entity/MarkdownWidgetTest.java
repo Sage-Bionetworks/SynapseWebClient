@@ -116,7 +116,6 @@ public class MarkdownWidgetTest {
 		callbackCaptor.getValue().invoke();
 		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
 		verify(mockView).setMarkdown(sampleHTML);
-		verify(mockSessionStorage).setItem(anyString(), anyString());
 		
 		// Called by loadMath and loadWidgets, 
 		verify(mockView, Mockito.times(4)).getElementById(anyString());
