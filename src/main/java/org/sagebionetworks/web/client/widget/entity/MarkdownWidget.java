@@ -98,10 +98,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
 		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
-		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-		String hostPrefix = gwt.getHostPrefix();
-		final String key = getKey(md, hostPrefix, isInTestWebsite);
-		
+//		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+//		String hostPrefix = gwt.getHostPrefix();
+//		final String key = getKey(md, hostPrefix, isInTestWebsite);
 		//avoid cache for new md processor until it is in good shape.
 //		final MarkdownCacheValue cachedValue = getValueFromCache(key);
 //		if(cachedValue == null) {
@@ -111,7 +110,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 					try {
 						String result = markdownIt.markdown2Html(md, uniqueSuffix);
 						//avoid cache for new md processor until it is in good shape.
-						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+//						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
 						loadHtml(uniqueSuffix, result);
 					} catch (RuntimeException e) { //JavaScriptException
 						synAlert.showError(e.getMessage());
