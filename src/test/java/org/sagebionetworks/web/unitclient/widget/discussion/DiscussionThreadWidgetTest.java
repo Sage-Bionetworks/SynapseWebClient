@@ -299,6 +299,91 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setPinIconVisible(false);
 		verify(mockView).setUnpinIconVisible(false);
 	}
+	
+	@Test
+	public void testPin() {
+		boolean isDeleted = false;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
+				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+		AsyncMockStubber.callSuccessWith(null)
+			.when(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
+		reset(mockView);
+		discussionThreadWidget.onClickPinThread();
+		verify(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
+		verify(mockView).setPinnedIconVisible(true);
+		verify(mockView).setPinIconVisible(false);
+		verify(mockView).setUnpinIconVisible(true);
+	}
+	
+
+	@Test
+	public void testPinFailure() {
+		boolean isDeleted = false;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
+				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+		Exception ex = new Exception("failed");
+		AsyncMockStubber.callFailureWith(ex)
+			.when(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
+		reset(mockView);
+		discussionThreadWidget.onClickPinThread();
+		verify(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testUnpin() {
+		boolean isDeleted = false;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = true;
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
+				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+		AsyncMockStubber.callSuccessWith(null)
+			.when(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
+		reset(mockView);
+		discussionThreadWidget.onClickUnpinThread();
+		verify(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
+		verify(mockView).setPinnedIconVisible(false);
+		verify(mockView).setPinIconVisible(true);
+		verify(mockView).setUnpinIconVisible(false);
+	}
+	
+	@Test
+	public void testUnpinFailure() {
+		boolean isDeleted = false;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = true;
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, mockCallback,
+				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+		Exception ex = new Exception("failed");
+		AsyncMockStubber.callFailureWith(ex)
+			.when(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
+		reset(mockView);
+		discussionThreadWidget.onClickUnpinThread();
+		verify(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+
 
 	@Test
 	public void testConfigureWithZeroReplies(){
