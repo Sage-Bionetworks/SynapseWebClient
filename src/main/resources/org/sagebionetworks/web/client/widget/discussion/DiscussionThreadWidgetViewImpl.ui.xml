@@ -13,6 +13,7 @@
 					<t:TableData>
 						<g:FocusPanel ui:field="showThread" addStyleNames="imageButton">
 							<bh:Div>
+								<b:Icon ui:field="pinnedIcon" type="THUMB_TACK" size="LARGE" addStyleNames="margin-right-10 lightGreyText moveup-2" visible="false"/>
 								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
 							</bh:Div>
 						</g:FocusPanel>
@@ -61,9 +62,17 @@
 									<b:Tooltip title="Delete thread" placement="LEFT">
 										<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
 									</b:Tooltip>
-									
 									<b:Tooltip title="Edit thread" placement="LEFT">
 										<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em" visible="false"/>
+									</b:Tooltip>
+									<b:Tooltip title="Pin thread" placement="LEFT">
+										<b:Icon ui:field="pinIcon" type="THUMB_TACK" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em" visible="false"/>
+									</b:Tooltip>
+									<b:Tooltip title="Unpin thread" placement="LEFT">
+										<b:IconStack ui:field="unpinIconStack" addStyleNames="imageButton line-height-1em right moveup-5" visible="false">
+											<b:Icon type="THUMB_TACK" stackTop="true" />
+											<b:Icon type="BAN" stackBase="true" addStyleNames="halfOpacity" ui:field="unpinIcon"/>
+										</b:IconStack>
 									</b:Tooltip>
 								</bh:Div>
 							</b:Column>

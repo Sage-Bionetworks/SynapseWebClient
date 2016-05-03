@@ -2054,6 +2054,10 @@ a.projectTitle:hover {
 	font-family: "Brush Script MT", cursive;
 }
 
+.halfOpacity {
+	opacity: .5;
+}
+
 .fullOpacityImp {
 	opacity: 1 !important;
 }

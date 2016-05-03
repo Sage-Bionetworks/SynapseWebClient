@@ -66,4 +66,8 @@ public interface DiscussionForumClientAsync{
 	void getThreadCountForForum(String forumId, DiscussionFilter filter, AsyncCallback<Long> callback);
 
 	void getReplyCountForThread(String threadId, DiscussionFilter filter, AsyncCallback<Long> asyncCallback);
+
+	void pinThread(String threadId, AsyncCallback<Void> callback);
+
+	void unpinThread(String threadId, AsyncCallback<Void> callback);
 }

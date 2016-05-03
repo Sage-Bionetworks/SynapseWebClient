@@ -69,4 +69,7 @@ public interface DiscussionForumClient extends RemoteService {
 	Long getThreadCountForForum(String forumId, DiscussionFilter filter) throws RestServiceException;
 
 	Long getReplyCountForThread(String threadId, DiscussionFilter filter) throws RestServiceException;
+	
+	void pinThread(String threadId) throws RestServiceException;
+	void unpinThread(String threadId) throws RestServiceException;
 }

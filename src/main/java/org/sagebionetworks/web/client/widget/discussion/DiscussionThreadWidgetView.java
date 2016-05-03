@@ -94,4 +94,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void removeRefreshAlert();
 
 	void setButtonContainerWidth(String width);
+	void setPinIconVisible(boolean visible);
+	void setUnpinIconVisible(boolean visible);
+	void setPinnedIconVisible(boolean visible);
 }
