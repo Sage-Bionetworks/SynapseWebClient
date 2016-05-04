@@ -355,16 +355,6 @@ public class SettingsPresenterTest {
 		verify(mockSynAlert, times(5)).clear();
 		verify(mockView).clear();
 		verify(mockView).asWidget();
-		//TODO: remove "never()" once subscription list is out of alpha
-		verify(mockSubscriptionListWidget, never()).configure();
-		verify(mockView).setSubscriptionsVisible(false);
-	}
-	
-	@Test
-	public void testConfigureSubscriptionListInAlpha() {
-		when(mockCookieProvider.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		profilePresenter.asWidget();
-		verify(mockView).setSubscriptionsVisible(true);
 		verify(mockSubscriptionListWidget).configure();
 	}
 	
