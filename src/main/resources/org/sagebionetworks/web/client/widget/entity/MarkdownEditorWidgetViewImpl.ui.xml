@@ -103,7 +103,7 @@
 	        <b:Tooltip placement="BOTTOM" title="Insert Link">
 	        	<b:Button ui:field="linkButton" icon="LINK" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-			<b:Tooltip placement="BOTTOM" title="Tag a user">
+			<b:Tooltip placement="BOTTOM" title="Tag someone">
 	        	<b:Button ui:field="userButton" icon="USER_PLUS" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
 	    </bh:Div>

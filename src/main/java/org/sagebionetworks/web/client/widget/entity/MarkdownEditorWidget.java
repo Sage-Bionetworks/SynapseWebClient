@@ -487,8 +487,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	@Override
 	public void onKeyPress(char c) {
 		if ('@' == c) {
-            insertUserLink();
-        }
+			insertUserLink();
+		}
 	}
 	
 	public void insertUserLink() {
