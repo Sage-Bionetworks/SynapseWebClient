@@ -266,15 +266,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
-		boolean isSubscriptionsVisible = DisplayUtils.isInTestWebsite(cookies);
-		view.setSubscriptionsVisible(isSubscriptionsVisible);
 		if (authenticationController.isLoggedIn()) {
 			updateUserStorage();
 			getUserNotificationEmail();
 			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
-			if (isSubscriptionsVisible) {
-				subscriptionListWidget.configure();	
-			}
+			subscriptionListWidget.configure();	
 		}
 	}
 
