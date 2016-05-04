@@ -28,7 +28,8 @@
 			    <b:AnchorListItem ui:field="synapseTableLink">Table: Query on a Synapse Table</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="queryLink">Table: Query on Files/Folders</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
-			    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="teamLink">Team Badge</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="userLink">User Link</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT">Video</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>

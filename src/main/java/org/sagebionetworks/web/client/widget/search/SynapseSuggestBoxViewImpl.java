@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -25,9 +26,8 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	TextBox selectedItem;
 	Text selectedItemText;
 	SageImageBundle sageImageBundle;
-	
 	@Inject
-	public SynapseSuggestBoxViewImpl(UserGroupSuggestionProvider oracle, SageImageBundle sageImageBundle) {
+	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle) {
 		this.sageImageBundle = sageImageBundle;
 	}
 	
@@ -83,6 +83,11 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		this.add(suggestBox);
 		this.add(selectedItem);
 		this.add(selectedItemText);
+	}
+	
+	@Override
+	public void setFocus(boolean focused) {
+		suggestBox.getValueBox().setFocus(true);
 	}
 	
 	@Override

@@ -2563,9 +2563,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	private static long sequence = 0;
-
-
 	private void handleTableUnavailableException(
 			SynapseTableUnavailableException e) throws TableUnavilableException {
 		try {
