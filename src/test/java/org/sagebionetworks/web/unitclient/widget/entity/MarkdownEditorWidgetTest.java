@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -158,6 +159,7 @@ public class MarkdownEditorWidgetTest {
 		presenter.insertMarkdown(newText);
 		
 		verify(mockView).setMarkdown(eq(newText + markdown));
+		verify(mockView).setFocus(true);
 	}
 	
 	@Test
@@ -555,5 +557,23 @@ public class MarkdownEditorWidgetTest {
 	public void testShowExternalImageButton() {
 		presenter.showExternalImageButton();
 		verify(mockView).setExternalImageButtonVisible(true);
+	}
+	
+	@Test
+	public void testHandleInsertUserLinkCommand(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_USER_LINK);
+		assertTrue(getNewMarkdown().contains("@"));
+		verify(mockUserSelector).show();
+	}
+	
+	@Test
+	public void testOnKeyPress() {
+		presenter.onKeyPress('1');
+		verify(mockUserSelector, never()).show();
+		presenter.onKeyPress('a');
+		verify(mockUserSelector, never()).show();
+		presenter.onKeyPress('@');
+		verify(mockUserSelector).show();
 	}
 }
