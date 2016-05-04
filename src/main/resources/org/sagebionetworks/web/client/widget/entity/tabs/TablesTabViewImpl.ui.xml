@@ -21,7 +21,7 @@
 				<b:BlockQuote styleName="panel scroll-auto">
 					<b:Icon type="TABLE" pull="LEFT" addStyleNames="font-size-150" />
 					<b:Heading text="Synapse Tables" size="H4"></b:Heading>
-					<bh:Text text="Synapse Tables is a new feature designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema."></bh:Text>
+					<bh:Text text="Synapse Tables are designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema."></bh:Text>
 					<bh:Div addStyleNames="margin-10">
 						<b:Button ui:field="tableLearnMoreButton" text="Learn More" type="PRIMARY"  />
 						<b:Button ui:field="tableAPIDocsButton" text="API Docs" type="DEFAULT" addStyleNames="margin-left-5" />
