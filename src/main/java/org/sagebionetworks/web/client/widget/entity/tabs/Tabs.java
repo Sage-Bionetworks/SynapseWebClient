@@ -33,6 +33,7 @@ public class Tabs implements IsWidget {
 	public void addTab(Tab tab) {
 		view.addTab(tab);
 		allTabs.add(tab);
+		tab.hideTab();
 		//this handles Tab click events
 		tab.addTabClickedCallback(onTabClickedCallback);
 	}
