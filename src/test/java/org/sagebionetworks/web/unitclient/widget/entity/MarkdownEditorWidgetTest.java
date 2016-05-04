@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,7 +19,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -37,6 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
+import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -63,9 +67,11 @@ public class MarkdownEditorWidgetTest {
 	WikiPage testPage;
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
-	
+	@Mock
+	UserSelector mockUserSelector;
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIcons = mock(IconsImageBundle.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
@@ -76,7 +82,7 @@ public class MarkdownEditorWidgetTest {
 		mockView = mock(MarkdownEditorWidgetView.class);
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockMarkdownWidget = mock(MarkdownWidget.class);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockMarkdownWidget);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockMarkdownWidget, mockUserSelector);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		initialMarkdown = "Hello Markdown";
 		presenter.configure(initialMarkdown);
@@ -153,6 +159,7 @@ public class MarkdownEditorWidgetTest {
 		presenter.insertMarkdown(newText);
 		
 		verify(mockView).setMarkdown(eq(newText + markdown));
+		verify(mockView).setFocus(true);
 	}
 	
 	@Test
@@ -550,5 +557,23 @@ public class MarkdownEditorWidgetTest {
 	public void testShowExternalImageButton() {
 		presenter.showExternalImageButton();
 		verify(mockView).setExternalImageButtonVisible(true);
+	}
+	
+	@Test
+	public void testHandleInsertUserLinkCommand(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_USER_LINK);
+		assertTrue(getNewMarkdown().contains("@"));
+		verify(mockUserSelector).show();
+	}
+	
+	@Test
+	public void testOnKeyPress() {
+		presenter.onKeyPress('1');
+		verify(mockUserSelector, never()).show();
+		presenter.onKeyPress('a');
+		verify(mockUserSelector, never()).show();
+		presenter.onKeyPress('@');
+		verify(mockUserSelector).show();
 	}
 }

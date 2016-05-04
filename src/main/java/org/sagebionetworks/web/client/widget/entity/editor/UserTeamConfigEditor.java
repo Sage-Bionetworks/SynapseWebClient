@@ -19,6 +19,7 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 		this.view = view;
 		view.initView();
 	}
+	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;

@@ -11,6 +11,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -80,7 +84,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem tableOfContentsLink;
 	@UiField
-	public AnchorListItem userTeamLink;
+	public AnchorListItem userLink;
+	@UiField
+	public Button userButton;
+	
+	@UiField
+	public AnchorListItem teamLink;
 	@UiField
 	public AnchorListItem synapseFormLink;
 	@UiField
@@ -184,7 +193,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		submitToEvaluationLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION));
 		tableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TABLE));
 		tableOfContentsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TOC));
-		userTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
+		userLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_LINK));
+		userButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_LINK));
+		teamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
 		synapseFormLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM));
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
@@ -236,6 +247,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				formattingGuideModal.hide();
+			}
+		});
+		markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				presenter.onKeyPress(event.getCharCode());
 			}
 		});
 	}
@@ -391,5 +408,10 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setExternalImageButtonVisible(boolean visible) {
 		externalImageButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setFocus(boolean focused) {
+		markdownTextArea.setFocus(focused);
 	}
 }

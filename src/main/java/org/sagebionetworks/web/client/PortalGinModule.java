@@ -297,6 +297,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiView;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorView;
+import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
@@ -1259,5 +1261,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
 		bind(PasswordStrengthWidgetView.class).to(PasswordStrengthWidgetViewImpl.class);
 		bind(ZxcvbnWrapper.class).to(ZxcvbnWrapperImpl.class);
+		
+		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
 	}
 }

@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresente
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -24,7 +25,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -51,6 +51,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WidgetSelectionState widgetSelectionState;
 	
 	private MarkdownWidget formattingGuide;
+	private UserSelector userSelector;
 	
 	//Optional wiki page key.  If set, wiki widgets may use.
 	private WikiPageKey wikiKey;
@@ -62,7 +63,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			GWTWrapper gwt,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			WidgetRegistrar widgetRegistrar,
-			MarkdownWidget formattingGuide
+			MarkdownWidget formattingGuide,
+			UserSelector userSelector
 			) {
 		super();
 		this.view = view;
@@ -72,10 +74,19 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
 		this.formattingGuide = formattingGuide;
+		this.userSelector = userSelector;
+		
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 		view.setFormattingGuideWidget(formattingGuide.asWidget());
 		view.setAttachmentCommandsVisible(true);
+		
+		userSelector.configure(new CallbackP<String>() {
+			@Override
+			public void invoke(String username) {
+				insertMarkdown(username);
+			}
+		});
 	}
 	
 	public void configure(String markdown) {
@@ -156,6 +167,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setMarkdown(currentValue.substring(0, cursorPos) + md + currentValue.substring(cursorPos));
 		//SWC-406: set cursor to after the current markdown
 		view.setCursorPos(cursorPos + md.length());
+		view.setFocus(true);
 	}
 	
 	/**
@@ -241,6 +253,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case INSERT_TOC:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
+			break;
+		case INSERT_USER_LINK:
+			insertMarkdown("@");
+			insertUserLink();
 			break;
 		case INSERT_USER_TEAM_BADGE:
 			insertNewWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE);
@@ -463,5 +479,17 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 
 	public void showExternalImageButton() {
 		view.setExternalImageButtonVisible(true);
+	}
+	
+	@Override
+	public void onKeyPress(char c) {
+		if ('@' == c) {
+			insertUserLink();
+		}
+	}
+	
+	public void insertUserLink() {
+		// pop up suggest box.  on selection, userSelector has been configured to add the username to the md.
+		userSelector.show();
 	}
 }
