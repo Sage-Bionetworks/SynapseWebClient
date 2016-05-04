@@ -29,7 +29,7 @@
 			    <b:AnchorListItem ui:field="queryLink">Table: Query on Files/Folders</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="teamLink">Team Badge</b:AnchorListItem>
-			    <b:AnchorListItem ui:field="userLink">User Link</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="userLink">User</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT">Video</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
 			    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
@@ -77,7 +77,6 @@
 	        <b:Tooltip placement="BOTTOM" title="Superscript">
 	        	<b:Button ui:field="superscriptButton" icon="SUPERSCRIPT" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        
 	        <b:ButtonGroup>
 			  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
 			  <b:DropDownMenu>
@@ -103,6 +102,9 @@
 	        </b:Tooltip>
 	        <b:Tooltip placement="BOTTOM" title="Insert Link">
 	        	<b:Button ui:field="linkButton" icon="LINK" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+			<b:Tooltip placement="BOTTOM" title="Tag a user">
+	        	<b:Button ui:field="userButton" icon="USER_PLUS" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
 	    </bh:Div>
 	    <bh:Div>
