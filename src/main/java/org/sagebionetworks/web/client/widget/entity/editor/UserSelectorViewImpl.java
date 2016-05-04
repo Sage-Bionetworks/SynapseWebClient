@@ -17,8 +17,6 @@ public class UserSelectorViewImpl implements UserSelectorView {
 	Modal modal;
 	@UiField
 	Div suggestBoxContainer;
-	@UiField
-	Div synAlertContainer;
 	Presenter presenter;
 	@Inject
 	public UserSelectorViewImpl(UserSelectorViewImplUiBinder binder) {
@@ -50,12 +48,6 @@ public class UserSelectorViewImpl implements UserSelectorView {
 	public void setSelectBox(Widget w) {
 		suggestBoxContainer.clear();
 		suggestBoxContainer.add(w);
-	}
-	
-	@Override
-	public void setSynAlert(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
 	}
 	
 	@Override

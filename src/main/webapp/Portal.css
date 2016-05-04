@@ -1214,8 +1214,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .markdown p {
-	margin: 0px;
+	margin: 10px 0 10px 0;
 }
+
+.markdown h1 {
+	padding: 35px 0 12px 0;
+}
+.markdown h2 {
+	padding: 29px 0 10px 0;
+}
+.markdown h3 {
+	padding: 23px 0 8px 0;
+}
+.markdown h4 {
+	padding: 17px 0 6px 0;
+}
+.markdown h5 {
+	padding: 11px 0 4px 0;
+}
+.markdown h6 {
+	padding: 5px 0 2px 0;
+}
+
 
 .previewtable {
   border: 1px solid #dddddd;

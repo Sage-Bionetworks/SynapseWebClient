@@ -62,53 +62,6 @@ public class MarkdownItImpl implements MarkdownIt {
 			};
 		}
 		
-		//TODO: remove extra style once we remove the old markdown processor, and just change the ".markdown p" css class instead
-		function initParagraphStyle() {
-			var defaultRender = $wnd.md.renderer.rules.paragraph_open
-					|| function(tokens, idx, options, env, self) {
-						return self.renderToken(tokens, idx, options);
-					};
-
-			$wnd.md.renderer.rules.paragraph_open = function(tokens, idx, options,
-					env, self) {
-				var aIndex = tokens[idx].attrIndex('style');
-				if (aIndex < 0) {
-					tokens[idx].attrPush([ 'style', 'margin: 10px 0 10px 0;' ]); // add new attribute
-				} else {
-					tokens[idx].attrs[aIndex][1] += ' margin: 10px 0 10px 0; '; // add value to existing attr
-				}
-
-				// pass token to default renderer.
-				return defaultRender(tokens, idx, options, env, self);
-			};
-		}
-		
-		//TODO: remove extra style once we remove the old markdown processor, and just change the ".markdown heading" css classes instead
-		function initSynapseHeadingStyle() {
-			var defaultRender = $wnd.md.renderer.rules.synapse_heading_open
-					|| function(tokens, idx, options, env, self) {
-						return self.renderToken(tokens, idx, options);
-					};
-
-			
-			$wnd.md.renderer.rules.synapse_heading_open = function(tokens, idx, options,
-					env, self) {
-				var level = tokens[idx].tag.substring(1);
-				var paddingTop = 35 - ((level-1) * 6);  //map to 5-35 px top 
-				var paddingBottom = 14 - (level * 2);  //map to 2-12
-				var styleValue = 'padding-top: ' + paddingTop + 'px;' + ' padding-bottom: ' + paddingBottom + 'px;';
-				var aIndex = tokens[idx].attrIndex('style');
-				if (aIndex < 0) {
-					tokens[idx].attrPush([ 'style', styleValue ]); // add new attribute
-				} else {
-					tokens[idx].attrs[aIndex][1] += styleValue; // add value to existing attr
-				}
-
-				// pass token to default renderer.
-				return defaultRender(tokens, idx, options, env, self);
-			};
-		}
-
 		function initLinkify() {
 			$wnd.md.linkify.set({ fuzzyLink: false });
 			
@@ -466,9 +419,6 @@ public class MarkdownItImpl implements MarkdownIt {
 			sendLinksToNewWindow();
 			initLinkify();
 			initMarkdownTableStyle();
-			//TODO: remove special paragraph renderer after release
-			initParagraphStyle();
-			initSynapseHeadingStyle();
 			$wnd.md.inline.ruler.at('link', link);
 			$wnd.md.inline.ruler.at('emphasis', emphasis);
 		}

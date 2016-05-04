@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class UserSelector implements UserSelectorView.Presenter {
@@ -16,26 +14,20 @@ public class UserSelector implements UserSelectorView.Presenter {
 	private UserSelectorView view;
 	CallbackP<String> usernameCallback;
 	SynapseSuggestBox suggestBox;
-	SynapseAlert synAlert;
-	SynapseClientAsync synapseClient;
+	
 	@Inject
 	public UserSelector(UserSelectorView view, 
 			SynapseSuggestBox suggestBox, 
-			UserGroupSuggestionProvider provider,
-			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient
+			UserGroupSuggestionProvider provider
 			) {
 		this.view = view;
 		this.suggestBox = suggestBox;
-		this.synapseClient = synapseClient;
-		this.synAlert = synAlert;
 		view.setPresenter(this);
-		view.setSynAlert(synAlert.asWidget());
 		suggestBox.setSuggestionProvider(provider);
 		view.setSelectBox(suggestBox.asWidget());
 		suggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			public void invoke(SynapseSuggestion suggestion) {
-				onSynapseSuggestSelected(suggestion);
+				onSynapseSuggestSelected((UserGroupSuggestion)suggestion);
 			};
 		});
 	}
@@ -49,7 +41,6 @@ public class UserSelector implements UserSelectorView.Presenter {
 	}
 	
 	public void clear() {
-		synAlert.clear();
 		suggestBox.clear();
 	}
 	
@@ -57,20 +48,9 @@ public class UserSelector implements UserSelectorView.Presenter {
 		return view.asWidget();
 	}
 
-	public void onSynapseSuggestSelected(SynapseSuggestion suggestion) {
-		synAlert.clear();
-		synapseClient.getUserProfile(suggestion.getId(), new AsyncCallback<UserProfile>() {
-			@Override
-			public void onSuccess(UserProfile profile) {
-				usernameCallback.invoke(profile.getUserName());
-				view.hide();
-			}
-			
-			@Override
-			public void onFailure(Throwable t) {
-				synAlert.handleException(t);
-			}
-		});
+	public void onSynapseSuggestSelected(UserGroupSuggestion suggestion) {
+		usernameCallback.invoke(suggestion.getHeader().getUserName());
+		view.hide();
 	}
 	
 	@Override
