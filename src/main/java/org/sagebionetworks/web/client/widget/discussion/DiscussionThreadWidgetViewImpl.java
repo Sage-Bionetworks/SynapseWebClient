@@ -7,6 +7,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STY
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.IconStack;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -82,6 +83,15 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Span subscribeButtonContainer;
 	@UiField
 	Div threadButtonContainer;
+	@UiField
+	IconStack unpinIconStack;
+	@UiField
+	Icon unpinIcon;
+	@UiField
+	Icon pinIcon;
+	@UiField
+	Icon pinnedIcon;
+	
 	String threadLinkHref;
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -120,6 +130,20 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickEditThread();
+			}
+		});
+		
+		pinIcon.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickPinThread();
+			}
+		});
+		
+		unpinIcon.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickUnpinThread();
 			}
 		});
 	}
@@ -324,5 +348,20 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setButtonContainerWidth(String width){
 		threadButtonContainer.setWidth(width);
+	}
+	
+	@Override
+	public void setPinIconVisible(boolean visible) {
+		pinIcon.setVisible(visible);
+	}
+	
+	@Override
+	public void setPinnedIconVisible(boolean visible) {
+		pinnedIcon.setVisible(visible);
+	}
+	
+	@Override
+	public void setUnpinIconVisible(boolean visible) {
+		unpinIconStack.setVisible(visible);
 	}
 }

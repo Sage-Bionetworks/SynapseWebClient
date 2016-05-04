@@ -188,6 +188,15 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setDeleteIconVisible(isCurrentUserModerator);
+		
+		Boolean isPinned = bundle.getIsPinned();
+		if (isPinned == null) {
+			isPinned = false;
+		}
+		view.setPinnedIconVisible(isPinned);
+		view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
+		view.setPinIconVisible(isCurrentUserModerator && !isPinned);
+		
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
 		if (showThreadDetails) {
@@ -429,5 +438,41 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	@Override
 	public void onClickEditThread() {
 		editThreadModal.show();
+	}
+
+	public void onClickPinThread() {
+		synAlert.clear();
+		discussionForumClientAsync.pinThread(threadId, new AsyncCallback<Void>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				view.setPinnedIconVisible(true);
+				view.setPinIconVisible(false);
+				view.setUnpinIconVisible(true);
+			}
+		});
+	}
+
+	public void onClickUnpinThread() {
+		synAlert.clear();
+		discussionForumClientAsync.unpinThread(threadId, new AsyncCallback<Void>(){
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				view.setPinnedIconVisible(false);
+				view.setPinIconVisible(true);
+				view.setUnpinIconVisible(false);
+			}
+		});
 	}
 }

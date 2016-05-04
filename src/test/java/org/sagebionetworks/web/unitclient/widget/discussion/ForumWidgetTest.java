@@ -350,7 +350,7 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockURLChangeCallback);
 		forumWidget.sortByActivity();
-		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		verify(mockAvailableThreadListWidget).sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -366,6 +366,6 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockURLChangeCallback);
 		forumWidget.sortByActivity();
-		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		verify(mockAvailableThreadListWidget, never()).sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 	}
 }

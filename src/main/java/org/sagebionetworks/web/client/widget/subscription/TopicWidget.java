@@ -37,7 +37,6 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 		synAlert.clear();
 		switch (type) {
 			case THREAD:
-			case DISCUSSION_THREAD:
 				configureThread(id);
 				break;
 			case FORUM:

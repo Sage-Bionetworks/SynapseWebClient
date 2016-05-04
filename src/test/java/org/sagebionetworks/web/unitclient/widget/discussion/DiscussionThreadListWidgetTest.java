@@ -264,13 +264,13 @@ public class DiscussionThreadListWidgetTest {
 	public void testSortByLatActivityRepeated() {
 		boolean canModerate = false;
 		discussionThreadListWidget.configure("123", canModerate, mockEmptyListCallback);
-		discussionThreadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
-				anyLong(), eq(DiscussionThreadOrder.LAST_ACTIVITY), eq(!DEFAULT_ASCENDING),
+				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(!DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
-		discussionThreadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
-				anyLong(), eq(DiscussionThreadOrder.LAST_ACTIVITY), eq(DEFAULT_ASCENDING),
+				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 
