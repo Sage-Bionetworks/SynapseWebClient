@@ -233,7 +233,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Override
 	public void sortByActivity() {
 		if (!isSingleThread) {
-			threadListWidget.sortBy(DiscussionThreadOrder.LAST_ACTIVITY);
+			threadListWidget.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 		}
 	}
 }

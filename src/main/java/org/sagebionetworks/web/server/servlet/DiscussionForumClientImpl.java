@@ -237,21 +237,21 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	
 	@Override
 	public void pinThread(String threadId) throws RestServiceException {
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			synapseClient.pinThread(threadId);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.pinThread(threadId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
 	public void unpinThread(String threadId) throws RestServiceException {
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			synapseClient.unpinThread(threadId);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.unpinThread(threadId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 }
