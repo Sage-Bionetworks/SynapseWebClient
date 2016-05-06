@@ -102,6 +102,8 @@ import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ProjectSettingsType;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
@@ -746,19 +748,20 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public String getUserIdFromUsername(String username) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//try to find the user id based on the given username
-			UserGroupHeaderResponsePage responsePage = synapseClient.getUserGroupHeadersByPrefix(username);
-			for (UserGroupHeader header : responsePage.getChildren()) {
-				if (username.equals(header.getUserName())){
-					return header.getOwnerId();
-				}
-			}
-			throw new NotFoundException(username + " not found");
+			PrincipalAliasRequest request = new PrincipalAliasRequest();
+			request.setAlias(username);
+			request.setType(AliasType.USER_NAME);
+			PrincipalAliasResponse response = synapseClient.getPrincipalAlias(request);
+			return response.getPrincipalId().toString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (UnsupportedEncodingException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
+	}
+	
+	@Override
+	public UserProfile getUserProfileFromUsername(String username) throws RestServiceException{
+		String userId = getUserIdFromUsername(username);
+		return getUserProfile(userId);
 	}
 	
 	@Override

@@ -179,16 +179,16 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		if (principalId != null) {
 			configure(principalId);	
 		} else {
-			// get the user id
-			synapseClient.getUserIdFromUsername(username, new AsyncCallback<String>() {
+			// get the user profile from the username
+			synapseClient.getUserProfileFromUsername(username, new AsyncCallback<UserProfile>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showLoadError("Unable to resolve username: " + username);
+					view.showLoadError(caught.getMessage());
 				}
 				@Override
-				public void onSuccess(String userId) {
-					clientCache.put(username + WebConstants.USERNAME_SUFFIX, userId);
-					configure(userId);
+				public void onSuccess(UserProfile userProfile) {
+					clientCache.put(username + WebConstants.USERNAME_SUFFIX, userProfile.getOwnerId());
+					configure(userProfile);
 				}
 			});
 		}
