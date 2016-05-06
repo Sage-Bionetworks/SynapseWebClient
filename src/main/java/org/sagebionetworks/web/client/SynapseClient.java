@@ -543,5 +543,7 @@ public interface SynapseClient extends RemoteService {
 	String getUserIdFromUsername(String username) throws RestServiceException;
 
 	Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException;
+
+	UserProfile getUserProfileFromUsername(String username);
 	
 }

@@ -442,6 +442,7 @@ public interface SynapseClientAsync {
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 
 	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
+	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
 	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
 }
