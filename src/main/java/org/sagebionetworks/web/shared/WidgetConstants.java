@@ -162,6 +162,7 @@ public class WidgetConstants {
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
 	public static final String USER_TEAM_BADGE_WIDGET_ID_KEY = "id";
+	public static final String USER_TEAM_BADGE_WIDGET_USERNAME_KEY = "username";
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
 	
 	public static final String BIODALLIANCE13_CONTENT_TYPE = "biodalliance13";

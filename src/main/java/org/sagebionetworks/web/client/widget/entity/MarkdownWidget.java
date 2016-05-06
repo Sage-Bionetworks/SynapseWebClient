@@ -224,6 +224,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
+				el.removeAllChildren();
 				//based on the contents of the element, create the correct widget descriptor and renderer
 				String innerText = el.getAttribute("widgetParams");
 				if (innerText != null) {

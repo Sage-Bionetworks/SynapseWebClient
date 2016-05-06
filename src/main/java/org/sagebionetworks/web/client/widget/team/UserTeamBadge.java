@@ -28,7 +28,12 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		String id = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.configure(id);
+			String username = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
+			if (username != null) {
+				badge.configureWithUsername(username);
+			} else{
+				badge.configure(id);
+			}
 			theWidget = badge.asWidget();
 		} else {
 			//team

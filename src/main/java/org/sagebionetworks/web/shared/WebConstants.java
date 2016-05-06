@@ -242,6 +242,7 @@ public class WebConstants {
 	
 	//ClientCache key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
+	public static final String USERNAME_SUFFIX = "_USERNAME_2_ID";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
 
 	public static final String TABLE_COLUMN_ID = "columnId";
