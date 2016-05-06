@@ -112,6 +112,8 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ProjectSetting;
@@ -216,15 +218,14 @@ public class SynapseClientImplTest {
 	UserGroupHeaderResponsePage mockUserGroupHeaderResponsePage;
 	@Mock
 	UserGroupHeader mockUserGroupHeader;
+	@Mock
+	PrincipalAliasResponse mockPrincipalAliasResponse;
 	
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
-	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
-//	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-//			adapterFactory);
 	private TeamMembershipStatus membershipStatus;
 
 	@Before
@@ -2251,28 +2252,17 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetUserIdFromUsername() throws UnsupportedEncodingException, SynapseException, RestServiceException {
 		//find the user id based on user name
-		String targetUserName = "lukeskywalker";
-		String targetUserId = "4";
-		when(mockUserGroupHeader.getUserName()).thenReturn(targetUserName);
-		when(mockUserGroupHeader.getOwnerId()).thenReturn(targetUserId);
-		when(mockSynapse.getUserGroupHeadersByPrefix(anyString())).thenReturn(mockUserGroupHeaderResponsePage);
-		when(mockUserGroupHeaderResponsePage.getChildren()).thenReturn(Collections.singletonList(mockUserGroupHeader));
-		String userId = synapseClient.getUserIdFromUsername(targetUserName);
-		assertEquals(targetUserId, userId);
-	}
-	
-	@Test(expected = NotFoundException.class)
-	public void testGetUserIdFromUsernameNotFound() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//test user name not found
-		when(mockSynapse.getUserGroupHeadersByPrefix(anyString())).thenReturn(mockUserGroupHeaderResponsePage);
-		when(mockUserGroupHeaderResponsePage.getChildren()).thenReturn(Collections.EMPTY_LIST);
-		synapseClient.getUserIdFromUsername("max_power");
+		Long targetUserId = 4L;
+		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserId);
+		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenReturn(mockPrincipalAliasResponse);
+		String userId = synapseClient.getUserIdFromUsername("luke");
+		assertEquals(targetUserId.toString(), userId);
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testGetUserIdFromUsernameBackendError() throws UnsupportedEncodingException, SynapseException, RestServiceException {
 		//test error from backend
-		when(mockSynapse.getUserGroupHeadersByPrefix(anyString())).thenThrow(new SynapseBadRequestException());
+		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
 		synapseClient.getUserIdFromUsername("bad-request");
 	}
 }

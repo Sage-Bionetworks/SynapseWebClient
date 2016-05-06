@@ -134,6 +134,8 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(Mockito.eq(mockWikiPageKey), anyString(), anyMap(), any(Callback.class), any(Long.class));
 		verify(mockView).addWidget(any(Widget.class), Mockito.contains(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0"));
+		//removes text inserted by markdown processor (usually "<Synapse widget>" text node, but is username in the case of @username mentions). 
+		verify(mockElementWrapper).removeAllChildren();
 	}
 	
 	@Test

@@ -66,6 +66,16 @@ public class UserTeamBadgeTest {
 	}
 	
 	@Test
+	public void testConfigureWithUsername(){
+		String username = "Potter";
+		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
+		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY, username);
+		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockGinInjector).getUserBadgeWidget();
+		verify(mockUserBadge).configureWithUsername(username);
+	}
+	
+	@Test
 	public void testConfigureTeam(){
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "false");
 		badge.configure(null, widgetDescriptor, null, null);
@@ -82,7 +92,7 @@ public class UserTeamBadgeTest {
 	}
 	
 	@Test
-	public void testConfigureNullPrincipalId(){
+	public void testConfigureNullPrincipalId() {
 		//userbadge or teambadge widget deals with null principal id, this should pass along
 		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		badge.configure(null, widgetDescriptor, null, null);
