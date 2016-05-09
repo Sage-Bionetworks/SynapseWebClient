@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -76,11 +77,10 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 
 	public void showForum(final String entityId) {
 		// get the moderator ids, and then show the forum
-		int mask = PERMISSIONS ;
-		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>() {
 			@Override
-			public void onSuccess(EntityBundle bundle) {
-				Set<Long> moderatorIds = AclUtils.getPrincipalIds(bundle.getAccessControlList(), ACCESS_TYPE.MODERATE);
+			public void onSuccess(AccessControlList acl) {
+				Set<Long> moderatorIds = AclUtils.getPrincipalIds(acl, ACCESS_TYPE.MODERATE);
 				showForum(entityId, moderatorIds);
 			}
 			
@@ -89,7 +89,7 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 				synAlert.handleException(caught);
 			}	
 		};
-		synapseClient.getEntityBundle(entityId, mask, callback);
+		synapseClient.getEntityBenefactorAcl(entityId, callback);
 	}
 
 	public void showForum(String entityId, Set<Long> moderatorIds) {

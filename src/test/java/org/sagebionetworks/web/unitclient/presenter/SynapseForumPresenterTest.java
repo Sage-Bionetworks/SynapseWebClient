@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.presenter.SynapseForumPresenter.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +58,8 @@ public class SynapseForumPresenterTest {
 	SynapseForumPlace mockPlace;
 
 	SynapseForumPresenter presenter;
-
+	Set<Long> moderatorIds;
+	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -66,6 +69,7 @@ public class SynapseForumPresenterTest {
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPlace.toToken()).thenReturn("fake token");
+		moderatorIds = new HashSet<Long>();
 	}
 
 	@Test
@@ -107,6 +111,6 @@ public class SynapseForumPresenterTest {
 		presenter.setPlace(mockPlace);
 		presenter.showForum(entityId);
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
-				eq(DEFAULT_IS_MODERATOR), any(CallbackP.class), any(Callback.class));
+				eq(DEFAULT_IS_MODERATOR), eq(moderatorIds), any(CallbackP.class), any(Callback.class));
 	}
 }

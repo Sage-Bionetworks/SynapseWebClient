@@ -6,6 +6,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +41,7 @@ public class DiscussionTabTest {
 	CookieProvider mockCookies;
 	@Mock
 	ForumWidget mockForumWidget;
-	
+	Set<Long> moderatorIds;
 	DiscussionTab tab;
 
 	@Before
@@ -46,6 +49,7 @@ public class DiscussionTabTest {
 		MockitoAnnotations.initMocks(this);
 		tab = new DiscussionTab(mockView, mockTab, mockCookies, mockForumWidget);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		moderatorIds = new HashSet<Long>();
 	}
 
 	@Test
@@ -66,10 +70,10 @@ public class DiscussionTabTest {
 		String entityName = "discussion project test";
 		String areaToken = "a=b&c=d";
 		boolean canModerate = false;
-		tab.configure(entityId, entityName, areaToken, canModerate);
+		tab.configure(entityId, entityName, areaToken, canModerate, moderatorIds);
 
 		ArgumentCaptor<CallbackP> paramCaptor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), paramCaptor.capture(), any(Callback.class));
+		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), eq(moderatorIds), paramCaptor.capture(), any(Callback.class));
 		
 		//simulate the forum calling back to the tab with the parameter
 		paramCaptor.getValue().invoke(new ParameterizedToken(areaToken));
