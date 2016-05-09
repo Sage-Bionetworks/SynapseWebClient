@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import java.util.Set;
+
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -78,6 +80,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private Callback deleteCallback;
 	private String projectId;
 	private Callback refreshCallback;
+	private Set<Long> moderatorIds;
 	
 	@Inject
 	public DiscussionThreadWidget(
@@ -136,14 +139,18 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Callback deleteCallback, boolean showThreadDetails, boolean showReplyDetails) {
+	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback, boolean showThreadDetails, boolean showReplyDetails) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.deleteCallback = deleteCallback;
 		this.projectId = bundle.getProjectId();
+		this.moderatorIds = moderatorIds;
 		configureView(bundle, showThreadDetails, showReplyDetails);
+		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
+		view.setIsAuthorModerator(isAuthorModerator);
+		
 		authorWidget.configure(bundle.getCreatedBy());
 		newReplyModal.configure(bundle.getId(), new Callback(){
 
@@ -261,7 +268,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			public void onSuccess(DiscussionThreadBundle result) {
 				boolean showThreadDetails = true;
 				boolean showReplyDetails = true;
-				configure(result, isCurrentUserModerator, deleteCallback, showThreadDetails, showReplyDetails);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
 			}
 		});
 	}

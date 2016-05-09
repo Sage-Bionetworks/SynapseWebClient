@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
@@ -10,6 +11,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -36,6 +41,8 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
+import org.sagebionetworks.web.shared.users.AclUtils;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -183,7 +190,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
     
     public void configureProject() {
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA ;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
@@ -357,10 +364,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void configureDiscussionTab() {
 		String projectId = projectHeader.getId();
 		boolean canModerate = false;
+		Set<Long> moderatorIds = new HashSet<Long>();
 		if (projectBundle != null) {
 			canModerate = projectBundle.getPermissions().getCanModerate();
+			moderatorIds = AclUtils.getPrincipalIds(projectBundle.getAccessControlList(), ACCESS_TYPE.MODERATE);
 		}
-		discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
+		discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, moderatorIds);
 	}
 		
 	@Override

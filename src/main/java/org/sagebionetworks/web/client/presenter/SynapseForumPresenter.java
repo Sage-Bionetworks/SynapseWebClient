@@ -1,7 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.HashMap;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
+import java.util.HashMap;
+import java.util.Set;
+
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -15,6 +20,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -68,7 +74,25 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 		showForum(globalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
 	}
 
-	public void showForum(String entityId) {
+	public void showForum(final String entityId) {
+		// get the moderator ids, and then show the forum
+		int mask = PERMISSIONS ;
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle bundle) {
+				Set<Long> moderatorIds = AclUtils.getPrincipalIds(bundle.getAccessControlList(), ACCESS_TYPE.MODERATE);
+				showForum(entityId, moderatorIds);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}	
+		};
+		synapseClient.getEntityBundle(entityId, mask, callback);
+	}
+
+	public void showForum(String entityId, Set<Long> moderatorIds) {
 		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
 			@Override
 			public void invoke(ParameterizedToken token) {
@@ -83,10 +107,9 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 				globalApplicationState.pushCurrentPlace(place);
 			}
 		};
-		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, paramChangeCallback, urlChangeCallback);
+		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, moderatorIds, paramChangeCallback, urlChangeCallback);
 	}
-
-
+	
 	@Override
 	public void setPlace(SynapseForumPlace place) {
 		this.place = place;

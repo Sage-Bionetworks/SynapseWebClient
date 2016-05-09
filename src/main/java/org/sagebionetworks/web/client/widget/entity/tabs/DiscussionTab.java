@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import java.util.Set;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
@@ -20,7 +22,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	ParameterizedToken params;
 	ForumWidget forumWidget;
 	String entityName, entityId;
-
+	
 	@Inject
 	public DiscussionTab(
 			DiscussionTabView view,
@@ -43,7 +45,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
+	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, Set<Long> moderatorIds) {
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
@@ -59,7 +61,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, updateParamsCallback, updateURLCallback);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, moderatorIds, updateParamsCallback, updateURLCallback);
 	}
 
 	/**

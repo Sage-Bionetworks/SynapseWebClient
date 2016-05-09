@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.discussion;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_THREAD_LIST;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_THREAD_LIST;
 
+import java.util.Set;
+
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
@@ -35,6 +37,8 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private Boolean isCurrentUserModerator;
 	private CallbackP<Boolean> emptyListCallback;
 	private CallbackP<String> threadIdClickedCallback;
+	Set<Long> moderatorIds;
+	
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,
@@ -52,10 +56,11 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		ascending = DEFAULT_ASCENDING;
 	}
 
-	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
+	public void configure(String forumId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, CallbackP<Boolean> emptyListCallback) {
 		clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
+		this.moderatorIds = moderatorIds;
 		offset = 0L;
 		this.forumId = forumId;
 		loadMore();
@@ -94,11 +99,11 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
 						for(DiscussionThreadBundle bundle: result.getResults()) {
 							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
-							thread.configure(bundle, isCurrentUserModerator, new Callback(){
+							thread.configure(bundle, isCurrentUserModerator, moderatorIds, new Callback(){
 
 								@Override
 								public void invoke() {
-									configure(forumId, isCurrentUserModerator, emptyListCallback);
+									configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
 								}
 							}, SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
 							thread.setThreadIdClickedCallback(threadIdClickedCallback);
@@ -123,6 +128,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			order = newOrder;
 			ascending = DEFAULT_ASCENDING;
 		}
-		configure(forumId, isCurrentUserModerator, emptyListCallback);
+		configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
 	}
 }
