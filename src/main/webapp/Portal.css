@@ -9,15 +9,15 @@ a {color:#1e7098;text-decoration:none;}
 a:visited{color:#1e7098; text-decoration:none;}
 a:hover{color:#1e7098; text-decoration:underline;}
 a:focus{color:#1e7098; text-decoration:underline;}
-.synapse-yellow {color:#68b2bb;}
-.synapse-blue {color:#1e7098;}
-.synapse-purple {color:#7772b4;}
-.synapse-green {color:#0ea862;}
+.synapse-yellow, #rootPanel .synapse-yellow {color:#68b2bb;}
+.synapse-blue, #rootPanel .synapse-blue {color:#1e7098;}
+.synapse-purple, #rootPanel .synapse-purple {color:#7772b4;}
+.synapse-green, #rootPanel .synapse-green {color:#0ea862;}
 
-.synapse-yellow-bg {background-color:#68b2bb;}
-.synapse-blue-bg {background-color:#1e7098;}
-.synapse-purple-bg {background-color:#7772b4;}
-.synapse-green-bg {background-color:#0ea862;}
+.synapse-yellow-bg, #rootPanel .synapse-yellow-bg {background-color:#68b2bb;}
+.synapse-blue-bg, #rootPanel .synapse-blue-bg {background-color:#1e7098;}
+.synapse-purple-bg, #rootPanel .synapse-purple-bg {background-color:#7772b4;}
+.synapse-green-bg, #rootPanel .synapse-green-bg {background-color:#0ea862;}
 
 .pagination>li>a, .pagination>li>span
 {

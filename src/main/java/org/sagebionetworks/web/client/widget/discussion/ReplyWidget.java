@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import java.util.Set;
+
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -39,7 +41,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
 	private Callback deleteReplyCallback;
-
+	private Set<Long> moderatorIds;
+	
 	@Inject
 	public ReplyWidget(
 			ReplyWidgetView view,
@@ -68,12 +71,13 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Callback deleteReplyCallback) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(DiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
@@ -81,6 +85,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setDeleteIconVisibility(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
+		view.setIsAuthorModerator(isAuthorModerator);
+
 		configureMessage();
 	}
 
@@ -190,7 +197,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator, deleteReplyCallback);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback);
 			}
 		});
 	}

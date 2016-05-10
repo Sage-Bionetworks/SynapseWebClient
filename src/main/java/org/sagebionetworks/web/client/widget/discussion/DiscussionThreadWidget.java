@@ -394,7 +394,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 						} else {
 							for (DiscussionReplyBundle bundle : result.getResults()) {
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
-								replyWidget.configure(bundle, isCurrentUserModerator, new Callback(){
+								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, new Callback(){
 									@Override
 									public void invoke() {
 										reconfigureThread();

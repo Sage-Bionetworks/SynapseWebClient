@@ -40,11 +40,8 @@
 			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
-					<b:Tooltip title="Moderator">
-						<b:Badge text="M" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple"/>
-					</b:Tooltip>
+					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
 				</bh:Div>
-				
 				<bh:Div width="100%">
 					<g:HTMLPanel ui:field="loadingMessage" visible="false">
 						<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />

@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
 import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
 import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
 
-import org.gwtbootstrap3.client.ui.Badge;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.IconStack;
@@ -93,7 +92,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Icon pinnedIcon;
 	@UiField
-	Badge moderatorBadge;
+	Label moderatorBadge;
 	
 	String threadLinkHref;
 	private Widget widget;
