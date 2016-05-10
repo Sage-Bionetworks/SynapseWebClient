@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -32,22 +33,18 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	}		
 
 	private void configureEntityFinder() {
-		entityFinder.configure(true, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					view.setEntityId(selected.getTargetId());
-					Long version = selected.getTargetVersionNumber();
-					if (version != null) {
-						view.setVersion(version.toString());
-					} else {
-						view.setVersion("");
-					}
-						
-					entityFinder.hide();
+				view.setEntityId(selected.getTargetId());
+				Long version = selected.getTargetVersionNumber();
+				if (version != null) {
+					view.setVersion(version.toString());
 				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+					view.setVersion("");
 				}
+					
+				entityFinder.hide();
 			}
 		});
 	}

@@ -13,8 +13,8 @@
 			<bh:Text> Loading...</bh:Text>
 		</bh:Div>
 	    <bh:Span ui:field="controlledUseUI">
-	        <g:Image ui:field="unmetRequirementsIcon" styleName="displayInline" resource='{icons.shieldRed16}' />
-	        <g:Image ui:field="metRequirementsIcon" styleName="displayInline" resource='{icons.shieldRed16WithGreenCheckmark}' />
+	        <g:Image ui:field="unmetRequirementsIcon" styleName="displayInline moveup-2" resource='{icons.shieldRed16}' />
+	        <g:Image ui:field="metRequirementsIcon" styleName="displayInline moveup-2" resource='{icons.shieldRed16WithGreenCheckmark}' />
 			<!-- Note, tooltip does not work if wrapping Text -->
 			<b:Tooltip placement="BOTTOM" title="Conditions for use are set by human privacy regulations or contractual obligations">
 			    <g:InlineLabel text="Controlled Use" />
@@ -28,7 +28,9 @@
 		</bh:Span>
 		
 		<bh:Span ui:field="linkUI">
-		    (<b:Anchor ui:field="changeLink">change</b:Anchor><b:Anchor ui:field="showLink">show</b:Anchor>)
+			<b:Anchor ui:field="changeLink" text="(change)"/>
+			<b:Anchor ui:field="showLink" text="(show)"/>
+			<b:Button addStyleNames="moveup-1" ui:field="showUnmetLink" type="WARNING" size="EXTRA_SMALL" text="Show unmet conditions"/>
 		</bh:Span>
 		
 		<bh:Span ui:field="flagUI">

@@ -30,7 +30,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
-import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -99,7 +98,6 @@ public class ChallengeClientImplTest {
 	V2WikiPage v2Page;
 	S3FileHandle handle;
 	Evaluation mockEvaluation;
-	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
@@ -158,12 +156,8 @@ public class ChallengeClientImplTest {
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
-		mockParticipant = Mockito.mock(Participant.class);
-		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
 		
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
-		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
-		
 		testChallengeTeam1 = getTestChallengeTeam("join the first team", testTeam1);
 		testChallengeTeam2 = getTestChallengeTeam("join the second team", testTeam2);
 		testChallenge = getTestChallenge();
@@ -333,6 +327,20 @@ public class ChallengeClientImplTest {
 		assertTrue(results.getTotalNumberOfResults() == 1);
 		assertEquals(TEST_CHALLENGE_PROJECT_NAME, results.getResults().get(0).getProjectName());
 		assertEquals(testChallenge, results.getResults().get(0).getChallenge());
+	}
+	
+	@Test
+	public void testGetChallengesWithNoChallenges() throws SynapseException, RestServiceException {
+		org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
+		results.setResults(new ArrayList<Challenge>());
+		results.setTotalNumberOfResults(0L);
+		when(mockSynapse.listChallengesForParticipant(anyString(), anyLong(), anyLong())).thenReturn(results);
+		
+		ChallengePagedResults challengeResults = synapseClient.getChallenges("userid", 10, 0);
+		verify(mockSynapse).listChallengesForParticipant(anyString(), anyLong(), anyLong());
+		verify(mockSynapse, never()).getEntityHeaderBatch(anyList());
+		
+		assertTrue(challengeResults.getTotalNumberOfResults() == 0);
 	}
 	
 	@Test (expected=NotFoundException.class)

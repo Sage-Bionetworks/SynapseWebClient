@@ -154,7 +154,7 @@ public class HomePresenterTest {
 	public void testNewsFeed() throws JSONObjectAdapterException {
 		homePresenter.loadNewsFeed();
 		
-		verify(mockView).prepareTwitterContainer(anyString());
+		verify(mockView).prepareTwitterContainer(anyString(), anyInt());
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(false);
 		homePresenter.twitterContainerReady("twitterElementId");
 		verify(mockResourceLoader).isLoaded(any(WebResource.class));
@@ -162,7 +162,7 @@ public class HomePresenterTest {
 		
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 		homePresenter.twitterContainerReady("twitterElementId");
-		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), anyInt());
+		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), eq(HomePresenter.TWEET_COUNT));
 	}	
 	
 	

@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -106,10 +105,6 @@ public class EntityListWidgetTest {
 		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
 		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
-		
-		// Since syn456 is depracated (syn456 instanceof locationable), the call
-		// on getPlainTextWikiPage should never have been made.
-		verify(mockSynapseClient, Mockito.never()).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -137,15 +132,10 @@ public class EntityListWidgetTest {
 
 		// Set up success for call to get wiki text.
 		String resultDescription = "Description =)";
-		AsyncMockStubber.callSuccessWith(resultDescription).when(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-
+		
 		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
 
-		// Since syn789 is non-deprecated, the call on
-		// getPlainTextWikiPage should have been made once.
-		verify(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		
 		// The wiki description was used.
 		ArgumentCaptor<EntityGroupRecordDisplay> arg = ArgumentCaptor.forClass(EntityGroupRecordDisplay.class);
 		verify(handler).onLoaded(arg.capture());

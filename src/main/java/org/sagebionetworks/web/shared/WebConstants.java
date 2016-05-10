@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 
@@ -171,6 +170,8 @@ public class WebConstants {
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
 	
+	public static final String FORUM_SYNAPSE_ID_PROPERTY ="org.sagebionetworks.portal.forum_project_id";
+	
 	//Workshop
 	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.collaboratorium_synapse_id";
 	public static final String STAGE_I_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageI_synapse_id";
@@ -225,6 +226,7 @@ public class WebConstants {
 	
 	public static final String CERTIFICATION = "Certification";
 	public static final String VALIDATION = "Validation";
+	public static final String FORUM = "Forum";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
@@ -240,6 +242,7 @@ public class WebConstants {
 	
 	//ClientCache key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
+	public static final String USERNAME_SUFFIX = "_USERNAME_2_ID";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
 
 	public static final String TABLE_COLUMN_ID = "columnId";
@@ -274,5 +277,15 @@ public class WebConstants {
 	
 	public static final String OAUTH2_PROVIDER = "oauth2provider";
 	public static final String OAUTH2_CODE = "code";
-	
+
+	// discussion message
+	public static final String DISCUSSION_MESSAGE_SERVLET = "/discussion/messageUrl";
+	public static final String MESSAGE_KEY_PARAM = "messageKey";
+	public static final String TYPE_PARAM = "type";
+	public static final String THREAD_TYPE = "thread";
+	public static final String REPLY_TYPE = "reply";
+
+	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
+
+	public static final String CONTENT_TYPE = "Content-Type";
 }

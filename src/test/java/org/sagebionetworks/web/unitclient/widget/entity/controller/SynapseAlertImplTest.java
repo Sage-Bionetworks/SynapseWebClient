@@ -43,7 +43,6 @@ public class SynapseAlertImplTest {
 	SynapseAlertImpl widget;
 	PlaceChanger mockPlaceChanger;
 	JiraURLHelper mockJiraClient;
-	SynapseClientAsync mockSynapseClient;
 	GWTWrapper mockGWT;
 	
 	public static final String HOST_PAGE_URL="http://foobar";
@@ -54,16 +53,13 @@ public class SynapseAlertImplTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockJiraClient = mock(JiraURLHelper.class);
 		mockView = mock(SynapseAlertView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGWT = mock(GWTWrapper.class);
-		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockGWT);
+		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT);
 		UserSessionData mockUSD = mock(UserSessionData.class);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUSD);
 		UserProfile mockProfile = mock(UserProfile.class);
 		when(mockUSD.getProfile()).thenReturn(mockProfile);
 		AsyncMockStubber.callSuccessWith(null).when(mockJiraClient).createIssueOnBackend(anyString(),  any(Throwable.class),  anyString(), any(AsyncCallback.class));
-		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
 		
@@ -212,39 +208,4 @@ public class SynapseAlertImplTest {
 		verify(mockView, times(2)).clearState();
 		verify(mockView).showError(errorMessage);
 	}
-	
-	@Test
-	public void testShowEntity403NotLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.show403("syn123");
-		verify(mockView, times(2)).clearState();
-		verify(mockView).showLoginAlert();
-	}
-	
-	@Test
-	public void testShowEntity403() {
-		String entityId = "syn123";
-		widget.show403(entityId);
-		verify(mockView, times(2)).clearState();
-		verify(mockView).showRequestAccessUI();
-		assertEquals(entityId, widget.getEntityId());
-	}
-	
-	@Test
-	public void testOnRequestAccess() {
-		widget.onRequestAccess();
-		verify(mockView).showRequestAccessButtonLoading();
-		verify(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockView).hideRequestAccessUI();
-	}
-	@Test
-	public void testOnRequestAccessFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("ex")).when(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		widget.onRequestAccess();
-		verify(mockView).showRequestAccessButtonLoading();
-		verify(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showError(anyString());
-	}
-		
 }

@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.SubscriptionClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
@@ -21,11 +24,13 @@ import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
+import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
+import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
@@ -76,6 +81,10 @@ public class PortalServletModule extends ServletModule {
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
 		
+		// Subscription service
+		bind(SubscriptionClientImpl.class).in(Singleton.class);
+		serve("/Portal/subscriptionclient").with(SubscriptionClientImpl.class);
+		
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
 		
@@ -118,7 +127,11 @@ public class PortalServletModule extends ServletModule {
 		// FileHandleAssociation download
 		bind(FileHandleAssociationServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET).with(FileHandleAssociationServlet.class);
-				
+
+		// Multipart file upload
+		bind(MultipartFileUploadClientImpl.class).in(Singleton.class);
+		serve("/Portal/multipartFileUploadClient").with(MultipartFileUploadClientImpl.class);
+
 		
 		// FileHandle upload
 		bind(FileEntityResolverServlet.class).in(Singleton.class);
@@ -132,7 +145,15 @@ public class PortalServletModule extends ServletModule {
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
 		serve("/Portal/linkedin").with(LinkedInServiceImpl.class);
-		
+
+		// Setup the Discussion Forum service mapping
+		bind(DiscussionForumClientImpl.class).in(Singleton.class);
+		serve("/Portal/discussionforumclient").with(DiscussionForumClientImpl.class);
+
+		// Discussion message download
+		bind(DiscussionMessageServlet.class).in(Singleton.class);
+		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
+
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);
 		serve("/Portal/jira").with(JiraClientImpl.class);

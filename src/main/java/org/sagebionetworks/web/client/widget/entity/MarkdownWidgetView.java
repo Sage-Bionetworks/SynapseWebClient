@@ -21,7 +21,6 @@ public interface MarkdownWidgetView extends IsWidget {
 	void setEmptyVisible(boolean b);
 
 	void setMarkdown(String result);
-
 	ElementWrapper getElementById(String string);
 
 	void addWidget(Widget widget, String divID);

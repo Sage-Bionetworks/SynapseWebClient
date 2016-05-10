@@ -30,7 +30,9 @@ import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
@@ -95,6 +97,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Certificate.class);
 		openAccessPlaces.add(StandaloneWiki.class);
 		openAccessPlaces.add(SignedToken.class);
+		openAccessPlaces.add(SynapseForumPlace.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);

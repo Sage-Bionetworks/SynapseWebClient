@@ -676,7 +676,9 @@ a.shortBtn {
 .min-height-48 {
 	min-height: 48px;
 }
-
+.min-width-25 {
+	min-width: 25px;
+}
 .profile-image-40px {
 	width: 40px;	
 }
@@ -1011,6 +1013,11 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
+
+.markdown img {
+	max-width: 100%;
+}
+
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }
@@ -1126,6 +1133,10 @@ span.font-size-13,
 i.font-size-1x {
 	font-size:1em;
 }
+.font-size-1-5x,
+i.font-size-1-5x {
+	font-size:1.5em;
+}
 .font-size-lg,
 i.font-size-lg {
 	font-size:1.33em;
@@ -1203,8 +1214,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .markdown p {
-	margin: 0px;
+	margin: 10px 0 10px 0;
 }
+
+.markdown h1 {
+	padding: 35px 0 12px 0;
+}
+.markdown h2 {
+	padding: 29px 0 10px 0;
+}
+.markdown h3 {
+	padding: 23px 0 8px 0;
+}
+.markdown h4 {
+	padding: 17px 0 6px 0;
+}
+.markdown h5 {
+	padding: 11px 0 4px 0;
+}
+.markdown h6 {
+	padding: 5px 0 2px 0;
+}
+
 
 .previewtable {
   border: 1px solid #dddddd;
@@ -1228,6 +1259,7 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  margin: 10px 0 10px 0;
 }
 
 .markdowntable td {
@@ -1239,7 +1271,8 @@ h1, h2, h3, h4, h5, h6 {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 1.1em;
 }
 
 /* Markdown table styles */
@@ -1372,6 +1405,10 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #ccc;
 }
 
+.lightGreyBackground {
+	background-color: #F9F9F9;
+}
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;
@@ -1424,10 +1461,6 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 
 /**table of contents styling **/
 /** .8em to 1.2em **/
-.toc-indent4 {
-	font-size: .8em;
-	margin-left: 125px;
-}
 .toc-indent0 {
 	font-size: 1.2em;
 	margin-left: 5px;
@@ -1443,7 +1476,16 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 .toc-indent3 {
 	font-size: 0.9em;
 	margin-left: 95px;
-}	
+}
+.toc-indent4 {
+	font-size: .8em;
+	margin-left: 125px;
+}
+.toc-indent5 {
+	font-size: .8em;
+	margin-left: 150px;
+}
+
 
 strong {
 	font-weight: bold;
@@ -1730,13 +1772,18 @@ ol.lowerroman {
 	position: relative;
 	top: -4px;
 }
-
+.moveup-3 {
+	position: relative;
+	top: -3px;
+}
 .moveup-2 {
 	position: relative;
 	top: -2px;
 }
-
-
+.moveup-1 {
+	position: relative;
+	top: -1px;
+}
 .movedown-1 {
 	position: relative;
 	top: 1px;
@@ -1917,6 +1964,10 @@ a.projectTitle:hover {
     overflow: hidden;
 }
 
+.table-layout-fixed {
+    table-layout: fixed;
+}
+
 .colAdaptiveHeight{ 
     margin-bottom: -99999px;
     padding-bottom: 99999px;  
@@ -2023,6 +2074,10 @@ a.projectTitle:hover {
 	font-family: "Brush Script MT", cursive;
 }
 
+.halfOpacity {
+	opacity: .5;
+}
+
 .fullOpacityImp {
 	opacity: 1 !important;
 }
@@ -2031,6 +2086,10 @@ a.projectTitle:hover {
 Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
 .modal-fullscreen [class*="modal-dialog"] {
 	width: 95%;
+}
+
+.gwt-TreeItem-selected [class*="link"] {
+	text-decoration: underline;
 }
 
 /* Prevent body from scrolling when modal is open
@@ -2057,6 +2116,10 @@ iframe[seamless] {
 
 .overflow-x-hidden {
 	overflow-x: hidden;
+}
+
+.line-height-1em {
+	line-height: 1em;
 }
 
 /*==================================*/
@@ -2975,6 +3038,31 @@ div.colborder {
 		background-image:url('../images/social/f.png');
 		background-position: -0px -26px;
 	}
+
+/* SWC-3048: override webkit scrollbar appearance, so that they're shown */
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+    width: 11px;
+}
+
+.frame::-webkit-scrollbar:horizontal {
+    height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid white; /* should match background, can't be transparent */
+    background-color: rgba(0, 0, 0, .5);
+}
+
+::-webkit-scrollbar-track { 
+    background-color: #fff; 
+    border-radius: 8px; 
+} 
 
 
 /*-------------------------------------------------------*/

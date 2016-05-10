@@ -15,9 +15,9 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -28,7 +28,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -38,6 +38,7 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -52,7 +53,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private SynapseAlert synAlert;
+	private StuAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
@@ -61,6 +62,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	private GWTWrapper gwt;
 	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
 	
@@ -69,9 +71,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
-			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
+			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
+			GWTWrapper gwt) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
@@ -81,13 +84,13 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
-		
+		this.gwt = gwt;
 		//place widgets and configure
 		view.setEntityPageTopWidget(entityPageTop);
 		view.setFooterWidget(footerWidget);
 		view.setHeaderWidget(headerWidget);
 		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
-		view.setSynAlertWidget(synAlert);
+		view.setSynAlertWidget(synAlert.asWidget());
 		clear();
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
@@ -118,6 +121,20 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
+	public boolean isValidEntityId(String entityId) {
+		if (entityId == null || entityId.length() == 0 || !entityId.toLowerCase().startsWith("syn")) {
+			return false;
+		}
+		
+		//try to parse the actual syn id
+		try {
+			Long.parseLong(entityId.substring("syn".length()).trim());
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+	
 	@Override
 	public void clear() {
 		synAlert.clear();
@@ -138,7 +155,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
 		int mask = ENTITY | ENTITY_PATH;
-		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				view.setLoadingVisible(false);
@@ -185,10 +202,21 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				}
 			}			
 		};
-		if (versionNumber == null) {
-			synapseClient.getEntityBundle(entityId, mask, callback);
+		
+		if(isValidEntityId(entityId)) {
+			if (versionNumber == null) {
+				synapseClient.getEntityBundle(entityId, mask, callback);
+			} else {
+				synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+			}
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+			//invalid entity detected, indicate that the page was not found
+			gwt.scheduleDeferred(new Callback() {
+				@Override
+				public void invoke() {
+					callback.onFailure(new NotFoundException());		
+				}
+			});
 		}
 	}
 	

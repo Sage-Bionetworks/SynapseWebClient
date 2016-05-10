@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -12,6 +11,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,19 +34,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public interface Binder extends UiBinder<Widget, MarkdownEditorWidgetViewImpl> {}
 	
 	private Presenter presenter;
-	
-	@UiField
-	public Modal editorDialog;
-	@UiField
-	public TextBox titleField;
 	//dialog for the formatting guide
 	@UiField
 	public Div mdCommands;
 	
 	@UiField
 	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
-	@UiField 
-	public com.google.gwt.user.client.ui.TextArea resizingTextArea;
 	
 	@UiField
 	public SimplePanel formattingGuideContainer;
@@ -53,6 +49,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	 */
 	@UiField
 	public Button editWidgetButton;
+	@UiField
+	public Button formattingGuideOkButton;
+	
 	//insert widget menu commands
 	@UiField
 	public AnchorListItem attachmentLink;
@@ -85,7 +84,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem tableOfContentsLink;
 	@UiField
-	public AnchorListItem userTeamLink;
+	public AnchorListItem userLink;
+	@UiField
+	public Button userButton;
+	
+	@UiField
+	public AnchorListItem teamLink;
+	@UiField
+	public AnchorListItem synapseFormLink;
 	@UiField
 	public AnchorListItem videoLink;
 	@UiField
@@ -121,6 +127,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem tutorialWizardLink;
 	@UiField
 	public AnchorListItem entityBackgroundLink;
+	@UiField
+	public AnchorListItem teamMembersLink;
 	
 	@UiField
 	public Button boldButton;
@@ -158,30 +166,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button imageButton;
 	@UiField
+	public Button externalImageButton;
+	@UiField
 	public Button videoButton;
 	@UiField
 	public Button linkButton;
 	
-	
-	//preview
-	@UiField
-	public SimplePanel previewHtmlContainer;
-	@UiField
-	public Modal previewModal;
-	@UiField
-	public Button previewButton;
-	
-	@UiField
-	public Button saveButton;
-	@UiField
-	public Button cancelButton;
-	@UiField
-	public Button deleteButton;
-	
 	//this UI widget
 	Widget widget;
-	
-	
 	
 	@Inject
 	public MarkdownEditorWidgetViewImpl(Binder binder) {
@@ -201,7 +193,10 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		submitToEvaluationLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION));
 		tableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TABLE));
 		tableOfContentsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TOC));
-		userTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
+		userLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_LINK));
+		userButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_LINK));
+		teamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
+		synapseFormLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM));
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
 		vimeoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIMEO));
@@ -230,29 +225,34 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading6Link.addClickHandler(getClickHandler(MarkdownEditorAction.H6));
 		attachmentButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
+		externalImageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
-		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
-		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
+		teamMembersLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBERS));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
 		heading3Link.addStyleName("font-size-24");
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
-		editorDialog.addCloseHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.handleCommand(MarkdownEditorAction.CANCEL);
-			}
-		});
 		formattingGuideButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				formattingGuideModal.show();
+			}
+		});
+		formattingGuideOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				formattingGuideModal.hide();
+			}
+		});
+		markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				presenter.onKeyPress(event.getCharCode());
 			}
 		});
 	}
@@ -260,11 +260,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override 
 	public void confirm(String text, ConfirmCallback callback) {
 		Bootbox.confirm(text, callback);
-	}
-	
-	@Override
-	public void setDeleteClickHandler(ClickHandler handler) {
-		deleteButton.addClickHandler(handler);
 	}
 	
 	@Override
@@ -287,14 +282,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void setSaving(boolean isSaving) {
-		if (isSaving) 
-			saveButton.state().loading();
-		else
-			saveButton.state().reset();
-	}
-	
-	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
@@ -310,7 +297,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		});
 	}
 	
-	
+
 	@Override
 	public void setAttachmentCommandsVisible(boolean visible) {
 		attachmentLink.setVisible(visible);
@@ -320,21 +307,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setAlphaCommandsVisible(boolean visible) {
 		alphaInsertButton.setVisible(visible);
-	}
-	
-	@Override
-	public boolean isEditorModalAttachedAndVisible() {
-		return editorDialog.isAttached() && editorDialog.isVisible();
-	}
-	
-	@Override
-	public void showEditorModal() {
-		editorDialog.show();
-	}
-	
-	@Override
-	public void hideEditorModal() {
-		editorDialog.hide();
 	}
 	
 	@Override
@@ -364,7 +336,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@Override
 	public void clear() {
-		saveButton.state().reset();
 		markdownTextArea.setText("");
 	}
 
@@ -394,11 +365,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void setMarkdownHeight(String height) {
-		markdownTextArea.setHeight(height);
-	}
-	
-	@Override
 	public int getSelectionLength() {
 		return markdownTextArea.getSelectionLength();
 	}
@@ -409,40 +375,43 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void setTitleEditorVisible(boolean visible) {
-		titleField.setVisible(visible);
-	}
+	public int getClientHeight() {
+		return Window.getClientHeight();
+	};
 	
 	@Override
-	public int getScrollHeight(String text) {
-		resizingTextArea.setText("");
-		resizingTextArea.setText(text);
-		return resizingTextArea.getElement().getScrollHeight();
-	}
-
-	
-	@Override
-	public String getTitle() {
-		return titleField.getValue();
+	public void setMarkdownTextAreaHeight(int heightPx) {
+		markdownTextArea.setHeight(heightPx + "px");
 	}
 	
-	@Override
-	public void setTitle(String title) {
-		titleField.setValue(title);
-	}
-
-	@Override
-	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
-		previewHtmlContainer.setWidget(markdownPreviewWidget);
-	}
-
 	@Override
 	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
 		formattingGuideContainer.setWidget(formattingGuideWidget);
 	}
+	@Override
+	public boolean isEditorAttachedAndVisible() {
+		return widget.isAttached() && widget.isVisible();
+	}
 
 	@Override
-	public void showPreviewModal() {
-		previewModal.show();
+	public void setImageCommandsVisible(boolean visible) {
+		imageLink.setVisible(visible);
+		imageButton.setVisible(visible);
+	}
+
+	@Override
+	public void setVideoCommandsVisible(boolean visible) {
+		videoLink.setVisible(visible);
+		videoButton.setVisible(visible);
+	}
+
+	@Override
+	public void setExternalImageButtonVisible(boolean visible) {
+		externalImageButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setFocus(boolean focused) {
+		markdownTextArea.setFocus(focused);
 	}
 }

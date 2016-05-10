@@ -139,6 +139,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	
 	@Override
+	public void scrollWikiHeadingIntoView() {
+		wikiHeading.getElement().scrollIntoView();
+	}
+	
+	@Override
 	public void clear() {
 		historyCollapse.hide();
 		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);

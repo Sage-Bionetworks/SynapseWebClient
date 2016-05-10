@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.google.gwt.json.client.JSONObject;
@@ -46,14 +47,14 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		this.source = source;
 		
 		view.setPresenter(this);
-		entityFinder.configure(true, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				entitySelected(selected);
 			}
 		});
 		
-		indexEntityFinder.configure(true, new SelectedHandler<Reference>() {					
+		indexEntityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				indexEntitySelected(selected);
@@ -123,7 +124,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				entityFinder.showError(caught.getMessage());
 			}			
 		};
 		if (ref.getTargetVersionNumber() == null) {
@@ -156,7 +157,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				indexEntityFinder.showError(caught.getMessage());
 			}			
 		};
 		if (ref.getTargetVersionNumber() == null) {

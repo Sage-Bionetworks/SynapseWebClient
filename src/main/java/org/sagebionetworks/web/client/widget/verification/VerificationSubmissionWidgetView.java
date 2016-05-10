@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -20,9 +21,13 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void setTitle(String title);
 	void setEmails(List<String> emails);
 	void setFirstName(String fname);
+	String getFirstName();
 	void setLastName(String lname);
+	String getLastName();
 	void setOrganization(String organization);
+	String getOrganization();
 	void setLocation(String location);
+	String getLocation();
 	void setOrcID(String href);
 	void setProfileLink(String profileId, String href);
 	void setSubmitButtonVisible(boolean visible);
@@ -32,11 +37,15 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void setApproveButtonVisible(boolean visible);
 	void setRejectButtonVisible(boolean visible);
 	void setSuspendButtonVisible(boolean visible);
+	void setResubmitButtonVisible(boolean visible);
+	void setCloseButtonVisible(boolean visible);
 	void setSuspendedReason(String reason);
 	void setSuspendedAlertVisible(boolean visible);
+	void setState(VerificationStateEnum state);
 	void popupError(String message);
 	void openWindow(String url);
 	void setPromptModal(Widget w);
+	void setProfileFieldsEditable(boolean editable);
 	/**
 	 * Presenter interface
 	 */
@@ -48,5 +57,7 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 		
 		void suspendVerification();
 		void deleteVerification();
+		
+		void recreateVerification();
 	}
 }

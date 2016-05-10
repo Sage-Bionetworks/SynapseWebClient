@@ -1,7 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="header" />
 
@@ -10,7 +11,16 @@
 				<div class="col-md-9 col-md-push-3">
 					<div class="row">
 						<div class="col-md-12">
-							<g:SimplePanel ui:field="searchBoxPanel" />
+							<b:Row>
+								<b:Column size="MD_9">
+									<b:InputGroup width="100%">
+										<b:TextBox ui:field="searchField" addStyleNames="form-control input-lg search-textbox" />
+									</b:InputGroup>
+								</b:Column>
+								<b:Column size="MD_3">
+									<b:Button ui:field="searchButton" block="true" size="LARGE" text="Search" icon="SEARCH" />
+								</b:Column>
+							</b:Row>
 						</div>
 					</div>
 					<div class="row">

@@ -8,11 +8,11 @@
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
 	<g:HTMLPanel ui:field="container" visible="false">
    	    <bh:Span text="Created by"/>
-	    <bh:Span ui:field="createdBadgePanel" addStyleNames="movedown-4"/>
+	    <bh:Span ui:field="createdBadgePanel" addStyleNames="movedown-7"/>
 	    <bh:Span ui:field="createdOnText"/>
 	    <br/>
    	    <bh:Span text="Modified by"/>
-   	    <bh:Span ui:field="modifiedBadgePanel" addStyleNames="movedown-4"/>
+   	    <bh:Span ui:field="modifiedBadgePanel" addStyleNames="movedown-7"/>
    	    <bh:Span ui:field="modifiedOnText"/>
 	</g:HTMLPanel>
 </ui:UiBinder>

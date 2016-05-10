@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -99,15 +100,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(false, new SelectedHandler<Reference>() {					
+				entityFinder.configure(EntityFilter.FILE, false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							entityField.setValue(DisplayUtils.createEntityVersionString(selected));
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
+						entityFinder.hide();
 					}
 				});
 				entityFinder.show();

@@ -85,7 +85,10 @@ public class TableModelTestUtils {
 					break;
 				case LINK:
 					defaultValue = "http";
-					break;		
+					break;
+				case LARGETEXT:
+					defaultValue = null;
+					break;
 				default:
 					throw new IllegalStateException("huh? missing enum");
 				}
@@ -281,6 +284,8 @@ public class TableModelTestUtils {
 		case ENTITYID:
 			return "syn"+i;
 		case LINK:
+			return "";
+		case LARGETEXT:
 			return "";	
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());

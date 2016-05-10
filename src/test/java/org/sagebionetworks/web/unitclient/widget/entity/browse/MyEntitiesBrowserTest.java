@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -29,6 +31,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
@@ -45,10 +48,17 @@ public class MyEntitiesBrowserTest {
 	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter jsonObjectAdapter;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	@Mock
 	EntityTreeBrowser mockEntityTreeBrowser;
+	@Mock
+	EntityTreeBrowser mockFavoritesTreeBrowser;
+	@Mock
+	EntityTreeBrowser mockCurrentContextTreeBrowser;
+	
 	String currentUserId = "100042";
 	@Before
 	public void before() {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(MyEntitiesBrowserView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -58,8 +68,8 @@ public class MyEntitiesBrowserTest {
 				jsonObjectAdapter, adapterFactory);
 		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
 		when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
-		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockEntityTreeBrowser);
-		when(mockView.getCurrentContextTreeBrowser()).thenReturn(mockEntityTreeBrowser);
+		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockFavoritesTreeBrowser);
+		when(mockView.getCurrentContextTreeBrowser()).thenReturn(mockCurrentContextTreeBrowser);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		searchResults = new EntityQueryResults();
@@ -181,7 +191,7 @@ public class MyEntitiesBrowserTest {
 		widget.loadCurrentContext();
 		verify(mockView).setCurrentContextTabVisible(true);
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		verify(mockEntityTreeBrowser).configureWithPath(anyList());
+		verify(mockCurrentContextTreeBrowser).configure(anyList());
 	}
 	@Test
 	public void testLoadContextSynapsePlaceFailure() {
@@ -194,5 +204,29 @@ public class MyEntitiesBrowserTest {
 		verify(mockView).setCurrentContextTabVisible(true);
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
+	}
+	
+	@Test
+	public void testSetEntityFilter() {
+		Synapse s = new Synapse("syn123");
+		String userId = "12345";
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		widget.updateContext();
+		assertEquals(s, widget.getCachedCurrentPlace());
+		assertEquals(userId, widget.getCachedUserId());
+
+		//verify that context is updated when the filter is set.
+		s = new Synapse("syn321");
+		userId = "54321";
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		EntityFilter filter = EntityFilter.FILE;
+		widget.setEntityFilter(filter);
+		verify(mockEntityTreeBrowser).setEntityFilter(filter);
+		verify(mockFavoritesTreeBrowser).setEntityFilter(filter);
+		verify(mockCurrentContextTreeBrowser).setEntityFilter(filter);
+		assertEquals(s, widget.getCachedCurrentPlace());
+		assertEquals(userId, widget.getCachedUserId());
 	}
 }

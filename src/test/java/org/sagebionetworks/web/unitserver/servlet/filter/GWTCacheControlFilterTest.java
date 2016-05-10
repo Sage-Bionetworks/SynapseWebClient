@@ -62,6 +62,18 @@ public class GWTCacheControlFilterTest {
 		
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
+	
+	@Test
+	public void testDoFilterNoCacheWhenSPA() throws IOException, ServletException {
+		when(mockRequest.getRequestURI()).thenReturn("/");
+		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+		
+		verify(mockResponse).setDateHeader("Expires", 0);
+		verify(mockResponse).setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
+		verify(mockResponse).setHeader("Pragma", "no-cache");
+		
+		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+	}
 
 
 	@Test

@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -110,6 +111,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		cachedUserId = authenticationController.getCurrentUserPrincipalId();
 	}
 	
+	public void clearCurrentContent() {
+		cachedPlace = null;
+		cachedUserId = null;
+	}
+	
 	public Place getCachedCurrentPlace() {
 		return cachedPlace;
 	}
@@ -144,15 +150,17 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(caught.getMessage());
 				}
+				
 				public void onSuccess(EntityBundle result) {
 					EntityPath path = result.getPath();
 					List<EntityHeader> pathHeaders = path.getPath();
 					//remove the high level root, so that the first item in the list is the Project
-					if (pathHeaders.size() > 0) {
-						pathHeaders.remove(0);	
+					List<EntityHeader> projectHeader = new ArrayList<EntityHeader>();
+					if (pathHeaders.size() > 1) {
+						projectHeader.add(pathHeaders.get(1));		
 					}
 					//add to the current context tree, and show all children of this container (or siblings if leaf)
-					view.getCurrentContextTreeBrowser().configureWithPath(pathHeaders);
+					view.getCurrentContextTreeBrowser().configure(projectHeader);
 				};
 			});
 		}
@@ -167,7 +175,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for (EntityQueryResult result : results.getEntities()) {
 						EntityHeader h = new EntityHeader();
-						h.setType(EntityType.project.name());
+						h.setType(Project.class.getName());
 						h.setId(result.getId());
 						h.setName(result.getName());
 						headers.add(h);
@@ -220,6 +228,18 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
+	}
+	
+	public void setEntityFilter(EntityFilter filter) {
+		getEntityTreeBrowser().setEntityFilter(filter);
+		getFavoritesTreeBrowser().setEntityFilter(filter);
+		view.getCurrentContextTreeBrowser().setEntityFilter(filter);
+		clearCurrentContent();
+		refresh();
+	}
+	
+	public EntityFilter getEntityFilter() {
+		return getEntityTreeBrowser().getEntityFilter();
 	}
 
 	

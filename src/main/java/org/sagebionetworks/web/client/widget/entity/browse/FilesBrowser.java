@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -25,7 +24,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private FilesBrowserView view;
 	private String configuredEntityId;
 	private SynapseClientAsync synapseClient;
-	private AdapterFactory adapterFactory;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
@@ -36,13 +34,11 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
 			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;

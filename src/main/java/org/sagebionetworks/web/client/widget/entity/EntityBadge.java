@@ -8,18 +8,13 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -32,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -120,7 +114,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	public void configure(EntityQueryResult header) {
 		entityHeader = header;
 		view.setEntity(header);
-		view.setIcon(getIconTypeForEntityType(header.getEntityType()));
+		view.setIcon(EntityTypeUtils.getIconTypeForEntityType(header.getEntityType()));
 		if (header.getModifiedByPrincipalId() != null) {
 			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
 			view.setModifiedByWidgetVisible(true);
@@ -139,24 +133,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 
-	public static IconType getIconTypeForEntityType(String entityType) {
-		String className = FileEntity.class.getName();
-		if (entityType != null) {
-			if (entityType.equalsIgnoreCase("file")) {
-				className = FileEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("folder")) {
-				className = Folder.class.getName();
-			} else if (entityType.equalsIgnoreCase("project")) {
-				className = Project.class.getName();
-			} else if (entityType.equalsIgnoreCase("table")) {
-				className = TableEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("link")) {
-				className = Link.class.getName();
-			}
-		}
-		return DisplayUtils.getIconTypeForEntityClassName(className);
-	}
-	
 	public void clearState() {
 	}
 

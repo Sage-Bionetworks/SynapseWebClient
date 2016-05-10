@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LogEntry;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -51,6 +52,7 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -64,6 +66,7 @@ import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -147,8 +150,6 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
 
-	public PaginatedResults<EntityHeader> getEntityReferencedBy(String entityId) throws RestServiceException;
-	
 	/**
 	 * Log a debug message in the server-side log.
 	 * @param message
@@ -281,13 +282,6 @@ public interface SynapseClient extends RemoteService {
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
 	PaginatedResults<AccessRequirement> getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
-	/**
-	 * convenience method for converting markdown to html
-	 * @param markdown
-	 * @return
-	 */
-	public String markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString) throws RestServiceException;
-	
 	public Activity getActivityForEntity(String entityId) throws RestServiceException;
 	
 	public Activity getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
@@ -327,8 +321,6 @@ public interface SynapseClient extends RemoteService {
 	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
-	public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
-	
 	public String getFileEndpoint() throws RestServiceException;
 	
 	public EntityHeader addFavorite(String entityId) throws RestServiceException;
@@ -362,9 +354,6 @@ public interface SynapseClient extends RemoteService {
 	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
 	
-	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5, Long storageLocationId) throws RestServiceException;
-	public String getChunkedPresignedUrl(ChunkRequest chunkRequest) throws RestServiceException;
-	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests) throws RestServiceException;
 	public UploadDaemonStatus getUploadDaemonStatus(String daemonId) throws RestServiceException;
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
@@ -384,7 +373,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
 	
-	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
+	public List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;
 
@@ -545,4 +534,16 @@ public interface SynapseClient extends RemoteService {
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
+
+	EntityBundlePlus getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask)
+			throws RestServiceException;
+
+	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
+
+	String getUserIdFromUsername(String username) throws RestServiceException;
+
+	Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException;
+
+	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
+	
 }

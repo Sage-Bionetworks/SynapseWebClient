@@ -18,7 +18,8 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void showCustomUserPicture(String url);
 	void showDescription(String description);
 	void setSize(BadgeSize size);
-	
+	void setDefaultPictureColor(String colorCss);
+	void setDefaultPictureLetter(String letter); 
 	/**
 	 * Presenter interface
 	 */

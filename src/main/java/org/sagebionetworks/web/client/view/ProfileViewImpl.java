@@ -271,6 +271,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button submitProfileValidationButton;
 	@UiField
+	Button resubmitProfileValidationButton;
+	@UiField
 	Button verificationApprovedButton;
 	@UiField
 	Button whyGetValidatedButton;
@@ -381,6 +383,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verificationSubmittedButton.addClickHandler(editVerificationSubmissionCallback);
 		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
 		verificationRejectedButton.addClickHandler(editVerificationSubmissionCallback);
+		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
 		
 		submitProfileValidationButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -610,7 +613,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
-		}		
+		} else {
+			settingsPresenter.resetView();
+		}
 		//Teams
 		DisplayUtils.show(navtabContainer);
 	}
@@ -830,6 +835,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifiedBadge.setVisible(false);
 		verificationApprovedButton.setVisible(false);
 		submitProfileValidationButton.setVisible(false);
+		resubmitProfileValidationButton.setVisible(false);
 		verificationSubmittedButton.setVisible(false);
 		verificationSuspendedButton.setVisible(false);
 		verificationRejectedButton.setVisible(false);
@@ -1044,6 +1050,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setVerificationButtonVisible(boolean isVisible) {
 		submitProfileValidationButton.setVisible(isVisible);
+	}
+	@Override
+	public void setResubmitVerificationButtonVisible(boolean isVisible) {
+		resubmitProfileValidationButton.setVisible(isVisible);
 	}
 	@Override
 	public void setVerificationSubmittedButtonVisible(boolean isVisible) {

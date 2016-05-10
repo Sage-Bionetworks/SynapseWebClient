@@ -30,7 +30,9 @@ import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
@@ -212,10 +214,18 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((ErrorPlace) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof ACTPlace) {
-					// user's profile page
 					ACTPresenter presenter = ginjector.getACTPresenter();
 					presenter.setPlace((ACTPlace) place);
 					presenter.start(panel, eventBus);
+				} else if (place instanceof SynapseForumPlace) {
+					SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();
+					presenter.setPlace((SynapseForumPlace) place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof SubscriptionPlace) {
+					SubscriptionPresenter presenter = ginjector.getSubscriptionPresenter();
+					presenter.setPlace((SubscriptionPlace) place);
+					presenter.start(panel, eventBus);
+
 				} else {
 					// Log that we have an unknown place but send the user to the default
 					log.log(Level.WARNING, "Unknown Place: " + place.getClass().getName());

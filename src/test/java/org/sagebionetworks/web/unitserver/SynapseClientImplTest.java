@@ -28,13 +28,14 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -49,19 +50,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
-import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
@@ -90,17 +94,15 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
-import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -110,6 +112,8 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ProjectSetting;
@@ -141,6 +145,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -163,6 +168,8 @@ import com.google.common.cache.Cache;
  * 
  */
 public class SynapseClientImplTest {
+	private static final String BANNER_2 = "Another Banner";
+	private static final String BANNER_1 = "Banner 1";
 	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
 	
@@ -191,7 +198,6 @@ public class SynapseClientImplTest {
 	V2WikiPage v2Page;
 	S3FileHandle handle;
 	Evaluation mockEvaluation;
-	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
@@ -208,18 +214,23 @@ public class SynapseClientImplTest {
 	JoinTeamSignedToken joinTeamToken;
 	String encodedJoinTeamToken, encodedNotificationSettingsToken;
 	
+	@Mock
+	UserGroupHeaderResponsePage mockUserGroupHeaderResponsePage;
+	@Mock
+	UserGroupHeader mockUserGroupHeader;
+	@Mock
+	PrincipalAliasResponse mockPrincipalAliasResponse;
+	
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
-	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
-//	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-//			adapterFactory);
 	private TeamMembershipStatus membershipStatus;
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
@@ -376,10 +387,6 @@ public class SynapseClientImplTest {
 		handle.setFileName(testFileName);
 		handle.setKey("key");
 		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
-		when(
-				mockSynapse
-						.completeChunkFileUpload(any(CompleteChunkedFileRequest.class)))
-				.thenReturn(handle);
 		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> ars = new org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
@@ -399,14 +406,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
-		mockParticipant = Mockito.mock(Participant.class);
-		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(
-				mockParticipant);
-
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
-		when(mockSynapse.createParticipant(anyString())).thenReturn(
-				mockParticipant);
-
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		String fileHandleId = "myFileHandleId";
 		status.setFileHandleId(fileHandleId);
@@ -658,6 +658,35 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).updateAnnotations(out.getId(), annos);
 	}
 
+	
+
+	@Test
+	public void testMoveEntity()
+			throws JSONObjectAdapterException, RestServiceException,
+			SynapseException {
+		String entityId = "syn123";
+		String oldParentId = "syn1", newParentId = "syn2";
+		ExampleEntity in = new ExampleEntity();
+		in.setName("some name");
+		in.setParentId(oldParentId);
+		in.setId(entityId);
+		in.setEntityType(ExampleEntity.class.getName());
+
+		ExampleEntity out = new ExampleEntity();
+		out.setName("some name");
+		out.setEntityType(ExampleEntity.class.getName());
+		out.setId(entityId);
+		out.setParentId(newParentId);
+		out.setEtag("45");
+
+		// when in comes in then return out.
+		when(mockSynapse.putEntity(in)).thenReturn(out);
+		when(mockSynapse.getEntityById(entityId)).thenReturn(in);
+		Entity result = synapseClient.moveEntity(entityId, newParentId);
+		assertEquals(newParentId, result.getParentId());
+		verify(mockSynapse).getEntityById(entityId);
+		verify(mockSynapse).putEntity(any(Entity.class));
+	}
 	@Test
 	public void testGetEntityBenefactorAcl() throws Exception {
 		EntityBundle bundle = new EntityBundle();
@@ -1082,6 +1111,38 @@ public class SynapseClientImplTest {
 		assertEquals(md5, handle.getContentMd5());
 //		assertEquals(fileSize, handle.getContentSize());
 	}
+	
+	@Test
+	public void testCreateExternalFileAutoname() throws Exception {
+		// test setting file handle name
+		String parentEntityId = "syn123333";
+		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String expectedAutoFilename = "test.txt";
+		String fileName = null;
+		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		Long fileSize = 1024L;
+		when(
+				mockSynapse
+						.createExternalFileHandle(any(ExternalFileHandle.class)))
+				.thenReturn(new ExternalFileHandle());
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
+				new FileEntity());
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, fileSize, md5, storageLocationId);
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
+				.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle handle = captor.getValue();
+		// verify name is set
+		assertEquals(expectedAutoFilename, handle.getFileName());
+		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(storageLocationId, handle.getStorageLocationId());
+		assertEquals(md5, handle.getContentMd5());
+		
+		//also check the entity name
+		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
+		verify(mockSynapse).createEntity(entityCaptor.capture());
+		assertEquals(expectedAutoFilename, entityCaptor.getValue().getName());
+	}
 
 	@Test
 	public void testGetEntityDoi() throws Exception {
@@ -1118,28 +1179,6 @@ public class SynapseClientImplTest {
 		// wiring test
 		synapseClient.createDoi("test entity id", null);
 		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
-	}
-
-	private List<ChunkRequest> getTestChunkRequestJson()
-			throws JSONObjectAdapterException {
-		ChunkRequest chunkRequest = new ChunkRequest();
-		ChunkedFileToken token = new ChunkedFileToken();
-		token.setKey("test key");
-		chunkRequest.setChunkedFileToken(token);
-		chunkRequest.setChunkNumber(1l);
-		List<ChunkRequest> chunkRequests = new ArrayList<ChunkRequest>();
-		chunkRequests.add(chunkRequest);
-		return chunkRequests;
-	}
-
-	@Test
-	public void testCombineChunkedFileUpload()
-			throws JSONObjectAdapterException, SynapseException,
-			RestServiceException {
-		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
-		synapseClient.combineChunkedFileUpload(chunkRequests);
-		verify(mockSynapse).startUploadDeamon(
-				any(CompleteAllChunksRequest.class));
 	}
 
 	@Test
@@ -1240,62 +1279,6 @@ public class SynapseClientImplTest {
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 		assertEquals(fileEntityId, file.getId());
-	}
-
-	@Test
-	public void testCompleteChunkedFileUploadExistingEntity()
-			throws JSONObjectAdapterException, SynapseException,
-			RestServiceException {
-		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
-		FileEntity testFileEntity = getTestFileEntity();
-		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
-		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(
-				new AssertionError("No need to create a new entity!"));
-		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(
-				testFileEntity);
-		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId");
-
-		// it should have tried to find the entity
-		verify(mockSynapse).getEntityById(anyString());
-		// update the data file handle id
-		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
-	}
-
-	@Test
-	public void testGetChunkedFileToken() throws SynapseException,
-			RestServiceException, JSONObjectAdapterException {
-		String fileName = "test file.zip";
-		String contentType = "application/test";
-		String md5 = "0123456789abcdef";
-		ChunkedFileToken testToken = new ChunkedFileToken();
-		testToken.setFileName(fileName);
-		testToken.setKey("a key 42");
-		testToken.setUploadId("upload ID 123");
-		testToken.setContentMD5(md5);
-		testToken.setStorageLocationId(storageLocationId);
-		when(
-				mockSynapse
-						.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class)))
-				.thenReturn(testToken);
-
-		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName,
-				contentType, md5, storageLocationId);
-		verify(mockSynapse).createChunkedFileUploadToken(
-				any(CreateChunkedFileTokenRequest.class));
-		assertEquals(testToken, token);
-	}
-
-	@Test
-	public void testGetChunkedPresignedUrl() throws SynapseException,
-			RestServiceException, MalformedURLException,
-			JSONObjectAdapterException {
-		URL testUrl = new URL("http://test.presignedurl.com/foo");
-		when(mockSynapse.createChunkedPresignedUrl(any(ChunkRequest.class)))
-				.thenReturn(testUrl);
-		String presignedUrl = synapseClient
-				.getChunkedPresignedUrl(getTestChunkRequestJson().get(0));
-		verify(mockSynapse).createChunkedPresignedUrl(any(ChunkRequest.class));
-		assertEquals(testUrl.toString(), presignedUrl);
 	}
 
 	@Test
@@ -2060,18 +2043,23 @@ public class SynapseClientImplTest {
 		List<StorageLocationSetting> existingStorageLocations = new ArrayList<StorageLocationSetting>();
 		StorageLocationSetting storageLocation = new ExternalS3StorageLocationSetting();
 		storageLocation.setStorageLocationId(1L);
-		storageLocation.setBanner("Banner 1");
+		storageLocation.setBanner(BANNER_1);
 		existingStorageLocations.add(storageLocation);
 		
 		storageLocation = new ExternalStorageLocationSetting();
 		storageLocation.setStorageLocationId(2L);
-		storageLocation.setBanner("Another Banner");
+		storageLocation.setBanner(BANNER_2);
 		((ExternalStorageLocationSetting)storageLocation).setUrl("sftp://www.jayhodgson.com");
 		existingStorageLocations.add(storageLocation);
 		
 		storageLocation = new ExternalStorageLocationSetting();
 		storageLocation.setStorageLocationId(3L);
-		storageLocation.setBanner("Banner 1");
+		storageLocation.setBanner(BANNER_1);
+		existingStorageLocations.add(storageLocation);
+		
+		storageLocation = new ExternalStorageLocationSetting();
+		storageLocation.setStorageLocationId(4L);
+		storageLocation.setBanner(null);
 		existingStorageLocations.add(storageLocation);
 		
 		when(mockSynapse.getMyStorageLocationSettings()).thenReturn(existingStorageLocations);
@@ -2084,8 +2072,8 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getMyStorageLocationSettings();
 		//should be 2 (only returns unique values)
 		assertEquals(2, banners.size());
-		//and alphabetically sorted
-		assertEquals(Arrays.asList("Another Banner", "Banner 1"), banners);
+		assertTrue(banners.contains(BANNER_1));
+		assertTrue(banners.contains(BANNER_2));
 	}
 	
 	@Test(expected = Exception.class)
@@ -2134,7 +2122,7 @@ public class SynapseClientImplTest {
 		
 		//test the case when it finds a duplicate storage location.
 		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-		setting.setBanner("Another Banner");
+		setting.setBanner(BANNER_2);
 		setting.setUrl("sftp://www.jayhodgson.com");
 		
 		synapseClient.createStorageLocationSetting(entityId, setting);
@@ -2156,7 +2144,7 @@ public class SynapseClientImplTest {
 		
 		//test the case when it does not find duplicate storage location setting.
 		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-		setting.setBanner("Another Banner");
+		setting.setBanner(BANNER_2);
 		setting.setUrl("sftp://www.google.com");
 		
 		Long newStorageLocationId = 1007L;
@@ -2196,5 +2184,85 @@ public class SynapseClientImplTest {
 		AccessControlList returnedAcl = synapseClient.getTeamAcl(teamId);
 		verify(mockSynapse).getTeamACL(teamId);
 		assertEquals(acl, returnedAcl);
+	}
+	
+	private void setupVersionedEntityBundle(String entityId, Long latestVersionNumber) throws SynapseException {
+		EntityBundle eb = new EntityBundle();
+		Entity file = new FileEntity();
+		eb.setEntity(file);
+		eb.getEntity().setId(entityId);
+		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
+		when(mockSynapse.getEntityBundle(anyString(), anyLong(), anyInt())).thenReturn(eb);
+		PaginatedResults<VersionInfo> versionInfoPaginatedResults = new PaginatedResults<VersionInfo>();
+		List<VersionInfo> versionInfoList = new LinkedList<VersionInfo>();
+		VersionInfo versionInfo = new VersionInfo();
+		versionInfo.setVersionNumber(latestVersionNumber);
+		versionInfoList.add(versionInfo);
+		versionInfoPaginatedResults.setResults(versionInfoList);
+		when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionInfoPaginatedResults);
+		when(mockSynapse.getEntityById(anyString())).thenReturn(file);
+	}
+	@Test
+	public void testGetEntityBundlePlusForVersionVersionable() throws RestServiceException, SynapseException {
+		String entityId = "syn123";
+		Long targetVersionNumber = 1L;
+		Long latestVersionNumber = 2L;
+		setupVersionedEntityBundle(entityId, latestVersionNumber);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
+		verify(mockSynapse).getEntityBundle(anyString(), eq(targetVersionNumber), anyInt());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForNullVersionVersionable() throws RestServiceException, SynapseException {
+		String entityId = "syn123";
+		Long targetVersionNumber = null;
+		Long latestVersionNumber = 2L;
+		setupVersionedEntityBundle(entityId, latestVersionNumber);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
+		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForVersionLatestVersion() throws RestServiceException, SynapseException {
+		String entityId = "syn123";
+		Long targetVersionNumber = 2L;
+		Long latestVersionNumber = 2L;
+		setupVersionedEntityBundle(entityId, latestVersionNumber);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
+		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
+		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
+	}
+	
+	@Test
+	public void testGetEntityBundlePlusForVersionNonVersionable() throws RestServiceException, SynapseException {
+		EntityBundle eb = new EntityBundle();
+		eb.setEntity(new Folder());
+		eb.getEntity().setId("syn123");
+		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
+		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 123L, 1);
+		assertNull(returnedEntityBundle.getLatestVersionNumber());
+		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
+	}
+	
+	@Test
+	public void testGetUserIdFromUsername() throws UnsupportedEncodingException, SynapseException, RestServiceException {
+		//find the user id based on user name
+		Long targetUserId = 4L;
+		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserId);
+		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenReturn(mockPrincipalAliasResponse);
+		String userId = synapseClient.getUserIdFromUsername("luke");
+		assertEquals(targetUserId.toString(), userId);
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testGetUserIdFromUsernameBackendError() throws UnsupportedEncodingException, SynapseException, RestServiceException {
+		//test error from backend
+		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
+		synapseClient.getUserIdFromUsername("bad-request");
 	}
 }

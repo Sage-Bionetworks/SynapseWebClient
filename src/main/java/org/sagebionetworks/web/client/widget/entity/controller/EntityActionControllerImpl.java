@@ -31,8 +31,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -44,6 +45,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -88,10 +90,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UserEntityPermissions permissions;
 	String enityTypeDisplay;
 	boolean isUserAuthenticated;
+	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
-	MarkdownEditorWidget wikiEditor;
+	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
 	
@@ -108,7 +111,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
-			MarkdownEditorWidget wikiEditor,
+			WikiMarkdownEditor wikiEditor,
 			ProvenanceEditorWidget provenanceEditor,
 			StorageLocationWidget storageLocationEditor) {
 		super();
@@ -135,7 +138,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, String wikiPageId, EntityUpdatedHandler handler) {
+			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityUpdatedHandler handler) {
 		this.entityBundle = entityBundle;
 		this.wikiPageId = wikiPageId;
 		this.entityUpdateHandler = handler;
@@ -143,6 +146,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
+		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
@@ -595,15 +599,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckLink(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					createLink(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				createLink(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();
@@ -660,15 +660,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					moveEntity(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				moveEntity(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();
@@ -679,9 +675,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @param target
 	 */
 	private void moveEntity(String target){
-		Entity entity = entityBundle.getEntity();
-		entity.setParentId(target);
-		synapseClient.updateEntity(entity, new AsyncCallback<Entity>() {
+		String entityId = entityBundle.getEntity().getId();
+		synapseClient.moveEntity(entityId, target, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {
@@ -762,7 +757,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	            @Override
 	            public void onSuccess(WikiPage result) {
 	                view.showInfo("'" + name + "' Page Added", "");
-	                entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
+	                globalApplicationState.getPlaceChanger().goTo(newPlace);
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
@@ -796,10 +792,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onEditFileMetadata() {
-		Synapse place = ((Synapse)globalApplicationState.getCurrentPlace());
-		Long version = place.getVersionNumber();
 		// Can only edit file metadata of the current file version
-		if (version == null) {
+		if (isCurrentVersion) {
 			// Validate the user can update this entity.
 			preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
 				@Override

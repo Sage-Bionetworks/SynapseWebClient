@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -20,13 +21,14 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -226,7 +228,9 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testConfigure() {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		headers.add(new EntityHeader());
+		EntityHeader header = new EntityHeader();
+		header.setType(Project.class.getName());
+		headers.add(header);
 		
 		entityTreeBrowser.configure(headers);
 		verify(mockView).clear();
@@ -267,7 +271,7 @@ public class EntityTreeBrowserTest {
 		Long versionNumber;
 		id = "12";
 		name = "project 1";
-		type = "project";
+		type = Project.class.getName();
 		versionNumber = 1L;
 		headers.add(createEntityHeader(id, name, type, versionNumber));
 		
@@ -277,7 +281,7 @@ public class EntityTreeBrowserTest {
 		EntityQueryResult result = results.getEntities().get(0);
 		assertEquals(id, result.getId());
 		assertEquals(name, result.getName());
-		assertEquals(type, result.getEntityType());
+		assertEquals(EntityType.project.name(), result.getEntityType());
 		assertEquals(versionNumber, result.getVersionNumber());
 		
 		id = "24";
@@ -297,107 +301,14 @@ public class EntityTreeBrowserTest {
 	}
 	
 	@Test
-	public void testConfigureWithEmptyPath() {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		entityTreeBrowser.configureWithPath(headers);
-		verify(mockView).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView, never()).appendRootEntityTreeItem(any(EntityTreeItem.class));
-		verify(mockView, never()).appendChildEntityTreeItem(any(EntityTreeItem.class), any(EntityTreeItem.class));
-		verify(mockView).setLoadingVisible(false);
+	public void testIsExpandable() {
+		EntityQueryResult result = new EntityQueryResult();
+		result.setEntityType("folder");
+		assertTrue(entityTreeBrowser.isExpandable(result));
+		result.setEntityType("project");
+		assertTrue(entityTreeBrowser.isExpandable(result));
+		result.setEntityType("file");
+		assertFalse(entityTreeBrowser.isExpandable(result));
 	}
 	
-	@Test
-	public void testConfigureWithSingleItemPath() {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		String id, name, type;
-		Long versionNumber;
-		id = "12";
-		name = "project 1";
-		type = "project";
-		versionNumber = 1L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		entityTreeBrowser.configureWithPath(headers);
-		verify(mockView).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
-		boolean open = true;
-		boolean fireEvents = false;
-		verify(mockEntityTreeItem).setState(open, fireEvents); 
-		verify(mockView, never()).appendChildEntityTreeItem(any(EntityTreeItem.class), any(EntityTreeItem.class));
-		verify(mockView).setLoadingVisible(false);
-		
-		//tries to load project children
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testConfigureWithTwoItemsPath() {
-		//with 2 items, it queries for children of project, will not manually add the leaf
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		String id, name, type;
-		Long versionNumber;
-		id = "12";
-		name = "project 1";
-		type = "project";
-		versionNumber = 1L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		id="13";
-		name="file";
-		type="file";
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		entityTreeBrowser.configureWithPath(headers);
-		verify(mockView).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
-		//here's the most important check (children are added from the query, the current entity may not be on this page of results!)...
-		verify(mockView, never()).appendChildEntityTreeItem(any(EntityTreeItem.class), any(EntityTreeItem.class));
-		boolean open = true;
-		boolean fireEvents = false;
-		verify(mockEntityTreeItem).setState(open, fireEvents); 
-		verify(mockView).setLoadingVisible(false);
-		
-		//tries to load project children
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testConfigureWithThreeOrMoreItemsPath() {
-		//with 2 items, it queries for children of project, will not manually add the leaf
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		String id, name, type;
-		Long versionNumber;
-		id = "12";
-		name = "project 1";
-		type = "project";
-		versionNumber = 1L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		id="13";
-		name="folder";
-		type="folder";
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		id="14";
-		name="file";
-		type="file";
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		entityTreeBrowser.configureWithPath(headers);
-		verify(mockView).clear();
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
-		//here's the most important check.  the folder is explicitly added, but the folder children are not (they are queried for)...
-		verify(mockView).appendChildEntityTreeItem(any(EntityTreeItem.class), any(EntityTreeItem.class));
-		boolean open = true;
-		boolean fireEvents = false;
-		//manually expand the project, and the folder
-		verify(mockEntityTreeItem, times(2)).setState(open, fireEvents); 
-		verify(mockView).setLoadingVisible(false);
-		
-		//tries to load project children
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),any(AsyncCallback.class));
-	}
 }

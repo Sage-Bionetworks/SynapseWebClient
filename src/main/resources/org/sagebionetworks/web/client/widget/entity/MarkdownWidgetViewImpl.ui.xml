@@ -8,7 +8,7 @@
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
 	<g:FlowPanel>
 	    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
-	    <g:HTMLPanel ui:field="contentPanel" addStyleNames="margin-right-40 margin-left-10"/>
+	    <g:HTMLPanel ui:field="contentPanel" addStyleNames="margin-right-10 margin-left-10 markdown"/>
 	    <g:SimplePanel ui:field="synAlertPanel"/>
 	    <bh:Italic ui:field="emptyPanel">There is no content. Please click Edit Wiki from the Tools menu.</bh:Italic>
 	</g:FlowPanel>

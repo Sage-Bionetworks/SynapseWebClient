@@ -18,13 +18,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * View that contains a list of challenge participants
+ * View that contains a list of users
  * @author jayhodgson
  *
  */
-public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView {
+public class UserListViewImpl implements UserListView {
 	
-	public interface Binder extends	UiBinder<Widget, ChallengeParticipantsViewImpl> {}
+	public interface Binder extends	UiBinder<Widget, UserListViewImpl> {}
 
 	private Presenter presenter;
 	PortalGinInjector ginInjector;
@@ -47,7 +47,7 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 	Widget widget;
 	
 	@Inject
-	public ChallengeParticipantsViewImpl(Binder binder, PortalGinInjector ginInjector) {
+	public UserListViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
 	}
@@ -62,11 +62,11 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 		return widget;
 	}
 	@Override
-	public void clearParticipants() {
+	public void clearUsers() {
 		participantsContainer.clear();
 	}
 	@Override
-	public void addParticipant(UserProfile profile) {
+	public void addUser(UserProfile profile) {
 		UserBadge userBadge = ginInjector.getUserBadgeWidget();
 		userBadge.configure(profile);
 		Div userBadgeContainer = new Div();
@@ -76,7 +76,7 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 	}
 
 	@Override
-	public void showNoParticipants() {
+	public void showNoUsers() {
 		participantsContainer.add(new Paragraph(DisplayConstants.EMPTY));
 	}
 	@Override
@@ -87,7 +87,7 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 	
 	@Override
 	public void clear() {
-		clearParticipants();
+		clearUsers();
 		hideErrors();
 	}
 	

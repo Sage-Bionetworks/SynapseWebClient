@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -56,7 +57,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private boolean showSubpages;
 	
 	// widgets
-	private SynapseAlert synapseAlert;
+	private StuAlert synapseAlert;
 	private WikiHistoryWidget historyWidget;
 	private MarkdownWidget markdownWidget;
 	private Breadcrumb breadcrumb;
@@ -71,20 +72,22 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	@Inject
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
-			SynapseAlert synapseAlert, WikiHistoryWidget historyWidget,
+			StuAlert stuAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
 			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
-			ModifiedCreatedByWidget modifiedCreatedBy) {
+			ModifiedCreatedByWidget modifiedCreatedBy
+			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.synapseAlert = synapseAlert;
+		this.synapseAlert = stuAlert;
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
 		this.breadcrumb = breadcrumb;
 		this.modifiedCreatedBy = modifiedCreatedBy;
+		this.synapseAlert = stuAlert;
 		view.setPresenter(this);
-		view.setSynapseAlertWidget(synapseAlert);
+		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
@@ -374,6 +377,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					if (wikiReloadHandler != null) {
 						wikiReloadHandler.invoke(currentPage.getId());
 					}
+					view.scrollWikiHeadingIntoView();
 				} catch (Exception e) {
 					onFailure(e);
 				}

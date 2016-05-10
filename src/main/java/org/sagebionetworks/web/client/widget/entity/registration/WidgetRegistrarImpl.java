@@ -61,6 +61,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getExternalImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {
@@ -165,7 +167,12 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getBiodallianceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.CYTOSCAPE_CONTENT_TYPE)) {
 			presenter = ginInjector.getCytoscapeRenderer();
-		}		
+		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableFormWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE)) {
+			presenter = ginInjector.getTeamMembersWidget();
+		}	
+		
 		//TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -239,6 +246,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.VIMEO_CONTENT_TYPE, WidgetConstants.VIMEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE, WidgetConstants.EXTERNAL_IMAGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, WidgetConstants.TABBED_TABLE_FRIENDLY_NAME);
@@ -254,6 +262,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE, WidgetConstants.JOIN_TEAM_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE, WidgetConstants.BIODALLIANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.CYTOSCAPE_CONTENT_TYPE, WidgetConstants.CYTOSCAPE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE, WidgetConstants.SYNAPSE_FORM_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

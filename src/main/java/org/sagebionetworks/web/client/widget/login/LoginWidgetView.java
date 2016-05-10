@@ -26,6 +26,7 @@ public interface LoginWidgetView extends IsWidget {
 		public void goTo(Place place);
 	}
 
+	void clearUsername();
 	public void showAuthenticationFailed();
 	
 	public void showTermsOfUseDownloadFailed();

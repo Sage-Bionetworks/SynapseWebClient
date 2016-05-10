@@ -13,11 +13,18 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 				<bh:Text> Loading...</bh:Text>
 			</t:TableData>
-			<t:TableData paddingRight="2">
-				<b:Icon ui:field="defaultUserPicture" type="USER" addStyleNames="lightGreyText margin-right-2" />
+			<t:TableData paddingRight="2" addStyleNames="min-width-25">
+				<g:FocusPanel ui:field="defaultUserPicture" addStyleNames="margin-right-2 imageButton">
+					<g:HTMLPanel>
+						<span class="fa-stack">
+							<b:Icon ui:field="squareIcon" type="SQUARE_O" addStyleNames="fa-stack-2x"/>
+							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x"/>
+						</span>
+					</g:HTMLPanel>
+				</g:FocusPanel>
 				<g:Image ui:field="userPicture" addStyleNames="userProfileImage imageButton margin-right-2" />
 			</t:TableData>
-			<t:TableData paddingRight="2" addStyleNames="vertical-align-bottom">
+			<t:TableData paddingRight="2" addStyleNames="vertical-align-middle">
 				<b:Tooltip placement="BOTTOM" title="" ui:field="usernameTooltip">
 					<b:Anchor ui:field="usernameLink" />
 				</b:Tooltip>

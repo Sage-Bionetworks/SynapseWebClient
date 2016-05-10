@@ -13,6 +13,7 @@ import com.google.inject.Inject;
 public class DateCellEditorImpl implements DateCellEditor {
 	
 	private DateCellEditorView view;
+	private Long originalTime;
 	
 	@Inject
 	public DateCellEditorImpl(DateCellEditorView view) {
@@ -34,8 +35,10 @@ public class DateCellEditorImpl implements DateCellEditor {
 	public void setValue(String value) {
 		value = StringUtils.trimWithEmptyAsNull(value);
 		Date date = null;
+		originalTime = null;
 		if(value != null){
-			date = new Date(Long.parseLong(value));
+			originalTime = Long.parseLong(value);
+			date = new Date(originalTime);
 		}
 		view.setValue(date);
 	}
@@ -44,11 +47,19 @@ public class DateCellEditorImpl implements DateCellEditor {
 	public String getValue() {
 		Date date = view.getValue();
 		if(date != null){
-			return Long.toString(date.getTime());
+			Long time = date.getTime();
+			if (originalTime != null) {
+				double originalSeconds = Math.floor(originalTime / 1000);
+				double newSeconds = Math.floor(time / 1000);
+				if (originalSeconds == newSeconds) {
+					time = originalTime;
+				}
+			}
+			return Long.toString(time);
 		}
 		return null;
 	}
-
+	
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
 		return view.addKeyDownHandler(handler);

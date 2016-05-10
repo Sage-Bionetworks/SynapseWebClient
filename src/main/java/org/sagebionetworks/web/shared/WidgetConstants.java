@@ -24,9 +24,15 @@ public class WidgetConstants {
 	
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
+
+	public static final String EXTERNAL_IMAGE_CONTENT_TYPE = "externalImage";
+	public static final String EXTERNAL_IMAGE_FRIENDLY_NAME = "External Image";
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
+	
+	public static final String SYNAPSE_FORM_CONTENT_TYPE = "synapseForm";
+	public static final String SYNAPSE_FORM_FRIENDLY_NAME = "Synapse Form";
 	
 	public static final String CYTOSCAPE_CONTENT_TYPE = "cytoscapeJs25";
 	public static final String CYTOSCAPE_FRIENDLY_NAME ="Cytoscape JS";
@@ -78,6 +84,10 @@ public class WidgetConstants {
 	public static final String BUTTON_LINK_CONTENT_TYPE = "buttonlink";
 	public static final String BUTTON_LINK_FRIENDLY_NAME ="Button Link";
 	
+	public static final String TEAM_MEMBERS_CONTENT_TYPE = "members";
+	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
+	
+	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	
@@ -108,7 +118,7 @@ public class WidgetConstants {
 	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
 	
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
-	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
+	public static final String TEAM_ID_KEY = "teamId";
 	public static final String JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY = "requestExpiresInXDays";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
 	public static final String IS_MEMBER_MESSAGE = "isMemberMessage";
@@ -117,7 +127,7 @@ public class WidgetConstants {
 	public static final String JOIN_TEAM_OPEN_REQUEST_TEXT = "requestOpenText";
 	public static final String JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON = "isSimpleRequestButton";
 	public static final String JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT = "Your request to join this team has been sent.";
-	public static final String JOIN_TEAM_SUCCESS_MESSAGE = "successMessage";
+	public static final String SUCCESS_MESSAGE = "successMessage";
 	public static final String JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE = "Successfully joined";
 	public static final String JOIN_WIDGET_SHOW_PROFILE_FORM_KEY = "showProfileForm";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY = "subchallengeIdList";
@@ -137,6 +147,7 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_DISPLAY_HEIGHT_KEY = "displayHeightPx";
 	public static final int PROV_WIDGET_HEIGHT_DEFAULT = 275;
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
+	public static final String TABLE_ID_KEY = "tableId";
 	public static final String VIMEO_WIDGET_VIDEO_ID_KEY = "vimeoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
@@ -151,6 +162,7 @@ public class WidgetConstants {
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
 	public static final String USER_TEAM_BADGE_WIDGET_ID_KEY = "id";
+	public static final String USER_TEAM_BADGE_WIDGET_USERNAME_KEY = "username";
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
 	
 	public static final String BIODALLIANCE13_CONTENT_TYPE = "biodalliance13";

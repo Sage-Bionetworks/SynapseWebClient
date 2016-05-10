@@ -10,7 +10,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -28,6 +30,8 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -51,9 +55,15 @@ public class PasswordResetPresenterTest {
 	PasswordReset place = Mockito.mock(PasswordReset.class);
 	UserSessionData currentUserSessionData = new UserSessionData();
 
+	@Mock
+	PasswordStrengthWidget mockPasswordStrengthWidget;
+	@Mock
+	SynapseAlert mockSynAlert;
 	
 	@Before
 	public void setup() {
+		MockitoAnnotations.initMocks(this);
+		
 		mockView = mock(PasswordResetView.class);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -67,7 +77,7 @@ public class PasswordResetPresenterTest {
 		presenter = new PasswordResetPresenter(mockView, mockCookieProvider,
 				mockUserService, mockAuthenticationController,
 				mockSageImageBundle, mockIconsImageBundle,
-				mockGlobalApplicationState);			
+				mockGlobalApplicationState, mockPasswordStrengthWidget, mockSynAlert);			
 		verify(mockView).setPresenter(presenter);
 		when(place.toToken()).thenReturn(ClientProperties.DEFAULT_PLACE_TOKEN);
 		currentUserSessionData.setProfile(new UserProfile());
@@ -208,11 +218,13 @@ public class PasswordResetPresenterTest {
 	public void testServiceFailure() {
 		//without the registration token set, mock a failed user service call
 		resetAll();
-		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		Exception ex = new RestServiceException("unknown error");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.setPlace(place);
 		presenter.resetPassword("myPassword");
+		verify(mockSynAlert).clear();
 		//verify password reset failed text is shown in the view
-		verify(mockView).showErrorMessage(DisplayConstants.PASSWORD_RESET_FAILED_TEXT);
+		verify(mockSynAlert).handleException(ex);
 	}
 
 }

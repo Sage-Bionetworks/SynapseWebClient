@@ -26,6 +26,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
@@ -42,7 +43,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-	
+
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -333,8 +334,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		//get the place associated to the current url
 		AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
 		String currentUrl = synapseJSNIUtils.getCurrentURL();
-		String place = currentUrl.substring(currentUrl.indexOf("!"));
-		Place currentPlace = appPlaceHistoryMapper.getPlace(place);
+		String place = DEFAULT_REFRESH_PLACE;
+		int index = currentUrl.indexOf("!");
+		if (index > -1) {
+			place = currentUrl.substring(index);
+		}
+		Place currentPlace = appPlaceHistoryMapper.getPlace(place); 
 		getPlaceChanger().goTo(currentPlace);
 	}
 }

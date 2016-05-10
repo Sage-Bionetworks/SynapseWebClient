@@ -139,7 +139,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 
 			//do not apply sorter if paging (service needs to be involved for a true column sort)
 			if(!tableConfig.isPaging()) {
-				synapseJSNIUtils.tablesorter(elementId);
+				synapseJSNIUtils.loadTableSorters();
 			}
 
 		}

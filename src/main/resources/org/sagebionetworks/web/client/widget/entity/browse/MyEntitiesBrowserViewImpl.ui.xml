@@ -11,7 +11,7 @@
 			    	<g:Anchor styleName="text-align-center no-background" ui:field="myProjectsLink" text="My Projects" />
 			    </li>
 			    <li ui:field="currentContextListItem">
-			    	<g:Anchor styleName="text-align-center link no-background" ui:field="currentContextLink" text="Current Folder" />
+			    	<g:Anchor styleName="text-align-center link no-background" ui:field="currentContextLink" text="Current Project" />
 			    </li>
 			    
 			    <li ui:field="myFavoritesListItem">

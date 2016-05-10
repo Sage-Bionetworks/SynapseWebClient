@@ -170,7 +170,7 @@ public class RestrictionWidgetTest {
 		verify(mockView).showControlledUseUI();
 		verify(mockView).showUnmetRequirementsIcon();
 		//has existing terms, has "show" link
-		verify(mockView).showShowLink(any(ClickHandler.class));
+		verify(mockView).showShowUnmetLink(any(ClickHandler.class));
 		verify(mockView).showFlagUI();
 		
 		verify(mockView).setAccessRequirementDialog(any(Widget.class));
@@ -191,7 +191,7 @@ public class RestrictionWidgetTest {
 		verify(mockView).showControlledUseUI();
 		verify(mockView).showUnmetRequirementsIcon();
 
-		verify(mockView).showShowLink(any(ClickHandler.class));
+		verify(mockView).showShowUnmetLink(any(ClickHandler.class));
 		verify(mockView).showAnonymousFlagUI();
 		
 		verify(mockView).setAccessRequirementDialog(any(Widget.class));
@@ -211,6 +211,7 @@ public class RestrictionWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).showControlledUseUI();
 		verify(mockView).showMetRequirementsIcon();
+		verify(mockView).showShowLink(any(ClickHandler.class));
 	}
 	@Test
 	public void testConfigureLoggedInOpen() {

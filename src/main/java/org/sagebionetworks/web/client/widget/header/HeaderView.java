@@ -33,6 +33,7 @@ public interface HeaderView extends IsWidget {
 		void onRegisterClick();
 		void onFavoriteClick();
 		void onLogoClick();
+		void onHelpForumClick();
 	}
 	public void showLargeLogo();
 	public void showSmallLogo();
@@ -47,5 +48,6 @@ public interface HeaderView extends IsWidget {
 	void showProjectFavoriteWidget();
 	void hideProjectFavoriteWidget();
 	void setStagingAlertVisible(boolean visible);
+	void openNewWindow(String url);
 	void clear();
 }

@@ -80,8 +80,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			results.setResults(evalList);
 			results.setTotalNumberOfResults(evalList.size());
 			return results;
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
@@ -93,8 +93,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 					.getAvailableEvaluationsPaginated(
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT));
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
@@ -110,8 +110,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT,
 							targetEvaluationIdsList));
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
@@ -122,30 +122,33 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 	@Override
 	public List<Evaluation> getSharableEvaluations(String entityId)
 			throws RestServiceException {
-		if (entityId == null || entityId.trim().length() == 0) {
-			throw new BadRequestException("Entity ID must be given");
-		}
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			if (entityId == null || entityId.trim().length() == 0) {
+				throw new BadRequestException("Entity ID must be given");
+			}
 			// look up the available evaluations
 			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
 					.getEvaluationByContentSource(entityId,
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);
-
 			List<Evaluation> mySharableEvalauations = new ArrayList<Evaluation>();
+			
 			for (Evaluation eval : allEvaluations.getResults()) {
 				// evaluation is associated to entity id. can I change
 				// permissions?
+				
 				UserEvaluationPermissions uep = synapseClient
 						.getUserEvaluationPermissions(eval.getId());
+				
 				if (uep.getCanChangePermissions()) {
 					mySharableEvalauations.add(eval);
 				}
 			}
 			return mySharableEvalauations;
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
@@ -156,8 +159,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
 			String settingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, settingsEndpoint);
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
@@ -168,8 +171,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
 			String settingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, settingsEndpoint);
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
@@ -182,6 +185,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			JSONObjectAdapter json = permissions
 					.writeToJSONObject(adapterFactory.createNew());
 			return json.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -194,6 +199,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			JSONObjectAdapter json = acl.writeToJSONObject(adapterFactory
 					.createNew());
 			return json.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -204,8 +211,8 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.updateEvaluationAcl(acl);
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
@@ -366,25 +373,26 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		try {
 			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengesForParticipant(userId, limit.longValue(), offset.longValue());
 			List<Challenge> challenges = pagedResults.getResults();
-			
-			//gather all project ids
-			List<Reference> references = new ArrayList<Reference>();
-			for (Challenge challenge : challenges) {
-				Reference ref = new Reference();
-				ref.setTargetId(challenge.getProjectId());
-				references.add(ref);
-			}
-			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
-			List<EntityHeader> projectHeaders = headers.getResults();
-			
-			Map<String, String> projectNameLookup = new HashMap<String, String>();
-			for (EntityHeader projectHeader : projectHeaders) {
-				projectNameLookup.put(projectHeader.getId(), projectHeader.getName());
-			}
-			
 			List<ChallengeBundle> results = new ArrayList<ChallengeBundle>(pagedResults.getResults().size());
-			for (Challenge challenge : challenges) {
-				results.add(new ChallengeBundle(challenge, projectNameLookup.get(challenge.getProjectId())));
+			if (pagedResults.getResults().size() > 0) {
+				//gather all project ids
+				List<Reference> references = new ArrayList<Reference>();
+				for (Challenge challenge : challenges) {
+					Reference ref = new Reference();
+					ref.setTargetId(challenge.getProjectId());
+					references.add(ref);
+				}
+				org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
+				List<EntityHeader> projectHeaders = headers.getResults();
+				
+				Map<String, String> projectNameLookup = new HashMap<String, String>();
+				for (EntityHeader projectHeader : projectHeaders) {
+					projectNameLookup.put(projectHeader.getId(), projectHeader.getName());
+				}
+				
+				for (Challenge challenge : challenges) {
+					results.add(new ChallengeBundle(challenge, projectNameLookup.get(challenge.getProjectId())));
+				}
 			}
 			ChallengePagedResults challengeBundles = new ChallengePagedResults(results, pagedResults.getTotalNumberOfResults());
 			return challengeBundles;

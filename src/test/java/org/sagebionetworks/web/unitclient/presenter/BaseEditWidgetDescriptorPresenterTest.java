@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -69,10 +68,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		verify(mockView).setWidgetDescriptor(any(WikiPageKey.class), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1));
 		verify(mockView).show();
 	}
-	@Test (expected=IllegalArgumentException.class)
-	public void testEditNewFailedPreconditions1() {
-		presenter.editNew(null,WidgetConstants.YOUTUBE_CONTENT_TYPE);
-	}
+
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions2() {
 		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), null);

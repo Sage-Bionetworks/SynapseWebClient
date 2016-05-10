@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.UserListener;
+import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -68,6 +69,8 @@ public class LoginWidgetTest {
 		
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener).userChanged(any(UserSessionData.class));
+		verify(mockView).clear();
+		verify(mockView).clearUsername();
 	}
 
 	@Test
@@ -85,5 +88,21 @@ public class LoginWidgetTest {
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
 		verify(mockSynapseJSNIUtils).consoleError(eq(unhandledExceptionMessage));
+		verify(mockView).clear();
+		verify(mockView, never()).clearUsername();
+	}
+
+	@Test
+	public void testSetUsernameAndPasswordLockedExceptionHandling() {
+		String u = "user";
+		String p = "pass";
+		String lockedMessage = "account is locked";
+		AsyncMockStubber.callFailureWith(new LockedException(lockedMessage)).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		loginWidget.setUsernameAndPassword(u, p);
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
+		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockView).showError(lockedMessage);
+		verify(mockView).clear();
+		verify(mockView, never()).clearUsername();
 	}
 }

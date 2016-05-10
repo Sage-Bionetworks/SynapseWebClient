@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -17,6 +18,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
@@ -74,6 +77,11 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	@UiField
 	SpanElement contentHtml;
 
+	@UiField
+	Div passwordStrengthContainer;
+	@UiField
+	Div synAlertContainer;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -114,6 +122,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	}
 	
 	private boolean checkPassword1() {
+		presenter.passwordChanged(password1Field.getText());
 		DisplayUtils.hideFormError(password1, password1Error);
 		if (!DisplayUtils.isDefined(password1Field.getText())){
 			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
@@ -185,7 +194,12 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 				checkEmail();
 			}
 		});
-		
+		password1Field.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				presenter.passwordChanged(password1Field.getText());
+			}
+		});
 		password1Field.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
@@ -292,5 +306,22 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		loadingPanel.setVisible(false);
 		pageTitle.setInnerHTML(DisplayConstants.REQUEST_EXPIRED);
 		contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
-	}  
+	}
+	
+	@Override
+	public void setPasswordStrengthWidget(Widget w) {
+		passwordStrengthContainer.clear();
+		passwordStrengthContainer.add(w);
+	}
+	
+	public void setSynAlertWidget(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	};
+	
+	@Override
+	public void setSubmitButtonEnabled(boolean enabled) {
+		submitBtn.setEnabled(enabled);
+	}
+
 }

@@ -17,7 +17,8 @@ public enum ColumnTypeViewEnum {
 	Date(ColumnType.DATE),
 	File(ColumnType.FILEHANDLEID),
 	Entity(ColumnType.ENTITYID),
-	Link(ColumnType.LINK);
+	Link(ColumnType.LINK),
+	LargeText(ColumnType.LARGETEXT);
 	
 	private ColumnType type;
 	ColumnTypeViewEnum(ColumnType type){

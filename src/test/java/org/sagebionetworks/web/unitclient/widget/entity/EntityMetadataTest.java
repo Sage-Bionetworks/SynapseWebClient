@@ -80,6 +80,7 @@ public class EntityMetadataTest {
 		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
 		boolean canChangePermissions = false;
 		boolean canCertifiedUserEdit = true;
+		boolean isCurrentVersion = true;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
 		when(mockRestrictionWidget.asWidget()).thenReturn(null);
@@ -90,13 +91,12 @@ public class EntityMetadataTest {
 		bundle.setEntity(project);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
-		Long versionNumber = -122L;
 		en.setId(entityId);
-		widget.setEntityBundle(bundle, versionNumber);
+		widget.setEntityBundle(bundle, null);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setRestrictionPanelVisible(false);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
 	}
@@ -106,6 +106,7 @@ public class EntityMetadataTest {
 		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
 		boolean canChangePermissions = true;
 		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = true;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
 		FileEntity fileEntity = new FileEntity();
@@ -121,7 +122,7 @@ public class EntityMetadataTest {
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
 	}
@@ -131,6 +132,7 @@ public class EntityMetadataTest {
 		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
 		boolean canChangePermissions = true;
 		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = false;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
 		Long versionNumber = -122L;
@@ -147,7 +149,7 @@ public class EntityMetadataTest {
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
 	}

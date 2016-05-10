@@ -25,4 +25,12 @@ public interface CellFactory {
 	 * @return
 	 */
 	public CellEditor createEditor(ColumnModel model);
+	
+	/**
+	 * Create a form based editor for a cell.
+	 * @param type
+	 * @param value
+	 * @return
+	 */
+	public CellEditor createFormEditor(ColumnModel model);
 }

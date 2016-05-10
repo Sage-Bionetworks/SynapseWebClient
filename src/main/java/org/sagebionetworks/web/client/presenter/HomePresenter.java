@@ -36,6 +36,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private int twitterHeight;
 	public static final String TWITTER_DATA_WIDGET_ID = "624656608589561856";
 	public static final String SYNAPSE_BLUE = "#1e7098";
+	public static final int TWEET_COUNT = 20;
 	public static final int TWITTER_STANDARD_HEIGHT = 390;
 	public static final int TWITTER_MINIMAL_HEIGHT = 200;
 	public static final String TWITTER_ELEMENT_ID = "twitter-feed";
@@ -114,7 +115,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void loadNewsFeed(){
 		long uniqueId = new Date().getTime();
 		final String twitterElementId = TWITTER_ELEMENT_ID+uniqueId;
-		view.prepareTwitterContainer(twitterElementId);
+		view.prepareTwitterContainer(twitterElementId, twitterHeight);
 	}
 	
 	@Override
@@ -122,7 +123,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		AsyncCallback<Void> initializedCallback = new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, twitterHeight);
+				jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, TWEET_COUNT);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -130,7 +131,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		};
 		if (resourceLoader.isLoaded(ClientProperties.TWITTER_JS))
-			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, twitterHeight);
+			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, TWEET_COUNT);
 		else
 			resourceLoader.requires(ClientProperties.TWITTER_JS, initializedCallback);		
 	}

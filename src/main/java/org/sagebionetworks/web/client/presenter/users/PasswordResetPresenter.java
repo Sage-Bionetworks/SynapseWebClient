@@ -16,6 +16,8 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -34,7 +36,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private GlobalApplicationState globalApplicationState;
-	
+	private PasswordStrengthWidget passwordStrengthWidget;
+	private SynapseAlert synAlert;
 	private String sessionToken = null;
 	
 	@Inject
@@ -42,7 +45,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			CookieProvider cookieProvider, UserAccountServiceAsync userService,
 			AuthenticationController authenticationController,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			PasswordStrengthWidget passwordStrengthWidget,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -51,7 +56,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
-		
+		this.passwordStrengthWidget = passwordStrengthWidget;
+		this.synAlert = synAlert;
+		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
+		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
 	}
 
@@ -89,6 +97,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 	@Override
 	public void requestPasswordReset(String emailAddress) {
+		synAlert.clear();
 		userService.sendPasswordResetEmail(emailAddress, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -99,9 +108,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
 					view.showErrorMessage(caught.getMessage());
-				} else if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage("An error occurred in sending your request. Please retry.");
+				} else {
+					synAlert.handleException(caught);
 				}
+				view.setSubmitButtonEnabled(true);
 			}
 		});
 		
@@ -109,6 +119,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 	@Override
 	public void resetPassword(final String newPassword) {
+		synAlert.clear();
 		if (sessionToken == null && authenticationController.isLoggedIn()) {
 			sessionToken = authenticationController.getCurrentUserSessionToken();
 		}
@@ -131,7 +142,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.PASSWORD_RESET_FAILED_TEXT);
+				view.setSubmitButtonEnabled(true);
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -150,4 +162,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
                 }
         });
 	}
+	
+	@Override
+	public void passwordChanged(String password) {
+		passwordStrengthWidget.scorePassword(password);
+	}
+
 }

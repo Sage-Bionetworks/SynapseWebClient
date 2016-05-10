@@ -10,14 +10,18 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -39,19 +43,20 @@ import com.google.inject.Inject;
 public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	private SynapseClientAsync synapseClient;
+	private MarkdownIt markdownIt;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private CookieProvider cookies;
 	AuthenticationController authenticationController;
 	GWTWrapper gwt;
+	private SessionStorage sessionStorage;
 	PortalGinInjector ginInjector;
 	private ResourceLoader resourceLoader;
 	private String md;
-	private WikiPageKey wikiKey;
-	private Long wikiVersionInView;
 	private MarkdownWidgetView view;
 	private SynapseAlert synAlert;
-	
+	private WikiPageKey wikiKey;
+	private Long wikiVersionInView;
 	@Inject
 	public MarkdownWidget(SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
@@ -60,7 +65,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			GWTWrapper gwt,
 			PortalGinInjector ginInjector,
 			MarkdownWidgetView view,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SessionStorage sessionStorage,
+			MarkdownIt markdownIt) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -71,7 +78,17 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.synAlert = synAlert;
+		this.sessionStorage = sessionStorage;
+		this.markdownIt = markdownIt;
 		view.setSynAlertWidget(synAlert.asWidget());
+	}
+	
+	/**
+	 * Configure this widget using markdown only.  Note that if no wiki key is given, then some Synapse widgets may not work properly (widgets that depend on wiki attachments for example).
+	 * @param md
+	 */
+	public void configure(final String md) {
+		configure(md, null, null);
 	}
 	
 	@Override
@@ -81,29 +98,75 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
 		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
-		synapseClient.markdown2Html(md, uniqueSuffix, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(final String result) {
-				view.callbackWhenAttached(new Callback() {
-					@Override
-					public void invoke() {
-						if(result != null && !result.isEmpty()) {
-							view.setEmptyVisible(false);
-							view.setMarkdown(result);
-							loadMath(wikiKey, uniqueSuffix);
-							loadWidgets(wikiKey, uniqueSuffix);
-							loadTableSorters();
-						} else {
-							view.setEmptyVisible(true);
-						}
+//		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+//		String hostPrefix = gwt.getHostPrefix();
+//		final String key = getKey(md, hostPrefix, isInTestWebsite);
+		//avoid cache for new md processor until it is in good shape.
+//		final MarkdownCacheValue cachedValue = getValueFromCache(key);
+//		if(cachedValue == null) {
+			view.callbackWhenAttached(new Callback() {
+				@Override
+				public void invoke() {
+					try {
+						String result = markdownIt.markdown2Html(md, uniqueSuffix);
+						//avoid cache for new md processor until it is in good shape.
+//						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
+						loadHtml(uniqueSuffix, result);
+					} catch (RuntimeException e) { //JavaScriptException
+						synAlert.showError(e.getMessage());
 					}
-				});
+				}
+			});
+//		} else {
+//			//used cached value
+//			view.callbackWhenAttached(new Callback() {
+//				@Override
+//				public void invoke() {
+//					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
+//				}
+//			});
+//		}
+	}
+	
+	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {
+		MarkdownCacheKey key = ginInjector.getMarkdownCacheKey();
+		key.init(md, hostPrefix, isInTestWebsite);
+		return key.toJSON();
+	}
+	
+	public String getValueToCache(String uniqueSuffix, String html) {
+		MarkdownCacheValue value = ginInjector.getMarkdownCacheValue();
+		value.init(uniqueSuffix, html);
+		return value.toJSON();
+	}
+	
+	public MarkdownCacheValue getValueFromCache(String key) {
+		String value = sessionStorage.getItem(key);
+		if (value != null) {
+			MarkdownCacheValue cacheValue = ginInjector.getMarkdownCacheValue();
+			cacheValue.init(value);
+			return cacheValue;
+		}
+		return null;
+	}
+	public void loadHtml(String uniqueSuffix, String result) {
+		if(result != null && !result.isEmpty()) {
+			view.setEmptyVisible(false);
+			view.setMarkdown(result);
+			boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+
+			//TODO: remove highlightCodeBlocks call once markdown-it has replaced the server-side processor
+			// (because code highlighting is does in the new parser)
+			if (!isInTestWebsite) {
+				synapseJSNIUtils.highlightCodeBlocks();
 			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
+				
+			loadMath(uniqueSuffix);
+			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
+			loadTableSorters();
+		} else {
+			view.setEmptyVisible(true);
+		}
 	}
 	
 	@Override
@@ -113,19 +176,11 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		view.setEmptyVisible(false);
 	}
 	
-	
 	public void loadTableSorters() {
-		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
-		int i = 0;
-		ElementWrapper table = view.getElementById(id + i);
-		while (table != null) {
-			synapseJSNIUtils.tablesorter(id+i);
-			i++;
-			table = view.getElementById(id + i);
-		}
+		synapseJSNIUtils.loadTableSorters();
 	}
 	
-	public void loadMath(WikiPageKey wikiKey, String suffix) {
+	public void loadMath(String suffix) {
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
@@ -162,13 +217,14 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		}
 	}
 	
-	public Set<String> loadWidgets(WikiPageKey wikiKey, String suffix) {
+	public Set<String> loadWidgets(WikiPageKey wikiKey, Long wikiVersionInView, String suffix) {
 		Set<String> contentTypes = new HashSet<String>();
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
+				el.removeAllChildren();
 				//based on the contents of the element, create the correct widget descriptor and renderer
 				String innerText = el.getAttribute("widgetParams");
 				if (innerText != null) {
@@ -191,7 +247,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						//try our best to load all of the widgets. if one fails to load, then fail quietly.
 						String message = innerText;
 						if (e.getMessage() != null)
-							message += "<br>" + e.getMessage();
+							message += ": " + e.getMessage();
 						view.addWidget(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)), currentWidgetDiv);
 					}
 				}
@@ -224,7 +280,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	
 	public void refresh() {
-		configure(md, wikiKey, null);
+		configure(md, wikiKey, wikiVersionInView);
 	}
 	
 	public Widget asWidget() {

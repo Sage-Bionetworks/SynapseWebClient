@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LogEntry;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -35,8 +36,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -49,6 +48,7 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -62,6 +62,7 @@ import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -88,6 +89,8 @@ public interface SynapseClientAsync {
 	
 	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
 
+	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
+	
 	void getEntityVersions(String entityId, int offset, int limit,
 			AsyncCallback<PaginatedResults<VersionInfo>> callback);
 
@@ -97,9 +100,6 @@ public interface SynapseClientAsync {
 
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);
-
-	void getEntityReferencedBy(String entityId,
-			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
 	void logDebug(String message, AsyncCallback<Void> callback);
 
@@ -194,8 +194,6 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
-	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
 	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
@@ -240,8 +238,6 @@ public interface SynapseClientAsync {
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
-	
-	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
@@ -289,9 +285,6 @@ public interface SynapseClientAsync {
 	void submitCertificationQuizResponse(QuizResponse response,
 			AsyncCallback<PassingRecord> callback);
 	
-	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, Long storageLocationId, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
-	void getChunkedPresignedUrl(ChunkRequest request, AsyncCallback<String> callback) throws RestServiceException;
-	void combineChunkedFileUpload(List<ChunkRequest> requests, AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
@@ -313,7 +306,7 @@ public interface SynapseClientAsync {
 	
 	void getAPIKey(AsyncCallback<String> callback);
 
-	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);
+	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
@@ -422,7 +415,9 @@ public interface SynapseClientAsync {
 			AsyncCallback<TableFileHandleResults> callback);
 
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
-
+	
+	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
+	
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
 	void getOrCreateActivityForEntityVersion(String entityId,
@@ -442,7 +437,12 @@ public interface SynapseClientAsync {
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
-
+	
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
+
+	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
+	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
+
+	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
 }

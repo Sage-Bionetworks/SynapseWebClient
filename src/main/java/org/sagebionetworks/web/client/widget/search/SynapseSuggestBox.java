@@ -129,4 +129,8 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	public void handleOracleException(Throwable caught) {
 		view.showErrorMessage(caught.getMessage());
 	}
+	
+	public void setFocus(boolean focused) {
+		view.setFocus(focused);
+	}
 }

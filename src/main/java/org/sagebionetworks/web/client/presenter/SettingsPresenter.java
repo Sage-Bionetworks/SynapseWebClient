@@ -7,11 +7,14 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -19,7 +22,10 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,7 +46,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseAlert passwordSynAlert;
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
-	
+	private SubscriptionListWidget subscriptionListWidget;
+	private CookieProvider cookies;
+	private PasswordStrengthWidget passwordStrengthWidget;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
@@ -48,7 +56,10 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient, GWTWrapper gwt,
 			PortalGinInjector ginInjector,
-			UserProfileModalWidget userProfileModalWidget) {
+			UserProfileModalWidget userProfileModalWidget,
+			SubscriptionListWidget subscriptionListWidget,
+			CookieProvider cookies,
+			PasswordStrengthWidget passwordStrengthWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -57,6 +68,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.ginInjector = ginInjector;
 		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
+		this.subscriptionListWidget = subscriptionListWidget;
+		this.cookies = cookies;
+		this.passwordStrengthWidget = passwordStrengthWidget;
+		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
+		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
@@ -93,6 +109,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Override
 	public void resetPassword(final String existingPassword,
 			final String newPassword) {
+		clearPasswordErrors();
 		if (authenticationController.isLoggedIn()) {
 			if (authenticationController.getCurrentUserSessionData() != null
 					&& authenticationController.getCurrentUserSessionData().getProfile() != null
@@ -123,8 +140,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 									@Override
 									public void onFailure(
 											Throwable caught) {
-										passwordSynAlert.showError("Password Change failed. Please try again.");
-										view.setCurrentPasswordInError(true);
+										passwordSynAlert.handleException(caught);
 										view.setChangePasswordEnabled(true);
 									}
 								});
@@ -244,15 +260,18 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 
 	// configuration
-	private void updateView() {
-		view.hideAPIKey();
+	public void resetView() {
+		view.clear();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
-		updateUserStorage();
-		getUserNotificationEmail();
-		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+		if (authenticationController.isLoggedIn()) {
+			updateUserStorage();
+			getUserNotificationEmail();
+			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+			subscriptionListWidget.configure();	
+		}
 	}
 
 	@Override
@@ -287,6 +306,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	@Override
 	public void addEmail(String emailAddress) {
+		addressSynAlert.clear();
 		// Is this email already in the profile email list?
 		// If so, just update it as the new notification email. Otherwise, kick
 		// off the verification process.
@@ -306,6 +326,12 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	public void additionalEmailValidation(String emailAddress) {
 		// need to validate
+		//first, does it look like an email address?
+		if (!ValidationUtils.isValidEmail(emailAddress)) {
+			addressSynAlert.showError(WebConstants.INVALID_EMAIL_MESSAGE);
+			return;
+		}
+
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
 		synapseClient.additionalEmailValidation(
 				authenticationController.getCurrentUserPrincipalId(),
@@ -317,18 +343,15 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showEmailChangeFailed(caught.getMessage());
+						addressSynAlert.handleException(caught);
 					}
 				});
 	}
 
 	// The entry point of this class, called from the ProfilePresenter
 	public Widget asWidget() {
-		this.apiSynAlert.clear();
-		this.notificationSynAlert.clear();
-		this.addressSynAlert.clear();
-		this.view.render();		
-		updateView();
+		resetView();
+		this.view.render();
 		return view.asWidget();
 	}
 	
@@ -377,4 +400,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		return password != null && !password.isEmpty();
 	}
 	
+	@Override
+	public void passwordChanged(String password) {
+		passwordStrengthWidget.scorePassword(password);
+	}
+
 }
