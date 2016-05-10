@@ -40,6 +40,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		addStyleName("displayInline");
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("displayInline");
 		
