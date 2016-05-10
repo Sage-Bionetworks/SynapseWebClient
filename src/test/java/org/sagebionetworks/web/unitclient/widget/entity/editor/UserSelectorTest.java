@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
@@ -48,6 +50,7 @@ public class UserSelectorTest {
 		
 		when(mockSuggestion.getId()).thenReturn(SUGGESTION_ID);
 		when(mockSuggestion.getHeader()).thenReturn(mockUserGroupHeader);
+		when(mockSuggestion.isIndividual()).thenReturn(Boolean.TRUE.toString());
 		when(mockUserGroupHeader.getUserName()).thenReturn(USERNAME);
 	}
 	
@@ -64,6 +67,16 @@ public class UserSelectorTest {
 		widget.onSynapseSuggestSelected(mockSuggestion);
 		verify(mockUsernameCallback).invoke(USERNAME);
 		verify(mockView).hide();
+	}
+	
+	@Test
+	public void testOnSynapseSuggestTeamSelected() {
+		when(mockSuggestion.isIndividual()).thenReturn(Boolean.FALSE.toString());
+		widget.onSynapseSuggestSelected(mockSuggestion);
+		verify(mockSuggestBox).showErrorMessage(DisplayConstants.NO_USER_SELECTED);
+		
+		verify(mockUsernameCallback, never()).invoke(USERNAME);
+		verify(mockView, never()).hide();
 	}
 	
 	@Test

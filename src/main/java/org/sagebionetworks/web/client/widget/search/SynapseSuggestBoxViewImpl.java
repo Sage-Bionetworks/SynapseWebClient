@@ -6,8 +6,8 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -26,9 +26,12 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	TextBox selectedItem;
 	Text selectedItemText;
 	SageImageBundle sageImageBundle;
+	SynapseAlert synAlert;
+	
 	@Inject
-	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle) {
+	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle, SynapseAlert synAlert) {
 		this.sageImageBundle = sageImageBundle;
+		this.synAlert = synAlert;
 	}
 	
 	@Override
@@ -83,6 +86,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		this.add(suggestBox);
 		this.add(selectedItem);
 		this.add(selectedItemText);
+		this.add(synAlert.asWidget());
 	}
 	
 	@Override
@@ -122,6 +126,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	
 	public void selectSuggestion(SynapseSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
+		synAlert.clear();
 		presenter.setSelectedSuggestion(suggestion);
 		selectedItem.setText(suggestion.getReplacementString());
 		selectedItem.setVisible(true);
@@ -145,7 +150,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		synAlert.showError(message);
 	}
 	
 	@Override

@@ -10,6 +10,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
@@ -20,6 +21,8 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class GWTWrapperImpl implements GWTWrapper {
 
+	private final static RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
+	
 	@Override
 	public String getHostPageBaseURL() {
 		return GWT.getHostPageBaseURL();
@@ -120,5 +123,10 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public void addDaysToDate(Date date, int days) {
 		CalendarUtil.addDaysToDate(date, days);
+	}
+	
+	@Override
+	public boolean isWhitespace(String text) {
+		return PATTERN_WHITE_SPACE.test(text);
 	}
 }

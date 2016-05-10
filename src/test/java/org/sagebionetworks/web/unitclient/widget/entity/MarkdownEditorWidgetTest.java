@@ -576,4 +576,23 @@ public class MarkdownEditorWidgetTest {
 		presenter.onKeyPress('@');
 		verify(mockUserSelector).show();
 	}
+
+	@Test
+	public void testOnKeyPressBeginningOfMarkdown() {
+		when(mockView.getCursorPos()).thenReturn(0);
+		when(mockView.getMarkdown()).thenReturn("");
+		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
+		presenter.onKeyPress('@');
+		verify(mockUserSelector).show();
+	}
+	
+	@Test
+	public void testOnKeyPressNotWhitespace() {
+		// typing an @ at the end of the string 'email'
+		when(mockView.getCursorPos()).thenReturn(5);
+		when(mockView.getMarkdown()).thenReturn("email");
+		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
+		presenter.onKeyPress('@');
+		verify(mockUserSelector, never()).show();
+	}
 }
