@@ -70,8 +70,8 @@
 									</b:Tooltip>
 									<b:Tooltip title="Unpin thread" placement="LEFT">
 										<b:IconStack ui:field="unpinIconStack" addStyleNames="imageButton line-height-1em right moveup-5" visible="false">
-											<b:Icon type="THUMB_TACK" stackTop="true" />
-											<b:Icon type="BAN" stackBase="true" addStyleNames="halfOpacity" ui:field="unpinIcon"/>
+											<b:Icon type="BAN" stackBase="true" addStyleNames="halfOpacity"/>
+											<b:Icon type="THUMB_TACK" stackTop="true" ui:field="unpinIcon"/>
 										</b:IconStack>
 									</b:Tooltip>
 								</bh:Div>
