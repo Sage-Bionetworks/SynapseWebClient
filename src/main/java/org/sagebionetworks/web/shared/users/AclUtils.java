@@ -10,12 +10,15 @@ import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE_SUBMISSION;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 public class AclUtils {
@@ -94,4 +97,18 @@ public class AclUtils {
 		return valueOf;
 	}
 	
+	/**
+	 * Return a set of principal IDs that have the given ACCESS_TYPE in the given AccessControlList.
+	 * @return
+	 */
+	public static Set<Long> getPrincipalIds(AccessControlList acl, ACCESS_TYPE t) {
+		Set<ResourceAccess> resourceAccessSet = acl.getResourceAccess();
+		Set<Long> principalIds = new HashSet<Long>();
+		for (ResourceAccess ra : resourceAccessSet) {
+			if (ra.getAccessType().contains(t)) {
+				principalIds.add(ra.getPrincipalId());
+			}
+		}
+		return principalIds;
+	}
 }

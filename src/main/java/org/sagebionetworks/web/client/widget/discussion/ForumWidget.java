@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import java.util.Set;
+
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
@@ -47,6 +49,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	CallbackP<Boolean> emptyListCallback;
 	Boolean isSingleThread;
 	SubscribeButtonWidget subscribeToForumButton;
+	Set<Long> moderatorIds;
 	
 	@Inject
 	public ForumWidget(
@@ -112,9 +115,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 	
 	public void configure(String entityId, ParameterizedToken params,
-			Boolean isCurrentUserModerator, CallbackP<ParameterizedToken> paramChangeCallback, Callback urlChangeCallback) {
+			Boolean isCurrentUserModerator,
+			Set<Long> moderatorIds,
+			CallbackP<ParameterizedToken> paramChangeCallback, Callback urlChangeCallback) {
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.moderatorIds = moderatorIds;
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
 		//are we just showing a single thread, or the full list?
@@ -149,7 +155,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			public void onSuccess(DiscussionThreadBundle result) {
 				view.setEmptyUIVisible(false);
 				view.setThreadHeaderVisible(true);
-				singleThreadWidget.configure(result, isCurrentUserModerator, new Callback(){
+				singleThreadWidget.configure(result, isCurrentUserModerator, moderatorIds, new Callback(){
 					@Override
 					public void invoke() {
 						showForum();
@@ -183,10 +189,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forumId, isCurrentUserModerator, emptyListCallback);
+						threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
 					}
 				});
-				threadListWidget.configure(forumId, isCurrentUserModerator, emptyListCallback);
+				threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
 			}
 		});
 	}
@@ -208,7 +214,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	private void refreshThreads() {
-		threadListWidget.configure(forumId, isCurrentUserModerator, emptyListCallback);
+		threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
 	}
 
 	@Override

@@ -10,12 +10,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -100,6 +104,8 @@ public class EntityPageTopTest {
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	GWTWrapper mockGWTWrapper;
+	@Mock
+	AccessControlList mockACL;
 	
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
@@ -107,6 +113,7 @@ public class EntityPageTopTest {
 	String projectWikiId = "31415926666";
 	boolean canEdit = true;
 	boolean canModerate = false;
+	Set<Long> moderatorIds;
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -129,6 +136,8 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		when(mockPermissions.getCanModerate()).thenReturn(canModerate);
+		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
+		moderatorIds = new HashSet<Long>();
 	}
 	
 	@Test
@@ -192,7 +201,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate, moderatorIds);
 		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, true, projectWikiId, mockEntityUpdatedHandler);
 	}
 	
@@ -210,7 +219,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, null);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, moderatorIds);
 		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, true, areaToken, mockEntityUpdatedHandler);
 	}
 	
@@ -229,7 +238,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, moderatorIds);
 	}
 	
 
@@ -251,7 +260,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, false);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, false, moderatorIds);
 	}
 	
 	@Test
@@ -271,7 +280,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, moderatorIds);
 	}
 	
 	@Test
@@ -290,7 +299,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, moderatorIds);
 	}
 	
 	@Test

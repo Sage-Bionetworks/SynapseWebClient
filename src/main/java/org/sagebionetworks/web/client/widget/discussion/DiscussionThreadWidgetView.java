@@ -97,4 +97,5 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void setPinIconVisible(boolean visible);
 	void setUnpinIconVisible(boolean visible);
 	void setPinnedIconVisible(boolean visible);
+	void setIsAuthorModerator(boolean isModerator);
 }

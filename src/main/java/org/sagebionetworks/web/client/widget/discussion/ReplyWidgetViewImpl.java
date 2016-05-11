@@ -43,6 +43,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Label edited;
 	@UiField
 	HTMLPanel loadingMessage;
+	@UiField
+	Label moderatorBadge;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -144,5 +146,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void showSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	
+	@Override
+	public void setIsAuthorModerator(boolean isModerator) {
+		moderatorBadge.setVisible(isModerator);
 	}
 }

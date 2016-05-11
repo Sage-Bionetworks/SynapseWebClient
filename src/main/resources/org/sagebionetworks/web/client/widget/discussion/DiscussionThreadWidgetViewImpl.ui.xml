@@ -40,8 +40,8 @@
 			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
+					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
 				</bh:Div>
-				
 				<bh:Div width="100%">
 					<g:HTMLPanel ui:field="loadingMessage" visible="false">
 						<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
@@ -70,8 +70,8 @@
 									</b:Tooltip>
 									<b:Tooltip title="Unpin thread" placement="LEFT">
 										<b:IconStack ui:field="unpinIconStack" addStyleNames="imageButton line-height-1em right moveup-5" visible="false">
-											<b:Icon type="THUMB_TACK" stackTop="true" />
-											<b:Icon type="BAN" stackBase="true" addStyleNames="halfOpacity" ui:field="unpinIcon"/>
+											<b:Icon type="BAN" stackBase="true" addStyleNames="halfOpacity"/>
+											<b:Icon type="THUMB_TACK" stackTop="true" ui:field="unpinIcon"/>
 										</b:IconStack>
 									</b:Tooltip>
 								</bh:Div>
