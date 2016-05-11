@@ -5,6 +5,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.junit.Before;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
+import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
@@ -57,7 +59,7 @@ public class ReplyWidgetTest {
 	MarkdownWidget mockMarkdownWidget;
 	@Mock
 	Callback mockDeleteCallback;
-
+	Set<Long> moderatorIds;
 	ReplyWidget replyWidget;
 
 	private static final String CREATED_BY = "123";
@@ -71,6 +73,7 @@ public class ReplyWidgetTest {
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
 				mockAuthController, mockEditReplyModal, mockMarkdownWidget);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
+		moderatorIds = new HashSet<Long>();
 	}
 
 	@Test
@@ -89,7 +92,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		verify(mockView).clear();
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setCreatedOn(anyString());
@@ -98,8 +101,22 @@ public class ReplyWidgetTest {
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
 		verify(mockView).setMessageVisible(true);
+		verify(mockView).setIsAuthorModerator(false);
 	}
 
+	@Test
+	public void testConfigureAuthorIsModerator() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		moderatorIds.add(Long.parseLong(CREATED_BY));
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
+				new Date(), isDeleted, CREATED_BY, isEdited);
+		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
+		verify(mockView).setIsAuthorModerator(true);
+	}
+	
 	@Test
 	public void testConfigureEdited() {
 		boolean isDeleted = false;
@@ -108,7 +125,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		verify(mockView).setEditedVisible(true);
 	}
 
@@ -121,7 +138,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		verify(mockView).setEditIconVisible(true);
 	}
 
@@ -132,7 +149,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, true, mockDeleteCallback);
+		replyWidget.configure(bundle, true, moderatorIds, mockDeleteCallback);
 		verify(mockView).setDeleteIconVisibility(true);
 	}
 
@@ -152,7 +169,7 @@ public class ReplyWidgetTest {
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder, never()).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -176,7 +193,7 @@ public class ReplyWidgetTest {
 				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -203,7 +220,7 @@ public class ReplyWidgetTest {
 				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -234,7 +251,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
@@ -256,7 +273,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
@@ -279,7 +296,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		AsyncMockStubber.callSuccessWith(bundle)
 				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
@@ -304,7 +321,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		replyWidget.configure(bundle, canModerate, mockDeleteCallback);
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();

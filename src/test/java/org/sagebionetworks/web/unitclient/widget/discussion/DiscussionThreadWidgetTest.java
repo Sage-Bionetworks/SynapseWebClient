@@ -170,6 +170,7 @@ public class DiscussionThreadWidgetTest {
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockView).setCreatedOn(anyString());
+		verify(mockView).setIsAuthorModerator(false);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockJsniUtils, times(2)).getRelativeTime(any(Date.class));
 		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
@@ -213,6 +214,22 @@ public class DiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).configure(threadId);
 	}
 
+	
+	@Test
+	public void testConfigureIsAuthorModerator() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		moderatorIds.add(Long.parseLong(CREATED_BY));
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, moderatorIds,mockCallback,
+				SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+		verify(mockView).setIsAuthorModerator(true);
+	}
+	
 	@Test
 	public void testConfigureWithEdited() {
 		boolean isDeleted = false;
