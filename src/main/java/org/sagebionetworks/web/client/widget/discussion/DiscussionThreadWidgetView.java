@@ -65,7 +65,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
 
 	void setReplyButtonVisible(boolean visible);
-
+	void setCommandsVisible(boolean visible);
 	void showErrorMessage(String errorMessage);
 
 	void setEditIconVisible(boolean visible);

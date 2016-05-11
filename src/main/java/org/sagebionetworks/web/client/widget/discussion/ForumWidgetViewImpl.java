@@ -30,7 +30,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	SimplePanel singleThreadContainer;
 	@UiField
-	Span emptyUI;
+	SimplePanel defaultThreadContainer;
 	@UiField
 	Table threadHeader;
 	@UiField
@@ -129,11 +129,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	}
 
 	@Override
-	public void setEmptyUIVisible(boolean visible) {
-		emptyUI.setVisible(visible);
-	}
-
-	@Override
 	public void setThreadHeaderVisible(boolean visible) {
 		threadHeader.setVisible(visible);
 	}
@@ -151,5 +146,15 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void setSubscribeButton(Widget w) {
 		subscribeButtonContainer.clear();
 		subscribeButtonContainer.add(w);
+	}
+	
+	@Override
+	public void setDefaultThreadWidget(Widget w) {
+		defaultThreadContainer.clear();
+		defaultThreadContainer.add(w);
+	}
+	@Override
+	public void setDefaultThreadWidgetVisible(boolean visible) {
+		defaultThreadContainer.setVisible(visible);
 	}
 }

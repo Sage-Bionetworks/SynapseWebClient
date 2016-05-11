@@ -66,6 +66,8 @@ public class ForumWidgetTest {
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
+	DiscussionThreadWidget mockDefaultThreadWidget;
+	@Mock
 	SubscribeButtonWidget mockSubscribeButtonWidget;
 	@Mock
 	CallbackP<ParameterizedToken> mockParamChangeCallback;
@@ -81,7 +83,7 @@ public class ForumWidgetTest {
 		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
-				mockSubscribeButtonWidget);
+				mockSubscribeButtonWidget, mockDefaultThreadWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		moderatorIds = new HashSet<Long>();
@@ -223,7 +225,6 @@ public class ForumWidgetTest {
 				eq(canModerate), eq(moderatorIds), onShowAllThreadsCallback.capture(), eq(SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD),
 				eq(SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD));
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class));
-		verify(mockView).setEmptyUIVisible(false);
 		verify(mockView).setThreadHeaderVisible(true);
 		
 		//verify param was updated
@@ -255,7 +256,6 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
-		verify(mockView).setEmptyUIVisible(true);
 		verify(mockView).setThreadHeaderVisible(false);
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockSynAlert).handleException(ex);

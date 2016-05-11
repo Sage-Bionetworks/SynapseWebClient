@@ -482,4 +482,12 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 			}
 		});
 	}
+	
+	public void setReplyButtonVisible(boolean visible) {
+		view.setReplyButtonVisible(visible);
+	}
+	
+	public void setCommandsVisible(boolean visible) {
+		view.setCommandsVisible(visible);
+	}
 }
