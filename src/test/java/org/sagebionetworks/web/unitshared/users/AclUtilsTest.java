@@ -1,19 +1,37 @@
 package org.sagebionetworks.web.unitshared.users;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 public class AclUtilsTest {
 
+	@Mock
+	AccessControlList mockACL;
+	Set<ResourceAccess> resourceAccessSet;
+	
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		resourceAccessSet = new HashSet<ResourceAccess>();
+		when(mockACL.getResourceAccess()).thenReturn(resourceAccessSet);
+	}
+	
 	@Test
 	public void testGetPermissionLevel() {
 		assertEquals(PermissionLevel.CAN_VIEW, AclUtils.getPermissionLevel(getReadAccessTypeSet()));
@@ -144,6 +162,41 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
 		return set;
+	}
+	
+	@Test
+	public void testGetPrincipalIds() {
+		// user 1 has the target access type, user 2 does not.
+		ACCESS_TYPE targetAccessType = ACCESS_TYPE.MODERATE;
+		Long user1Id = 3L;
+		Long user2Id = 8L;
+		ResourceAccess ra = new ResourceAccess();
+		ra.setPrincipalId(user1Id);
+		ra.setAccessType(Collections.singleton(targetAccessType));
+		resourceAccessSet.add(ra);
+		
+		ra = new ResourceAccess();
+		ra.setPrincipalId(user2Id);
+		ra.setAccessType(Collections.singleton(ACCESS_TYPE.READ));
+		resourceAccessSet.add(ra);
+		
+		Set<Long> principalIds = AclUtils.getPrincipalIds(mockACL, targetAccessType);
+		assertTrue(principalIds.contains(user1Id));
+		assertFalse(principalIds.contains(user2Id));
+	}
+	
+	@Test
+	public void testGetPrincipalIdsNoMatches() {
+		// no matches
+		ACCESS_TYPE targetAccessType = ACCESS_TYPE.MODERATE;
+		Long user1Id = 3L;
+		ResourceAccess ra = new ResourceAccess();
+		ra.setPrincipalId(user1Id);
+		ra.setAccessType(Collections.singleton(ACCESS_TYPE.CREATE));
+		resourceAccessSet.add(ra);
+		
+		Set<Long> principalIds = AclUtils.getPrincipalIds(mockACL, targetAccessType);
+		assertTrue(principalIds.isEmpty());
 	}
 }
 

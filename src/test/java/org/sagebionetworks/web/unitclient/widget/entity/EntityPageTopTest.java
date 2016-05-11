@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -103,6 +104,8 @@ public class EntityPageTopTest {
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	GWTWrapper mockGWTWrapper;
+	@Mock
+	AccessControlList mockACL;
 	
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
@@ -133,6 +136,7 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		when(mockPermissions.getCanModerate()).thenReturn(canModerate);
+		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		moderatorIds = new HashSet<Long>();
 	}
 	
