@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.presenter.SynapseForumPresenter.*;
+import static org.sagebionetworks.web.client.presenter.SynapseForumPresenter.DEFAULT_IS_MODERATOR;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -56,7 +60,9 @@ public class SynapseForumPresenterTest {
 	ForumWidget mockForumWidget;
 	@Mock
 	SynapseForumPlace mockPlace;
-
+	@Mock
+	AccessControlList mockACL;
+	
 	SynapseForumPresenter presenter;
 	Set<Long> moderatorIds;
 	
@@ -69,6 +75,7 @@ public class SynapseForumPresenterTest {
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPlace.toToken()).thenReturn("fake token");
+		AsyncMockStubber.callSuccessWith(mockACL).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
 		moderatorIds = new HashSet<Long>();
 	}
 
@@ -104,7 +111,6 @@ public class SynapseForumPresenterTest {
 		verify(mockSynAlert).handleException(ex);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testShowForum() {
 		String entityId = "syn1";
@@ -113,4 +119,17 @@ public class SynapseForumPresenterTest {
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
 				eq(DEFAULT_IS_MODERATOR), eq(moderatorIds), any(CallbackP.class), any(Callback.class));
 	}
+	
+	@Test
+	public void testShowForumACLFailure() {
+		String entityId = "syn1";
+		Exception ex = new Exception("error");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
+		presenter.setPlace(mockPlace);
+		presenter.showForum(entityId);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockForumWidget, never()).configure(anyString(), any(ParameterizedToken.class),
+				eq(DEFAULT_IS_MODERATOR), eq(moderatorIds), any(CallbackP.class), any(Callback.class));
+	}
+
 }
