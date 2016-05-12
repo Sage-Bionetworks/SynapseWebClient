@@ -280,10 +280,9 @@ public class ProfilePresenterTest {
 	public void testUpdateProfileView() {
 		boolean isOwner = true;
 		String userId = userProfile.getOwnerId();
-		ProfileArea initialTab = ProfileArea.PROJECTS;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(isOwner);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		profilePresenter.updateProfileView(userId, initialTab);
+		profilePresenter.updateProfileView(userId);
 		
 		verify(mockView).clear();
 		verify(mockTeamListWidget, Mockito.atLeastOnce()).clear();

@@ -171,7 +171,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				newVerificationSubmissionClicked();
 			}
 		};
-
 	}
 
 	
@@ -704,7 +703,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentChallengeOffset += CHALLENGE_PAGE_SIZE;
 		view.setIsMoreChallengesVisible(currentChallengeOffset < totalNumberOfResults);
 	}
-
 	
 	public void getFavorites() {
 		view.showProjectsLoading(true);
@@ -832,7 +830,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
 		}
-		if (token.equals("v") || token.startsWith("v/")) {
+		if (token.equals("v") || token.startsWith("v/") || token.isEmpty()) {
 			Place gotoPlace = null;
 			if (authenticationController.isLoggedIn()) {
 				//replace url with current user id

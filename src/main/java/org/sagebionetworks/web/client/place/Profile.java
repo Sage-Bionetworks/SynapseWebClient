@@ -18,6 +18,7 @@ public class Profile extends Place implements RestartActivityOptional{
 	public static final String ALL_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.ALL);
 	public static final String FAV_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.FAVORITES);
 	public static final String CREATED_BY_ME_DELIMITER = getDelimiter(ProjectFilterEnum.CREATED_BY_ME);
+	public static final String ALL_MY_TEAM_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS);
 	public static final String SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME);
 	public static final String TEAM_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.TEAM);
 	
@@ -53,6 +54,8 @@ public class Profile extends Place implements RestartActivityOptional{
 						projectFilter = ProjectFilterEnum.CREATED_BY_ME;
 					} else if (toProcess.contains(SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER)){
 						projectFilter = ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME;
+					} else if (toProcess.contains(ALL_MY_TEAM_PROJECTS_DELIMITER)){
+						projectFilter = ProjectFilterEnum.ALL_MY_TEAM_PROJECTS;
 					} else if (toProcess.contains(TEAM_PROJECTS_DELIMITER)){
 						projectFilter = ProjectFilterEnum.TEAM;
 						toProcess = toProcess.substring(TEAM_PROJECTS_DELIMITER.length());
