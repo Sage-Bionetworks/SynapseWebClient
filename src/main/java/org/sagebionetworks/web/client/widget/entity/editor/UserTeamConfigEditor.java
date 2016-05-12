@@ -44,7 +44,6 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 		view.checkParams();
 		descriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, view.isIndividual());
 		descriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, view.getId());
-		descriptor.put(WidgetConstants.INLINE_WIDGET_KEY, Boolean.TRUE.toString());
 	}
 	
 	@Override
