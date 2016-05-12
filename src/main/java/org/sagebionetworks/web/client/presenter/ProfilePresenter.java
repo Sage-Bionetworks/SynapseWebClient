@@ -102,8 +102,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private int currentProjectOffset, currentChallengeOffset;
 	public final static int PROJECT_PAGE_SIZE=100;
 	public final static int CHALLENGE_PAGE_SIZE=100;
+	public ProfileArea currentArea;
 	public ProjectFilterEnum filterType;
-	public Team filterTeam;
+	public String filterTeamId;
 	public SortOptionEnum currentProjectSort;
 	public TeamListWidget myTeamsWidget;
 	public SynapseAlert profileSynAlert;
@@ -218,17 +219,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	@Override
 	public void updateArea(ProfileArea area) {
 		if (area != null && !area.equals(place.getArea())) {
-			place.setArea(area);
-			place.setNoRestartActivity(true);
-			globalApplicationState.getPlaceChanger().goTo(place);
+			place.setArea(area, filterType, filterTeamId);
+			globalApplicationState.pushCurrentPlace(place);
 		}
 	}
 
 	// Configuration
-	public void updateProfileView(String userId, final ProfileArea initialTab) {
+	public void updateProfileView(String userId) {
 		inviteCount = 0;
 		openRequestCount = 0;
 		isOwner = authenticationController.isLoggedIn()
@@ -249,20 +248,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			initUserFavorites(new Callback() {
 				@Override
 				public void invoke() {
-					getUserProfile(initialTab);
+					getUserProfile();
+					tabClicked(currentArea);
 				}
 			});
-			tabClicked(initialTab);
 		} else {
-			if (initialTab == ProfileArea.SETTINGS) 
-				getUserProfile(ProfileArea.PROJECTS);
-			else
-				getUserProfile(initialTab);
-			tabClicked(initialTab == ProfileArea.SETTINGS ? ProfileArea.PROJECTS : initialTab);
+			getUserProfile();
+			tabClicked(currentArea);
 		}
 	}
 	
-	private void getUserProfile(final ProfileArea initialTab) {
+	private void getUserProfile() {
 		//ask for everything in the user bundle
 		currentUserBundle = null;
 		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED;
@@ -492,9 +488,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param filterType
 	 * @param team
 	 */
-	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
+	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, String filterTeamId) {
 		this.filterType = filterType;
-		filterTeam = team;
+		this.filterTeamId = filterTeamId;
+		place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
+		globalApplicationState.pushCurrentPlace(place);
 		refreshProjects();
 	}
 
@@ -508,17 +506,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.setAllProjectsFilterSelected();
 					getMyProjects(ProjectListType.MY_PROJECTS, ProjectFilterEnum.ALL, currentProjectOffset);
 					break;
-				case MINE:
+				case CREATED_BY_ME:
 					view.setMyProjectsFilterSelected();
-					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.MINE, currentProjectOffset);
+					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.CREATED_BY_ME, currentProjectOffset);
 					break;
-				case MY_PARTICIPATED_PROJECTS:
+				case SHARED_DIRECTLY_WITH_ME:
 					view.setSharedDirectlyWithMeFilterSelected();
-					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, currentProjectOffset);
+					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, currentProjectOffset);
 					break;
-				case MY_TEAM_PROJECTS:
+				case ALL_MY_TEAM_PROJECTS:
 					view.setTeamsFilterSelected();
-					getMyProjects(ProjectListType.MY_TEAM_PROJECTS, ProjectFilterEnum.MY_TEAM_PROJECTS, currentProjectOffset);
+					getMyProjects(ProjectListType.MY_TEAM_PROJECTS, ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, currentProjectOffset);
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
@@ -641,7 +639,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
@@ -826,6 +824,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		teamSynAlert.clear();
 		String token = place.toToken();
+		currentArea = place.getArea();
+		filterType = place.getProjectFilter();
+		filterTeamId = place.getTeamId();
+		
 		if (token.equals("oauth_bound")) {
 			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
@@ -845,7 +847,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
-			updateProfileView(place.getUserId(), place.getArea());
+			updateProfileView(place.getUserId());
 		}
 		else if(!"".equals(token) && token != null) {
 			//if this contains an oauth_token, it's from linkedin
@@ -882,7 +884,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				//if this is a number, then treat it as a a user id
 				try{
 					Long.parseLong(place.getUserId());
-					updateProfileView(place.getUserId(), place.getArea());
+					updateProfileView(place.getUserId());
 				} catch (NumberFormatException nfe) {
 					getUserIdFromUsername(token);
 				}
@@ -895,7 +897,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(String userId) {
 				place.setUserId(userId);
-				updateProfileView(userId, place.getArea());
+				updateProfileView(userId);
 			}
 			
 			@Override
@@ -986,6 +988,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				public void invoke() {
 					refreshData(tab);
 					view.setTabSelected(tab);
+					updateArea(tab);
 				}
 			};
 			view.showConfirmDialog("",
@@ -994,13 +997,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		} else {
 			refreshData(tab);
 			view.setTabSelected(tab);
+			updateArea(tab);
 		}
 	}
 	
 	private void refreshData(ProfileArea tab) {
 		switch (tab) {
 			case PROJECTS:
-				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+				setProjectFilterAndRefresh(filterType, filterTeamId);
 				break;
 			case TEAMS:
 				refreshTeams();
@@ -1043,7 +1047,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void applyFilterClicked(ProjectFilterEnum filterType, Team team) {
-		setProjectFilterAndRefresh(filterType, team);
+		String filterTeamId = null;
+		if (team != null) {
+			filterTeamId = team.getId();
+		}
+		setProjectFilterAndRefresh(filterType, filterTeamId);
 	}
 	
 	@Override

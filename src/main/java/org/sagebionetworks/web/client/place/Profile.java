@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.place;
 
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
@@ -14,24 +15,53 @@ public class Profile extends Place implements RestartActivityOptional{
 	public static final String CHALLENGES_DELIMITER = getDelimiter(Synapse.ProfileArea.CHALLENGES);
 	public static final String TEAMS_DELIMITER = getDelimiter(Synapse.ProfileArea.TEAMS);
 	
+	public static final String ALL_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.ALL);
+	public static final String FAV_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.FAVORITES);
+	public static final String CREATED_BY_ME_DELIMITER = getDelimiter(ProjectFilterEnum.CREATED_BY_ME);
+	public static final String SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME);
+	public static final String TEAM_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.TEAM);
+	
 	private String token;
 	private String userId;
+	private String teamId;
 	private ProfileArea area;
+	private ProjectFilterEnum projectFilter;
 	private boolean noRestartActivity;
 	
 	public Profile(String token) {
 		this.token = token;
-		int firstSlash = token.indexOf(DELIMITER);
-		if (firstSlash > -1) {
-			userId = token.substring(0, firstSlash);
+		teamId = null;
+		area = Synapse.ProfileArea.PROJECTS;
+		projectFilter = ProjectFilterEnum.ALL;
+		
+		int slashIndex = token.indexOf(DELIMITER);
+		if (slashIndex > -1) {
+			userId = token.substring(0, slashIndex);
 			//there's more
-			String toProcess = token.substring(firstSlash);
-			
-			if(toProcess.contains(SETTINGS_DELIMITER)) {
+			String toProcess = token.substring(slashIndex);
+			if (toProcess.contains(SETTINGS_DELIMITER)) {
 				area = Synapse.ProfileArea.SETTINGS;
 				return;
 			} else if(toProcess.contains(PROJECTS_DELIMITER)) {
 				area = Synapse.ProfileArea.PROJECTS;
+				projectFilter = ProjectFilterEnum.ALL; 
+				toProcess = toProcess.substring(PROJECTS_DELIMITER.length());
+				if (toProcess.length() > 0) {
+					if (toProcess.contains(FAV_PROJECTS_DELIMITER)){
+						projectFilter = ProjectFilterEnum.FAVORITES;
+					} else if (toProcess.contains(CREATED_BY_ME_DELIMITER)){
+						projectFilter = ProjectFilterEnum.CREATED_BY_ME;
+					} else if (toProcess.contains(SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER)){
+						projectFilter = ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME;
+					} else if (toProcess.contains(TEAM_PROJECTS_DELIMITER)){
+						projectFilter = ProjectFilterEnum.TEAM;
+						toProcess = toProcess.substring(TEAM_PROJECTS_DELIMITER.length());
+						slashIndex = toProcess.indexOf(DELIMITER);
+						if (slashIndex > -1) {
+							teamId = toProcess.substring(slashIndex + 1);
+						}
+					}
+				}
 				return;
 			} else if(toProcess.contains(CHALLENGES_DELIMITER)) {
 				area = Synapse.ProfileArea.CHALLENGES;
@@ -63,9 +93,15 @@ public class Profile extends Place implements RestartActivityOptional{
 		return area;
 	}
 	
-	public void setArea(ProfileArea area) {
+	public ProjectFilterEnum getProjectFilter() {
+		return projectFilter;
+	}
+	
+	public void setArea(ProfileArea area, ProjectFilterEnum projectFilter, String teamId) {
 		this.area = area;
-		calculateToken(userId, area);
+		this.projectFilter = projectFilter;
+		this.teamId = teamId;
+		calculateToken(userId, area, projectFilter, teamId);
 	}
 	
 	public String getUserId() {
@@ -76,7 +112,11 @@ public class Profile extends Place implements RestartActivityOptional{
 		this.userId = userId;
 	}
 	
-	public static String getDelimiter(Synapse.ProfileArea tab) {
+	public String getTeamId() {
+		return teamId;
+	}
+	
+	public static String getDelimiter(Enum tab) {
 		return DELIMITER+tab.toString().toLowerCase();
 	}
 	
@@ -103,11 +143,18 @@ public class Profile extends Place implements RestartActivityOptional{
 		return noRestartActivity;
 	}
 
-	private void calculateToken(String userId, Synapse.ProfileArea area) {
+	private void calculateToken(String userId, Synapse.ProfileArea area, ProjectFilterEnum projectFilter, String teamId) {
 		this.token = userId;
 		if(area != null) {
 			this.token += getDelimiter(area);
+			if (ProfileArea.PROJECTS.equals(area) && projectFilter != null) {
+				token += getDelimiter(projectFilter);
+				if (projectFilter.equals(ProjectFilterEnum.TEAM) && teamId != null) {
+					token += DELIMITER + teamId;
+				}
+			}
 		}
+		
 	}
 
 }

@@ -556,7 +556,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		//when setting the filter to my projects, it should query for projects created by me
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockView, times(2)).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
@@ -585,7 +585,7 @@ public class ProfilePresenterTest {
 	public void testGetSharedDirectlyWithMeProjects() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
 		verify(mockView, times(2)).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
@@ -641,7 +641,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("111");
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockView).setProjectsError(anyString());
 	}
 	
@@ -657,7 +657,7 @@ public class ProfilePresenterTest {
 	public void testApplyFilterClickedMine() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		profilePresenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
@@ -666,7 +666,7 @@ public class ProfilePresenterTest {
 	public void testApplyFilterClickedMyParticipatedProjects() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		profilePresenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
@@ -675,7 +675,7 @@ public class ProfilePresenterTest {
 	public void testApplyFilterClickedMyTeamProjects() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		profilePresenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_TEAM_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
 	}

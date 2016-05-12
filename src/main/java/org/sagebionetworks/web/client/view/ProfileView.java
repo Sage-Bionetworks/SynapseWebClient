@@ -87,7 +87,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void createTeam(final String teamName);
 		void goTo(Place place);
 		void refreshTeams();
-		void updateArea(ProfileArea area);
 		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
