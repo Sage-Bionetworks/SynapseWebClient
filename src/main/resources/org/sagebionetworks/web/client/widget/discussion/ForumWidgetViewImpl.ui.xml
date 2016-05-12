@@ -20,7 +20,6 @@
 			<b:Row>
 				<b:Column size="XS_12">
 					<bh:Div addStyleNames="padding-10 light-border-bottom">
-						<bh:Span ui:field="emptyUI" text="&#8212; Empty" visible="false"/>
 						<!-- Thread header -->
 						<t:Table ui:field="threadHeader" width="100%" visible="false">
 							<t:TableRow>
@@ -58,6 +57,10 @@
 				<b:Column size="XS_12">
 					<g:SimplePanel addStyleNames="margin-top-10" ui:field="singleThreadContainer"/>
 				</b:Column>
+				<b:Column size="XS_12">
+					<g:SimplePanel addStyleNames="margin-top-10" ui:field="defaultThreadContainer" visible="false"/>
+				</b:Column>
+				
 			</b:Row>
 		</bh:Div>
 		<g:SimplePanel ui:field="newThreadModalContainer"/>

@@ -66,6 +66,10 @@ public class ForumWidgetTest {
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
+	DiscussionThreadWidget mockDefaultThreadWidget;
+	@Mock
+	DiscussionThreadBundle mockDefaultDiscussionThreadBundle;
+	@Mock
 	SubscribeButtonWidget mockSubscribeButtonWidget;
 	@Mock
 	CallbackP<ParameterizedToken> mockParamChangeCallback;
@@ -75,13 +79,19 @@ public class ForumWidgetTest {
 	ForumWidget forumWidget;
 	private boolean canModerate = false;
 	Set<Long> moderatorIds;
+	
+	public static final String DEFAULT_THREAD_ID = "424242";
+	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		when(mockGlobalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY)).thenReturn(DEFAULT_THREAD_ID);
+		AsyncMockStubber.callSuccessWith(mockDefaultDiscussionThreadBundle).when(mockDiscussionForumClient)
+			.getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
-				mockSubscribeButtonWidget);
+				mockSubscribeButtonWidget, mockDefaultThreadWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		moderatorIds = new HashSet<Long>();
@@ -106,7 +116,36 @@ public class ForumWidgetTest {
 		assertTrue(onSubscribeCallback.equals(onUnsubscribeCallback));
 		//invoke callback to verify thread list is reconfigured
 		onSubscribeCallback.invoke();
-		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class));
+		
+		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), captorP.capture());
+		
+		verify(mockDiscussionForumClient).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
+		Set<Long> moderatorIds = new HashSet<Long>();
+		Callback deleteCallback = null;
+		boolean showThreadDetails = true;
+		boolean showReplyDetails = false;
+		boolean isCurrentUserModerator = false;
+		verify(mockDefaultThreadWidget).configure(mockDefaultDiscussionThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
+		verify(mockDefaultThreadWidget).setReplyButtonVisible(false);
+		verify(mockDefaultThreadWidget).setCommandsVisible(false);
+		
+		//test empty thread callback
+		CallbackP emptyThreadsCallback = captorP.getValue();
+		reset(mockView);
+		boolean isThreads = true;
+		emptyThreadsCallback.invoke(isThreads);
+		verify(mockView).setDefaultThreadWidgetVisible(!isThreads);
+	}
+	
+	@Test
+	public void testDefaultThreadBundleCached() {
+		reset(mockDiscussionForumClient);
+		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
+				mockAvailableThreadListWidget, mockNewDiscussionThreadModal,
+				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
+				mockSubscribeButtonWidget, mockDefaultThreadWidget);
+		verify(mockDiscussionForumClient, never()).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -126,6 +165,7 @@ public class ForumWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
+		verify(mockView).setDefaultThreadWidgetVisible(false);
 		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
@@ -217,13 +257,13 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
+		verify(mockView).setDefaultThreadWidgetVisible(false);
 		ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle),
 				eq(canModerate), eq(moderatorIds), onShowAllThreadsCallback.capture(), eq(SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD),
 				eq(SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD));
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class));
-		verify(mockView).setEmptyUIVisible(false);
 		verify(mockView).setThreadHeaderVisible(true);
 		
 		//verify param was updated
@@ -255,7 +295,6 @@ public class ForumWidgetTest {
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
-		verify(mockView).setEmptyUIVisible(true);
 		verify(mockView).setThreadHeaderVisible(false);
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockSynAlert).handleException(ex);

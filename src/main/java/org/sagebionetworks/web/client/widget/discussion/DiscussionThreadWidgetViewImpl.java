@@ -93,7 +93,8 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Icon pinnedIcon;
 	@UiField
 	Label moderatorBadge;
-	
+	@UiField
+	Div commandsContainer;
 	String threadLinkHref;
 	private Widget widget;
 	private DiscussionThreadWidget presenter;
@@ -370,5 +371,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void setIsAuthorModerator(boolean isModerator) {
 		moderatorBadge.setVisible(isModerator);
+	}
+	
+	@Override
+	public void setCommandsVisible(boolean visible) {
+		commandsContainer.setVisible(visible);
 	}
 }
