@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
@@ -74,7 +75,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	DivElement externalUrlUI;
 	@UiField
 	SpanElement externalUrl;
-	
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -188,11 +188,14 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		if (directDownloadUrl != null) {
+			Icon downloadIcon = new Icon(IconType.DOWNLOAD);
+			downloadIcon.addStyleName("margin-left-5");
 			//special case, if this starts with sftp proxy, then handle
 			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 			if (directDownloadUrl.startsWith(sftpProxy)) {
 				authorizedDirectDownloadLink.setVisible(true);
 				authorizedDirectDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
+				authorizedDirectDownloadLink.add(downloadIcon);
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
 				presenter.queryForSftpLoginInstructions(url);
@@ -200,6 +203,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				directDownloadLink.setVisible(true);
 				directDownloadLink.setHref(directDownloadUrl);
 				directDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
+				directDownloadLink.add(downloadIcon);
 			}
 		}
 		else {
