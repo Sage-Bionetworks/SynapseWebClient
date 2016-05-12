@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -61,6 +62,8 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void addTeam(Team team, Long notificationCount) {
 		emptyHTML.setVisible(false);
+		SimplePanel container = new SimplePanel();
+		container.addStyleName("margin-top-10");
 		if (isBig) {
 			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 			teamRenderer.configure(team, team.getDescription());
@@ -68,9 +71,9 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 				teamRenderer.setNotificationValue(String.valueOf(notificationCount));
 			team2Badge.put(team.getId(), teamRenderer);
 			Widget teamRendererWidget = teamRenderer.asWidget();
-			teamRendererWidget.addStyleName("col-sm-12 col-md-6 margin-top-15");
+			teamRendererWidget.addStyleName("col-sm-12 col-md-6");
 			teamRendererWidget.setHeight("120px");
-			add(teamRendererWidget);
+			container.add(teamRendererWidget);
 		} else {
 			TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
 			teamRenderer.configure(team);
@@ -78,9 +81,9 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 				teamRenderer.setNotificationValue(String.valueOf(notificationCount));
 			team2Badge.put(team.getId(), teamRenderer);
 			Widget teamRendererWidget = teamRenderer.asWidget();
-			teamRendererWidget.addStyleName("margin-top-10");
-			add(teamRendererWidget);
+			container.add(teamRendererWidget);
 		}
+		add(container);
 	}
 	
 	@Override
