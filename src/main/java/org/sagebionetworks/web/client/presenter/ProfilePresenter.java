@@ -224,7 +224,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			globalApplicationState.pushCurrentPlace(place);
 		}
 	}
-
+	
 	// Configuration
 	public void updateProfileView(String userId) {
 		inviteCount = 0;
@@ -232,6 +232,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
+		if (ProfileArea.SETTINGS.equals(currentArea) && !isOwner) {
+			currentArea = ProfileArea.PROJECTS;
+		}
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clear();
 		view.showLoading();
@@ -847,7 +850,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//View my profile
 			updateProfileView(place.getUserId());
 		}
-		else if(!"".equals(token) && token != null) {
+		else {
 			//if this contains an oauth_token, it's from linkedin
 			if (token.contains("oauth_token"))
 			{
