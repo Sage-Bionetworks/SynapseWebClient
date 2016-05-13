@@ -555,6 +555,19 @@ public class ProfilePresenterTest {
 		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
 		//should not have refreshed team invites, since this is not the owner
 	}
+	
+	@Test
+	public void testGetProjectsDefaultFilter() {
+		profilePresenter.setPlace(place);
+		profilePresenter.setIsOwner(false);
+		//when setting the filter to all, it should ask for all of their projects
+		profilePresenter.setProjectFilterAndRefresh(null, null);
+		verify(mockView, times(2)).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+	}
+
 
 	
 	@Test

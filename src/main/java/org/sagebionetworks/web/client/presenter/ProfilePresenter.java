@@ -491,6 +491,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param team
 	 */
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, String filterTeamId) {
+		if (filterType == null) {
+			filterType = ProjectFilterEnum.ALL;
+		}
 		this.filterType = filterType;
 		this.filterTeamId = filterTeamId;
 		place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
