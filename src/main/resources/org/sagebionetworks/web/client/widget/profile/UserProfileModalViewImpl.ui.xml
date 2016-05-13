@@ -14,6 +14,17 @@
 			</g:SimplePanel>
 			<bh:Div styleName="margin-top-15" />
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
+			<g:FlowPanel addStyleNames="help-panel">
+				<b:BlockQuote styleName="panel scroll-auto">
+					<bh:Text text="To change your&nbsp;"/>
+					<bh:Strong text="email address&nbsp;"/>
+					<bh:Text text="or&nbsp;" />
+					<bh:Strong text="password"/>
+					<bh:Text text=", please visit your Synapse account&nbsp;" />
+					<b:Anchor text="Settings" target="_blank" href="#!Profile:v/settings"/>
+					<bh:Text text="&nbsp;page." />
+				</b:BlockQuote>
+			</g:FlowPanel>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="primaryButton" type="PRIMARY"
