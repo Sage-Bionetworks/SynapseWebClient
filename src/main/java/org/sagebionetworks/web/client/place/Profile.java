@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.place;
 
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
@@ -9,36 +10,36 @@ import com.google.gwt.place.shared.Prefix;
 public class Profile extends Place implements RestartActivityOptional{
 	public static final String EDIT_PROFILE_TOKEN="edit";
 	public static final String DELIMITER = "/"; 
-	public static final String SETTINGS_DELIMITER = getDelimiter(Synapse.ProfileArea.SETTINGS);
-	public static final String PROJECTS_DELIMITER = getDelimiter(Synapse.ProfileArea.PROJECTS);
-	public static final String CHALLENGES_DELIMITER = getDelimiter(Synapse.ProfileArea.CHALLENGES);
-	public static final String TEAMS_DELIMITER = getDelimiter(Synapse.ProfileArea.TEAMS);
 	
 	private String token;
 	private String userId;
+	private String teamId;
 	private ProfileArea area;
+	private ProjectFilterEnum projectFilter;
 	private boolean noRestartActivity;
 	
 	public Profile(String token) {
-		this.token = token;
-		int firstSlash = token.indexOf(DELIMITER);
-		if (firstSlash > -1) {
-			userId = token.substring(0, firstSlash);
-			//there's more
-			String toProcess = token.substring(firstSlash);
-			
-			if(toProcess.contains(SETTINGS_DELIMITER)) {
-				area = Synapse.ProfileArea.SETTINGS;
-				return;
-			} else if(toProcess.contains(PROJECTS_DELIMITER)) {
-				area = Synapse.ProfileArea.PROJECTS;
-				return;
-			} else if(toProcess.contains(CHALLENGES_DELIMITER)) {
-				area = Synapse.ProfileArea.CHALLENGES;
-				return;
-			} else if(toProcess.contains(TEAMS_DELIMITER)) {
-				area = Synapse.ProfileArea.TEAMS;
-				return;
+		this.token = token.toLowerCase();
+		teamId = null;
+		area = Synapse.ProfileArea.PROJECTS;
+		projectFilter = ProjectFilterEnum.ALL;
+		String[] tokens = token.split(DELIMITER);
+		if (tokens.length > 1) {
+			// at least 2 tokens
+			userId = tokens[0];
+			try {
+				area = ProfileArea.valueOf(tokens[1].toUpperCase());
+				if(Synapse.ProfileArea.PROJECTS.equals(area)) {
+					projectFilter = ProjectFilterEnum.ALL;
+					if (tokens.length > 2) {
+						projectFilter = ProjectFilterEnum.valueOf(tokens[2].toUpperCase());
+						if (ProjectFilterEnum.TEAM.equals(projectFilter) && tokens.length > 3){
+							teamId = tokens[3];
+						}
+					}
+				}
+			} catch (Exception e) {
+				// parsing error.  will reroute to default values (All Projects)
 			}
 		} else {
 			userId = token;
@@ -63,9 +64,15 @@ public class Profile extends Place implements RestartActivityOptional{
 		return area;
 	}
 	
-	public void setArea(ProfileArea area) {
+	public ProjectFilterEnum getProjectFilter() {
+		return projectFilter;
+	}
+	
+	public void setArea(ProfileArea area, ProjectFilterEnum projectFilter, String teamId) {
 		this.area = area;
-		calculateToken(userId, area);
+		this.projectFilter = projectFilter;
+		this.teamId = teamId;
+		calculateToken(userId, area, projectFilter, teamId);
 	}
 	
 	public String getUserId() {
@@ -76,8 +83,8 @@ public class Profile extends Place implements RestartActivityOptional{
 		this.userId = userId;
 	}
 	
-	public static String getDelimiter(Synapse.ProfileArea tab) {
-		return DELIMITER+tab.toString().toLowerCase();
+	public String getTeamId() {
+		return teamId;
 	}
 	
 	@Prefix("!Profile")
@@ -103,11 +110,21 @@ public class Profile extends Place implements RestartActivityOptional{
 		return noRestartActivity;
 	}
 
-	private void calculateToken(String userId, Synapse.ProfileArea area) {
+	private void calculateToken(String userId, Synapse.ProfileArea area, ProjectFilterEnum projectFilter, String teamId) {
 		this.token = userId;
 		if(area != null) {
 			this.token += getDelimiter(area);
+			if (ProfileArea.PROJECTS.equals(area) && projectFilter != null) {
+				token += getDelimiter(projectFilter);
+				if (projectFilter.equals(ProjectFilterEnum.TEAM) && teamId != null) {
+					token += DELIMITER + teamId;
+				}
+			}
 		}
+	}
+	
+	public static String getDelimiter(Enum tab) {
+		return DELIMITER+tab.toString().toLowerCase();
 	}
 
 }
