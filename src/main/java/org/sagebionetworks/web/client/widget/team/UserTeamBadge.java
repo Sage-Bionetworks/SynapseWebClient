@@ -35,7 +35,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 				badge.configure(id);
 			}
 			theWidget = badge.asWidget();
-			theWidget.addStyleName("movedown-7");
+			theWidget.addStyleName("movedown-9");
 		} else {
 			//team
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();
