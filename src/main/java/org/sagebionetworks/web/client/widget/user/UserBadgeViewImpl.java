@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.user;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -28,8 +27,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	FocusPanel defaultUserPicture;
 	@UiField
 	Image userPicture;
-	@UiField
-	Tooltip usernameTooltip;
 	@UiField
 	Anchor usernameLink;
 	@UiField
@@ -109,7 +106,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void setDisplayName(String displayName, String shortDisplayName) {
 		loadingUI.setVisible(false);
 		usernameLink.setText(shortDisplayName);
-		usernameTooltip.setTitle(displayName);
 	}
 	
 	@Override
