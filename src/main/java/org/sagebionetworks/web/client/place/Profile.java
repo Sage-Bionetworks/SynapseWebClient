@@ -10,17 +10,6 @@ import com.google.gwt.place.shared.Prefix;
 public class Profile extends Place implements RestartActivityOptional{
 	public static final String EDIT_PROFILE_TOKEN="edit";
 	public static final String DELIMITER = "/"; 
-	public static final String SETTINGS_DELIMITER = getDelimiter(Synapse.ProfileArea.SETTINGS);
-	public static final String PROJECTS_DELIMITER = getDelimiter(Synapse.ProfileArea.PROJECTS);
-	public static final String CHALLENGES_DELIMITER = getDelimiter(Synapse.ProfileArea.CHALLENGES);
-	public static final String TEAMS_DELIMITER = getDelimiter(Synapse.ProfileArea.TEAMS);
-	
-	public static final String ALL_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.ALL);
-	public static final String FAV_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.FAVORITES);
-	public static final String CREATED_BY_ME_DELIMITER = getDelimiter(ProjectFilterEnum.CREATED_BY_ME);
-	public static final String ALL_MY_TEAM_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS);
-	public static final String SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME);
-	public static final String TEAM_PROJECTS_DELIMITER = getDelimiter(ProjectFilterEnum.TEAM);
 	
 	private String token;
 	private String userId;
@@ -30,48 +19,27 @@ public class Profile extends Place implements RestartActivityOptional{
 	private boolean noRestartActivity;
 	
 	public Profile(String token) {
-		this.token = token;
+		this.token = token.toLowerCase();
 		teamId = null;
 		area = Synapse.ProfileArea.PROJECTS;
 		projectFilter = ProjectFilterEnum.ALL;
-		
-		int slashIndex = token.indexOf(DELIMITER);
-		if (slashIndex > -1) {
-			userId = token.substring(0, slashIndex);
-			//there's more
-			String toProcess = token.substring(slashIndex);
-			if (toProcess.contains(SETTINGS_DELIMITER)) {
-				area = Synapse.ProfileArea.SETTINGS;
-				return;
-			} else if(toProcess.contains(PROJECTS_DELIMITER)) {
-				area = Synapse.ProfileArea.PROJECTS;
-				projectFilter = ProjectFilterEnum.ALL; 
-				toProcess = toProcess.substring(PROJECTS_DELIMITER.length());
-				if (toProcess.length() > 0) {
-					if (toProcess.contains(FAV_PROJECTS_DELIMITER)){
-						projectFilter = ProjectFilterEnum.FAVORITES;
-					} else if (toProcess.contains(CREATED_BY_ME_DELIMITER)){
-						projectFilter = ProjectFilterEnum.CREATED_BY_ME;
-					} else if (toProcess.contains(SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER)){
-						projectFilter = ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME;
-					} else if (toProcess.contains(ALL_MY_TEAM_PROJECTS_DELIMITER)){
-						projectFilter = ProjectFilterEnum.ALL_MY_TEAM_PROJECTS;
-					} else if (toProcess.contains(TEAM_PROJECTS_DELIMITER)){
-						projectFilter = ProjectFilterEnum.TEAM;
-						toProcess = toProcess.substring(TEAM_PROJECTS_DELIMITER.length());
-						slashIndex = toProcess.indexOf(DELIMITER);
-						if (slashIndex > -1) {
-							teamId = toProcess.substring(slashIndex + 1);
+		String[] tokens = token.split(DELIMITER);
+		if (tokens.length > 1) {
+			// at least 2 tokens
+			userId = tokens[0];
+			try {
+				area = ProfileArea.valueOf(tokens[1].toUpperCase());
+				if(Synapse.ProfileArea.PROJECTS.equals(area)) {
+					projectFilter = ProjectFilterEnum.ALL;
+					if (tokens.length > 2) {
+						projectFilter = ProjectFilterEnum.valueOf(tokens[2].toUpperCase());
+						if (ProjectFilterEnum.TEAM.equals(projectFilter) && tokens.length > 3){
+							teamId = tokens[3];
 						}
 					}
 				}
-				return;
-			} else if(toProcess.contains(CHALLENGES_DELIMITER)) {
-				area = Synapse.ProfileArea.CHALLENGES;
-				return;
-			} else if(toProcess.contains(TEAMS_DELIMITER)) {
-				area = Synapse.ProfileArea.TEAMS;
-				return;
+			} catch (Exception e) {
+				// parsing error.  will reroute to default values (All Projects)
 			}
 		} else {
 			userId = token;
@@ -119,10 +87,6 @@ public class Profile extends Place implements RestartActivityOptional{
 		return teamId;
 	}
 	
-	public static String getDelimiter(Enum tab) {
-		return DELIMITER+tab.toString().toLowerCase();
-	}
-	
 	@Prefix("!Profile")
 	public static class Tokenizer implements PlaceTokenizer<Profile> {
         @Override
@@ -157,7 +121,10 @@ public class Profile extends Place implements RestartActivityOptional{
 				}
 			}
 		}
-		
+	}
+	
+	public static String getDelimiter(Enum tab) {
+		return DELIMITER+tab.toString().toLowerCase();
 	}
 
 }

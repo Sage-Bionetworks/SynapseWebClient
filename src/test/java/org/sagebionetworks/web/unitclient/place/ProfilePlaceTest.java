@@ -30,7 +30,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testProjectsCase() {
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER;
+		String testToken = testUserId + PROJECTS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -39,7 +39,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testChallengesCase() {
-		String testToken = testUserId + Profile.CHALLENGES_DELIMITER;
+		String testToken = testUserId + CHALLENGES_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.CHALLENGES, place.getArea());
@@ -48,7 +48,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testSettingsCase() {
-		String testToken = testUserId + Profile.SETTINGS_DELIMITER;
+		String testToken = testUserId + SETTINGS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.SETTINGS, place.getArea());
@@ -57,7 +57,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testTeamsCase() {
-		String testToken = testUserId + Profile.TEAMS_DELIMITER;
+		String testToken = testUserId + TEAMS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.TEAMS, place.getArea());
@@ -66,7 +66,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testAllProjectFilterCase() {
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER + Profile.ALL_PROJECTS_DELIMITER;
+		String testToken = testUserId + PROJECTS_DELIMITER + ALL_PROJECTS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -76,7 +76,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testFavProjectFilterCase() {
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER + Profile.FAV_PROJECTS_DELIMITER;
+		String testToken = testUserId + PROJECTS_DELIMITER + FAV_PROJECTS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -86,7 +86,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testMyProjectFilterCase() {
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER + Profile.CREATED_BY_ME_DELIMITER;
+		String testToken = testUserId + PROJECTS_DELIMITER + CREATED_BY_ME_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -96,7 +96,7 @@ public class ProfilePlaceTest {
 	
 	@Test
 	public void testSharedWithMeProjectFilterCase() {
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER + Profile.SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER;
+		String testToken = testUserId + PROJECTS_DELIMITER + SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -106,7 +106,7 @@ public class ProfilePlaceTest {
 
 	@Test
 	public void testAllMyTeamsProjectFilterCase() {
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER + Profile.ALL_MY_TEAM_PROJECTS_DELIMITER;
+		String testToken = testUserId + PROJECTS_DELIMITER + ALL_MY_TEAM_PROJECTS_DELIMITER;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -117,7 +117,7 @@ public class ProfilePlaceTest {
 	@Test
 	public void testTeamProjectFilterCase() {
 		String teamId = "99993";
-		String testToken = testUserId + Profile.PROJECTS_DELIMITER + Profile.TEAM_PROJECTS_DELIMITER + Profile.DELIMITER + teamId;
+		String testToken = testUserId + PROJECTS_DELIMITER + TEAM_PROJECTS_DELIMITER + Profile.DELIMITER + teamId;
 		Profile place = tokenizer.getPlace(testToken);
 		assertEquals(testUserId, place.getUserId());
 		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
@@ -125,5 +125,18 @@ public class ProfilePlaceTest {
 		assertEquals(ProjectFilterEnum.TEAM, place.getProjectFilter());
 		assertEquals(teamId, place.getTeamId());
 	}
+	
+	public static final String SETTINGS_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.SETTINGS);
+	public static final String PROJECTS_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.PROJECTS);
+	public static final String CHALLENGES_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.CHALLENGES);
+	public static final String TEAMS_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.TEAMS);
+	
+	public static final String ALL_PROJECTS_DELIMITER = Profile.getDelimiter(ProjectFilterEnum.ALL);
+	public static final String FAV_PROJECTS_DELIMITER = Profile.getDelimiter(ProjectFilterEnum.FAVORITES);
+	public static final String CREATED_BY_ME_DELIMITER = Profile.getDelimiter(ProjectFilterEnum.CREATED_BY_ME);
+	public static final String ALL_MY_TEAM_PROJECTS_DELIMITER = Profile.getDelimiter(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS);
+	public static final String SHARED_DIRECTLY_WITH_ME_PROJECTS_DELIMITER = Profile.getDelimiter(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME);
+	public static final String TEAM_PROJECTS_DELIMITER = Profile.getDelimiter(ProjectFilterEnum.TEAM);
+	
 
 }
