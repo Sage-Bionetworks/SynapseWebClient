@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 
-import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID;
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
@@ -40,6 +39,9 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
@@ -73,8 +75,6 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.Alert;
-import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
@@ -109,7 +109,6 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -137,6 +136,18 @@ public class DisplayUtils {
         QUESTION
 	}
 	
+	public static NotifySettings getDefaultSettings() {
+		NotifySettings notifySettings = NotifySettings.newSettings();
+		notifySettings.setTemplate("<div data-notify=\"container\" class=\"col-xs-11 alert alert-{0}\" role=\"alert\">\n" + 
+				"  <button type=\"button\" aria-hidden=\"true\" class=\"close\" data-notify=\"dismiss\">x</button>\n" + 
+				"  <span data-notify=\"icon\"></span>\n" + 
+				"  <strong><span data-notify=\"title\">{1}</span></strong>\n" + 
+				"  <span data-notify=\"message\">{2}</span>\n" + 
+				"  <a href=\"{3}\" target=\"{4}\" data-notify=\"url\"></a>\n" + 
+				"</div>");
+		
+		return notifySettings;
+	}
 	/**
 	 * Returns a properly aligned icon from an ImageResource
 	 * @param icon
@@ -466,32 +477,27 @@ public class DisplayUtils {
 
 	/**
 	 * Shows an info message to the user in the "Global Alert area".
-	 * For more precise control over how the message appears,
-	 * use the {@link displayGlobalAlert(Alert)} method.
 	 * @param title
 	 * @param message
 	 */
-	public static void showInfo(String title, String message) {	
-		Alert alert = new Alert(title, message, false);
-		alert.setAlertType(AlertType.Info);
-		alert.setTimeout(4000);
-		displayGlobalAlert(alert);
+	public static void showInfo(String title, String message) {
+		NotifySettings settings = getDefaultSettings();
+		settings.setType(NotifyType.INFO);
+		Notify.notify(title, message, settings);
 	}
 
 	/**
 	 * Shows an warning message to the user in the "Global Alert area".
-	 * For more precise control over how the message appears,
-	 * use the {@link displayGlobalAlert(Alert)} method.
 	 * @param title
 	 * @param message
 	 */
 	public static void showError(String title, String message, Integer timeout) {
-		Alert alert = new Alert(title, message, true);
-		alert.setAlertType(AlertType.Error);
-		if(timeout != null) {
-			alert.setTimeout(timeout);
+		NotifySettings settings = getDefaultSettings();
+		settings.setType(NotifyType.DANGER);
+		if (timeout != null) {
+			settings.setDelay(timeout);	
 		}
-		displayGlobalAlert(alert);
+		Notify.notify(title, message, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
@@ -1127,16 +1133,6 @@ public class DisplayUtils {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * The preferred method for creating new global alerts.  For a
-	 * default 'info' type alert, you can also use {@link showInfo(String, String)}
-	 * @param alert
-	 */
-	public static void displayGlobalAlert(Alert alert) {
-		Element container = DOM.getElementById(ALERT_CONTAINER_ID);
-		DOM.insertChild(container, alert.getElement(), 0);
 	}
 	
 	public static String getVersionDisplay(Versionable versionable) {		
