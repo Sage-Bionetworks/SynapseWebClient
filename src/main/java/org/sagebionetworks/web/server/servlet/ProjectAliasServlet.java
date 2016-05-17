@@ -106,10 +106,17 @@ public class ProjectAliasServlet extends HttpServlet {
 		try {
 			SynapseClient client = createNewClient(token);
 			perThreadRequest.set(httpRqst);
-			String alias = requestURL.getPath().substring(1);
-			EntityId entityId = client.getEntityIdByAlias(alias);
-			String newPath = "/#!Synapse:" + entityId.getId();
-			
+			String path = requestURL.getPath().substring(1);
+			String[] tokens = path.split("/");
+			EntityId entityId = client.getEntityIdByAlias(tokens[0]);
+			StringBuilder newPathBuilder = new StringBuilder();
+			newPathBuilder.append("/#!Synapse:");
+			newPathBuilder.append(entityId.getId());
+			for (int i = 1; i < tokens.length; i++) {
+				newPathBuilder.append("/");
+				newPathBuilder.append(tokens[i]);
+			}
+			String newPath = newPathBuilder.toString();
 			URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), newPath);
 			response.sendRedirect(response.encodeRedirectURL(redirectURL.toString()));
 		} catch (SynapseException e) {
