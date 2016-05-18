@@ -41,8 +41,11 @@ public class ProjectAliasServletTest {
 	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	ProjectAliasServlet servlet;
-	String testAliasUrl = "https://www.synapse.org/MyAlias";
+	String testAlias = "MyAlias";
+	String testAliasUrl = "https://www.synapse.org/" + testAlias;
 	String testAliasSynapseId = "syn3334444";
+	String testFilesPath = "/files";
+	
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		servlet = new ProjectAliasServlet();
@@ -84,6 +87,21 @@ public class ProjectAliasServletTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).encodeRedirectURL(captor.capture());
 		assertTrue(captor.getValue().endsWith("/#!Synapse:"+testAliasSynapseId));
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
+	public void testWithPathRedirect() throws Exception {
+		mockRequest = mock(HttpServletRequest.class);
+		StringBuffer sb = new StringBuffer();
+		sb.append(testAliasUrl);
+		sb.append(testFilesPath);
+		when(mockRequest.getRequestURL()).thenReturn(sb);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getEntityIdByAlias(eq(testAlias));
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockResponse).encodeRedirectURL(captor.capture());
+		assertTrue(captor.getValue().endsWith("/#!Synapse:"+testAliasSynapseId + testFilesPath));
 		verify(mockResponse).sendRedirect(anyString());
 	}
 	
