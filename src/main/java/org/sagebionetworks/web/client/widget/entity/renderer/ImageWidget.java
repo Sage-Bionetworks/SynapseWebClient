@@ -16,7 +16,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
 	AuthenticationController authenticationController;
-	
+	public static final String MAX_WIDTH_NONE = "max-width-none";
 	@Inject
 	public ImageWidget(ImageWidgetView view, 
 			AuthenticationController authenticationController) {
@@ -34,6 +34,11 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
 				synapseId, authenticationController.isLoggedIn(), wikiVersionInView);
+		
+		String responsiveValue = descriptor.get(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY);
+		if (responsiveValue != null && !Boolean.parseBoolean(responsiveValue)) {
+			view.addStyleName(MAX_WIDTH_NONE);
+		}
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 	}
