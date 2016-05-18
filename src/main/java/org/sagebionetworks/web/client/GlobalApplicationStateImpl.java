@@ -305,15 +305,32 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change
+		setCurrentPlaceInHistory(targetPlace, true);
+	}
+	
+	@Override
+	public void replaceCurrentPlace(Place targetPlace) {
+		setCurrentPlaceInHistory(targetPlace, false);
+	}
+	
+	
+	private void setCurrentPlaceInHistory(Place targetPlace, boolean pushState) {
+		//only push this place into the history if it is a place change
 		if (targetPlace != null && !(targetPlace.equals(getCurrentPlace()))) {
 			setLastPlace(getCurrentPlace());
 			setCurrentPlace(targetPlace);
 			String token = appPlaceHistoryMapper.getToken(targetPlace);
-			synapseJSNIUtils.pushHistoryState(token);
+			if (pushState) {
+				synapseJSNIUtils.pushHistoryState(token);	
+			} else {
+				synapseJSNIUtils.replaceHistoryState(token);
+			}
 			
 			recordPlaceVisit(targetPlace);
 		}
 	}
+	
+	
 	@Override
 	public void recordPlaceVisit(Place targetPlace) {
 		String token = appPlaceHistoryMapper.getToken(targetPlace);

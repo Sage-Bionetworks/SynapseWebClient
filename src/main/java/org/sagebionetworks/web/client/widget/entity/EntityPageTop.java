@@ -73,7 +73,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
-	
+	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
@@ -125,7 +125,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		tabs.addTab(tablesTab.asTab());
 		tabs.addTab(adminTab.asTab());
 		tabs.addTab(discussionTab.asTab());
-		
 		CallbackP<Boolean> showHideProjectInfoCallback = new CallbackP<Boolean>() {
 			public void invoke(Boolean visible) {
 				view.setProjectInformationVisible(visible);
@@ -170,21 +169,21 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		}
 		//go to the tab corresponding to the area stated
+		
 		if (area == EntityArea.WIKI) {
-			tabs.showTab(wikiTab.asTab());
+			tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 			wikiAreaToken = areaToken;
 		} else if (area == EntityArea.FILES) {
-			tabs.showTab(filesTab.asTab());
+			tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		} else if (area == EntityArea.TABLES) {
-			tabs.showTab(tablesTab.asTab());
+			tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 			tablesAreaToken = areaToken;
 		} else if (area == EntityArea.ADMIN) {
-			tabs.showTab(adminTab.asTab());
+			tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		} else if (area == EntityArea.DISCUSSION) {
-			tabs.showTab(discussionTab.asTab());
+			tabs.showTab(discussionTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 			discussionAreaToken = areaToken;
 		}
-		
     	//note: the files/tables/wiki/discussion tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
@@ -334,7 +333,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				//if wiki area not specified and no wiki found, show Files tab instead for projects 
 				// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
 				if(isWikiTabShown) {
-					tabs.showTab(filesTab.asTab());
+					tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				}
 			}
 		};
@@ -344,7 +343,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
 		if (isWikiTabShown) {
 			//initially push the configured place into the browser history
-			tabs.showTab(wikiTab.asTab());
+			tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		}
 
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){

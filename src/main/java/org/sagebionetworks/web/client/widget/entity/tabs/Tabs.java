@@ -13,6 +13,7 @@ public class Tabs implements IsWidget {
 	TabsView view;
 	CallbackP<Tab> onTabClickedCallback;
 	List<Tab> allTabs;
+	
 	@Inject
 	public Tabs(TabsView view) {
 		this.view = view;
@@ -44,14 +45,14 @@ public class Tabs implements IsWidget {
 		}
 	}
 	
-	public void showTab(Tab tab) {
+	public void showTab(Tab tab, boolean isPushState) {
 		hideAllTabs();
 		//and show the tab
-		tab.showTab();
+		tab.showTab(isPushState);
 	}
 	
 	public void onTabClicked(Tab tabClicked) {
-		showTab(tabClicked);
+		showTab(tabClicked, true);
 	}
 	
 	@Override
