@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEditorPresenter {
 	
+	public static final String UNRECOGNIZED_VIDEO_FORMAT_MESSAGE = "Unrecognized video format";
 	private VideoConfigView view;
 	private Map<String, String> descriptor;
 	private SynapseClientAsync synapseClient;
@@ -55,7 +56,6 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
@@ -90,7 +90,7 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 					} else if (isRecognizedWebMFileName(fileName)) {
 						currentType = VIDEO_TYPE.WEBM;
 					} else {
-						view.showFinderError("Unrecognized video format");
+						view.showFinderError(UNRECOGNIZED_VIDEO_FORMAT_MESSAGE);
 					}
 				}
 				if (currentType != null) {

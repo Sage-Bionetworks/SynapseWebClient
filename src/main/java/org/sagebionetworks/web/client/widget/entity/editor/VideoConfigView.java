@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface VideoConfigView extends IsWidget, WidgetEditorView {
 
