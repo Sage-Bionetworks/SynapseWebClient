@@ -14,6 +14,8 @@ public interface ImageWidgetView extends IsWidget {
 	
 	public void configure(WikiPageKey wikiKey, String fileName, String scale, String alignment, String synapseId, boolean isLoggedIn, Long wikiVersion);
 	
+	void addStyleName(String style);
+	
 	/**
 	 * Presenter interface
 	 */

@@ -32,7 +32,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 	private static final int MAX_IMAGE_WIDTH = 940;
 	//if image fails to load from the given source, it will try to load from the cache (this is for the case when the image has been uploaded, but the wiki has not yet been saved)
 	private boolean hasTriedCache;
-	
+	private Image image;
 	@Inject
 	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, GlobalApplicationState globalApplicationState, ClientCache clientCache) {
 		this.synapseJsniUtils = synapseJsniUtils;
@@ -57,8 +57,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
 		}
 		
-		final Image image = new Image();
-		image.addStyleName("maxWidth100");
+		image = new Image();
 		if (synapseId != null) {
 			image.addStyleName("imageButton");
 			image.addClickHandler(new ClickHandler() {
@@ -149,6 +148,12 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		image.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		add(image);
 		image.setUrl(url);
+	}
+	
+	public void addStyleName(String style) {
+		if (image != null) {
+			image.addStyleName(style);
+		}
 	}
 
 	public void showError(String error) {
