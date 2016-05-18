@@ -262,6 +262,27 @@ public class GlobalApplicationStateImplTest {
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockSynapseJSNIUtils).pushHistoryState(newToken);
 	}
+	
+	@Test
+	public void testReplaceCurrentPlace(){
+		String newToken = "/some/new/token";
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		//should have set the last place (to the current), and the current place (as requested)
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
+		verify(mockSynapseJSNIUtils).replaceHistoryState(newToken);
+		
+		//if I push the same place again, it should not push the history state again
+		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
+		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		//verify that these were still only called once
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
+		verify(mockSynapseJSNIUtils).replaceHistoryState(newToken);
+	}
 
 	@Test
 	public void testInitOnPopStateHandler() {

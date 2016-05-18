@@ -191,7 +191,7 @@ public class EntityPageTopTest {
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		//Area was not defined for this project, should try to go to wiki tab by default.
 		//Once to show the active tab, and once after configuration so that the place is pushed into the history.
-		verify(mockTabs, times(2)).showTab(mockWikiInnerTab);
+		verify(mockTabs, times(2)).showTab(mockWikiInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
@@ -229,7 +229,7 @@ public class EntityPageTopTest {
 		String areaToken = null;
 		Long versionNumber = 5L;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockFilesInnerTab);
+		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
@@ -250,7 +250,7 @@ public class EntityPageTopTest {
 		String areaToken = null;
 		Long versionNumber = 5L;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockFilesInnerTab);
+		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
 		verify(mockEntityMetadata, Mockito.never()).setEntityBundle(mockProjectBundle, null);
 		EntityBundle expectedProjectEntityBundle = null;
@@ -269,7 +269,7 @@ public class EntityPageTopTest {
 		String areaToken = "a table query area token";
 		Long versionNumber = null;
 		pageTop.configure(mockTableEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockTablesInnerTab);
+		verify(mockTabs).showTab(mockTablesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
@@ -289,7 +289,7 @@ public class EntityPageTopTest {
 		String areaToken = null;
 		Long versionNumber = null;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockChallengeInnerTab);
+		verify(mockTabs).showTab(mockChallengeInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
