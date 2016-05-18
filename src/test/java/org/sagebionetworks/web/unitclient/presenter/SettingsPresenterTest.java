@@ -136,7 +136,8 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).showPasswordChangeSuccess();		
+		verify(mockView).showPasswordChangeSuccess();
+		verify(mockPasswordStrengthWidget).setVisible(false);
 	}
 	
 	@Test
@@ -353,6 +354,7 @@ public class SettingsPresenterTest {
 	public void testAsWidget() {
 		profilePresenter.asWidget();
 		verify(mockSynAlert, times(5)).clear();
+		verify(mockPasswordStrengthWidget).setVisible(false);
 		verify(mockView).clear();
 		verify(mockView).asWidget();
 		verify(mockSubscriptionListWidget).configure();
