@@ -108,6 +108,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
@@ -2089,18 +2090,27 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetStorageLocationSettingEmptyLocations() throws SynapseException, RestServiceException {
-		UploadDestinationListSetting setting = new UploadDestinationListSetting();
-		setting.setLocations(Collections.EMPTY_LIST);
-		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+	public void testGetStorageLocationSettingNullUploadDestination() throws SynapseException, RestServiceException {
+		assertNull(synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingDefaultUploadDestination() throws SynapseException, RestServiceException {
+		UploadDestination setting = Mockito.mock(UploadDestination.class);
+		String defaultStorageId = synapseClient.getSynapseProperties().get(SynapseClientImpl.DEFAULT_STORAGE_ID_PROPERTY_KEY);
+		when(setting.getStorageLocationId()).thenReturn(Long.parseLong(defaultStorageId));
+		when(mockSynapse.getDefaultUploadDestination(entityId)).thenReturn(setting);
+		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
+		
 		assertNull(synapseClient.getStorageLocationSetting(entityId));
 	}
 	
 	@Test
 	public void testGetStorageLocationSetting() throws SynapseException, RestServiceException {
-		UploadDestinationListSetting setting = new UploadDestinationListSetting();
-		setting.setLocations(Collections.singletonList(42L));
-		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+		UploadDestination setting = Mockito.mock(UploadDestination.class);
+		when(setting.getStorageLocationId()).thenReturn(42L);
+		when(mockSynapse.getDefaultUploadDestination(entityId)).thenReturn(setting);
 		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
 		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
 		assertEquals(mockStorageLocationSetting, synapseClient.getStorageLocationSetting(entityId));

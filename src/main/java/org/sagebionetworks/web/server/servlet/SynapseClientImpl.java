@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -35,7 +34,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
@@ -75,7 +73,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -175,6 +172,7 @@ import com.google.gwt.core.server.StackTraceDeobfuscator;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
+	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
 	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
@@ -2337,7 +2335,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 
 	}
-
+	
 	private String getSynapseProperty(String key) {
 		return PortalPropertiesHolder.getProperty(key);
 	}
@@ -2377,7 +2375,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return propsMap;
 		}
 	}
-
+	
+	public static Long defaultStorageLocation = Long.parseLong(PortalPropertiesHolder.getProperty(DEFAULT_STORAGE_ID_PROPERTY_KEY));
+	
 	@Override
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2948,16 +2948,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException{
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			UploadDestinationListSetting setting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
-			if (setting == null || 
-					CollectionUtils.isEmpty(setting.getLocations()) || 
-					setting.getLocations().get(0) == null) {
+			UploadDestination uploadDestination = synapseClient.getDefaultUploadDestination(parentEntityId);
+			if (uploadDestination == null || uploadDestination.getStorageLocationId().equals(defaultStorageLocation)) {
 				//default storage location
 				return null;
 			}
 			
 			//else
-			return synapseClient.getMyStorageLocationSetting(setting.getLocations().get(0));
+			return synapseClient.getMyStorageLocationSetting(uploadDestination.getStorageLocationId());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
