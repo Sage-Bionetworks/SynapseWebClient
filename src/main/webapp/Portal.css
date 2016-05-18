@@ -1018,6 +1018,11 @@ a.shortBtn {
 	max-width: 100%;
 }
 
+.max-width-none, #rootPanel .max-width-none {
+	max-width: none;
+}
+
+
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }

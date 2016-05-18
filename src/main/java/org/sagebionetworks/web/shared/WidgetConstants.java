@@ -108,6 +108,7 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
+	public static final String IMAGE_WIDGET_RESPONSIVE_KEY = "responsive";
 	
 	public static final String SYNAPSE_ID_KEY = "synapseId";
 	public static final String STYLE_SYNAPSE_ID_KEY = "styleSynapseId";
