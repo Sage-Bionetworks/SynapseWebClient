@@ -122,6 +122,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
 									@Override
 									public void onSuccess(Void result) {
+										passwordStrengthWidget.setVisible(false);
 										view.showPasswordChangeSuccess();
 										// login user as session token
 										// has changed
@@ -266,6 +267,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
+		passwordStrengthWidget.setVisible(false);
 		if (authenticationController.isLoggedIn()) {
 			updateUserStorage();
 			getUserNotificationEmail();
