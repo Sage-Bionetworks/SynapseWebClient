@@ -61,7 +61,7 @@
 			</div>
 			<div class="row margin-bottom-40">
 			    <div class="col-sm-10 col-sm-offset-1">
-					<g:Button ui:field="registerBtn" styleName="btn btn-lg btn-primary margin-top-10 right" text="Register"/>
+			    	<b:Button ui:field="registerBtn" addStyleNames="margin-top-10" type="PRIMARY" size="LARGE" pull="RIGHT" dataLoadingText="Register...">Register</b:Button>
 				</div>
 			</div>
 			<div class="clear"></div>

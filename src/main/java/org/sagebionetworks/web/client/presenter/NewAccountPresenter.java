@@ -90,15 +90,18 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	
 	@Override
 	public void completeRegistration(String userName, String fName, String lName, String password) {
+		view.setLoading(true);
 		userAccountService.createUserStep2(userName, fName, lName, password, emailValidationToken, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sessionToken) {
+				view.setLoading(false);
 				//success, send to login place to continue login process (sign terms of use...)
 				view.showInfo(DisplayConstants.ACCOUNT_CREATED, "");
 				globalAppState.getPlaceChanger().goTo(new LoginPlace(sessionToken));
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoading(false);
 				view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + caught.getMessage());
 			}
 		});

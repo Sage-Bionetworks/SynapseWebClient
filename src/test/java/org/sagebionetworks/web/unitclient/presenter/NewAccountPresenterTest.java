@@ -148,6 +148,8 @@ public class NewAccountPresenterTest {
 		String emailValidationToken = "a&b&c=123";
 		newAccountPresenter.setEmailValidationToken(emailValidationToken);
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
+		verify(mockView).setLoading(true);
+		verify(mockView).setLoading(false);
 		verify(mockUserService).createUserStep2(eq(userName), eq(firstName), eq(lastName), eq(password), eq(emailValidationToken), any(AsyncCallback.class));
 		
 		//should go to the login place with the new session token
