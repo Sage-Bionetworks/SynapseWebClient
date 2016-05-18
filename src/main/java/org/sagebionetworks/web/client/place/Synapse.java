@@ -6,7 +6,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class Synapse extends Place implements RestartActivityOptional{
+public class Synapse extends Place {
 	public static final String DOT_REGEX = "\\.";
 	public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
 	public static final String VERSION_DELIMITER = "/version/";
@@ -21,7 +21,6 @@ public class Synapse extends Place implements RestartActivityOptional{
 	private String entityId, areaToken;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
-	private boolean noRestartActivity;
 	
 	public Synapse(String token) {
 		this.token = token;
@@ -180,16 +179,6 @@ public class Synapse extends Place implements RestartActivityOptional{
 		} else if (!token.equals(other.token))
 			return false;
 		return true;
-	}
-
-	@Override
-	public void setNoRestartActivity(boolean noRestart) {
-		this.noRestartActivity = noRestart;
-	}
-
-	@Override
-	public boolean isNoRestartActivity() {
-		return noRestartActivity;
 	}
 	
 	/**
