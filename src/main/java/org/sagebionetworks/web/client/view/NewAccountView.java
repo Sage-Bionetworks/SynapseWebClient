@@ -16,6 +16,7 @@ public interface NewAccountView extends IsWidget, SynapseView {
 	void markUsernameUnavailable();
 	void setEmail(String email);
 	void setPasswordStrengthWidget(Widget w);
+	void setLoading(boolean loading);
 	public interface Presenter extends SynapsePresenter {
 		void checkUsernameAvailable(String username);
 		void completeRegistration(String userName, String fName, String lName, String password);
