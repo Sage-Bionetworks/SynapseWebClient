@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -37,13 +38,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private boolean isEditing;
-	private HashMap<String, String> synapseProperties;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-
+	private SessionStorage sessionStorage;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -51,13 +51,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			EventBus eventBus, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils synapseJSNIUtils, 
-			ClientLogger logger) {
+			ClientLogger logger,
+			SessionStorage sessionStorage) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
+		this.sessionStorage = sessionStorage;
 		this.view = view;
 		isEditing = false;
 		initUncaughtExceptionHandler();
@@ -241,19 +243,32 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public void initSynapseProperties(final Callback c) {
-		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
-			@Override
-			public void onSuccess(HashMap<String, String> properties) {
-				synapseProperties = properties;
-				initWikiEntities(properties);
-				initSynapseVersions(c);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				c.invoke();
-			}
-		});
+		String isLoaded = sessionStorage.getItem("synapse_properties_loaded");
+		if (isLoaded != null) {
+			//skip loading properties, they should already be in there.
+			initWikiEntitiesAndVersions(c);
+		} else {
+			synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+				@Override
+				public void onSuccess(HashMap<String, String> properties) {
+					for (String key : properties.keySet()) {
+						sessionStorage.setItem(key, properties.get(key));
+					}
+					sessionStorage.setItem("synapse_properties_loaded", "true");
+					initWikiEntitiesAndVersions(c);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					c.invoke();
+				}
+			});
+		}
+	}
+	
+	public void initWikiEntitiesAndVersions(Callback c) {
+		initWikiEntities();
+		initSynapseVersions(c);
 	}
 	
 	public void initSynapseVersions(final Callback c) {
@@ -274,10 +289,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public String getSynapseProperty(String key) {
-		if (synapseProperties != null)
-			return synapseProperties.get(key);
-		else 
-			return null;
+		return sessionStorage.getItem(key);
 	}
 
 	@Override
@@ -293,13 +305,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	 * Setup the wiki based entities.
 	 * @param properties
 	 */
-	private void initWikiEntities(HashMap<String, String> properties) {
+	private void initWikiEntities() {
 		wikiBasedEntites = new HashSet<String>();
-		wikiBasedEntites.add(properties.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
 	@Override
