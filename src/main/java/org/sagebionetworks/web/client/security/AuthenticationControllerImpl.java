@@ -2,18 +2,18 @@ package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
 
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.shared.UserLoginBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -28,22 +28,24 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
+	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
-	private static UserBundle userBundle;
 	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private SessionStorage sessionStorage;
 	private ClientCache localStorage;
+	private AdapterFactory adapterFactory;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage, ClientCache localStorage){
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage, ClientCache localStorage, AdapterFactory adapterFactory){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
+		this.adapterFactory = adapterFactory;
 	}
 
 	@Override
@@ -88,7 +90,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		sessionStorage.clear();
 		currentUser = null;
-		userBundle = null;
 	}
 
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
@@ -98,26 +99,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			return;
 		}
 		
-		// clear out old userBundle
-		userBundle = null;
-		
-		userAccountService.getUserLoginBundle(token, new AsyncCallback<UserLoginBundle>() {
+		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
 			@Override
-			public void onSuccess(UserLoginBundle userLoginBundle) {
-				UserSessionData userSessionData = userLoginBundle.getUserSessionData();
-				UserBundle fetchedUserBundle = userLoginBundle.getUserBundle();
-				if (userSessionData != null) {					
-					Date tomorrow = getDayFromNow();
-					cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
-					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
-					currentUser = userSessionData;
-					if (fetchedUserBundle != null) {
-						userBundle = fetchedUserBundle;	
-					}
-					callback.onSuccess(userSessionData);
-				} else {
-					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
-				}
+			public void onSuccess(UserSessionData userSessionData) {
+				Date tomorrow = getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
+				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
+				currentUser = userSessionData;
+				sessionStorage.setItem(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser));
+				callback.onSuccess(userSessionData);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -127,6 +117,25 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		});
 	}
 
+	public String getUserSessionDataString(UserSessionData session) {
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		try {
+			session.writeToJSONObject(adapter);
+			return adapter.toJSONString();
+		} catch (JSONObjectAdapterException e) {
+			return null;
+		}
+	}
+	
+	public UserSessionData getUserSessionData(String sessionString) {
+		try {
+			return new UserSessionData(adapterFactory.createNew(sessionString));
+		} catch (JSONObjectAdapterException e) {
+			return null;
+		}
+	}
+	
+	
 	@Override
 	public void updateCachedProfile(UserProfile updatedProfile){
 		if(currentUser != null) {
@@ -159,7 +168,22 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void reloadUserSessionData(AsyncCallback<UserSessionData> callback) {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		setUser(sessionToken, callback);
+		// try to set current user and bundle from session cache
+		currentUser = null;
+		if (sessionToken != null) {
+			// try to load user session data from session storage
+			String sessionStorageString = sessionStorage.getItem(USER_SESSION_DATA_CACHE_KEY);
+			if (sessionStorageString != null) {
+				currentUser = getUserSessionData(sessionStorageString);
+				callback.onSuccess(currentUser);
+				return;
+			}
+		}
+		
+		if (currentUser == null) {
+			// do the rpc call to get the user session
+			setUser(sessionToken, callback);
+		}
 	}
 
 	@Override
@@ -174,16 +198,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public String getCurrentUserSessionToken() {
 		if(currentUser != null) return currentUser.getSession().getSessionToken();
 		else return null;
-	}
-	
-	@Override
-	public UserBundle getCurrentUserBundle() {
-		if (currentUser != null && userBundle != null && currentUser.getProfile() != null
-				&& userBundle.getUserId().equals(currentUser.getProfile().getOwnerId())) {
-			return userBundle;
-		} else {
-			return null;
-		}
 	}
 	
 	@Override

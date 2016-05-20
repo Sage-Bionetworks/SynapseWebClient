@@ -40,6 +40,4 @@ public interface UserAccountService extends RemoteService {
 	
 	public StorageUsageSummaryList getStorageUsage();
 
-	public UserLoginBundle getUserLoginBundle(String sessionToken) throws RestServiceException;
-
 }
