@@ -24,6 +24,12 @@ public class CookieKeys {
 	 * Login token
 	 */
 	public static String USER_LOGIN_TOKEN = "org.sagebionetworks.security.user.login.token";
+	/**
+	 * Attempting to save user session into web storage does not currently work on Chrome.
+	 * On app startup, despite showing the key value in local storage, getting the value
+	 * at this time results in null.
+	 */
+	public static String USER_SESSION = "org.sagebionetworks.security.user.login.session";
 
 	/**
 	 * Login token
