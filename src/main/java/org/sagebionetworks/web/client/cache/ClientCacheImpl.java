@@ -12,7 +12,6 @@ public class ClientCacheImpl implements ClientCache {
 	public ClientCacheImpl(StorageWrapper storage) {
 		this.storage = storage;
 	}
-
 	
 	@Override
 	public String get(String key) {
