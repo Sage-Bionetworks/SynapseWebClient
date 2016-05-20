@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
 
-import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
@@ -10,11 +9,13 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,6 +31,7 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
+	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
@@ -41,7 +43,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private AdapterFactory adapterFactory;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, SessionStorage sessionStorage, ClientCache localStorage, AdapterFactory adapterFactory){
+	public AuthenticationControllerImpl(
+			CookieProvider cookies, 
+			UserAccountServiceAsync userAccountService, 
+			SessionStorage sessionStorage, 
+			ClientCache localStorage, 
+			AdapterFactory adapterFactory){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
@@ -69,7 +76,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	public void storeAuthenticationReceipt(String username, String receipt) {
-		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt);
+		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, getDayFromNow().getTime());
 	}
 	public LoginRequest getLoginRequest(String username, String password) {
 		LoginRequest request = new LoginRequest();
@@ -88,24 +95,17 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void logoutUser() {
 		// don't actually terminate session, just remove the cookie
-		cookies.removeCookie(CookieKeys.USER_SESSION);
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		localStorage.remove(USER_SESSION_DATA_CACHE_KEY);
 		sessionStorage.clear();
 		currentUser = null;
 	}
 
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
+			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
-		} else if (token.equals(cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN))) {
-			// skip rpc, return cached value from cookie
-			String userSessionString = cookies.getCookie(CookieKeys.USER_SESSION);
-			if (userSessionString != null) {
-				currentUser = getUserSessionData(userSessionString);
-				callback.onSuccess(currentUser);
-				return;
-			}
 		}
 		
 		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
@@ -113,9 +113,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(UserSessionData userSessionData) {
 				Date tomorrow = getDayFromNow();
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
-				currentUser = userSessionData;
 				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
-				cookies.setCookie(CookieKeys.USER_SESSION, getUserSessionDataString(currentUser), tomorrow);
+				currentUser = userSessionData;
+				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 				callback.onSuccess(userSessionData);
 			}
 			@Override
@@ -175,9 +175,18 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void reloadUserSessionData(AsyncCallback<UserSessionData> callback) {
+	public void reloadUserSessionData() {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		setUser(sessionToken, callback);
+		// try to set current user and bundle from session cache
+		if (sessionToken != null) {
+			// load user session data from session storage
+			String sessionStorageString = localStorage.get(USER_SESSION_DATA_CACHE_KEY);
+			if (sessionStorageString != null) {
+				currentUser = getUserSessionData(sessionStorageString);
+			} else {
+				logoutUser();
+			}
+		}
 	}
 
 	@Override
