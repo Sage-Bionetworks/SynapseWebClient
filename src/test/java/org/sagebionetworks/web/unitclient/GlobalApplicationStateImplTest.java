@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -22,7 +23,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -44,7 +43,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.springframework.mock.web.MockAsyncContext;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -199,8 +197,8 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
-		verify(mockLocalStorage).put(key, value);
-		verify(mockCookieProvider).setCookie(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString());
+		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
+		verify(mockLocalStorage).put(eq(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY), eq(Boolean.TRUE.toString()), anyLong());
 		when(mockLocalStorage.get(key)).thenReturn(value);
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
@@ -213,7 +211,7 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testSynapsePropertiesCached() {
 		Callback mockCallback = mock(Callback.class);
-		when(mockCookieProvider.getCookie(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY)).thenReturn(Boolean.TRUE.toString());
+		when(mockLocalStorage.get(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY)).thenReturn(Boolean.TRUE.toString());
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
 		verify(mockSynapseClient, never()).getSynapseProperties(any(AsyncCallback.class));
@@ -231,7 +229,7 @@ public class GlobalApplicationStateImplTest {
 		deferredCallback.getValue().invoke();
 		//local synapse properties are updated
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
-		verify(mockLocalStorage).put(key, value);
+		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
 	}
 	
 	@Test

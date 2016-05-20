@@ -247,7 +247,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public void initSynapseProperties(final Callback c) {
-		String isLoaded = cookieProvider.getCookie(PROPERTIES_LOADED_KEY);
+		String isLoaded = localStorage.get(PROPERTIES_LOADED_KEY);
 		if (isLoaded != null) {
 			// we have properties locally, defer updating properties from server
 			gwt.scheduleDeferred(new Callback() {
@@ -270,9 +270,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key));
+					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
 				}
-				cookieProvider.setCookie(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString());
+				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
 				initWikiEntitiesAndVersions(c);
 			}
 			
