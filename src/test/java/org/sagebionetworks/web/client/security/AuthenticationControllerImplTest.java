@@ -63,7 +63,7 @@ public class AuthenticationControllerImplTest {
 		sessionData.setIsSSO(false);
 		sessionData.setProfile(new UserProfile());
 		sessionData.setSession(new Session());
-		sessionData.getSession().setSessionToken("1234");
+		sessionData.getSession().setSessionToken("1111");
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
@@ -144,16 +144,18 @@ public class AuthenticationControllerImplTest {
 		profile.setOwnerId(principalId);
 		sessionData.setProfile(profile);
 		sessionData.setSession(new Session());
-		sessionData.getSession().setSessionToken("1234");
+		sessionData.getSession().setSessionToken("4321");
 		
 		
 		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
 		
 		// not logged in
+		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
 		assertNull(authenticationController.getCurrentUserSessionData());
 		
 		// logged in
+		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		authenticationController.revalidateSession("token", callback);
 		assertEquals(sessionData, authenticationController.getCurrentUserSessionData());	
 		
@@ -221,7 +223,7 @@ public class AuthenticationControllerImplTest {
 		assertEquals(oldAuthReceipt, request.getAuthenticationReceipt());
 		
 		//verify the new receipt is cached
-		verify(mockClientCache).put(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT, newAuthReceipt);
+		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
 	}
 	

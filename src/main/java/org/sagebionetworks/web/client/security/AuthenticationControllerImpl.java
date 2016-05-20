@@ -76,8 +76,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	public void storeAuthenticationReceipt(String username, String receipt) {
-		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, getDayFromNow().getTime());
+		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, getYearFromNow().getTime());
 	}
+	
 	public LoginRequest getLoginRequest(String username, String password) {
 		LoginRequest request = new LoginRequest();
 		request.setUsername(username);
@@ -217,6 +218,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private Date getWeekFromNow() {
 		Date date = new Date();
 		CalendarUtil.addDaysToDate(date, 7);
+		return date;  
+	}
+	
+	private Date getYearFromNow() {
+		Date date = new Date();
+		CalendarUtil.addMonthsToDate(date, 12);
 		return date;  
 	}
 }

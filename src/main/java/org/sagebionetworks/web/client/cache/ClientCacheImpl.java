@@ -6,8 +6,8 @@ public class ClientCacheImpl implements ClientCache {
 	private StorageWrapper storage;
 
 	//default to an hour
-	private static final Long DEFAULT_CACHE_TIME_MS = 1000L*60L*60L;
-	private static final String SUFFIX = "_EXPIRE_TIME";
+	public static final Long DEFAULT_CACHE_TIME_MS = 1000L*60L*60L;
+	public static final String SUFFIX = "_EXPIRE_TIME";
 	@Inject
 	public ClientCacheImpl(StorageWrapper storage) {
 		this.storage = storage;
