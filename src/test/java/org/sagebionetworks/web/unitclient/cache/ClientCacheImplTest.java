@@ -31,6 +31,7 @@ public class ClientCacheImplTest {
 		String value = "testValue";
 		when(mockStorage.getItem(eq(key))).thenReturn(value);
 		cache.put(key, value);
+		when(mockStorage.getItem(key + ClientCacheImpl.SUFFIX)).thenReturn(Long.toString(System.currentTimeMillis() + ClientCacheImpl.DEFAULT_CACHE_TIME_MS));
 		verify(mockStorage).setItem(eq(key), eq(value));
 		assertTrue(cache.contains(key));
 		assertEquals(value, cache.get(key));
@@ -40,9 +41,11 @@ public class ClientCacheImplTest {
 	public void testExpiration() {
 		String key = "testkey";
 		String value = "testValue";
+		Long expireTime = System.currentTimeMillis() - 1L;
+		when(mockStorage.getItem(key + ClientCacheImpl.SUFFIX)).thenReturn(expireTime.toString());
 		when(mockStorage.getItem(eq(key))).thenReturn(value);
 		//put something in that is already expired
-		cache.put(key, value, System.currentTimeMillis() - 1L);
+		cache.put(key, value, expireTime);
 		//it should not come back because it is expired
 		assertNull(cache.get(key));
 		verify(mockStorage).removeItem(eq(key));
@@ -52,9 +55,11 @@ public class ClientCacheImplTest {
 	public void testExpirationContains() {
 		String key = "testkey";
 		String value = "testValue";
+		Long expireTime = System.currentTimeMillis() - 1L;
 		when(mockStorage.getItem(eq(key))).thenReturn(value);
+		when(mockStorage.getItem(key + ClientCacheImpl.SUFFIX)).thenReturn(expireTime.toString());
 		//put something in that is already expired
-		cache.put(key, value, System.currentTimeMillis() - 1L);
+		cache.put(key, value, expireTime);
 		assertFalse(cache.contains(key));
 		verify(mockStorage).removeItem(eq(key));
 	}

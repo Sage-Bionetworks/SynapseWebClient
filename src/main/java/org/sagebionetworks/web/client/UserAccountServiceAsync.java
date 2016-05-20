@@ -36,6 +36,4 @@ public interface UserAccountServiceAsync {
 	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);
 	
 	void getStorageUsage(AsyncCallback<StorageUsageSummaryList> callback);
-
-	void getUserLoginBundle(String sessionToken, AsyncCallback<UserLoginBundle> callback);
 }

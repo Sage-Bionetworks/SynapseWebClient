@@ -118,25 +118,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override 
-	public UserLoginBundle getUserLoginBundle(String sessionToken) throws RestServiceException {
-		validateService();
-		SynapseClient synapseClient = createSynapseClient(sessionToken);
-		try {
-			UserSessionData userSessionData = synapseClient.getUserSessionData();
-			UserBundle userBundle = null;
-			if (userSessionData.getSession().getAcceptsTermsOfUse()) {
-				long principalId = Long.valueOf(userSessionData.getProfile().getOwnerId());
-				// 63 is the mask equivalent for getting every UserBundle component
-				userBundle = synapseClient.getUserBundle(principalId, 63);
-			}
-			return new UserLoginBundle(userSessionData, userBundle);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
+
 	@Override
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
 		validateService();
