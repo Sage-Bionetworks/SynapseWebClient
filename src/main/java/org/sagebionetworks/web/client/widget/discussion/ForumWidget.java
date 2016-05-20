@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -123,22 +125,45 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 					synAlert.handleException(caught);
 				}
 				public void onSuccess(DiscussionThreadBundle threadBundle) {
-					defaultThreadBundle = threadBundle;
-					initDefaultThread(defaultThreadBundle);
+					defaultThreadBundle = createDefaultThread(threadBundle);
+					initDefaultThreadWidget();
 				};
 			});
 		} else {
 			//configure using default thread bundle
-			initDefaultThread(defaultThreadBundle);
+			initDefaultThreadWidget();
 		}
 	}
 	
-	public void initDefaultThread(DiscussionThreadBundle threadBundle) {
+	public DiscussionThreadBundle createDefaultThread(DiscussionThreadBundle stuThread) {
+		DiscussionThreadBundle defaultThreadBundle = new DiscussionThreadBundle();
+		defaultThreadBundle.setProjectId(stuThread.getProjectId());
+		defaultThreadBundle.setTitle(stuThread.getTitle());
+		defaultThreadBundle.setMessageKey(stuThread.getMessageKey());
+		defaultThreadBundle.setCreatedBy(stuThread.getCreatedBy());
+		defaultThreadBundle.setId(stuThread.getId());
+		defaultThreadBundle.setActiveAuthors(new ArrayList<String>());
+		defaultThreadBundle.setIsEdited(false);
+		defaultThreadBundle.setIsPinned(false);
+		defaultThreadBundle.setNumberOfReplies(0L);
+		defaultThreadBundle.setNumberOfViews(1L);
+		return defaultThreadBundle;
+	}
+	
+	public void resetDefaultThreadDates() {
+		Date now = new Date();
+		defaultThreadBundle.setCreatedOn(now);
+		defaultThreadBundle.setModifiedOn(now);
+		defaultThreadBundle.setLastActivity(now);
+	}
+	
+	public void initDefaultThreadWidget() {
 		Set<Long> moderatorIds = new HashSet<Long>();
 		Callback deleteCallback = null;
 		boolean showThreadDetails = true;
 		boolean showReplyDetails = false;
 		boolean isCurrentUserModerator = false;
+		resetDefaultThreadDates();
 		defaultThreadWidget.configure(defaultThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
 		defaultThreadWidget.setReplyButtonVisible(false);
 		defaultThreadWidget.setCommandsVisible(false);

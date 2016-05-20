@@ -81,6 +81,7 @@ public class ForumWidgetTest {
 	Set<Long> moderatorIds;
 	
 	public static final String DEFAULT_THREAD_ID = "424242";
+	public static final String DEFAULT_THREAD_MESSAGE_KEY = "1234567";
 	
 	@Before
 	public void setUp() {
@@ -88,6 +89,8 @@ public class ForumWidgetTest {
 		when(mockGlobalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY)).thenReturn(DEFAULT_THREAD_ID);
 		AsyncMockStubber.callSuccessWith(mockDefaultDiscussionThreadBundle).when(mockDiscussionForumClient)
 			.getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
+		when(mockDefaultDiscussionThreadBundle.getId()).thenReturn(DEFAULT_THREAD_ID);
+		when(mockDefaultDiscussionThreadBundle.getMessageKey()).thenReturn(DEFAULT_THREAD_MESSAGE_KEY);
 		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
@@ -126,9 +129,20 @@ public class ForumWidgetTest {
 		boolean showThreadDetails = true;
 		boolean showReplyDetails = false;
 		boolean isCurrentUserModerator = false;
-		verify(mockDefaultThreadWidget).configure(mockDefaultDiscussionThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
+		ArgumentCaptor<DiscussionThreadBundle> threadCaptor = ArgumentCaptor.forClass(DiscussionThreadBundle.class);
+		verify(mockDefaultThreadWidget).configure(threadCaptor.capture(), eq(isCurrentUserModerator), eq(moderatorIds), eq(deleteCallback), eq(showThreadDetails), eq(showReplyDetails));
+		DiscussionThreadBundle defaultThreadBundle = threadCaptor.getValue();
+		//verify default thread bundle stats
+		assertEquals((Long)0L, defaultThreadBundle.getNumberOfReplies());
+		assertEquals((Long)1L, defaultThreadBundle.getNumberOfViews());
+		assertFalse(defaultThreadBundle.getIsPinned());
+		assertFalse(defaultThreadBundle.getIsEdited());
+		assertEquals(DEFAULT_THREAD_ID, defaultThreadBundle.getId());
+		assertEquals(DEFAULT_THREAD_MESSAGE_KEY, defaultThreadBundle.getMessageKey());
+		
 		verify(mockDefaultThreadWidget).setReplyButtonVisible(false);
 		verify(mockDefaultThreadWidget).setCommandsVisible(false);
+		
 		
 		//test empty thread callback
 		CallbackP emptyThreadsCallback = captorP.getValue();
