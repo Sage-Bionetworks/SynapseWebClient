@@ -91,24 +91,4 @@ public class UserAccountServiceImplTest {
 		AccountSetupInfo capturedSetInfo = arg.getValue();
 		assertEquals(testASI, capturedSetInfo);
 	}
-	
-	@Test
-	public void testGetUserLoginBundle() throws Exception {
-		userAccountService.getUserLoginBundle(testSessionToken);
-		verify(mockSynapse).getUserSessionData();
-		verify(mockSynapse).getUserBundle(Long.valueOf(testProfile.getOwnerId()), 63);
-	}
-	
-	@Test
-	public void testGetUserLoginBundleNotSignedToU() throws Exception {
-		Session testSession = new Session();
-		testSession.setSessionToken(testSessionToken);
-		testSession.setAcceptsTermsOfUse(false);
-		when(mockUserSessionData.getSession()).thenReturn(testSession);
-		
-		userAccountService.getUserLoginBundle(testSessionToken);
-		verify(mockSynapse).getUserSessionData();
-		verify(mockSynapse, never()).getUserBundle(anyLong(), anyInt());
-	}
-
 }
