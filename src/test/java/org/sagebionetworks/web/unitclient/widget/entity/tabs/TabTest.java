@@ -69,6 +69,29 @@ public class TabTest {
 	}
 	
 	@Test
+	public void testShowTabReplaceState() {
+		tab.setEntityName("entity name");
+		boolean pushState = false;
+		tab.showTab(pushState);
+		verify(mockGlobalAppState).replaceCurrentPlace(any(Place.class));
+		verify(mockView).setActive(true);
+		//verify showing tab also attempts to update the page title
+		verify(mockSynapseJSNIUtils).setPageTitle(anyString());
+	}
+	
+	@Test
+	public void testShowTabPushState() {
+		tab.setEntityName("entity name");
+		boolean pushState = true;
+		tab.showTab(pushState);
+		verify(mockGlobalAppState).pushCurrentPlace(any(Place.class));
+		verify(mockView).setActive(true);
+		//verify showing tab also attempts to update the page title
+		verify(mockSynapseJSNIUtils).setPageTitle(anyString());
+	}
+
+	
+	@Test
 	public void testSetEntityNameAndPlaceNotActive() {
 		when(mockView.isActive()).thenReturn(false);
 		//verify page title is not set during this process (if tab is not active)
