@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -27,6 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+	public static final String PROPERTIES_LOADED_KEY = "org.sagebionetworks.web.client.properties-loaded";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
@@ -43,7 +44,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-	private SessionStorage sessionStorage;
+	private ClientCache localStorage;
+	private GWTWrapper gwt;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -52,14 +54,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			ClientLogger logger,
-			SessionStorage sessionStorage) {
+			ClientCache localStorage, 
+			GWTWrapper gwt) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
-		this.sessionStorage = sessionStorage;
+		this.localStorage = localStorage;
+		this.gwt = gwt;
 		this.view = view;
 		isEditing = false;
 		initUncaughtExceptionHandler();
@@ -243,27 +247,40 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public void initSynapseProperties(final Callback c) {
-		String isLoaded = sessionStorage.getItem("synapse_properties_loaded");
+		String isLoaded = cookieProvider.getCookie(PROPERTIES_LOADED_KEY);
 		if (isLoaded != null) {
-			//skip loading properties, they should already be in there.
-			initWikiEntitiesAndVersions(c);
-		} else {
-			synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+			// we have properties locally, defer updating properties from server
+			gwt.scheduleDeferred(new Callback() {
 				@Override
-				public void onSuccess(HashMap<String, String> properties) {
-					for (String key : properties.keySet()) {
-						sessionStorage.setItem(key, properties.get(key));
-					}
-					sessionStorage.setItem("synapse_properties_loaded", "true");
-					initWikiEntitiesAndVersions(c);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					c.invoke();
+				public void invoke() {
+					initSynapsePropertiesFromServer(new Callback() {
+						public void invoke() {}
+					});
 				}
 			});
+			initWikiEntitiesAndVersions(c);
+			
+		} else {
+			initSynapsePropertiesFromServer(c);
 		}
+	}
+	
+	public void initSynapsePropertiesFromServer(final Callback c) {
+		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+			@Override
+			public void onSuccess(HashMap<String, String> properties) {
+				for (String key : properties.keySet()) {
+					localStorage.put(key, properties.get(key));
+				}
+				cookieProvider.setCookie(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString());
+				initWikiEntitiesAndVersions(c);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				c.invoke();
+			}
+		});
 	}
 	
 	public void initWikiEntitiesAndVersions(Callback c) {
@@ -289,7 +306,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public String getSynapseProperty(String key) {
-		return sessionStorage.getItem(key);
+		return localStorage.get(key);
 	}
 
 	@Override
@@ -307,11 +324,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	 */
 	private void initWikiEntities() {
 		wikiBasedEntites = new HashSet<String>();
-		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(sessionStorage.getItem(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
 	@Override

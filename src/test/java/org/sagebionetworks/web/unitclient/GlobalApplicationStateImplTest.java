@@ -23,13 +23,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateView;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -61,9 +66,13 @@ public class GlobalApplicationStateImplTest {
 	ClientLogger mockLogger;
 	GlobalApplicationStateView mockView;
 	HashMap<String, String> testProps;
-	
+	@Mock
+	ClientCache mockLocalStorage;
+	@Mock
+	GWTWrapper mockGWT;
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
 		mockPlaceController = Mockito.mock(PlaceController.class);
 		mockEventBus = Mockito.mock(EventBus.class);
@@ -77,7 +86,7 @@ public class GlobalApplicationStateImplTest {
 		testProps = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger, mockLocalStorage, mockGWT);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -190,12 +199,39 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockLocalStorage).put(key, value);
+		verify(mockCookieProvider).setCookie(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString());
+		when(mockLocalStorage.get(key)).thenReturn(value);
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
 		//also sets synapse versions on app load
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		assertEquals("v1", globalApplicationState.getSynapseVersion());
 		verify(mockCallback).invoke();
+	}
+	
+	@Test
+	public void testSynapsePropertiesCached() {
+		Callback mockCallback = mock(Callback.class);
+		when(mockCookieProvider.getCookie(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY)).thenReturn(Boolean.TRUE.toString());
+		globalApplicationState.initSynapseProperties(mockCallback);
+		
+		verify(mockSynapseClient, never()).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		assertEquals("v1", globalApplicationState.getSynapseVersion());
+		verify(mockCallback).invoke();
+		
+		ArgumentCaptor<Callback> deferredCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockGWT).scheduleDeferred(deferredCallback.capture());
+		
+		//invoke this deferred callback
+		String key = "k1";
+		String value = "bar";
+		testProps.put(key, value);
+		deferredCallback.getValue().invoke();
+		//local synapse properties are updated
+		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockLocalStorage).put(key, value);
 	}
 	
 	@Test
