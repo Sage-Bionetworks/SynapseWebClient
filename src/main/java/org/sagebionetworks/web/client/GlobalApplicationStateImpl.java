@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -26,6 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+	public static final String PROPERTIES_LOADED_KEY = "org.sagebionetworks.web.client.properties-loaded";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
@@ -37,13 +39,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private boolean isEditing;
-	private HashMap<String, String> synapseProperties;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-
+	private ClientCache localStorage;
+	private GWTWrapper gwt;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -51,13 +53,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			EventBus eventBus, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils synapseJSNIUtils, 
-			ClientLogger logger) {
+			ClientLogger logger,
+			ClientCache localStorage, 
+			GWTWrapper gwt) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
+		this.localStorage = localStorage;
+		this.gwt = gwt;
 		this.view = view;
 		isEditing = false;
 		initUncaughtExceptionHandler();
@@ -241,12 +247,33 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public void initSynapseProperties(final Callback c) {
+		String isLoaded = localStorage.get(PROPERTIES_LOADED_KEY);
+		if (isLoaded != null) {
+			// we have properties locally, defer updating properties from server
+			gwt.scheduleDeferred(new Callback() {
+				@Override
+				public void invoke() {
+					initSynapsePropertiesFromServer(new Callback() {
+						public void invoke() {}
+					});
+				}
+			});
+			initWikiEntitiesAndVersions(c);
+			
+		} else {
+			initSynapsePropertiesFromServer(c);
+		}
+	}
+	
+	public void initSynapsePropertiesFromServer(final Callback c) {
 		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
-				synapseProperties = properties;
-				initWikiEntities(properties);
-				initSynapseVersions(c);
+				for (String key : properties.keySet()) {
+					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+				}
+				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+				initWikiEntitiesAndVersions(c);
 			}
 			
 			@Override
@@ -254,6 +281,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				c.invoke();
 			}
 		});
+	}
+	
+	public void initWikiEntitiesAndVersions(Callback c) {
+		initWikiEntities();
+		initSynapseVersions(c);
 	}
 	
 	public void initSynapseVersions(final Callback c) {
@@ -274,10 +306,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public String getSynapseProperty(String key) {
-		if (synapseProperties != null)
-			return synapseProperties.get(key);
-		else 
-			return null;
+		return localStorage.get(key);
 	}
 
 	@Override
@@ -293,13 +322,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	 * Setup the wiki based entities.
 	 * @param properties
 	 */
-	private void initWikiEntities(HashMap<String, String> properties) {
+	private void initWikiEntities() {
 		wikiBasedEntites = new HashSet<String>();
-		wikiBasedEntites.add(properties.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
 	@Override

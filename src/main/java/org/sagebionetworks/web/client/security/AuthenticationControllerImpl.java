@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DateUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -76,7 +77,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	public void storeAuthenticationReceipt(String username, String receipt) {
-		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, getYearFromNow().getTime());
+		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, DateUtils.getYearFromNow().getTime());
 	}
 	
 	public LoginRequest getLoginRequest(String username, String password) {
@@ -112,8 +113,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
-				Date tomorrow = getDayFromNow();
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
+				Date tomorrow = DateUtils.getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateUtils.getWeekFromNow());
 				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
@@ -207,23 +208,5 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
-	}
-
-	private Date getDayFromNow() {
-		Date date = new Date();
-		CalendarUtil.addDaysToDate(date, 1);
-		return date;  
-	}
-	
-	private Date getWeekFromNow() {
-		Date date = new Date();
-		CalendarUtil.addDaysToDate(date, 7);
-		return date;  
-	}
-	
-	private Date getYearFromNow() {
-		Date date = new Date();
-		CalendarUtil.addMonthsToDate(date, 12);
-		return date;  
 	}
 }
