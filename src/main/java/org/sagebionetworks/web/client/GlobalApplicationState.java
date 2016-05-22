@@ -124,4 +124,6 @@ public interface GlobalApplicationState {
 	
 	public void recordPlaceVisit(Place targetPlace);
 
+	void replaceCurrentPlace(Place targetPlace);
+
 }

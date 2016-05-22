@@ -7,7 +7,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class Profile extends Place implements RestartActivityOptional{
+public class Profile extends Place{
 	public static final String EDIT_PROFILE_TOKEN="edit";
 	public static final String DELIMITER = "/"; 
 	
@@ -16,7 +16,6 @@ public class Profile extends Place implements RestartActivityOptional{
 	private String teamId;
 	private ProfileArea area;
 	private ProjectFilterEnum projectFilter;
-	private boolean noRestartActivity;
 	
 	public Profile(String token) {
 		this.token = token.toLowerCase();
@@ -100,16 +99,6 @@ public class Profile extends Place implements RestartActivityOptional{
         }
     }
 	
-	@Override
-	public void setNoRestartActivity(boolean noRestart) {
-		this.noRestartActivity = noRestart;
-	}
-
-	@Override
-	public boolean isNoRestartActivity() {
-		return noRestartActivity;
-	}
-
 	private void calculateToken(String userId, Synapse.ProfileArea area, ProjectFilterEnum projectFilter, String teamId) {
 		this.token = userId;
 		if(area != null) {

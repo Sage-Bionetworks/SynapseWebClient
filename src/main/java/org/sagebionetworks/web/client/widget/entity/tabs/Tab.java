@@ -55,7 +55,16 @@ public class Tab implements TabView.Presenter {
 	}
 	
 	public void showTab() {
-		globalAppState.pushCurrentPlace(place);
+		showTab(true);
+	}
+	
+	public void showTab(boolean pushState) {
+		if (pushState) {
+			globalAppState.pushCurrentPlace(place);	
+		} else {
+			globalAppState.replaceCurrentPlace(place);
+		}
+		
 		view.setActive(true);
 		updatePageTitle();
 	}
