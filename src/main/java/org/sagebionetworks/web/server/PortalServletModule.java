@@ -189,7 +189,7 @@ public class PortalServletModule extends ServletModule {
 		//(which we need for GWT place handling).
 		// This is also where project aliases are handled.
 		bind(ProjectAliasServlet.class).in(Singleton.class);
-		serveRegex("\\/\\w+(\\/?\\w*)*").with(ProjectAliasServlet.class);
+		serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
 	}
 	
 	public void handleGWTPlaces() {
