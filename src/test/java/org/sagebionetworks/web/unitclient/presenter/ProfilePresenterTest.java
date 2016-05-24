@@ -333,9 +333,6 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.TEAMS);
-		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -389,8 +386,6 @@ public class ProfilePresenterTest {
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		//also verify that it is asking for the correct teams
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());

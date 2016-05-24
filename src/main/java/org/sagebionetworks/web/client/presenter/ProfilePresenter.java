@@ -220,7 +220,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void updateArea(ProfileArea area, boolean pushState) {
-		if (area != null && !area.equals(place.getArea())) {
+		if (area != null && place != null && !area.equals(place.getArea())) {
 			place.setArea(area, filterType, filterTeamId);
 			if (pushState) {
 				globalApplicationState.pushCurrentPlace(place);	
@@ -237,7 +237,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
-		if (ProfileArea.SETTINGS.equals(currentArea) && !isOwner) {
+		if (currentArea == null || (ProfileArea.SETTINGS.equals(currentArea) && !isOwner)) {
 			currentArea = ProfileArea.PROJECTS;
 		}
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
@@ -503,7 +503,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		this.filterType = filterType;
 		this.filterTeamId = filterTeamId;
-		place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
+		if (place != null)
+			place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
 		refreshProjects();
 	}
 
