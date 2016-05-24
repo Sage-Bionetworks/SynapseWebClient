@@ -1289,15 +1289,26 @@ public class ProfilePresenterTest {
 	public void testUpdateArea() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.CHALLENGES);
+		boolean pushState = true;
+		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Profile.class));
+	}
+	
+	@Test
+	public void testUpdateAreaReplacestate() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		boolean pushState = false;
+		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
+		verify(mockGlobalApplicationState).replaceCurrentPlace(any(Profile.class));
 	}
 
 	@Test
 	public void testUpdateAreaNoChange() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.PROJECTS);
+		boolean pushState = true;
+		profilePresenter.updateArea(ProfileArea.PROJECTS, false);
 		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
 	}
 	
