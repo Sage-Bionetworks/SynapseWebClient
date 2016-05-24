@@ -25,7 +25,7 @@ public class DiscussionThreadCountAlert implements RefreshAlertView.Presenter, S
 	private String forumId;
 	
 	private Callback invokeCheck;
-	public static final int DELAY = 16000; // check every 16 seconds (until detached, configuration cleared, or a change has been detected)
+	public static final int DELAY = 30000; // check every 30 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public DiscussionThreadCountAlert(RefreshAlertView view, 
 			DiscussionForumClientAsync discussionForumClient, 
