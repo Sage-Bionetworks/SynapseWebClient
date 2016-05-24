@@ -671,6 +671,7 @@ public class ProfilePresenterTest {
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
+		verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
 	}
 	
 	@Test
