@@ -14,8 +14,7 @@
 		<b:ButtonToolBar addStyleNames="margin-top-20">
 			<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
 			<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
-			
-			<b:Button ui:field="addFileView" icon="PLUS" visible="false">Create File View</b:Button>
+			<b:Button ui:field="addFileView" icon="PLUS" visible="false">Add View</b:Button>
 		</b:ButtonToolBar>
 		<!-- Slot for the create table model dialog -->
 		<g:SimplePanel ui:field="createTableModalPanel" />

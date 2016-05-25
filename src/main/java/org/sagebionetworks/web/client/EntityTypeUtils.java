@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 
 public class EntityTypeUtils {
@@ -24,6 +25,8 @@ public class EntityTypeUtils {
 				className = Project.class.getName();
 			} else if (entityType.equalsIgnoreCase("table")) {
 				className = TableEntity.class.getName();
+			} else if (entityType.equalsIgnoreCase("fileview")) {
+				className = FileView.class.getName();
 			} else if (entityType.equalsIgnoreCase("link")) {
 				className = Link.class.getName();
 			}
@@ -49,6 +52,9 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			type = EntityType.table;
+		} else if(FileView.class.getName().equals(className)) {
+			// FileView
+			type = EntityType.fileview;
 		}
 		return type;
 	}
@@ -80,7 +86,11 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			icon = IconType.TABLE;
+		} else if(FileView.class.getName().equals(className)) {
+			// FileView
+			icon = IconType.FILES_O;
 		}
+		
 		return icon;
 	}
 
