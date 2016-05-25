@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,12 +25,17 @@ public class CreateFileViewWizardStep1 implements ModalPage {
 	SynapseClientAsync synapseClient;
 	String parentId;
 	ModalPresenter modalPresenter;
+	EntityContainerListWidget entityContainerList;
 	
 	@Inject
-	public CreateFileViewWizardStep1(CreateFileViewWizardStep1View view,
-			SynapseClientAsync synapseClient) {
+	public CreateFileViewWizardStep1(
+			CreateFileViewWizardStep1View view,
+			SynapseClientAsync synapseClient, 
+			EntityContainerListWidget entityContainerList) {
 		super();
 		this.view = view;
+		this.entityContainerList = entityContainerList;
+		view.setScopeWidget(entityContainerList.asWidget());
 		this.synapseClient = synapseClient;
 	}
 	
@@ -37,6 +46,8 @@ public class CreateFileViewWizardStep1 implements ModalPage {
 	 */
 	public void configure(String parentId ){
 		this.parentId = parentId;
+		boolean canEdit = true;
+		entityContainerList.configure(new ArrayList<String>(), canEdit);
 	}
 	
 	/**
@@ -49,6 +60,8 @@ public class CreateFileViewWizardStep1 implements ModalPage {
 		table.setName(name);
 		table.setParentId(parentId);
 		table.setEntityType(FileView.class.getName());
+		List<String> scopeIds = entityContainerList.getEntityIds();
+		table.setScopeIds(scopeIds);
 		synapseClient.createEntity(table, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity table) {

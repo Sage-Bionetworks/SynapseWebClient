@@ -45,6 +45,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	SimplePanel uploadTableModalPanel;
 	@UiField
+	SimplePanel fileViewWizardContainer;
+	@UiField
 	SimplePanel paginationPanel;
 	
 	HTMLPanel panel;
@@ -149,5 +151,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void addUploadTableModal(IsWidget uploadTableModalWidget) {
 		this.uploadTableModalPanel.add(uploadTableModalWidget);
 	}
+	
+	@Override
+	public void addFileViewWizard(IsWidget wizard) {
+		fileViewWizardContainer.clear();
+		fileViewWizardContainer.add(wizard);
+	}
+	
 
 }
