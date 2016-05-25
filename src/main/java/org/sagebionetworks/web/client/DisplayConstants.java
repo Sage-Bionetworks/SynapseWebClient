@@ -576,7 +576,8 @@ public class DisplayConstants {
 	public static final String PAGE_NEXT = "Go to the next page";
 	public static final String SWITCH_TO_STANDARD_WEBSITE = "Switch back to the release version";
 	public static final String SWITCH_TO_TEST_WEBSITE = "Try an alpha test version of the website";
-	public static final String TEST_MODE_WARNING = "This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade. Are you sure you want to switch into this mode?";
+	public static final String TEST_MODE_WARNING = "<h5>Alpha Test Mode</h5>This mode is for alpha testing features only. Please note that the <a target=\"blank\" href=\"https://s3.amazonaws.com/static.synapse.org/stu/party/stuparty.html\"> developer</a> does not guarantee an absence of errors, "
+				+ "and that the data created using alpha features may be lost during product upgrade.<br><br><strong>Are you sure you want to switch into this mode?</strong>";
 	
 	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
 	public static final String MY_PROJECTS = "My Projects";

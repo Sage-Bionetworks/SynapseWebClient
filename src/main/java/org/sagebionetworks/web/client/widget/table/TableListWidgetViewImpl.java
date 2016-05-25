@@ -36,6 +36,9 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	Button addTable;
 	@UiField
+	Button addFileView;
+	
+	@UiField
 	Button uploadTable;
 	@UiField
 	SimplePanel createTableModalPanel;
@@ -74,6 +77,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 				presenter.onAddTable();
 			}
 		});
+		this.addFileView.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddFileView();
+			}
+		});
 		this.uploadTable.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -109,6 +118,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void setAddTableVisible(boolean visibile) {
 		this.addTable.setVisible(visibile);
+	}
+	
+	@Override
+	public void setAddFileViewVisible(boolean visible) {
+		addFileView.setVisible(visible);
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -149,7 +150,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
-		boolean isTable = entity instanceof TableEntity;
+		boolean isTable = entity instanceof TableEntity || entity instanceof FileView;
 		
 		if (!isTable) {
 			//configure based on project
@@ -190,7 +191,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
-		boolean isTable = entity instanceof TableEntity;
+		boolean isTable = entity instanceof TableEntity || entity instanceof FileView;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
