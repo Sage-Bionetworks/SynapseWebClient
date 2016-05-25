@@ -10,14 +10,18 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -46,27 +50,43 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private PaginationWidget paginationWidget;
 	private CreateTableModalWidget createTableModalWidget;
 	private UploadTableModalWidget uploadTableModalWidget;
+	private CreateFileViewWizard createFileViewWizard;
 	private boolean canEdit;
 	private EntityQuery query;
 	private EntityBundle parentBundle;
 	private CallbackP<String> onTableClickCallback;
+	WizardCallback refreshTablesCallback;
 	@Inject
 	public TableListWidget(PreflightController preflightController,
 			TableListWidgetView view,
 			SynapseClientAsync synapseClient,
 			CreateTableModalWidget createTableModalWidget,
 			PaginationWidget paginationWidget,
-			UploadTableModalWidget uploadTableModalWidget) {
+			UploadTableModalWidget uploadTableModalWidget,
+			CookieProvider cookies,
+			CreateFileViewWizard createFileViewWizard) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.createTableModalWidget = createTableModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.paginationWidget = paginationWidget;
+		this.createFileViewWizard = createFileViewWizard;
 		this.view.setPresenter(this);
 		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.addPaginationWidget(paginationWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
+		this.view.setAddFileViewVisible(DisplayUtils.isInTestWebsite(cookies));
+		refreshTablesCallback = new WizardCallback() {
+			@Override
+			public void onFinished() {
+				tableCreated();
+			}
+			
+			@Override
+			public void onCanceled() {
+			}
+		};
 	}	
 	
 	/**
@@ -80,6 +100,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
+		this.createFileViewWizard.configure(parentBundle.getEntity().getId());
 		this.query = createQuery(parentBundle.getEntity().getId());
 		queryForOnePage(OFFSET_ZERO);
 	}
@@ -91,13 +112,15 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 */
 	public EntityQuery createQuery(String parentId) {
 		EntityQuery newQuery = new EntityQuery();
-		newQuery.setFilterByType(EntityType.table);
 		Sort sort = new Sort();
 		sort.setColumnName(EntityFieldName.createdOn.name());
 		sort.setDirection(SortDirection.DESC);
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
-		newQuery.setConditions(Arrays.asList(condition));
+		Condition typeCondition = EntityQueryUtils.buildCondition(
+				EntityFieldName.nodeType, Operator.IN, EntityType.table.name(), EntityType.fileview.name());
+		
+		newQuery.setConditions(Arrays.asList(condition, typeCondition));
 		newQuery.setLimit(PAGE_SIZE);
 		newQuery.setOffset(OFFSET_ZERO);
 		return newQuery;
@@ -152,17 +175,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 * Called after a successful preflight check.
 	 */
 	private void postCheckUploadTable(){
-		this.uploadTableModalWidget.showModal(new WizardCallback() {
-			
-			@Override
-			public void onFinished() {
-				tableCreated();
-			}
-			
-			@Override
-			public void onCanceled() {			
-			}
-		});
+		this.uploadTableModalWidget.showModal(refreshTablesCallback);
 	}
 
 
@@ -170,7 +183,22 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public void onPageChange(Long newOffset) {
 		queryForOnePage(newOffset);
 	}
-
+	@Override
+	public void onAddFileView() {
+		preflightController.checkCreateEntity(parentBundle, FileView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateFileView();
+			}
+		});
+	}
+	/**
+	 * Called after all pre-flight checks are performed on a file view.
+	 */
+	private void postCheckCreateFileView() {
+		this.createFileViewWizard.showModal(refreshTablesCallback);
+	}
+	
 	@Override
 	public void onAddTable() {
 		preflightController.checkCreateEntity(parentBundle, TableEntity.class.getName(), new Callback() {

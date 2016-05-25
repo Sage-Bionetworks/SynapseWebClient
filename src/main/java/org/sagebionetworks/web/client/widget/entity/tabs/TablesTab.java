@@ -13,6 +13,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -150,8 +151,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
 		boolean isTable = entity instanceof TableEntity;
+		boolean isFileView = entity instanceof FileView;
 		
-		if (!isTable) {
+		if (!(isTable || isFileView)) {
 			//configure based on project
 			showProjectLevelUI();
 		} else {
@@ -191,6 +193,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
 		boolean isTable = entity instanceof TableEntity;
+		boolean isFileView = entity instanceof FileView;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
@@ -200,7 +203,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
-		if (isTable) {
+		if (isTable || isFileView) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);

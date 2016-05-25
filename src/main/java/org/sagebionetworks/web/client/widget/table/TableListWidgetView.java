@@ -26,6 +26,12 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 */
 		void onAddTable();
 
+		
+		/**
+		 * Add file view button pushed
+		 */
+		void onAddFileView();
+		
 		/**
 		 * Upload table button pushed.
 		 */
@@ -47,6 +53,13 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * @param enabled
 	 */
 	public void setAddTableVisible(boolean enabled);
+	
+	/**
+	 * Show/hide the add file view button.
+	 * @param visible
+	 */
+	public void setAddFileViewVisible(boolean visible);
+	
 	
 	/**
 	 * Show or hide the upload tables button.
