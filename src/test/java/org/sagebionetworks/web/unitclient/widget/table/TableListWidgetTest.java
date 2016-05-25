@@ -189,4 +189,22 @@ public class TableListWidgetTest {
 		// proceed to create
 		verify(mockcreateTableModalWidget).showCreateModal();
 	}
+	
+	@Test
+	public void testAddFileViewPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddFileView();
+		// Failure should not proceed to create
+		verify(mockCreateFileViewWizard, never()).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testAddFileViewPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddFileView();
+		// proceed to create
+		verify(mockCreateFileViewWizard).showModal(any(WizardCallback.class));
+	}
 }

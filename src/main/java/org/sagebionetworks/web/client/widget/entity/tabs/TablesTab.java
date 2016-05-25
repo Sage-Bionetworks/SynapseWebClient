@@ -192,8 +192,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
-		boolean isTable = entity instanceof TableEntity;
-		boolean isFileView = entity instanceof FileView;
+		boolean isTable = entity instanceof TableEntity || entity instanceof FileView;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
@@ -203,7 +202,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
-		if (isTable || isFileView) {
+		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);
