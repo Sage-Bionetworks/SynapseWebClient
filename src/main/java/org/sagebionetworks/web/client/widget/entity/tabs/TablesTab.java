@@ -150,10 +150,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
-		boolean isTable = entity instanceof TableEntity;
-		boolean isFileView = entity instanceof FileView;
+		boolean isTable = entity instanceof TableEntity || entity instanceof FileView;
 		
-		if (!(isTable || isFileView)) {
+		if (!isTable) {
 			//configure based on project
 			showProjectLevelUI();
 		} else {
