@@ -333,9 +333,6 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.TEAMS);
-		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -389,8 +386,6 @@ public class ProfilePresenterTest {
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		//also verify that it is asking for the correct teams
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
@@ -676,6 +671,7 @@ public class ProfilePresenterTest {
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
+		verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
 	}
 	
 	@Test
@@ -1289,15 +1285,26 @@ public class ProfilePresenterTest {
 	public void testUpdateArea() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.CHALLENGES);
+		boolean pushState = true;
+		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Profile.class));
+	}
+	
+	@Test
+	public void testUpdateAreaReplacestate() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		boolean pushState = false;
+		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
+		verify(mockGlobalApplicationState).replaceCurrentPlace(any(Profile.class));
 	}
 
 	@Test
 	public void testUpdateAreaNoChange() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.PROJECTS);
+		boolean pushState = true;
+		profilePresenter.updateArea(ProfileArea.PROJECTS, false);
 		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
 	}
 	
