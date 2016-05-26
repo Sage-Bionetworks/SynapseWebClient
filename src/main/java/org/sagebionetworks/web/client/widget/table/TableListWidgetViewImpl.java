@@ -61,7 +61,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
 		for(final EntityQueryResult header: tables){
-			tablesList.add(new EntityListGroupItem(HeadingSize.H3, header, new ClickHandler() {
+			tablesList.add(new EntityListGroupItem(HeadingSize.H4, header, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.onTableClicked(header.getId());
