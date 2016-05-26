@@ -58,6 +58,7 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -218,10 +219,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	public void updateArea(ProfileArea area) {
-		if (area != null && !area.equals(place.getArea())) {
+	public void updateArea(ProfileArea area, boolean pushState) {
+		if (area != null && place != null && !area.equals(place.getArea())) {
 			place.setArea(area, filterType, filterTeamId);
-			globalApplicationState.pushCurrentPlace(place);
+			if (pushState) {
+				globalApplicationState.pushCurrentPlace(place);	
+			} else {
+				globalApplicationState.replaceCurrentPlace(place);
+			}
 		}
 	}
 	
@@ -232,7 +237,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
-		if (ProfileArea.SETTINGS.equals(currentArea) && !isOwner) {
+		if (currentArea == null || (ProfileArea.SETTINGS.equals(currentArea) && !isOwner)) {
 			currentArea = ProfileArea.PROJECTS;
 		}
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
@@ -251,12 +256,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				@Override
 				public void invoke() {
 					getUserProfile();
-					tabClicked(currentArea);
+					boolean pushState = false;
+					showTab(currentArea, pushState);
 				}
 			});
 		} else {
 			getUserProfile();
-			tabClicked(currentArea);
+			boolean pushState = false;
+			showTab(currentArea, pushState);
 		}
 	}
 	
@@ -496,8 +503,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		this.filterType = filterType;
 		this.filterTeamId = filterTeamId;
-		place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
-		globalApplicationState.pushCurrentPlace(place);
+		if (place != null)
+			place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
 		refreshProjects();
 	}
 
@@ -979,6 +986,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return isOwner;
 	}
 	
+	public void showTab(ProfileArea tab, boolean pushState) {
+		updateArea(tab, pushState);
+		refreshData(tab);
+		view.setTabSelected(tab);
+	}
+	
 	@Override
 	public void tabClicked(final ProfileArea tab) {
 		if (tab == null) {
@@ -990,18 +1003,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
-					refreshData(tab);
-					view.setTabSelected(tab);
-					updateArea(tab);
+					boolean pushState = true;
+					showTab(tab, pushState);
 				}
 			};
 			view.showConfirmDialog("",
 					DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE,
 					yesCallback);
 		} else {
-			refreshData(tab);
-			view.setTabSelected(tab);
-			updateArea(tab);
+			boolean pushState = true;
+			showTab(tab, pushState);
 		}
 	}
 	
@@ -1056,6 +1067,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			filterTeamId = team.getId();
 		}
 		setProjectFilterAndRefresh(filterType, filterTeamId);
+		globalApplicationState.pushCurrentPlace(place);
 	}
 	
 	@Override
