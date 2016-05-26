@@ -17,40 +17,45 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizardStep1;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizardStep1View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import static org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl.*;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class CreateFileViewWizardStep1Test {
+public class CreateTableViewWizardStep1Test {
 
 	@Mock
-	CreateFileViewWizardStep1View mockView;
+	CreateTableViewWizardStep1View mockView;
 	@Mock
 	ModalPresenter mockWizardPresenter;
+	@Mock
+	EntityContainerListWidget mockEntityContainerListWidget;
+	
 	SynapseClientAsync mockSynapseClient;
 	String parentId;
-	CreateFileViewWizardStep1 widget;
+	CreateTableViewWizardStep1 widget;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		
-		widget = new CreateFileViewWizardStep1(mockView, mockSynapseClient);
+		widget = new CreateTableViewWizardStep1(mockView, mockSynapseClient, mockEntityContainerListWidget);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
-		widget.configure(parentId);
+		widget.configure(parentId, TableType.view);
 	}
 	
 	@Test
 	public void testNullName(){
 		when(mockView.getName()).thenReturn(null);
 		widget.onPrimary();
-		verify(mockWizardPresenter).setErrorMessage(CreateFileViewWizardStep1.TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
+		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep1.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		verify(mockSynapseClient, never()).createEntity(any(TableEntity.class), any(AsyncCallback.class));
 	}
 	

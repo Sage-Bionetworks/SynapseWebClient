@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author Jay
  *
  */
-public interface CreateFileViewWizardStep1View extends IsWidget {
+public interface CreateTableViewWizardStep1View extends IsWidget {
 	
 	/**
 	 * Name of entity chosen by the user
@@ -22,4 +22,5 @@ public interface CreateFileViewWizardStep1View extends IsWidget {
 	 * Add widget to set/get scope.
 	 */
 	void setScopeWidget(IsWidget scopeWidget);
+	void setScopeWidgetVisible(boolean visible);
 }

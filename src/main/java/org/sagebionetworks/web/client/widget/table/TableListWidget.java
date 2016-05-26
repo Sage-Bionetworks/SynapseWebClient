@@ -21,7 +21,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -50,7 +51,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private PaginationWidget paginationWidget;
 	private CreateTableModalWidget createTableModalWidget;
 	private UploadTableModalWidget uploadTableModalWidget;
-	private CreateFileViewWizard createFileViewWizard;
+	private CreateTableViewWizard createFileViewWizard;
 	private boolean canEdit;
 	private EntityQuery query;
 	private EntityBundle parentBundle;
@@ -64,7 +65,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 			PaginationWidget paginationWidget,
 			UploadTableModalWidget uploadTableModalWidget,
 			CookieProvider cookies,
-			CreateFileViewWizard createFileViewWizard) {
+			CreateTableViewWizard createFileViewWizard) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -88,7 +89,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 			public void onCanceled() {
 			}
 		};
-	}	
+	}
 	
 	/**
 	 * Configure this widget before use.
@@ -101,7 +102,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
-		this.createFileViewWizard.configure(parentBundle.getEntity().getId());
+		this.createFileViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
 		this.query = createQuery(parentBundle.getEntity().getId());
 		queryForOnePage(OFFSET_ZERO);
 	}

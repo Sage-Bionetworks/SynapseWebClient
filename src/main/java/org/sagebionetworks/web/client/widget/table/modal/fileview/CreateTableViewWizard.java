@@ -8,26 +8,34 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Wizard used to create a new File View
+ * Wizard used to create a new Table or View
  * @author Jay
  *
  */
-public class CreateFileViewWizard {
+public class CreateTableViewWizard {
 	
 	ModalWizardWidget modalWizardWidget;
-	CreateFileViewWizardStep1 step1;
+	CreateTableViewWizardStep1 step1;
+	public enum TableType {
+	    table,
+	    view
+	}
 
 	@Inject
-	public CreateFileViewWizard(ModalWizardWidget modalWizarWidget, CreateFileViewWizardStep1 step1) {
+	public CreateTableViewWizard(ModalWizardWidget modalWizarWidget, CreateTableViewWizardStep1 step1) {
 		this.modalWizardWidget = modalWizarWidget;
-		this.modalWizardWidget.setTitle("Create File View");
 		this.modalWizardWidget.setModalSize(ModalSize.LARGE);
 		this.step1 = step1;
 		this.modalWizardWidget.configure(this.step1);
 	}
 
-	public void configure(String parentId) {
-		this.step1.configure(parentId);
+	public void configure(String parentId, TableType type) {
+		if (TableType.view.equals(type)) {
+			this.modalWizardWidget.setTitle("Create View");
+		} else {
+			this.modalWizardWidget.setTitle("Create Table");
+		}
+		this.step1.configure(parentId, type);
 	}
 
 	public Widget asWidget() {

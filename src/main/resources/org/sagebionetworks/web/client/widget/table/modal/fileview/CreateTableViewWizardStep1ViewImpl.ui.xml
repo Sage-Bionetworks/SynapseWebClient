@@ -12,7 +12,7 @@
 				<b:TextBox ui:field="nameField" />
 			</b:FormGroup>
 		</bh:Div>
-		<b:FormGroup>
+		<b:FormGroup ui:field="scopeUI">
 			<b:FormLabel>Scope</b:FormLabel>
 			<g:SimplePanel ui:field="scopeContainer" addStyleNames="light-border padding-10" />
 		</b:FormGroup>
