@@ -401,7 +401,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return The list of ColumnModel JSON strings.
 	 * @throws RestServiceException
 	 */
-	public void setTableSchema(TableEntity entity, List<ColumnModel> newSchema)
+	public void setTableSchema(Entity entity, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**

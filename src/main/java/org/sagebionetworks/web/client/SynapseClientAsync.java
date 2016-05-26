@@ -329,7 +329,7 @@ public interface SynapseClientAsync {
 	 * @param newSchema
 	 * @param callback
 	 */
-	void setTableSchema(TableEntity entity, List<ColumnModel> newSchema,
+	void setTableSchema(Entity entity, List<ColumnModel> newSchema,
 			AsyncCallback<Void> callback);
 	
 	/**
