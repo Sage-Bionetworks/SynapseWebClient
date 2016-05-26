@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.SelectedRow;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Edit column models page
+ * Wizard page to edit column schema
  * 
  * @author Jay
  *
@@ -57,6 +58,8 @@ public class CreateTableViewWizardStep2 implements ColumnModelsView.Presenter, C
 		this.ginInjector = ginInjector;
 		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
+		this.editor.setAddAllAnnotationsButtonVisible(true);
+		this.editor.setAddDefaultFileColumnsButtonVisible(true);
 		this.synapseClient = synapseClient;
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
 		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
@@ -252,16 +255,6 @@ public class CreateTableViewWizardStep2 implements ColumnModelsView.Presenter, C
 		throw new IllegalStateException("Nothing selected");
 	}
 	
-	private static class SelectedRow{
-		ColumnModelTableRow row;
-		int index;
-		public SelectedRow(ColumnModelTableRow row, int index) {
-			super();
-			this.row = row;
-			this.index = index;
-		}
-	}
-	
 	@Override
 	public void selectionChanged(boolean isSelected) {
 		checkSelectionState();
@@ -317,5 +310,17 @@ public class CreateTableViewWizardStep2 implements ColumnModelsView.Presenter, C
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public void onAddAllAnnotations() {
+		// TODO:  call a service to generate column models based on annotations!
+		presenter.setErrorMessage("Sorry, adding columns based on annotations has not been implemented!");
+	}
+	
+	@Override
+	public void onAddDefaultFileColumns() {
+		// TODO:  call a service for the default file column models, or define it in SWC??
+		presenter.setErrorMessage("Sorry, adding columns based on the default file fields has not been implemented!");
 	}
 }

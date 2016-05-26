@@ -7,7 +7,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -174,8 +173,7 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = getEditedColumnModels();
 		baseView.setLoading();
-		TableEntity entity = (TableEntity) this.bundle.getEntity();
-		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
+		synapseClient.setTableSchema(this.bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -274,9 +272,9 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		throw new IllegalStateException("Nothing selected");
 	}
 	
-	private static class SelectedRow{
-		ColumnModelTableRow row;
-		int index;
+	public static class SelectedRow{
+		public ColumnModelTableRow row;
+		public int index;
 		public SelectedRow(ColumnModelTableRow row, int index) {
 			super();
 			this.row = row;
@@ -339,5 +337,15 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public void onAddAllAnnotations() {
+		// N/A, not showing this button
+	}
+	
+	@Override
+	public void onAddDefaultFileColumns() {
+		// N/A, not showing this button
 	}
 }
