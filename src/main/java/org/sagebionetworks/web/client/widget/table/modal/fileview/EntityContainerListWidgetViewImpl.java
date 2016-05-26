@@ -3,41 +3,43 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Hr;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
-public class EntityContainerListWidgetViewImpl extends Div implements EntityContainerListWidgetView {
+public class EntityContainerListWidgetViewImpl implements EntityContainerListWidgetView {
+	public interface Binder extends UiBinder<Widget, EntityContainerListWidgetViewImpl> {}
+	Widget widget;
 	Presenter presenter;
-	Div synAlertContainer = new Div();
-	Div entitiesContainer = new Div();
-	Span noContainers = new Span("<div><i>- Empty</i></div>");
-	Button addButton = new Button("Add container", IconType.PLUS, new ClickHandler() {
-		@Override
-		public void onClick(ClickEvent event) {
-			presenter.onAddProject();
-		}
-	});
+	@UiField
+	Div synAlertContainer;
+	@UiField
+	Div entitiesContainer;
+	@UiField
+	Span noContainers;
+	@UiField
+	Button addButton;
 	
-	public EntityContainerListWidgetViewImpl() {
-		add(synAlertContainer);
-		add(entitiesContainer);
-		noContainers.setVisible(false);
-		add(noContainers);
-		addButton.setVisible(false);
-		addButton.addStyleName("margin-top-10");
-		addButton.setSize(ButtonSize.SMALL);
-		add(addButton);
+	@Inject
+	public EntityContainerListWidgetViewImpl(Binder binder){
+		widget = binder.createAndBindUi(this);
+		addButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddProject();
+			}
+		});
 	}
-	
+
 	@Override
 	public void clear() {
 		entitiesContainer.clear();
@@ -45,7 +47,7 @@ public class EntityContainerListWidgetViewImpl extends Div implements EntityCont
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 
 	@Override
