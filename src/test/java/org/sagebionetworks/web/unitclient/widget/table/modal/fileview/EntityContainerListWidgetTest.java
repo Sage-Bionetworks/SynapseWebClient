@@ -1,0 +1,155 @@
+package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+public class EntityContainerListWidgetTest {
+
+	@Mock
+	EntityContainerListWidgetView mockView;
+	@Mock
+	EntityFinder mockEntityFinder;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseAlert mockSynapseAlert;
+	
+	EntityContainerListWidget widget;
+	ArrayList<EntityHeader> entityHeaders;
+	@Mock
+	EntityHeader mockEntityHeader;
+	String headerId = "963";
+	String headerName = "project area 52";
+	
+	@Mock
+	Entity mockSelectedEntity;
+	String selectedEntityId = "0112358";
+	String selectedEntityName = "Fibonacci folder";
+	
+	@Before
+	public void before(){
+		MockitoAnnotations.initMocks(this);
+		widget = new EntityContainerListWidget(mockView, mockEntityFinder, mockSynapseClient, mockSynapseAlert);
+		when(mockEntityHeader.getId()).thenReturn(headerId);
+		when(mockEntityHeader.getName()).thenReturn(headerName);
+		entityHeaders = new ArrayList<EntityHeader>();
+		entityHeaders.add(mockEntityHeader);
+		when(mockSelectedEntity.getId()).thenReturn(selectedEntityId);
+		when(mockSelectedEntity.getName()).thenReturn(selectedEntityName);
+	}
+	@Test
+	public void testConstruction() {
+		verify(mockView).setPresenter(widget);
+		boolean showVersions = false;
+		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
+	}
+	
+	@Test
+	public void testConfigureHappyCase() {
+		// configure with pre-defined entity id list
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		boolean canEdit = true;
+		widget.configure(Collections.singletonList(headerId), canEdit);
+		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		verify(mockView).setAddButtonVisible(true);
+		verify(mockView).setNoContainers(false);
+		verify(mockSynapseAlert).clear();
+		boolean showDeleteButton = true;
+		verify(mockView).addEntity(headerId, headerName, showDeleteButton);
+		
+		assertTrue(widget.getEntityIds().contains(headerId));
+		widget.onRemoveProject(headerId);
+		assertTrue(widget.getEntityIds().isEmpty());
+	}
+	
+	@Test
+	public void testConfigureNoIdsNoEdit() {
+		entityHeaders.clear();
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		boolean canEdit = false;
+		widget.configure(Collections.EMPTY_LIST, canEdit);
+		verify(mockSynapseClient, never()).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		verify(mockView).setAddButtonVisible(false);
+		verify(mockView).setNoContainers(true);
+		verify(mockSynapseAlert).clear();
+		verify(mockView, never()).addEntity(anyString(), anyString(), anyBoolean());
+		
+		assertTrue(widget.getEntityIds().isEmpty());
+	}
+	
+
+	@Test
+	public void testConfigureError() {
+		Exception ex = new Exception("error!"); 
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		boolean canEdit = false;
+		widget.configure(Collections.singletonList(headerId), canEdit);
+		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).clear();
+		verify(mockSynapseAlert).handleException(ex);
+		verify(mockView, never()).addEntity(anyString(), anyString(), anyBoolean());
+	}
+
+	@Test
+	public void testOnAddProject() {
+		widget.onAddProject();
+		verify(mockEntityFinder).show();
+	}
+
+	@Test
+	public void testOnAddProjectId() {
+		AsyncMockStubber.callSuccessWith(mockSelectedEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		widget.onAddProject(selectedEntityId);
+		
+		verify(mockView).setNoContainers(false);
+		verify(mockEntityFinder).hide();
+		verify(mockView).addEntity(selectedEntityId, selectedEntityName, true);
+		
+		assertTrue(widget.getEntityIds().contains(selectedEntityId));
+	}
+	
+	@Test
+	public void testOnAddProjectIdFailure() {
+		String error = "error during lookup!";
+		Exception ex = new Exception(error); 
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		widget.onAddProject(selectedEntityId);
+		
+		verify(mockEntityFinder).showError(error);
+	}
+
+	@Test
+	public void testAsWidget() {
+		widget.asWidget();
+		verify(mockView).asWidget();
+	}
+
+}

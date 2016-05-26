@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
-import static junit.framework.Assert.*;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,20 +20,12 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
-import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import static org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 

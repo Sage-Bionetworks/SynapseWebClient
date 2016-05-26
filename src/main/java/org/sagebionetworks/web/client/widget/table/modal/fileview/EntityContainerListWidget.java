@@ -23,7 +23,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	SynapseClientAsync synapseClient;
 	List<String> entityIds;
 	SynapseAlert synAlert;
-	boolean canEdit;
+	boolean canEdit = true;
 	@Inject
 	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder finder, SynapseClientAsync synapseClient, SynapseAlert synAlert) {
 		this.view = view;
@@ -70,6 +70,10 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		finder.show();
 	}
 	
+	/**
+	 * Called when a container entity is selected in the entity finder.
+	 * @param id
+	 */
 	public void onAddProject(String id) {
 		synapseClient.getEntity(id, new AsyncCallback<Entity>() {
 			@Override
