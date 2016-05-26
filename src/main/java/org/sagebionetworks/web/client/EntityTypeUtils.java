@@ -14,20 +14,21 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 
 public class EntityTypeUtils {
 
+	
 	public static String getEntityClassNameForEntityType(String entityType) {
 		String className = FileEntity.class.getName();
 		if (entityType != null) {
-			if (entityType.equalsIgnoreCase("file")) {
+			if (entityType.equalsIgnoreCase(EntityType.file.name())) {
 				className = FileEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("folder")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.folder.name())) {
 				className = Folder.class.getName();
-			} else if (entityType.equalsIgnoreCase("project")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.project.name())) {
 				className = Project.class.getName();
-			} else if (entityType.equalsIgnoreCase("table")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.table.name())) {
 				className = TableEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("fileview")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.fileview.name())) {
 				className = FileView.class.getName();
-			} else if (entityType.equalsIgnoreCase("link")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.link.name())) {
 				className = Link.class.getName();
 			}
 		}
