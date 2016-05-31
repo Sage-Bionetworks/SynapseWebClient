@@ -47,6 +47,7 @@ public class CreateTableViewWizardStep1Test {
 	String parentId;
 	CreateTableViewWizardStep1 widget;
 	List<String> scopeIds;
+	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -83,9 +84,7 @@ public class CreateTableViewWizardStep1Test {
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
 		assertEquals(FileView.class.getName(), capturedFileView.getEntityType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		
-		//TODO: go to next step
-		verify(mockWizardPresenter).onFinished();
+		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
 	@Test
@@ -103,9 +102,7 @@ public class CreateTableViewWizardStep1Test {
 		TableEntity capturedTable = (TableEntity)captor.getValue();
 		assertEquals(TableEntity.class.getName(), capturedTable.getEntityType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		
-		//TODO: go to next step
-		verify(mockWizardPresenter).onFinished();
+		verify(mockWizardPresenter).setNextActivePage(mockStep2);;
 	}
 	
 	@Test
