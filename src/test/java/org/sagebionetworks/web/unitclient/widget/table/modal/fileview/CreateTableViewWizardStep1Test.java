@@ -71,6 +71,7 @@ public class CreateTableViewWizardStep1Test {
 	@Test
 	public void testCreateFileView(){
 		widget.configure(parentId, TableType.view);
+		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		String tableName = "a name";
 		FileView table = new FileView();
@@ -84,6 +85,8 @@ public class CreateTableViewWizardStep1Test {
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
 		assertEquals(FileView.class.getName(), capturedFileView.getEntityType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		verify(mockWizardPresenter).setLoading(false);
+		verify(mockStep2).configure(table, TableType.view);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
@@ -102,6 +105,8 @@ public class CreateTableViewWizardStep1Test {
 		TableEntity capturedTable = (TableEntity)captor.getValue();
 		assertEquals(TableEntity.class.getName(), capturedTable.getEntityType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		verify(mockWizardPresenter).setLoading(false);
+		verify(mockStep2).configure(table, TableType.table);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);;
 	}
 	
