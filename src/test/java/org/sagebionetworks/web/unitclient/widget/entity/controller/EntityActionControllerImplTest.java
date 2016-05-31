@@ -42,6 +42,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -351,6 +352,15 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
 	}
 	
+	@Test
+	public void testConfigureWikiNoWikiView(){
+		entityBundle.setEntity(new FileView());
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
+	}
+	
 
 	@Test
 	public void testConfigureViewWikiSource(){
@@ -383,7 +393,25 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testConfigureViewWikiSourceWikiView(){
+		entityBundle.setEntity(new FileView());
+		entityBundle.setRootWikiId("22");
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+	}
+
+	
+	@Test
 	public void testConfigureMoveTable(){
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, false);
+		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+	}
+	
+	@Test
+	public void testConfigureMoveView(){
+		entityBundle.setEntity(new FileView());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
@@ -1010,6 +1038,15 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
 	}
+	
+	@Test
+	public void testConfigureWikiSubpageView(){
+		entityBundle.setEntity(new FileView());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+	}
+
 	
 	@Test
 	public void testOnAddWikiSubpageNoUpdate(){

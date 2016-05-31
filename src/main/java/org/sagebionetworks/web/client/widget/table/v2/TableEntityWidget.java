@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -111,11 +112,13 @@ public class TableEntityWidget implements IsWidget,
 	 * Setup the actions for this widget.
 	 */
 	private void configureActions() {
-		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEdit);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEdit);
+		Entity table = entityBundle.getEntity();
+		boolean isEditableTable = table instanceof TableEntity && canEdit;
+		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, isEditableTable);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, isEditableTable);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		this.actionMenu.setBasicDivderVisible(canEdit);
+		this.actionMenu.setBasicDivderVisible(isEditableTable);
 		// Listen to action events.
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
