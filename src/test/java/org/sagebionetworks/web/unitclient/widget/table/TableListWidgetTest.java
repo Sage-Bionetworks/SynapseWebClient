@@ -31,7 +31,7 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -50,7 +50,7 @@ public class TableListWidgetTest {
 	private TableListWidget widget;
 	private EntityBundle parentBundle;
 	@Mock
-	CreateFileViewWizard mockCreateFileViewWizard;
+	CreateTableViewWizard mockCreateFileViewWizard;
 	@Mock
 	CookieProvider mockCookies;
 	@Before

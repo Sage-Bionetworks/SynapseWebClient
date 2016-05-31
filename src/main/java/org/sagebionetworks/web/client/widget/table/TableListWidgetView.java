@@ -92,6 +92,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void addUploadTableModal(IsWidget uploadTableModalWidget);
 
-	
+	public void addFileViewWizard(IsWidget wizard);
 	
 }

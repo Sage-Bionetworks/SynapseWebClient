@@ -459,8 +459,10 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePa
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizardStep1View;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateFileViewWizardStep1ViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1ViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
@@ -1265,6 +1267,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ZxcvbnWrapper.class).to(ZxcvbnWrapperImpl.class);
 		
 		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
-		bind(CreateFileViewWizardStep1View.class).to(CreateFileViewWizardStep1ViewImpl.class);
+		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
+		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
 	}
 }

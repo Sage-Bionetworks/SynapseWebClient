@@ -6,12 +6,9 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<bh:Div>
-			<b:FormGroup>
-				<b:FormLabel>Name</b:FormLabel>
-				<b:TextBox ui:field="nameField" />
-			</b:FormGroup>
-		</bh:Div>
-		<g:SimplePanel ui:field="scopeContainer" />
+		<bh:Span ui:field="noContainers" visible="false"><div><i>- Empty</i></div></bh:Span>
+		<bh:Div ui:field="entitiesContainer" />
+		<b:Button ui:field="addButton" icon="PLUS" addStyleNames="margin-top-10" size="SMALL" visible="false">Add container</b:Button>
+		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>
 </ui:UiBinder>

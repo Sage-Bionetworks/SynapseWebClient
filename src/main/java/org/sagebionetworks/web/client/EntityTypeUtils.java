@@ -9,22 +9,26 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 
 public class EntityTypeUtils {
 
+	
 	public static String getEntityClassNameForEntityType(String entityType) {
 		String className = FileEntity.class.getName();
 		if (entityType != null) {
-			if (entityType.equalsIgnoreCase("file")) {
+			if (entityType.equalsIgnoreCase(EntityType.file.name())) {
 				className = FileEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("folder")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.folder.name())) {
 				className = Folder.class.getName();
-			} else if (entityType.equalsIgnoreCase("project")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.project.name())) {
 				className = Project.class.getName();
-			} else if (entityType.equalsIgnoreCase("table")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.table.name())) {
 				className = TableEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("link")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.fileview.name())) {
+				className = FileView.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.link.name())) {
 				className = Link.class.getName();
 			}
 		}
@@ -49,6 +53,9 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			type = EntityType.table;
+		} else if(FileView.class.getName().equals(className)) {
+			// FileView
+			type = EntityType.fileview;
 		}
 		return type;
 	}
@@ -80,7 +87,11 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			icon = IconType.TABLE;
+		} else if(FileView.class.getName().equals(className)) {
+			// FileView
+			icon = IconType.FILES_O;
 		}
+		
 		return icon;
 	}
 
