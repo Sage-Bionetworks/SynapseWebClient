@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -39,6 +40,8 @@ public class CreateTableViewWizardStep1Test {
 	ModalPresenter mockWizardPresenter;
 	@Mock
 	EntityContainerListWidget mockEntityContainerListWidget;
+	@Mock
+	CreateTableViewWizardStep2 mockStep2;
 	
 	SynapseClientAsync mockSynapseClient;
 	String parentId;
@@ -50,7 +53,7 @@ public class CreateTableViewWizardStep1Test {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		scopeIds = Collections.singletonList("3");
 		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(scopeIds);
-		widget = new CreateTableViewWizardStep1(mockView, mockSynapseClient, mockEntityContainerListWidget);
+		widget = new CreateTableViewWizardStep1(mockView, mockSynapseClient, mockEntityContainerListWidget, mockStep2);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 	}

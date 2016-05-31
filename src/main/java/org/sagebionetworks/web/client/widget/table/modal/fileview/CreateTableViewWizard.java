@@ -20,7 +20,9 @@ public class CreateTableViewWizard {
 	    table,
 	    view
 	}
-
+	private String parentId;
+	private TableType type;
+	
 	@Inject
 	public CreateTableViewWizard(ModalWizardWidget modalWizarWidget, CreateTableViewWizardStep1 step1) {
 		this.modalWizardWidget = modalWizarWidget;
@@ -30,12 +32,13 @@ public class CreateTableViewWizard {
 	}
 
 	public void configure(String parentId, TableType type) {
+		this.parentId = parentId;
+		this.type = type;
 		if (TableType.view.equals(type)) {
 			this.modalWizardWidget.setTitle("Create View");
 		} else {
 			this.modalWizardWidget.setTitle("Create Table");
 		}
-		this.step1.configure(parentId, type);
 	}
 
 	public Widget asWidget() {
@@ -43,6 +46,7 @@ public class CreateTableViewWizard {
 	}
 
 	public void showModal(WizardCallback wizardCallback) {
+		this.step1.configure(parentId, type);
 		this.modalWizardWidget.showModal(wizardCallback);
 	}
 
