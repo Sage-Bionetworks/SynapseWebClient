@@ -64,15 +64,19 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	}
 
 	@Override
-	public void setPresenter(Presenter setPresenter) {
-		this.presenter = setPresenter;
+	public void setEditHandler(final EditHandler handler) {
 		// Edit clicks
 		this.editColumnsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onEditColumns();
+				handler.onEditColumns();
 			}
 		});
+	}
+	
+	@Override
+	public void setPresenter(Presenter setPresenter) {
+		this.presenter = setPresenter;
 		// Add clicks
 		this.addColumnButton.addClickHandler(new ClickHandler() {
 			@Override

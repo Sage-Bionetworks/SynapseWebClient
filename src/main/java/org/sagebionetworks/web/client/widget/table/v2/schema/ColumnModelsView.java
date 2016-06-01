@@ -14,6 +14,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface ColumnModelsView extends IsWidget {
 
+	public interface EditHandler {
+		/**
+		 * Called when the edit button is pressed
+		 */
+		public void onEditColumns();
+	}
+	
 	/**
 	 * All business logic for this view belongs in the presenter.
 	 * 
@@ -43,12 +50,6 @@ public interface ColumnModelsView extends IsWidget {
 		 */
 		public ColumnModelTableRowEditorWidget addNewColumn();
 		
-		/**
-		 * Called when the edit button is pressed
-		 */
-		public void onEditColumns();
-
-
 		/**
 		 * Toggle the selection.
 		 */
@@ -90,11 +91,14 @@ public interface ColumnModelsView extends IsWidget {
 		void onAddAllAnnotations();
 	}
 
+	
 	/**
 	 * Connect the view to the presenter.
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
+	
+	public void setEditHandler(EditHandler handler);
 	
 	/**
 	 * Add a row to the table.

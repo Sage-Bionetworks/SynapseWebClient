@@ -80,7 +80,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.view.addPaginationWidget(paginationWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
 		this.view.addFileViewWizard(createFileViewWizard.asWidget());
-		this.view.setAddFileViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		refreshTablesCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
