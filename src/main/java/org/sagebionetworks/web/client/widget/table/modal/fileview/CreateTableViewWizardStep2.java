@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -23,6 +22,7 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
+	public static final String FINISH = "Finish";
 	ColumnModelsEditorWidget editor;
 	String tableId;
 	ModalPresenter presenter;
@@ -54,6 +54,8 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.entity = entity;
 		this.tableType = tableType;
 		editor.configure(entity, startingModels);
+		this.editor.setAddAllAnnotationsButtonVisible(TableType.view.equals(tableType));
+		this.editor.setAddDefaultFileColumnsButtonVisible(TableType.view.equals(tableType));
 	}
 
 	@Override
@@ -64,6 +66,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	@Override
 	public void setModalPresenter(ModalPresenter presenter) {
 		this.presenter = presenter;
+		presenter.setPrimaryButtonText(FINISH);
 	}
 	
 	@Override
@@ -79,16 +82,14 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		editor.setTableSchema(new AsyncCallback<Void>(){
 			@Override
 			public void onFailure(Throwable caught) {
+				presenter.setLoading(false);
 				presenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
 			public void onSuccess(Void result) {
+				presenter.setLoading(false);
 				presenter.onFinished();
-				
-//				TODO: go to next page if view?  Can decide based on tableType
-//				presenter.setLoading(false);
-//				presenter.setNextActivePage(next);
 			}}); 
 	}
 }

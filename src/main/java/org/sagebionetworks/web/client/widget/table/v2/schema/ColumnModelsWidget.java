@@ -67,9 +67,6 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			rowViewer.setSelectable(false);
 			viewer.addColumn(rowViewer);
 		}
-		if(isEditable){
-			editor.configure(bundle.getEntity(), startingModels);
-		}
 	}
 
 	@Override
