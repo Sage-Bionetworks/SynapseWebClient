@@ -1,47 +1,49 @@
-package org.sagebionetworks.web.client.widget.table.v2.schema;
+package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.SelectedRow;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * All business logic for the ColumnModelsView.
+ * Wizard page to edit column schema
  * 
- * @author jmhill
+ * @author Jay
  *
  */
-public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnModelsViewBase.Presenter, ColumnModelTableRow.SelectionPresenter, SynapseWidgetPresenter{
-	
-	public static final String SEE_THE_ERROR_S_ABOVE = "See the error(s) above.";
-	public static final ColumnType DEFAULT_NEW_COLUMN_TYPE = ColumnType.STRING;
-	public static final long DEFAULT_STRING_MAX_SIZE = 50L;
-	PortalGinInjector ginInjector;
-	ColumnModelsViewBase baseView;
-	ColumnModelsView viewer;
+public class CreateTableViewWizardStep2 implements ColumnModelsView.Presenter, ColumnModelTableRow.SelectionPresenter, ModalPage, IsWidget {
 	ColumnModelsView editor;
-	boolean isEditable;
+	PortalGinInjector ginInjector;
 	SynapseClientAsync synapseClient;
 	String tableId;
 	List<ColumnModel> startingModels;
 	List<ColumnModelTableRow> editorRows;
-	EntityBundle bundle;
-	EntityUpdatedHandler updateHandler;
 	KeyboardNavigationHandler keyboardNavigationHandler;
+	ModalPresenter presenter;
+	// the TableEntity or View
+	Entity entity;
+	TableType tableType;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -52,56 +54,36 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	 * @param view
 	 */
 	@Inject
-	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient){
+	public CreateTableViewWizardStep2(PortalGinInjector ginInjector, SynapseClientAsync synapseClient){
 		this.ginInjector = ginInjector;
-		// we will always have a viewer
-		this.baseView = baseView;
-		this.baseView.setPresenter(this);
-		// We need two copies of the view, one as an editor, and the other as a viewer.
-		this.viewer = ginInjector.createNewColumnModelsView();
-		this.viewer.setPresenter(this);
 		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
-		// Add all of the parts
-		this.baseView.setViewer(this.viewer);
-		this.baseView.setEditor(this.editor);
+		this.editor.setAddAllAnnotationsButtonVisible(true);
+		this.editor.setAddDefaultFileColumnsButtonVisible(true);
 		this.synapseClient = synapseClient;
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
+		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
 	}
 
-	@Override
-	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
+	public void configure(Entity entity, TableType tableType) {
+		configure(entity, tableType, new ArrayList<ColumnModel>());
+	}
+	
+	public void configure(Entity entity, TableType tableType, List<ColumnModel> startingModels) {
 		this.changingSelection = false;
-		this.isEditable = isEditable;
-		this.bundle = bundle;
-		this.startingModels = bundle.getTableBundle().getColumnModels();
-		this.updateHandler = updateHandler;
-		viewer.configure(ViewType.VIEWER, this.isEditable);
-		for(ColumnModel cm: this.startingModels){
-			// Create a viewer
-			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
-			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
-			rowViewer.setSelectable(false);
-			viewer.addColumn(rowViewer);
-		}
-		if(isEditable){
-			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
-		}else{
-			keyboardNavigationHandler = null;
-		}
+		this.entity = entity;
+		this.tableType = tableType;
+		this.startingModels = startingModels;
+		resetEditor();
 	}
 
 	@Override
 	public List<ColumnModel> getEditedColumnModels() {
-		if(!isEditable){
-			throw new IllegalStateException("Can only be called on an editable view.");
-		}
 		return ColumnModelUtils.extractColumnModels(this.editorRows);
 	}
 
 	@Override
 	public boolean validateModel() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -109,8 +91,8 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	public ColumnModelTableRowEditorWidget addNewColumn() {
 		// Create a new column
 		ColumnModel cm = new ColumnModel();
-		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
-		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
+		cm.setColumnType(ColumnModelsWidget.DEFAULT_NEW_COLUMN_TYPE);
+		cm.setMaximumSize(ColumnModelsWidget.DEFAULT_STRING_MAX_SIZE);
 		// Assign an id to this column
 		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
 		// bind this row for navigation.
@@ -127,29 +109,25 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 
 	@Override
 	public Widget asWidget() {
-		return baseView.asWidget();
+		return editor.asWidget();
 	}
 
 	@Override
 	public void onEditColumns() {
-		if(!this.isEditable){
-			throw new IllegalStateException("Cannot call onEditColumns() for a read-only widget");
-		}
 		// reset the editor to the starting state
 		resetEditor();
-		// Pass this to the base
-		baseView.showEditor();
 	}
+	
 	/**
 	 * Reset the editor.
 	 */
-	private void resetEditor(){
+	public void resetEditor(){
 		// clear the current navigation editor
 		if(this.keyboardNavigationHandler != null){
 			this.keyboardNavigationHandler.removeAllRows();
 		}
 		this.editorRows.clear();
-		editor.configure(ViewType.EDITOR, this.isEditable);
+		editor.configure(ViewType.EDITOR, true);
 		for(ColumnModel cm: this.startingModels){
 			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
 			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
@@ -162,29 +140,34 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	}
 
 	@Override
-	public void onSave() {
+	public void setModalPresenter(ModalPresenter presenter) {
+		this.presenter = presenter;
+	}
+	
+	@Override
+	public void onPrimary() {
+		presenter.setLoading(true);
 		// Save it the data is valid
 		if(!validate()){
-			baseView.showError(SEE_THE_ERROR_S_ABOVE);
+			presenter.setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
+			presenter.setLoading(false);
 			return;
-		}else{
-			baseView.hideErrors();
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = getEditedColumnModels();
-		baseView.setLoading();
-		synapseClient.setTableSchema(this.bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
-
+		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				baseView.showError(caught.getMessage());
+				presenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
 			public void onSuccess(Void result) {
-				// Hide the dialog
-				baseView.hideEditor();
-				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				presenter.onFinished();
+				
+//				TODO: go to next page if view?  Can decide based on tableType
+//				presenter.setLoading(false);
+//				presenter.setNextActivePage(next);
 			}}); 
 	}
 	
@@ -272,16 +255,6 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		throw new IllegalStateException("Nothing selected");
 	}
 	
-	public static class SelectedRow{
-		public ColumnModelTableRow row;
-		public int index;
-		public SelectedRow(ColumnModelTableRow row, int index) {
-			super();
-			this.row = row;
-			this.index = index;
-		}
-	}
-	
 	@Override
 	public void selectionChanged(boolean isSelected) {
 		checkSelectionState();
@@ -341,11 +314,13 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	
 	@Override
 	public void onAddAllAnnotations() {
-		// N/A, not showing this button
+		// TODO:  call a service to generate column models based on annotations!
+		presenter.setErrorMessage("Sorry, adding columns based on annotations has not been implemented!");
 	}
 	
 	@Override
 	public void onAddDefaultFileColumns() {
-		// N/A, not showing this button
+		// TODO:  call a service for the default file column models, or define it in SWC??
+		presenter.setErrorMessage("Sorry, adding columns based on the default file fields has not been implemented!");
 	}
 }

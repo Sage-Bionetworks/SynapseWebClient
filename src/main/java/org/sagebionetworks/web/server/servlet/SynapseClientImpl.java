@@ -113,6 +113,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -2689,8 +2690,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void setTableSchema(TableEntity table, List<ColumnModel> models)
+	public void setTableSchema(Entity table, List<ColumnModel> models)
 			throws RestServiceException {
+		if (!(table instanceof TableEntity || table instanceof FileView)) {
+			throw new BadRequestException("Updating a schema is only supported by tables and views");
+		}
+		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// Create any models that do not have an ID
@@ -2702,8 +2707,13 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				}
 				newSchema.add(m.getId());
 			}
-			// Get the table
-			table.setColumnIds(newSchema);
+			// Get the table/view
+			if (table instanceof TableEntity) {
+				((TableEntity)table).setColumnIds(newSchema);	
+			} else if (table instanceof FileView) {
+				((FileView)table).setColumnIds(newSchema);
+			}
+			
 			table = synapseClient.putEntity(table);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

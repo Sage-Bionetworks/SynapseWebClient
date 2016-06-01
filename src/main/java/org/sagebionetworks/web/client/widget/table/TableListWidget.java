@@ -56,6 +56,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private EntityQuery query;
 	private EntityBundle parentBundle;
 	private CallbackP<String> onTableClickCallback;
+	private CookieProvider cookies;
 	WizardCallback refreshTablesCallback;
 	@Inject
 	public TableListWidget(PreflightController preflightController,
@@ -73,6 +74,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.paginationWidget = paginationWidget;
 		this.createFileViewWizard = createFileViewWizard;
+		this.cookies = cookies;
 		this.view.setPresenter(this);
 		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.addPaginationWidget(paginationWidget);
@@ -155,6 +157,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		//Must have edit and showAddTables for the buttons to be visible.
 		view.setAddTableVisible(this.canEdit);
 		view.setUploadTableVisible(this.canEdit);
+		view.setAddFileViewVisible(this.canEdit && DisplayUtils.isInTestWebsite(cookies));
 	}
     
 	@Override

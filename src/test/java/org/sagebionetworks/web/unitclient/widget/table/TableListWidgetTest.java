@@ -49,6 +49,7 @@ public class TableListWidgetTest {
 	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
 	private EntityBundle parentBundle;
+	private UserEntityPermissions permissions;
 	@Mock
 	CreateTableViewWizard mockCreateFileViewWizard;
 	@Mock
@@ -56,7 +57,7 @@ public class TableListWidgetTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		UserEntityPermissions permissions = new UserEntityPermissions();
+		permissions = new UserEntityPermissions();
 		permissions.setCanEdit(true);
 		Project project = new Project();
 		project.setId("syn123");
@@ -78,12 +79,13 @@ public class TableListWidgetTest {
 	}
 	
 	@Test
-	public void testInAlphaMode() {
+	public void testAddFileViewVisible() {
 		reset(mockView);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget, mockCookies, mockCreateFileViewWizard);
 		verify(mockView).setAddFileViewVisible(true);
 	}
+	
 	
 	@Test
 	public void testCreateQuery(){
@@ -143,6 +145,7 @@ public class TableListWidgetTest {
 		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
+		verify(mockView, atLeastOnce()).setAddFileViewVisible(false);
 	}
 	
 	@Test

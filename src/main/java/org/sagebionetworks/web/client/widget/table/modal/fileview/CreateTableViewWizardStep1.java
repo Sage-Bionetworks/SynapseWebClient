@@ -28,14 +28,17 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	ModalPresenter modalPresenter;
 	EntityContainerListWidget entityContainerList;
 	TableType tableType;
+	CreateTableViewWizardStep2 step2;
 	
 	@Inject
 	public CreateTableViewWizardStep1(
 			CreateTableViewWizardStep1View view,
 			SynapseClientAsync synapseClient, 
-			EntityContainerListWidget entityContainerList) {
+			EntityContainerListWidget entityContainerList,
+			CreateTableViewWizardStep2 step2) {
 		super();
 		this.view = view;
+		this.step2 = step2;
 		this.entityContainerList = entityContainerList;
 		view.setScopeWidget(entityContainerList.asWidget());
 		this.synapseClient = synapseClient;
@@ -52,6 +55,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		boolean canEdit = true;
 		view.setScopeWidgetVisible(TableType.view.equals(type));
 		entityContainerList.configure(new ArrayList<String>(), canEdit);
+		view.setName("");
 	}
 	
 	/**
@@ -75,10 +79,9 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		synapseClient.createEntity(table, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity table) {
-				modalPresenter.onFinished();
-				//TODO: add other pages
-//				modalPresenter.setLoading(false);
-//				modalPresenter.setNextActivePage(next);
+				modalPresenter.setLoading(false);
+				step2.configure(table, tableType);
+				modalPresenter.setNextActivePage(step2);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
