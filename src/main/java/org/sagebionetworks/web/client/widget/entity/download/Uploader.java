@@ -395,7 +395,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					//there was already a file with this name in the directory.
 					
 					//confirm we can overwrite
-					view.showConfirmDialog("A file named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
+					view.showConfirmDialog("A file named \""+fileName+"\" ("+result+") already exists in this location. Do you want to update the existing file and create a new version?", 
 							new Callback() {
 								@Override
 								public void invoke() {
