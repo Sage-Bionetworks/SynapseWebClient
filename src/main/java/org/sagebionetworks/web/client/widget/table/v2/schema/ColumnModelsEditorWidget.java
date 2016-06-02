@@ -4,15 +4,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,13 +19,12 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	public static final long DEFAULT_STRING_MAX_SIZE = 50L;
 	
 	PortalGinInjector ginInjector;
-	SynapseClientAsync synapseClient;
 	ColumnModelsView editor;
 	List<ColumnModel> startingModels;
 	List<ColumnModelTableRow> editorRows;
 	String tableId;
 	KeyboardNavigationHandler keyboardNavigationHandler;
-	Entity entity;
+	
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -36,16 +32,14 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	boolean changingSelection = false;
 	
 	@Inject
-	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, SynapseClientAsync synapseClient) {
+	public ColumnModelsEditorWidget(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
 		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
 	}
 	
-	public void configure(Entity entity, List<ColumnModel> startingModels) {
-		this.entity = entity;
+	public void configure(List<ColumnModel> startingModels) {
 		this.changingSelection = false;
 		this.startingModels = startingModels;
 		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
@@ -257,11 +251,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			}
 		}
 		return valid;
-	}
-	
-	public void setTableSchema(AsyncCallback<Void> callback) {
-		List<ColumnModel> newSchema = getEditedColumnModels();
-		synapseClient.setTableSchema(entity, newSchema, callback);
 	}
 	
 	public void setAddAllAnnotationsButtonVisible(boolean visible) {

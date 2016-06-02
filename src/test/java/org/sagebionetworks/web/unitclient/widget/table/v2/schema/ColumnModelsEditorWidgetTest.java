@@ -18,12 +18,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
@@ -48,18 +46,13 @@ public class ColumnModelsEditorWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	ColumnModelsEditorWidget widget;
-	TableEntity table;
-	
+	List<ColumnModel> schema;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
-		table = new TableEntity();
-		table.setId("syn123");
 		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockEditor);
 		when(mockGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget >() {
 			@Override
@@ -76,13 +69,13 @@ public class ColumnModelsEditorWidgetTest {
 			}
 		});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
-		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient);
+		widget = new ColumnModelsEditorWidget(mockGinInjector);
+		schema = TableModelTestUtils.createOneOfEachType(true);
+		widget.configure(schema);
 	}
 	
 	@Test
 	public void testConfigure(){
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(table, schema);
 		verify(mockEditor).configure(ViewType.EDITOR, true);
 		// All rows should be added to the editor
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
@@ -95,8 +88,6 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testAddNewColumn(){
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(table, schema);
 		// This should add a new string column
 		widget.addNewColumn();
 		// the new row should be added to the keyboard navigator
@@ -114,9 +105,6 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(table, schema);
-		
 		// Add a column
 		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
 		editor.setValid(false);
@@ -128,9 +116,6 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testSelectAll(){
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(table, schema);
-
 		verify(mockEditor).setCanDelete(false);
 		verify(mockEditor).setCanMoveUp(false);
 		verify(mockEditor).setCanMoveDown(false);
@@ -173,9 +158,6 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testSelectNone(){
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(table, schema);
-
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
@@ -191,9 +173,6 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testToggleSelect(){
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(table, schema);
-
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();

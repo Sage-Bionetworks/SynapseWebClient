@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBase;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -124,7 +126,7 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		// show the editor
 		widget.onEditColumns();
-		verify(mockEditor).configure(table, schema);
+		verify(mockEditor).configure(schema);
 		verify(mockBaseView).showEditor();
 	}
 	
@@ -146,7 +148,7 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
-		AsyncMockStubber.callSuccessWith(null).when(mockEditor).setTableSchema(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(Entity.class), anyList(), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
@@ -183,7 +185,7 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		String errorMessage = "Something went wrong";
-		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockEditor).setTableSchema(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(any(Entity.class), anyList(), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();

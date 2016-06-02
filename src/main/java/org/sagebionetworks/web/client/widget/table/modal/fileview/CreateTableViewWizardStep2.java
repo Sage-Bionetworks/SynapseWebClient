@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
@@ -29,6 +30,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	// the TableEntity or View
 	Entity entity;
 	TableType tableType;
+	SynapseClientAsync synapseClient;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -39,7 +41,8 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * @param view
 	 */
 	@Inject
-	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor){
+	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient){
+		this.synapseClient = synapseClient;
 		this.editor = editor;
 		this.editor.setAddAllAnnotationsButtonVisible(false);
 		this.editor.setAddDefaultFileColumnsButtonVisible(false);
@@ -53,7 +56,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.changingSelection = false;
 		this.entity = entity;
 		this.tableType = tableType;
-		editor.configure(entity, startingModels);
+		editor.configure(startingModels);
 		this.editor.setAddAllAnnotationsButtonVisible(TableType.view.equals(tableType));
 		this.editor.setAddDefaultFileColumnsButtonVisible(TableType.view.equals(tableType));
 	}
@@ -79,7 +82,8 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			return;
 		}
 		// Get the models from the view and save them
-		editor.setTableSchema(new AsyncCallback<Void>(){
+		List<ColumnModel> newSchema = editor.getEditedColumnModels();
+		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setLoading(false);
