@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -43,224 +45,82 @@ import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTabl
 import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTableRowViewerStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sun.jersey.spi.inject.Errors.ErrorMessage;
 
 
 
 public class CreateTableViewWizardStep2Test {
 
 	@Mock
-	PortalGinInjector mockGinInjector;
+	ColumnModelsEditorWidget mockEditor;
 	@Mock
 	ModalPresenter mockWizardPresenter;
-	@Mock
-	ColumnModelsView mockColumnModelsView;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
-	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	String parentId;
 	CreateTableViewWizardStep2 widget;
 	@Mock
 	FileView viewEntity;
-	@Mock
-	ColumnModelTableRowViewer mockColumnModelTableRowViewer;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockColumnModelsView);
-		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
-		when(mockGinInjector.createNewColumnModelTableRowViewer()).thenAnswer(new Answer<ColumnModelTableRowViewer>() {
-			@Override
-			public ColumnModelTableRowViewer answer(InvocationOnMock invocation)
-					throws Throwable {
-				return new ColumnModelTableRowViewerStub();
-			}
-		});
-		when(mockGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget >() {
-			@Override
-			public ColumnModelTableRowEditorWidget answer(InvocationOnMock invocation)
-					throws Throwable {
-				return new ColumnModelTableRowEditorStub();
-			}
-		});
-
-		widget = new CreateTableViewWizardStep2(mockGinInjector, mockSynapseClient);
+	
+		widget = new CreateTableViewWizardStep2(mockEditor);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
+		when(mockEditor.validate()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(null).when(mockEditor).setTableSchema(any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testConstruction(){
-		verify(mockColumnModelsView).setPresenter(widget);
-		verify(mockColumnModelsView).setAddAllAnnotationsButtonVisible(true);
-		verify(mockColumnModelsView).setAddDefaultFileColumnsButtonVisible(true);
+		verify(mockEditor).setAddAllAnnotationsButtonVisible(false);
+		verify(mockEditor).setAddDefaultFileColumnsButtonVisible(false);
 	}
 	
 	@Test
 	public void testConfigure(){
-		boolean isEditable = true;
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		
-		widget.configure(viewEntity, TableType.view, schema);
-		verify(mockColumnModelsView).configure(ViewType.EDITOR, isEditable);
-		verify(mockColumnModelsView, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		widget.configure(viewEntity, TableType.view);
+		verify(mockEditor).configure(viewEntity, new ArrayList<ColumnModel>());
+		verify(mockEditor).setAddAllAnnotationsButtonVisible(true);
+		verify(mockEditor).setAddDefaultFileColumnsButtonVisible(true);
+	}
+	@Test
+	public void testAsWidget(){
+		widget.asWidget();
+		verify(mockEditor).asWidget();
 	}
 	
 
 	@Test
-	public void testAddNewColumn(){
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(viewEntity, TableType.view, schema);
-		// show the editor
-		widget.onEditColumns();
-		// This should add a new string column
-		widget.addNewColumn();
-		// the new row should be added to the keyboard navigator
-		verify(mockKeyboardNavigationHandler).bindRow(any(RowOfWidgets.class));
-		// A string should be added...
-		ColumnModel newModel = new ColumnModel();
-		newModel.setColumnType(ColumnModelsWidget.DEFAULT_NEW_COLUMN_TYPE);
-		newModel.setMaximumSize(ColumnModelsWidget.DEFAULT_STRING_MAX_SIZE);
-		schema.add(newModel);
-		// Extract the columns from the editor
-		List<ColumnModel> clone = widget.getEditedColumnModels();
-		assertEquals(schema, clone);
-	}
-	
-	@Test
-	public void testOnSaveSuccess() throws JSONObjectAdapterException{
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(viewEntity, TableType.view, schema);
-		// Show the dialog
-		widget.onEditColumns();
-		// Add a column
-		ColumnModelTableRowEditorWidget editor = widget.addNewColumn();
-		editor.setColumnName("a name");
-		List<ColumnModel> expectedNewScheam = new LinkedList<ColumnModel>(schema);
-		expectedNewScheam.add(ColumnModelUtils.extractColumnModel(editor));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(FileView.class), any(List.class), any(AsyncCallback.class));
-		// Now call save
-		widget.onPrimary();
-		verify(mockWizardPresenter).setLoading(true);
-		//TODO: determine if another page is necessary
-		verify(mockWizardPresenter).onFinished();
-	}
-	
-	@Test
-	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(viewEntity, TableType.view, schema);
-		// Show the dialog
-		widget.onEditColumns();
-		
-		// Add an invalid  column
-		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
-		editor.setValid(false);
-		editor.setColumnName("a name");
-		
+	public void testOnPrimaryInvalid(){
+		when(mockEditor.validate()).thenReturn(false);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
 		verify(mockWizardPresenter).setLoading(false);
 	}
 	
 	@Test
-	public void testOnSaveFailure() throws JSONObjectAdapterException{
-		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(viewEntity, TableType.view, schema);
-		// Add a column
-		ColumnModelTableRowEditorWidget editor = widget.addNewColumn();
-		editor.setColumnName("a name");
-		String errorMessage = "Something went wrong";
-		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(any(TableEntity.class), any(List.class), any(AsyncCallback.class));
-		// Now call save
+	public void testOnPrimary(){
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
-		verify(mockWizardPresenter).setErrorMessage(errorMessage);
+		verify(mockEditor).validate();
+		verify(mockWizardPresenter).setLoading(false);
+		verify(mockWizardPresenter).onFinished();
 	}
 	
 	@Test
-	public void testSelectAll(){
-		widget.configure(viewEntity, TableType.view);
-		verify(mockColumnModelsView).setCanDelete(false);
-		verify(mockColumnModelsView).setCanMoveUp(false);
-		verify(mockColumnModelsView).setCanMoveDown(false);
-		
-		// Add three columns
-		reset(mockColumnModelsView);
-		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
-		verify(mockColumnModelsView).setCanDelete(false);
-		verify(mockColumnModelsView).setCanMoveUp(false);
-		verify(mockColumnModelsView).setCanMoveDown(false);
-		
-		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
-		// Start with two selected
-		reset(mockColumnModelsView);
-		two.setSelected(true);
-		verify(mockColumnModelsView).setCanDelete(true);
-		verify(mockColumnModelsView).setCanMoveUp(true);
-		verify(mockColumnModelsView).setCanMoveDown(false);
-		
-		reset(mockColumnModelsView);
-		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
-		// With a new row the second row can move down.
-		verify(mockColumnModelsView).setCanDelete(true);
-		verify(mockColumnModelsView).setCanMoveUp(true);
-		verify(mockColumnModelsView).setCanMoveDown(true);;
-		
-		// select all
-		reset(mockColumnModelsView);
-		widget.selectAll();
-		assertTrue(one.isSelected());
-		assertTrue(two.isSelected());
-		assertTrue(three.isSelected());
-		// The select all must not attempt to change the state
-		// of the buttons for each selection and instead 
-		// update the state at the end of the selection.
-		verify(mockColumnModelsView).setCanDelete(true);
-		verify(mockColumnModelsView).setCanMoveUp(false);
-		verify(mockColumnModelsView).setCanMoveDown(false);
+	public void testOnPrimaryFailure(){
+		String error = "error message";
+		Exception ex = new Exception(error);
+		AsyncMockStubber.callFailureWith(ex).when(mockEditor).setTableSchema(any(AsyncCallback.class));
+		widget.onPrimary();
+		verify(mockWizardPresenter).setLoading(true);
+		verify(mockEditor).validate();
+		verify(mockWizardPresenter).setLoading(false);
+		verify(mockWizardPresenter).setErrorMessage(error);
 	}
+
+
 	
-	@Test
-	public void testSelectNone(){
-		widget.configure(viewEntity, TableType.view);
-		// Show the dialog
-		widget.onEditColumns();
-		// Add three columns
-		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
-		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
-		// Start with two selected
-		two.setSelected(true);
-		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
-		// select all
-		widget.selectNone();
-		assertFalse(one.isSelected());
-		assertFalse(two.isSelected());
-		assertFalse(three.isSelected());
-	}
-	
-	@Test
-	public void testToggleSelect(){
-		widget.configure(viewEntity, TableType.view);
-		// Show the dialog
-		widget.onEditColumns();
-		// Add three columns
-		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
-		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
-		// Start with two selected
-		two.setSelected(true);
-		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
-		// select all
-		widget.toggleSelect();
-		assertFalse(one.isSelected());
-		assertFalse(two.isSelected());
-		assertFalse(three.isSelected());
-		// do it again
-		widget.toggleSelect();
-		assertTrue(one.isSelected());
-		assertTrue(two.isSelected());
-		assertTrue(three.isSelected());
-	}
 	
 }

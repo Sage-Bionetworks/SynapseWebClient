@@ -74,20 +74,6 @@ public class TableListWidgetTest {
 	}
 	
 	@Test
-	public void testConstruction() {
-		verify(mockView).setAddFileViewVisible(false);
-	}
-	
-	@Test
-	public void testAddFileViewVisible() {
-		reset(mockView);
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget, mockCookies, mockCreateFileViewWizard);
-		verify(mockView).setAddFileViewVisible(true);
-	}
-	
-	
-	@Test
 	public void testCreateQuery(){
 		String parentId = "syn123";
 		EntityQuery query = widget.createQuery(parentId);
@@ -128,12 +114,14 @@ public class TableListWidgetTest {
 	
 	@Test
 	public void testConfigureCanEdit(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		EntityQueryResults results = new EntityQueryResults();
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(true);
 		verify(mockView).setUploadTableVisible(true);
+		verify(mockView).setAddFileViewVisible(true);
 	}
 	
 	@Test
@@ -145,7 +133,7 @@ public class TableListWidgetTest {
 		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
-		verify(mockView, atLeastOnce()).setAddFileViewVisible(false);
+		verify(mockView).setAddFileViewVisible(false);
 	}
 	
 	@Test

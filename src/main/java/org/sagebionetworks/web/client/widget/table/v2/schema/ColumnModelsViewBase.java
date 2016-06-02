@@ -28,7 +28,7 @@ public interface ColumnModelsViewBase extends IsWidget {
 
 	public void setViewer(ColumnModelsView viewer);
 
-	public void setEditor(ColumnModelsView editor);
+	public void setEditor(IsWidget editor);
 
 	/**
 	 * Show the editor.
