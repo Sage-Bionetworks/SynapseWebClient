@@ -74,7 +74,6 @@ public class CreateTableViewWizardStep2Test {
 		when(mockEditor.validate()).thenReturn(false);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
-		verify(mockWizardPresenter).setLoading(false);
 	}
 	
 	@Test
@@ -82,7 +81,6 @@ public class CreateTableViewWizardStep2Test {
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();
-		verify(mockWizardPresenter).setLoading(false);
 		verify(mockWizardPresenter).onFinished();
 	}
 	
@@ -94,11 +92,6 @@ public class CreateTableViewWizardStep2Test {
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();
-		verify(mockWizardPresenter).setLoading(false);
 		verify(mockWizardPresenter).setErrorMessage(error);
 	}
-
-
-	
-	
 }

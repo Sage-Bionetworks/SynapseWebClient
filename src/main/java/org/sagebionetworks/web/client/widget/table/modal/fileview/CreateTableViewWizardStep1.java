@@ -20,6 +20,8 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep1 implements ModalPage {
+	private static final String NEXT = "Next";
+
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 	
 	CreateTableViewWizardStep1View view;
@@ -79,14 +81,12 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		synapseClient.createEntity(table, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity table) {
-				modalPresenter.setLoading(false);
 				step2.configure(table, tableType);
 				modalPresenter.setNextActivePage(step2);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				modalPresenter.setErrorMessage(caught.getMessage());
-				modalPresenter.setLoading(false);
 			}
 		});
 	}
@@ -113,6 +113,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	@Override
 	public void setModalPresenter(ModalPresenter modalPresenter) {
 		this.modalPresenter = modalPresenter;
+		modalPresenter.setPrimaryButtonText(NEXT);
 	}
 
 

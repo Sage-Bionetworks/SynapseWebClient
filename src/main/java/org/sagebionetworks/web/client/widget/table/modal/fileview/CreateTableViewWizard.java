@@ -24,11 +24,10 @@ public class CreateTableViewWizard {
 	private TableType type;
 	
 	@Inject
-	public CreateTableViewWizard(ModalWizardWidget modalWizarWidget, CreateTableViewWizardStep1 step1) {
-		this.modalWizardWidget = modalWizarWidget;
+	public CreateTableViewWizard(ModalWizardWidget modalWizardWidget, CreateTableViewWizardStep1 step1) {
+		this.modalWizardWidget = modalWizardWidget;
 		this.modalWizardWidget.setModalSize(ModalSize.LARGE);
 		this.step1 = step1;
-		this.modalWizardWidget.configure(this.step1);
 	}
 
 	public void configure(String parentId, TableType type) {
@@ -47,6 +46,7 @@ public class CreateTableViewWizard {
 
 	public void showModal(WizardCallback wizardCallback) {
 		this.step1.configure(parentId, type);
+		this.modalWizardWidget.configure(this.step1);
 		this.modalWizardWidget.showModal(wizardCallback);
 	}
 

@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -78,7 +79,6 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		// Save it the data is valid
 		if(!editor.validate()){
 			presenter.setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
-			presenter.setLoading(false);
 			return;
 		}
 		// Get the models from the view and save them
@@ -86,7 +86,6 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				presenter.setLoading(false);
 				presenter.setErrorMessage(caught.getMessage());
 			}
 			
