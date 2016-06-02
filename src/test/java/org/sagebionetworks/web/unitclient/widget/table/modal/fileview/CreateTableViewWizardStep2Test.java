@@ -1,51 +1,28 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FileView;
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTableRowEditorStub;
-import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTableRowViewerStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.sun.jersey.spi.inject.Errors.ErrorMessage;
 
 
 
@@ -59,16 +36,17 @@ public class CreateTableViewWizardStep2Test {
 	CreateTableViewWizardStep2 widget;
 	@Mock
 	FileView viewEntity;
-	
+	@Mock
+	SynapseClientAsync mockSynapseClient;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 	
-		widget = new CreateTableViewWizardStep2(mockEditor);
+		widget = new CreateTableViewWizardStep2(mockEditor, mockSynapseClient);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(null).when(mockEditor).setTableSchema(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(Entity.class), anyList(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -80,7 +58,7 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testConfigure(){
 		widget.configure(viewEntity, TableType.view);
-		verify(mockEditor).configure(viewEntity, new ArrayList<ColumnModel>());
+		verify(mockEditor).configure(new ArrayList<ColumnModel>());
 		verify(mockEditor).setAddAllAnnotationsButtonVisible(true);
 		verify(mockEditor).setAddDefaultFileColumnsButtonVisible(true);
 	}
@@ -96,7 +74,6 @@ public class CreateTableViewWizardStep2Test {
 		when(mockEditor.validate()).thenReturn(false);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
-		verify(mockWizardPresenter).setLoading(false);
 	}
 	
 	@Test
@@ -104,7 +81,6 @@ public class CreateTableViewWizardStep2Test {
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();
-		verify(mockWizardPresenter).setLoading(false);
 		verify(mockWizardPresenter).onFinished();
 	}
 	
@@ -112,15 +88,10 @@ public class CreateTableViewWizardStep2Test {
 	public void testOnPrimaryFailure(){
 		String error = "error message";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockEditor).setTableSchema(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setTableSchema(any(Entity.class), anyList(), any(AsyncCallback.class));
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();
-		verify(mockWizardPresenter).setLoading(false);
 		verify(mockWizardPresenter).setErrorMessage(error);
 	}
-
-
-	
-	
 }

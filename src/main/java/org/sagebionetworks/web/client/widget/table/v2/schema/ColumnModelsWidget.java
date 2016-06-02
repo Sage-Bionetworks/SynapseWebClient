@@ -79,7 +79,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		if(!this.isEditable){
 			throw new IllegalStateException("Cannot call onEditColumns() for a read-only widget");
 		}
-		editor.configure(bundle.getEntity(), bundle.getTableBundle().getColumnModels());
+		editor.configure(bundle.getTableBundle().getColumnModels());
 		// Pass this to the base
 		baseView.showEditor();
 	}
@@ -95,7 +95,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		}
 		// Get the models from the view and save them
 		baseView.setLoading();
-		editor.setTableSchema(new AsyncCallback<Void>(){
+		List<ColumnModel> newSchema = editor.getEditedColumnModels();
+		synapseClient.setTableSchema(bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
