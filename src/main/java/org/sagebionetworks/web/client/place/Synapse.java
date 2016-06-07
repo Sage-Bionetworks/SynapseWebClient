@@ -54,8 +54,16 @@ public class Synapse extends Place {
 			area = EntityArea.valueOf(nextToken.toUpperCase());
 		}
 			
-		//last token that we recognize is the area token
-		areaToken = tokens.poll();
+		//remaining tokens are recognized is the area token
+		if (tokens.size() > 0) {
+			areaToken = "";
+		}
+		while (tokens.size() > 0) {
+			areaToken += tokens.poll();
+			if (tokens.size() > 0) {
+				areaToken += "/";	
+			}
+		}
 	}
 	
 	public static String getDelimiter(Synapse.EntityArea tab) {

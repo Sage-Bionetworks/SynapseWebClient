@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 
 /**
  * Synapse Place token testing
@@ -76,6 +77,20 @@ public class SynapsePlaceTest {
 		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
 		Assert.assertEquals(Synapse.EntityArea.ADMIN, place.getArea());
 		Assert.assertNull(place.getAreaToken());
+		Assert.assertEquals(testToken, tokenizer.getToken(place));
+	}
+	
+	@Test
+	public void testTablesQueryCase() {
+		String queryToken = "abcdef";
+		String testToken = testEntityId + TABLES_DELIMITER + TablesTab.TABLE_QUERY_PREFIX + queryToken;
+		Synapse place = tokenizer.getPlace(testToken);
+		
+		Assert.assertEquals(testEntityId, place.getEntityId());
+		Assert.assertEquals(Synapse.EntityArea.TABLES, place.getArea());
+		String areaToken = place.getAreaToken();
+		assertTrue(areaToken.startsWith(TablesTab.TABLE_QUERY_PREFIX));
+		assertEquals(queryToken, areaToken.substring(TablesTab.TABLE_QUERY_PREFIX.length()));
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 
