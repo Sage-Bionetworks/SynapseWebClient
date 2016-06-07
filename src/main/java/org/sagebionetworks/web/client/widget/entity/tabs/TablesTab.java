@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -65,7 +66,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	CallbackP<Boolean> showProjectInfoCallack;
-	
 	@Inject
 	public TablesTab(
 			TablesTabView view,
@@ -268,7 +268,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			if(token != null){
 				areaToken = TABLE_QUERY_PREFIX + token;
 				tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
-				tab.showTab();
+				// replace state if configuring table query widget, push history state after configuration.
+				tab.showTab(false);
 			}
 		}
 	}
