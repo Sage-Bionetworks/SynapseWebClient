@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
@@ -66,7 +67,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	 */
 	private void createFileViewEntity(final String name) {
 		modalPresenter.setLoading(true);
-		Entity table;
+		Table table;
 		if (TableType.view.equals(tableType)) {
 			table = new FileView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
@@ -81,7 +82,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		synapseClient.createEntity(table, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity table) {
-				step2.configure(table, tableType);
+				step2.configure((Table)table, tableType);
 				modalPresenter.setNextActivePage(step2);
 			}
 			@Override

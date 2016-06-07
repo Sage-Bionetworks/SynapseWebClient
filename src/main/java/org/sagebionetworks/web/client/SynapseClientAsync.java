@@ -52,6 +52,7 @@ import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -329,7 +330,7 @@ public interface SynapseClientAsync {
 	 * @param newSchema
 	 * @param callback
 	 */
-	void setTableSchema(Entity entity, List<ColumnModel> newSchema,
+	void setTableSchema(Table entity, List<ColumnModel> newSchema,
 			AsyncCallback<Void> callback);
 	
 	/**

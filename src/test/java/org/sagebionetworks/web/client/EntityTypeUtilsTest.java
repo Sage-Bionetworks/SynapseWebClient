@@ -44,7 +44,7 @@ public class EntityTypeUtilsTest {
 		assertEquals(IconType.FOLDER, EntityTypeUtils.getIconTypeForEntityClassName(Folder.class.getName()));
 		assertEquals(IconType.LIST_ALT, EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()));
 		assertEquals(IconType.TABLE, EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()));
-		assertEquals(IconType.FILES_O, EntityTypeUtils.getIconTypeForEntityClassName(FileView.class.getName()));
+		assertEquals(IconType.TH_LIST, EntityTypeUtils.getIconTypeForEntityClassName(FileView.class.getName()));
 		assertEquals(IconType.LINK, EntityTypeUtils.getIconTypeForEntityClassName(Link.class.getName()));
 		
 		assertEquals(IconType.FILE_O, EntityTypeUtils.getIconTypeForEntityClassName("default"));

@@ -89,7 +89,7 @@ public class EntityTypeUtils {
 			icon = IconType.TABLE;
 		} else if(FileView.class.getName().equals(className)) {
 			// FileView
-			icon = IconType.FILES_O;
+			icon = IconType.TH_LIST;
 		}
 		
 		return icon;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -96,7 +97,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// Get the models from the view and save them
 		baseView.setLoading();
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema(bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
+		synapseClient.setTableSchema((Table)bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
