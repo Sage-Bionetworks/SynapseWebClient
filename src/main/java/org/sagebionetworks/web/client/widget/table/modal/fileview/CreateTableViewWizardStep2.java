@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
@@ -29,7 +30,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	String tableId;
 	ModalPresenter presenter;
 	// the TableEntity or View
-	Entity entity;
+	Table entity;
 	TableType tableType;
 	SynapseClientAsync synapseClient;
 	
@@ -49,11 +50,11 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.editor.setAddDefaultFileColumnsButtonVisible(false);
 	}
 
-	public void configure(Entity entity, TableType tableType) {
+	public void configure(Table entity, TableType tableType) {
 		configure(entity, tableType, new ArrayList<ColumnModel>());
 	}
 	
-	public void configure(Entity entity, TableType tableType, List<ColumnModel> startingModels) {
+	public void configure(Table entity, TableType tableType, List<ColumnModel> startingModels) {
 		this.changingSelection = false;
 		this.entity = entity;
 		this.tableType = tableType;

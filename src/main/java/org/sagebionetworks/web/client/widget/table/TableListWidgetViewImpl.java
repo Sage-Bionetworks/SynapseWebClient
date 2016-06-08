@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.LinkedGroup;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
@@ -126,7 +125,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void setAddFileViewVisible(boolean visible) {
 		addFileView.setVisible(visible);
 	}
-
+	
 	@Override
 	public void setUploadTableVisible(boolean visibile) {
 		this.uploadTable.setVisible(visibile);
@@ -153,7 +152,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 	
 	@Override
-	public void addFileViewWizard(IsWidget wizard) {
+	public void addWizard(IsWidget wizard) {
 		fileViewWizardContainer.clear();
 		fileViewWizardContainer.add(wizard);
 	}

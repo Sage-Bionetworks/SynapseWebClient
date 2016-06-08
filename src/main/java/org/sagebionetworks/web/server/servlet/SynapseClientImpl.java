@@ -117,6 +117,7 @@ import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -2690,7 +2691,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void setTableSchema(Entity table, List<ColumnModel> models)
+	public void setTableSchema(Table table, List<ColumnModel> models)
 			throws RestServiceException {
 		if (!(table instanceof TableEntity || table instanceof FileView)) {
 			throw new BadRequestException("Updating a schema is only supported by tables and views");
@@ -2707,13 +2708,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				}
 				newSchema.add(m.getId());
 			}
-			// Get the table/view
-			if (table instanceof TableEntity) {
-				((TableEntity)table).setColumnIds(newSchema);	
-			} else if (table instanceof FileView) {
-				((FileView)table).setColumnIds(newSchema);
-			}
-			
+			table.setColumnIds(newSchema);	
 			table = synapseClient.putEntity(table);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

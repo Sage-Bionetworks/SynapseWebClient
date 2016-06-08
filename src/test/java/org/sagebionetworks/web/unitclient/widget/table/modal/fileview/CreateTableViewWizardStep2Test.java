@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
@@ -46,7 +47,7 @@ public class CreateTableViewWizardStep2Test {
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(Entity.class), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(Table.class), anyList(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -88,7 +89,7 @@ public class CreateTableViewWizardStep2Test {
 	public void testOnPrimaryFailure(){
 		String error = "error message";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setTableSchema(any(Entity.class), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setTableSchema(any(Table.class), anyList(), any(AsyncCallback.class));
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();

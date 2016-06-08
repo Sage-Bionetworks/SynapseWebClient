@@ -51,7 +51,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private PaginationWidget paginationWidget;
 	private CreateTableModalWidget createTableModalWidget;
 	private UploadTableModalWidget uploadTableModalWidget;
-	private CreateTableViewWizard createFileViewWizard;
+	private CreateTableViewWizard createTableViewWizard;
 	private boolean canEdit;
 	private EntityQuery query;
 	private EntityBundle parentBundle;
@@ -66,20 +66,20 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 			PaginationWidget paginationWidget,
 			UploadTableModalWidget uploadTableModalWidget,
 			CookieProvider cookies,
-			CreateTableViewWizard createFileViewWizard) {
+			CreateTableViewWizard createTableViewWizard) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.createTableModalWidget = createTableModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.paginationWidget = paginationWidget;
-		this.createFileViewWizard = createFileViewWizard;
+		this.createTableViewWizard = createTableViewWizard;
 		this.cookies = cookies;
 		this.view.setPresenter(this);
 		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.addPaginationWidget(paginationWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
-		this.view.addFileViewWizard(createFileViewWizard.asWidget());
+		this.view.addWizard(createTableViewWizard.asWidget());
 		refreshTablesCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -103,7 +103,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
-		this.createFileViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
 		this.query = createQuery(parentBundle.getEntity().getId());
 		queryForOnePage(OFFSET_ZERO);
 	}
@@ -200,7 +199,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 * Called after all pre-flight checks are performed on a file view.
 	 */
 	private void postCheckCreateFileView() {
-		this.createFileViewWizard.showModal(refreshTablesCallback);
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	
 	@Override
@@ -218,7 +218,13 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 * Called after all pre-flight checks are performed on a table.
 	 */
 	private void postCheckCreateTable(){
-		this.createTableModalWidget.showCreateModal();
+		// use new wizard if in alpha mode
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
+			this.createTableViewWizard.showModal(refreshTablesCallback);
+		} else {
+			this.createTableModalWidget.showCreateModal();	
+		}
 	}
 	
 
