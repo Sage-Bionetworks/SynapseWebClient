@@ -123,7 +123,6 @@ public class ForumWidgetTest {
 		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), captorP.capture());
 		
-		verify(mockDiscussionForumClient).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		Set<Long> moderatorIds = new HashSet<Long>();
 		Callback deleteCallback = null;
 		boolean showThreadDetails = true;
@@ -150,6 +149,14 @@ public class ForumWidgetTest {
 		boolean isThreads = true;
 		emptyThreadsCallback.invoke(isThreads);
 		verify(mockView).setDefaultThreadWidgetVisible(!isThreads);
+	}
+	
+	@Test
+	public void testDefaultBundleInit() {
+		ForumWidget.defaultThreadBundle = null;
+		forumWidget.initDefaultThread(DEFAULT_THREAD_ID);
+		verify(mockDiscussionForumClient).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
+		assertNotNull(ForumWidget.defaultThreadBundle);
 	}
 	
 	@Test
