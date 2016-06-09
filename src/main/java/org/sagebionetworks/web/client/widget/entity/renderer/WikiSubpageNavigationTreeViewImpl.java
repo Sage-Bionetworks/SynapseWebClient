@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTree.SubpageNavTreeNode;
@@ -8,7 +11,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -49,12 +54,42 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 
 	private void addTreeItemsRecursive(UnorderedListPanel ul, SubpageNavTreeNode root) {
 		String styleName = presenter.isCurrentPage(root) ? "active" : "";
-		ul.add(makeListItem(root), styleName);
+		HorizontalPanel w = makeListItem(root);
+		ul.add(w, styleName);
 		if (!root.getChildren().isEmpty()) {
 			UnorderedListPanel subList = new UnorderedListPanel();
-
 			subList.addStyleName("nav");
-			ul.add(subList);
+			final Div subListContainer = new Div();
+			subListContainer.add(subList);
+			ul.add(subListContainer);
+			final org.gwtbootstrap3.client.ui.Anchor collapseAnchor = new org.gwtbootstrap3.client.ui.Anchor();
+			collapseAnchor.setIcon(IconType.ANGLE_DOWN);
+			collapseAnchor.setPull(Pull.RIGHT);
+			final org.gwtbootstrap3.client.ui.Anchor expandAnchor = new org.gwtbootstrap3.client.ui.Anchor();
+			expandAnchor.setIcon(IconType.ANGLE_RIGHT);
+			expandAnchor.setPull(Pull.RIGHT);
+			expandAnchor.setVisible(false);
+			
+			collapseAnchor.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					subListContainer.setVisible(false);
+					collapseAnchor.setVisible(false);
+					expandAnchor.setVisible(true);
+				}
+			});
+			expandAnchor.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					subListContainer.setVisible(true);
+					collapseAnchor.setVisible(true);
+					expandAnchor.setVisible(false);
+				}
+			});
+			FlowPanel iconContainer = new FlowPanel();
+			iconContainer.add(collapseAnchor);
+			iconContainer.add(expandAnchor);
+			w.add(iconContainer);
 			for (SubpageNavTreeNode child : root.getChildren()) {
 				addTreeItemsRecursive(subList, child);
 			}
@@ -76,15 +111,22 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		DisplayUtils.showErrorMessage(message);
 	}
 
-	private Widget makeListItem(final SubpageNavTreeNode node) {
-		final Anchor l = new Anchor(node.getPageTitle());
-		l.addStyleName("link");
-		l.addClickHandler(new ClickHandler() {
+	private HorizontalPanel makeListItem(final SubpageNavTreeNode node) {
+		HorizontalPanel f = new HorizontalPanel();
+		f.setWidth("100%");
+		f.setHeight("25px");
+		FocusPanel anchorContainer = new FocusPanel();
+		anchorContainer.addStyleName("imageButton");
+		Anchor l = new Anchor(node.getPageTitle());
+		l.addStyleName("subpage-link");
+		anchorContainer.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.reloadWiki(node);
 			}
 		});
-		return l;
+		anchorContainer.add(l);
+		f.add(anchorContainer);
+		return f;
 	}
 }
