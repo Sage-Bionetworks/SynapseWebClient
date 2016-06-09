@@ -151,7 +151,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
 		adminTab.setTabClickedCallback(showProjectInfoCallback);
 		discussionTab.setTabClickedCallback(showProjectInfoCallback);
-		dockerTab.setTabClickedCallback(showProjectInfoCallback);
+		dockerTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
 	}
 	
     /**
@@ -165,6 +165,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	wikiAreaToken = null;
     	tablesAreaToken = null;
     	discussionAreaToken = null;
+    	dockerAreaToken = null;
     	filesVersionNumber = versionNumber;
     	this.entity = entity;
 
@@ -174,6 +175,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				area = EntityArea.WIKI;
 			} else if (entity instanceof TableEntity) {
 				area = EntityArea.TABLES;
+			/*} else if (entity instanceof DockerRepositoryEntity) {
+				area = EntityArea.DOCKER;*/
 			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
 				area = EntityArea.FILES;
 			}
@@ -199,7 +202,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				dockerAreaToken = areaToken;
 			}
 		}
-    	//note: the files/tables/wiki/discussion tabs rely on the project bundle, so they are configured later
+
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			dockerTab.asTab().setTabListItemVisible(false);
+		}
+    	//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
     
@@ -403,8 +410,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	public void configureDockerTab() {
-		String projectId = projectHeader.getId();
-		dockerTab.configure(projectId, projectHeader.getName(), dockerAreaToken);
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+			dockerTab.configure(entity, entityUpdateHandler, dockerAreaToken);
+		}
 	}
 		
 	@Override
