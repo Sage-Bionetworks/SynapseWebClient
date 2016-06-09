@@ -136,7 +136,7 @@ public class Synapse extends Place {
         }
     }
 
-	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN, DISCUSSION }
+	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN, DISCUSSION, DOCKER }
 	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, SETTINGS }
 
 	@Override
