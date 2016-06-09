@@ -175,7 +175,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				area = EntityArea.WIKI;
 			} else if (entity instanceof TableEntity) {
 				area = EntityArea.TABLES;
-			/*} else if (entity instanceof DockerRepositoryEntity) {
+			// TODO: add check for Docker
+			/*} else if (entity instanceof DockerRepository) {
 				area = EntityArea.DOCKER;*/
 			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
 				area = EntityArea.FILES;
@@ -203,10 +204,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		}
 
-		if (!DisplayUtils.isInTestWebsite(cookies)) {
-			dockerTab.asTab().setTabListItemVisible(false);
-		}
-    	//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
+		dockerTab.asTab().setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
+		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
     
