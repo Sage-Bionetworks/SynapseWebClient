@@ -96,30 +96,6 @@ public class SynapsePlaceTest {
 	}
 
 	@Test
-	public void testDiscussionVersionCase() {
-		String testToken = testEntityId + VERSION_DELIMITER + testVersionNumber + DISCUSSION_DELIMITER;
-		Synapse place = tokenizer.getPlace(testToken);
-		
-		Assert.assertEquals(testEntityId, place.getEntityId());
-		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityArea.DISCUSSION, place.getArea());
-		Assert.assertNull(place.getAreaToken());
-		Assert.assertEquals(testToken, tokenizer.getToken(place));
-	}
-
-	@Test
-	public void testDockerVersionCase() {
-		String testToken = testEntityId + VERSION_DELIMITER + testVersionNumber + DOCKER_DELIMITER;
-		Synapse place = tokenizer.getPlace(testToken);
-		
-		Assert.assertEquals(testEntityId, place.getEntityId());
-		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityArea.DOCKER, place.getArea());
-		Assert.assertNull(place.getAreaToken());
-		Assert.assertEquals(testToken, tokenizer.getToken(place));
-	}
-	
-	@Test
 	public void testEntityDotVersionCase() {
 		String testToken = testEntityId + "." + testVersionNumber;
 		Synapse place = tokenizer.getPlace(testToken);
