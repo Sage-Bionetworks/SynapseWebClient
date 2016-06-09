@@ -14,6 +14,7 @@
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="dockerListWidgetContainer" visible="false"/>
 			<g:SimplePanel addStyleNames="margin-top-15" ui:field="dockerWidgetContainer"/>
+			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="dockerModifiedAndCreatedContainer"/>
 		</b:Column>
 	</b:Row>
 </ui:UiBinder>
