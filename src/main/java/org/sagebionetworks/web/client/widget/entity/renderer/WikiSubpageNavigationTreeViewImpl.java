@@ -52,7 +52,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		addTreeItemsRecursive(ulNavTree, overallRoot);
 	}
 
-	private void addTreeItemsRecursive(UnorderedListPanel ul, SubpageNavTreeNode root) {
+	private void addTreeItemsRecursive(UnorderedListPanel ul, final SubpageNavTreeNode root) {
 		String styleName = presenter.isCurrentPage(root) ? "active" : "";
 		HorizontalPanel w = makeListItem(root);
 		ul.add(w, styleName);
@@ -68,28 +68,36 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 			final org.gwtbootstrap3.client.ui.Anchor expandAnchor = new org.gwtbootstrap3.client.ui.Anchor();
 			expandAnchor.setIcon(IconType.ANGLE_RIGHT);
 			expandAnchor.setPull(Pull.RIGHT);
-			expandAnchor.setVisible(false);
 			
-			collapseAnchor.addClickHandler(new ClickHandler() {
+			ClickHandler collapseClickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					subListContainer.setVisible(false);
 					collapseAnchor.setVisible(false);
 					expandAnchor.setVisible(true);
+					root.setCollapsed(true);
 				}
-			});
-			expandAnchor.addClickHandler(new ClickHandler() {
+			};
+			collapseAnchor.addClickHandler(collapseClickHandler);
+			ClickHandler expandClickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					subListContainer.setVisible(true);
 					collapseAnchor.setVisible(true);
 					expandAnchor.setVisible(false);
+					root.setCollapsed(false);
 				}
-			});
+			}; 
+			expandAnchor.addClickHandler(expandClickHandler);
 			FlowPanel iconContainer = new FlowPanel();
 			iconContainer.add(collapseAnchor);
 			iconContainer.add(expandAnchor);
 			w.add(iconContainer);
+			if (root.isCollapsed()) {
+				collapseClickHandler.onClick(null);
+			} else {
+				expandClickHandler.onClick(null);
+			}
 			for (SubpageNavTreeNode child : root.getChildren()) {
 				addTreeItemsRecursive(subList, child);
 			}

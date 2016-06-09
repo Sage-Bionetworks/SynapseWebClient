@@ -98,12 +98,14 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		private String pageTitle;
 		private Place targetPlace;
 		private WikiPageKey wikiPageKey;
+		private boolean collapsed;
 
 		public SubpageNavTreeNode(String pageTitle, Place targetPlace, WikiPageKey wikiPageKey) {
 			this.pageTitle = pageTitle;
 			this.targetPlace = targetPlace;
 			this.children = new ArrayList<SubpageNavTreeNode>();
 			this.wikiPageKey = wikiPageKey;
+			collapsed = false;
 		}
 
 		/*
@@ -113,6 +115,12 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		public String getPageTitle()                        {       return this.pageTitle;       }
 		public Place getTargetPlace()                       {       return this.targetPlace;     }
 		public WikiPageKey getWikiPageKey()                 {       return this.wikiPageKey;     }
+		public boolean isCollapsed() {
+			return collapsed;
+		}
+		public void setCollapsed(boolean collapsed) {
+			this.collapsed = collapsed;
+		}
 	}
 
 	@Override
