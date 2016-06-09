@@ -155,7 +155,7 @@ public class ForumWidgetTest {
 	public void testDefaultBundleInit() {
 		ForumWidget.defaultThreadBundle = null;
 		forumWidget.initDefaultThread(DEFAULT_THREAD_ID);
-		verify(mockDiscussionForumClient).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient, atLeastOnce()).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		assertNotNull(ForumWidget.defaultThreadBundle);
 	}
 	
