@@ -3,20 +3,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.ui.TabListItem;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -27,7 +26,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionTabTest {
@@ -38,8 +36,6 @@ public class DiscussionTabTest {
 	@Mock
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
-	CookieProvider mockCookies;
-	@Mock
 	ForumWidget mockForumWidget;
 	Set<Long> moderatorIds;
 	DiscussionTab tab;
@@ -47,8 +43,7 @@ public class DiscussionTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new DiscussionTab(mockView, mockTab, mockCookies, mockForumWidget);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		tab = new DiscussionTab(mockView, mockTab, mockForumWidget);
 		moderatorIds = new HashSet<Long>();
 	}
 

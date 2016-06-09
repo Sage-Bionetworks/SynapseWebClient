@@ -369,6 +369,8 @@ import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
@@ -1230,6 +1232,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TablesTabView.class).to(TablesTabViewImpl.class);
 		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
 		bind(DiscussionTabView.class).to(DiscussionTabViewImpl.class);
+		bind(DockerTabView.class).to(DockerTabViewImpl.class);
 		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
 		bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
 		bind(ACTView.class).to(ACTViewImpl.class);

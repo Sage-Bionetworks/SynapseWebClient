@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -36,6 +37,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
@@ -56,7 +58,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private Entity entity;
 	
 	private Synapse.EntityArea area;
-	private String wikiAreaToken, tablesAreaToken, discussionAreaToken;
+	private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken;
 	private Long filesVersionNumber;
 	private EntityHeader projectHeader;
 	
@@ -66,6 +68,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private TablesTab tablesTab;
 	private ChallengeTab adminTab;
 	private DiscussionTab discussionTab;
+	private DockerTab dockerTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
@@ -73,6 +76,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
+	private CookieProvider cookies;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -84,9 +88,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			TablesTab tablesTab,
 			ChallengeTab adminTab,
 			DiscussionTab discussionTab,
+			DockerTab dockerTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			CookieProvider cookies) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -95,10 +101,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.tablesTab = tablesTab;
 		this.adminTab = adminTab;
 		this.discussionTab = discussionTab;
+		this.dockerTab = dockerTab;
 		this.projectMetadata = projectMetadata;
 		this.controller = controller;
 		this.actionMenu = actionMenu;
 		this.gwt = gwt;
+		this.cookies = cookies;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -125,6 +133,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		tabs.addTab(tablesTab.asTab());
 		tabs.addTab(adminTab.asTab());
 		tabs.addTab(discussionTab.asTab());
+		tabs.addTab(dockerTab.asTab());
 		CallbackP<Boolean> showHideProjectInfoCallback = new CallbackP<Boolean>() {
 			public void invoke(Boolean visible) {
 				view.setProjectInformationVisible(visible);
@@ -142,6 +151,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
 		adminTab.setTabClickedCallback(showProjectInfoCallback);
 		discussionTab.setTabClickedCallback(showProjectInfoCallback);
+		dockerTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
 	}
 	
     /**
@@ -155,6 +165,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	wikiAreaToken = null;
     	tablesAreaToken = null;
     	discussionAreaToken = null;
+    	dockerAreaToken = null;
     	filesVersionNumber = versionNumber;
     	this.entity = entity;
 
@@ -164,6 +175,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				area = EntityArea.WIKI;
 			} else if (entity instanceof TableEntity) {
 				area = EntityArea.TABLES;
+			/*} else if (entity instanceof DockerRepositoryEntity) {
+				area = EntityArea.DOCKER;*/
 			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
 				area = EntityArea.FILES;
 			}
@@ -183,8 +196,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		} else if (area == EntityArea.DISCUSSION) {
 			tabs.showTab(discussionTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 			discussionAreaToken = areaToken;
+		} else if (area == EntityArea.DOCKER) {
+			if (DisplayUtils.isInTestWebsite(cookies)) {
+				tabs.showTab(dockerTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				dockerAreaToken = areaToken;
+			}
 		}
-    	//note: the files/tables/wiki/discussion tabs rely on the project bundle, so they are configured later
+
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			dockerTab.asTab().setTabListItemVisible(false);
+		}
+    	//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
     
@@ -243,6 +265,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			case DISCUSSION:
 				configureDiscussionTab();
 				break;
+			case DOCKER:
+				configureDockerTab();
+				break;
 			default:
 			}
 		}
@@ -253,6 +278,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			configureTablesTab();
 			configureAdminTab();
 			configureDiscussionTab();
+			configureDockerTab();
 		} else {
 			switch (area) {
 			case FILES:
@@ -260,29 +286,41 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureTablesTab();
 				configureAdminTab();
 				configureDiscussionTab();
+				configureDockerTab();
 				break;
 			case WIKI:
 				configureFilesTab();
 				configureTablesTab();
 				configureAdminTab();
 				configureDiscussionTab();
+				configureDockerTab();
 				break;
 			case TABLES:
 				configureWikiTab();
 				configureFilesTab();
 				configureAdminTab();
 				configureDiscussionTab();
+				configureDockerTab();
 				break;
 			case ADMIN:
 				configureWikiTab();
 				configureFilesTab();
 				configureTablesTab();
 				configureDiscussionTab();
+				configureDockerTab();
 				break;
 			case DISCUSSION:
 				configureWikiTab();
 				configureFilesTab();
 				configureTablesTab();
+				configureAdminTab();
+				configureDockerTab();
+				break;
+			case DOCKER:
+				configureWikiTab();
+				configureFilesTab();
+				configureTablesTab();
+				configureDiscussionTab();
 				configureAdminTab();
 				break;
 			default:
@@ -369,6 +407,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			moderatorIds = AclUtils.getPrincipalIds(projectBundle.getAccessControlList(), ACCESS_TYPE.MODERATE);
 		}
 		discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, moderatorIds);
+	}
+
+	public void configureDockerTab() {
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+			dockerTab.configure(entity, entityUpdateHandler, dockerAreaToken);
+		}
 	}
 		
 	@Override

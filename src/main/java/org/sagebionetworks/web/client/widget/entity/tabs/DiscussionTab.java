@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import java.util.Set;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -17,7 +16,6 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	private final static Long PROJECT_VERSION_NUMBER = null;
 	Tab tab;
 	DiscussionTabView view;
-	CookieProvider cookies;
 	//use this token to navigate between threads within the discussion tab
 	ParameterizedToken params;
 	ForumWidget forumWidget;
@@ -27,12 +25,10 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	public DiscussionTab(
 			DiscussionTabView view,
 			Tab tab,
-			CookieProvider cookies,
 			ForumWidget forumWidget
 			) {
 		this.view = view;
 		this.tab = tab;
-		this.cookies = cookies;
 		this.forumWidget = forumWidget;
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		view.updateWidth(tab);
