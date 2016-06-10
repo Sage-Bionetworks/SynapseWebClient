@@ -348,7 +348,7 @@ public class DisplayUtilsTest {
 	@Test
 	public void testHandleServiceExceptionReadOnly() {
 		assertTrue(DisplayUtils.handleServiceException(new ReadOnlyModeException(), mockGlobalApplicationState, true, mockView));
-		verify(mockView).showErrorMessage(eq(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE));
+		verify(mockPlaceChanger).goTo(any(Down.class));
 	}
 	
 	@Test
