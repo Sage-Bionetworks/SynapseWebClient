@@ -73,7 +73,7 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceExceptionReadOnly() {
 		widget.handleException(new ReadOnlyModeException());
 		verify(mockView, times(2)).clearState();
-		verify(mockView).showError(eq(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE));
+		verify(mockPlaceChanger).goTo(any(Down.class));
 	}
 	
 	@Test

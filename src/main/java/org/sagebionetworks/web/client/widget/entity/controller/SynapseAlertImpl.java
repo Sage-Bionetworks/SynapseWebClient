@@ -44,9 +44,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		clear();
 		this.ex = ex;
 		boolean isLoggedIn = authController.isLoggedIn();
-		if(ex instanceof ReadOnlyModeException) {
-			view.showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
-		} else if(ex instanceof SynapseDownException) {
+		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page				

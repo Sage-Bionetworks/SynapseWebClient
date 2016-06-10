@@ -23,7 +23,6 @@ public class DownPresenter extends AbstractActivity implements DownView.Presente
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(this.view.asWidget());
 		this.bus = eventBus;
-		
 	}
 	
 	@Override

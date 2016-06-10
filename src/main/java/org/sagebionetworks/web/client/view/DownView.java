@@ -8,7 +8,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface DownView extends IsWidget, SynapseView {
 	
 	void setPresenter(Presenter loginPresenter);	
-	
 	public interface Presenter extends SynapsePresenter {
     }
 	

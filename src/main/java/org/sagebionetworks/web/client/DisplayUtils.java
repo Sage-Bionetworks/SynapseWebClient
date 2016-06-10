@@ -334,10 +334,7 @@ public class DisplayUtils {
 		//send exception to the javascript console
 		if (displayUtilsLogger != null && ex != null)
 			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
-		if(ex instanceof ReadOnlyModeException) {
-			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
-			return true;
-		} else if(ex instanceof SynapseDownException) {
+		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 			return true;
 		} else if(ex instanceof UnauthorizedException) {

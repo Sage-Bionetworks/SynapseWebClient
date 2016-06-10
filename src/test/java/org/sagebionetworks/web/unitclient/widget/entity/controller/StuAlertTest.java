@@ -60,24 +60,6 @@ public class StuAlertTest {
 	}
 	
 	@Test
-	public void testHandleServiceExceptionReadOnly() {
-		widget.handleException(new ReadOnlyModeException());
-		verify(mockSynapseAlert).clear();
-		verify(mockView).clearState();
-		verify(mockView).showReadOnly();
-		verify(mockView).setVisible(true);
-	}
-	
-	@Test
-	public void testHandleServiceExceptionDown() {
-		widget.handleException(new SynapseDownException());
-		verify(mockSynapseAlert).clear();
-		verify(mockView).clearState();
-		verify(mockView).showSynapseDown();
-		verify(mockView).setVisible(true);
-	}
-	
-	@Test
 	public void testHandleServiceExceptionForbiddenLoggedIn() {
 		widget.handleException(new ForbiddenException());
 		verify(mockSynapseAlert).clear();
