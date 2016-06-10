@@ -127,6 +127,10 @@ import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadMo
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -1247,6 +1251,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
 		bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
+
+		// docker
+		bind(DockerRepoListWidgetView.class).to(DockerRepoListWidgetViewImpl.class);
+		bind(AddExternalRepoModalView.class).to(AddExternalRepoModalViewImpl.class);
 		
 		bind(SessionStorage.class).to(SessionStorageImpl.class);
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
