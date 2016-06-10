@@ -2235,13 +2235,13 @@ div.input-group > input.search-textbox {
   padding: 5px 10px 30px 0px;
 }
 
-.nav > .active a:first-child,
-.nav > .active:hover a:first-child,
-.nav > .active:focus a:first-child {
-  color: black !important;
-  text-decoration:none;
-  background-color: transparent;
-  border-right: 0px;
+.bs-sidenav .nav .active,
+.bs-sidenav .nav .active:hover,
+.bs-sidenav .nav .active:focus {
+	color: black !important;
+	text-decoration:none;
+	background-color: transparent;
+	border-right: 0px;
 }
 
 .bs-sidenav .nav > li > div { 

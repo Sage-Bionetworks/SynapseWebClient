@@ -54,7 +54,16 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 
 	private void addTreeItemsRecursive(UnorderedListPanel ul, final SubpageNavTreeNode root) {
 		String styleName = presenter.isCurrentPage(root) ? "active" : "";
-		HorizontalPanel w = makeListItem(root);
+		HorizontalPanel w = new HorizontalPanel();
+		w.setWidth("100%");
+		w.setHeight("25px");
+		FocusPanel anchorContainer = new FocusPanel();
+		anchorContainer.addStyleName("imageButton");
+		Anchor l = new Anchor(root.getPageTitle());
+		l.addStyleName("subpage-link " + styleName);
+		anchorContainer.add(l);
+		w.add(anchorContainer);
+		
 		ul.add(w, styleName);
 		if (!root.getChildren().isEmpty()) {
 			UnorderedListPanel subList = new UnorderedListPanel();
@@ -79,7 +88,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 				}
 			};
 			collapseAnchor.addClickHandler(collapseClickHandler);
-			ClickHandler expandClickHandler = new ClickHandler() {
+			final ClickHandler expandClickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					subListContainer.setVisible(true);
@@ -98,9 +107,23 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 			} else {
 				expandClickHandler.onClick(null);
 			}
+			anchorContainer.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					expandClickHandler.onClick(null);
+					presenter.reloadWiki(root);
+				}
+			});
 			for (SubpageNavTreeNode child : root.getChildren()) {
 				addTreeItemsRecursive(subList, child);
 			}
+		} else {
+			anchorContainer.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.reloadWiki(root);
+				}
+			});
 		}
 	}
 
@@ -119,22 +142,4 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		DisplayUtils.showErrorMessage(message);
 	}
 
-	private HorizontalPanel makeListItem(final SubpageNavTreeNode node) {
-		HorizontalPanel f = new HorizontalPanel();
-		f.setWidth("100%");
-		f.setHeight("25px");
-		FocusPanel anchorContainer = new FocusPanel();
-		anchorContainer.addStyleName("imageButton");
-		Anchor l = new Anchor(node.getPageTitle());
-		l.addStyleName("subpage-link");
-		anchorContainer.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.reloadWiki(node);
-			}
-		});
-		anchorContainer.add(l);
-		f.add(anchorContainer);
-		return f;
-	}
 }
