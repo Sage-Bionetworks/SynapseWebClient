@@ -15,7 +15,8 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.docker.DockerListWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -34,7 +35,9 @@ public class DockerTabTest {
 	@Mock
 	BasicTitleBar mockDockerTitleBar;
 	@Mock
-	DockerListWidget mockDockerListWidget;
+	DockerRepoListWidget mockDockerRepoListWidget;
+	@Mock
+	DockerRepoWidget mockDockerRepoWidget;
 	@Mock
 	Breadcrumb mockBreadcrumb;
 	@Mock
@@ -67,8 +70,9 @@ public class DockerTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new DockerTab(mockView, mockTab, mockDockerTitleBar, mockDockerListWidget,
-				mockBreadcrumb, mockMetadata, mockModifiedCreatedBy, mockSynAlert);
+		tab = new DockerTab(mockView, mockTab, mockDockerTitleBar, mockDockerRepoListWidget,
+				mockDockerRepoWidget, mockBreadcrumb, mockMetadata, mockModifiedCreatedBy,
+				mockSynAlert);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 	}
 
@@ -76,7 +80,8 @@ public class DockerTabTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(tab);
 		verify(mockView).setBreadcrumb(any(Widget.class));
-		verify(mockView).setDockerList(any(Widget.class));
+		verify(mockView).setDockerRepoList(any(Widget.class));
+		verify(mockView).setDockerRepoWidget(any(Widget.class));
 		verify(mockView).setEntityMetadata(any(Widget.class));
 		verify(mockView).setModifiedCreatedBy(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));

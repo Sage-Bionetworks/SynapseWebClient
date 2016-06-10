@@ -24,13 +24,13 @@ import com.google.gwt.user.client.ui.Widget;
  * @author jmhill
  *
  */
-public class EntityListGroupItem extends ListGroupItem {
+public class TableEntityListGroupItem extends ListGroupItem {
 
 	private static final String CREATED_ON = "Created On: ";
 
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 	
-	EntityListGroupItem(HeadingSize size, EntityQueryResult header, ClickHandler clickHandler){
+	TableEntityListGroupItem(HeadingSize size, EntityQueryResult header, ClickHandler clickHandler){
 		addStyleName("padding-10");
 		Heading iconHeading = new Heading(HeadingSize.H3);
 		iconHeading.setPull(Pull.LEFT);
