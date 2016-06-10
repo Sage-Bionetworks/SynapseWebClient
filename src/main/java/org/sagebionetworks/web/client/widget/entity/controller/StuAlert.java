@@ -95,11 +95,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 	public void handleException(Throwable ex) {
 		clear();
 		//if it's something that Stu recognizes, then he should handle it.
-		if(ex instanceof ReadOnlyModeException) {
-			view.showReadOnly();
-		} else if(ex instanceof SynapseDownException) {
-			view.showSynapseDown();
-		} else if(ex instanceof ForbiddenException) {			
+		if(ex instanceof ForbiddenException) {			
 			if(!authController.isLoggedIn()) {
 				synAlert.showMustLogin();
 			} else {
