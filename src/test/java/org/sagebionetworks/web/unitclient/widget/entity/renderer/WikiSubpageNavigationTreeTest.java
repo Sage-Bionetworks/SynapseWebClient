@@ -106,6 +106,10 @@ public class WikiSubpageNavigationTreeTest {
 
 		assertEquals(Arrays.asList(aWikiPageKey, bWikiPageKey, cWikiPageKey, dWikiPageKey, eWikiPageKey),
 				Arrays.asList(aNode.getWikiPageKey(), bNode.getWikiPageKey(), cNode.getWikiPageKey(), dNode.getWikiPageKey(), eNode.getWikiPageKey()));
+		
+		//on page D by default, should expand all
+		assertFalse(aNode.isCollapsed());
+		assertFalse(bNode.isCollapsed());
 	}
 
 	@Test
@@ -149,6 +153,20 @@ public class WikiSubpageNavigationTreeTest {
 		assertFalse(tree.isCurrentPage(bNode));
 		assertFalse(tree.isCurrentPage(cNode));
 		assertFalse(tree.isCurrentPage(eNode));
+	}
+	
+	@Test
+	public void testRootCurrentPage() {
+		//set root to be the currently selected node
+		currentWikiKey.setWikiPageId("0");
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+
+		SubpageNavTreeNode aNode = tree.getOverallRoot();
+		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
+		
+		//verify other parent nodes are collapsed, but root is expanded
+		assertFalse(aNode.isCollapsed());
+		assertTrue(bNode.isCollapsed());
 	}
 
 	@Test

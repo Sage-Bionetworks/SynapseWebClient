@@ -2235,43 +2235,43 @@ div.input-group > input.search-textbox {
   padding: 5px 10px 30px 0px;
 }
 
-/* All levels of nav */
-.bs-sidenav > li > a {
-  padding: 5px 20px !important;
+.bs-sidenav .nav .active,
+.bs-sidenav .nav .active:hover,
+.bs-sidenav .nav .active:focus {
+	color: black !important;
+	text-decoration:none;
+	background-color: transparent;
+	border-right: 0px;
 }
 
-.nav > .active > a,
-.nav > .active:hover > a,
-.nav > .active:focus > a {
-  color: black !important;
-  text-decoration:none;
-  background-color: transparent;
-  border-right: 0px;
+.bs-sidenav .nav > li > div { 
+	padding-top:    3px;
+	padding-bottom: 3px;
 }
 
-.bs-sidenav .nav > li > a {
-  padding-top:    3px;
-  padding-bottom: 3px;
-  padding-left: 30px;
-  font-size: 1.1em;
+.bs-sidenav .nav .subpage-link {
+	padding-left: 25px;
+	text-decoration:none;
+	font-size: 1.1em;
 }
-.bs-sidenav .nav .nav > li > a {
+
+.bs-sidenav .nav .nav .subpage-link {
   padding-left: 40px;
   font-size: 1em;
 }
-.bs-sidenav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .subpage-link {
   padding-left: 50px;
 }
-.bs-sidenav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .subpage-link {
   padding-left: 60px;
 }
-.bs-sidenav .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .nav .subpage-link {
   padding-left: 70px;
 }
-.bs-sidenav .nav .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .nav .nav .subpage-link {
   padding-left: 80px;
 }
-.bs-sidenav .nav .nav .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .nav .nav .nav .subpage-link {
   padding-left: 90px;
 }
 /*===========*/
