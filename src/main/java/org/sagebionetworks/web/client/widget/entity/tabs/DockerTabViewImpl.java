@@ -15,7 +15,9 @@ public class DockerTabViewImpl implements DockerTabView {
 	@UiField
 	SimplePanel dockerTitlebarContainer;
 	@UiField
-	SimplePanel dockerListWidgetContainer;
+	SimplePanel dockerRepoListWidgetContainer;
+	@UiField
+	SimplePanel dockerRepoWidgetContainer;
 	@UiField
 	SimplePanel synapseAlertContainer;
 	@UiField
@@ -46,8 +48,8 @@ public class DockerTabViewImpl implements DockerTabView {
 	}
 
 	@Override
-	public void setDockerList(Widget widget) {
-		dockerListWidgetContainer.add(widget);
+	public void setDockerRepoList(Widget widget) {
+		dockerRepoListWidgetContainer.add(widget);
 	}
 
 	@Override
@@ -68,5 +70,10 @@ public class DockerTabViewImpl implements DockerTabView {
 	@Override
 	public void setModifiedCreatedBy(IsWidget widget) {
 		dockerModifiedAndCreatedContainer.add(widget);
+	}
+
+	@Override
+	public void setDockerRepoWidget(Widget widget) {
+		dockerRepoWidgetContainer.add(widget);
 	}
 }

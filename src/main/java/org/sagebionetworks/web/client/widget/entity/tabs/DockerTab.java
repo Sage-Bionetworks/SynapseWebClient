@@ -6,7 +6,8 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.docker.DockerListWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -20,7 +21,8 @@ public class DockerTab implements DockerTabView.Presenter{
 	Tab tab;
 	DockerTabView view;
 	BasicTitleBar dockerTitleBar;
-	DockerListWidget dockerListWidget;
+	DockerRepoListWidget dockerListRepoWidget;
+	DockerRepoWidget dockerRepoWidget;
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
 	ModifiedCreatedByWidget modifiedCreatedBy;
@@ -39,7 +41,8 @@ public class DockerTab implements DockerTabView.Presenter{
 			DockerTabView view,
 			Tab tab,
 			BasicTitleBar dockerTitleBar,
-			DockerListWidget dockerListWidget,
+			DockerRepoListWidget dockerListRepoWidget,
+			DockerRepoWidget dockerRepoWidget,
 			Breadcrumb breadcrumb,
 			EntityMetadata metadata,
 			ModifiedCreatedByWidget modifiedCreatedBy,
@@ -48,7 +51,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.view = view;
 		this.tab = tab;
 		this.dockerTitleBar = dockerTitleBar;
-		this.dockerListWidget = dockerListWidget;
+		this.dockerListRepoWidget = dockerListRepoWidget;
 		this.breadcrumb = breadcrumb;
 		this.metadata = metadata;
 		this.modifiedCreatedBy = modifiedCreatedBy;
@@ -56,7 +59,8 @@ public class DockerTab implements DockerTabView.Presenter{
 		tab.configure(DOCKER_TAB_TITLE, view.asWidget());
 		view.setPresenter(this);
 		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setDockerList(dockerListWidget.asWidget());
+		view.setDockerRepoList(dockerListRepoWidget.asWidget());
+		view.setDockerRepoWidget(dockerRepoWidget.asWidget());
 		view.setTitlebar(dockerTitleBar.asWidget());
 		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
@@ -84,6 +88,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
+		// TODO: determine what to do depends on the entity type
 		//if (entity instanceof DockerRepository) {
 			//configure based on project
 			showProjectLevelUI();

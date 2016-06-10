@@ -11,9 +11,10 @@ public interface DockerTabView extends IsWidget{
 
 	void setPresenter(Presenter presenter);
 	void setTitlebar(Widget widget);
-	void setDockerList(Widget widget);
+	void setDockerRepoList(Widget widget);
 	void setBreadcrumb(Widget widget);
 	void setEntityMetadata(Widget widget);
 	void setSynapseAlert(Widget widget);
 	void setModifiedCreatedBy(IsWidget widget);
+	void setDockerRepoWidget(Widget widget);
 }
