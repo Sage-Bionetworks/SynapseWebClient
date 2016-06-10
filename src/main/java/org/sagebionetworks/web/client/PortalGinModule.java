@@ -129,6 +129,8 @@ import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
@@ -1254,6 +1256,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// docker
 		bind(DockerRepoListWidgetView.class).to(DockerRepoListWidgetViewImpl.class);
+		bind(DockerRepoWidgetView.class).to(DockerRepoWidgetViewImpl.class);
 		bind(AddExternalRepoModalView.class).to(AddExternalRepoModalViewImpl.class);
 		
 		bind(SessionStorage.class).to(SessionStorageImpl.class);
