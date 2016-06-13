@@ -28,4 +28,5 @@ public interface ForumWidgetView extends IsWidget{
 	void setShowAllThreadsButtonVisible(boolean visible);
 	void setDefaultThreadWidget(Widget w);
 	void setDefaultThreadWidgetVisible(boolean visible);
+	void showNewThreadTooltip();
 }

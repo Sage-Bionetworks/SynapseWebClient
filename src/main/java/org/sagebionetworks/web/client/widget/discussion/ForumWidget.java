@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -165,6 +164,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		boolean isCurrentUserModerator = false;
 		resetDefaultThreadDates();
 		defaultThreadWidget.configure(defaultThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
+		// show reminder on thread id click
+		defaultThreadWidget.setThreadIdClickedCallback(new CallbackP<String>() {
+			@Override
+			public void invoke(String param) {
+				view.showNewThreadTooltip();
+			}
+		});
 		defaultThreadWidget.setReplyButtonVisible(false);
 		defaultThreadWidget.setCommandsVisible(false);
 	}
