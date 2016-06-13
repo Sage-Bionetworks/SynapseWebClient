@@ -64,8 +64,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GWTWrapper gwt;
 	
-	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
-	
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalAppState,
@@ -121,7 +119,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
-	public boolean isValidEntityId(String entityId) {
+	public static boolean isValidEntityId(String entityId) {
 		if (entityId == null || entityId.length() == 0 || !entityId.toLowerCase().startsWith("syn")) {
 			return false;
 		}
