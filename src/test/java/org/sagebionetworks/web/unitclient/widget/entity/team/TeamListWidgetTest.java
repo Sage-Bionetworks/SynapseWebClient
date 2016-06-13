@@ -13,10 +13,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -32,7 +30,6 @@ public class TeamListWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	TeamListWidgetView mockView;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	String teamId = "123";
 	TeamListWidget widget;
 	AuthenticationController mockAuthenticationController;
@@ -47,11 +44,11 @@ public class TeamListWidgetTest {
 		mockView = mock(TeamListWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		widget = new TeamListWidget(mockView, mockGlobalApplicationState);
-		teamList = setupUserTeams(adapter, mockSynapseClient);
+		teamList = setupUserTeams(mockSynapseClient);
 		AsyncMockStubber.callSuccessWith(0l).when(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
-	public static ArrayList<Team> setupUserTeams(JSONObjectAdapter adapter, SynapseClientAsync mockSynapseClient) throws JSONObjectAdapterException {
+	public static ArrayList<Team> setupUserTeams(SynapseClientAsync mockSynapseClient) throws JSONObjectAdapterException {
 		Team testTeam1 = new Team();
 		testTeam1.setId("42");
 		testTeam1.setName("My Test Team");

@@ -39,8 +39,7 @@ public class ExceptionUtil {
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
 				return new ConflictException(ex.getMessage());
 			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
-				if(ex.getMessage().contains("READ_ONLY")) return new ReadOnlyModeException(ex.getMessage());
-				else if(ex.getMessage().contains("Synapse is down")) return new SynapseDownException(ex.getMessage());				
+				return new SynapseDownException(ex.getMessage());
 			}
 		}
 		return new UnknownErrorException(ex.getMessage());

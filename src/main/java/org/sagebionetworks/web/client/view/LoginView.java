@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 
@@ -22,7 +21,7 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	void showTermsOfUse(String content, AcceptTermsOfUseCallback callback);
 	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void goTo(Place place);
 		void goToLastPlace();
 		void setNewUser(UserSessionData newUser);
