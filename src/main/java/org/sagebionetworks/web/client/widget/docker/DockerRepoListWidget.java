@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter {
+public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter, DockerRepoAddedHandler {
 
 	public static final Long PAGE_SIZE = 10L;
 	public static final Long OFFSET_ZERO = 0L;
@@ -41,6 +41,12 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	@Override
 	public void onClickAddExternalRepo() {
 		addExternalRepoModal.show();
+	}
+
+	@Override
+	public void repoAdded() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
