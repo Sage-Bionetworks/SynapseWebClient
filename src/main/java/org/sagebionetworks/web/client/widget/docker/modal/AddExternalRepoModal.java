@@ -1,27 +1,44 @@
 package org.sagebionetworks.web.client.widget.docker.modal;
 
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoAddedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
 public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter {
-	private static final String ADD_EXTERNAL_REPO_MODAL_TITLE = "Add External Repository";
-	private static final String SUCCESS_TITLE = "External repository added";
-	private static final String SUCCESS_MESSAGE = "An external repository has been added";
+	public static final String ADD_EXTERNAL_REPO_MODAL_TITLE = "Add External Repository";
+	public static final String SUCCESS_TITLE = "External repository added";
+	public static final String SUCCESS_MESSAGE = "An external repository has been added";
 
 	private AddExternalRepoModalView view;
 	private SynapseAlert synAlert;
+	private SynapseClientAsync synapseClient;
+
+	private String parentId;
+	private DockerRepoAddedHandler handler;
 
 	@Inject
 	public AddExternalRepoModal(
 			AddExternalRepoModalView view,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			SynapseClientAsync synapseClient
 			){
 		this.view = view;
 		this.synAlert = synAlert;
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
+		view.setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);
+	}
+
+	public void configuration(String projectId, DockerRepoAddedHandler handler) {
+		this.parentId = projectId;
+		this.handler = handler;
 	}
 
 	public IsWidget asWidget() {
@@ -40,6 +57,44 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 	@Override
 	public void onSave() {
 		synAlert.clear();
+		String registryHost = view.getRegistryHost();
+		String port = view.getPort();
+		String repoPath = view.getRepoPath();
+		// TODO: validate input
+		DockerRepository dockerRepo = new DockerRepository();
+		dockerRepo.setEntityType(DockerRepository.class.getName());
+		dockerRepo.setParentId(parentId);
+		// TODO: replace this method with Bruce's
+		String name = buildRepoName(registryHost, port, repoPath);
+		dockerRepo.setName(name);
+		synapseClient.createEntity(dockerRepo, new AsyncCallback<Entity>() {
+			@Override
+			public void onSuccess(Entity dockerRepo) {
+				view.hideDialog();
+				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
+				handler.repoAdded();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.resetButton();
+				synAlert.handleException(caught);
+			}
+		});
+	}
+
+	private String buildRepoName(String registryHost, String port, String repoPath) {
+		String name = "";
+		if (registryHost != null) {
+			name += registryHost;
+			if (port != null) {
+				name += ":"+port;
+			}
+		}
+		if (name.length() > 0) {
+			name += "/";
+		}
+		name += repoPath;
+		return name;
 	}
 
 }
