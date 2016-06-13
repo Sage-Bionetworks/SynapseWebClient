@@ -12,7 +12,7 @@
 			<g:SimplePanel ui:field="dockerMetadataContainer" visible="false"/>
 		</bh:Div>
 		<b:Column size="XS_12">
-			<g:SimplePanel ui:field="dockerRepoListWidgetContainer" visible="false"/>
+			<g:SimplePanel ui:field="dockerRepoListWidgetContainer"/>
 			<g:SimplePanel addStyleNames="margin-top-15" ui:field="dockerRepoWidgetContainer"/>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="dockerModifiedAndCreatedContainer"/>
 		</b:Column>

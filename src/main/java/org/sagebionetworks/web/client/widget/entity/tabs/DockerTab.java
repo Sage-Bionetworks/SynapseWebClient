@@ -52,6 +52,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.tab = tab;
 		this.dockerTitleBar = dockerTitleBar;
 		this.dockerListRepoWidget = dockerListRepoWidget;
+		this.dockerRepoWidget = dockerRepoWidget;
 		this.breadcrumb = breadcrumb;
 		this.metadata = metadata;
 		this.modifiedCreatedBy = modifiedCreatedBy;

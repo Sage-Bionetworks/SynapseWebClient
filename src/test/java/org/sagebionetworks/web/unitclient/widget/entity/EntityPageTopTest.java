@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -72,6 +73,8 @@ public class EntityPageTopTest {
 	FileEntity mockFileEntity;
 	@Mock
 	TableEntity mockTableEntity;
+	@Mock
+	DockerRepository mockDockerEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock
@@ -290,7 +293,6 @@ public class EntityPageTopTest {
 		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
-		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockTableEntity, mockEntityUpdatedHandler, versionNumber);
@@ -301,16 +303,26 @@ public class EntityPageTopTest {
 		verify(mockDockerTab).configure(mockTableEntity, mockEntityUpdatedHandler, null);
 	}
 
-	// TODO: add testConfigureWithDocker
-
 	@Test
-	public void testConfigureDockerTabNotInAlpha(){
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		pageTop.configureDockerTab();
-		verify(mockDockerTab, never()).setProject(anyString(), any(EntityBundle.class), any(Throwable.class));
-		verify(mockDockerTab, never()).configure(any(Project.class), any(EntityUpdatedHandler.class), anyString());
+	public void testConfigureWithDocker(){
+		Synapse.EntityArea area = null;
+		String areaToken = "docker area token";
+		Long versionNumber = null;
+		pageTop.configure(mockDockerEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockTabs).showTab(mockDockerInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
+		
+		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
+		
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
+		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockFilesTab).configure(mockDockerEntity, mockEntityUpdatedHandler, versionNumber);
+		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockTablesTab).configure(mockDockerEntity, mockEntityUpdatedHandler, null);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, moderatorIds);
+		verify(mockDockerTab).configure(mockDockerEntity, mockEntityUpdatedHandler, areaToken);
 	}
-	
+
 	@Test
 	public void testConfigureWithFileGoToChallengeAdminTab(){
 		Synapse.EntityArea area = Synapse.EntityArea.ADMIN;
