@@ -15,12 +15,14 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -101,6 +103,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		if (version == null && entityId.contains(".")) {
+			String[] tokens = entityId.split("\\.");
+			entityId = tokens[0];
+			version = tokens[1];
+		}
+		
 		int mask = ENTITY  | FILE_HANDLES;
 		AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<EntityBundle>() {
 			@Override
@@ -113,17 +121,20 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				configure(bundle);
 			}
 		};
-		
-		if (version == null) {
-			synapseClient.getEntityBundle(entityId, mask, entityBundleCallback);
+		if (EntityPresenter.isValidEntityId(entityId)) {
+			if (version == null) {
+				synapseClient.getEntityBundle(entityId, mask, entityBundleCallback);
+			} else {
+				synapseClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+			}
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+			view.addSynapseAlertWidget(synapseAlert.asWidget());
+			synapseAlert.showError("Preview error: " + entityId + " does not appear to be a valid Synapse identifier.");
 		}
 	}
 	
 	public void configure(EntityBundle bundle) {
 		view.clear();
-		
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
 		if (!synapseAlert.isUserLoggedIn()) {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());

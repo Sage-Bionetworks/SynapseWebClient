@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -10,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,7 +43,14 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	FocusPanel sortByActivity;
 	@UiField
 	Span subscribeButtonContainer;
+	@UiField
+	Tooltip newThreadTooltip;
 	
+	Timer newThreadTooltipHider = new Timer() { 
+	    public void run() {
+	    	newThreadTooltip.hide();
+	    } 
+	};
 	private Presenter presenter;
 
 	Widget widget;
@@ -156,5 +165,11 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setDefaultThreadWidgetVisible(boolean visible) {
 		defaultThreadContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void showNewThreadTooltip() {
+		newThreadTooltip.show();
+		newThreadTooltipHider.schedule(5000);
 	}
 }

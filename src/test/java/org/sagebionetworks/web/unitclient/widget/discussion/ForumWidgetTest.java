@@ -141,7 +141,13 @@ public class ForumWidgetTest {
 		
 		verify(mockDefaultThreadWidget).setReplyButtonVisible(false);
 		verify(mockDefaultThreadWidget).setCommandsVisible(false);
-		
+
+		//test "New Thread" button tooltip shown if user attempts to follow default thread
+		verify(mockView, never()).showNewThreadTooltip();
+		ArgumentCaptor<CallbackP> threadClickedCallbackCaptor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockDefaultThreadWidget).setThreadIdClickedCallback(threadClickedCallbackCaptor.capture());
+		threadClickedCallbackCaptor.getValue().invoke("");
+		verify(mockView).showNewThreadTooltip();
 		
 		//test empty thread callback
 		CallbackP emptyThreadsCallback = captorP.getValue();
