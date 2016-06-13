@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -8,7 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	
-	public interface Presenter extends SynapsePresenter, IsWidget {
+	public interface Presenter extends IsWidget {
 		public void sendJoinRequest(String message);
 		//service may be added later to query for current user requests to allow deletion
 //		public void deleteAllJoinRequests();

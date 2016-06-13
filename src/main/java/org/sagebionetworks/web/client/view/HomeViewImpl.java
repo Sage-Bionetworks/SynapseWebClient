@@ -1,24 +1,16 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -98,8 +90,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
-	IconsImageBundle iconsImageBundle;
-	SynapseJSNIUtils synapseJSNIUtils;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
 	LoginWidget loginWidget;
@@ -108,20 +98,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
 			Header headerWidget,
 			Footer footerWidget, 
-			IconsImageBundle icons, 
-			SageImageBundle imageBundle,
 			final GlobalApplicationState globalApplicationState,
-			CookieProvider cookies,
 			final AuthenticationController authController,
-			SynapseJSNIUtils synapseJSNIUtils,
 			UserBadge userBadge,
 			RegisterWidget registerWidget,
 			LoginWidget loginWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.iconsImageBundle = icons;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.userBadge = userBadge;
 		this.loginWidget = loginWidget;
 		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);

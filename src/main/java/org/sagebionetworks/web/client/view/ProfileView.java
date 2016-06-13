@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
@@ -79,7 +78,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setVerificationRejectedButtonVisible(boolean isVisible);
 	void setVerificationSubmittedButtonVisible(boolean isVisible);
 	void setVerificationDetailsButtonVisible(boolean isVisible);
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
 		void updateProfileWithLinkedIn(String requestToken, String verifier);

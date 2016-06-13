@@ -43,10 +43,8 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -117,7 +115,6 @@ public class ProfilePresenterTest {
 	UserProfileModalWidget mockUserProfileModalWidget;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
-	String testUserJson;
 	String password = "password";
 	SortOptionEnum sort = SortOptionEnum.LATEST_ACTIVITY;
 	List<EntityHeader> myFavorites;
@@ -193,11 +190,7 @@ public class ProfilePresenterTest {
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
 		
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
-		testUser.writeToJSONObject(adapter);
-		testUserJson = adapter.toJSONString(); 
-		
-		myTeams = TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		myTeams = TeamListWidgetTest.setupUserTeams(mockSynapseClient);
 		myTeamBundles = new ArrayList<TeamRequestBundle>();
 		for (int i = 0; i < myTeams.size(); i++) {
 			myTeamBundles.add(new TeamRequestBundle(myTeams.get(i), Long.valueOf(i)));
