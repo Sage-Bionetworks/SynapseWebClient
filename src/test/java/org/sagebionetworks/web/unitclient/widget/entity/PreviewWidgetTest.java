@@ -214,6 +214,27 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testWikiConfigureWithDotVersion() {
+		String entityId = "syn123";
+		Long versionNumber = 9L;
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, entityId + "." + versionNumber);
+		previewWidget.configure(null, descriptor, null, null);
+		
+		//verify that it tries to get the entity bundle (with version)
+		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testWikiConfigureInvalidEntityId() {
+		String entityId = "123.9";
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, entityId);
+		previewWidget.configure(null, descriptor, null, null);
+		
+		verify(mockView).addSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).showError(anyString());
+	}
+	
+	@Test
 	public void testWikiConfigureFailure() {
 		String exceptionMessage= "my test error message";
 		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
