@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -63,8 +67,15 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	}
 
 	@Override
-	public void addRepo(DockerRepoListGroupItem item) {
-		dockerList.add(item);
+	public void addRepos(List<EntityQueryResult> headers) {
+		for(final EntityQueryResult header: headers){
+			dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, header, new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.onRepoClicked(header.getId());
+				}
+			}));
+		}
 	}
 
 	@Override
