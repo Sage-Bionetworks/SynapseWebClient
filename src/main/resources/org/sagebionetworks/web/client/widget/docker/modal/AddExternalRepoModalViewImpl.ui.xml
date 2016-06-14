@@ -8,7 +8,7 @@
 			<b:Row>
 				<b:Column size="MD_9">
 					<bh:Span addStyleNames="font-size-18">Registry Host</bh:Span>
-					<b:TextBox ui:field="registryHost" placeholder="myregistrydomain.com" addStyleNames="font-size-24 margin-bottom-10" />
+					<b:TextBox ui:field="registryHost" placeholder="index.docker.io" addStyleNames="font-size-24 margin-bottom-10" />
 				</b:Column>
 				<b:Column size="MD_3">
 					<bh:Span addStyleNames="font-size-18">Port</bh:Span>
