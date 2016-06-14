@@ -76,4 +76,34 @@ public class DockerTabViewImpl implements DockerTabView {
 	public void setDockerRepoWidget(Widget widget) {
 		dockerRepoWidgetContainer.add(widget);
 	}
+
+	@Override
+	public void setEntityMetadataVisible(boolean visible) {
+		dockerMetadataContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setBreadcrumbVisible(boolean visible) {
+		dockerBreadcrumbContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDockerRepoListVisible(boolean visible) {
+		dockerRepoListWidgetContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDockerRepoWidgetVisible(boolean visible) {
+		dockerRepoWidgetContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setTitlebarVisible(boolean visible) {
+		dockerTitlebarContainer.setVisible(visible);
+	}
+
+	@Override
+	public void clearDockerRepoWidget() {
+		dockerRepoWidgetContainer.clear();
+	}
 }

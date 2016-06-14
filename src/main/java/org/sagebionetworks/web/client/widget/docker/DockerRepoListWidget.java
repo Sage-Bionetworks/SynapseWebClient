@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
@@ -45,6 +47,16 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 
 	@Override
 	public void repoAdded() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setRepoClickedCallback(CallbackP<String> callbackP) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void configure(EntityBundle bundle) {
 		// TODO Auto-generated method stub
 		
 	}
