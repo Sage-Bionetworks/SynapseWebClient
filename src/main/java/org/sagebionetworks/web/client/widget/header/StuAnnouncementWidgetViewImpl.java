@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.header;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -17,9 +18,10 @@ public class StuAnnouncementWidgetViewImpl implements StuAnnouncementWidgetView 
 	Widget w;
 	@UiField
 	Text bubbleText;
-	
 	@UiField
 	FocusPanel panel;
+	@UiField
+	Anchor dismissLink;
 	
 	@Inject
 	public StuAnnouncementWidgetViewImpl(Binder binder) {
@@ -28,6 +30,14 @@ public class StuAnnouncementWidgetViewImpl implements StuAnnouncementWidgetView 
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickAnnouncement();
+			}
+		});
+		dismissLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//stop propogation so that the FocusPanel doesn't also receive it.
+				event.stopPropagation();
+				presenter.onDismiss();
 			}
 		});
 	}

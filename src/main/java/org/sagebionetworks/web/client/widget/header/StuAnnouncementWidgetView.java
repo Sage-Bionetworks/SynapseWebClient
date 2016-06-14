@@ -8,6 +8,7 @@ public interface StuAnnouncementWidgetView extends IsWidget{
 	public interface Presenter {
 		Widget asWidget();
 		void onClickAnnouncement();
+		void onDismiss();
 	}
 
 	void setPresenter(StuAnnouncementWidget presenter);

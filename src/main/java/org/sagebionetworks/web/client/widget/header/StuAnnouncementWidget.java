@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -103,10 +104,20 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	
 	@Override
 	public void onClickAnnouncement() {
+		dismiss();
 		//go to the thread!
-		clientCache.put(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId, "true", DateUtils.getYearFromNow().getTime());
 		String stuAnnouncementsProjectId = globalApplicationState.getSynapseProperty(STU_ANNOUNCEMENTS_PROJECT_ID_KEY);
 		globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(stuAnnouncementsProjectId, announcementThreadId));
+	}
+	
+	@Override
+	public void onDismiss() {
+		dismiss();
+	}
+	
+	private void dismiss() {
+		clientCache.put(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId, "true", DateUtils.getYearFromNow().getTime());
+		view.hide();
 	}
 	
 	@Override
