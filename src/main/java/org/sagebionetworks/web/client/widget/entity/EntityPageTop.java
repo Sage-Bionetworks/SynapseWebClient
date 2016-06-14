@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -175,9 +176,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				area = EntityArea.WIKI;
 			} else if (entity instanceof TableEntity) {
 				area = EntityArea.TABLES;
-			// TODO: add check for Docker
-			/*} else if (entity instanceof DockerRepository) {
-				area = EntityArea.DOCKER;*/
+			} else if (entity instanceof DockerRepository) {
+				area = EntityArea.DOCKER;
 			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
 				area = EntityArea.FILES;
 			}
@@ -409,12 +409,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	public void configureDockerTab() {
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			dockerTab.configure(entity, entityUpdateHandler, dockerAreaToken);
-		}
+		dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+		dockerTab.configure(entity, entityUpdateHandler, dockerAreaToken);
 	}
-		
+
 	@Override
 	public void fireEntityUpdatedEvent() {
 		EntityUpdatedEvent event = new EntityUpdatedEvent();

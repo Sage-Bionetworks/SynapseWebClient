@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,6 +34,11 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	public void configure(EntityBundle bundle, DockerTab dockerTab) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

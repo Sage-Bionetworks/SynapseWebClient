@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 
@@ -30,6 +31,8 @@ public class EntityTypeUtils {
 				className = FileView.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.link.name())) {
 				className = Link.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.dockerrepo.name())) {
+				className = DockerRepository.class.getName();
 			}
 		}
 		return className;
@@ -56,6 +59,9 @@ public class EntityTypeUtils {
 		} else if(FileView.class.getName().equals(className)) {
 			// FileView
 			type = EntityType.fileview;
+		} else if(DockerRepository.class.getName().equals(className)) {
+			// Docker Repository
+			type = EntityType.dockerrepo;
 		}
 		return type;
 	}
@@ -90,6 +96,10 @@ public class EntityTypeUtils {
 		} else if(FileView.class.getName().equals(className)) {
 			// FileView
 			icon = IconType.TH_LIST;
+		} else if(DockerRepository.class.getName().equals(className)) {
+			// DockerRepository
+			// TODO: change to Docker Icon: https://github.com/wesbos/Font-Awesome-Docker-Icon
+			icon = IconType.ARCHIVE;
 		}
 		
 		return icon;
