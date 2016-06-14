@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapsePresenter;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetView.Presenter;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface TeamEditModalWidgetView {

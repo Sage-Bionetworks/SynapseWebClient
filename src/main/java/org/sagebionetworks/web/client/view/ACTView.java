@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
@@ -21,7 +20,7 @@ public interface ACTView extends IsWidget, SynapseView {
 	void setSelectedStateText(String state);
 	void setSelectedUserBadge(Widget w);
 	void setSelectedUserBadgeVisible(boolean visible);
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void onClearUserFilter();
 		void onClearStateFilter();
 		

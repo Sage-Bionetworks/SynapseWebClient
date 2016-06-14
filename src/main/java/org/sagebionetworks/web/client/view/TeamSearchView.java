@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
@@ -21,7 +20,7 @@ public interface TeamSearchView extends IsWidget, SynapseView {
 	
 	public void configure(List<Team> teams, String searchTerm);
 	public void showEmptyTeams();
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void goTo(Place place);
 		int getOffset();
 		void search(String searchTerm, Integer offset);
