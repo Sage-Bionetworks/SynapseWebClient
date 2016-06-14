@@ -68,6 +68,7 @@
 					<b:Heading size="H4" text="Any data created will be deleted shortly.  To do your work please visit " addStyleNames="color-white displayInline margin-right-5" />
 					<b:Anchor href="https://www.synapse.org" text="www.synapse.org" addStyleNames="font-size-20" />
 				</b:Alert>
+				<g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="margin-left-10"/>
 			</b:Column>
 		</b:Row>
 	</b:Container>
