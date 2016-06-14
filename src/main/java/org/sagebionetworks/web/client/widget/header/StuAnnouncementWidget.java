@@ -95,7 +95,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 		// only display posts by stu
 		String stuUserId = globalApplicationState.getSynapseProperty(STU_USER_ID_KEY);
 		boolean show = false;
-		int daysOld = CalendarUtil.getDaysBetween(bundle.getLastActivity(), new Date());
+		int daysOld = CalendarUtil.getDaysBetween(bundle.getModifiedOn(), new Date());
 		if (bundle.getCreatedBy().equals(stuUserId) && daysOld < 3 && !clientCache.contains(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId)) {
 			show = true;
 		}
