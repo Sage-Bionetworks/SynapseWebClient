@@ -84,9 +84,9 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 
 	private String buildRepoName(String registryHost, String port, String repoPath) {
 		String name = "";
-		if (registryHost != null) {
+		if (registryHost != null && !registryHost.equals("")) {
 			name += registryHost;
-			if (port != null) {
+			if (port != null && !registryHost.equals("")) {
 				name += ":"+port;
 			}
 		}
