@@ -41,7 +41,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		anchor = new Anchor("#!Synapse:"+header.getId());
 		anchor.setTarget("_blank");
 		anchor.setIcon(IconType.ANGLE_RIGHT);
-		anchor.addStyleName("margin-left-10 moveup-2 pull-right");
+		anchor.addStyleName("margin-right-10 moveup-2 pull-right h3");
 
 		Div div = new Div();
 		div.add(iconHeading);
