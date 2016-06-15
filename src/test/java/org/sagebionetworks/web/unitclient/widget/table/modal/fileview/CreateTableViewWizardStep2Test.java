@@ -11,9 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
@@ -36,7 +35,7 @@ public class CreateTableViewWizardStep2Test {
 	String parentId;
 	CreateTableViewWizardStep2 widget;
 	@Mock
-	FileView viewEntity;
+	EntityView viewEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Before

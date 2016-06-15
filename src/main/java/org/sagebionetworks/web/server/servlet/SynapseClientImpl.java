@@ -113,12 +113,10 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -2693,10 +2691,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public void setTableSchema(Table table, List<ColumnModel> models)
 			throws RestServiceException {
-		if (!(table instanceof TableEntity || table instanceof FileView)) {
-			throw new BadRequestException("Updating a schema is only supported by tables and views");
-		}
-		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// Create any models that do not have an ID

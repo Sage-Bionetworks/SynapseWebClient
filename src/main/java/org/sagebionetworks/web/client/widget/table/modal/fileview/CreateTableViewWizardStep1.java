@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
@@ -69,10 +70,11 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		modalPresenter.setLoading(true);
 		Table table;
 		if (TableType.view.equals(tableType)) {
-			table = new FileView();
+			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
-			((FileView)table).setScopeIds(scopeIds);
-			table.setEntityType(FileView.class.getName());
+			((EntityView)table).setScopeIds(scopeIds);
+			table.setEntityType(EntityView.class.getName());
+			((EntityView)table).setType(ViewType.file);
 		} else {
 			table = new TableEntity();
 			table.setEntityType(TableEntity.class.getName());
