@@ -9,7 +9,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 
 public class EntityTypeUtils {
@@ -26,8 +26,8 @@ public class EntityTypeUtils {
 				className = Project.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.table.name())) {
 				className = TableEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase(EntityType.fileview.name())) {
-				className = FileView.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.entityview.name())) {
+				className = EntityView.class.getName();
 			} else if (entityType.equalsIgnoreCase(EntityType.link.name())) {
 				className = Link.class.getName();
 			}
@@ -53,9 +53,9 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			type = EntityType.table;
-		} else if(FileView.class.getName().equals(className)) {
-			// FileView
-			type = EntityType.fileview;
+		} else if(EntityView.class.getName().equals(className)) {
+			// EntityView
+			type = EntityType.entityview;
 		}
 		return type;
 	}
@@ -87,7 +87,7 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			icon = IconType.TABLE;
-		} else if(FileView.class.getName().equals(className)) {
+		} else if(EntityView.class.getName().equals(className)) {
 			// FileView
 			icon = IconType.TH_LIST;
 		}
