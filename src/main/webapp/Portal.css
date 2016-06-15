@@ -977,16 +977,24 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: auto;
 	text-align: justify;
+	line-height: 1.6em;
 }
 
 .markdown ol { 
 	list-style-type: decimal;
-	padding-left: 24px;
+	padding-left: 15px;
+}
+.markdown ol li {
+	padding-top: 5px;
 }
 .markdown ul { 
 	list-style-type: square;
 	padding-left: 17px;
 }
+.markdown ul li {
+	padding-top: 5px;
+}
+
 .markdown strong { font-weight: bold; }
 .markdown del { text-decoration: line-through; }
 .markdown em { font-style: italic; }
