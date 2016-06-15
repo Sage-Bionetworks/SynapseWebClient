@@ -109,6 +109,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(Trash.class);
 		excludeFromLastPlace.add(Certificate.class);
 		excludeFromLastPlace.add(SignedToken.class);
+		excludeFromLastPlace.add(Down.class);
 	}
 
 	@Override
