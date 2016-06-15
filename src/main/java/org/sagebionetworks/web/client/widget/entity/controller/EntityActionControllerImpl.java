@@ -13,8 +13,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.table.FileView;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -46,7 +45,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -430,9 +428,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isMovableType(Entity entity){
-		if(entity instanceof Project){
-			return false;
-		}else if(entity instanceof TableEntity || entity instanceof FileView){
+		if(entity instanceof Project || entity instanceof Table){
 			return false;
 		}
 		return true;
@@ -444,9 +440,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isWikiableType(Entity entity){
-		if(entity instanceof TableEntity || entity instanceof FileView){
-			return false;
-		}else if(entity instanceof Link){
+		if(entity instanceof Table || entity instanceof Link){
 			return false;
 		}
 		return true;
@@ -470,7 +464,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isSubmittableType(Entity entity){
-		if(entity instanceof TableEntity || entity instanceof FileView){
+		if(entity instanceof Table){
 			return false;
 		}
 		return entity instanceof Versionable;
@@ -932,7 +926,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		String parentId = entityBundle.getEntity().getParentId();
 		Place gotoPlace = null;
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
-			if(entityBundle.getEntity() instanceof TableEntity || entityBundle.getEntity() instanceof FileView) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
+			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

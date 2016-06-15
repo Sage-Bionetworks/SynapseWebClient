@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.Arrays;
 
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -10,7 +12,7 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -25,14 +27,11 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
-import org.sagebionetworks.repo.model.EntityType;
 
 /**
  * This widget lists the tables of a given project.
@@ -120,7 +119,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
 		Condition typeCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.nodeType, Operator.IN, EntityType.table.name(), EntityType.fileview.name());
+				EntityFieldName.nodeType, Operator.IN, EntityType.table.name(), EntityType.entityview.name());
 		
 		newQuery.setConditions(Arrays.asList(condition, typeCondition));
 		newQuery.setLimit(PAGE_SIZE);
@@ -188,7 +187,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	}
 	@Override
 	public void onAddFileView() {
-		preflightController.checkCreateEntity(parentBundle, FileView.class.getName(), new Callback() {
+		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
 			@Override
 			public void invoke() {
 				postCheckCreateFileView();

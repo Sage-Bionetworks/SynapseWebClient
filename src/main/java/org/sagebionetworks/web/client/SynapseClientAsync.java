@@ -55,6 +55,7 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -446,4 +447,6 @@ public interface SynapseClientAsync {
 	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
 	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
+
+	void getDefaultColumnsForView(ViewType type, AsyncCallback<List<ColumnModel>> callback);
 }

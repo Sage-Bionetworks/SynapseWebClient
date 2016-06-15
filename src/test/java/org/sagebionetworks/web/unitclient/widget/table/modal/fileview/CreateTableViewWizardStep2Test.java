@@ -6,15 +6,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.FileView;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
@@ -36,9 +38,13 @@ public class CreateTableViewWizardStep2Test {
 	String parentId;
 	CreateTableViewWizardStep2 widget;
 	@Mock
-	FileView viewEntity;
+	EntityView viewEntity;
+	@Mock
+	TableEntity tableEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	List<ColumnModel> mockDefaultColumnModels;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -51,18 +57,30 @@ public class CreateTableViewWizardStep2Test {
 	}
 	
 	@Test
-	public void testConstruction(){
-		verify(mockEditor).setAddAllAnnotationsButtonVisible(false);
-		verify(mockEditor).setAddDefaultFileColumnsButtonVisible(false);
+	public void testConfigureTable(){
+		widget.configure(tableEntity, TableType.table);
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
+		verify(mockEditor).configure(new ArrayList<ColumnModel>());
 	}
 	
 	@Test
-	public void testConfigure(){
+	public void testConfigureView() {
+		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockSynapseClient).getDefaultColumnsForView(any(ViewType.class), any(AsyncCallback.class));
 		widget.configure(viewEntity, TableType.view);
 		verify(mockEditor).configure(new ArrayList<ColumnModel>());
-		verify(mockEditor).setAddAllAnnotationsButtonVisible(true);
-		verify(mockEditor).setAddDefaultFileColumnsButtonVisible(true);
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
+	
+	@Test
+	public void testConfigureViewFailure() {
+		String error = "error message getting default column models";
+		Exception ex = new Exception(error);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getDefaultColumnsForView(any(ViewType.class), any(AsyncCallback.class));
+		widget.configure(viewEntity, TableType.view);
+		verify(mockWizardPresenter).setErrorMessage(error);
+	}
+
 	@Test
 	public void testAsWidget(){
 		widget.asWidget();
