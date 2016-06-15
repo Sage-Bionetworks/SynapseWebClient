@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -53,13 +54,15 @@ public class FooterViewImpl extends Composite implements FooterView {
 			public void onClick(ClickEvent event) {
 				if (!DisplayUtils.isInTestWebsite(cookies)) {
 					//verify
-					Bootbox.alert(DisplayConstants.TEST_MODE_WARNING, new AlertCallback() {
+					Bootbox.confirm(DisplayConstants.TEST_MODE_WARNING, new ConfirmCallback() {
 						@Override
-						public void callback() {
-							//switch to pre-release test website mode
-							DisplayUtils.setTestWebsite(true, cookies);
-							Window.scrollTo(0, 0);
-							globalAppState.refreshPage();
+						public void callback(boolean isConfirmed) {
+							if (isConfirmed) {
+								//switch to pre-release test website mode
+								DisplayUtils.setTestWebsite(true, cookies);
+								Window.scrollTo(0, 0);
+								globalAppState.refreshPage();
+							}
 						}
 					});
 				} else {
