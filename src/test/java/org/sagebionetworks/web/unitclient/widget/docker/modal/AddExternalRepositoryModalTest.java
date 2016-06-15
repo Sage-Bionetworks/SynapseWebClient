@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.docker.DockerRepoAddedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -29,7 +29,7 @@ public class AddExternalRepositoryModalTest {
 	@Mock
 	private DockerRepository mockDockerEntity;
 	@Mock
-	private DockerRepoAddedHandler mockHandler;
+	private Callback mockCallback;
 
 	AddExternalRepoModal modal;
 
@@ -61,11 +61,11 @@ public class AddExternalRepositoryModalTest {
 	public void testOnSaveSuccess() {
 		AsyncMockStubber.callSuccessWith(mockDockerEntity)
 				.when(mockSynapseClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
-		modal.configuration("syn123", mockHandler);
+		modal.configuration("syn123", mockCallback);
 		modal.onSave();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
-		verify(mockHandler).repoAdded();
+		verify(mockCallback).invoke();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -25,7 +25,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter, DockerRepoAddedHandler, PageChangeListener {
+public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter, PageChangeListener {
 
 	public static final Long PAGE_SIZE = 10L;
 	public static final Long OFFSET_ZERO = 0L;
@@ -72,11 +72,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		});
 	}
 
-	@Override
-	public void repoAdded() {
-		queryForOnePage(OFFSET_ZERO);
-	}
-
 	public void setRepoClickedCallback(CallbackP<String> onRepoClickCallback) {
 		this.onRepoClickCallback = onRepoClickCallback;
 	}
@@ -89,7 +84,13 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		this.projectBundle = projectBundle;
 		String projectId = projectBundle.getEntity().getId();
 		this.query = createDockerRepoEntityQuery(projectId);
-		addExternalRepoModal.configuration(projectId, this);
+		addExternalRepoModal.configuration(projectId, new Callback(){
+
+			@Override
+			public void invoke() {
+				queryForOnePage(OFFSET_ZERO);
+			}
+		});
 		queryForOnePage(OFFSET_ZERO);
 	}
 

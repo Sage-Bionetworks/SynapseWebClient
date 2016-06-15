@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.docker.modal;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.docker.DockerRepoAddedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -20,7 +20,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 	private SynapseClientAsync synapseClient;
 
 	private String parentId;
-	private DockerRepoAddedHandler handler;
+	private Callback repoAddedCallback;
 
 	@Inject
 	public AddExternalRepoModal(
@@ -36,9 +36,9 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 		view.setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);
 	}
 
-	public void configuration(String projectId, DockerRepoAddedHandler handler) {
+	public void configuration(String projectId, Callback repoAddedCallback) {
 		this.parentId = projectId;
-		this.handler = handler;
+		this.repoAddedCallback = repoAddedCallback;
 	}
 
 	public IsWidget asWidget() {
@@ -64,6 +64,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 		DockerRepository dockerRepo = new DockerRepository();
 		dockerRepo.setEntityType(DockerRepository.class.getName());
 		dockerRepo.setParentId(parentId);
+		dockerRepo.setIsManaged(false);
 		// TODO: replace this method with Bruce's
 		String name = buildRepoName(registryHost, port, repoPath);
 		dockerRepo.setName(name);
@@ -72,7 +73,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 			public void onSuccess(Entity dockerRepo) {
 				view.hideDialog();
 				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
-				handler.repoAdded();
+				repoAddedCallback.invoke();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
