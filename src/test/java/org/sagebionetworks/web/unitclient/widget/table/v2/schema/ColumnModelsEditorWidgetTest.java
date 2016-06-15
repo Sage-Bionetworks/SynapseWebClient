@@ -84,6 +84,16 @@ public class ColumnModelsEditorWidgetTest {
 		// Extract the columns from the editor
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
+		
+		//attempting to add all columns again is a no-op if they all exist in the editor already
+		widget.addColumns(schema);
+		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		
+		//select all, delete, and add schema again (verify all columns from the schema have been re-added).
+		widget.selectAll();
+		widget.deleteSelected();
+		widget.addColumns(schema);
+		verify(mockEditor, times(schema.size() * 2)).addColumn(any(ColumnModelTableRow.class));
 	}
 	
 	@Test
