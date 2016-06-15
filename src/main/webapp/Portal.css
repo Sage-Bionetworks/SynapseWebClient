@@ -2249,31 +2249,17 @@ div.input-group > input.search-textbox {
 	padding-bottom: 3px;
 }
 
-.bs-sidenav .nav .subpage-link {
-	padding-left: 25px;
+.bs-sidenav .nav li {
+	padding-left: 10px;
 	text-decoration:none;
 	font-size: 1.1em;
 }
 
-.bs-sidenav .nav .nav .subpage-link {
-  padding-left: 40px;
+.bs-sidenav .nav .nav li {
+  padding-left: 15px;
   font-size: 1em;
 }
-.bs-sidenav .nav .nav .nav .subpage-link {
-  padding-left: 50px;
-}
-.bs-sidenav .nav .nav .nav .nav .subpage-link {
-  padding-left: 60px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .subpage-link {
-  padding-left: 70px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav .subpage-link {
-  padding-left: 80px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav .nav .subpage-link {
-  padding-left: 90px;
-}
+
 /*===========*/
 
 .largeIconButton {
