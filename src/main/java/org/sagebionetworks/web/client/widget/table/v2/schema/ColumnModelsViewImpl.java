@@ -49,6 +49,8 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Button addColumnButton;
 	@UiField
 	Button editColumnsButton;
+	@UiField
+	Button addDefaultViewColumnsButton;
 	
 	ViewType viewType;
 	Presenter presenter;
@@ -122,6 +124,12 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				presenter.deleteSelected();
 			}
 		});
+		addDefaultViewColumnsButton.addClickHandler(new ClickHandler() {
+			 @Override
+			 public void onClick(ClickEvent event) {
+			 presenter.onAddDefaultViewColumns();
+			 }
+		});
 	}
 
 
@@ -185,5 +193,9 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public boolean isMoveDownEnabled() {
 		return this.moveDownButton.isEnabled();
+	}
+	@Override
+	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
+		addDefaultViewColumnsButton.setVisible(visible);
 	}
 }

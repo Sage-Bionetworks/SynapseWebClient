@@ -59,6 +59,7 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testConfigureTable(){
 		widget.configure(tableEntity, TableType.table);
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
 		verify(mockEditor).configure(new ArrayList<ColumnModel>());
 	}
 	
@@ -66,7 +67,9 @@ public class CreateTableViewWizardStep2Test {
 	public void testConfigureView() {
 		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockSynapseClient).getDefaultColumnsForView(any(ViewType.class), any(AsyncCallback.class));
 		widget.configure(viewEntity, TableType.view);
-		verify(mockEditor).configure(mockDefaultColumnModels);
+		verify(mockEditor).configure(new ArrayList<ColumnModel>());
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
 	
 	@Test

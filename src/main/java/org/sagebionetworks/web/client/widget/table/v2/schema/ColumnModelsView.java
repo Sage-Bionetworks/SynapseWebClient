@@ -79,6 +79,11 @@ public interface ColumnModelsView extends IsWidget {
 		 * Delete the selected columns.
 		 */
 		public void deleteSelected();
+		
+		/**
+		 * Add column models based on the default entity view fields
+		 */
+		 void onAddDefaultViewColumns();
 	}
 
 	
@@ -149,6 +154,12 @@ public interface ColumnModelsView extends IsWidget {
 	 */
 	public boolean isMoveDownEnabled();
 	
+	/**
+	 * Is the Add Default View Columns Button visible?
+	 * @param visible
+	 */
+	 void setAddDefaultViewColumnsButtonVisible(boolean visible);
+	 
 	/**
 	 * The view can be used as a column viewer or as a column editor.
 	 *

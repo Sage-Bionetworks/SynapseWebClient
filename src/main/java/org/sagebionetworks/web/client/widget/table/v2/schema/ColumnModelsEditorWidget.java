@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
@@ -24,7 +27,8 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	List<ColumnModelTableRow> editorRows;
 	String tableId;
 	KeyboardNavigationHandler keyboardNavigationHandler;
-	
+	Callback onAddDefaultViewColumnsCallback;
+	Set<String> columnModelIds;
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
@@ -32,6 +36,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	
 	@Inject
 	public ColumnModelsEditorWidget(PortalGinInjector ginInjector) {
+		columnModelIds = new HashSet<String>();
 		this.ginInjector = ginInjector;
 		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
@@ -85,17 +90,26 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	 * Reset the editor.
 	 */
 	private void resetEditor(){
+		columnModelIds.clear();
 		// clear the current navigation editor
 		this.keyboardNavigationHandler.removeAllRows();
 		this.editorRows.clear();
 		editor.configure(ViewType.EDITOR, true);
-		for(ColumnModel cm: this.startingModels){
-			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
-			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
-			rowViewer.setSelectable(true);
-			rowViewer.setSelectionPresenter(this);
-			editor.addColumn(rowViewer);
-			this.editorRows.add(rowViewer);
+		addColumns(this.startingModels);
+	}
+	
+	public void addColumns(List<ColumnModel> models) {
+		for(ColumnModel cm: models){
+			String columnModelId = cm.getId();
+			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
+				ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
+				ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
+				rowViewer.setSelectable(true);
+				rowViewer.setSelectionPresenter(this);
+				editor.addColumn(rowViewer);
+				this.editorRows.add(rowViewer);
+				columnModelIds.add(columnModelId);
+			}
 		}
 		checkSelectionState();
 	}
@@ -139,13 +153,14 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 
 	@Override
 	public void deleteSelected() {
-		// Select all 
+		// delete all selected rows
 		Iterator<ColumnModelTableRow> it = editorRows.iterator();
 		while(it.hasNext()){
 			ColumnModelTableRow row = it.next();
 			if(row.isSelected()){
 				row.delete();
 				it.remove();
+				columnModelIds.remove(row.getId());
 			}
 		}
 		// Check the selection state when done.
@@ -238,7 +253,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	 * Validate each editor.
 	 * @return
 	 */
-	public boolean validate(){
+	public boolean validate() {
 		// Validate each editor row
 		boolean valid = true;
 		for(ColumnModelTableRow editor: editorRows){
@@ -251,4 +266,19 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		}
 		return valid;
 	}
+	
+	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
+		editor.setAddDefaultViewColumnsButtonVisible(visible);
+	}
+	
+	public void setOnAddDefaultViewColumnsCallback(Callback onAddDefaultViewColumnsCallback) {
+		this.onAddDefaultViewColumnsCallback = onAddDefaultViewColumnsCallback;
+	}
+	
+	@Override
+	 public void onAddDefaultViewColumns() {
+		if (onAddDefaultViewColumnsCallback != null) {
+			onAddDefaultViewColumnsCallback.invoke();
+		}
+	 }
 }

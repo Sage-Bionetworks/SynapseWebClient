@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
@@ -46,6 +47,12 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient){
 		this.synapseClient = synapseClient;
 		this.editor = editor;
+		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
+			@Override
+			public void invoke() {
+				getDefaultColumnsForView();
+			}
+		});
 	}
 
 	public void configure(Table entity, TableType tableType) {
@@ -53,11 +60,13 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.entity = entity;
 		this.tableType = tableType;
 		
+		editor.configure(new ArrayList<ColumnModel>());
 		if (TableType.view.equals(tableType)) {
 			// start with the default file columns
+			this.editor.setAddDefaultViewColumnsButtonVisible(true);
 			getDefaultColumnsForView();
 		} else {
-			setStartingModels(new ArrayList<ColumnModel>());	
+			this.editor.setAddDefaultViewColumnsButtonVisible(false);
 		}
 	}
 	
@@ -69,14 +78,10 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 				presenter.setErrorMessage(caught.getMessage());
 			}
 			@Override
-			public void onSuccess(List<ColumnModel> result) {
-				setStartingModels(result);
+			public void onSuccess(List<ColumnModel> columns) {
+				editor.addColumns(columns);
 			}
 		});
-	}
-	
-	private void setStartingModels(List<ColumnModel> startingModels) {
-		editor.configure(startingModels);
 	}
 
 	@Override
