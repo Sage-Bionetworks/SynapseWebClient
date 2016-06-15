@@ -30,6 +30,7 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -180,6 +181,13 @@ public class SynapseAlertImplTest {
 		widget.handleException(new IllegalArgumentException(errorMessage));
 		verify(mockView, times(2)).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
+	}
+	
+	@Test
+	public void testHandleServiceUnauthorizedExceptionMessage() {
+		widget.handleException(new UnauthorizedException());
+		verify(mockAuthenticationController).logoutUser();
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 	
 	@Test

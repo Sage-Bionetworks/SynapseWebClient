@@ -81,7 +81,7 @@ public class LoginPresenterTest {
 		usd.setSession(session);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);

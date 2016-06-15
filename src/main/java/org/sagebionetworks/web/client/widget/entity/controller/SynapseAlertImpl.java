@@ -47,9 +47,10 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 		} else if(ex instanceof UnauthorizedException) {
-			// send user to login page				
-			view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
+			// send user to login page
+			// invalid session token.  log out user and send to login place
+			authController.logoutUser();
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {
 				view.showLoginAlert();
