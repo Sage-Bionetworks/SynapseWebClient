@@ -18,7 +18,7 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 
 public class DockerRepoListGroupItem extends ListGroupItem {
 
-	private static final String CREATED_ON = "Added Since: ";
+	private static final String ADDED_ON = "Added On: ";
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 
 	public DockerRepoListGroupItem(HeadingSize size, EntityQueryResult header, ClickHandler clickHandler) {
@@ -37,7 +37,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		heading.addStyleName("displayInline");
 
 		LinkedGroupItemText text = new LinkedGroupItemText();
-		text.setText(CREATED_ON+DATE_FORMAT.format(header.getCreatedOn()));
+		text.setText(ADDED_ON+DATE_FORMAT.format(header.getCreatedOn()));
 		anchor = new Anchor("#!Synapse:"+header.getId());
 		anchor.setTarget("_blank");
 		anchor.setIcon(IconType.ANGLE_RIGHT);

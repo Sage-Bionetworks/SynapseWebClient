@@ -200,7 +200,7 @@ public class DockerTabTest {
 		verify(mockView).setDockerRepoListVisible(false);
 		verify(mockView).setDockerRepoWidgetVisible(true);
 		verify(mockView).setTitlebarVisible(true);
-		verify(mockView).clearDockerRepoWidget();
+		verify(mockView, atLeastOnce()).clearDockerRepoWidget();
 		verify(mockShowProjectInfoCallback).invoke(false);
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockBreadcrumb).configure(mockPath, EntityArea.DOCKER);
@@ -237,9 +237,10 @@ public class DockerTabTest {
 	@Test
 	public void testShowError() {
 		tab.setShowProjectInfoCallback(mockShowProjectInfoCallback);
-		tab.showError(new Throwable());
+		Throwable error = new Throwable();
+		tab.showError(error );
 		verify(mockSynAlert).clear();
-		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockSynAlert).handleException(error);
 	}
 
 	@Test

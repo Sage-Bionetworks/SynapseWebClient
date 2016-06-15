@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -53,6 +54,8 @@ public class DockerRepoListWidgetTest {
 	private Project mockProject;
 	@Mock
 	private EntityQueryResults mockEntityQueryResults;
+	@Mock
+	private SynapseAlert mockSynAlert;
 
 	DockerRepoListWidget dockerRepoListWidget;
 	String projectId;
@@ -61,7 +64,8 @@ public class DockerRepoListWidgetTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		dockerRepoListWidget = new DockerRepoListWidget(mockView, mockSynapseClient,
-				mockPaginationWidget, mockAddExternalRepoModal, mockPreflightController);
+				mockPaginationWidget, mockAddExternalRepoModal, mockPreflightController,
+				mockSynAlert);
 		projectId = "syn123";
 		when(mockProjectBundle.getEntity()).thenReturn(mockProject);
 		when(mockProject.getId()).thenReturn(projectId);
@@ -72,6 +76,7 @@ public class DockerRepoListWidgetTest {
 		verify(mockView).setPresenter(dockerRepoListWidget);
 		verify(mockView).addExternalRepoModal(any(Widget.class));
 		verify(mockView).addPaginationWidget(any(PaginationWidget.class));
+		verify(mockView).setSynAlert(any(Widget.class));
 	}
 
 	@Test
@@ -87,12 +92,20 @@ public class DockerRepoListWidgetTest {
 		verify(mockPreflightController).checkCreateEntity(eq(mockProjectBundle), eq(DockerRepository.class.getName()), any(Callback.class));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testRepoAdded(){
+	public void testOnClickAddExternalRepoPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(eq(mockProjectBundle), eq(DockerRepository.class.getName()), any(Callback.class));
 		dockerRepoListWidget.configure(mockProjectBundle);
-		dockerRepoListWidget.repoAdded();
-		verify(mockSynapseClient, atLeastOnce()).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		dockerRepoListWidget.onClickAddExternalRepo();
+		verify(mockAddExternalRepoModal, never()).show();
+	}
+
+	@Test
+	public void testOnClickAddExternalRepoPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(eq(mockProjectBundle), eq(DockerRepository.class.getName()), any(Callback.class));
+		dockerRepoListWidget.configure(mockProjectBundle);
+		dockerRepoListWidget.onClickAddExternalRepo();
+		verify(mockAddExternalRepoModal).show();
 	}
 
 	@Test
@@ -117,8 +130,8 @@ public class DockerRepoListWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockEntityQueryResults)
 			.when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(projectId, dockerRepoListWidget);
-		verify(mockSynapseClient, atLeastOnce()).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		verify(mockPaginationWidget).configure(PAGE_SIZE, OFFSET_ZERO, count, dockerRepoListWidget);
 		verify(mockView).showPaginationVisible(false);
 		verify(mockView).clear();
@@ -133,8 +146,8 @@ public class DockerRepoListWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockEntityQueryResults)
 			.when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(projectId, dockerRepoListWidget);
-		verify(mockSynapseClient, atLeastOnce()).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		verify(mockPaginationWidget).configure(PAGE_SIZE, OFFSET_ZERO, count, dockerRepoListWidget);
 		verify(mockView).showPaginationVisible(true);
 	}
@@ -146,15 +159,16 @@ public class DockerRepoListWidgetTest {
 		when(mockEntityQueryResults.getTotalEntityCount()).thenReturn(count);
 		List<EntityQueryResult> list = Arrays.asList(new EntityQueryResult(), new EntityQueryResult());
 		when(mockEntityQueryResults.getEntities()).thenReturn(list);
-		AsyncMockStubber.callFailureWith(new Throwable())
+		Throwable error = new Throwable();
+		AsyncMockStubber.callFailureWith(error)
 			.when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(projectId, dockerRepoListWidget);
-		verify(mockSynapseClient, atLeastOnce()).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		verify(mockPaginationWidget, never()).configure(PAGE_SIZE, OFFSET_ZERO, count, dockerRepoListWidget);
 		verify(mockView, never()).showPaginationVisible(false);
 		verify(mockView, never()).clear();
 		verify(mockView, never()).addRepos(list);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(error);
 	}
 }
