@@ -53,7 +53,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
 		final FormPanel form = new FormPanel();
-		form.setAction("/expect_404");
+		form.setAction("/expect_405");
 		signInBtn = new SubmitButton();
 		signInBtn.addStyleName("btn btn-large btn-primary");
 		signInBtn.setText(DisplayConstants.SIGN_IN);
@@ -131,7 +131,8 @@ public class LoginWidgetViewImpl extends Composite implements
 
 	@Override
 	public void showError(String message) {
-		DisplayUtils.showErrorMessage(message);
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+message+"</h4>");
+		clear();
 	}
 
 	@Override
