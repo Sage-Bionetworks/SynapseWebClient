@@ -79,16 +79,6 @@ public interface ColumnModelsView extends IsWidget {
 		 * Delete the selected columns.
 		 */
 		public void deleteSelected();
-		
-		/**
-		 * Add column models based on the default file entity fields
-		 */
-		void onAddDefaultFileColumns();
-		
-		/**
-		 * Add column models based on annotations (automatically discovered based on the view scope)
-		 */
-		void onAddAllAnnotations();
 	}
 
 	
@@ -158,18 +148,6 @@ public interface ColumnModelsView extends IsWidget {
 	 * @return
 	 */
 	public boolean isMoveDownEnabled();
-	
-	/**
-	 * Is the Add Default File Columns Button visible?
-	 * @param visible
-	 */
-	void setAddDefaultFileColumnsButtonVisible(boolean visible);
-	
-	/**
-	 * Is the Add All Annotations Button visible?
-	 * @param visible
-	 */
-	void setAddAllAnnotationsButtonVisible(boolean visible);
 	
 	/**
 	 * The view can be used as a column viewer or as a column editor.

@@ -73,11 +73,9 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			((EntityView)table).setScopeIds(scopeIds);
-			table.setEntityType(EntityView.class.getName());
 			((EntityView)table).setType(ViewType.file);
 		} else {
 			table = new TableEntity();
-			table.setEntityType(TableEntity.class.getName());
 		}
 		table.setName(name);
 		table.setParentId(parentId);

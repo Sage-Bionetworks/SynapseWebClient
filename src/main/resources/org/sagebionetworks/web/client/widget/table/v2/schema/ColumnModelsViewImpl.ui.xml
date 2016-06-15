@@ -51,10 +51,6 @@
 		</t:Table>
 		<b:Button ui:field="addColumnButton" icon="PLUS" type="INFO">Add
 			Column</b:Button>
-		<b:Button ui:field="addDefaultFileColumnsButton" type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
-			Default File Columns</b:Button>
-		<b:Button ui:field="addAllAnnotationsButton" icon="SEARCH_PLUS" type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
-			All Annotations</b:Button>
 		<b:Button ui:field="editColumnsButton" icon="GEAR" type="INFO">Edit
 			Schema</b:Button>
 	</g:HTMLPanel>

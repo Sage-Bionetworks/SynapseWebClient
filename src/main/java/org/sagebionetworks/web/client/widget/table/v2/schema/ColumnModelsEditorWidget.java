@@ -25,7 +25,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	String tableId;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	
-	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
@@ -251,22 +250,5 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			}
 		}
 		return valid;
-	}
-	
-	public void setAddAllAnnotationsButtonVisible(boolean visible) {
-		editor.setAddAllAnnotationsButtonVisible(visible);
-	}
-	public void setAddDefaultFileColumnsButtonVisible(boolean visible) {
-		editor.setAddDefaultFileColumnsButtonVisible(visible);
-	}
-	
-	@Override
-	public void onAddAllAnnotations() {
-		// TODO
-	}
-	
-	@Override
-	public void onAddDefaultFileColumns() {
-		// TODO
 	}
 }
