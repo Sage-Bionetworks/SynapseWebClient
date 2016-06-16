@@ -16,9 +16,7 @@ public interface DockerRepoWidgetView {
 
 	void setWikiPage(Widget widget);
 
-	void setProvenanceVisible(boolean visible);
-
-	void setWikiPageWidgetVisible(boolean visible);
-
 	void setSynapseAlert(Widget widget);
+
+	void setDockerPullCommand(String command);
 }

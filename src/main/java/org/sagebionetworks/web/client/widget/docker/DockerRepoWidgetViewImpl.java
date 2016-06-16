@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import org.gwtbootstrap3.client.ui.PanelBody;
+import org.gwtbootstrap3.client.ui.Lead;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,7 +15,7 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@UiField
 	Div dockerRepoProvenanceContainer;
 	@UiField
-	PanelBody dockerPullCommand;
+	Lead dockerPullCommand;
 	@UiField
 	SimplePanel synapseAlertContainer;
 
@@ -26,6 +26,7 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@Inject
 	public DockerRepoWidgetViewImpl(Binder binder){
 		this.widget = binder.createAndBindUi(this);
+		dockerRepoProvenanceContainer.getElement().setAttribute("highlight-box-title", "Provenance");
 	}
 
 	@Override
@@ -49,17 +50,13 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	}
 
 	@Override
-	public void setProvenanceVisible(boolean visible) {
-		dockerRepoProvenanceContainer.setVisible(visible);
-	}
-
-	@Override
-	public void setWikiPageWidgetVisible(boolean visible) {
-		dockerRepoWikiPageContainer.setVisible(visible);
-	}
-
-	@Override
 	public void setSynapseAlert(Widget widget) {
 		synapseAlertContainer.setWidget(widget);
 	}
+
+	@Override
+	public void setDockerPullCommand(String command) {
+		dockerPullCommand.setText(command);
+	}
+
 }
