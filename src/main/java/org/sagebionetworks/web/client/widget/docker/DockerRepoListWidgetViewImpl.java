@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,6 +26,8 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	SimplePanel paginationPanel;
 	@UiField
 	SimplePanel addExternalRepoModalPanel;
+	@UiField
+	SimplePanel synAlertContainer;
 
 	Widget widget;
 	Presenter presenter;
@@ -52,29 +57,20 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	}
 
 	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void addRepo(DockerRepoListGroupItem item) {
-		dockerList.add(item);
+	public void addRepos(List<EntityQueryResult> headers) {
+		for(final EntityQueryResult header: headers){
+			dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, header, new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.onRepoClicked(header.getId());
+				}
+			}));
+		}
 	}
 
 	@Override
 	public void clear() {
 		dockerList.clear();
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -95,5 +91,15 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	@Override
 	public void addExternalRepoModal(IsWidget addExternalRepoModel) {
 		this.addExternalRepoModalPanel.add(addExternalRepoModel);
+	}
+
+	@Override
+	public void setSynAlert(Widget widget){
+		synAlertContainer.add(widget);
+	}
+
+	@Override
+	public void setSynAlertVisible(boolean visible) {
+		synAlertContainer.setVisible(visible);
 	}
 }

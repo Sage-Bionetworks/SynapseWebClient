@@ -13,9 +13,8 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.table.FileView;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -37,7 +36,6 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -150,7 +148,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
-		boolean isTable = entity instanceof TableEntity || entity instanceof FileView;
+		boolean isTable = entity instanceof Table;
 		
 		if (!isTable) {
 			//configure based on project
@@ -191,7 +189,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
-		boolean isTable = entity instanceof TableEntity || entity instanceof FileView;
+		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);

@@ -19,11 +19,9 @@ public interface AddExternalRepoModalView extends IsWidget{
 
 	String getRegistryHost();
 
+	String getPort();
+
 	String getRepoPath();
-
-	String getDigest();
-
-	String getTag();
 
 	void clear();
 
@@ -34,4 +32,6 @@ public interface AddExternalRepoModalView extends IsWidget{
 	void showSaving();
 
 	void resetButton();
+
+	void setModalTitle(String title);
 }

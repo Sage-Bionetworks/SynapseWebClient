@@ -5,11 +5,22 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:Modal ui:field="addExternalRepoModal" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal">
 		<b:ModalBody>
-			<b:TextBox ui:field="registryHost" placeholder="Registry Host" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
-			<b:TextBox ui:field="repoPath" placeholder="Repository Path" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
-			<b:TextBox ui:field="digest" placeholder="Digest" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
-			<b:TextBox ui:field="tag" placeholder="Tag" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
-
+			<b:Row>
+				<b:Column size="XS_12, MD_9">
+					<bh:Span addStyleNames="font-size-18">Registry Host</bh:Span>
+					<b:TextBox ui:field="registryHost" placeholder="index.docker.io" addStyleNames="font-size-24 margin-bottom-10" />
+				</b:Column>
+				<b:Column size="XS_6, MD_3">
+					<bh:Span addStyleNames="font-size-18">Port</bh:Span>
+					<b:TextBox ui:field="port" placeholder="5000" addStyleNames="font-size-24 margin-bottom-10" />
+				</b:Column>
+			</b:Row>
+			<b:Row>
+				<b:Column size="XS_12, MD_12">
+					<bh:Span addStyleNames="font-size-18">Repository Path</bh:Span>
+					<b:TextBox ui:field="repoPath" placeholder="ubuntu" addStyleNames="font-size-24 margin-bottom-10" />
+				</b:Column>
+			</b:Row>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>

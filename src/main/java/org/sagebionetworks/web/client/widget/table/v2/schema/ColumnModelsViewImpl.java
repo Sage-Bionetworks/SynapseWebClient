@@ -50,9 +50,7 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@UiField
 	Button editColumnsButton;
 	@UiField
-	Button addDefaultFileColumnsButton;
-	@UiField
-	Button addAllAnnotationsButton;
+	Button addDefaultViewColumnsButton;
 	
 	ViewType viewType;
 	Presenter presenter;
@@ -126,19 +124,11 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				presenter.deleteSelected();
 			}
 		});
-		
-		addAllAnnotationsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddAllAnnotations();
-			}
-		});
-		
-		addDefaultFileColumnsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddDefaultFileColumns();
-			}
+		addDefaultViewColumnsButton.addClickHandler(new ClickHandler() {
+			 @Override
+			 public void onClick(ClickEvent event) {
+			 presenter.onAddDefaultViewColumns();
+			 }
 		});
 	}
 
@@ -204,14 +194,8 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	public boolean isMoveDownEnabled() {
 		return this.moveDownButton.isEnabled();
 	}
-	
 	@Override
-	public void setAddAllAnnotationsButtonVisible(boolean visible) {
-		addAllAnnotationsButton.setVisible(visible);
-	}
-	
-	@Override
-	public void setAddDefaultFileColumnsButtonVisible(boolean visible) {
-		addDefaultFileColumnsButton.setVisible(visible);
+	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
+		addDefaultViewColumnsButton.setVisible(visible);
 	}
 }

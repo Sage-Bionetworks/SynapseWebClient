@@ -13,7 +13,7 @@
 				<g:SimplePanel ui:field="paginationPanel" visible="false"/>
 			</b:Column>
 		</b:Row>
-
+		<g:SimplePanel ui:field="synAlertContainer" />
 		<g:SimplePanel ui:field="addExternalRepoModalPanel" />
 	</g:HTMLPanel>
 </ui:UiBinder>

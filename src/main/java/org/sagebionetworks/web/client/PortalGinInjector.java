@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -395,4 +396,7 @@ public interface PortalGinInjector extends Ginjector {
 	public RefreshAlert getRefreshAlert();
 	public ReplyCountAlert getReplyCountAlert();
 	public DiscussionThreadCountAlert getDiscussionThreadCountAlert();
+
+	// docker
+	public DockerRepoWidget createNewDockerRepoWidget();
 }
