@@ -15,7 +15,7 @@
 							<b:Heading size="H3" text="Docker Pull Command"/>
 						</b:PanelHeader>
 						<b:PanelBody>
-							<b:Lead ui:field="dockerPullCommand"/>
+							<g:TextBox ui:field="dockerPullCommand" addStyleNames="border-none noBackground" readOnly="true" />
 						</b:PanelBody>
 					</b:Panel>
 					<bh:Div ui:field="dockerRepoProvenanceContainer" addStyleNames="highlight-box" />
