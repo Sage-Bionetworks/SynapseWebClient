@@ -133,11 +133,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		tab.configure("Files", view.asWidget());
 		
-		configMap = new HashMap<String,String>();
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
+		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
 		CallbackP<String> entityClicked = new CallbackP<String> () {
 			@Override
 			public void invoke(String id) {
@@ -349,12 +345,13 @@ public class FilesTab implements FilesTabView.Presenter{
 		}
 
 		//Provenance
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile){
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 			view.setProvenance(provWidget.asWidget());
-			provWidget.configure(null, configMap, null, null);
+			provWidget.configure(configMap);
 		}
 		//Created By and Modified By
 		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), 
