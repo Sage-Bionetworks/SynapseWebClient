@@ -48,7 +48,9 @@ import com.google.inject.Inject;
 
 public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetRendererPresenter {
 	
+	private static final int DEFAULT_DEPTH_KEY = 1;
 	private static final String FAKE_ID_PREFIX = "fakeId";
+	private static final int DEFAULT_HEIGHT = 270;
 	private ProvenanceWidgetView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;	
@@ -95,8 +97,12 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.jsoProvider = jsoProvider;
 		this.clientCache = clientCache;
 		view.setPresenter(this);
-	}	
-	
+	}
+
+	public void configure(Map<String, String> widgetDescriptor){
+		configure(null, widgetDescriptor, null, null);
+	}
+
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
@@ -516,5 +522,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 		});
 	}
-	
+
+	public static Map<String,String> getDefaultWidgetDescriptor(){
+		Map<String,String> configMap = new HashMap<String,String>();
+		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
+		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
+		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(DEFAULT_DEPTH_KEY));
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(DEFAULT_HEIGHT));
+		return configMap;
+	}
 }

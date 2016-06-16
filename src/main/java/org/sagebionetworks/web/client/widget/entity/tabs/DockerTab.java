@@ -187,7 +187,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
-			repoWidget.configure(bundle, this);
+			repoWidget.configure(bundle, handler);
 		} else if (isProject) {
 			areaToken = null;
 			dockerRepoListWidget.configure(bundle);
