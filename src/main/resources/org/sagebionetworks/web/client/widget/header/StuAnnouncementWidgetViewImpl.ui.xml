@@ -9,7 +9,7 @@
 			<b:Image url="https://s3.amazonaws.com/static.synapse.org/stu/joy_icon.png" />
 			<bh:Span addStyleNames="bubble bubble-right">
 				<bh:Text ui:field="bubbleText"/>
-				<b:Anchor icon="TIMES" ui:field="dismissLink" pull="RIGHT" addStyleNames="lightGreyText margin-left-10 moveup-5"/>
+				<b:Anchor icon="TIMES" ui:field="dismissLink" addStyleNames="lightGreyText top-right"/>
 			</bh:Span>
 		</g:FlowPanel>
 	</g:FocusPanel>

@@ -92,7 +92,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span headerButtons;
 	
 	@UiField
-	Button trashLink;
+	Anchor trashLink;
 	@UiField
 	Button logoutLink;
 
@@ -326,7 +326,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void openNewWindow(String url) {
-		DisplayUtils.newWindow(url, "", "");	
+		DisplayUtils.newWindow(url, "", "");
 	}
 	
 	@Override

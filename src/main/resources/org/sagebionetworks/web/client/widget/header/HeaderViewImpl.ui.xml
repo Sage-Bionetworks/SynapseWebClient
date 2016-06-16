@@ -45,7 +45,6 @@
 							</b:DropDownMenu>
 						</b:ButtonGroup>
 					</b:Tooltip>
-					<b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" height="28px" >@ Trash can</b:Button>
 				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Log in</b:Button>
 					</g:SimplePanel>
@@ -56,19 +55,20 @@
 						<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="28px" addStyleNames="my-dashboard-header-button" />
 					</g:SimplePanel>
 				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
-					<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-				    	<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
-				    	<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
-				    	<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
-				    	<b:Anchor addStyleNames="smallerText displayInline color-white" ui:field="goToStandardSite">off</b:Anchor>
-				    </g:FlowPanel>
+				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-5 "/>
 				</bh:Span>
 				<b:Alert ui:field="stagingAlert" type="WARNING" visible="false">
 					<b:Heading size="H3" text="This website is for testing only." addStyleNames="color-white margin-right-5" />
 					<b:Heading size="H4" text="Any data created will be deleted shortly.  To do your work please visit " addStyleNames="color-white displayInline margin-right-5" />
 					<b:Anchor href="https://www.synapse.org" text="www.synapse.org" addStyleNames="font-size-20" />
 				</b:Alert>
-				<g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="margin-left-10"/>
+				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
+					<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
+					<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
+					<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
+					<b:Anchor addStyleNames="smallerText color-white" ui:field="goToStandardSite">off</b:Anchor>
+					<b:Anchor ui:field="trashLink" icon="TRASH_O" addStyleNames="margin-left-20 smallerText color-white">Trash can</b:Anchor>
+				</g:FlowPanel>
 			</b:Column>
 		</b:Row>
 	</b:Container>

@@ -1920,14 +1920,22 @@ ol.lowerroman {
 	width: 120px;
 }
 
+.top-right {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+}
+
 .bubble {
     background-color: white;
     border-radius: 5px;
     box-shadow: 0 0 6px #B2B2B2;
     display: inline-block;
-    padding: 8px 5px 8px 18px;
+    padding: 8px 20px 8px 18px;
     position: relative;
     vertical-align: top;
+    margin: 5px;
+    max-width: 300px;
 }
 
 .bubble::before {
@@ -1945,17 +1953,10 @@ ol.lowerroman {
     width:  20px;
 }
 
-.bubble-right {
-    margin: 5px 45px 5px 20px;         
-}
 
 .bubble-right::before {
     box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
     left: -9px;           
-}
-
-.bubble-left {
-    margin: 5px 20px 5px 45px;         
 }
 
 .bubble-left::before {
