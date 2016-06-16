@@ -3,16 +3,17 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,21 +47,41 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient){
 		this.synapseClient = synapseClient;
 		this.editor = editor;
-		this.editor.setAddAllAnnotationsButtonVisible(false);
-		this.editor.setAddDefaultFileColumnsButtonVisible(false);
+		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
+			@Override
+			public void invoke() {
+				getDefaultColumnsForView();
+			}
+		});
 	}
 
 	public void configure(Table entity, TableType tableType) {
-		configure(entity, tableType, new ArrayList<ColumnModel>());
-	}
-	
-	public void configure(Table entity, TableType tableType, List<ColumnModel> startingModels) {
 		this.changingSelection = false;
 		this.entity = entity;
 		this.tableType = tableType;
-		editor.configure(startingModels);
-		this.editor.setAddAllAnnotationsButtonVisible(TableType.view.equals(tableType));
-		this.editor.setAddDefaultFileColumnsButtonVisible(TableType.view.equals(tableType));
+		
+		editor.configure(new ArrayList<ColumnModel>());
+		if (TableType.view.equals(tableType)) {
+			// start with the default file columns
+			this.editor.setAddDefaultViewColumnsButtonVisible(true);
+			getDefaultColumnsForView();
+		} else {
+			this.editor.setAddDefaultViewColumnsButtonVisible(false);
+		}
+	}
+	
+	public void getDefaultColumnsForView() {
+		ViewType type = ((EntityView)entity).getType(); 
+		synapseClient.getDefaultColumnsForView(type, new AsyncCallback<List<ColumnModel>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				presenter.setErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(List<ColumnModel> columns) {
+				editor.addColumns(columns);
+			}
+		});
 	}
 
 	@Override
