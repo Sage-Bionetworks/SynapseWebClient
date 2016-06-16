@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -76,10 +75,12 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	
 				@Override
 				public void onSuccess(PaginatedResults<DiscussionThreadBundle> threads) {
-					DiscussionThreadBundle bundle = threads.getResults().get(0);
-					announcementThreadId = bundle.getId();
-					if (isShowAnnouncement(bundle)) {
-						view.show(bundle.getTitle());	
+					if (threads.getResults().size() > 0) {
+						DiscussionThreadBundle bundle = threads.getResults().get(0);
+						announcementThreadId = bundle.getId();
+						if (isShowAnnouncement(bundle)) {
+							view.show(bundle.getTitle());	
+						}
 					}
 				}
 			});
@@ -104,7 +105,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	
 	@Override
 	public void onClickAnnouncement() {
-		dismiss();
+		onDismiss();
 		//go to the thread!
 		String stuAnnouncementsProjectId = globalApplicationState.getSynapseProperty(STU_ANNOUNCEMENTS_PROJECT_ID_KEY);
 		globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(stuAnnouncementsProjectId, announcementThreadId));
@@ -112,11 +113,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	
 	@Override
 	public void onDismiss() {
-		dismiss();
-	}
-	
-	private void dismiss() {
-		clientCache.put(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId, "true", DateUtils.getYearFromNow().getTime());
+		clientCache.put(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId, Boolean.TRUE.toString(), DateUtils.getYearFromNow().getTime());
 		view.hide();
 	}
 	
