@@ -28,7 +28,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -77,6 +76,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	SimplePanel projectFavoritePanel;
 	@UiField
+	SimplePanel stuAnnouncementsContainer;
+	@UiField
 	SimplePanel registerLinkUI;
 	@UiField
 	SimplePanel dashboardButtonUI;
@@ -91,7 +92,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span headerButtons;
 	
 	@UiField
-	Button trashLink;
+	Anchor trashLink;
 	@UiField
 	Button logoutLink;
 
@@ -325,7 +326,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void openNewWindow(String url) {
-		DisplayUtils.newWindow(url, "", "");	
+		DisplayUtils.newWindow(url, "", "");
 	}
 	
 	@Override
@@ -391,5 +392,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		loading.setEnabled(false);
 		headerFavList.add(loading);
 	}
-	
+	@Override
+	public void setStuAnnouncementWidget(Widget w) {
+		stuAnnouncementsContainer.clear();
+		stuAnnouncementsContainer.add(w);
+	}
 }

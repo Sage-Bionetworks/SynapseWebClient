@@ -5,21 +5,17 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,21 +36,20 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseClientAsync synapseClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private CookieProvider cookies;
 	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
+			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, StuAnnouncementWidget stuAnnouncementWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.favWidget = favWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.cookies = cookies;
 		view.clear();
 		view.setProjectFavoriteWidget(favWidget);
+		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		view.setPresenter(this);
 		initStagingAlert();
 	}
@@ -115,7 +110,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 
 	@Override
 	public void onTrashClick() {
-		globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));	
+		globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
 
 	@Override
