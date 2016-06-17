@@ -23,12 +23,10 @@
 					<b:Button icon="GEAR" ui:field="toolsMenu" dataToggle="DROPDOWN">Tools</b:Button>
 					<b:DropDownMenu ui:field="toolsDropDown"
 						addStyleNames="dropdown-menu-right">
-						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload
-							Data To Table</a:ActionMenuItem>
-						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_TABLE_DATA">Edit
-							Query Results</a:ActionMenuItem>
-						<a:ActionMenuItem icon="DOWNLOAD" iconFixedWidth="true"
-							action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
+						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_COMMIT">Add Commit</a:ActionMenuItem>
+						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data To Table</a:ActionMenuItem>
+						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_TABLE_DATA">Edit Query Results</a:ActionMenuItem>
+						<a:ActionMenuItem icon="DOWNLOAD" iconFixedWidth="true" action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
 						<b:Divider ui:field="basicDivider" visible="false" />
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit Metadata</a:ActionMenuItem>

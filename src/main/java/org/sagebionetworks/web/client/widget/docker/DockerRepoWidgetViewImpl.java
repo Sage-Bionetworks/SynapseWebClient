@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import org.gwtbootstrap3.client.ui.Lead;
 import org.gwtbootstrap3.client.ui.html.Div;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -15,9 +18,17 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@UiField
 	Div dockerRepoProvenanceContainer;
 	@UiField
-	Lead dockerPullCommand;
+	TextBox dockerPullCommand;
 	@UiField
 	SimplePanel synapseAlertContainer;
+	@UiField
+	SimplePanel dockerMetadataContainer;
+	@UiField
+	SimplePanel dockerTitlebarContainer;
+	@UiField
+	SimplePanel dockerModifiedAndCreatedContainer;
+	@UiField
+	SimplePanel dockerActionMenuContainer;
 
 	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {}
 	private Presenter presenter;
@@ -27,6 +38,12 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	public DockerRepoWidgetViewImpl(Binder binder){
 		this.widget = binder.createAndBindUi(this);
 		dockerRepoProvenanceContainer.getElement().setAttribute("highlight-box-title", "Provenance");
+		dockerPullCommand.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dockerPullCommand.selectAll();
+			}
+		});
 	}
 
 	@Override
@@ -57,6 +74,26 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@Override
 	public void setDockerPullCommand(String command) {
 		dockerPullCommand.setText(command);
+	}
+
+	@Override
+	public void setTitlebar(Widget widget) {
+		dockerTitlebarContainer.add(widget);
+	}
+
+	@Override
+	public void setEntityMetadata(Widget widget) {
+		dockerMetadataContainer.add(widget);
+	}
+
+	@Override
+	public void setModifiedCreatedBy(IsWidget widget) {
+		dockerModifiedAndCreatedContainer.add(widget);
+	}
+
+	@Override
+	public void setActionMenu(Widget w) {
+		dockerActionMenuContainer.add(w);
 	}
 
 }

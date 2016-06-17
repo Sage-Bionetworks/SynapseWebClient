@@ -46,6 +46,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 	}
 
 	public void show() {
+		synAlert.clear();
 		view.clear();
 		view.showDialog();
 	}

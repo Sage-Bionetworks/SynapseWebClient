@@ -62,7 +62,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		view.setSynAlert(synAlert.asWidget());
 	}
 
-
 	public Widget asWidget() {
 		return view.asWidget();
 	}

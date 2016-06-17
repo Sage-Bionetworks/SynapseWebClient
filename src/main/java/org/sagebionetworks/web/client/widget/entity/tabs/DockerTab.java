@@ -22,10 +22,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,11 +33,8 @@ public class DockerTab implements DockerTabView.Presenter{
 
 	Tab tab;
 	DockerTabView view;
-	BasicTitleBar dockerTitleBar;
 	DockerRepoListWidget dockerRepoListWidget;
 	Breadcrumb breadcrumb;
-	EntityMetadata metadata;
-	ModifiedCreatedByWidget modifiedCreatedBy;
 	PortalGinInjector ginInjector;
 	SynapseClientAsync synapseClient;
 	StuAlert synAlert;
@@ -57,22 +51,16 @@ public class DockerTab implements DockerTabView.Presenter{
 	public DockerTab(
 			DockerTabView view,
 			Tab tab,
-			BasicTitleBar dockerTitleBar,
 			DockerRepoListWidget dockerListRepoWidget,
 			Breadcrumb breadcrumb,
-			EntityMetadata metadata,
-			ModifiedCreatedByWidget modifiedCreatedBy,
 			PortalGinInjector ginInjector,
 			SynapseClientAsync synapseClient,
 			StuAlert synAlert
 			) {
 		this.view = view;
 		this.tab = tab;
-		this.dockerTitleBar = dockerTitleBar;
 		this.dockerRepoListWidget = dockerListRepoWidget;
 		this.breadcrumb = breadcrumb;
-		this.metadata = metadata;
-		this.modifiedCreatedBy = modifiedCreatedBy;
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -80,10 +68,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		view.setPresenter(this);
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setDockerRepoList(dockerListRepoWidget.asWidget());
-		view.setTitlebar(dockerTitleBar.asWidget());
-		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
-		view.setModifiedCreatedBy(modifiedCreatedBy);
 		initClickHandler();
 	}
 
@@ -130,7 +115,6 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;
-		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
 		if (entity instanceof DockerRepository) {
 			getTargetBundleAndDisplay(entity.getId());
@@ -152,14 +136,11 @@ public class DockerTab implements DockerTabView.Presenter{
 
 	public void resetView() {
 		synAlert.clear();
-		view.setEntityMetadataVisible(false);
 		view.setBreadcrumbVisible(false);
 		view.setDockerRepoListVisible(false);
 		view.clearDockerRepoWidget();
 		view.setDockerRepoWidgetVisible(false);
-		view.setTitlebarVisible(false);
 		showProjectInfoCallack.invoke(false);
-		modifiedCreatedBy.setVisible(false);
 	}
 	
 	public void showError(Throwable error) {
@@ -171,20 +152,13 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.entity = bundle.getEntity();
 		boolean isRepo = entity instanceof DockerRepository;
 		boolean isProject = entity instanceof Project;
-		view.setEntityMetadataVisible(isRepo);
 		view.setBreadcrumbVisible(isRepo);
 		view.setDockerRepoListVisible(isProject);
 		view.setDockerRepoWidgetVisible(isRepo);
-		view.setTitlebarVisible(isRepo);
 		showProjectInfoCallack.invoke(isProject);
 		view.clearDockerRepoWidget();
-		modifiedCreatedBy.setVisible(false);
 		if (isRepo) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.DOCKER);
-			metadata.setEntityBundle(bundle, null);
-			dockerTitleBar.configure(bundle);
-			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
-			
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
 			repoWidget.configure(bundle, handler);

@@ -83,6 +83,7 @@ public class AddExternalRepositoryModalTest {
 		modal.show();
 		verify(mockView).clear();
 		verify(mockView).showDialog();
+		verify(mockSynAlert).clear();
 	}
 
 	@Test

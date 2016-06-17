@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface DockerRepoWidgetView {
@@ -19,4 +20,12 @@ public interface DockerRepoWidgetView {
 	void setSynapseAlert(Widget widget);
 
 	void setDockerPullCommand(String command);
+
+	void setTitlebar(Widget widget);
+
+	void setEntityMetadata(Widget widget);
+
+	void setModifiedCreatedBy(IsWidget widget);
+
+	void setActionMenu(Widget widget);
 }

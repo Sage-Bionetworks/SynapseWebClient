@@ -8,13 +8,10 @@
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
 			<g:SimplePanel ui:field="dockerBreadcrumbContainer" visible="false"/>
-			<g:SimplePanel ui:field="dockerTitlebarContainer" visible="false"/>
-			<g:SimplePanel ui:field="dockerMetadataContainer" visible="false"/>
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="dockerRepoListWidgetContainer"/>
 			<g:SimplePanel addStyleNames="margin-top-15" ui:field="dockerRepoWidgetContainer"/>
-			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="dockerModifiedAndCreatedContainer"/>
 		</b:Column>
 	</b:Row>
 </ui:UiBinder>

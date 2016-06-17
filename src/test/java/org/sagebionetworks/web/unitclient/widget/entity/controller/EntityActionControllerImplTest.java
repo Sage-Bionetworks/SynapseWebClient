@@ -41,6 +41,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -467,9 +468,31 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
 		verify(mockActionMenu).setActionListener(Action.EDIT_PROVENANCE, controller);
 	}
+
+	@Test
+	public void testConfigureProvenanceDockerCanEdit(){
+		boolean canEdit = true;
+		entityBundle.getPermissions().setCanEdit(canEdit);
+		entityBundle.setEntity(new DockerRepository());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionListener(Action.EDIT_PROVENANCE, controller);
+	}
 	
 	@Test
-	public void testConfigureProvenanceNonFile(){
+	public void testConfigureProvenanceDockerCannotEdit(){
+		boolean canEdit = false;
+		entityBundle.getPermissions().setCanEdit(canEdit);
+		entityBundle.setEntity(new DockerRepository());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionListener(Action.EDIT_PROVENANCE, controller);
+	}
+	
+	@Test
+	public void testConfigureProvenanceNonFileNorDocker(){
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, false);
