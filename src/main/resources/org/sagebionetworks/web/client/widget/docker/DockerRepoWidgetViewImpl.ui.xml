@@ -6,6 +6,13 @@
 	<b:Row>
 		<b:Column size="XS_12">
 			<b:Row>
+				<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<g:SimplePanel ui:field="dockerActionMenuContainer"/>
+					<g:SimplePanel ui:field="dockerTitlebarContainer"/>
+					<g:SimplePanel ui:field="dockerMetadataContainer"/>
+				</bh:Div>
+			</b:Row>
+			<b:Row>
 				<b:Column size="XS_12, MD_6">
 					<bh:Div ui:field="dockerRepoWikiPageContainer" />
 				</b:Column>
@@ -20,6 +27,9 @@
 					</b:Panel>
 					<bh:Div ui:field="dockerRepoProvenanceContainer" addStyleNames="highlight-box" />
 				</b:Column>
+			</b:Row>
+			<b:Row>
+				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="dockerModifiedAndCreatedContainer"/>
 			</b:Row>
 		</b:Column>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>

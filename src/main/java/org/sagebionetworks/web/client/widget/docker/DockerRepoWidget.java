@@ -2,15 +2,20 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -27,6 +32,10 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	private WikiPageWidget wikiPageWidget;
 	private ProvenanceWidget provWidget;
 	private EntityUpdatedHandler handler;
+	private ActionMenuWidget actionMenu;
+	private EntityMetadata metadata;
+	private ModifiedCreatedByWidget modifiedCreatedBy;
+	private BasicTitleBar dockerTitleBar;
 
 	@Inject
 	public DockerRepoWidget(
@@ -34,17 +43,28 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 			DockerRepoWidgetView view,
 			SynapseAlert synAlert,
 			WikiPageWidget wikiPageWidget,
-			ProvenanceWidget provWidget
+			ProvenanceWidget provWidget,
+			ActionMenuWidget actionMenu,
+			BasicTitleBar dockerTitleBar,
+			EntityMetadata metadata,
+			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.provWidget = provWidget;
+		this.actionMenu = actionMenu;
+		this.dockerTitleBar = dockerTitleBar;
+		this.metadata = metadata;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setProvenance(provWidget.asWidget());
+		view.setTitlebar(dockerTitleBar.asWidget());
+		view.setEntityMetadata(metadata.asWidget());
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 	}
 
 	public Widget asWidget() {
@@ -52,7 +72,12 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	}
 
 	public void configure(EntityBundle bundle, final EntityUpdatedHandler handler) {
+		Entity entity = bundle.getEntity();
 		this.handler = handler;
+		metadata.setEntityUpdatedHandler(handler);
+		metadata.setEntityBundle(bundle, null);
+		dockerTitleBar.configure(bundle);
+		modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 		configureWikiPage(bundle);
 		configureProvenance(bundle.getEntity().getId());
 		view.setDockerPullCommand(DOCKER_PULL_COMMAND + bundle.getEntity().getName());

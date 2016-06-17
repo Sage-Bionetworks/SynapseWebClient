@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.docker.DockerRepoWidget.*;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.junit.Before;
@@ -17,9 +18,13 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
+import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -44,22 +49,39 @@ public class DockerRepoWidgetTest {
 	private DockerRepository mockEntity;
 	@Mock
 	private UserEntityPermissions mockPermissions;
+	@Mock
+	BasicTitleBar mockDockerTitleBar;
+	@Mock
+	EntityMetadata mockMetadata;
+	@Mock
+	ModifiedCreatedByWidget mockModifiedCreatedBy;
+	@Mock
+	ActionMenuWidget mockActionMenu;
 
 	DockerRepoWidget dockerRepoWidget;
 	String entityId = "syn123";
 	String entityName = "dockerRepoName";
 	Boolean canEdit = true;
+	private Date createdOn = new Date();
+	private String createdBy = "999";
+	private Date modifiedOn = new Date();
+	private String modifiedBy = "555";
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		dockerRepoWidget = new DockerRepoWidget(mockPreflightController,
-				mockView, mockSynAlert, mockWikiPageWidget, mockProvWidget);
+				mockView, mockSynAlert, mockWikiPageWidget, mockProvWidget,
+				mockActionMenu, mockDockerTitleBar, mockMetadata, mockModifiedCreatedBy);
 		when(mockEntity.getId()).thenReturn(entityId);
 		when(mockEntity.getName()).thenReturn(entityName);
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
+		when(mockEntity.getCreatedBy()).thenReturn(createdBy);
+		when(mockEntity.getCreatedOn()).thenReturn(createdOn);
+		when(mockEntity.getModifiedBy()).thenReturn(modifiedBy);
+		when(mockEntity.getModifiedOn()).thenReturn(modifiedOn);
 	}
 
 	@Test
@@ -68,6 +90,9 @@ public class DockerRepoWidgetTest {
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setProvenance(any(Widget.class));
+		verify(mockView).setEntityMetadata(any(Widget.class));
+		verify(mockView).setModifiedCreatedBy(any(Widget.class));
+		verify(mockView).setTitlebar(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,5 +103,9 @@ public class DockerRepoWidgetTest {
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + entityName);
+		verify(mockMetadata).setEntityUpdatedHandler(mockHandler);
+		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
+		verify(mockDockerTitleBar).configure(mockEntityBundle);
+		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 	}
 }
