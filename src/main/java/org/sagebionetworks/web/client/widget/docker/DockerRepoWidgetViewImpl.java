@@ -27,6 +27,8 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	SimplePanel dockerTitlebarContainer;
 	@UiField
 	SimplePanel dockerModifiedAndCreatedContainer;
+	@UiField
+	SimplePanel dockerActionMenuContainer;
 
 	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {}
 	private Presenter presenter;
@@ -87,6 +89,11 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@Override
 	public void setModifiedCreatedBy(IsWidget widget) {
 		dockerModifiedAndCreatedContainer.add(widget);
+	}
+
+	@Override
+	public void setActionMenu(Widget w) {
+		dockerActionMenuContainer.add(w);
 	}
 
 }

@@ -26,4 +26,6 @@ public interface DockerRepoWidgetView {
 	void setEntityMetadata(Widget widget);
 
 	void setModifiedCreatedBy(IsWidget widget);
+
+	void setActionMenu(Widget widget);
 }
