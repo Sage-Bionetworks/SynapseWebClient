@@ -462,7 +462,7 @@ public class EntityActionControllerImplTest {
 	public void testConfigureProvenanceFileCannotEdit(){
 		boolean canEdit = false;
 		entityBundle.getPermissions().setCanEdit(canEdit);
-		entityBundle.setEntity(new DockerRepository());
+		entityBundle.setEntity(new FileEntity());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
@@ -484,7 +484,7 @@ public class EntityActionControllerImplTest {
 	public void testConfigureProvenanceDockerCannotEdit(){
 		boolean canEdit = false;
 		entityBundle.getPermissions().setCanEdit(canEdit);
-		entityBundle.setEntity(new FileEntity());
+		entityBundle.setEntity(new DockerRepository());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);

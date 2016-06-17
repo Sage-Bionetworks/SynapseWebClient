@@ -127,4 +127,29 @@ public class DockerRepoWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureCannotEdit() {
+		canEdit = false;
+		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
+		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
+		verify(mockProvWidget).configure(any(Map.class));
+		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + entityName);
+		verify(mockMetadata).setEntityUpdatedHandler(mockHandler);
+		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
+		verify(mockDockerTitleBar).configure(mockEntityBundle);
+		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
+		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
+		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
+		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
+		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
+	}
 }
