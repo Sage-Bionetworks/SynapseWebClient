@@ -536,11 +536,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_DOI:
 			onCreateDOI();
 			break;
+		case ADD_COMMIT:
+			onAddCommit();
+			break;
 		default:
 			break;
 		}
 	}
-	
+
+	private void onAddCommit() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	private void onChangeStorageLocation() {
 		storageLocationEditor.configure(this.entityBundle, entityUpdateHandler);
