@@ -14,9 +14,6 @@
 			</b:Row>
 			<b:Row>
 				<b:Column size="XS_12, MD_6">
-					<bh:Div ui:field="dockerRepoWikiPageContainer" />
-				</b:Column>
-				<b:Column size="XS_12, MD_6">
 					<b:Panel addStyleNames="margin-top-15">
 						<b:PanelHeader>
 							<b:Heading size="H3" text="Docker Pull Command"/>
@@ -25,11 +22,16 @@
 							<g:TextBox ui:field="dockerPullCommand" addStyleNames="border-none noBackground" readOnly="true" />
 						</b:PanelBody>
 					</b:Panel>
+					<b:Panel addStyleNames="margin-top-15">
+						<b:PanelBody ui:field="dockerRepoWikiPageContainer" />
+					</b:Panel>
+				</b:Column>
+				<b:Column size="XS_12, MD_6">
 					<bh:Div ui:field="dockerRepoProvenanceContainer" addStyleNames="highlight-box" />
 				</b:Column>
 			</b:Row>
 			<b:Row>
-				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="dockerModifiedAndCreatedContainer"/>
+				<g:SimplePanel addStyleNames="margin-bottom-15 margin-left-15" ui:field="dockerModifiedAndCreatedContainer"/>
 			</b:Row>
 		</b:Column>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
