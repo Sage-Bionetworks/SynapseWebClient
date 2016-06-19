@@ -977,16 +977,24 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: auto;
 	text-align: justify;
+	line-height: 1.6em;
 }
 
 .markdown ol { 
 	list-style-type: decimal;
-	padding-left: 24px;
+	padding-left: 15px;
+}
+.markdown ol li {
+	padding-top: 5px;
 }
 .markdown ul { 
 	list-style-type: square;
 	padding-left: 17px;
 }
+.markdown ul li {
+	padding-top: 5px;
+}
+
 .markdown strong { font-weight: bold; }
 .markdown del { text-decoration: line-through; }
 .markdown em { font-style: italic; }
@@ -2294,31 +2302,17 @@ div.input-group > input.search-textbox {
 	padding-bottom: 3px;
 }
 
-.bs-sidenav .nav .subpage-link {
-	padding-left: 25px;
+.bs-sidenav .nav li {
+	padding-left: 10px;
 	text-decoration:none;
 	font-size: 1.1em;
 }
 
-.bs-sidenav .nav .nav .subpage-link {
-  padding-left: 40px;
+.bs-sidenav .nav .nav li {
+  padding-left: 15px;
   font-size: 1em;
 }
-.bs-sidenav .nav .nav .nav .subpage-link {
-  padding-left: 50px;
-}
-.bs-sidenav .nav .nav .nav .nav .subpage-link {
-  padding-left: 60px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .subpage-link {
-  padding-left: 70px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav .subpage-link {
-  padding-left: 80px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav .nav .subpage-link {
-  padding-left: 90px;
-}
+
 /*===========*/
 
 .largeIconButton {
