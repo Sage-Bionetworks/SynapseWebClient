@@ -11,7 +11,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget.*;
+import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_THREAD_LIST;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD;
@@ -44,9 +44,9 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -71,7 +71,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class DiscussionThreadWidgetTest {
 
 	@Mock
-	DiscussionThreadWidgetView mockView;
+	SingleDiscussionThreadWidgetView mockView;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
@@ -117,7 +117,7 @@ public class DiscussionThreadWidgetTest {
 	@Mock
 	CallbackP<String> mockThreadIdClickedCallback;
 	Set<Long> moderatorIds;
-	DiscussionThreadWidget discussionThreadWidget;
+	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
 	private static final String CREATED_BY = "123";
 	private static final String NON_AUTHOR = "456";
@@ -128,7 +128,7 @@ public class DiscussionThreadWidgetTest {
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
-		discussionThreadWidget = new DiscussionThreadWidget(mockView, mockNewReplyModal,
+		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockNewReplyModal,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,

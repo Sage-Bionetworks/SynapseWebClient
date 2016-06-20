@@ -42,7 +42,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	DiscussionForumClientAsync discussionForumClient;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
-	DiscussionThreadWidget singleThreadWidget;
+	SingleDiscussionThreadWidget singleThreadWidget;
 
 	String forumId;
 	String entityId;
@@ -57,7 +57,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	// From portal.properties, what thread should we show if no threads are available?
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
 	public static DiscussionThreadBundle defaultThreadBundle;
-	public DiscussionThreadWidget defaultThreadWidget;
+	public SingleDiscussionThreadWidget defaultThreadWidget;
 
 	@Inject
 	public ForumWidget(
@@ -68,9 +68,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			NewDiscussionThreadModal newThreadModal,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			DiscussionThreadWidget singleThreadWidget,
+			SingleDiscussionThreadWidget singleThreadWidget,
 			SubscribeButtonWidget subscribeToForumButton,
-			DiscussionThreadWidget defaultThreadWidget
+			SingleDiscussionThreadWidget defaultThreadWidget
 			) {
 		this.view = view;
 		this.synAlert = synAlert;

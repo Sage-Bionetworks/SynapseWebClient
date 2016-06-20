@@ -5,7 +5,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface DiscussionThreadWidgetView extends IsWidget{
+public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	public interface Presenter {
 
@@ -22,7 +22,7 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void onClickThread();
 	}
 
-	void setPresenter(DiscussionThreadWidget presenter);
+	void setPresenter(SingleDiscussionThreadWidget presenter);
 
 	void addReply(Widget w);
 

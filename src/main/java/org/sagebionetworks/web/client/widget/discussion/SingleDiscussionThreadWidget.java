@@ -39,7 +39,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presenter{
+public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidgetView.Presenter{
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
@@ -53,7 +53,7 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	public static final String CREATED_ON_PREFIX = "posted ";
 	public static final String NO_INDENTATION_WIDTH = "100%";
 	public static final String INDENTATION_WIDTH = "98%";
-	DiscussionThreadWidgetView view;
+	SingleDiscussionThreadWidgetView view;
 	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
@@ -83,8 +83,8 @@ public class DiscussionThreadWidget implements DiscussionThreadWidgetView.Presen
 	private Set<Long> moderatorIds;
 	
 	@Inject
-	public DiscussionThreadWidget(
-			DiscussionThreadWidgetView view,
+	public SingleDiscussionThreadWidget(
+			SingleDiscussionThreadWidgetView view,
 			NewReplyModal newReplyModal,
 			SynapseAlert synAlert,
 			UserBadge authorWidget,
