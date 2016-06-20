@@ -552,9 +552,9 @@ public class DisplayUtils {
 			@Override
 			public void onClick(ClickEvent event) {
 				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
-						errorMessage, new AsyncCallback<Void>() {
+						errorMessage, new AsyncCallback<String>() {
 							@Override
-							public void onSuccess(Void result) {
+							public void onSuccess(String result) {
 								d.hide();
 								showInfo("Report sent", "Thank you!");
 							}
