@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -16,7 +15,6 @@ import com.google.inject.Inject;
 public class DiscussionThreadListItemWidget implements DiscussionThreadListItemWidgetView.Presenter{
 
 	DiscussionThreadListItemWidgetView view;
-	SynapseAlert synAlert;
 	PortalGinInjector ginInjector;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
@@ -24,12 +22,10 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	private CallbackP<String> threadIdClickedCallback; 
 	
 	private String threadId;
-	private String title;
 	private String projectId;
 	@Inject
 	public DiscussionThreadListItemWidget(
 			DiscussionThreadListItemWidgetView view,
-			SynapseAlert synAlert,
 			UserBadge authorWidget,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils,
@@ -38,12 +34,10 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.jsniUtils = jsniUtils;
-		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.globalApplicationState = globalApplicationState;
 		
 		view.setPresenter(this);
-		view.setAlert(synAlert.asWidget());
 		view.setThreadAuthor(authorWidget.asWidget());
 	}
 
@@ -53,10 +47,9 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	}
 
 	public void configure(DiscussionThreadBundle bundle) {
-		this.title = bundle.getTitle();
 		this.threadId = bundle.getId();
-		view.clear();
-		view.setTitle(title);
+		this.projectId = bundle.getProjectId();
+		view.setTitle(bundle.getTitle());
 		authorWidget.configure(bundle.getCreatedBy());
 		authorWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		for (String userId : bundle.getActiveAuthors()){
@@ -80,7 +73,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	@Override
 	public void onClickThread() {
 		if (threadIdClickedCallback == null) {
-			globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(projectId, threadId));	
+			globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(projectId, threadId));
 		} else {
 			threadIdClickedCallback.invoke(threadId);
 		}
