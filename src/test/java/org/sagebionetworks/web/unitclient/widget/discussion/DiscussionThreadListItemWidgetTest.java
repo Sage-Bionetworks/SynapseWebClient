@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -36,8 +35,6 @@ public class DiscussionThreadListItemWidgetTest {
 	PortalGinInjector mockGinInjector;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
-	@Mock
-	SynapseAlert mockSynAlert;
 	@Mock
 	UserBadge mockUserBadge;
 	@Mock
@@ -59,7 +56,7 @@ public class DiscussionThreadListItemWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadListItemWidget(mockView,
-				mockSynAlert, mockAuthorWidget, mockGinInjector, mockJsniUtils,
+				mockAuthorWidget, mockGinInjector, mockJsniUtils,
 				mockGlobalApplicationState);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockThreadBundle.getTitle()).thenReturn(title);
@@ -70,14 +67,12 @@ public class DiscussionThreadListItemWidgetTest {
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadWidget);
-		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setThreadAuthor(any(Widget.class));
 	}
 
 	@Test
 	public void testConfigure() {
 		discussionThreadWidget.configure(mockThreadBundle);
-		verify(mockView).clear();
 		verify(mockView).setTitle(title);
 		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfViews("2");

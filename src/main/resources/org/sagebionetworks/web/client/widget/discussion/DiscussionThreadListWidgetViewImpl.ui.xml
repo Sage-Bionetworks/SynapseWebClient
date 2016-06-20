@@ -19,6 +19,5 @@
 				<b:Button ui:field="loadMoreButton" pull="LEFT">Load more threads</b:Button>
 			</b:Column>
 		</b:Row>
-		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>
 </ui:UiBinder>

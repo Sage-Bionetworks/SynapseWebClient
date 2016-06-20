@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -32,8 +31,6 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	@UiField
 	FocusPanel showThread;
 	@UiField
-	Div synAlertContainer;
-	@UiField
 	Icon pinnedIcon;
 
 	private Widget widget;
@@ -61,14 +58,6 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	}
 
 	@Override
-	public void clear() {
-		threadTitle.clear();
-		activeUsers.clear();
-		numberOfReplies.clear();
-		lastActivity.clear();
-	}
-
-	@Override
 	public void setTitle(String title) {
 		threadTitle.setText(title);
 	}
@@ -89,23 +78,8 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	}
 
 	@Override
-	public void setAlert(Widget w) {
-		synAlertContainer.add(w);
-	}
-
-	@Override
 	public void addActiveAuthor(Widget user) {
 		activeUsers.add(user);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
