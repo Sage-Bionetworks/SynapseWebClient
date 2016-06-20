@@ -21,6 +21,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
+	public static final String BROWSE_PATH = "/browse/";
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
@@ -88,7 +89,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 				public void onSuccess(String key) {
 					view.hideJiraDialog();
 					String jiraEndpoint = globalApplicationState.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
-					String url = jiraEndpoint + "/browse/" + key;
+					String url = jiraEndpoint + BROWSE_PATH + key;
 					view.showJiraIssueOpen(key, url);
 				}
 

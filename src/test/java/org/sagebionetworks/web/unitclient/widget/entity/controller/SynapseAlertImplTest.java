@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -45,8 +46,11 @@ public class SynapseAlertImplTest {
 	PlaceChanger mockPlaceChanger;
 	JiraURLHelper mockJiraClient;
 	GWTWrapper mockGWT;
+	// a new jira odyssey
+	String newJiraKey = "SWC-2001";
 	
 	public static final String HOST_PAGE_URL="http://foobar";
+	public static final String JIRA_ENDPOINT_URL="http://foo.bar.com/";
 	@Before
 	public void before(){
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -60,12 +64,14 @@ public class SynapseAlertImplTest {
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUSD);
 		UserProfile mockProfile = mock(UserProfile.class);
 		when(mockUSD.getProfile()).thenReturn(mockProfile);
-		AsyncMockStubber.callSuccessWith(null).when(mockJiraClient).createIssueOnBackend(anyString(),  any(Throwable.class),  anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(newJiraKey).when(mockJiraClient).createIssueOnBackend(anyString(),  any(Throwable.class),  anyString(), any(AsyncCallback.class));
 		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockGlobalApplicationState.getJiraURLHelper()).thenReturn(mockJiraClient);
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT)).thenReturn(JIRA_ENDPOINT_URL);
+		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		verify(mockView).setPresenter(widget);
 	}
@@ -133,11 +139,12 @@ public class SynapseAlertImplTest {
 	@Test
 	public void testOnCreateJiraIssue() {
 		widget.handleException(new UnknownErrorException());
-		
 		String userReport = "clicked a button";
 		widget.onCreateJiraIssue(userReport);
 		verify(mockView).hideJiraDialog();
-		verify(mockView).showInfo(anyString(),  anyString());
+		
+		// tell user that the jira has been created, and include a link to the new issue!
+		verify(mockView).showJiraIssueOpen(newJiraKey, JIRA_ENDPOINT_URL + SynapseAlertImpl.BROWSE_PATH + newJiraKey);
 	}
 	
 	@Test

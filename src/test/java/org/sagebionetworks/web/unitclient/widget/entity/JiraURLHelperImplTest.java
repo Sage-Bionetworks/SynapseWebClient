@@ -132,7 +132,7 @@ public class JiraURLHelperImplTest {
 		String rootCause = "an error in the stack trace";
 		Throwable ex = new Exception(rootCause); 
 		String friendlyError = "this is the test error message";
-		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
+		AsyncCallback<String> mockCallback = mock(AsyncCallback.class);
 		helper.createIssueOnBackend(userSteps, ex, friendlyError, mockCallback);
 		
 		ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
