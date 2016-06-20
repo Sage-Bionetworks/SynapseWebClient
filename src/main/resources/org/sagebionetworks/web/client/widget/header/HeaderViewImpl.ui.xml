@@ -23,7 +23,7 @@
 					<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="28px">Help</b:Button>
 						<b:DropDownMenu addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Synapse tutorial</b:AnchorListItem>
+							<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted" text="Synapse tutorial" />
 							<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
 							<b:ListItem>
 								<b:Anchor href="#!SynapseForum:default">
@@ -31,11 +31,11 @@
 									<span class="smallerText"><span class="label label-warning label-as-badge margin-left-5 moveup-2">beta</span></span>
 								</b:Anchor>
 							</b:ListItem>
-							<b:AnchorListItem ui:field="rLink">R client</b:AnchorListItem>
-							<b:AnchorListItem ui:field="pythonLink">Python client</b:AnchorListItem>
-							<b:AnchorListItem ui:field="commandLineLink">Command line client</b:AnchorListItem>
-							<b:AnchorListItem ui:field="restAPILink">REST API docs</b:AnchorListItem>
-							<b:AnchorListItem ui:field="governanceLink">Data use conditions</b:AnchorListItem>
+							<b:AnchorListItem ui:field="rLink" text="R client" />
+							<b:AnchorListItem ui:field="pythonLink" text="Python client" />
+							<b:AnchorListItem ui:field="commandLineLink" text="Command line client" />
+							<b:AnchorListItem ui:field="restAPILink" text="REST API docs" />
+							<b:AnchorListItem ui:field="governanceLink" text="Data use conditions" />
 						</b:DropDownMenu>
 					</b:ButtonGroup> 
 					<b:Tooltip placement="BOTTOM" title="Favorites">
@@ -66,8 +66,8 @@
 					<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
 					<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
 					<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
-					<b:Anchor addStyleNames="smallerText color-white" ui:field="goToStandardSite">off</b:Anchor>
-					<b:Anchor ui:field="trashLink" icon="TRASH_O" addStyleNames="margin-left-20 smallerText color-white">Trash can</b:Anchor>
+					<b:Anchor addStyleNames="smallerText color-white" ui:field="goToStandardSite" text="off" />
+					<b:Anchor ui:field="trashLink" icon="TRASH_O" addStyleNames="margin-left-20 smallerText color-white" text="Trash can" />
 				</g:FlowPanel>
 			</b:Column>
 		</b:Row>
