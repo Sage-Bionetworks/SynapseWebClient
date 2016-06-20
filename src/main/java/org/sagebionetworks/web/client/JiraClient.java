@@ -9,5 +9,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("jira")
 public interface JiraClient extends RemoteService {
-	public void createJiraIssue(String summary, String description, String reporter, Map<String, String> customFieldValues) throws RestServiceException ;
+	public String createJiraIssue(String summary, String description, String reporter, Map<String, String> customFieldValues) throws RestServiceException ;
 }

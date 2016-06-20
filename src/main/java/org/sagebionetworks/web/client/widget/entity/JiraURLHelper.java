@@ -18,7 +18,7 @@ public interface JiraURLHelper {
 			String stepsToRepro,
 			Throwable t,
 			String errorMessage,
-			AsyncCallback<Void> callback);
+			AsyncCallback<String> callback);
 
 	
 }

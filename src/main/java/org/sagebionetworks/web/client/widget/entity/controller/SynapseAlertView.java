@@ -37,6 +37,12 @@ public interface SynapseAlertView extends IsWidget {
 	void showError(String error);
 	
 	/**
+	 * Show info about the jira issue that was just created.
+	 */
+	void showJiraIssueOpen(String key, String url);
+	
+	
+	/**
 	 * Show a special login alert, that includes a link to the login page.
 	 */
 	void showLoginAlert();
