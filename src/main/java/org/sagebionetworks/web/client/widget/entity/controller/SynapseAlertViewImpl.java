@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -127,5 +128,10 @@ public class SynapseAlertViewImpl implements
 		widget.setVisible(true);
 		alert.setText(error);
 		alert.setVisible(true);
+	}
+	
+	@Override
+	public void showJiraIssueOpen(String key, String url) {
+		Bootbox.alert("The new report <a target=\"_blank\" href=\"" + url + "\">"+key+"</a> has been sent. Thank you for submitting!");
 	}
 }

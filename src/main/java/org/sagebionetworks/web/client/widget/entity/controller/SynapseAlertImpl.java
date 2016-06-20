@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -20,6 +21,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
+	public static final String BROWSE_PATH = "/browse/";
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
@@ -82,11 +84,13 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void onCreateJiraIssue(final String userReport) {
 		JiraURLHelper jiraHelper = globalApplicationState.getJiraURLHelper();
 		jiraHelper.createIssueOnBackend(userReport, ex,
-			ex.getMessage(), new AsyncCallback<Void>() {
+			ex.getMessage(), new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void onSuccess(String key) {
 					view.hideJiraDialog();
-					view.showInfo("Report sent", "Thank you!");
+					String jiraEndpoint = globalApplicationState.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
+					String url = jiraEndpoint + BROWSE_PATH + key;
+					view.showJiraIssueOpen(key, url);
 				}
 
 				@Override

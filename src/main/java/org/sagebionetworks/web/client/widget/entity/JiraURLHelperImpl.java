@@ -205,7 +205,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 			String stepsToRepro,
 			Throwable t,
 			String errorMessage,
-			AsyncCallback<Void> callback) {
+			AsyncCallback<String> callback) {
 		Map<String, String> fieldValues = new HashMap<String, String>();
 		
 		String stackTrace = DisplayUtils.getStackTrace(t);

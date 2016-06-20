@@ -65,6 +65,20 @@ public class JiraClientImplTest {
 		assertEquals(customFieldValue, actualIssueInput.getField(customFieldKey).getValue());
 	}
 	
+	@Test
+	public void testCreateJiraIssueLongSummary() throws RestServiceException {
+		// verify that summary (if greater than maximum size allowed) is truncated.  Also verify that the full summary is captured in the description.
+		testSummary = "Quisque egestas arcu id purus venenatis, quis dictum risus luctus. Proin in elementum erat. Mauris volutpat elit vestibulum vulputate dapibus. Sed et tellus mattis, imperdiet eros vitae, mollis nisl. Quisque elementum vehicula mauris ac rutrum. Proin pretium dignissim elit in egestas. Sed sollicitudin nibh ac tortor gravida, in sollicitudin turpis lacinia. Proin sed maximus ex. Aliquam lacinia id tellus posuere bibendum. Aenean quis ipsum et nulla tristique blandit vel sed mauris. Pellentesque id ex non massa tempus elementum a quis elit. Mauris condimentum, nulla eu tristique feugiat, orci felis molestie orci, porta maximus odio erat sed nunc. Cras ut turpis eu metus facilisis scelerisque ut et ligula.";
+		jiraClient.createJiraIssue(testSummary, testDescription, testReporter, customFieldValues);
+		ArgumentCaptor<IssueInput> issueInputCaptor = ArgumentCaptor.forClass(IssueInput.class);
+		verify(mockIssueClient).createIssue(issueInputCaptor.capture());
+		IssueInput actualIssueInput = issueInputCaptor.getValue();
+		String actualSummary = actualIssueInput.getField("summary").getValue().toString();
+		String actualDescription = actualIssueInput.getField("description").getValue().toString();
+		assertEquals(JiraClientImpl.SUMMARY_MAX_SIZE, actualSummary.length());
+		assertTrue(actualDescription.startsWith(testSummary));
+	}
+	
 	@Test (expected=UnknownErrorException.class)
 	public void testCreateJiraIssueFailure() throws Exception {
 		when(mockPromise.get()).thenThrow(new ExecutionException(new Exception()));
