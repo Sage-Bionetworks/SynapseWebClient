@@ -4,9 +4,11 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
-import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget.DEFAULT_ASCENDING;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,20 +18,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
-import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -44,7 +43,7 @@ public class DiscussionThreadListWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	DiscussionThreadWidget mockDiscussionThreadWidget;
+	DiscussionThreadListItemWidget mockDiscussionThreadWidget;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -65,7 +64,7 @@ public class DiscussionThreadListWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		when(mockGinInjector.createThreadWidget()).thenReturn(mockDiscussionThreadWidget);
+		when(mockGinInjector.createThreadListItemWidget()).thenReturn(mockDiscussionThreadWidget);
 		when(mockGinInjector.getDiscussionThreadCountAlert()).thenReturn(mockDiscussionThreadCountAlert);
 		discussionThreadListWidget = new DiscussionThreadListWidget(mockView, mockGinInjector, mockDiscussionForumClient, mockSynAlert);
 		moderatorIds = new HashSet<Long>();
@@ -108,9 +107,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
-		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class),
-				eq(canModerate), eq(moderatorIds), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_THREAD_LIST),
-				eq(SHOW_REPLY_DETAILS_FOR_THREAD_LIST));
+		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockDiscussionThreadWidget).setThreadIdClickedCallback(mockThreadIdClickedCallback);
 	}
 
@@ -139,10 +136,8 @@ public class DiscussionThreadListWidgetTest {
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).addThread(any(Widget.class));
-		verify(mockGinInjector).createThreadWidget();
-		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class),
-				eq(canModerate), eq(moderatorIds), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_THREAD_LIST),
-				eq(SHOW_REPLY_DETAILS_FOR_THREAD_LIST));
+		verify(mockGinInjector).createThreadListItemWidget();
+		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockView).setLoadMoreButtonVisibility(false);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
@@ -166,10 +161,8 @@ public class DiscussionThreadListWidgetTest {
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView, never()).addThread(any(Widget.class));
-		verify(mockGinInjector, never()).createThreadWidget();
-		verify(mockDiscussionThreadWidget, never()).configure(any(DiscussionThreadBundle.class),
-				eq(canModerate), eq(moderatorIds), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_THREAD_LIST),
-				eq(SHOW_REPLY_DETAILS_FOR_THREAD_LIST));
+		verify(mockGinInjector, never()).createThreadListItemWidget();
+		verify(mockDiscussionThreadWidget, never()).configure(any(DiscussionThreadBundle.class));
 		verify(mockView).setLoadMoreButtonVisibility(false);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
@@ -194,10 +187,8 @@ public class DiscussionThreadListWidgetTest {
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).addThread(any(Widget.class));
-		verify(mockGinInjector).createThreadWidget();
-		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class),
-				eq(canModerate), eq(moderatorIds), any(Callback.class), eq(SHOW_THREAD_DETAILS_FOR_THREAD_LIST),
-				eq(SHOW_REPLY_DETAILS_FOR_THREAD_LIST));
+		verify(mockGinInjector).createThreadListItemWidget();
+		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockView).setLoadMoreButtonVisibility(true);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
@@ -215,7 +206,7 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback);
 		verify(mockView).clear();
 		verify(mockView, never()).addThread(any(Widget.class));
-		verify(mockGinInjector, never()).createThreadWidget();
+		verify(mockGinInjector, never()).createThreadListItemWidget();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(),
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),

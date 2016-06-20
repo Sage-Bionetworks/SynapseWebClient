@@ -27,9 +27,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -62,11 +62,11 @@ public class ForumWidgetTest {
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
-	DiscussionThreadWidget mockDiscussionThreadWidget;
+	SingleDiscussionThreadWidget mockDiscussionThreadWidget;
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
-	DiscussionThreadWidget mockDefaultThreadWidget;
+	SingleDiscussionThreadWidget mockDefaultThreadWidget;
 	@Mock
 	DiscussionThreadBundle mockDefaultDiscussionThreadBundle;
 	@Mock

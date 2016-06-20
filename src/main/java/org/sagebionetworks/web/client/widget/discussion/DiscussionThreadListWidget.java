@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_THREAD_LIST;
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_THREAD_LIST;
-
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -10,7 +7,6 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
@@ -98,14 +94,8 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 					@Override
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
 						for(DiscussionThreadBundle bundle: result.getResults()) {
-							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
-							thread.configure(bundle, isCurrentUserModerator, moderatorIds, new Callback(){
-
-								@Override
-								public void invoke() {
-									configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
-								}
-							}, SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
+							DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();
+							thread.configure(bundle);
 							thread.setThreadIdClickedCallback(threadIdClickedCallback);
 							view.addThread(thread.asWidget());
 						}

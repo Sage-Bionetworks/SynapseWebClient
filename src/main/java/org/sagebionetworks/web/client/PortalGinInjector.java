@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceE
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
@@ -386,7 +386,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 
 	// discussion
-	public DiscussionThreadWidget createThreadWidget();
+	public DiscussionThreadListItemWidget createThreadListItemWidget();
 	public ReplyWidget createReplyWidget();
 	
 	public MarkdownCacheKey getMarkdownCacheKey();
