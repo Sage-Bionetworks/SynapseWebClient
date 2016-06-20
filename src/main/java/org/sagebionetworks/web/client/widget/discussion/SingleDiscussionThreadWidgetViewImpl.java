@@ -25,9 +25,9 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
+public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThreadWidgetView {
 
-	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, SingleDiscussionThreadWidgetViewImpl> {}
 
 	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
@@ -97,10 +97,10 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	Div commandsContainer;
 	String threadLinkHref;
 	private Widget widget;
-	private DiscussionThreadWidget presenter;
+	private SingleDiscussionThreadWidget presenter;
 
 	@Inject
-	public DiscussionThreadWidgetViewImpl(Binder binder) {
+	public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		loadMoreButton.addClickHandler(new ClickHandler() {
 
@@ -157,7 +157,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setPresenter(DiscussionThreadWidget presenter) {
+	public void setPresenter(SingleDiscussionThreadWidget presenter) {
 		this.presenter = presenter;
 	}
 
