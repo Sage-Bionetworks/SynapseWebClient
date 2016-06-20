@@ -36,7 +36,5 @@
 				</t:TableRow>
 			</t:Table>
 		</bh:Div>
-
-		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>
