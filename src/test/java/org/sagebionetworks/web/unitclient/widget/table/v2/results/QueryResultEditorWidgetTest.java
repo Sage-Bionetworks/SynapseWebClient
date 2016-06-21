@@ -138,6 +138,7 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).setEditorPanelVisible(true);
 		verify(mockView).setProgressPanelVisible(false);
+		verify(mockView, never()).scrollProgressIntoView();
 		verify(mockView).setSaveButtonLoading(false);
 		verify(mockView).showEditor();
 		verify(mockGlobalState).setIsEditing(true);
@@ -221,6 +222,7 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView).setErrorMessageVisible(true);
 		verify(mockView).setEditorPanelVisible(true);
 		verify(mockView).setProgressPanelVisible(false);
+		verify(mockView, never()).scrollProgressIntoView();
 		verify(mockView).showErrorMessage(QueryResultEditorWidget.SEE_THE_ERRORS_ABOVE);
 		verify(mockView).setSaveButtonLoading(false);
 		// callback should not be invoked
@@ -247,6 +249,7 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView).setEditorPanelVisible(false);
 		// progress should be visible while the job runs.
 		verify(mockView).setProgressPanelVisible(true);
+		verify(mockView).scrollProgressIntoView();
 		
 		// The editor should be hidden and the callback invoked
 		// end false
