@@ -134,10 +134,12 @@ public class QueryResultEditorWidget implements
 	 * @param isRunning
 	 */
 	private void setJobRunning(boolean isRunning) {
-		view.setEditorPanelVisible(!isRunning);
-		view.setProgressPanelVisible(isRunning);
 		if (isRunning) {
-			view.scrollProgressIntoView();
+			view.hideEditor();
+			view.showProgress();
+		} else {
+			view.hideProgress();
+			view.showEditor();
 		}
 	}
 
@@ -227,6 +229,7 @@ public class QueryResultEditorWidget implements
 	private void doHideEditor() {
 		this.globalApplicationState.setIsEditing(false);
 		this.view.hideEditor();
+		this.view.hideProgress();
 	}
 
 }
