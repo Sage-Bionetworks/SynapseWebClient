@@ -136,6 +136,9 @@ public class QueryResultEditorWidget implements
 	private void setJobRunning(boolean isRunning) {
 		view.setEditorPanelVisible(!isRunning);
 		view.setProgressPanelVisible(isRunning);
+		if (isRunning) {
+			view.scrollProgressIntoView();
+		}
 	}
 
 	/**

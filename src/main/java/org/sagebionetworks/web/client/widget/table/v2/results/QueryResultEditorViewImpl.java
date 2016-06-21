@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -206,5 +207,9 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void hideEditor() {
 		editRowsModal.hide();
 	}
-
+	
+	@Override
+	public void scrollProgressIntoView() {
+		progressPanel.getElement().scrollIntoView();
+	}
 }

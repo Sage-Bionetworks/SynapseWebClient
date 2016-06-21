@@ -131,5 +131,7 @@ public interface QueryResultEditorView extends IsWidget {
 	 * Hide the editor.
 	 */
 	void hideEditor();
+	
+	void scrollProgressIntoView();
 
 }
