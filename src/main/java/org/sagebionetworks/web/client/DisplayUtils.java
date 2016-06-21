@@ -111,6 +111,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -1809,10 +1810,20 @@ public class DisplayUtils {
 	/**
 	  * just return the empty string if input string parameter s is null, otherwise returns s.
 	  */
-	 public static String replaceWithEmptyStringIfNull(String s) {
+	public static String replaceWithEmptyStringIfNull(String s) {
 		if (s == null)
 			return "";
 		else return s;
-	 }
+	}
 
+	/**
+	 * return true if the widget is in the visible part of the page
+	 */
+	public static boolean isInViewport(Widget widget) {
+		int docViewTop = Window.getScrollTop();
+		int docViewBottom = docViewTop + Window.getClientHeight();
+		int elemTop = widget.getAbsoluteTop();
+		int elemBottom = elemTop + widget.getOffsetHeight();
+		return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+	}
 }
