@@ -6,7 +6,10 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
@@ -26,6 +29,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseAlert synAlert;
+	GWTWrapper gwtWrapper;
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
@@ -34,18 +38,21 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private CallbackP<Boolean> emptyListCallback;
 	private CallbackP<String> threadIdClickedCallback;
 	Set<Long> moderatorIds;
+	private Callback invokeCheckForInViewAndLoadData;
 	
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,
 			PortalGinInjector ginInjector,
 			DiscussionForumClientAsync discussionForumClientAsync,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			GWTWrapper gwtWrapper
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.synAlert = synAlert;
+		this.gwtWrapper= gwtWrapper;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		order = DEFAULT_ORDER;
@@ -63,6 +70,26 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
 		view.setThreadCountAlert(threadCountAlert.asWidget());
 		threadCountAlert.configure(forumId);
+		invokeCheckForInViewAndLoadData = new Callback() {
+			@Override
+			public void invoke() {
+				checkForInViewAndLoadData();
+			}
+		};
+		checkForInViewAndLoadData();
+	}
+
+	public void checkForInViewAndLoadData() {
+		if (!view.isLoadMoreAttached()) {
+			//Done, view has been detached and widget was never in the viewport
+			return;
+		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility()) {
+			//try to load data!
+			loadMore();
+		} else {
+			//wait for a few seconds and see if we should load data
+			gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+		}
 	}
 
 	public void clear() {

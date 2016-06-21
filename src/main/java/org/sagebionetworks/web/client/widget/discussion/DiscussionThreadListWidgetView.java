@@ -25,4 +25,10 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	void setLoadingVisible(boolean visible);
 
 	void setThreadHeaderVisible(boolean visible);
+
+	boolean isLoadMoreAttached();
+
+	boolean isLoadMoreInViewport();
+
+	boolean getLoadMoreVisibility();
 }
