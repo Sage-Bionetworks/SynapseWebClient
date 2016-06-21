@@ -3,11 +3,14 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,6 +30,16 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@UiField
 	HTMLPanel loadingUI;
 
+	@UiField
+	FocusPanel sortByReplies;
+	@UiField
+	FocusPanel sortByViews;
+	@UiField
+	FocusPanel sortByActivity;
+	@UiField
+	Table threadHeader;
+
+
 	Widget widget;
 	private DiscussionThreadListWidget presenter;
 
@@ -38,6 +51,25 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.loadMore();
+			}
+		});
+
+		sortByReplies.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+			}
+		});
+		sortByViews.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+			}
+		});
+		sortByActivity.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 			}
 		});
 	}
@@ -82,4 +114,9 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 		threadCountAlertContainer.clear();
 		threadCountAlertContainer.add(w);
 	};
+
+	@Override
+	public void setThreadHeaderVisible(boolean visible){
+		threadHeader.setVisible(visible);
+	}
 }

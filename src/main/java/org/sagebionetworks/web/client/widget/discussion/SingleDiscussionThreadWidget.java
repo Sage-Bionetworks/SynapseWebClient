@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -65,7 +64,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	GlobalApplicationState globalApplicationState;
 	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
-	UserBadge authorIconWidget;
 	GWTWrapper gwtWrapper;
 	SubscribeButtonWidget subscribeButtonWidget;
 	private CallbackP<String> threadIdClickedCallback; 
@@ -96,7 +94,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			GlobalApplicationState globalApplicationState,
 			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
-			UserBadge authorIconWidget,
 			GWTWrapper gwtWrapper,
 			SubscribeButtonWidget subscribeButtonWidget
 			) {
@@ -112,7 +109,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.globalApplicationState = globalApplicationState;
 		this.editThreadModal = editThreadModal;
 		this.markdownWidget = markdownWidget;
-		this.authorIconWidget = authorIconWidget;
 		this.gwtWrapper = gwtWrapper;
 		this.subscribeButtonWidget = subscribeButtonWidget;
 		
@@ -122,7 +118,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setAuthor(authorWidget.asWidget());
 		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
-		view.setThreadAuthor(authorIconWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		
 		subscribeButtonWidget.showIconOnly();
@@ -139,7 +134,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback, boolean showThreadDetails, boolean showReplyDetails) {
+	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
@@ -147,7 +142,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.deleteCallback = deleteCallback;
 		this.projectId = bundle.getProjectId();
 		this.moderatorIds = moderatorIds;
-		configureView(bundle, showThreadDetails, showReplyDetails);
+		configureView(bundle);
 		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
 		view.setIsAuthorModerator(isAuthorModerator);
 		
@@ -159,6 +154,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				reconfigureThread();
 			}
 		});
+
+		configureMessage();
+		configureReplies();
+		watchReplyCount();
 	}
 	
 	/**
@@ -171,56 +170,29 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		refreshAlert.configure(threadId);
 	}
 
-	public void unwatchReplyCount() {
-		//detach
-		view.removeRefreshAlert();
-	}
-
-
-	private void configureView(DiscussionThreadBundle bundle, boolean showThreadDetails, boolean showReplyDetails) {
+	private void configureView(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(title);
-		authorIconWidget.configure(bundle.getCreatedBy());
-		authorIconWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
-		for (String userId : bundle.getActiveAuthors()){
-			UserBadge user = ginInjector.getUserBadgeWidget();
-			user.configure(userId);
-			user.setSize(BadgeSize.SMALL_PICTURE_ONLY);
-			view.addActiveAuthor(user.asWidget());
-		}
 		Long numberOfReplies = bundle.getNumberOfReplies();
-		view.setNumberOfReplies(numberOfReplies.toString(), getDescriptiveReplyText(numberOfReplies));
-		view.setNumberOfViews(bundle.getNumberOfViews().toString());
-		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
 		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setDeleteIconVisible(isCurrentUserModerator);
-		
+
 		Boolean isPinned = bundle.getIsPinned();
 		if (isPinned == null) {
 			isPinned = false;
 		}
-		view.setPinnedIconVisible(isPinned);
 		view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
 		view.setPinIconVisible(isCurrentUserModerator && !isPinned);
-		
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
-		if (showThreadDetails) {
-			showThreadDetails();
-		} else {
-			hideThreadDetails();
-		}
-		if (showReplyDetails) {
-			showReplyDetails();
-		} else {
-			hideReplyDetails();
-		}
+
 		if (numberOfReplies == 0) {
 			view.setButtonContainerWidth(NO_INDENTATION_WIDTH);
 		} else {
 			view.setButtonContainerWidth(INDENTATION_WIDTH);
 		}
+
 	}
 	
 	@Override
@@ -236,25 +208,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.threadIdClickedCallback = threadIdClickedCallback;
 	}
 
-	private String getDescriptiveReplyText(Long numberOfReplies) {
-		if (numberOfReplies == 1) {
-			return REPLY;
-		} else {
-			return REPLIES;
-		}
-	}
-
-	private void hideThreadDetails() {
-		view.hideThreadDetails();
-		unwatchReplyCount();
-	}
-
-	private void showThreadDetails() {
-		configureMessage();
-		view.showThreadDetails();
-		watchReplyCount();
-	}
-
 	public void reconfigureThread() {
 		synAlert.clear();
 		discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
@@ -266,15 +219,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				boolean showThreadDetails = true;
-				boolean showReplyDetails = true;
-				configure(result, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteCallback);
 			}
 		});
-	}
-
-	public boolean isThreadCollapsed() {
-		return view.isThreadCollapsed();
 	}
 
 	public void configureMessage() {
@@ -339,16 +286,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		});
 	}
 
-	private void hideReplyDetails() {
-		view.setLoadMoreButtonVisibility(false);
-		view.hideReplyDetails();
-	}
-
-	private void showReplyDetails() {
-		configureReplies();
-		view.showReplyDetails();
-	}
-
 	public void configureReplies() {
 		view.clearReplies();
 		offset = 0L;
@@ -389,9 +326,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 					public void onSuccess(
 							PaginatedResults<DiscussionReplyBundle> result) {
 						offset += LIMIT;
-						if (result.getResults().isEmpty()) {
-							view.hideReplyDetails();
-						} else {
+						if (!result.getResults().isEmpty()) {
 							for (DiscussionReplyBundle bundle : result.getResults()) {
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
 								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, new Callback(){
@@ -402,12 +337,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 								});
 								view.addReply(replyWidget.asWidget());
 							}
-							view.setLoadingRepliesVisible(false);
-							Long totalReplies = result.getTotalNumberOfResults();
-							view.setNumberOfReplies(""+totalReplies, getDescriptiveReplyText(totalReplies));
-							view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
-							view.showReplyDetails();
 						}
+						view.setLoadingRepliesVisible(false);
+						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
 					}
 		});
 	}
@@ -458,7 +390,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(Void result) {
-				view.setPinnedIconVisible(true);
 				view.setPinIconVisible(false);
 				view.setUnpinIconVisible(true);
 			}
@@ -476,7 +407,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(Void result) {
-				view.setPinnedIconVisible(false);
 				view.setPinIconVisible(true);
 				view.setUnpinIconVisible(false);
 			}

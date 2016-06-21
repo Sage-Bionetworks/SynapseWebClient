@@ -142,6 +142,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
+		verify(mockView).setThreadHeaderVisible(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -167,6 +168,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
+		verify(mockView).setThreadHeaderVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")

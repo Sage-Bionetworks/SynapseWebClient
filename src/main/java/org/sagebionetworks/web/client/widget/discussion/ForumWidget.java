@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -26,11 +25,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ForumWidget implements ForumWidgetView.Presenter{
-
-	public final static Boolean SHOW_THREAD_DETAILS_FOR_THREAD_LIST = false;
-	public final static Boolean SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD = true;
-	public final static Boolean SHOW_REPLY_DETAILS_FOR_THREAD_LIST = false;
-	public final static Boolean SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD = true;
 
 	//used to tell the discussion forum to show a single thread
 	public final static String THREAD_ID_KEY = "threadId";
@@ -159,11 +153,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void initDefaultThreadWidget() {
 		Set<Long> moderatorIds = new HashSet<Long>();
 		Callback deleteCallback = null;
-		boolean showThreadDetails = true;
-		boolean showReplyDetails = false;
 		boolean isCurrentUserModerator = false;
 		resetDefaultThreadDates();
-		defaultThreadWidget.configure(defaultThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback, showThreadDetails, showReplyDetails);
+		defaultThreadWidget.configure(defaultThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback);
 		// show reminder on thread id click
 		defaultThreadWidget.setThreadIdClickedCallback(new CallbackP<String>() {
 			@Override
@@ -218,21 +210,19 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setThreadHeaderVisible(false);
 				view.setSingleThreadUIVisible(false);
 				synAlert.handleException(caught);
 			}
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				view.setThreadHeaderVisible(true);
 				singleThreadWidget.configure(result, isCurrentUserModerator, moderatorIds, new Callback(){
 					@Override
 					public void invoke() {
 						showForum();
 						urlChangeCallback.invoke();
 					}
-				}, SHOW_THREAD_DETAILS_FOR_SINGLE_THREAD, SHOW_REPLY_DETAILS_FOR_SINGLE_THREAD);
+				});
 			}
 		});
 	}
@@ -251,13 +241,11 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setThreadHeaderVisible(false);
 				synAlert.handleException(caught);
 			}
 
 			@Override
 			public void onSuccess(final Forum forum) {
-				view.setThreadHeaderVisible(true);
 				forumId = forum.getId();
 				subscribeToForumButton.configure(SubscriptionObjectType.FORUM, forumId);
 				newThreadModal.configure(forumId, new Callback(){
@@ -294,26 +282,5 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Override
 	public Widget asWidget(){
 		return view.asWidget();
-	}
-
-	@Override
-	public void sortByReplies() {
-		if (!isSingleThread) {
-			threadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		}
-	}
-
-	@Override
-	public void sortByViews() {
-		if (!isSingleThread) {
-			threadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		}
-	}
-
-	@Override
-	public void sortByActivity() {
-		if (!isSingleThread) {
-			threadListWidget.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
-		}
 	}
 }

@@ -7,35 +7,6 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div addStyleNames="overflow-x-hidden">
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
-		<bh:Div addStyleNames="padding-5 light-border-bottom">
-			<t:Table width="100%">
-				<t:TableRow>
-					<t:TableData>
-						<g:FocusPanel ui:field="showThread" addStyleNames="imageButton">
-							<bh:Div>
-								<b:Icon ui:field="pinnedIcon" type="THUMB_TACK" size="LARGE" addStyleNames="margin-right-10 lightGreyText moveup-2" visible="false"/>
-								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
-							</bh:Div>
-						</g:FocusPanel>
-					</t:TableData>
-					<t:TableData width="60px" addStyleNames="visible-lg">
-						<bh:Span ui:field="threadAuthor"></bh:Span>
-					</t:TableData>
-					<t:TableData width="310px" addStyleNames="visible-lg">
-						<bh:Span ui:field="activeUsers" addStyleNames="imageButton"></bh:Span>
-					</t:TableData>
-					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
-						<bh:Span ui:field="numberOfReplies"></bh:Span>
-					</t:TableData>
-					<t:TableData width="60px" addStyleNames="visible-lg visible-md">
-						<bh:Span ui:field="numberOfViews"></bh:Span>
-					</t:TableData>
-					<t:TableData width="130px" addStyleNames="hidden-xs">
-						<bh:Span ui:field="lastActivity"></bh:Span>
-					</t:TableData>
-				</t:TableRow>
-			</t:Table>
-		</bh:Div>
 		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
 			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
@@ -49,6 +20,9 @@
 					</g:HTMLPanel>
 					<b:Container fluid="true">
 						<b:Row>
+							<b:Column size="XS_12">
+								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10 margin-left-10"/>
+							</b:Column>
 							<b:Column size="XS_12">
 								<bh:Div ui:field="threadMessage"></bh:Div>
 							</b:Column>

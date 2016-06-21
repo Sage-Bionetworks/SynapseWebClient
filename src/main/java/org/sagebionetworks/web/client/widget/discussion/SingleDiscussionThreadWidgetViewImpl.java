@@ -19,7 +19,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,20 +36,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Span threadTitle;
 	@UiField
 	Div threadMessage;
-	@UiField
-	Span activeUsers;
-	@UiField
-	Span numberOfReplies;
-	@UiField
-	Span numberOfViews;
-	@UiField
-	Span lastActivity;
-	@UiField
-	FocusPanel showThread;
-	@UiField
-	Div threadDetails;
-	@UiField
-	Div replyDetails;
 	@UiField
 	Span author;
 	@UiField
@@ -78,8 +63,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Label edited;
 	@UiField
-	Span threadAuthor;
-	@UiField
 	Span subscribeButtonContainer;
 	@UiField
 	Div threadButtonContainer;
@@ -89,8 +72,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Icon unpinIcon;
 	@UiField
 	Icon pinIcon;
-	@UiField
-	Icon pinnedIcon;
 	@UiField
 	Label moderatorBadge;
 	@UiField
@@ -107,12 +88,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.loadMore();
-			}
-		});
-		showThread.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickThread();
 			}
 		});
 		replyButton.addClickHandler(new ClickHandler(){
@@ -169,9 +144,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void clear() {
 		threadTitle.clear();
-		activeUsers.clear();
-		numberOfReplies.clear();
-		lastActivity.clear();
 		createdOn.clear();
 		replyListContainer.clear();
 	}
@@ -184,21 +156,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setMarkdownWidget(Widget widget) {
 		threadMessage.add(widget);
-	}
-
-	@Override
-	public void setNumberOfReplies(String numberOfReplies, String descriptiveText) {
-		this.numberOfReplies.setText(numberOfReplies);
-	}
-
-	@Override
-	public void setNumberOfViews(String numberOfViews) {
-		this.numberOfViews.setText(numberOfViews);
-	}
-
-	@Override
-	public void setLastActivity(String lastActivity) {
-		this.lastActivity.setText(lastActivity);
 	}
 
 	@Override
@@ -227,34 +184,8 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void showReplyDetails() {
-		replyDetails.setVisible(true);
-	}
-
-	@Override
-	public void hideReplyDetails() {
-		replyDetails.setVisible(false);
-	}
-
-	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
-	}
-
-	@Override
-	public void addActiveAuthor(Widget user) {
-		activeUsers.add(user);
-	}
-
-	@Override
-	public boolean isThreadCollapsed() {
-		return threadDetails.isVisible();
-	}
-
-
-	@Override
-	public boolean isReplyCollapsed() {
-		return replyDetails.isVisible();
 	}
 
 	@Override
@@ -314,21 +245,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setThreadAuthor(Widget widget){
-		threadAuthor.add(widget);
-	}
-
-	@Override
-	public void showThreadDetails() {
-		threadDetails.setVisible(true);
-	}
-
-	@Override
-	public void hideThreadDetails() {
-		threadDetails.setVisible(false);
-	}
-
-	@Override
 	public void setThreadLink(String link){
 		threadLinkHref = link;
 	}
@@ -356,11 +272,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setPinIconVisible(boolean visible) {
 		pinIcon.setVisible(visible);
-	}
-	
-	@Override
-	public void setPinnedIconVisible(boolean visible) {
-		pinnedIcon.setVisible(visible);
 	}
 	
 	@Override
