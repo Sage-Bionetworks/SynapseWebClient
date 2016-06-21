@@ -18,6 +18,10 @@ public interface TableEntityWidgetView extends IsWidget {
 		 * Called when the schema is shown or hidden.
 		 */
 		void onSchemaToggle(boolean shown);
+		/**
+		 * Called when the view scope is shown or hidden.
+		 */
+		void onScopeToggle(boolean shown);
 	}
 	
 	/**
@@ -97,5 +101,11 @@ public interface TableEntityWidgetView extends IsWidget {
 	 */
 	public void toggleSchema();
 
+	/**
+	 * Show or hide the view scope.
+	 */
+	public void toggleScope();
+
+	void setScopeVisible(boolean visible);
 
 }

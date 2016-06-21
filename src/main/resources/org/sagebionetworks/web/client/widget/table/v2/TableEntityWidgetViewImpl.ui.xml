@@ -10,6 +10,13 @@
 				<b:PanelBody ui:field="columnDetailsPanel" />
 			</b:Panel>
 		</b:Collapse>
+		
+		<b:Collapse b:id="editScopeCollapse" toggle="false" ui:field="scopeCollapse" visible="false">
+			<b:Panel>
+				<b:PanelBody ui:field="scopePanel" />
+			</b:Panel>
+		</b:Collapse>
+		
 
 		<b:Alert ui:field="tableMessage" type="INFO" />
 

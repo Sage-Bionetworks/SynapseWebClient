@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -54,6 +55,7 @@ public class TableEntityWidget implements IsWidget,
 	String tableId;
 	TableBundle tableBundle;
 	boolean canEdit, canEditResults;
+	boolean isView;
 	QueryChangeHandler queryChangeHandler;
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
@@ -97,6 +99,7 @@ public class TableEntityWidget implements IsWidget,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
+		this.isView = table instanceof EntityView;
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
@@ -118,6 +121,7 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, isView);
 		this.actionMenu.setBasicDivderVisible(canEditResults);
 		// Listen to action events.
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
@@ -144,6 +148,14 @@ public class TableEntityWidget implements IsWidget,
 				view.toggleSchema();
 			}
 		});
+		
+		this.actionMenu.setActionListener(Action.TOGGLE_VIEW_SCOPE, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				view.toggleScope();
+			}
+		});
+
 	}
 
 	/**

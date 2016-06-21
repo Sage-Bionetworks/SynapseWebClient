@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.repo.model.EntityBundle;
 
@@ -35,7 +36,12 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	Collapse schemaCollapse;
 	@UiField
+	Collapse scopeCollapse;
+
+	@UiField
 	PanelBody columnDetailsPanel;
+	@UiField
+	PanelBody scopePanel;
 	@UiField
 	Alert tableMessage;
 	@UiField
@@ -49,15 +55,18 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
+	EntityContainerListWidget scopeWidget;
 	Presenter presenter;
 
 	@Inject
 	public TableEntityWidgetViewImpl(final Binder uiBinder,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector, EntityContainerListWidget scopeWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
 		this.columnDetailsPanel.add(this.columnModelsWidget.asWidget());
+		this.scopeWidget = scopeWidget;
+		this.scopePanel.add(scopeWidget.asWidget());
 	}
 
 	@Override
@@ -74,6 +83,20 @@ public class TableEntityWidgetViewImpl extends Composite implements
 			@Override
 			public void onHidden(HiddenEvent event) {
 				presenter.onSchemaToggle(false);
+			}
+		});
+		
+		this.scopeCollapse.addShownHandler(new ShownHandler() {
+			@Override
+			public void onShown(ShownEvent event) {
+				presenter.onScopeToggle(true);
+				
+			}
+		});
+		this.scopeCollapse.addHiddenHandler(new HiddenHandler() {
+			@Override
+			public void onHidden(HiddenEvent event) {
+				presenter.onScopeToggle(false);
 			}
 		});
 	}
@@ -137,5 +160,14 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	public void toggleSchema() {
 		this.schemaCollapse.toggle();
 	}
-
+	
+	@Override
+	public void toggleScope() {
+		this.scopeCollapse.toggle();
+	}
+	
+	@Override
+	public void setScopeVisible(boolean visible) {
+		scopeCollapse.setVisible(visible);
+	}
 }
