@@ -206,7 +206,7 @@
 			        <compileReport>true</compileReport>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
-			        <extraJvmArgs>-Xmx1536m -Xms1024m -XX:PermSize=128m -XX:MaxPermSize=256m</extraJvmArgs>
+			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
