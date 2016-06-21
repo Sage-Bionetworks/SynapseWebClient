@@ -62,7 +62,10 @@
 				</g:HTMLPanel>
 			</bh:Div>
 			<bh:Div ui:field="threadButtonContainer" width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
-				<b:Button ui:field="loadMoreButton" addStyleNames="margin-top-5" visible="false">Load more replies</b:Button>
+				<g:HTMLPanel ui:field="loadMore" visible="false">
+					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+					&nbsp;Loading...
+				</g:HTMLPanel>
 				<b:Button ui:field="replyButton" addStyleNames="margin-top-5" icon="MAIL_REPLY">Reply</b:Button>
 			</bh:Div>
 		</bh:Div>

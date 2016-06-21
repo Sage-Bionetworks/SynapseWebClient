@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.discussion;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -475,7 +476,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).clearReplies();
 		verify(mockView).setLoadingRepliesVisible(true);
 		verify(mockView).setLoadingRepliesVisible(false);
-		verify(mockView).setLoadMoreButtonVisibility(false);
+		verify(mockView).setLoadMoreVisibility(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -529,7 +530,7 @@ public class SingleDiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
-		verify(mockView).setLoadMoreButtonVisibility(true);
+		verify(mockView).setLoadMoreVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setLoadingRepliesVisible(true);
@@ -694,6 +695,63 @@ public class SingleDiscussionThreadWidgetTest {
 		AsyncMockStubber.callSuccessWith(bundle)
 		.when(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.reconfigureThread();
+	}
+
+	@Test
+	public void testCheckForInViewAndLoadDataNotAttached() {
+		when(mockView.isLoadMoreAttached()).thenReturn(false);
+		discussionThreadWidget.checkForInViewAndLoadData();
+		verify(mockGwtWrapper, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testCheckForInViewAndLoadDataAttachedNotInViewport() {
+		when(mockView.isLoadMoreAttached()).thenReturn(true);
+		when(mockView.isLoadMoreInViewport()).thenReturn(false);
+		discussionThreadWidget.checkForInViewAndLoadData();
+		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testCheckForInViewAndLoadDataAttachedNotVisible() {
+		when(mockView.isLoadMoreAttached()).thenReturn(true);
+		when(mockView.isLoadMoreInViewport()).thenReturn(true);
+		when(mockView.getLoadMoreVisibility()).thenReturn(false);
+		discussionThreadWidget.checkForInViewAndLoadData();
+		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testCheckForInViewAndLoadDataAttachedVisible() {
+		when(mockView.isLoadMoreAttached()).thenReturn(true);
+		when(mockView.isLoadMoreInViewport()).thenReturn(false);
+		when(mockView.getLoadMoreVisibility()).thenReturn(true);
+		discussionThreadWidget.checkForInViewAndLoadData();
+		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testCheckForInViewAndLoadDataAttachedInViewAndVisible() {
+		when(mockView.isLoadMoreAttached()).thenReturn(true);
+		when(mockView.isLoadMoreInViewport()).thenReturn(true);
+		when(mockView.getLoadMoreVisibility()).thenReturn(true);
+		discussionThreadWidget.checkForInViewAndLoadData();
+		verify(mockGwtWrapper, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,

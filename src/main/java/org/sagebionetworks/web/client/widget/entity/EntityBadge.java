@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -35,7 +36,6 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPresenter {
 	
-	public static final int DELAY_UNTIL_IN_VIEW = 2000;
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityQueryResult entityHeader;
@@ -88,7 +88,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			getEntityBundle();
 		} else {
 			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DELAY_UNTIL_IN_VIEW);
+			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
 		}
 	}
 	@Override
