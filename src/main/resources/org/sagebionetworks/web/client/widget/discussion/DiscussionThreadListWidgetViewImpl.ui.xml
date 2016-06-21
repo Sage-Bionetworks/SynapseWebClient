@@ -10,9 +10,9 @@
 		<bh:Div ui:field="threadCountAlertContainer"/>
 		<b:Row>
 			<b:Column size="XS_12">
-				<bh:Div addStyleNames="padding-10 light-border-bottom">
-					<!-- Thread header -->
-					<t:Table ui:field="threadHeader" width="100%">
+				<!-- Thread header -->
+				<bh:Div ui:field="threadHeader" addStyleNames="padding-10 light-border-bottom">
+					<t:Table width="100%">
 						<t:TableRow>
 							<t:TableHeader>
 								<bh:Span text="Topic"/>
