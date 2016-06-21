@@ -89,6 +89,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			@Override
 			public void invoke(Boolean param) {
 				view.setDefaultThreadWidgetVisible(!param);
+				view.setThreadListUIVisible(param);
 			}
 		};
 		Callback refreshThreadsCallback = new Callback() {
