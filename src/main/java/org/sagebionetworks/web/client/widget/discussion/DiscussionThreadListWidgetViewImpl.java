@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,7 +25,7 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@UiField
 	Div threadCountAlertContainer;
 	@UiField
-	Button loadMoreButton;
+	HTMLPanel loadMore;
 	@UiField
 	HTMLPanel loadingUI;
 
@@ -45,14 +45,6 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Inject
 	public DiscussionThreadListWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		loadMoreButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.loadMore();
-			}
-		});
-
 		sortByReplies.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -100,7 +92,7 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 
 	@Override
 	public void setLoadMoreButtonVisibility(boolean visible) {
-		loadMoreButton.setVisible(visible);
+		loadMore.setVisible(visible);
 	}
 
 	@Override
@@ -117,5 +109,20 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Override
 	public void setThreadHeaderVisible(boolean visible){
 		threadHeader.setVisible(visible);
+	}
+
+	@Override
+	public boolean isLoadMoreAttached() {
+		return loadMore.isAttached();
+	}
+
+	@Override
+	public boolean isLoadMoreInViewport() {
+		return DisplayUtils.isInViewport(loadMore.asWidget());
+	}
+
+	@Override
+	public boolean getLoadMoreVisibility() {
+		return loadMore.isVisible();
 	}
 }
