@@ -91,7 +91,7 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	}
 
 	@Override
-	public void setLoadMoreButtonVisibility(boolean visible) {
+	public void setLoadMoreVisibility(boolean visible) {
 		loadMore.setVisible(visible);
 	}
 
