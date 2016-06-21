@@ -49,10 +49,12 @@
 				</g:HTMLPanel>
 			</b:Column>
 			<b:Column size="XS_12" ui:field="threadListContainer" />
-			<g:HTMLPanel ui:field="loadMore" visible="false">
-				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-				&nbsp;Loading...
-			</g:HTMLPanel>
+			<b:Column size="XS_12">
+				<g:HTMLPanel ui:field="loadMore" visible="false">
+					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+					&nbsp;Loading...
+				</g:HTMLPanel>
+			</b:Column>
 		</b:Row>
 		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>
