@@ -107,6 +107,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						if (emptyListCallback != null) {
 							emptyListCallback.invoke(numberOfThreads > 0);
 						};
+						view.setThreadHeaderVisible(numberOfThreads > 0);
 					}
 		});
 	}
