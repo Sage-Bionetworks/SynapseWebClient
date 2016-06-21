@@ -130,7 +130,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						offset += LIMIT;
 						long numberOfThreads = result.getTotalNumberOfResults();
 						view.setLoadingVisible(false);
-						view.setLoadMoreButtonVisibility(offset < numberOfThreads);
+						view.setLoadMoreVisibility(offset < numberOfThreads);
 						if (emptyListCallback != null) {
 							emptyListCallback.invoke(numberOfThreads > 0);
 						};

@@ -144,7 +144,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadListItemWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
-		verify(mockView).setLoadMoreButtonVisibility(false);
+		verify(mockView).setLoadMoreVisibility(false);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
@@ -170,7 +170,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView, never()).addThread(any(Widget.class));
 		verify(mockGinInjector, never()).createThreadListItemWidget();
 		verify(mockDiscussionThreadWidget, never()).configure(any(DiscussionThreadBundle.class));
-		verify(mockView).setLoadMoreButtonVisibility(false);
+		verify(mockView).setLoadMoreVisibility(false);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
@@ -197,7 +197,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadListItemWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
-		verify(mockView).setLoadMoreButtonVisibility(true);
+		verify(mockView).setLoadMoreVisibility(true);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
