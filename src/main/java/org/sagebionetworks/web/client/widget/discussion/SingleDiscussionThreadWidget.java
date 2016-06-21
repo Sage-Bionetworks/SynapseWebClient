@@ -154,6 +154,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				reconfigureThread();
 			}
 		});
+
+		configureMessage();
+		configureReplies();
+		watchReplyCount();
 	}
 	
 	/**
@@ -189,9 +193,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setButtonContainerWidth(INDENTATION_WIDTH);
 		}
 
-		configureMessage();
-		configureReplies();
-		watchReplyCount();
 	}
 	
 	@Override
