@@ -19,10 +19,10 @@
 						<b:ButtonGroup>
 		    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
 			    		    <b:DropDownMenu addStyleNames="dropdown-menu-right">
-								<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false">Invite User</b:AnchorListItem>
-								<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false">Edit Team</b:AnchorListItem>
-								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false">Delete Team</b:AnchorListItem>
-								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false">Leave Team</b:AnchorListItem>
+								<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false" text="Invite User" />
+								<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false" text="Edit Team" />
+								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false" text="Delete Team" />
+								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" /> 
 				    		</b:DropDownMenu>
 		    		    </b:ButtonGroup>
 					</b:ButtonToolBar>
