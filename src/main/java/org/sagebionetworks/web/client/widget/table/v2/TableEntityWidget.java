@@ -53,7 +53,7 @@ public class TableEntityWidget implements IsWidget,
 	EntityBundle entityBundle;
 	String tableId;
 	TableBundle tableBundle;
-	boolean canEdit;
+	boolean canEdit, canEditResults;
 	QueryChangeHandler queryChangeHandler;
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
@@ -100,6 +100,8 @@ public class TableEntityWidget implements IsWidget,
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
+		// SWC-3125: Editing EntityView query results is currently blocked.
+		this.canEditResults = table instanceof TableEntity && canEdit;
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
 		this.uploadTableModalWidget.configure(table.getParentId(), tableId);
@@ -112,13 +114,11 @@ public class TableEntityWidget implements IsWidget,
 	 * Setup the actions for this widget.
 	 */
 	private void configureActions() {
-		Entity table = entityBundle.getEntity();
-		boolean isEditableTable = table instanceof TableEntity && canEdit;
-		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, isEditableTable);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, isEditableTable);
+		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		this.actionMenu.setBasicDivderVisible(isEditableTable);
+		this.actionMenu.setBasicDivderVisible(canEditResults);
 		// Listen to action events.
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
@@ -249,7 +249,7 @@ public class TableEntityWidget implements IsWidget,
 	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		// Pass this along to the input widget.
 		this.queryInputWidget.queryExecutionFinished(wasSuccessful, resultsEditable);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEdit && resultsEditable);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEditResults && resultsEditable);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful && canEdit);
 	
 		// Set this as the query if it was successful
