@@ -21,7 +21,7 @@
 					<b:Container fluid="true">
 						<b:Row>
 							<b:Column size="XS_12">
-								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"/>
+								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10 margin-left-10"/>
 							</b:Column>
 							<b:Column size="XS_12">
 								<bh:Div ui:field="threadMessage"></bh:Div>
