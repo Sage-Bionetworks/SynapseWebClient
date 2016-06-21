@@ -79,6 +79,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private String projectId;
 	private Callback refreshCallback;
 	private Set<Long> moderatorIds;
+	private Callback invokeCheckForInViewAndLoadData;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -158,8 +159,28 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		configureMessage();
 		configureReplies();
 		watchReplyCount();
+		invokeCheckForInViewAndLoadData = new Callback() {
+			@Override
+			public void invoke() {
+				checkForInViewAndLoadData();
+			}
+		};
+		checkForInViewAndLoadData();
 	}
-	
+
+	public void checkForInViewAndLoadData() {
+		if (!view.isLoadMoreAttached()) {
+			//Done, view has been detached and widget was never in the viewport
+			return;
+		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility()) {
+			//try to load data!
+			loadMore();
+		} else {
+			//wait for a few seconds and see if we should load data
+			gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+		}
+	}
+
 	/**
 	 * After configuring this widget, call this method to pop up an alert when the thread etag changes upstream.
 	 */
@@ -339,7 +360,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 							}
 						}
 						view.setLoadingRepliesVisible(false);
-						view.setLoadMoreButtonVisibility(offset < result.getTotalNumberOfResults());
+						view.setLoadMoreVisibility(offset < result.getTotalNumberOfResults());
 					}
 		});
 	}
