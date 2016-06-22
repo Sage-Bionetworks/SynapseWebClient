@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -201,6 +202,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
+		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
+		
 	}
 
 	@SuppressWarnings("unchecked")
