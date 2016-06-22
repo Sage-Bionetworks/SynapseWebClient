@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -136,11 +136,9 @@ public class QueryResultEditorWidgetTest {
 	public void testOnEdit(){
 		widget.showEditor(bundle, mockCallback);
 		verify(mockView).setErrorMessageVisible(false);
-		verify(mockView).setEditorPanelVisible(true);
-		verify(mockView).setProgressPanelVisible(false);
-		verify(mockView, never()).scrollProgressIntoView();
+		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
-		verify(mockView).showEditor();
+		verify(mockView, times(2)).showEditor();
 		verify(mockGlobalState).setIsEditing(true);
 		verify(mockGlobalState, never()).setIsEditing(false);
 	}
@@ -220,9 +218,8 @@ public class QueryResultEditorWidgetTest {
 		verify(mockGlobalState, never()).setIsEditing(false);
 		verify(mockView, never()).hideEditor();
 		verify(mockView).setErrorMessageVisible(true);
-		verify(mockView).setEditorPanelVisible(true);
-		verify(mockView).setProgressPanelVisible(false);
-		verify(mockView, never()).scrollProgressIntoView();
+		verify(mockView).showEditor();
+		verify(mockView).hideProgress();
 		verify(mockView).showErrorMessage(QueryResultEditorWidget.SEE_THE_ERRORS_ABOVE);
 		verify(mockView).setSaveButtonLoading(false);
 		// callback should not be invoked
@@ -246,15 +243,14 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView, never()).setErrorMessageVisible(true);
 		verify(mockView, never()).showErrorMessage(anyString());
 		// while the job is running the editor should not be visible
-		verify(mockView).setEditorPanelVisible(false);
+		verify(mockView, times(2)).hideEditor();
 		// progress should be visible while the job runs.
-		verify(mockView).setProgressPanelVisible(true);
-		verify(mockView).scrollProgressIntoView();
+		verify(mockView).showProgress();
 		
 		// The editor should be hidden and the callback invoked
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
-		verify(mockView).hideEditor();
+		
 		// The callback should be invoked
 		verify(mockCallback).invoke();
 	}
@@ -276,13 +272,13 @@ public class QueryResultEditorWidgetTest {
 		// start with button loading
 		verify(mockView).setSaveButtonLoading(true);
 		// while the job is running the editor should not be visible
-		verify(mockView).setEditorPanelVisible(false);
+		verify(mockView).hideEditor();
 		// progress should be visible while the job runs.
-		verify(mockView).setProgressPanelVisible(true);
+		verify(mockView).showProgress();
 		// After the job fails the editor should be visible
-		verify(mockView).setEditorPanelVisible(false);
+		verify(mockView).hideEditor();
 		// After the job fails the progress should not be visible
-		verify(mockView).setProgressPanelVisible(false);
+		verify(mockView).hideProgress();
 		
 		verify(mockView).setErrorMessageVisible(true);
 		verify(mockView).showErrorMessage(error);
@@ -291,8 +287,6 @@ public class QueryResultEditorWidgetTest {
 		
 		// still editing when fails.
 		verify(mockGlobalState, never()).setIsEditing(false);
-		// no hide on error
-		verify(mockView, never()).hideEditor();
 		verify(mockCallback, never()).invoke();
 	}
 	
@@ -313,14 +307,13 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView, never()).setErrorMessageVisible(true);
 		verify(mockView, never()).showErrorMessage(anyString());
 		// while the job is running the editor should not be visible
-		verify(mockView).setEditorPanelVisible(false);
+		verify(mockView, times(2)).hideEditor();
 		// progress should be visible while the job runs.
-		verify(mockView).setProgressPanelVisible(true);
+		verify(mockView).showProgress();
 		
 		// The editor should be hidden and the callback invoked
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
-		verify(mockView).hideEditor();
 		// The callback should be invoked
 		verify(mockCallback).invoke();
 	}

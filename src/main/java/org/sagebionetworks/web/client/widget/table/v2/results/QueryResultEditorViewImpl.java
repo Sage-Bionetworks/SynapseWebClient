@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -61,7 +60,10 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	Modal editRowsModal;
 	@UiField
 	Button cancelButton;
-	
+	@UiField
+	Modal inProgressModal;
+	@UiField
+	Button cancelProgressButton;
 	Presenter presenter;
 	Widget widget;
 	
@@ -134,6 +136,12 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 				presenter.onCancel();
 			}
 		});
+		cancelProgressButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCancel();	
+			}
+		});
 	}
 
 	@Override
@@ -168,16 +176,6 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	}
 
 	@Override
-	public void setEditorPanelVisible(boolean visible) {
-		this.editorPanel.setVisible(visible);
-	}
-
-	@Override
-	public void setProgressPanelVisible(boolean visible) {
-		this.progressPanel.setVisible(visible);
-	}
-	
-	@Override
 	public void showConfirmDialog(String message, final Callback callback) {
 		Bootbox.confirm(message, new ConfirmCallback() {
 			@Override
@@ -209,7 +207,11 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	}
 	
 	@Override
-	public void scrollProgressIntoView() {
-		progressPanel.getElement().scrollIntoView();
+	public void hideProgress() {
+		inProgressModal.hide();
+	}
+	@Override
+	public void showProgress() {
+		inProgressModal.show();	
 	}
 }

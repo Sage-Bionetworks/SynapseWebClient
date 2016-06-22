@@ -94,16 +94,15 @@ public interface QueryResultEditorView extends IsWidget {
 	public void setProgressWidget(IsWidget progress);
 
 	/**
-	 * Show/hide the editor panel.
-	 * @param b
+	 * Show the progress dialog.
+	 * 
 	 */
-	public void setEditorPanelVisible(boolean visible);
-
+	public void showProgress();
 	/**
-	 * Show/hide the editor panel.
-	 * @param visible
+	 * Hide the progress dialog.
+	 * 
 	 */
-	public void setProgressPanelVisible(boolean visible);
+	public void hideProgress();
 	
 	/**
 	 * Show a confirm dialog.
@@ -132,6 +131,4 @@ public interface QueryResultEditorView extends IsWidget {
 	 */
 	void hideEditor();
 	
-	void scrollProgressIntoView();
-
 }
