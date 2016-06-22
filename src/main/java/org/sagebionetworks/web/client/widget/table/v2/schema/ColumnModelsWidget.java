@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
@@ -52,6 +54,12 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.baseView.setViewer(this.viewer);
 		this.baseView.setEditor(this.editor);
 		this.synapseClient = synapseClient;
+		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
+			@Override
+			public void invoke() {
+				getDefaultColumnsForView();
+			}
+		});
 	}
 
 	@Override
@@ -61,6 +69,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
+		editor.setAddDefaultViewColumnsButtonVisible(isEditable && bundle.getEntity() instanceof EntityView);
 		for(ColumnModel cm: startingModels){
 			// Create a viewer
 			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
@@ -70,6 +79,21 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		}
 	}
 
+	public void getDefaultColumnsForView() {
+		baseView.hideErrors();
+		org.sagebionetworks.repo.model.table.ViewType type = ((EntityView)bundle.getEntity()).getType(); 
+		synapseClient.getDefaultColumnsForView(type, new AsyncCallback<List<ColumnModel>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				baseView.showError(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(List<ColumnModel> columns) {
+				editor.addColumns(columns);
+			}
+		});
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return baseView.asWidget();
