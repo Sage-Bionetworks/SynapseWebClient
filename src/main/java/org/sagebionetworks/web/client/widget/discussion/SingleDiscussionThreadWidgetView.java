@@ -46,8 +46,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void clearReplies();
 
-	void setLoadingRepliesVisible(boolean visible);
-
 	void setDeleteIconVisible(boolean visible);
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);

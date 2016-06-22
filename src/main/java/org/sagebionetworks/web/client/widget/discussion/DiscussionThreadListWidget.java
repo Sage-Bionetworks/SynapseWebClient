@@ -106,14 +106,14 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 	public void loadMore() {
 		synAlert.clear();
-		view.setLoadingVisible(true);
+		view.setLoadMoreVisibility(true);
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset,
 				order, ascending, DEFAULT_FILTER,
 				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.setLoadingVisible(false);
+						view.setLoadMoreVisibility(false);
 						synAlert.handleException(caught);
 					}
 
@@ -128,7 +128,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						
 						offset += LIMIT;
 						long numberOfThreads = result.getTotalNumberOfResults();
-						view.setLoadingVisible(false);
 						view.setLoadMoreVisibility(offset < numberOfThreads);
 						if (offset < numberOfThreads) {
 							gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);

@@ -42,16 +42,10 @@
 					</t:Table>
 				</bh:Div>
 			</b:Column>
-			<b:Column size="XS_12" >
-				<g:HTMLPanel ui:field="loadingUI" addStyleNames="center-block center margin-top-20">
-					<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
-					&nbsp;Loading...
-				</g:HTMLPanel>
-			</b:Column>
 			<b:Column size="XS_12" ui:field="threadListContainer" />
 			<b:Column size="XS_12">
-				<g:HTMLPanel ui:field="loadMore" visible="false">
-					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+				<g:HTMLPanel ui:field="loadMore" addStyleNames="center-block center margin-top-20">
+					<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
 					&nbsp;Loading...
 				</g:HTMLPanel>
 			</b:Column>

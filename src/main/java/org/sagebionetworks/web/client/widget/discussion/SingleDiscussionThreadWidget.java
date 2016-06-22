@@ -332,14 +332,14 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	@Override
 	public void loadMore() {
 		synAlert.clear();
-		view.setLoadingRepliesVisible(true);
+		view.setLoadMoreVisibility(true);
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset,
 				order, ascending, DEFAULT_FILTER,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.setLoadingRepliesVisible(false);
+						view.setLoadMoreVisibility(false);
 						synAlert.handleException(caught);
 					}
 
@@ -359,7 +359,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 								view.addReply(replyWidget.asWidget());
 							}
 						}
-						view.setLoadingRepliesVisible(false);
 						view.setLoadMoreVisibility(offset < result.getTotalNumberOfResults());
 						if (offset < result.getTotalNumberOfResults()) {
 							gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);

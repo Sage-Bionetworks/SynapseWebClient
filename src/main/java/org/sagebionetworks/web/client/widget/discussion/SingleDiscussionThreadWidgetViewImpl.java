@@ -51,8 +51,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Div refreshAlertContainer;
 	@UiField
-	HTMLPanel loadingReplies;
-	@UiField
 	HTMLPanel loadingMessage;
 	@UiField
 	Icon deleteIcon;
@@ -179,11 +177,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
-	}
-
-	@Override
-	public void setLoadingRepliesVisible(boolean visible) {
-		loadingReplies.setVisible(visible);
 	}
 
 	@Override
