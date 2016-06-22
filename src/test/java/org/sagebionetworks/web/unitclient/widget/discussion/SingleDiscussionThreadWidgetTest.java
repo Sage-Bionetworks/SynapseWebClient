@@ -446,8 +446,8 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).clearReplies();
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
-		verify(mockView).setLoadingRepliesVisible(true);
-		verify(mockView).setLoadingRepliesVisible(false);
+		verify(mockView).setLoadMoreVisibility(true);
+		verify(mockView).setLoadMoreVisibility(false);
 		verify(mockView).setDeleteIconVisible(false);
 	}
 
@@ -475,8 +475,7 @@ public class SingleDiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
-		verify(mockView).setLoadingRepliesVisible(true);
-		verify(mockView).setLoadingRepliesVisible(false);
+		verify(mockView).setLoadMoreVisibility(true);
 		verify(mockView).setLoadMoreVisibility(false);
 	}
 
@@ -503,9 +502,8 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView, never()).addReply(any(Widget.class));
 		verify(mockGinInjector, never()).createReplyWidget();
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setLoadingRepliesVisible(true);
-		verify(mockView).setLoadingRepliesVisible(false);
-		verify(mockView).setDeleteIconVisible(false);
+		verify(mockView).setLoadMoreVisibility(true);
+		verify(mockView).setLoadMoreVisibility(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -531,11 +529,9 @@ public class SingleDiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView).clearReplies();
-		verify(mockView).setLoadMoreVisibility(true);
 		verify(mockView, times(2)).addReply(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
-		verify(mockView).setLoadingRepliesVisible(true);
-		verify(mockView).setLoadingRepliesVisible(false);
+		verify(mockView, times(2)).setLoadMoreVisibility(true);
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
 	}

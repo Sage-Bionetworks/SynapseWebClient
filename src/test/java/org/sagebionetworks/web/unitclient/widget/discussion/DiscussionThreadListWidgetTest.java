@@ -145,9 +145,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadListItemWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
+		verify(mockView).setLoadMoreVisibility(true);
 		verify(mockView).setLoadMoreVisibility(false);
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
 		verify(mockView).setThreadHeaderVisible(true);
 	}
@@ -171,9 +170,8 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView, never()).addThread(any(Widget.class));
 		verify(mockGinInjector, never()).createThreadListItemWidget();
 		verify(mockDiscussionThreadWidget, never()).configure(any(DiscussionThreadBundle.class));
+		verify(mockView).setLoadMoreVisibility(true);
 		verify(mockView).setLoadMoreVisibility(false);
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
 		verify(mockView).setThreadHeaderVisible(false);
 	}
@@ -198,9 +196,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockView).addThread(any(Widget.class));
 		verify(mockGinInjector).createThreadListItemWidget();
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
-		verify(mockView).setLoadMoreVisibility(true);
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
+		verify(mockView, times(2)).setLoadMoreVisibility(true);
 		verify(mockEmptyListCallback).invoke(anyBoolean());
 		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
 		
@@ -223,8 +219,8 @@ public class DiscussionThreadListWidgetTest {
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockView).setLoadingVisible(true);
-		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setLoadMoreVisibility(true);
+		verify(mockView).setLoadMoreVisibility(false);
 	}
 
 	@SuppressWarnings("unchecked")

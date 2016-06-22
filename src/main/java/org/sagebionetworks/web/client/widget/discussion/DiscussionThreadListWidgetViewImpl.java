@@ -26,8 +26,6 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	Div threadCountAlertContainer;
 	@UiField
 	HTMLPanel loadMore;
-	@UiField
-	HTMLPanel loadingUI;
 
 	@UiField
 	FocusPanel sortByReplies;
@@ -95,11 +93,6 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 		loadMore.setVisible(visible);
 	}
 
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
-	}
-	
 	@Override
 	public void setThreadCountAlert(Widget w) {
 		threadCountAlertContainer.clear();
