@@ -54,6 +54,9 @@
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
+			<bh:Div ui:field="threadButtonContainer" width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
+				<b:Button ui:field="replyButton" addStyleNames="margin-top-5" icon="MAIL_REPLY">Reply</b:Button>
+			</bh:Div>
 			<bh:Div ui:field="replyDetails">
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 				<g:HTMLPanel ui:field="loadingReplies">
@@ -61,12 +64,11 @@
 					&nbsp;Loading...
 				</g:HTMLPanel>
 			</bh:Div>
-			<bh:Div ui:field="threadButtonContainer" width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
+			<bh:Div width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
 				<g:HTMLPanel ui:field="loadMore" visible="false">
 					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 					&nbsp;Loading...
 				</g:HTMLPanel>
-				<b:Button ui:field="replyButton" addStyleNames="margin-top-5" icon="MAIL_REPLY">Reply</b:Button>
 			</bh:Div>
 		</bh:Div>
 		<g:SimplePanel ui:field="newReplyModalContainer"/>
