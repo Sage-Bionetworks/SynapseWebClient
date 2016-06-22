@@ -66,17 +66,16 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.moderatorIds = moderatorIds;
 		offset = 0L;
 		this.forumId = forumId;
-		loadMore();
-		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
-		view.setThreadCountAlert(threadCountAlert.asWidget());
-		threadCountAlert.configure(forumId);
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
 			public void invoke() {
 				checkForInViewAndLoadData();
 			}
 		};
-		checkForInViewAndLoadData();
+		loadMore();
+		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
+		view.setThreadCountAlert(threadCountAlert.asWidget());
+		threadCountAlert.configure(forumId);
 	}
 
 	public void checkForInViewAndLoadData() {
@@ -131,6 +130,9 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						long numberOfThreads = result.getTotalNumberOfResults();
 						view.setLoadingVisible(false);
 						view.setLoadMoreVisibility(offset < numberOfThreads);
+						if (offset < numberOfThreads) {
+							gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+						}
 						if (emptyListCallback != null) {
 							emptyListCallback.invoke(numberOfThreads > 0);
 						};

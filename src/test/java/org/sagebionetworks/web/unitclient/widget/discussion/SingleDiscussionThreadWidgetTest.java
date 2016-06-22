@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -536,6 +537,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setLoadingRepliesVisible(true);
 		verify(mockView).setLoadingRepliesVisible(false);
 		verify(mockView).setDeleteIconVisible(false);
+		verify(mockGwtWrapper).scheduleExecution(any(Callback.class), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
 	}
 
 	@SuppressWarnings("unchecked")

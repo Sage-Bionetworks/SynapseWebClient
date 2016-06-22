@@ -155,17 +155,17 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				reconfigureThread();
 			}
 		});
-
-		configureMessage();
-		configureReplies();
-		watchReplyCount();
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
 			public void invoke() {
 				checkForInViewAndLoadData();
 			}
 		};
-		checkForInViewAndLoadData();
+
+		configureMessage();
+		configureReplies();
+		watchReplyCount();
+
 	}
 
 	public void checkForInViewAndLoadData() {
@@ -361,6 +361,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 						}
 						view.setLoadingRepliesVisible(false);
 						view.setLoadMoreVisibility(offset < result.getTotalNumberOfResults());
+						if (offset < result.getTotalNumberOfResults()) {
+							gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+						}
 					}
 		});
 	}
