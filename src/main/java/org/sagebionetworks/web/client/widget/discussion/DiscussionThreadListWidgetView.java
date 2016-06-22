@@ -20,9 +20,13 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 
 	void setAlert(Widget w);
 
-	void setLoadMoreButtonVisibility(boolean visible);
-
-	void setLoadingVisible(boolean visible);
+	void setLoadMoreVisibility(boolean visible);
 
 	void setThreadHeaderVisible(boolean visible);
+
+	boolean isLoadMoreAttached();
+
+	boolean isLoadMoreInViewport();
+
+	boolean getLoadMoreVisibility();
 }

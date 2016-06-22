@@ -42,11 +42,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setAlert(Widget w);
 
-	void setLoadMoreButtonVisibility(boolean visible);
+	void setLoadMoreVisibility(boolean visible);
 
 	void clearReplies();
-
-	void setLoadingRepliesVisible(boolean visible);
 
 	void setDeleteIconVisible(boolean visible);
 
@@ -78,4 +76,10 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setPinIconVisible(boolean visible);
 	void setUnpinIconVisible(boolean visible);
 	void setIsAuthorModerator(boolean isModerator);
+
+	boolean isLoadMoreInViewport();
+
+	boolean getLoadMoreVisibility();
+
+	boolean isLoadMoreAttached();
 }

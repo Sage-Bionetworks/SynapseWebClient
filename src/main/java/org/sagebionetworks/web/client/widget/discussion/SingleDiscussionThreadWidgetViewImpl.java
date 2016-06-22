@@ -41,7 +41,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Span createdOn;
 	@UiField
-	Button loadMoreButton;
+	HTMLPanel loadMore;
 	@UiField
 	Button replyButton;
 	@UiField
@@ -50,8 +50,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Div synAlertContainer;
 	@UiField
 	Div refreshAlertContainer;
-	@UiField
-	HTMLPanel loadingReplies;
 	@UiField
 	HTMLPanel loadingMessage;
 	@UiField
@@ -83,13 +81,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Inject
 	public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		loadMoreButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.loadMore();
-			}
-		});
 		replyButton.addClickHandler(new ClickHandler(){
 
 			@Override
@@ -179,18 +170,13 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setLoadMoreButtonVisibility(boolean visible) {
-		loadMoreButton.setVisible(visible);
+	public void setLoadMoreVisibility(boolean visible) {
+		loadMore.setVisible(visible);
 	}
 
 	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
-	}
-
-	@Override
-	public void setLoadingRepliesVisible(boolean visible) {
-		loadingReplies.setVisible(visible);
 	}
 
 	@Override
@@ -287,5 +273,20 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setCommandsVisible(boolean visible) {
 		commandsContainer.setVisible(visible);
+	}
+
+	@Override
+	public boolean isLoadMoreAttached() {
+		return loadMore.isAttached();
+	}
+
+	@Override
+	public boolean isLoadMoreInViewport() {
+		return DisplayUtils.isInViewport(loadMore.asWidget());
+	}
+
+	@Override
+	public boolean getLoadMoreVisibility() {
+		return loadMore.isVisible();
 	}
 }
