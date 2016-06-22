@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.table.EntityView;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -104,8 +105,13 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
+		scopeWidget.configure(entityContainerIds, canEdit);
 	}
 
+	@Override
+	public void configureScope(boolean isEditable) {
+		
+	}
 
 	@Override
 	public void setQueryResultsVisible(boolean visible) {

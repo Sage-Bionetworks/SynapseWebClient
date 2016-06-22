@@ -337,6 +337,15 @@ public class TableEntityWidget implements IsWidget,
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 		}
 	}
+	
+	@Override
+	public void onScopeToggle(boolean shown) {
+		if(shown){
+			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_DOWN);
+		}else{
+			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_RIGHT);
+		}
+	}
 
 	@Override
 	public void onStartingNewQuery(Query newQuery) {
