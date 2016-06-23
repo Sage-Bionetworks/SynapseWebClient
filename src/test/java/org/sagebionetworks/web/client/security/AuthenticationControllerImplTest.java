@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,7 +50,6 @@ public class AuthenticationControllerImplTest {
 	SessionStorage mockSessionStorage;
 	@Mock
 	ClientCache mockClientCache;
-	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	@Before
@@ -94,6 +94,7 @@ public class AuthenticationControllerImplTest {
 		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("");
 		assertFalse(authenticationController.isLoggedIn());
+		
 	}
 	
 	@Test
@@ -126,6 +127,14 @@ public class AuthenticationControllerImplTest {
 		// logged in
 		authenticationController.revalidateSession("token", callback);
 		assertEquals(principalId, authenticationController.getCurrentUserPrincipalId());	
+		
+		//try updating the cached profile (verify it updates the local storage cached value).
+		reset(mockClientCache);
+		UserProfile updatedProfile = new UserProfile();
+		updatedProfile.setOwnerId("888888888");
+		authenticationController.updateCachedProfile(updatedProfile);
+		assertEquals(updatedProfile, authenticationController.getCurrentUserSessionData().getProfile());
+		verify(mockClientCache).put(eq(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY), anyString(), anyLong());
 		
 		// empty user profile
 		sessionData.setProfile(null);

@@ -10,17 +10,13 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 /**
@@ -151,6 +147,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile){
 		if(currentUser != null) {
 			currentUser.setProfile(updatedProfile);
+			Date tomorrow = DateUtils.getDayFromNow();
+			localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 		}
 	}
 	
