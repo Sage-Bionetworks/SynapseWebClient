@@ -1041,7 +1041,7 @@ public class SynapseClientImplTest {
 		// verify call is directly calling the synapse client provider, and it
 		// tries to rename the entity to the filename
 		String myFileName = "testFileName.csv";
-		String testUrl = "http://mytesturl/" + myFileName;
+		String testUrl = "  http://mytesturl/" + myFileName;
 		String testId = "myTestId";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		Long fileSize=2048L;
@@ -1061,7 +1061,7 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
 		ExternalFileHandle capturedValue = captor.getValue();
-		assertEquals(testUrl, capturedValue.getExternalURL());
+		assertEquals(testUrl.trim(), capturedValue.getExternalURL());
 		assertEquals(md5, capturedValue.getContentMd5());
 //		assertEquals(fileSize, capturedValue.getContentSize());
 		
@@ -1090,7 +1090,7 @@ public class SynapseClientImplTest {
 	public void testCreateExternalFile() throws Exception {
 		// test setting file handle name
 		String parentEntityId = "syn123333";
-		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String externalUrl = "  sftp://foobar.edu/b/test.txt";
 		String fileName = "testing.txt";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		Long fileSize = 1024L;
@@ -1107,7 +1107,7 @@ public class SynapseClientImplTest {
 		ExternalFileHandle handle = captor.getValue();
 		// verify name is set
 		assertEquals(fileName, handle.getFileName());
-		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(externalUrl.trim(), handle.getExternalURL());
 		assertEquals(storageLocationId, handle.getStorageLocationId());
 		assertEquals(md5, handle.getContentMd5());
 //		assertEquals(fileSize, handle.getContentSize());
