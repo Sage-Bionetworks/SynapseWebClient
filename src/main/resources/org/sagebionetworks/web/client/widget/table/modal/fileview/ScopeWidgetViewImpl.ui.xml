@@ -9,7 +9,7 @@
 		<g:SimplePanel ui:field="viewScopeContainer" />
 		<b:Button ui:field="editButton" icon="EDIT" addStyleNames="margin-top-10" visible="false" text="Edit Scope" type="INFO"/>
 		
-		<b:Modal ui:field="editModal" title="Edit Columns" closable="true"
+		<b:Modal ui:field="editModal" title="Edit Scope" closable="true"
 			fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="editScopeModal"
 			size="LARGE">
 			<b:ModalBody>
