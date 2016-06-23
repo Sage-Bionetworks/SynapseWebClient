@@ -22,7 +22,7 @@
 				</t:Table>
 				<g:FlowPanel ui:field="editorsPanel"/>
 				<b:Button ui:field="addAnnotationButton" icon="PLUS" type="INFO">Add Annotation</b:Button>
-				<b:Alert type="DANGER" ui:field="alert" visible="false" title="Error"/>
+				<b:Alert type="DANGER" ui:field="alert" visible="false" title="Error" addStyleNames="margin-top-10"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="saveButton" type="PRIMARY"
