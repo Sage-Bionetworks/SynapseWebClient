@@ -1,16 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import java.util.List;
-
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,7 +53,8 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	EntityBundle bundle;
 	EntityUpdatedHandler updateHandler;
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
-	
+	SynapseAlert synAlert;
+	EntityView currentView;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -65,17 +63,31 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	public ScopeWidget(ScopeWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			EntityContainerListWidget viewScopeWidget, 
-			EntityContainerListWidget editScopeWidget){
+			EntityContainerListWidget editScopeWidget,
+			SynapseAlert synAlert){
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.viewScopeWidget = viewScopeWidget;
 		this.editScopeWidget = editScopeWidget;
+		this.synAlert = synAlert;
+		
+		view.setPresenter(this);
+		view.setEditableEntityListWidget(editScopeWidget.asWidget());
+		view.setEntityListWidget(viewScopeWidget.asWidget());
+		view.setSynAlert(synAlert.asWidget());
 	}
 
 	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
 		this.isEditable = isEditable;
 		this.bundle = bundle;
 		this.updateHandler = updateHandler;
+		boolean isVisible = bundle.getEntity() instanceof EntityView;
+		if (isVisible) {
+			currentView = (EntityView) bundle.getEntity();
+			viewScopeWidget.configure(currentView.getScopeIds(), false);
+			view.setEditButtonVisible(isEditable);
+		}
+		view.setVisible(isVisible);
 	}
 
 	@Override
@@ -86,5 +98,24 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	@Override
 	public void onSave() {
 		// update scope
+		currentView.setScopeIds(editScopeWidget.getEntityIds());
+		synapseClient.updateEntity(currentView, new AsyncCallback<Entity>() {
+			@Override
+			public void onSuccess(Entity entity) {
+				view.hideModal();
+				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
+	
+	@Override
+	public void onEdit() {
+		// configure edit list, and show modal
+		editScopeWidget.configure(currentView.getScopeIds(), true);
+		view.showModal();
 	}
 }

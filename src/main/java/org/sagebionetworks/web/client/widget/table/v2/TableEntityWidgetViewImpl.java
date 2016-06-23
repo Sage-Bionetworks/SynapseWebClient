@@ -8,11 +8,11 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -42,7 +42,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	PanelBody columnDetailsPanel;
 	@UiField
-	PanelBody scopePanel;
+	Div scopePanel;
 	@UiField
 	Alert tableMessage;
 	@UiField
@@ -56,18 +56,19 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
-	EntityContainerListWidget scopeWidget;
+	ScopeWidget scopeWidget;
 	Presenter presenter;
 
 	@Inject
 	public TableEntityWidgetViewImpl(final Binder uiBinder,
-			PortalGinInjector ginInjector, EntityContainerListWidget scopeWidget) {
+			PortalGinInjector ginInjector, ScopeWidget scopeWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
 		this.columnDetailsPanel.add(this.columnModelsWidget.asWidget());
 		this.scopeWidget = scopeWidget;
 		this.scopePanel.add(scopeWidget.asWidget());
+		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");
 	}
 
 	@Override
@@ -105,12 +106,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
-		scopeWidget.configure(entityContainerIds, canEdit);
-	}
-
-	@Override
-	public void configureScope(boolean isEditable) {
-		
+		this.scopeWidget.configure(bundle, isEditable, this.presenter);
 	}
 
 	@Override

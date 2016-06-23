@@ -11,12 +11,17 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface ScopeWidgetView extends IsWidget {
 
 	void setVisible(boolean visible);
-	void setEntityListWidget(IsWidget entityListWidget);
-	void setEditableEntityListWidget(IsWidget entityListWidget);
-	void showEditScopeModal();
+	void setEntityListWidget(IsWidget w);
+	void setEditableEntityListWidget(IsWidget w);
+	void setSynAlert(IsWidget w);
+	
+	void showModal();
+	void hideModal();
+	void setEditButtonVisible(boolean visible);
 	
 	public interface Presenter {
 		void onSave();
+		void onEdit();
 	}
 	void setPresenter(Presenter presenter);
 }

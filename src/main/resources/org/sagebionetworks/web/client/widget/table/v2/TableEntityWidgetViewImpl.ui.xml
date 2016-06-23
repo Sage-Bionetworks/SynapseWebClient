@@ -11,10 +11,8 @@
 			</b:Panel>
 		</b:Collapse>
 		
-		<b:Collapse b:id="editScopeCollapse" toggle="false" ui:field="scopeCollapse" visible="false">
-			<b:Panel>
-				<b:PanelBody ui:field="scopePanel" />
-			</b:Panel>
+		<b:Collapse b:id="editScopeCollapse" toggle="false" ui:field="scopeCollapse" addStyleNames="padding-bottom-15">
+			<bh:Div ui:field="scopePanel" addStyleNames="highlight-box" />
 		</b:Collapse>
 		
 
