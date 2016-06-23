@@ -20,7 +20,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -174,7 +174,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (area == null) {
 			if (entity instanceof Project) {
 				area = EntityArea.WIKI;
-			} else if (entity instanceof TableEntity) {
+			} else if (entity instanceof Table) {
 				area = EntityArea.TABLES;
 			} else if (entity instanceof DockerRepository) {
 				area = EntityArea.DOCKER;
