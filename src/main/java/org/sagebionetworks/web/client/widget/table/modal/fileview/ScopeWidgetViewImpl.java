@@ -88,4 +88,14 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 		editButton.setVisible(visible);
 	}
 	
+	@Override
+	public void setLoading(boolean loading) {
+		if(!loading){
+			this.saveButton.state().reset();
+		}else{
+			this.saveButton.state().loading();
+		}
+	}
+
+	
 }

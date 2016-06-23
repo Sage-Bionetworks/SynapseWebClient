@@ -18,7 +18,7 @@ import com.google.inject.Inject;
  * 
  *  
 
-Scope Widget design
+Scope Widget - these are the UI output elements in this widget:
 
 +-------------------------------------------+
 |Scope                                      |
@@ -30,7 +30,7 @@ Scope Widget design
 | +----+                                    |
 +------------------------------------+------+
    |                                 ^
-   | onEdit (show modal)             | onSave
+   | onEdit (show modal)             | onSave (update view scope)
    v                                 |
 +--+---------------------------------+------+
 |Edit Scope (modal)                         |
@@ -98,15 +98,19 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	@Override
 	public void onSave() {
 		// update scope
+		synAlert.clear();
+		view.setLoading(true);
 		currentView.setScopeIds(editScopeWidget.getEntityIds());
 		synapseClient.updateEntity(currentView, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
+				view.setLoading(false);
 				view.hideModal();
 				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoading(false);
 				synAlert.handleException(caught);
 			}
 		});

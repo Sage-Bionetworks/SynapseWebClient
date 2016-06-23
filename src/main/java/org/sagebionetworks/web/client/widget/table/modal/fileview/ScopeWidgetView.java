@@ -18,6 +18,7 @@ public interface ScopeWidgetView extends IsWidget {
 	void showModal();
 	void hideModal();
 	void setEditButtonVisible(boolean visible);
+	void setLoading(boolean loading);
 	
 	public interface Presenter {
 		void onSave();
