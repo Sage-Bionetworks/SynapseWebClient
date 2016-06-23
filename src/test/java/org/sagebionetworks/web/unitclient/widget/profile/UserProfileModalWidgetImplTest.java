@@ -2,7 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.profile;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -11,10 +13,13 @@ import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalView;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,16 +31,21 @@ public class UserProfileModalWidgetImplTest {
 	SynapseClientAsync mockSynapse;
 	Callback mockCallback;
 	UserProfileModalWidgetImpl widget;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	ClientCache mockClientCache;
 	
 	UserProfile profile;
 	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(UserProfileModalView.class);
 		mockEditorWidget = Mockito.mock(UserProfileEditorWidget.class);
 		mockSynapse = Mockito.mock(SynapseClientAsync.class);
 		mockCallback = Mockito.mock(Callback.class);
-		widget = new UserProfileModalWidgetImpl(mockView, mockEditorWidget, mockSynapse);
+		widget = new UserProfileModalWidgetImpl(mockView, mockEditorWidget, mockSynapse, mockAuthController, mockClientCache);
 		
 		profile = new UserProfile();
 		profile.setOwnerId("123");
@@ -108,6 +118,8 @@ public class UserProfileModalWidgetImplTest {
 		verify(mockView).setProcessing(true);
 		verify(mockCallback).invoke();
 		verify(mockView).hideModal();
+		verify(mockClientCache).remove(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
+		verify(mockAuthController).updateCachedProfile(profile);
 	}
 	
 	@Test
