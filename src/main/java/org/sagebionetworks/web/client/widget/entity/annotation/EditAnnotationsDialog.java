@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -119,23 +119,27 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		for (AnnotationEditor annotationEditor : annotationEditors) {
 			updatedAnnotationsList.add(annotationEditor.getUpdatedAnnotation());
 		}
-		transformer.updateAnnotationsFromList(annotationsCopy, updatedAnnotationsList);
-		
-		synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo("Successfully updated the annotations", "");
-				view.hideEditor();
-				if (updateHandler != null) {
-					updateHandler.onPersistSuccess(new EntityUpdatedEvent());
-				}
-			}
+		try {
+			transformer.updateAnnotationsFromList(annotationsCopy, updatedAnnotationsList);
 			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showError(caught.getMessage());
-			}
-		});
+			synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					view.showInfo("Successfully updated the annotations", "");
+					view.hideEditor();
+					if (updateHandler != null) {
+						updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showError(caught.getMessage());
+				}
+			});
+		} catch (DuplicateKeyException e) {
+			view.showError(e.getMessage());
+		}
 	}
 	
 	public Widget asWidget() {
