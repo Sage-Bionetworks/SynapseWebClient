@@ -115,10 +115,10 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
@@ -329,8 +329,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
-import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeView;
@@ -355,6 +353,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWid
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
@@ -475,6 +475,8 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
@@ -1289,5 +1291,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
 		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
 		bind(StuAnnouncementWidgetView.class).to(StuAnnouncementWidgetViewImpl.class);
+		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
 	}
 }

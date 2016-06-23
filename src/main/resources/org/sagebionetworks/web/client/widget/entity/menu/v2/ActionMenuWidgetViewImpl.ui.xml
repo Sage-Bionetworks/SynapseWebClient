@@ -13,6 +13,9 @@
 				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA">Schema</a:ActionButton>
 			</b:ButtonGroup>
 			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_VIEW_SCOPE">Scope</a:ActionButton>
+			</b:ButtonGroup>
+			<b:ButtonGroup>
 				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_ANNOTATIONS">Annotations</a:ActionButton>
 			</b:ButtonGroup>
 			<b:ButtonGroup>

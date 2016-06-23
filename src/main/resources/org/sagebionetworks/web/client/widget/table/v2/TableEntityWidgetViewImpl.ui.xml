@@ -5,12 +5,16 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
+		<b:Collapse b:id="editScopeCollapse" toggle="false" ui:field="scopeCollapse" addStyleNames="padding-bottom-15">
+			<bh:Div ui:field="scopePanel" addStyleNames="highlight-box" />
+		</b:Collapse>
+		
 		<b:Collapse b:id="editSchemaCollapse" toggle="false" ui:field="schemaCollapse">
 			<b:Panel>
 				<b:PanelBody ui:field="columnDetailsPanel" />
 			</b:Panel>
 		</b:Collapse>
-
+		
 		<b:Alert ui:field="tableMessage" type="INFO" />
 
 		<g:SimplePanel ui:field="queryInputPanel" />
