@@ -72,11 +72,11 @@ public class WikiSubpageNavigationTreeTest {
 		c.setParentId("1");
 
 		d.setId("3");
-		d.setTitle("D");
+		d.setTitle(null);
 		d.setParentId("0");
 
 		e.setId("4");
-		e.setTitle("E");
+		e.setTitle("");
 		e.setParentId("0");
 
 		currentWikiKey = new WikiPageKey();
@@ -221,9 +221,11 @@ public class WikiSubpageNavigationTreeTest {
 		assertTrue(cNode.getPageTitle().equals("C"));
 
 		assertTrue(dNode.getChildren().isEmpty());
-		assertTrue(dNode.getPageTitle().equals("D"));
+		// D has a null title, should use it's ID
+		assertTrue(dNode.getPageTitle().equals("3"));
 
 		assertTrue(eNode.getChildren().isEmpty());
-		assertTrue(eNode.getPageTitle().equals("E"));
+		// E has an empty string for a title, should use it's ID
+		assertTrue(eNode.getPageTitle().equals("4"));
 	}
 }

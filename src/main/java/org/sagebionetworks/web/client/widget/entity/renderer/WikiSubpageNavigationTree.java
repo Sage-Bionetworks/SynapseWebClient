@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -54,7 +55,12 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 				isCurrentWikiRoot = currentWikiKey.getWikiPageId() == null || currentWikiKey.getWikiPageId().equals(header.getId());
 			} else {
 				targetPlace = WikiSubpagesWidget.getLinkPlace(currentWikiKey.getOwnerObjectId(), currentWikiKey.getVersion(), header.getId(), isEmbeddedInOwnerPage);
-				pageTitle = header.getTitle();
+				if (DisplayUtils.isDefined(header.getTitle())){
+					pageTitle = header.getTitle();	
+				} else {
+					pageTitle = header.getId();
+				}
+				
 			}
 			WikiPageKey wikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), header.getId(), currentWikiKey.getVersion());
 
