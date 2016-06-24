@@ -1051,7 +1051,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			}
 
 			ExternalFileHandle efh = new ExternalFileHandle();
-			efh.setExternalURL(externalUrl);
+			efh.setExternalURL(externalUrl.trim());
 			efh.setContentMd5(md5);
 			efh.setContentSize(fileSize);
 			efh.setStorageLocationId(storageLocationId);
@@ -1079,7 +1079,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			FileEntity newEntity = new FileEntity();
 			ExternalFileHandle efh = new ExternalFileHandle();
-			efh.setExternalURL(externalUrl);
+			efh.setExternalURL(externalUrl.trim());
 			efh.setContentMd5(md5);
 			efh.setContentSize(fileSize);
 			String fileName;
