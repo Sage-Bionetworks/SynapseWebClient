@@ -7,11 +7,9 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DateUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -27,7 +25,6 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	DiscussionForumClientAsync discussionForumClient;
 	GlobalApplicationState globalApplicationState;
 	ClientCache clientCache;
-	CookieProvider cookies;
 	public static final String STU_ANNOUNCEMENTS_FORUM_ID_KEY = "org.sagebionetworks.portal.stu_announcements_forum_id";
 	public static final String STU_ANNOUNCEMENTS_PROJECT_ID_KEY = "org.sagebionetworks.portal.stu_announcements_project_id";
 	public static final String STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY = "org.sagebionetworks.portal.stu_announcement_clicked_";
@@ -40,51 +37,46 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 			SynapseJSNIUtils synapseJSNIUtils,
 			DiscussionForumClientAsync discussionForumClient,
 			GlobalApplicationState globalApplicationState,
-			ClientCache clientCache, 
-			CookieProvider cookies
+			ClientCache clientCache
 			) {
 		this.view = view;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.discussionForumClient = discussionForumClient;
 		this.globalApplicationState = globalApplicationState;
 		this.clientCache = clientCache;
-		this.cookies = cookies;
 		view.setPresenter(this);
-		initStuAnnouncement();
 	}
 
-	public void initStuAnnouncement() {
+	public void init() {
 		view.hide();
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			String forumId = globalApplicationState.getSynapseProperty(STU_ANNOUNCEMENTS_FORUM_ID_KEY);
-			Long limit = 1L;
-			Long offset = 0L;
-			boolean ascending = false;
-			discussionForumClient.getThreadsForForum(forumId, 
-					limit, 
-					offset, 
-					DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY, 
-					ascending, 
-					DiscussionFilter.EXCLUDE_DELETED,
-					new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
-	
-				@Override
-				public void onFailure(Throwable caught) {
-					synapseJSNIUtils.consoleError(caught.getMessage());
-				}
-	
-				@Override
-				public void onSuccess(PaginatedResults<DiscussionThreadBundle> threads) {
-					if (threads.getResults().size() > 0) {
-						DiscussionThreadBundle bundle = threads.getResults().get(0);
-						announcementThreadId = bundle.getId();
-						if (isShowAnnouncement(bundle)) {
-							view.show(bundle.getTitle());	
-						}
+		String forumId = globalApplicationState.getSynapseProperty(STU_ANNOUNCEMENTS_FORUM_ID_KEY);
+		Long limit = 1L;
+		Long offset = 0L;
+		boolean ascending = false;
+		discussionForumClient.getThreadsForForum(forumId, 
+				limit, 
+				offset, 
+				DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY, 
+				ascending, 
+				DiscussionFilter.EXCLUDE_DELETED,
+				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synapseJSNIUtils.consoleError(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<DiscussionThreadBundle> threads) {
+				if (threads.getResults().size() > 0) {
+					DiscussionThreadBundle bundle = threads.getResults().get(0);
+					announcementThreadId = bundle.getId();
+					if (isShowAnnouncement(bundle)) {
+						view.show(bundle.getTitle());	
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 	
 	/**
