@@ -51,6 +51,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setProjectFavoriteWidget(favWidget);
 		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		view.setPresenter(this);
+		stuAnnouncementWidget.init();
 		initStagingAlert();
 	}
 	

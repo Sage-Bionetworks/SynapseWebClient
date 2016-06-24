@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -21,40 +21,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.SynapseForumPlace;
-import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 
@@ -74,8 +55,6 @@ public class StuAnnouncementWidgetTest {
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
-	CookieProvider mockCookies;
-	@Mock
 	StuAnnouncementWidget mockStuAnnouncementWidget;
 	@Mock
 	PaginatedResults<DiscussionThreadBundle> mockThreadBundlePage;
@@ -92,7 +71,7 @@ public class StuAnnouncementWidgetTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new StuAnnouncementWidget(mockView, mockSynapseJSNIUtils, mockDiscussionForumClient, mockGlobalApplicationState, mockClientCache, mockCookies);
+		widget = new StuAnnouncementWidget(mockView, mockSynapseJSNIUtils, mockDiscussionForumClient, mockGlobalApplicationState, mockClientCache);
 		discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
 			.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
@@ -108,13 +87,11 @@ public class StuAnnouncementWidgetTest {
 		when(mockDiscussionThreadBundle.getId()).thenReturn(announcementThreadId);
 		when(mockDiscussionThreadBundle.getTitle()).thenReturn(announcementTitle);
 		when(mockClientCache.contains(anyString())).thenReturn(false);
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(widget);
-		verify(mockView).hide();
 	}
 
 	@Test
@@ -126,7 +103,8 @@ public class StuAnnouncementWidgetTest {
 	@Test
 	public void testInitStuAnnouncement() {
 		discussionThreadBundleList.add(mockDiscussionThreadBundle);
-		widget.initStuAnnouncement();
+		widget.init();
+		verify(mockView).hide();
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
@@ -137,7 +115,7 @@ public class StuAnnouncementWidgetTest {
 	public void testInitStuAnnouncementInCache() {
 		when(mockClientCache.contains(anyString())).thenReturn(true);
 		discussionThreadBundleList.add(mockDiscussionThreadBundle);
-		widget.initStuAnnouncement();
+		widget.init();
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
@@ -148,7 +126,7 @@ public class StuAnnouncementWidgetTest {
 	public void testInitStuAnnouncementNotStu() {
 		when(mockDiscussionThreadBundle.getCreatedBy()).thenReturn("different-user-id");
 		discussionThreadBundleList.add(mockDiscussionThreadBundle);
-		widget.initStuAnnouncement();
+		widget.init();
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
@@ -161,7 +139,7 @@ public class StuAnnouncementWidgetTest {
 		CalendarUtil.addMonthsToDate(monthAgo, -1);
 		when(mockDiscussionThreadBundle.getModifiedOn()).thenReturn(monthAgo);
 		discussionThreadBundleList.add(mockDiscussionThreadBundle);
-		widget.initStuAnnouncement();
+		widget.init();
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
@@ -178,7 +156,7 @@ public class StuAnnouncementWidgetTest {
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	
 		discussionThreadBundleList.add(mockDiscussionThreadBundle);
-		widget.initStuAnnouncement();
+		widget.init();
 		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
@@ -193,7 +171,7 @@ public class StuAnnouncementWidgetTest {
 		verify(mockClientCache).put(stringCaptor.capture(), eq(Boolean.TRUE.toString()), anyLong());
 		String capturedKey = stringCaptor.getValue();
 		assertTrue(capturedKey.startsWith(StuAnnouncementWidget.STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY));
-		verify(mockView, times(2)).hide();
+		verify(mockView).hide();
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
 	}
 	
@@ -204,7 +182,7 @@ public class StuAnnouncementWidgetTest {
 		verify(mockClientCache).put(stringCaptor.capture(), eq(Boolean.TRUE.toString()), anyLong());
 		String capturedKey = stringCaptor.getValue();
 		assertTrue(capturedKey.startsWith(StuAnnouncementWidget.STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY));
-		verify(mockView, times(2)).hide();
+		verify(mockView).hide();
 		verifyZeroInteractions(mockPlaceChanger);
 	}
 

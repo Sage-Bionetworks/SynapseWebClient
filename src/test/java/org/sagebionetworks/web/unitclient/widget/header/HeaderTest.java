@@ -85,6 +85,7 @@ public class HeaderTest {
 	public void testSetPresenter() {
 		verify(mockView).setPresenter(header);
 		verify(mockView).setStagingAlertVisible(false);
+		verify(mockStuAnnouncementWidget).init();
 	}
 
 	@Test
