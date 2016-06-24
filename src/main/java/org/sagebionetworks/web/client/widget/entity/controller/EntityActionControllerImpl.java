@@ -862,8 +862,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				String confirmMessage;
 				if (parentWikiId == null) {
 					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES;
-				} else {
+				} else if (DisplayUtils.isDefined(page.getTitle())){
 					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page \""+page.getTitle()+"\" and all subpages?";
+				} else {
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page ID "+page.getId()+" and all subpages?";
 				}
 				view.showConfirmDialog(CONFIRM_DELETE_TITLE, confirmMessage, new Callback() {
 					@Override

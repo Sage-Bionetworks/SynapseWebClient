@@ -559,6 +559,30 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testOnDeleteWikiPageNullTitle(){
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		// the call under test
+		when(mockWikiPageToDelete.getTitle()).thenReturn(null);
+		controller.onAction(Action.DELETE_WIKI_PAGE);
+		ArgumentCaptor<String> confirmMessageCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showConfirmDialog(anyString(), confirmMessageCaptor.capture(), any(Callback.class));
+		//verify confirmation message contains the wiki title being deleted
+		assertTrue(confirmMessageCaptor.getValue().contains(wikiPageId));
+	}
+	
+	@Test
+	public void testOnDeleteWikiPageEmptyTitle(){
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		// the call under test
+		when(mockWikiPageToDelete.getTitle()).thenReturn("");
+		controller.onAction(Action.DELETE_WIKI_PAGE);
+		ArgumentCaptor<String> confirmMessageCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showConfirmDialog(anyString(), confirmMessageCaptor.capture(), any(Callback.class));
+		//verify confirmation message contains the wiki title being deleted
+		assertTrue(confirmMessageCaptor.getValue().contains(wikiPageId));
+	}
+	
+	@Test
 	public void testOnDeleteWikiPageConfirmedDeleteSuccess(){
 		// confirm the delete
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
