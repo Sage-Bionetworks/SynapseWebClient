@@ -60,7 +60,10 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	Modal editRowsModal;
 	@UiField
 	Button cancelButton;
-	
+	@UiField
+	Modal inProgressModal;
+	@UiField
+	Button cancelProgressButton;
 	Presenter presenter;
 	Widget widget;
 	
@@ -133,6 +136,12 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 				presenter.onCancel();
 			}
 		});
+		cancelProgressButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCancel();	
+			}
+		});
 	}
 
 	@Override
@@ -167,16 +176,6 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	}
 
 	@Override
-	public void setEditorPanelVisible(boolean visible) {
-		this.editorPanel.setVisible(visible);
-	}
-
-	@Override
-	public void setProgressPanelVisible(boolean visible) {
-		this.progressPanel.setVisible(visible);
-	}
-	
-	@Override
 	public void showConfirmDialog(String message, final Callback callback) {
 		Bootbox.confirm(message, new ConfirmCallback() {
 			@Override
@@ -206,5 +205,13 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void hideEditor() {
 		editRowsModal.hide();
 	}
-
+	
+	@Override
+	public void hideProgress() {
+		inProgressModal.hide();
+	}
+	@Override
+	public void showProgress() {
+		inProgressModal.show();	
+	}
 }
