@@ -90,8 +90,7 @@
 						<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
 							<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Getting Started" />
 							<b:Heading size="H6" text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. " />
-							<b:Heading size="H6" text="This tutorial steps you through how to create your first Project, store your research data, share with your collaborators, and more!" />
-							<b:Button text="Open the tutorial" />
+							<b:Button text="Open the guide" />
 						</b:Panel>
 					</g:FocusPanel>
 				</b:Column>
@@ -113,8 +112,9 @@
 												<g:Image resource='{sageImageBundle.logoR45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="R client" />
-												<b:Anchor href="http://r-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="http://r-docs.synapse.org/" target="_blank" text="R client"/>
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -128,8 +128,9 @@
 												<g:Image resource='{sageImageBundle.logoPython45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Python client" />
-												<b:Anchor href="http://docs.synapse.org/python/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="http://docs.synapse.org/python/" target="_blank" text="Python client"/>
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -143,8 +144,9 @@
 												<g:Image resource='{sageImageBundle.logoCommandLine45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Command line client" />
-												<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" target="_blank" text="Command line client"/>												
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -158,8 +160,9 @@
 												<g:Image resource='{sageImageBundle.logoJava45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Java client" />
-												<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" target="_blank" text="Java client"/>
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
