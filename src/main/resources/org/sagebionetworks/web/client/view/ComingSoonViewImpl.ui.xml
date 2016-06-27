@@ -17,7 +17,7 @@
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="header" />
-		<w:HelpWidget text="Optional help link text" help="This contains concise but basic help." href="http://link/to/more/help" />
+		<w:HelpWidget text="Optional help link text" help="This contains concise but basic help." href="http://link/to/more/help" placement="BOTTOM" />
 		
 		<g:SimplePanel ui:field="fileHandleListContainer" />
 		
