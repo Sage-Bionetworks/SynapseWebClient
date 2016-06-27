@@ -44,7 +44,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	CallbackP<ParameterizedToken> paramChangeCallback;
 	Callback urlChangeCallback;
 	CallbackP<Boolean> emptyListCallback;
-	Boolean isSingleThread;
+	Boolean isSingleThread = false;
 	SubscribeButtonWidget subscribeToForumButton;
 	Set<Long> moderatorIds;
 
