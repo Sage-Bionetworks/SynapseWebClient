@@ -21,15 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
  * In your ui.xml, add the help widget.
  * ```
  * xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
- * <w:HelpWidget ui:field="helpWidget" />
- * ```
- * 
- * In your code, bind it and configure.
- * ```
- * @UiField
- * HelpWidget helpWidget;
- * ...
- * helpWidget.configure(helpLinkText, basicHelp, fullHelpHref);
+ * <w:HelpWidget text="Optional help link text" help="This contains concise but basic help." href="http://link/to/more/help" />
  * ```
  * 
  * That's it!
