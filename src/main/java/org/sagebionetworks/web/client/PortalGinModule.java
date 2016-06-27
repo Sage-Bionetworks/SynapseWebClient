@@ -117,12 +117,14 @@ import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
@@ -1252,7 +1254,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);
 		bind(ReplyModalView.class).to(ReplyModalViewImpl.class);
 		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
-		bind(DiscussionThreadWidgetView.class).to(DiscussionThreadWidgetViewImpl.class);
+		bind(DiscussionThreadListItemWidgetView.class).to(DiscussionThreadListItemWidgetViewImpl.class);
+		bind(SingleDiscussionThreadWidgetView.class).to(SingleDiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
 		bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
 

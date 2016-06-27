@@ -1,13 +1,15 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,9 +25,17 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@UiField
 	Div threadCountAlertContainer;
 	@UiField
-	Button loadMoreButton;
+	HTMLPanel loadMore;
+
 	@UiField
-	HTMLPanel loadingUI;
+	FocusPanel sortByReplies;
+	@UiField
+	FocusPanel sortByViews;
+	@UiField
+	FocusPanel sortByActivity;
+	@UiField
+	Div threadHeader;
+
 
 	Widget widget;
 	private DiscussionThreadListWidget presenter;
@@ -33,11 +43,22 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Inject
 	public DiscussionThreadListWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		loadMoreButton.addClickHandler(new ClickHandler() {
-
+		sortByReplies.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.loadMore();
+				presenter.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+			}
+		});
+		sortByViews.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+			}
+		});
+		sortByActivity.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 			}
 		});
 	}
@@ -68,18 +89,33 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	}
 
 	@Override
-	public void setLoadMoreButtonVisibility(boolean visible) {
-		loadMoreButton.setVisible(visible);
+	public void setLoadMoreVisibility(boolean visible) {
+		loadMore.setVisible(visible);
 	}
 
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
-	}
-	
 	@Override
 	public void setThreadCountAlert(Widget w) {
 		threadCountAlertContainer.clear();
 		threadCountAlertContainer.add(w);
 	};
+
+	@Override
+	public void setThreadHeaderVisible(boolean visible){
+		threadHeader.setVisible(visible);
+	}
+
+	@Override
+	public boolean isLoadMoreAttached() {
+		return loadMore.isAttached();
+	}
+
+	@Override
+	public boolean isLoadMoreInViewport() {
+		return DisplayUtils.isInViewport(loadMore.asWidget());
+	}
+
+	@Override
+	public boolean getLoadMoreVisibility() {
+		return loadMore.isVisible();
+	}
 }

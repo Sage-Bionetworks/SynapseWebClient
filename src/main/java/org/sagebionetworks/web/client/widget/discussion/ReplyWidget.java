@@ -80,7 +80,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(DiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setDeleteIconVisibility(isCurrentUserModerator);

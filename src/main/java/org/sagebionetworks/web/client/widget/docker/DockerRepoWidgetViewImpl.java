@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -14,7 +15,7 @@ import com.google.inject.Inject;
 
 public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@UiField
-	Div dockerRepoWikiPageContainer;
+	PanelBody dockerRepoWikiPageContainer;
 	@UiField
 	Div dockerRepoProvenanceContainer;
 	@UiField
