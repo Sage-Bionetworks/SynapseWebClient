@@ -102,7 +102,7 @@
 						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
 						   all from the comfort of your own code." />
 						<b:Heading size="H6" text="Don't see your language of choice here? Check out our full&nbsp;">
-							<b:Anchor href="http://rest.synapse.org" text="REST API documentation" target="_blank"/>
+							<b:Anchor href="http://docs.synapse.org/rest/" text="REST API documentation" target="_blank"/>
 						</b:Heading>
 						<b:Row>
 							<b:Column size="SM_3">
@@ -130,7 +130,7 @@
 											</t:TableData>
 											<t:TableData>
 												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Python client" />
-												<b:Anchor href="http://python-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
+												<b:Anchor href="http://docs.synapse.org/python/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
 												<b:Anchor href="#!Help:PythonClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
 											</t:TableData>
 										</t:TableRow>
