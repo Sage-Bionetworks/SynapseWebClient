@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
@@ -177,6 +178,24 @@ public class SingleDiscussionThreadWidgetTest {
 	}
 
 	@Test
+	public void testConfigureDefaultThread() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		String threadId = "1";
+		when(mockGlobalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY)).thenReturn(threadId);
+		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, moderatorIds, mockCallback);
+		verify(mockGinInjector, never()).getReplyCountAlert();
+		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@Test
 	public void testConfigureSingleThread() {
 		boolean isDeleted = false;
 		boolean canModerate = false;
@@ -190,7 +209,25 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).configure(threadId);
 	}
 
-	
+	@Test
+	public void testConfigureWithZeroReplies(){
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, canModerate, moderatorIds, mockCallback);
+		verify(mockView).clear();
+		verify(mockView).setTitle("title");
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
+		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView).setDeleteIconVisible(false);
+		verify(mockView).setButtonContainerWidth(NO_INDENTATION_WIDTH);
+	}
+
 	@Test
 	public void testConfigureIsAuthorModerator() {
 		boolean isDeleted = false;
@@ -356,27 +393,6 @@ public class SingleDiscussionThreadWidgetTest {
 		discussionThreadWidget.onClickUnpinThread();
 		verify(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
-	}
-	
-
-
-	@Test
-	public void testConfigureWithZeroReplies(){
-		boolean isDeleted = false;
-		boolean canModerate = false;
-		boolean isEdited = false;
-		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
-				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
-				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, canModerate, moderatorIds, mockCallback);
-		verify(mockView).clear();
-		verify(mockView).setTitle("title");
-		verify(mockView).setCreatedOn(anyString());
-		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
-		verify(mockAuthorWidget).configure(anyString());
-		verify(mockView).setDeleteIconVisible(false);
-		verify(mockView).setButtonContainerWidth(NO_INDENTATION_WIDTH);
 	}
 
 	@Test
