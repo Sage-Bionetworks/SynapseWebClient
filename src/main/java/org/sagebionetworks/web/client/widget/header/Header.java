@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,6 +37,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseClientAsync synapseClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private StuAnnouncementWidget stuAnnouncementWidget;
 	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController,
@@ -48,8 +50,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.favWidget = favWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
-		view.setProjectFavoriteWidget(favWidget);
-		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
+		this.stuAnnouncementWidget = stuAnnouncementWidget;
 		view.setPresenter(this);
 		stuAnnouncementWidget.init();
 		initStagingAlert();
@@ -107,6 +108,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setUser(userSessionData);
 		view.refresh();
 		view.setSearchVisible(true);
+		view.setProjectFavoriteWidget(favWidget);
+		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 	}
 
 	@Override

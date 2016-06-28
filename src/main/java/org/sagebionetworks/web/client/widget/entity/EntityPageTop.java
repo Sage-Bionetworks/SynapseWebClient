@@ -329,6 +329,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
     public void clearState() {
 		view.clear();
+		wikiTab.clear();
 		this.entity = null;
 	}
 
@@ -374,7 +375,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			}
 		};
-		
 		wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
 				canEdit, callback);
 		
