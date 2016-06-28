@@ -10,7 +10,6 @@
 			<bh:Div addStyleNames="well">
 				<b:Heading size ="H4">
 					<b:Icon type="DATABASE" addStyleNames="margin-right-10" />
-					<bh:Span ui:field="storageUsageSpan" />
 				</b:Heading>
 			</bh:Div>
 			<b:Row>

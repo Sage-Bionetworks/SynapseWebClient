@@ -3,10 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.UserLoginBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -37,7 +34,5 @@ public interface UserAccountService extends RemoteService {
 	public String getTermsOfUse();
 	
 	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
-	
-	public StorageUsageSummaryList getStorageUsage();
 
 }
