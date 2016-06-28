@@ -96,7 +96,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		tab.configure("Tables", view.asWidget());
+		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", "http://docs.synapse.org/articles/tables.html");
 		
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
 			@Override

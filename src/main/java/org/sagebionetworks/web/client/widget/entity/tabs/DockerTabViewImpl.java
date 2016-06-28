@@ -74,4 +74,9 @@ public class DockerTabViewImpl implements DockerTabView {
 	public void clearDockerRepoWidget() {
 		dockerRepoWidgetContainer.clear();
 	}
+	
+	public void updateWidth(Tab tab) {
+		tab.getTabListItem().setWidth("150px");
+	};
+	
 }

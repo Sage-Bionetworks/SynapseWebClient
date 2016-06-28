@@ -108,11 +108,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//////Tabs
 	@UiField
-	Anchor projectsLink;
+	FocusPanel projectsLink;
 	@UiField
 	LIElement projectsListItem;
 	@UiField
-	Anchor teamsLink;
+	FocusPanel teamsLink;
 	@UiField
 	LIElement teamsListItem;
 	@UiField
@@ -120,7 +120,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement settingsListItem;
 	@UiField
-	Anchor challengesLink;
+	FocusPanel challengesLink;
 	@UiField
 	LIElement challengesListItem;
 	
@@ -277,6 +277,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button whyGetValidatedButton;
 	
+	@UiField
+	Span teamNotifications;
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -589,7 +591,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeamNotificationCount(String count) {
-		teamsLink.setHTML(DisplayConstants.TEAMS + "&nbsp" + DisplayUtils.getBadgeHtml(count));
+		teamNotifications.setHTML(DisplayUtils.getBadgeHtml(count));
 	}
 	
 	@Override
@@ -866,7 +868,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clearTeamNotificationCount() {
-		teamsLink.setHTML(DisplayConstants.TEAMS);
+		teamNotifications.setHTML("");
 	}
 	
 	private void hideTabContainers() {

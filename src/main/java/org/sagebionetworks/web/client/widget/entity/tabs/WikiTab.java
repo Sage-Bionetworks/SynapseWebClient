@@ -18,7 +18,7 @@ public class WikiTab {
 	public WikiTab(Tab tab, WikiPageWidget wikiPageWidget) {
 		this.tab = tab;
 		this.wikiPageWidget = wikiPageWidget;
-		tab.configure("Wiki", wikiPageWidget.asWidget());
+		tab.configure("Wiki", wikiPageWidget.asWidget(), "Build narrative content to describe your project in the Wiki.", "http://docs.synapse.org/articles/wikis.html");
 		wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
 	}
 	

@@ -64,7 +64,8 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
-		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
+		view.updateWidth(tab);
+		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "Not yet implemented", "");
 		view.setPresenter(this);
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setDockerRepoList(dockerListRepoWidget.asWidget());

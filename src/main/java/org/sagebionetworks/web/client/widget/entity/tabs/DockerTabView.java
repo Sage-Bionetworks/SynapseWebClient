@@ -18,4 +18,10 @@ public interface DockerTabView extends IsWidget{
 	void setDockerRepoListVisible(boolean visible);
 	void setDockerRepoWidgetVisible(boolean visible);
 	void clearDockerRepoWidget();
+	
+	/**
+	 * TODO: delete this method after taking the Discussion feature out of beta.
+	 * @param t
+	 */
+	void updateWidth(Tab t);
 }
