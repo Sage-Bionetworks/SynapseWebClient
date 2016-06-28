@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.sagebionetworks.web.client.MarkdownIt;
+import org.sagebionetworks.web.client.MarkdownItImpl;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -38,37 +40,30 @@ public class HelpWidget implements IsWidget {
 	@UiField
 	Popover helpPopover;
 	Widget widget;
+	private static MarkdownIt markdownIt = new MarkdownItImpl();
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	String text, basicHelpText, fullHelpHref;
+	String text="", basicHelpText="", moreHelpHTML="";
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 	}
 
-	public void configure(String text, String basicHelpText, String fullHelpHref) {
-		this.text = text;
-		this.basicHelpText = basicHelpText;
-		this.fullHelpHref = fullHelpHref;
-	}
-	
 	public void setText(String text) {
-		moreInfoText.setInnerText(text);
+		this.text = text;
 	}
 	
-	public void setHelp(String basicHelpText) {
-		this.basicHelpText = basicHelpText;
+	public void setHelpMarkdown(String md) {
+		this.basicHelpText = markdownIt.markdown2Html(md, "");
 	}
 	
 	public void setHref(String fullHelpHref) {
-		this.fullHelpHref = fullHelpHref;
+		this.moreHelpHTML = "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>";
 	}
 	
 	@Override
 	public Widget asWidget() {
-		if (text != null) {
-			moreInfoText.setInnerText(text);
-		}
-		helpPopover.setContent(SafeHtmlUtils.htmlEscape(basicHelpText) + "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>");
+		moreInfoText.setInnerText(text);
+		helpPopover.setContent(basicHelpText + moreHelpHTML);
 		return widget;
 	}
 	

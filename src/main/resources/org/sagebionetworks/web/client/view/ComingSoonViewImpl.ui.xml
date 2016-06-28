@@ -17,8 +17,10 @@
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="header" />
-		<w:HelpWidget text="Optional help link text" help="This contains concise but basic help." href="http://link/to/more/help" placement="BOTTOM" />
-		
+		<g:FlowPanel addStyleNames="margin-bottom-60 margin-top-100">
+			<w:HelpWidget text="Optional help link text" helpMarkdown="This contains basic help." href="http://link/to/more/help" placement="BOTTOM" />
+			<w:HelpWidget helpMarkdown="This contains **very basic** markdown, perhaps with a [link](http://www.jayhodgson.com)."/>
+		</g:FlowPanel>
 		<g:SimplePanel ui:field="fileHandleListContainer" />
 		
 		<h2>Coming Soon</h2>
