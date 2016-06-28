@@ -163,8 +163,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		};
 
 		configureMessage();
-		configureReplies();
-		watchReplyCount();
+		if (!bundle.getId().equals(globalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
+			configureReplies();
+			watchReplyCount();
+		}
 
 	}
 
