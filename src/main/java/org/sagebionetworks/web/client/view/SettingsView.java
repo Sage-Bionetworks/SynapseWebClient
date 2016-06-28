@@ -26,10 +26,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	 */
 	public void showPasswordChangeSuccess();
 	
-	public void updateStorageUsage(Long grandTotal);
-
-	public void clearStorageUsageUI();
-	
 	public void updateNotificationCheckbox(UserProfile profile);
 	
 	void showNotificationEmailAddress(String primaryEmailAddress);

@@ -25,20 +25,16 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummary;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -65,8 +61,7 @@ public class SettingsPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserService;
 	GlobalApplicationState mockGlobalApplicationState;
-	PlaceChanger mockPlaceChanger;	
-	CookieProvider mockCookieProvider;
+	PlaceChanger mockPlaceChanger;
 	SynapseClientAsync mockSynapseClient;
 	GWTWrapper mockGWT;
 	PortalGinInjector mockInjector;
@@ -93,7 +88,6 @@ public class SettingsPresenterTest {
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockCookieProvider = mock(CookieProvider.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGWT = mock(GWTWrapper.class);
 		mockInjector = mock(PortalGinInjector.class);
@@ -102,7 +96,7 @@ public class SettingsPresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
-				mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget, mockCookieProvider,mockPasswordStrengthWidget);	
+				mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget,mockPasswordStrengthWidget);	
 		verify(mockView).setPresenter(profilePresenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -169,25 +163,6 @@ public class SettingsPresenterTest {
 		profilePresenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));		
-	}
-	
-	@Test
-	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
-		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
-		Long totalSize = 12345l;
-		usageSummary.setTotalSize(totalSize);
-		usageSummary.setTotalCount(54321L);
-		usageSummary.setSummaryList(new ArrayList<StorageUsageSummary>());
-		
-		AsyncMockStubber.callSuccessWith(usageSummary).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
-		profilePresenter.updateUserStorage();
-		verify(mockView).updateStorageUsage(eq(totalSize));
-	}
-	@Test
-	public void testUsageFailure() throws RestServiceException {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));
-		profilePresenter.updateUserStorage();
-		verify(mockView).clearStorageUsageUI();
 	}
 	
 	//if notification settings are null, should still successfully update with user specified notification setting
