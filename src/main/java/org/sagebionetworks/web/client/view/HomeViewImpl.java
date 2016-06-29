@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Help;
@@ -188,7 +189,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		gettingStartedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help("GettingStarted"));
+				DisplayUtils.newWindow(ClientProperties.HELP_URL + ClientProperties.HELP_GETTING_STARTED_PATH, "", "");
 			}
 		});
 		

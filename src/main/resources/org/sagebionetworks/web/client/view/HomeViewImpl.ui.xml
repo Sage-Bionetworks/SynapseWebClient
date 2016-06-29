@@ -88,10 +88,9 @@
 				<b:Column size="SM_3" addStyleNames="margin-top-30">
 					<g:FocusPanel ui:field="gettingStartedBox">
 						<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
-							<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Synapse Tutorial" />
+							<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Getting Started" />
 							<b:Heading size="H6" text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. " />
-							<b:Heading size="H6" text="This tutorial steps you through how to create your first Project, store your research data, share with your collaborators, and more!" />
-							<b:Button text="Open the tutorial" />
+							<b:Button text="Open the guide" />
 						</b:Panel>
 					</g:FocusPanel>
 				</b:Column>
@@ -102,7 +101,7 @@
 						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
 						   all from the comfort of your own code." />
 						<b:Heading size="H6" text="Don't see your language of choice here? Check out our full&nbsp;">
-							<b:Anchor href="http://rest.synapse.org" text="REST API documentation" target="_blank"/>
+							<b:Anchor href="http://docs.synapse.org/rest/" text="REST API documentation" target="_blank"/>
 						</b:Heading>
 						<b:Row>
 							<b:Column size="SM_3">
@@ -113,9 +112,9 @@
 												<g:Image resource='{sageImageBundle.logoR45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="R client" />
-												<b:Anchor href="http://r-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!Help:RClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="http://r-docs.synapse.org/" target="_blank" text="R client"/>
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -129,9 +128,9 @@
 												<g:Image resource='{sageImageBundle.logoPython45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Python client" />
-												<b:Anchor href="http://python-docs.synapse.org/" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!Help:PythonClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="http://docs.synapse.org/python/" target="_blank" text="Python client"/>
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -145,9 +144,9 @@
 												<g:Image resource='{sageImageBundle.logoCommandLine45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Command line client" />
-												<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!Help:CommandLineClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="http://docs.synapse.org/python/CommandLineClient.html" target="_blank" text="Command line client"/>												
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
@@ -161,9 +160,9 @@
 												<g:Image resource='{sageImageBundle.logoJava45}' addStyleNames="margin-right-5"/>
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Java client" />
-												<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" addStyleNames="displayBlock" target="_blank" text="API documentation"/>
-												<b:Anchor href="#!StandaloneWiki:JavaClient" addStyleNames="displayBlock" target="_blank" text="Getting started"/>
+												<b:Heading size="H5" addStyleNames="font-weight-bolder">
+													<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" target="_blank" text="Java client"/>
+												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
