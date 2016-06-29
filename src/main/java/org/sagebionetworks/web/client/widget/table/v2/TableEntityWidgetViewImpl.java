@@ -40,7 +40,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Collapse scopeCollapse;
 
 	@UiField
-	PanelBody columnDetailsPanel;
+	SimplePanel columnDetailsPanel;
 	@UiField
 	Div scopePanel;
 	@UiField
