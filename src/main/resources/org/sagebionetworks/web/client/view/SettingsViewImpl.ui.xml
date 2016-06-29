@@ -82,7 +82,7 @@
 	    			<w:HelpWidget helpMarkdown="These are discussion threads and forums that you have been subscribed to which means you will receive an email when someone responds or creates a thread." 
 						href="http://docs.synapse.org/articles/discussion.html" addStyleNames="margin-left-5"/>
 	    		</bh:Div>
-	    		<g:SimplePanel ui:field="subscriptionsContainer" />
+	    		<bh:Div ui:field="subscriptionsContainer" />
 	    	</g:FlowPanel>
 			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box">
 				<p>Using an API key allows you to authenticate your scripts for an

@@ -7,7 +7,7 @@
 	<bh:Span>
 		<b:Popover ui:field="helpPopover" title="" content="" trigger="FOCUS" placement="RIGHT" isHtml="true" container="body">
 			<b:Anchor ui:field="moreInfoLink">
-				<span class="fa fa-question-circle font-size-15 synapse-purple"></span>
+				<span class="fa fa-question-circle synapse-purple"></span>
 				<span ui:field="moreInfoText"></span>
 			</b:Anchor>
 		</b:Popover>

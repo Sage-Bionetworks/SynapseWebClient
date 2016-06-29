@@ -305,7 +305,7 @@ public class JoinTeamWidgetTest {
 		verify(mockGwt).addDaysToDate(any(Date.class), eq(requestExpiresInXDays));
 		Date expireDate = dateCaptor.getValue();
 		assertTrue(expireDate.getTime() >= now.getTime());
-		assertTrue(expireDate.getTime() < new Date().getTime());
+		assertTrue(expireDate.getTime() <= new Date().getTime());
 	}
 	
 	

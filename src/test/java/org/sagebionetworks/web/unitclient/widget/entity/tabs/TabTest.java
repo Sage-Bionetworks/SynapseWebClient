@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,8 +44,8 @@ public class TabTest {
 		//and configure
 		String tabTitle = "TestTab";
 		Widget content = null;
-		tab.configure(tabTitle, content);
-		verify(mockView).configure(tabTitle, content);
+		tab.configure(tabTitle, content, "help markdown", "link");
+		verify(mockView).configure(eq(tabTitle), eq(content), anyString(), anyString());
 	}
 
 	@Test

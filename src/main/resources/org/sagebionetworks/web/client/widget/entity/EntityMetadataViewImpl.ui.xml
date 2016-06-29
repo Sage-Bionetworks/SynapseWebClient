@@ -22,7 +22,7 @@
 				    <bh:Span addStyleNames="boldText">Storage Location:</bh:Span>
 				    <bh:Span ui:field="uploadDestinationField"></bh:Span>
 				</bh:Span>
-				<w:HelpWidget helpMarkdown="This block contains information about the content such as file size, storage location and md5 hash.&#10;The Synapse ID (e.g. syn123) is a unique identifier assigned to all content.&#10;Conditions for use describes data use requirements that must be fulfilled before downloading" 
+				<w:HelpWidget helpMarkdown="The Synapse ID (e.g. syn123) is a unique identifier assigned to all content.&#10;Conditions for use describes data use requirements that must be fulfilled before downloading." 
 							href="http://docs.synapse.org/articles/access_controls.html#conditions_of_use" addStyleNames="margin-left-5"/>
 		    </bh:Div>
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">
