@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -63,7 +64,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		
 		HelpWidget helpWidget = new HelpWidget();
 		helpWidget.setHelpMarkdown("##### Sharing Settings: Controls who can view the content.\nBy default, folders and files inherit  the Sharing Settings of the parent folder or project.");
-		helpWidget.setHref("http://docs.synapse.org/articles/access_controls.html#sharing-setting");
+		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#sharing-setting");
 		container.add(helpWidget.asWidget());
 		
 		//add share settings
@@ -114,7 +115,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		
 		helpWidget = new HelpWidget();
 		helpWidget.setHelpMarkdown("##### Conditions For Use: Controls how the data can be used.\nBy default, folders and files inherit the Conditions For Use of the parent folder.");
-		helpWidget.setHref("http://docs.synapse.org/articles/access_controls.html#conditions-for-use");
+		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#conditions-for-use");
 		container.add(helpWidget.asWidget());
 
 		container.add(new InlineHTML("<h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));

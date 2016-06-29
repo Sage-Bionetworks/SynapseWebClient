@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -96,7 +97,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", "http://docs.synapse.org/articles/tables.html");
+		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
 		
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
 			@Override

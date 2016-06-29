@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
 		<b:InputGroup ui:field="queryInputGroup" visible="true">
 			<b:FormGroup ui:field="inputFormGroup">
@@ -14,7 +15,7 @@
 					dataLoadingText="Executing...">Query</b:Button>
 				<b:Button ui:field="editResultsButton" icon="EDIT" height="34px" />
 				<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" />
-				<b:Button ui:field="helpButton" icon="QUESTION_CIRCLE" type="LINK"/>
+				<b:Button ui:field="helpButton" icon="QUESTION_CIRCLE" type="LINK" addStyleNames="synapse-purple"/>
 			</b:InputGroupButton>
 		</b:InputGroup>
 		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
