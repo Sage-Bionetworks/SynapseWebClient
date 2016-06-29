@@ -131,7 +131,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
 		
-		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", "");
+		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
 		
 		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
 		CallbackP<String> entityClicked = new CallbackP<String> () {
