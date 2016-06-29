@@ -242,6 +242,14 @@ public class EntityPageTopTest {
 	}
 	
 	@Test
+	public void testClear(){
+		pageTop.clearState();
+		verify(mockView).clear();
+		verify(mockWikiTab).clear();
+	}
+	
+	
+	@Test
 	public void testConfigureWithFile(){
 		Synapse.EntityArea area = null;
 		String areaToken = null;
