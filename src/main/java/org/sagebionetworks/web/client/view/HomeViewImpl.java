@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Help;
@@ -19,6 +18,7 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -189,7 +189,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		gettingStartedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.HELP_URL + ClientProperties.HELP_GETTING_STARTED_PATH, "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "getting_started.html", "", "");
 			}
 		});
 		

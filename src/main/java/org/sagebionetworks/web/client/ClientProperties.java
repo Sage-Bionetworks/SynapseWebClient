@@ -16,8 +16,6 @@ public class ClientProperties {
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
-	public static final String HELP_URL = "http://docs.synapse.org";
-	public static final String HELP_GETTING_STARTED_PATH = "/articles/getting_started.html";
 	
 	public static final String USER_GUIDE_ID = "syn1669771";
 	public static final String ABOUT_SYNAPSE_URL = "https://s3.amazonaws.com/static.synapse.org/About_Synapse.pdf";
