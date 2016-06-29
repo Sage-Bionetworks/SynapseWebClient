@@ -56,7 +56,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public EntityMetadataViewImpl(IconsImageBundle icons) {
 		this.icons = icons;
 		initWidget(uiBinder.createAndBindUi(this));
-		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
 			@Override

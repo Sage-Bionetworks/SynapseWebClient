@@ -77,4 +77,8 @@ public class HelpWidget implements IsWidget {
 	public void setPlacement(final Placement placement) {
 		helpPopover.setPlacement(placement);		
 	}
+	
+	public void setAddStyleNames(String styleNames) {
+		moreInfoLink.addStyleName(styleNames);
+	}
 }
