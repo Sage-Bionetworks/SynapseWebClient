@@ -74,7 +74,9 @@
 											</bh:OrderedList>
 										</bh:Paragraph>
 									</bh:Div>
-									<b:Button ui:field="whyGetValidatedButton" type="DEFAULT" icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="More info..."/>
+									<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data." text="More info..."
+										    	href="http://docs.synapse.org/articles/accounts_certified_users_and_qualified_researchers.html#qualified_researcher" iconStyles="" />
+
 								</b:Alert>
 								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
 									<bh:Div>

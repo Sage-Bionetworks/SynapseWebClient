@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -275,8 +274,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button resubmitProfileValidationButton;
 	@UiField
 	Button verificationApprovedButton;
-	@UiField
-	Button whyGetValidatedButton;
 	
 	@UiField
 	Span teamNotifications;
@@ -355,16 +352,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Search(""));
 			}
 		});
-		whyGetValidatedButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onVerifyMoreInfoClicked();
-			}
-		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html", "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html#certified_user", "", "");
 			}
 		});
 		ClickHandler newVerificationSubmissionCallback = new ClickHandler() {

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
@@ -40,17 +41,24 @@ public class HelpWidget implements IsWidget {
 	SpanElement moreInfoText;
 	@UiField
 	Popover helpPopover;
+	@UiField
+	SpanElement icon;
+	
 	Widget widget;
 	private static MarkdownIt markdownIt = new MarkdownItImpl();
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	String text="", basicHelpText="", moreHelpHTML="";
+	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText";
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 	}
 
 	public void setText(String text) {
 		this.text = text;
+	}
+	
+	public void setIconStyles(String iconStyles) {
+		this.iconStyles = iconStyles;
 	}
 	
 	public void setHelpMarkdown(String md) {
@@ -65,6 +73,8 @@ public class HelpWidget implements IsWidget {
 	
 	@Override
 	public Widget asWidget() {
+		if (DisplayUtils.isDefined(iconStyles))
+			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);
 		helpPopover.setContent(basicHelpText + moreHelpHTML);
 		return widget;
