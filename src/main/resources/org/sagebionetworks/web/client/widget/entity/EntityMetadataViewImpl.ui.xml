@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.widget">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
  
     <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
     
@@ -21,9 +22,19 @@
 				    <bh:Span addStyleNames="boldText">Storage Location:</bh:Span>
 				    <bh:Span ui:field="uploadDestinationField"></bh:Span>
 				</bh:Span>
+				<w:HelpWidget helpMarkdown="The Synapse ID (e.g. syn123) is a unique identifier assigned to all content.&#10;Conditions for use describes data use requirements that must be fulfilled before downloading." 
+							href="http://docs.synapse.org/articles/access_controls.html#conditions_of_use" addStyleNames="margin-left-5"/>
 		    </bh:Div>
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">
-		    	<g:SimplePanel ui:field="annotationsContainer" addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel> 
+		    	<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+		    		<bh:Div addStyleNames="highlight-title">
+		    			<bh:Text>Annotations</bh:Text>
+		    			<w:HelpWidget helpMarkdown="Projects, folder and files can be annotated with key-value terms describing the content.&#10;These terms enables data queries through the web or the Synapse analytical clients" 
+							href="http://docs.synapse.org/articles/annotation_and_query.html" addStyleNames="margin-left-5"/>
+		    		</bh:Div>
+		    		<g:SimplePanel ui:field="annotationsContainer" />
+		    	</g:FlowPanel>
+		    	 
 		    </b:Collapse>
 		    <b:Collapse ui:field="fileHistoryContent" toggle="false" b:id="fileHistoryContentCollapse">
 		    	<g:SimplePanel ui:field="fileHistoryContainer" addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel> 

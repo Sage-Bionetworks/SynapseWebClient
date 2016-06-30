@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
 
@@ -32,7 +33,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.forumWidget = forumWidget;
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		view.updateWidth(tab);
-		tab.configure("Discussion&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
+		tab.configure("Discussion&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
 		view.setPresenter(this);
 		view.setForum(forumWidget.asWidget());
 	}

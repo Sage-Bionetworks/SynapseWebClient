@@ -4,12 +4,14 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
-	<g:SimplePanel>
-		<b:Popover ui:field="helpPopover" title="" content="" trigger="FOCUS" placement="RIGHT" isHtml="true">
-			<b:Anchor ui:field="moreInfoLink" addStyleNames="margin-left-9">
-				<span class="glyphicon glyphicon-question-sign font-size-15"></span>
-				<span ui:field="moreInfoText"></span>
+	<bh:Span>
+		<b:Popover ui:field="helpPopover" title="" content="" trigger="FOCUS" placement="RIGHT" isHtml="true" container="body">
+			<b:Anchor addStyleNames="textDecorationNone">
+				<span ui:field="icon">
+					<span class="fa fa-question-circle" />
+				</span>
+				<span ui:field="moreInfoText" />
 			</b:Anchor>
 		</b:Popover>
-	</g:SimplePanel>
+	</bh:Span>
 </ui:UiBinder>

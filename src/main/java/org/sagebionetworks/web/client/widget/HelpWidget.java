@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
 
@@ -34,16 +35,17 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class HelpWidget implements IsWidget {
 	@UiField
-	Anchor moreInfoLink;
-	@UiField
 	SpanElement moreInfoText;
 	@UiField
 	Popover helpPopover;
+	@UiField
+	SpanElement icon;
+	
 	Widget widget;
 	private static MarkdownIt markdownIt = new MarkdownItImpl();
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	String text="", basicHelpText="", moreHelpHTML="";
+	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText";
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 	}
@@ -52,16 +54,24 @@ public class HelpWidget implements IsWidget {
 		this.text = text;
 	}
 	
+	public void setIconStyles(String iconStyles) {
+		this.iconStyles = iconStyles;
+	}
+	
 	public void setHelpMarkdown(String md) {
 		this.basicHelpText = markdownIt.markdown2Html(md, "");
 	}
 	
 	public void setHref(String fullHelpHref) {
-		this.moreHelpHTML = "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>";
+		if (DisplayUtils.isDefined(fullHelpHref)) {
+			this.moreHelpHTML = "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>";	
+		}
 	}
 	
 	@Override
 	public Widget asWidget() {
+		if (DisplayUtils.isDefined(iconStyles))
+			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);
 		helpPopover.setContent(basicHelpText + moreHelpHTML);
 		return widget;
@@ -73,5 +83,13 @@ public class HelpWidget implements IsWidget {
 	
 	public void setPlacement(final Placement placement) {
 		helpPopover.setPlacement(placement);		
+	}
+	
+	public void setAddStyleNames(String styleNames) {
+		widget.addStyleName(styleNames);
+	}
+	
+	public void setPull(Pull pull) {
+		widget.addStyleName(pull.getCssName());
 	}
 }

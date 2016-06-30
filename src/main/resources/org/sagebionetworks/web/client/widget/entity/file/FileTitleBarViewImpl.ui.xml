@@ -4,7 +4,8 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
@@ -26,6 +27,9 @@
 					<span class="boldText">URL:</span>
 					<span ui:field="externalUrl"/>
 				</div>
+				<w:HelpWidget helpMarkdown="This block contains information about the content such as file size, storage location and md5 hash." 
+					addStyleNames="margin-left-5"/>
+
 			</g:HTMLPanel>
 		</g:HTMLPanel>
 	</g:HTMLPanel>

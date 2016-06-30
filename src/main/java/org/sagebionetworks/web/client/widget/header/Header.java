@@ -148,11 +148,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public void onRegisterClick() {
 		globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));	
 	}
-	
-	@Override
-	public void onHelpForumClick() {
-		view.openNewWindow(GET_SATISFACTION_SUPPORT_SITE);
-	}
 
 	@Override
 	public void onFavoriteClick() {

@@ -72,7 +72,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -143,8 +142,6 @@ public class ProfilePresenterTest {
 	VerificationSubmissionWidget mockVerificationSubmissionModal;
 	@Mock
 	VerificationSubmission mockVerificationSubmission;
-	@Mock
-	WikiModalWidget mockWikiModalWidget;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -169,7 +166,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockWikiModalWidget);	
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -1740,12 +1737,6 @@ public class ProfilePresenterTest {
 		profilePresenter.unbindOrcIdAfterConfirmation();
 		//error is shown
 		verify(mockSynAlert).handleException(ex);
-	}
-	
-	@Test
-	public void testonVerifyMoreInfoClicked() {
-		profilePresenter.onVerifyMoreInfoClicked();
-		verify(mockWikiModalWidget).show(anyString());
 	}
 	
 	@Test

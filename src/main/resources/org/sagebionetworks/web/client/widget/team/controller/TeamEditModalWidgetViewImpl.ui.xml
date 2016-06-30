@@ -3,12 +3,19 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
     
-	<b:Modal ui:field="modal" title="Edit Team" closable="true" fade="true"
+	<b:Modal ui:field="modal" fade="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
+		<b:ModalHeader closable="true">
+		    <b:Heading size="H4" text="Edit Team" addStyleNames="displayInline"/>
+		    <w:HelpWidget helpMarkdown="A team of users can be used to grant access to content for the whole group or give attribution to a team." 
+				href="http://docs.synapse.org/articles/teams.html" addStyleNames="margin-left-5"/>
+		</b:ModalHeader>
+	
 		<b:ModalBody>
 		    <b:FieldSet>
 		        <b:FormGroup>

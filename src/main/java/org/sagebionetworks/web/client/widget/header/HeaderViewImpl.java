@@ -13,7 +13,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -22,6 +21,7 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -61,19 +61,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDownMenu headerFavList;
 
 	@UiField
-	AnchorListItem forumLink;
-	@UiField
-	AnchorListItem rLink;
-	@UiField
-	AnchorListItem pythonLink;
-	@UiField
-	AnchorListItem commandLineLink;
-	@UiField
-	AnchorListItem restAPILink;
-	@UiField
-	AnchorListItem governanceLink;
-
-	@UiField
 	SimplePanel projectFavoritePanel;
 	@UiField
 	SimplePanel stuAnnouncementsContainer;
@@ -104,6 +91,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SimplePanel searchBoxContainer;
 	@UiField
 	Alert stagingAlert;
+	@UiField
+	Button helpButton;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -247,42 +236,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				presenter.onRegisterClick();
 			}
 		});
-		forumLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onHelpForumClick();
-			}
-		});
-		rLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.CLIENT_R_API_URL, "", "");
-			}
-		});
-		pythonLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.CLIENT_PYTHON_API_URL, "", "");
-			}
-		});
-		commandLineLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.CLIENT_CL_API_URL, "", "");
-			}
-		});
-		restAPILink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.REST_API_URL, "", "");
-			}
-		});
-		governanceLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.GOVERNANCE_HELP_URL, "", "");
-			}
-		});
 		
 		headerFavButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -294,6 +247,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onLogoClick();
+			}
+		});
+		helpButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
 			}
 		});
 	}

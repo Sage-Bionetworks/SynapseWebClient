@@ -3,16 +3,22 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
 		<b:Collapse b:id="editScopeCollapse" toggle="false" ui:field="scopeCollapse" addStyleNames="padding-bottom-15">
 			<bh:Div ui:field="scopePanel" addStyleNames="highlight-box" />
 		</b:Collapse>
 		
 		<b:Collapse b:id="editSchemaCollapse" toggle="false" ui:field="schemaCollapse">
-			<b:Panel>
-				<b:PanelBody ui:field="columnDetailsPanel" />
-			</b:Panel>
+			<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+	    		<bh:Div addStyleNames="highlight-title">
+	    			<bh:Text>Schema</bh:Text>
+	    			<w:HelpWidget helpMarkdown="Every table has a schema that describes the columns and types of data stored in each column." 
+						href="http://docs.synapse.org/articles/tables.html" addStyleNames="margin-left-5"/>
+	    		</bh:Div>
+	    		<g:SimplePanel ui:field="columnDetailsPanel" />
+	    	</g:FlowPanel>
 		</b:Collapse>
 		
 		<b:Alert ui:field="tableMessage" type="INFO" />

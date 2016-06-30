@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -188,7 +189,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		gettingStartedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help("GettingStarted"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "getting_started.html", "", "");
 			}
 		});
 		

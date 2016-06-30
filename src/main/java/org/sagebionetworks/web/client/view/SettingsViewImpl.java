@@ -155,7 +155,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
-		subscriptionsContainer.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Following");
 		
 		newEmailField.addKeyDownHandler(new KeyDownHandler() {
 			@Override

@@ -20,24 +20,7 @@
 					<b:Tooltip placement="BOTTOM" title="Log out">
 						<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="28px" />	
 					</b:Tooltip>
-					<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-						<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="28px">Help</b:Button>
-						<b:DropDownMenu addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted" text="Synapse tutorial" />
-							<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
-							<b:ListItem>
-								<b:Anchor href="#!SynapseForum:default">
-									Synapse Forum
-									<span class="smallerText"><span class="label label-warning label-as-badge margin-left-5 moveup-2">beta</span></span>
-								</b:Anchor>
-							</b:ListItem>
-							<b:AnchorListItem ui:field="rLink" text="R client" />
-							<b:AnchorListItem ui:field="pythonLink" text="Python client" />
-							<b:AnchorListItem ui:field="commandLineLink" text="Command line client" />
-							<b:AnchorListItem ui:field="restAPILink" text="REST API docs" />
-							<b:AnchorListItem ui:field="governanceLink" text="Data use conditions" />
-						</b:DropDownMenu>
-					</b:ButtonGroup> 
+					<b:Button ui:field="helpButton" size="EXTRA_SMALL" height="28px" text="Help" addStyleNames="right margin-left-5 margin-right-5 margin-top-5"/>
 					<b:Tooltip placement="BOTTOM" title="Favorites">
 						<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
 							<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="28px" addStyleNames="favoriteIcon"></b:Button>

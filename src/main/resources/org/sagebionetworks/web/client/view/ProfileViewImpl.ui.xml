@@ -5,7 +5,8 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
-	xmlns:v="urn:import:org.sagebionetworks.web.client.widget.verification">
+	xmlns:v="urn:import:org.sagebionetworks.web.client.widget.verification"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
     
@@ -73,7 +74,9 @@
 											</bh:OrderedList>
 										</bh:Paragraph>
 									</bh:Div>
-									<b:Button ui:field="whyGetValidatedButton" type="DEFAULT" icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="More info..."/>
+									<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data." text="More info..."
+										    	href="http://docs.synapse.org/articles/accounts_certified_users_and_qualified_researchers.html#qualified_researcher" iconStyles="" />
+
 								</b:Alert>
 								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
 									<bh:Div>
@@ -128,9 +131,35 @@
 				    	<div class="container-fluid">
 					    	<div class="row" ui:field="navtabContainer">
 							    <ul class="nav nav-tabs entity-tabs margin-top-15">
-								    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>
-								    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" text="Challenges" ui:field="challengesLink"/></li>
-								    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" text="Teams" ui:field="teamsLink"/></li>
+								    <li class="entity-tab active margin-left-15" ui:field="projectsListItem">
+								    	<a class="text-align-center link no-background">
+									    	<g:FocusPanel ui:field="projectsLink" addStyleNames="displayInline">
+									    		<bh:Text>Projects</bh:Text>
+										    </g:FocusPanel>
+										    <w:HelpWidget helpMarkdown="##### Content in Synapse is organized into user-created projects.&#10;This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name." 
+										    	href="http://docs.synapse.org/articles/making_a_project.html" placement="BOTTOM"/>
+										</a>
+								    </li>
+								    <li class="entity-tab" ui:field="challengesListItem">
+								    	<a class="text-align-center link no-background">
+									    	<g:FocusPanel ui:field="challengesLink" addStyleNames="displayInline">
+									    		<bh:Text>Challenges</bh:Text>
+										    </g:FocusPanel>
+										    <w:HelpWidget helpMarkdown="##### Challenges are computational contests organized through the Dream Challenges.&#10;This tab shows you challenges you have registered for." 
+										    	href="http://dreamchallenges.org" placement="BOTTOM"/>
+										</a>
+								    </li>
+								    <li class="entity-tab" ui:field="teamsListItem">
+								    	<a class="text-align-center link no-background">
+									    	<g:FocusPanel ui:field="teamsLink" addStyleNames="displayInline">
+									    		<bh:Text>Teams</bh:Text>
+										    </g:FocusPanel>
+										    <bh:Span ui:field="teamNotifications" />
+										    <w:HelpWidget helpMarkdown="##### A Team is a group of Synapse users.&#10;Teams can be used to share content with a group of people. An email address (TeamName@synapse.org) is created for easily contacting all Team members.&#10;This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”." 
+										    	placement="BOTTOM"/>
+										</a>
+								    </li>
+								    
 								    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
 							    </ul>
 							</div>

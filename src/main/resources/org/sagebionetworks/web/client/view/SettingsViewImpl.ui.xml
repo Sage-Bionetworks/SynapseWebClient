@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
 		<bh:Div>
@@ -75,7 +76,14 @@
 					</bh:Div>	
 			    </b:Column>
 			</b:Row>
-			<bh:Div ui:field="subscriptionsContainer" addStyleNames="highlight-box margin-bottom-20"/>
+			<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+	    		<bh:Div addStyleNames="highlight-title">
+	    			<bh:Text>Following</bh:Text>
+	    			<w:HelpWidget helpMarkdown="These are discussion threads and forums that you have been subscribed to which means you will receive an email when someone responds or creates a thread." 
+						href="http://docs.synapse.org/articles/discussion.html" addStyleNames="margin-left-5"/>
+	    		</bh:Div>
+	    		<bh:Div ui:field="subscriptionsContainer" />
+	    	</g:FlowPanel>
 			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API

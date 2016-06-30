@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -36,6 +35,7 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -108,11 +108,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//////Tabs
 	@UiField
-	Anchor projectsLink;
+	FocusPanel projectsLink;
 	@UiField
 	LIElement projectsListItem;
 	@UiField
-	Anchor teamsLink;
+	FocusPanel teamsLink;
 	@UiField
 	LIElement teamsListItem;
 	@UiField
@@ -120,7 +120,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement settingsListItem;
 	@UiField
-	Anchor challengesLink;
+	FocusPanel challengesLink;
 	@UiField
 	LIElement challengesListItem;
 	
@@ -274,9 +274,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button resubmitProfileValidationButton;
 	@UiField
 	Button verificationApprovedButton;
-	@UiField
-	Button whyGetValidatedButton;
 	
+	@UiField
+	Span teamNotifications;
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -352,16 +352,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Search(""));
 			}
 		});
-		whyGetValidatedButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onVerifyMoreInfoClicked();
-			}
-		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new Quiz("Certification"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html#certified_user", "", "");
 			}
 		});
 		ClickHandler newVerificationSubmissionCallback = new ClickHandler() {
@@ -589,7 +583,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeamNotificationCount(String count) {
-		teamsLink.setHTML(DisplayConstants.TEAMS + "&nbsp" + DisplayUtils.getBadgeHtml(count));
+		teamNotifications.setHTML(DisplayUtils.getBadgeHtml(count));
 	}
 	
 	@Override
@@ -866,7 +860,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clearTeamNotificationCount() {
-		teamsLink.setHTML(DisplayConstants.TEAMS);
+		teamNotifications.setHTML("");
 	}
 	
 	private void hideTabContainers() {

@@ -23,7 +23,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 		this.evaluationList = evaluationList;
 		
 		view.setEvaluationList(evaluationList.asWidget());
-		tab.configure("Challenge", view.asWidget());
+		tab.configure("Challenge", view.asWidget(), "Challenges are computational contests organized through the Dream Challenges.", "http://dreamchallenges.org");
 		tab.setTabListItemVisible(false);
 	}
 	
