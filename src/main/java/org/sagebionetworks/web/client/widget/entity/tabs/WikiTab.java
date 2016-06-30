@@ -35,9 +35,12 @@ public class WikiTab {
 			Callback callback) {
 		Long versionNumber = null; //version is always null for project
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
-		
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
+	}
+	
+	public void clear() {
+		wikiPageWidget.clear();
 	}
 	
 	public Tab asTab(){

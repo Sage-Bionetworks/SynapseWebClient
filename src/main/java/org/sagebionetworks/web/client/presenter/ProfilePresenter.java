@@ -837,7 +837,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentArea = place.getArea();
 		filterType = place.getProjectFilter();
 		filterTeamId = place.getTeamId();
-		
+		view.setPresenter(this);
 		if (token.equals("oauth_bound")) {
 			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
