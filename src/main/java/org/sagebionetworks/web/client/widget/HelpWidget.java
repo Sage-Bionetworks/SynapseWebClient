@@ -2,8 +2,8 @@ package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
@@ -90,5 +90,9 @@ public class HelpWidget implements IsWidget {
 	
 	public void setAddStyleNames(String styleNames) {
 		moreInfoLink.addStyleName(styleNames);
+	}
+	
+	public void setPull(Pull pull) {
+		widget.addStyleName(pull.getCssName());
 	}
 }
