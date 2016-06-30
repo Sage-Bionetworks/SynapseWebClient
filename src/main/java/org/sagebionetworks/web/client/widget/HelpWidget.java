@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -35,8 +34,6 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class HelpWidget implements IsWidget {
-	@UiField
-	Anchor moreInfoLink;
 	@UiField
 	SpanElement moreInfoText;
 	@UiField
@@ -89,7 +86,7 @@ public class HelpWidget implements IsWidget {
 	}
 	
 	public void setAddStyleNames(String styleNames) {
-		moreInfoLink.addStyleName(styleNames);
+		widget.addStyleName(styleNames);
 	}
 	
 	public void setPull(Pull pull) {
