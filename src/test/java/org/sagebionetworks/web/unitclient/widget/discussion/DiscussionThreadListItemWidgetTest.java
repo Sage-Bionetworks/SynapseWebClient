@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.discussion;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,11 +15,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
@@ -40,8 +39,6 @@ public class DiscussionThreadListItemWidgetTest {
 	@Mock
 	UserBadge mockAuthorWidget;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	CallbackP<String> mockThreadIdClickedCallback;
@@ -56,9 +53,7 @@ public class DiscussionThreadListItemWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		discussionThreadWidget = new DiscussionThreadListItemWidget(mockView,
-				mockAuthorWidget, mockGinInjector, mockJsniUtils,
-				mockGlobalApplicationState);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+				mockAuthorWidget, mockGinInjector, mockJsniUtils);
 		when(mockThreadBundle.getTitle()).thenReturn(title);
 		when(mockThreadBundle.getActiveAuthors()).thenReturn(Arrays.asList("123"));
 		when(mockThreadBundle.getNumberOfViews()).thenReturn(numberOfViews);
@@ -101,7 +96,7 @@ public class DiscussionThreadListItemWidgetTest {
 	@Test
 	public void testOnClickThreadNoCallback() {
 		discussionThreadWidget.onClickThread();
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockThreadIdClickedCallback, never()).invoke(anyString());
 	}
 	
 	@Test
@@ -109,5 +104,11 @@ public class DiscussionThreadListItemWidgetTest {
 		discussionThreadWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadWidget.onClickThread();
 		verify(mockThreadIdClickedCallback).invoke(anyString());
+	}
+
+	@Test
+	public void testDisableClick() {
+		discussionThreadWidget.disableClick();
+		verify(mockView).disableClick();
 	}
 }

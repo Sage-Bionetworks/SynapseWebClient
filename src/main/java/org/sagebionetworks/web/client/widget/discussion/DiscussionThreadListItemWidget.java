@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -18,7 +16,6 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	PortalGinInjector ginInjector;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
-	GlobalApplicationState globalApplicationState;
 	private CallbackP<String> threadIdClickedCallback; 
 	
 	private String threadId;
@@ -28,14 +25,12 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 			DiscussionThreadListItemWidgetView view,
 			UserBadge authorWidget,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils,
-			GlobalApplicationState globalApplicationState
+			SynapseJSNIUtils jsniUtils
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.jsniUtils = jsniUtils;
 		this.authorWidget = authorWidget;
-		this.globalApplicationState = globalApplicationState;
 		
 		view.setPresenter(this);
 		view.setThreadAuthor(authorWidget.asWidget());
@@ -72,14 +67,16 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	
 	@Override
 	public void onClickThread() {
-		if (threadIdClickedCallback == null) {
-			globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(projectId, threadId));
-		} else {
+		if (threadIdClickedCallback != null) {
 			threadIdClickedCallback.invoke(threadId);
 		}
 	}
 	
 	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
 		this.threadIdClickedCallback = threadIdClickedCallback;
+	}
+
+	public void disableClick() {
+		view.disableClick();
 	}
 }
