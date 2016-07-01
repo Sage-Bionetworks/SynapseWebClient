@@ -9,6 +9,7 @@ public interface ForumWidgetView extends IsWidget{
 		void onClickNewThread();
 		void onClickShowAllThreads();
 		Widget asWidget();
+		void onClickDeletedThreadButton();
 	}
 
 	void setPresenter(Presenter presenter);
@@ -25,4 +26,8 @@ public interface ForumWidgetView extends IsWidget{
 	void setDefaultThreadWidget(Widget w);
 	void setDefaultThreadWidgetVisible(boolean visible);
 	void showNewThreadTooltip();
+	boolean isDeletedThreadListVisible();
+	void setDeletedThreadListVisible(boolean visible);
+	void setDeletedThreadList(Widget widget);
+	void setDeletedThreadButtonVisible(boolean visible);
 }

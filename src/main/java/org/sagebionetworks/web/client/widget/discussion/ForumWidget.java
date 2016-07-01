@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
@@ -37,6 +38,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
 	SingleDiscussionThreadWidget singleThreadWidget;
+	DiscussionThreadListWidget deletedThreadListWidget;
 
 	String forumId;
 	String entityId;
@@ -59,6 +61,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			SynapseAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
+			DiscussionThreadListWidget deletedThreadListWidget,
 			NewDiscussionThreadModal newThreadModal,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
@@ -76,6 +79,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.singleThreadWidget = singleThreadWidget;
 		this.subscribeToForumButton = subscribeToForumButton;
 		this.defaultThreadWidget = defaultThreadWidget;
+		this.deletedThreadListWidget = deletedThreadListWidget;
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
@@ -83,6 +87,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setSingleThread(singleThreadWidget.asWidget());
 		view.setSubscribeButton(subscribeToForumButton.asWidget());
 		view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
+		view.setDeletedThreadList(deletedThreadListWidget.asWidget());
 		String defaultThreadId = globalApplicationState.getSynapseProperty(DEFAULT_THREAD_ID_KEY);
 		initDefaultThread(defaultThreadId);
 		emptyListCallback = new CallbackP<Boolean>(){
@@ -91,6 +96,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				if (!isSingleThread) {
 					view.setDefaultThreadWidgetVisible(!param);
 					view.setThreadListUIVisible(param);
+					view.setDeletedThreadListVisible(false);
 				}
 			}
 		};
@@ -209,6 +215,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setNewThreadButtonVisible(false);
 		view.setShowAllThreadsButtonVisible(true);
 		view.setDefaultThreadWidgetVisible(false);
+		view.setDeletedThreadListVisible(false);
+		view.setDeletedThreadButtonVisible(false);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
@@ -241,6 +249,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setNewThreadButtonVisible(true);
 		view.setShowAllThreadsButtonVisible(false);
 		view.setDefaultThreadWidgetVisible(false);
+		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -254,10 +263,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				newThreadModal.configure(forumId, new Callback(){
 					@Override
 					public void invoke() {
-						threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
+						threadListWidget.configure(forumId, isCurrentUserModerator,
+								moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 					}
 				});
-				threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
+				threadListWidget.configure(forumId, isCurrentUserModerator,
+						moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			}
 		});
 	}
@@ -279,11 +290,23 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	private void refreshThreads() {
-		threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
+		threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds,
+				emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 	}
 
 	@Override
 	public Widget asWidget(){
 		return view.asWidget();
+	}
+
+	@Override
+	public void onClickDeletedThreadButton() {
+		if (view.isDeletedThreadListVisible()) {
+			view.setDeletedThreadListVisible(false);
+		} else {
+			view.setDeletedThreadListVisible(true);
+			deletedThreadListWidget.configure(forumId, isCurrentUserModerator,
+					moderatorIds, null, DiscussionFilter.DELETED_ONLY);
+		}
 	}
 }
