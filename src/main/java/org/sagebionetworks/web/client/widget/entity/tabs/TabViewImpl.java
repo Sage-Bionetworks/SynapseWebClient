@@ -82,9 +82,9 @@ public class TabViewImpl implements TabView {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 		if (isActive) {
-			tabItem.addStyleName("active");	
+			tabListItem.addStyleName("active");	
 		} else {
-			tabItem.removeStyleName("active");
+			tabListItem.removeStyleName("active");
 		}
 		
 		tabPane.setVisible(isActive);

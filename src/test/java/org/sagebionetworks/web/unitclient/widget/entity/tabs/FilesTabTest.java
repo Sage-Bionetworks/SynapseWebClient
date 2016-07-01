@@ -297,13 +297,6 @@ public class FilesTabTest {
 		assertEquals(version, place.getVersionNumber());
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
-		
-		//quick test to verify that reconfiguring with the same entity/version should cause nothing to change (certainly should not ask for the entity bundle again).
-		reset(mockSynapseClientAsync);
-		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
-		
-		verifyZeroInteractions(mockSynapseClientAsync);
 	}
 	
 
