@@ -29,4 +29,6 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	boolean isLoadMoreInViewport();
 
 	boolean getLoadMoreVisibility();
+
+	void setNoThreadsFoundVisible(boolean visible);
 }

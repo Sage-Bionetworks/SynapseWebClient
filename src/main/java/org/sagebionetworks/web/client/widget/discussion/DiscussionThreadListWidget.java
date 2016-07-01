@@ -39,6 +39,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private CallbackP<String> threadIdClickedCallback;
 	Set<Long> moderatorIds;
 	private Callback invokeCheckForInViewAndLoadData;
+	private DiscussionFilter filter;
 	
 	@Inject
 	public DiscussionThreadListWidget(
@@ -59,13 +60,20 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		ascending = DEFAULT_ASCENDING;
 	}
 
-	public void configure(String forumId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, CallbackP<Boolean> emptyListCallback) {
+	public void configure(String forumId, Boolean isCurrentUserModerator,
+			Set<Long> moderatorIds, CallbackP<Boolean> emptyListCallback,
+			DiscussionFilter filter) {
 		clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		this.moderatorIds = moderatorIds;
 		offset = 0L;
 		this.forumId = forumId;
+		if (filter != null) {
+			this.filter = filter;
+		} else {
+			this.filter = DEFAULT_FILTER;
+		}
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
 			public void invoke() {
@@ -108,8 +116,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		synAlert.clear();
 		view.setLoadMoreVisibility(true);
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset,
-				order, ascending, DEFAULT_FILTER,
-				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
+				order, ascending, filter, new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -122,7 +129,11 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						for(DiscussionThreadBundle bundle: result.getResults()) {
 							DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();
 							thread.configure(bundle);
-							thread.setThreadIdClickedCallback(threadIdClickedCallback);
+							if (threadIdClickedCallback != null) {
+								thread.setThreadIdClickedCallback(threadIdClickedCallback);
+							} else {
+								thread.disableClick();
+							}
 							view.addThread(thread.asWidget());
 						}
 						
@@ -136,6 +147,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 							emptyListCallback.invoke(numberOfThreads > 0);
 						};
 						view.setThreadHeaderVisible(numberOfThreads > 0);
+						view.setNoThreadsFoundVisible(numberOfThreads == 0);
 					}
 		});
 	}
@@ -147,6 +159,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			order = newOrder;
 			ascending = DEFAULT_ASCENDING;
 		}
-		configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback);
+		configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, filter);
 	}
 }
