@@ -461,18 +461,6 @@ public class ProvUtilsTest {
 			}
 
 			@Override
-			public void replaceHistoryState(String token) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void pushHistoryState(String token) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
 			public void initOnPopStateHandler() {
 				// TODO Auto-generated method stub
 			}

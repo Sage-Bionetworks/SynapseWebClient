@@ -350,9 +350,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			setCurrentPlace(targetPlace);
 			String token = appPlaceHistoryMapper.getToken(targetPlace);
 			if (pushState) {
-				synapseJSNIUtils.pushHistoryState(token);	
+				gwt.newItem(token, false);
 			} else {
-				synapseJSNIUtils.replaceHistoryState(token);
+				gwt.replaceItem(token, false);
 			}
 			
 			recordPlaceVisit(targetPlace);
