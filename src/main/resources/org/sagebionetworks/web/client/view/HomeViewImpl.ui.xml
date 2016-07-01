@@ -113,7 +113,7 @@
 											</t:TableData>
 											<t:TableData>
 												<b:Heading size="H5" addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://r-docs.synapse.org/" target="_blank" text="R client"/>
+													<b:Anchor href="http://docs.synapse.org/r/" target="_blank" text="R client"/>
 												</b:Heading>
 											</t:TableData>
 										</t:TableRow>

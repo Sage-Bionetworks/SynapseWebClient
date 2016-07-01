@@ -3,17 +3,15 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -52,16 +50,10 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 			row.add(selectBox);
 			evaluationCheckboxes.add(selectBox);
 			if (DisplayUtils.isDefined(data.getSubmissionInstructionsMessage())) {
-				Anchor moreInfoButton = new Anchor();
-				moreInfoButton.setIcon(IconType.INFO_CIRCLE);
-				moreInfoButton.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						DisplayUtils.showInfoDialog(data.getName(), data.getSubmissionInstructionsMessage(), null);
-					}
-				});
-				moreInfoButton.addStyleName("margin-left-10 greyText-imp");
-				row.add(moreInfoButton);
+				HelpWidget helpWidget = new HelpWidget();
+				helpWidget.setHelpMarkdown(SafeHtmlUtils.htmlEscape(data.getSubmissionInstructionsMessage()));
+				helpWidget.setAddStyleNames("margin-left-10 greyText-imp");
+				row.add(helpWidget.asWidget());
 			}
 			group.add(row);
 		}
