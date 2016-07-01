@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -35,6 +36,8 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	FocusPanel sortByActivity;
 	@UiField
 	Div threadHeader;
+	@UiField
+	Span noThreadsFound;
 
 
 	Widget widget;
@@ -117,5 +120,10 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Override
 	public boolean getLoadMoreVisibility() {
 		return loadMore.isVisible();
+	}
+
+	@Override
+	public void setNoThreadsFoundVisible(boolean visible) {
+		noThreadsFound.setVisible(visible);
 	}
 }

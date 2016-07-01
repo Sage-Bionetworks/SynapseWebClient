@@ -50,6 +50,11 @@
 				</g:HTMLPanel>
 			</b:Column>
 		</b:Row>
+		<b:Row>
+			<b:Column size="XS_12">
+				<bh:Span ui:field="noThreadsFound" visible="false"> No threads found.</bh:Span>
+			</b:Column>
+		</b:Row>
 		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>
 </ui:UiBinder>

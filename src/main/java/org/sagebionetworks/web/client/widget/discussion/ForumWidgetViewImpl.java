@@ -35,6 +35,12 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Span subscribeButtonContainer;
 	@UiField
 	Tooltip newThreadTooltip;
+	@UiField
+	Button deletedThreadButton;
+	@UiField
+	SimplePanel deletedThreadListContainer;
+	@UiField
+	Div deleteThreadsArea;
 	
 	Timer newThreadTooltipHider = new Timer() { 
 	    public void run() {
@@ -59,6 +65,12 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickShowAllThreads();
+			}
+		});
+		deletedThreadButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickDeletedThreadButton();
 			}
 		});
 	}
@@ -138,5 +150,26 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void showNewThreadTooltip() {
 		newThreadTooltip.show();
 		newThreadTooltipHider.schedule(5000);
+	}
+
+	@Override
+	public boolean isDeletedThreadListVisible() {
+		return deletedThreadListContainer.isVisible();
+	}
+
+	@Override
+	public void setDeletedThreadListVisible(boolean visible) {
+		deleteThreadsArea.setVisible(visible);
+		deletedThreadListContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedThreadList(Widget widget) {
+		deletedThreadListContainer.add(widget);
+	}
+
+	@Override
+	public void setDeletedThreadButtonVisible(boolean visible) {
+		deletedThreadButton.setVisible(visible);
 	}
 }
