@@ -85,6 +85,10 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		} else if (isShowCompany) {
 			view.showDescription(profile.getCompany());
 		}
+		
+		if (customClickHandler == null) {
+			view.setHref("#!Profile:" + profile.getOwnerId());
+		}
 		useCachedImage = true;
 		configurePicture();
 	}
@@ -213,6 +217,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	 */
 	public void setCustomClickHandler(ClickHandler clickHandler) {
 		customClickHandler = clickHandler;
+		view.clearHref();
 	}	
 	
 	@Override

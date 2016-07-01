@@ -108,6 +108,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 		verify(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
+		verify(mockView).setHref("#!Profile:" + profile.getOwnerId());
 	}
 	
 	@Test
@@ -142,6 +143,7 @@ public class UserBadgeTest {
 		userBadge.configure(profile);
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
 		userBadge.setCustomClickHandler(mockClickHandler);
+		verify(mockView).clearHref();
 		userBadge.badgeClicked(null);
 		verify(mockClickHandler).onClick(any(ClickEvent.class));
 	}

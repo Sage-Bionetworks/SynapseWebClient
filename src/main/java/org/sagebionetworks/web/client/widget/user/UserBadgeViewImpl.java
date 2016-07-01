@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.user;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.base.HasHref;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -51,7 +52,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 			}
 		};
 		userPicture.addClickHandler(badgeClicked);
-		usernameLink.addClickHandler(badgeClicked);
 		defaultUserPicture.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {
@@ -146,7 +146,15 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public Widget asWidget() {
 		return widget;
 	}
-
+	@Override
+	public void setHref(String href) {
+		usernameLink.setHref(href);
+	}
+	
+	@Override
+	public void clearHref() {
+		usernameLink.setHref(HasHref.EMPTY_HREF);
+	}
 	/*
 	 * Private Methods
 	 */
