@@ -12,7 +12,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -27,6 +29,10 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
 	
+	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inhereted from the parent folder or project.  If you want to have different settings on a specific file folder or table you need to create local sharing settings then modify them.";
+
+	public static final String DELETE_ACL_HELP_TEXT = "If a file or folder has sharing settings that are different from its parent folder or project you can delete the setting thereby inherting the sharing settings of the parent folder or project.";
+
 	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";
 	
 	private Presenter presenter;
@@ -43,7 +49,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private PermissionLevel[] permList;	// To enforce order.
 	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
-	private Tooltip toolTipAndDeleteAclButton;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
@@ -54,18 +59,13 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		
 		// 'Delete ACL' button
 		deleteAclButton.setType(ButtonType.DANGER);
-		deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
+		deleteAclButton.setSize(ButtonSize.SMALL);
 		deleteAclButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent ce) {
 				presenter.deleteAcl();					
 			}
 		});
-			
-		toolTipAndDeleteAclButton = new Tooltip();
-		toolTipAndDeleteAclButton.setWidget(deleteAclButton);
-		toolTipAndDeleteAclButton.setTitle(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
-		toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
 	}
 	
 	public void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay) {
@@ -154,6 +154,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			if(isInherited) {
 				// Notify user of inherited sharing settings.
 				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);
+				readOnly.addStyleName("margin-bottom-10");
 				add(readOnly);
 				
 				// 'Create ACL' button
@@ -166,13 +167,13 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					
 				});
 				createAclButton.setType(ButtonType.SUCCESS);
-				createAclButton.addStyleName("margin-top-10");
-				
-				Tooltip toolTipAndCreateAclButton = new Tooltip();
-				toolTipAndCreateAclButton.setWidget(createAclButton);
-				toolTipAndCreateAclButton.setTitle(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
-				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
-				add(toolTipAndCreateAclButton);
+				createAclButton.setSize(ButtonSize.SMALL);
+				add(createAclButton);
+				HelpWidget helpWidget = new HelpWidget();
+				helpWidget.setHelpMarkdown(CREATE_ACL_HELP_TEXT);
+				helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
+				helpWidget.setAddStyleNames("margin-left-5");
+				add(helpWidget.asWidget());
 			} else {
 				// Configure AddPeopleToAclPanel.
 				CallbackP<SynapseSuggestion> addPersonCallback = new CallbackP<SynapseSuggestion>() {
@@ -199,7 +200,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				addPeoplePanel.configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				deleteAclButton.setEnabled(canEnableInheritance);
-				add(toolTipAndDeleteAclButton);
+				add(deleteAclButton);
+				HelpWidget helpWidget = new HelpWidget();
+				helpWidget.setHelpMarkdown(DELETE_ACL_HELP_TEXT);
+				helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
+				helpWidget.setAddStyleNames("margin-left-5");
+				add(helpWidget.asWidget());
 			}
 		}
 	}

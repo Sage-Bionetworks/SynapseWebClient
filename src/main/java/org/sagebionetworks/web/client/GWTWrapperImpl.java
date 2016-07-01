@@ -12,6 +12,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -128,5 +129,14 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public boolean isWhitespace(String text) {
 		return PATTERN_WHITE_SPACE.test(text);
+	}
+	
+	@Override
+	public void newItem(String historyToken, boolean issueEvent) {
+		History.newItem(historyToken, issueEvent);
+	}
+	@Override
+	public void replaceItem(String historyToken, boolean issueEvent) {
+		History.replaceItem(historyToken, issueEvent);
 	}
 }
