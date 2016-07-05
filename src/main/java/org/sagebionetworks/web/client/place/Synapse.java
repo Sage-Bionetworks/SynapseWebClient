@@ -23,7 +23,6 @@ public class Synapse extends Place {
 		this.synapsePlaceToken = token;
 		area = null;
 		areaToken = null;
-		
 		String[] tokensArray = token.split(DELIMITER);
 		LinkedList<String> tokens = new LinkedList<String>();
 		for (int i = 0; i < tokensArray.length; i++) {
@@ -44,6 +43,7 @@ public class Synapse extends Place {
 		String nextToken = tokens.poll();
 		
 		if (nextToken != null && VERSION.equals(nextToken.toLowerCase())) {
+			nextToken = null;
 			if (!tokens.isEmpty()) {
 				versionNumber = Long.parseLong(tokens.removeFirst());
 				nextToken = tokens.poll();

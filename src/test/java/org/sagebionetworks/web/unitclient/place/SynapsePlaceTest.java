@@ -70,6 +70,18 @@ public class SynapsePlaceTest {
 	}
 	
 	@Test
+	public void testInvalidVersionCase() {
+		String testToken = testEntityId + VERSION_DELIMITER;
+		Synapse place = tokenizer.getPlace(testToken);
+		
+		Assert.assertEquals(testEntityId, place.getEntityId());
+		Assert.assertNull(place.getVersionNumber());
+		Assert.assertNull(place.getArea());
+		Assert.assertNull(place.getAreaToken());
+		Assert.assertEquals(testToken, tokenizer.getToken(place));
+	}
+	
+	@Test
 	public void testAdminVersionCase() {
 		String testToken = testEntityId + VERSION_DELIMITER + testVersionNumber + ADMIN_DELIMITER;
 		Synapse place = tokenizer.getPlace(testToken);
