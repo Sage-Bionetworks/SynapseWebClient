@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.core.shared.GWT;
@@ -11,6 +12,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,6 +34,7 @@ public class TabViewImpl implements TabView {
 	public interface TabViewImplUiBinder extends UiBinder<Widget, TabViewImpl> {}
 	Presenter presenter;
 	Widget widget;
+	ClickHandler tabClickedHandler;
 	
 	@Inject
 	public TabViewImpl(HelpWidget helpWidget) {
@@ -38,12 +42,12 @@ public class TabViewImpl implements TabView {
 		TabViewImplUiBinder binder = GWT.create(TabViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
 		this.helpWidget = helpWidget;
-		tabItem.addClickHandler(new ClickHandler() {
+		tabClickedHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onTabClicked();
 			}
-		});
+		};
 	}
 	
 	@Override
@@ -58,9 +62,11 @@ public class TabViewImpl implements TabView {
 		helpWidget.setHelpMarkdown(helpMarkdown);
 		helpWidget.setHref(helpLink);
 		tabItem.clear();
-		InlineHTML html = new InlineHTML(tabTitle);
-		html.addStyleName("margin-right-5");
-		tabItem.add(html);
+		FocusPanel panel = new FocusPanel();
+		panel.add(new InlineHTML(tabTitle));
+		panel.addClickHandler(tabClickedHandler);
+		panel.addStyleName("margin-right-5 displayInline");
+		tabItem.add(panel);
 		tabItem.add(helpWidget.asWidget());
 	}
 	
