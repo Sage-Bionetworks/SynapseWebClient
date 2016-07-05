@@ -6,12 +6,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.LIMIT;
 
 import java.util.ArrayList;
@@ -25,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -112,6 +108,8 @@ public class SingleDiscussionThreadWidgetTest {
 	ReplyCountAlert mockRefreshAlert;
 	@Mock
 	CallbackP<String> mockThreadIdClickedCallback;
+	@Mock
+	DiscussionReplyBundle mockDiscussionReplyBundle;
 	Set<Long> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -708,6 +706,8 @@ public class SingleDiscussionThreadWidgetTest {
 		AsyncMockStubber.callSuccessWith(bundle)
 		.when(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.reconfigureThread();
+		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -765,6 +765,56 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testOnClickCancel() {
+		discussionThreadWidget.onClickCancel();
+		verify(mockView).resetButton();
+		verify(mockView).setReplyTextBoxVisible(true);
+		verify(mockView).setNewReplyContainerVisible(false);
+	}
+
+	@Test
+	public void testOnClickSaveInvalidArgument() {
+		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("");
+		discussionThreadWidget.onClickSave();
+		verify(mockSynAlert).clear();
+		verify(mockMarkdownEditorWidget).getMarkdown();
+		verify(mockSynAlert).showError(anyString());
+		verifyZeroInteractions(mockDiscussionForumClientAsync);
+	}
+
+	@Test
+	public void testOnClickSaveSuccess() {
+		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("message");
+		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
+			.when(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class),
+					any(AsyncCallback.class));
+		discussionThreadWidget.onClickSave();
+		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockView).showSaving();
+		verify(mockView).showSuccess(anyString(), anyString());
+		verify(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
+		verify(mockView).resetButton();
+		verify(mockView).setReplyTextBoxVisible(true);
+		verify(mockView).setNewReplyContainerVisible(false);
+		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testOnSaveFailure() {
+		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("message");
+		AsyncMockStubber.callFailureWith(new Exception())
+			.when(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class),
+					any(AsyncCallback.class));
+		discussionThreadWidget.onClickSave();
+		verify(mockSynAlert).clear();
+		verify(mockView).showSaving();
+		verify(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
+		verifyZeroInteractions(mockCallback);
+		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockView).resetButton();
 	}
 
 	private DiscussionThreadBundle createThreadBundle(String threadId, String title,
