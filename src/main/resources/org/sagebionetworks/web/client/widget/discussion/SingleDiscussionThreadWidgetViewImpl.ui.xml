@@ -54,8 +54,13 @@
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div ui:field="threadButtonContainer" width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
-				<b:Button ui:field="replyButton" addStyleNames="margin-top-5" icon="MAIL_REPLY">Reply</b:Button>
+			<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
+					<b:TextBox ui:field="replyTextBox" placeholder="Type your reply"/>
+					<bh:Div ui:field="newReplyContainer" visible="false">
+						<bh:Div ui:field="markdownEditorContainer"></bh:Div>
+						<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
+						<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving...">Save</b:Button>
+					</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="replyDetails">
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
@@ -67,7 +72,6 @@
 				</g:HTMLPanel>
 			</bh:Div>
 		</bh:Div>
-		<g:SimplePanel ui:field="newReplyModalContainer"/>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>

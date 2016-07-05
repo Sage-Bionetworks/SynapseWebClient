@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 import java.util.Set;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -20,8 +21,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
+import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
@@ -47,13 +49,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
+	private static final String NEW_REPLY_SUCCESS_TITLE = "Reply created";
+	private static final String NEW_REPLY_SUCCESS_MESSAGE = "A new reply has been created.";
 	public static final String REPLY = "reply";
 	public static final String REPLIES = "replies";
 	public static final String CREATED_ON_PREFIX = "posted ";
 	public static final String NO_INDENTATION_WIDTH = "100%";
 	public static final String INDENTATION_WIDTH = "98%";
+	public static final String DEFAULT_MARKDOWN = "";
 	SingleDiscussionThreadWidgetView view;
-	NewReplyModal newReplyModal;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
@@ -66,6 +70,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	MarkdownWidget markdownWidget;
 	GWTWrapper gwtWrapper;
 	SubscribeButtonWidget subscribeButtonWidget;
+	MarkdownEditorWidget markdownEditor;
 	private CallbackP<String> threadIdClickedCallback; 
 	
 	private Long offset;
@@ -84,7 +89,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	@Inject
 	public SingleDiscussionThreadWidget(
 			SingleDiscussionThreadWidgetView view,
-			NewReplyModal newReplyModal,
+			MarkdownEditorWidget markdownEditor,
 			SynapseAlert synAlert,
 			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
@@ -101,7 +106,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.jsniUtils = jsniUtils;
-		this.newReplyModal = newReplyModal;
+		this.markdownEditor = markdownEditor;
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
@@ -114,7 +119,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.subscribeButtonWidget = subscribeButtonWidget;
 		
 		view.setPresenter(this);
-		view.setNewReplyModal(newReplyModal.asWidget());
+		view.setMarkdownEditorWidget(markdownEditor.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
 		view.setEditThreadModal(editThreadModal.asWidget());
@@ -148,13 +153,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setIsAuthorModerator(isAuthorModerator);
 		
 		authorWidget.configure(bundle.getCreatedBy());
-		newReplyModal.configure(bundle.getId(), new Callback(){
-
-			@Override
-			public void invoke() {
-				reconfigureThread();
-			}
-		});
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
 			public void invoke() {
@@ -209,12 +207,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
-
-		if (numberOfReplies == 0) {
-			view.setButtonContainerWidth(NO_INDENTATION_WIDTH);
-		} else {
-			view.setButtonContainerWidth(INDENTATION_WIDTH);
-		}
 
 	}
 	
@@ -327,7 +319,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else {
-			newReplyModal.show();
+			view.setReplyTextBoxVisible(false);
+			markdownEditor.configure(DEFAULT_MARKDOWN);
+			view.setNewReplyContainerVisible(true);
+			markdownEditor.setMarkdownFocus();
 		}
 	}
 
@@ -438,11 +433,46 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		});
 	}
 	
-	public void setReplyButtonVisible(boolean visible) {
-		view.setReplyButtonVisible(visible);
+	public void setReplyTextBoxVisible(boolean visible) {
+		view.setReplyTextBoxVisible(visible);
 	}
 	
 	public void setCommandsVisible(boolean visible) {
 		view.setCommandsVisible(visible);
+	}
+
+	public void onClickCancel() {
+		view.resetButton();
+		view.setReplyTextBoxVisible(true);
+		view.setNewReplyContainerVisible(false);
+	}
+
+	public void onClickSave() {
+		synAlert.clear();
+		String messageMarkdown = markdownEditor.getMarkdown();
+		ValidationResult result = new ValidationResult();
+		result.requiredField("Message", messageMarkdown);
+		if (!result.isValid()) {
+			synAlert.showError(result.getErrorMessage());
+			return;
+		}
+		view.showSaving();
+		CreateDiscussionReply toCreate = new CreateDiscussionReply();
+		toCreate.setThreadId(threadId);
+		toCreate.setMessageMarkdown(messageMarkdown);
+		discussionForumClientAsync.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				view.resetButton();
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(DiscussionReplyBundle result) {
+				view.showSuccess(NEW_REPLY_SUCCESS_TITLE, NEW_REPLY_SUCCESS_MESSAGE);
+				reconfigureThread();
+				onClickCancel();
+			}
+		});
 	}
 }

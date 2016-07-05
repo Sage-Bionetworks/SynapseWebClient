@@ -6,15 +6,13 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.INDENTATION_WIDTH;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.LIMIT;
-import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.NO_INDENTATION_WIDTH;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +47,7 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.discussion.modal.NewReplyModal;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
@@ -79,7 +77,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
 	@Mock
-	NewReplyModal mockNewReplyModal;
+	MarkdownEditorWidget mockMarkdownEditorWidget;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -126,7 +124,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
-		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockNewReplyModal,
+		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockMarkdownEditorWidget,
 				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
 				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
@@ -140,7 +138,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadWidget);
-		verify(mockView).setNewReplyModal(any(Widget.class));
+		verify(mockView).setMarkdownEditorWidget(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setEditThreadModal(any(Widget.class));
@@ -163,13 +161,11 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setIsAuthorModerator(false);
-		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedVisible(false);
 		verify(mockView).setThreadLink(anyString());
-		verify(mockView).setButtonContainerWidth(INDENTATION_WIDTH);
 		verify(mockView).setPinIconVisible(false);
 		verify(mockView).setUnpinIconVisible(false);
 		verify(mockView).setRefreshAlert(any(Widget.class));
@@ -222,10 +218,8 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
-		verify(mockView).setButtonContainerWidth(NO_INDENTATION_WIDTH);
 	}
 
 	@Test
@@ -282,7 +276,6 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
-		verify(mockNewReplyModal).configure(anyString(), any(Callback.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(true);
 		verify(mockView).setEditedVisible(false);
@@ -406,16 +399,22 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickNewReply() {
 		discussionThreadWidget.onClickNewReply();
-		verify(mockNewReplyModal).show();
+		verify(mockMarkdownEditorWidget).configure(anyString());
+		verify(mockView).setReplyTextBoxVisible(false);
+		verify(mockView).setNewReplyContainerVisible(true);
+		verify(mockMarkdownEditorWidget).setMarkdownFocus();
 	}
 
 	@Test
 	public void testOnClickNewReplyAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		discussionThreadWidget.onClickNewReply();
-		verify(mockNewReplyModal, never()).show();
+		verify(mockMarkdownEditorWidget, never()).configure(anyString());
 		verify(mockGlobalApplicationState).getPlaceChanger();
 		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, never()).setReplyTextBoxVisible(false);
+		verify(mockView, never()).setNewReplyContainerVisible(true);
+		verify(mockMarkdownEditorWidget, never()).setMarkdownFocus();
 	}
 
 	@SuppressWarnings("unchecked")

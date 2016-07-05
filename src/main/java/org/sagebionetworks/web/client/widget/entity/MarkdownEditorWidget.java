@@ -499,4 +499,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		// pop up suggest box.  on selection, userSelector has been configured to add the username to the md.
 		userSelector.show();
 	}
+
+	public void setMarkdownFocus() {
+		view.setMarkdownFocus();
+	}
 }
