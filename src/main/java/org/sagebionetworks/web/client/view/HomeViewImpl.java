@@ -27,7 +27,6 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -38,7 +37,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
-	public static final String FAVORITE_STAR_HTML = "<span style=\"font-size:19px;color:#f0ad4e\" class=\"fa fa-star\"></span>";
 	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
 	
@@ -196,7 +194,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		becomeCertifiedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Certification"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html", "", "");
 			}
 		});
 		
@@ -302,12 +300,5 @@ public class HomeViewImpl extends Composite implements HomeView {
 		registerUI.setVisible(false);
 		loginUI.setVisible(false);
 		userDisplayName.setText("");
-	}
-
-	private void configureNewWindowLink(Anchor a, String href, String text) {
-		a.addStyleName("link");
-		a.setTarget("_blank");
-		a.setHref(href);
-		a.setText(text);
 	}
 }
