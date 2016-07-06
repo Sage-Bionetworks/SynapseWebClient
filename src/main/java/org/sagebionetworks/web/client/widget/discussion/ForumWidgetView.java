@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -30,4 +32,5 @@ public interface ForumWidgetView extends IsWidget{
 	void setDeletedThreadListVisible(boolean visible);
 	void setDeletedThreadList(Widget widget);
 	void setDeletedThreadButtonVisible(boolean visible);
+	void setDeletedThreadButtonIcon(IconType icon);
 }
