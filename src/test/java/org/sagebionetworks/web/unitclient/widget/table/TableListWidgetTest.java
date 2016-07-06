@@ -95,8 +95,8 @@ public class TableListWidgetTest {
 		assertEquals(TableListWidget.OFFSET_ZERO, query.getOffset());
 		assertEquals(TableListWidget.PAGE_SIZE, query.getLimit());
 		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.createdOn.name());
-		sort.setDirection(SortDirection.DESC);
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
 		assertEquals(sort, query.getSort());
 	}
 	
