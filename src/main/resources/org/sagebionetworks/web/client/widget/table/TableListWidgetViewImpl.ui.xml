@@ -5,11 +5,27 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-		<b:ButtonToolBar addStyleNames="margin-bottom-5">
-			<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
-			<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
-			<b:Button ui:field="addFileView" icon="PLUS" visible="false">Add View</b:Button>
-		</b:ButtonToolBar>
+		<b:Row addStyleNames="margin-bottom-5">
+			<b:Column size="XS_12 SM_1 MD_3" push="SM_11 MD_9">
+				<b:ButtonGroup pull="RIGHT">
+					<b:Button ui:field="sortButton" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px" text="Created On: Most Recent"></b:Button>
+					<b:DropDownMenu>
+						<b:AnchorListItem ui:field="createdOnDesc">Created On: Most Recent</b:AnchorListItem>
+						<b:AnchorListItem ui:field="createdOnAsc">Created On: Least Recent</b:AnchorListItem>
+						<b:AnchorListItem ui:field="nameAsc">Name: A-Z</b:AnchorListItem>
+						<b:AnchorListItem ui:field="nameDesc">Name: Z-A</b:AnchorListItem>
+					</b:DropDownMenu>
+				</b:ButtonGroup>
+			</b:Column>
+			<b:Column size="XS_12 SM_11 MD_9" pull="SM_1 MD_3">
+				<b:ButtonToolBar>
+					<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
+					<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
+					<b:Button ui:field="addFileView" icon="PLUS" visible="false">Add View</b:Button>
+			</b:ButtonToolBar>
+			</b:Column>
+		</b:Row>
+		
 		<b:ListGroup ui:field="tablesList" />
 		<b:Row >
 			<b:Column size="XS_2" offset="XS_5">

@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -47,6 +50,16 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	SimplePanel fileViewWizardContainer;
 	@UiField
 	SimplePanel paginationPanel;
+	@UiField
+	AnchorListItem createdOnDesc;
+	@UiField
+	AnchorListItem createdOnAsc;
+	@UiField
+	AnchorListItem nameAsc;
+	@UiField
+	AnchorListItem nameDesc;
+	@UiField
+	Button sortButton;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -54,6 +67,35 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Inject
 	public TableListWidgetViewImpl(Binder binder) {
 		this.panel = binder.createAndBindUi(this);
+		createdOnDesc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(createdOnDesc.getText());
+				presenter.onSort(EntityFieldName.createdOn.name(), SortDirection.DESC);
+			}
+		});
+		createdOnAsc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(createdOnAsc.getText());
+				presenter.onSort(EntityFieldName.createdOn.name(), SortDirection.ASC);
+			}
+		});
+		nameDesc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(nameDesc.getText());
+				presenter.onSort(EntityFieldName.name.name(), SortDirection.DESC);
+			}
+		});
+
+		nameAsc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(nameAsc.getText());
+				presenter.onSort(EntityFieldName.name.name(), SortDirection.ASC);
+			}
+		});
 	}
 
 	@Override
@@ -67,6 +109,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 				}
 			}));
 		}
+	}
+	
+	@Override
+	public void resetSortUI() {
+		sortButton.setText(createdOnDesc.getText());	
 	}
 	
 	@Override

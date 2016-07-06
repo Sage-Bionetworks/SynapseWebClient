@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -40,6 +41,13 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 * Report when a table is clicked
 		 */
 		void onTableClicked(String entityId);
+		
+		/**
+		 * called on sort
+		 * @param sortColumnName
+		 * @param sortDirection
+		 */
+		void onSort(String sortColumnName, SortDirection sortDirection);
 	}
 
 	/**
@@ -93,5 +101,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	public void addUploadTableModal(IsWidget uploadTableModalWidget);
 
 	public void addWizard(IsWidget wizard);
+	void resetSortUI();
 	
 }

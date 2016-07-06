@@ -82,7 +82,7 @@ public class TableListWidgetTest {
 	@Test
 	public void testCreateQuery(){
 		String parentId = ENTITY_ID;
-		EntityQuery query = widget.createQuery(parentId);
+		EntityQuery query = widget.createQuery(parentId, EntityFieldName.name.name(), SortDirection.ASC);
 		assertNotNull(query);
 		assertNotNull(query.getConditions());
 		assertEquals(2, (query.getConditions().size()));
@@ -106,6 +106,7 @@ public class TableListWidgetTest {
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE-1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
+		verify(mockView).resetSortUI();
 		verify(mockView).showPaginationVisible(false);
 	}
 	

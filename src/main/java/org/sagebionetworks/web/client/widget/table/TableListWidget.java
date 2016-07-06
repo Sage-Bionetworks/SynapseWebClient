@@ -102,20 +102,25 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
-		this.query = createQuery(parentBundle.getEntity().getId());
+		view.resetSortUI();
+		onSort(EntityFieldName.createdOn.name(), SortDirection.DESC);
+	}
+	
+	public void onSort(String sortColumnName, SortDirection sortDirection) {
+		this.query = createQuery(parentBundle.getEntity().getId(), sortColumnName, sortDirection);
 		queryForOnePage(OFFSET_ZERO);
 	}
-
+	
 	/**
 	 * Create a new query.
 	 * @param parentId
 	 * @return
 	 */
-	public EntityQuery createQuery(String parentId) {
+	public EntityQuery createQuery(String parentId, String sortColumnName, SortDirection sortDirection) {
 		EntityQuery newQuery = new EntityQuery();
 		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
+		sort.setColumnName(sortColumnName);
+		sort.setDirection(sortDirection);
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
 		Condition typeCondition = EntityQueryUtils.buildCondition(
@@ -126,6 +131,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		newQuery.setOffset(OFFSET_ZERO);
 		return newQuery;
 	}
+	
 	/**
 	 * Run a query and populate the page with the results.
 	 * @param offset The offset used by the query.
