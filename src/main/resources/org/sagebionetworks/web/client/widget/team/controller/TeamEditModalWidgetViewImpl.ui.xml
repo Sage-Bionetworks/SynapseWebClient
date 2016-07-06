@@ -12,8 +12,8 @@
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalHeader closable="true">
 		    <b:Heading size="H4" text="Edit Team" addStyleNames="displayInline"/>
-		    <w:HelpWidget helpMarkdown="A team of users can be used to grant access to content for the whole group or give attribution to a team." 
-				href="http://docs.synapse.org/articles/teams.html" addStyleNames="margin-left-5"/>
+		    <w:HelpWidget helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation." 
+				href="http://docs.synapse.org/articles/teams.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 		</b:ModalHeader>
 	
 		<b:ModalBody>

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -40,6 +41,8 @@ public class HelpWidget implements IsWidget {
 	Popover helpPopover;
 	@UiField
 	SpanElement icon;
+	@UiField
+	Anchor anchor;
 	
 	Widget widget;
 	private static MarkdownIt markdownIt = new MarkdownItImpl();
@@ -48,6 +51,7 @@ public class HelpWidget implements IsWidget {
 	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText";
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
+		anchor.getElement().setAttribute("tabindex", "0");
 	}
 
 	public void setText(String text) {

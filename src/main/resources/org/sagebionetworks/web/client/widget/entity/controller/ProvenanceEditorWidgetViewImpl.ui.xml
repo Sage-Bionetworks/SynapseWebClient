@@ -11,7 +11,7 @@
 			<b:ModalHeader>
 			    <b:Heading size="H4" text="Edit Provenance (Activity)" addStyleNames="displayInline"/>
 			    <w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results." 
-					href="http://docs.synapse.org/articles/provenance.html" addStyleNames="margin-left-5"/>
+					href="http://docs.synapse.org/articles/provenance.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			</b:ModalHeader>
 			<b:ModalBody>
 			     <b:FormGroup>
