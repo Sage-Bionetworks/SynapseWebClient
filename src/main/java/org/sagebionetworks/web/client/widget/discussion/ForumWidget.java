@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
@@ -303,8 +304,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void onClickDeletedThreadButton() {
 		if (view.isDeletedThreadListVisible()) {
 			view.setDeletedThreadListVisible(false);
+			view.setDeletedThreadButtonIcon(IconType.TOGGLE_RIGHT);
 		} else {
 			view.setDeletedThreadListVisible(true);
+			view.setDeletedThreadButtonIcon(IconType.TOGGLE_DOWN);
 			deletedThreadListWidget.configure(forumId, isCurrentUserModerator,
 					moderatorIds, null, DiscussionFilter.DELETED_ONLY);
 		}
