@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -171,5 +172,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setDeletedThreadButtonVisible(boolean visible) {
 		deletedThreadButton.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedThreadButtonIcon(IconType icon) {
+		deletedThreadButton.setIcon(icon);
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import static junit.framework.Assert.*;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -350,6 +351,7 @@ public class ForumWidgetTest {
 		when(mockView.isDeletedThreadListVisible()).thenReturn(true);
 		forumWidget.onClickDeletedThreadButton();
 		verify(mockView).setDeletedThreadListVisible(false);
+		verify(mockView).setDeletedThreadButtonIcon(IconType.TOGGLE_RIGHT);
 	}
 
 	@Test
@@ -367,5 +369,6 @@ public class ForumWidgetTest {
 		forumWidget.onClickDeletedThreadButton();
 		verify(mockView).setDeletedThreadListVisible(true);
 		verify(mockDeletedThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), eq((CallbackP)null), eq(DiscussionFilter.DELETED_ONLY));
+		verify(mockView).setDeletedThreadButtonIcon(IconType.TOGGLE_DOWN);
 	}
 }
