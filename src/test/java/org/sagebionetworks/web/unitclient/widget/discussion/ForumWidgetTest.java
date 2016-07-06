@@ -140,7 +140,7 @@ public class ForumWidgetTest {
 		assertEquals(DEFAULT_THREAD_ID, defaultThreadBundle.getId());
 		assertEquals(DEFAULT_THREAD_MESSAGE_KEY, defaultThreadBundle.getMessageKey());
 		
-		verify(mockDefaultThreadWidget).setReplyButtonVisible(false);
+		verify(mockDefaultThreadWidget).setReplyTextBoxVisible(false);
 		verify(mockDefaultThreadWidget).setCommandsVisible(false);
 
 		//test "New Thread" button tooltip shown if user attempts to follow default thread

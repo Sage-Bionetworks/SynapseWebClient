@@ -38,8 +38,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setCreatedOn(String createdOn);
 
-	void setNewReplyModal(Widget w);
-
 	void setAlert(Widget w);
 
 	void setLoadMoreVisibility(boolean visible);
@@ -50,7 +48,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
 
-	void setReplyButtonVisible(boolean visible);
+	void setReplyTextBoxVisible(boolean visible);
 
 	void setCommandsVisible(boolean visible);
 
@@ -72,7 +70,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void removeRefreshAlert();
 
-	void setButtonContainerWidth(String width);
 	void setPinIconVisible(boolean visible);
 	void setUnpinIconVisible(boolean visible);
 	void setIsAuthorModerator(boolean isModerator);
@@ -82,4 +79,12 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	boolean getLoadMoreVisibility();
 
 	boolean isLoadMoreAttached();
+
+	void resetButton();
+
+	void setNewReplyContainerVisible(boolean visible);
+
+	void setMarkdownEditorWidget(Widget widget);
+
+	void showSaving();
 }

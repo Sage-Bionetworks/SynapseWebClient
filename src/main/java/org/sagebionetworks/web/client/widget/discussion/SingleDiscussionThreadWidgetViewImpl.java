@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.IconStack;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -43,10 +44,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	HTMLPanel loadMore;
 	@UiField
-	Button replyButton;
-	@UiField
-	SimplePanel newReplyModalContainer;
-	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div refreshAlertContainer;
@@ -63,8 +60,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Span subscribeButtonContainer;
 	@UiField
-	Div threadButtonContainer;
-	@UiField
 	IconStack unpinIconStack;
 	@UiField
 	Icon unpinIcon;
@@ -74,6 +69,17 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Label moderatorBadge;
 	@UiField
 	Div commandsContainer;
+	@UiField
+	TextBox replyTextBox;
+	@UiField
+	Div newReplyContainer;
+	@UiField
+	Div markdownEditorContainer;
+	@UiField
+	Button cancelButton;
+	@UiField
+	Button saveButton;
+
 	String threadLinkHref;
 	private Widget widget;
 	private SingleDiscussionThreadWidget presenter;
@@ -81,7 +87,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Inject
 	public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		replyButton.addClickHandler(new ClickHandler(){
+		replyTextBox.addClickHandler(new ClickHandler(){
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -113,6 +119,18 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickUnpinThread();
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickCancel();
+			}
+		});
+		saveButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickSave();
 			}
 		});
 	}
@@ -160,11 +178,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setNewReplyModal(Widget w) {
-		newReplyModalContainer.setWidget(w);
-	}
-
-	@Override
 	public void setAlert(Widget w) {
 		synAlertContainer.add(w);
 	}
@@ -198,11 +211,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
 				.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 				.show();
-	}
-
-	@Override
-	public void setReplyButtonVisible(boolean visible) {
-		replyButton.setVisible(visible);
 	}
 
 	@Override
@@ -251,11 +259,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setButtonContainerWidth(String width){
-		threadButtonContainer.setWidth(width);
-	}
-	
-	@Override
 	public void setPinIconVisible(boolean visible) {
 		pinIcon.setVisible(visible);
 	}
@@ -288,5 +291,30 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public boolean getLoadMoreVisibility() {
 		return loadMore.isVisible();
+	}
+
+	@Override
+	public void setReplyTextBoxVisible(boolean visible) {
+		replyTextBox.setVisible(visible);
+	}
+
+	@Override
+	public void resetButton() {
+		saveButton.state().reset();
+	}
+
+	@Override
+	public void setNewReplyContainerVisible(boolean visible) {
+		newReplyContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setMarkdownEditorWidget(Widget widget) {
+		markdownEditorContainer.add(widget);
+	}
+
+	@Override
+	public void showSaving() {
+		saveButton.state().loading();
 	}
 }

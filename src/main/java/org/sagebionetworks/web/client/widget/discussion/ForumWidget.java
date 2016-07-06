@@ -173,7 +173,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				view.showNewThreadTooltip();
 			}
 		});
-		defaultThreadWidget.setReplyButtonVisible(false);
+		defaultThreadWidget.setReplyTextBoxVisible(false);
 		defaultThreadWidget.setCommandsVisible(false);
 	}
 	
