@@ -12,7 +12,7 @@
 		<b:ModalHeader>
 			<b:Heading size="H4" text="Sharing Settings" addStyleNames="displayInline" />
 			<w:HelpWidget helpMarkdown="Sharing of content can be done using multiple access levels. Only Administrators can add, delete ,or change access levels for other people." 
-					addStyleNames="margin-left-5"/>
+					addStyleNames="margin-left-5" placement="BOTTOM"/>
 		</b:ModalHeader>
 		<b:ModalBody>
 			<g:SimplePanel ui:field="editorPanel" />

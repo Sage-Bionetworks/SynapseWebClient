@@ -136,7 +136,7 @@
 									    	<g:FocusPanel ui:field="projectsLink" addStyleNames="displayInline">
 									    		<bh:Text>Projects</bh:Text>
 										    </g:FocusPanel>
-										    <w:HelpWidget helpMarkdown="##### Content in Synapse is organized into user-created projects.&#10;This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name." 
+										    <w:HelpWidget helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name." 
 										    	href="http://docs.synapse.org/articles/making_a_project.html" placement="BOTTOM"/>
 										</a>
 								    </li>
@@ -145,7 +145,7 @@
 									    	<g:FocusPanel ui:field="challengesLink" addStyleNames="displayInline">
 									    		<bh:Text>Challenges</bh:Text>
 										    </g:FocusPanel>
-										    <w:HelpWidget helpMarkdown="##### Challenges are computational contests organized through the Dream Challenges.&#10;This tab shows you challenges you have registered for." 
+										    <w:HelpWidget helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are computational contests organized through the Dream Challenges." 
 										    	href="http://dreamchallenges.org" placement="BOTTOM"/>
 										</a>
 								    </li>
@@ -155,8 +155,8 @@
 									    		<bh:Text>Teams</bh:Text>
 										    </g:FocusPanel>
 										    <bh:Span ui:field="teamNotifications" />
-										    <w:HelpWidget helpMarkdown="##### A Team is a group of Synapse users.&#10;Teams can be used to share content with a group of people. An email address (TeamName@synapse.org) is created for easily contacting all Team members.&#10;This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”." 
-										    	placement="BOTTOM"/>
+										    <w:HelpWidget helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”." 
+												href="http://docs.synapse.org/articles/teams.html" placement="BOTTOM" />
 										</a>
 								    </li>
 								    

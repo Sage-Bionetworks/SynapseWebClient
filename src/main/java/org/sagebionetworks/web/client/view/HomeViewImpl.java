@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -180,7 +179,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		termsOfUseBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help("Governance"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "governance.html", "", "");
 			}
 		});
 		

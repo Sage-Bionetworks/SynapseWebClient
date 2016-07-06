@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.core.shared.GWT;
@@ -13,7 +13,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -61,6 +60,7 @@ public class TabViewImpl implements TabView {
 		contentDiv.add(content);
 		helpWidget.setHelpMarkdown(helpMarkdown);
 		helpWidget.setHref(helpLink);
+		helpWidget.setPlacement(Placement.BOTTOM);
 		tabItem.clear();
 		FocusPanel panel = new FocusPanel();
 		panel.add(new InlineHTML(tabTitle));
