@@ -55,7 +55,7 @@
 				</bh:Div>
 			</bh:Div>
 			<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
-					<b:TextBox ui:field="replyTextBox" placeholder="Type your reply"/>
+					<b:TextBox ui:field="replyTextBox" placeholder="Write a reply..."/>
 					<bh:Div ui:field="newReplyContainer" visible="false">
 						<bh:Div ui:field="markdownEditorContainer"></bh:Div>
 						<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>

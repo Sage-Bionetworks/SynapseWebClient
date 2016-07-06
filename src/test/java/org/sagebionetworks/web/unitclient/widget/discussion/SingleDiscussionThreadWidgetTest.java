@@ -805,7 +805,8 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnSaveFailure() {
 		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callFailureWith(new Exception())
+		Exception exception = new Exception();
+		AsyncMockStubber.callFailureWith(exception)
 			.when(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class),
 					any(AsyncCallback.class));
 		discussionThreadWidget.onClickSave();
@@ -813,7 +814,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).showSaving();
 		verify(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
-		verify(mockSynAlert).handleException(any(Throwable.class));
+		verify(mockSynAlert).handleException(exception);
 		verify(mockView).resetButton();
 	}
 
