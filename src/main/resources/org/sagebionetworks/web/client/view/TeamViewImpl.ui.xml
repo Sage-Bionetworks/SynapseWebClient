@@ -27,7 +27,7 @@
 				    		</b:DropDownMenu>
 		    		    </b:ButtonGroup>
 					</b:ButtonToolBar>
-					<w:HelpWidget helpMarkdown="A team of users can be used to grant access to content for the whole group or give attribution to a team." 
+					<w:HelpWidget helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation." 
 						href="http://docs.synapse.org/articles/teams.html" iconStyles="lightGreyText movedown-6 font-size-18" addStyleNames="margin-right-10" pull="RIGHT" placement="LEFT" />
 	    		    <g:SimplePanel ui:field="teamEditPanel"/>
 	    			<g:SimplePanel ui:field="teamDeletePanel"/>
