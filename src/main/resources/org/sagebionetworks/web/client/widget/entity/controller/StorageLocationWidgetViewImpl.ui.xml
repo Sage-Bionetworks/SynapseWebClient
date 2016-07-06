@@ -11,7 +11,7 @@
 			<b:ModalHeader>
 				<b:Heading size="H4" text="Storage Location" addStyleNames="displayInline" />
 				<w:HelpWidget helpMarkdown="Synapse can access files stored in multiple locations.&#10;By default content is stored in Synapse native storage but can alternatively be setup with other solutions." 
-					href="http://docs.synapse.org/articles/custom_storage_location.html" addStyleNames="margin-left-5"/>
+					href="http://docs.synapse.org/articles/custom_storage_location.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			</b:ModalHeader>
 			<b:ModalBody>
 			     <b:FormGroup>
