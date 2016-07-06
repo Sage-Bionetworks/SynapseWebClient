@@ -41,7 +41,7 @@ import com.google.inject.Inject;
  */
 public class TableListWidget implements TableListWidgetView.Presenter, PageChangeListener, TableCreatedHandler, IsWidget {
 	
-	public static final Long PAGE_SIZE = 10L;
+	public static final Long PAGE_SIZE = 20L;
 	public static final Long OFFSET_ZERO = 0L;
 
 	private PreflightController preflightController;
@@ -114,8 +114,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public EntityQuery createQuery(String parentId) {
 		EntityQuery newQuery = new EntityQuery();
 		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.createdOn.name());
-		sort.setDirection(SortDirection.DESC);
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
 		Condition typeCondition = EntityQueryUtils.buildCondition(
