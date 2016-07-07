@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter.users;
 
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
@@ -11,7 +10,6 @@ import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -19,21 +17,17 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	private RegisterAccount place;
 	private RegisterAccountView view;
 	
-	private GlobalApplicationState globalApplicationState;
 	private RegisterWidget registerWidget;
 	private Header headerWidget;
 	private Footer footerWidget;
 	
 	@Inject
 	public RegisterAccountPresenter(RegisterAccountView view,
-			GlobalApplicationState globalApplicationState,
 			RegisterWidget registerWidget,
 			Header headerWidget, Footer footerWidget) {
 		this.view = view;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		// Set the presenter on the view
-		this.globalApplicationState = globalApplicationState;
 		this.registerWidget = registerWidget;
 	}
 
@@ -51,11 +45,6 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		headerWidget.refresh();
 		view.setFooterWidget(footerWidget.asWidget());
 		view.setHeaderWidget(headerWidget.asWidget());
-	}
-
-	@Override
-	public void goTo(Place place) {
-		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 	@Override

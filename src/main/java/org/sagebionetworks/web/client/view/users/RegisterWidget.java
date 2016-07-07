@@ -41,10 +41,6 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		view.setInlineUI(isInline);
 	}
 	
-	public void clearState() {
-		view.clear();
-	}
-
 	/**
 	 * Create the new user account
 	 * @param username
@@ -62,7 +58,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
 				view.showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
-				clearState();
+				view.clear();
 			}
 			
 			@Override
