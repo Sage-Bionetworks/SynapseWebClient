@@ -66,7 +66,10 @@
 						</bh:Div>
 						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" marginBottom="33" />
 					</bh:Div>
-					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15"></bh:Div>
+					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15 synapse-blue-bg padding-15">
+						<b:Heading size="H3" addStyleNames="color-white margin-top-5 margin-bottom-15" text="START USING SYNAPSE" />
+						<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-10" />
+					</bh:Div>
 					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-30 margin-bottom-15" />
 				</b:Column>
 				<b:Column size="SM_5">

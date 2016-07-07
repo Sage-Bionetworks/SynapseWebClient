@@ -84,6 +84,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Heading collaborateHeading;
 	@UiField
 	Heading userDisplayName;
+	@UiField
+	Div registerWidgetContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -125,8 +127,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
 			}
 		});
-		
-		registerUI.add(registerWidget.asWidget());
+		boolean isInline = false;
+		registerWidget.configure(isInline);
+		registerWidgetContainer.add(registerWidget.asWidget());
 		
 		loginWidget.setUserListener(new UserListener() {
 			@Override

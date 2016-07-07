@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.view.users;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -15,20 +14,21 @@ import com.google.inject.Inject;
 public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidgetPresenter {
 	
 	private RegisterWidgetView view;
-	private GlobalApplicationState globalApplicationState;
 	private UserAccountServiceAsync userService;
 	private GWTWrapper gwt;
+	private SynapseAlert synAlert;
 
 	@Inject
 	public RegisterWidget(RegisterWidgetView view, 
 			UserAccountServiceAsync userService,
-			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt) {
+			GWTWrapper gwt, 
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.userService = userService;
-		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlert(synAlert.asWidget());
 	}	
 	
 	@Override
@@ -37,6 +37,10 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		return view.asWidget();		
 	}
 
+	public void configure(boolean isInline) {
+		view.setInlineUI(isInline);
+	}
+	
 	public void clearState() {
 		view.clear();
 	}
@@ -50,13 +54,14 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	 */
 	@Override
 	public void registerUser(String email) {
+		synAlert.clear();
 		view.enableRegisterButton(false);
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";
 		userService.createUserStep1(email, callbackUrl, new AsyncCallback<Void>() {			
 			@Override
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
-				view.showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT, "");
+				view.setEmailSentAlert(true);
 				clearState();
 			}
 			
@@ -64,10 +69,9 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 			public void onFailure(Throwable caught) {
 				view.enableRegisterButton(true);
 				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
+					synAlert.showError(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
 				} else {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, false, view))
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
+					synAlert.handleException(caught);
 				}
 			}
 		});
@@ -76,9 +80,8 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	public void setVisible(boolean isVisible) {
 		view.setVisible(isVisible);
 	}
-
 	
-	/*
-	 * Private Methods
-	 */
+	public void setEmail(String email) {
+		view.setEmail(email);
+	}
 }
