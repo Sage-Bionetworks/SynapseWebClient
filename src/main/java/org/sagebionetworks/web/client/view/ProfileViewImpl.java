@@ -355,7 +355,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		alertFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html#certified_user", "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html#certified-users", "", "");
 			}
 		});
 		ClickHandler newVerificationSubmissionCallback = new ClickHandler() {
