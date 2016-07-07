@@ -20,6 +20,5 @@
 			<b:Button ui:field="registerBtn2" text="Sign up" size="LARGE" type="SUCCESS" width="100%"/>
 		</bh:Div>
 		<bh:Div ui:field="synAlertContainer" />
-		<b:Alert ui:field="emailSentAlert" visible="false" type="INFO" text="We have sent you an email with instructions on how to complete the registration process." />
 	</bh:Div>
 </ui:UiBinder> 

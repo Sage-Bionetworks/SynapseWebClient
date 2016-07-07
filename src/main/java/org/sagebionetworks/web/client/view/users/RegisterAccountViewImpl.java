@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.view.users;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.widget.footer.Footer;
-import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -23,22 +21,22 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@UiField
 	Div registerWidgetContainer;
 	
-	private Header headerWidget;
-	
 	@Inject
-	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget) {		
+	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder) {		
 		initWidget(binder.createAndBindUi(this));
-		this.headerWidget = headerWidget;
-		header.setWidget(headerWidget.asWidget());
-		footer.setWidget(footerWidget.asWidget());
 	}
 	
 	@Override
-	public void setPresenter(Presenter presenter) {
-		headerWidget.configure(false);
-		headerWidget.refresh();
+	public void setFooterWidget(Widget w) {
+		footer.clear();
+		footer.setWidget(w);
 	}
 	
+	@Override
+	public void setHeaderWidget(Widget w) {
+		header.clear();
+		header.setWidget(w);
+	}
 	@Override
 	public void setRegisterWidget(Widget w) {
 		registerWidgetContainer.clear();

@@ -61,7 +61,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 			@Override
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
-				view.setEmailSentAlert(true);
+				view.showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
 				clearState();
 			}
 			

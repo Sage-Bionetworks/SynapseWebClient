@@ -21,6 +21,6 @@ public interface RegisterWidgetView extends IsWidget {
 	void setVisible(boolean isVisible);
 	void setInlineUI(boolean isInline);
 	void setEmail(String email);
-	void setEmailSentAlert(boolean isVisible);
 	void clear();
+	void showInfo(String message);
 }

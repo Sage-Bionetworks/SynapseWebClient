@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.view.users;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,8 +29,6 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	Div blockUI;
 	@UiField
 	Div inlineUI;
-	@UiField
-	Alert emailSentAlert;
 	
 	@UiField
 	TextBox emailAddressField2;
@@ -98,9 +96,8 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	
 	@Override
 	public void clear() {
-		emailSentAlert.setVisible(false);
 		emailAddressField.setText("");
-		emailAddressField.setText("");
+		emailAddressField2.setText("");
 	}
 
 	@Override
@@ -120,9 +117,8 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 		emailAddressField.setText(email);
 		emailAddressField2.setText(email);
 	}
-	
 	@Override
-	public void setEmailSentAlert(boolean isVisible) {
-		emailSentAlert.setVisible(isVisible);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message, "");
 	}
 }
