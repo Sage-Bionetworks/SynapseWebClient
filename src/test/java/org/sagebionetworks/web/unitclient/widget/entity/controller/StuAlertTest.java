@@ -119,14 +119,6 @@ public class StuAlertTest {
 	}
 	
 	@Test
-	public void testShowSuggestLogin() {
-		widget.showSuggestLogin();
-		verify(mockView).clearState();
-		verify(mockSynapseAlert).showSuggestLogin();
-		verify(mockView).setVisible(true);
-	}
-	
-	@Test
 	public void testShowEntity403() {
 		String entityId = "syn123";
 		widget.show403(entityId);
