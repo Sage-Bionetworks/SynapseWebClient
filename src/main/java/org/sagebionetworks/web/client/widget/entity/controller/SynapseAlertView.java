@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 /**
  * Abstraction for the view 
  *
@@ -47,12 +48,14 @@ public interface SynapseAlertView extends IsWidget {
 	 */
 	void showLogin();
 	void setPresenter(Presenter p);
-
+	void setLoginWidget(Widget w);
+	
+	void reload();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onCreateJiraIssue(String userReport);
-		void onLoginClicked();
 	}
 }
