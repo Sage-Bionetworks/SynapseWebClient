@@ -41,6 +41,6 @@ public interface QuestionContainerWidgetView extends IsWidget {
 			ClickHandler clickHandler, boolean isSelected);
 	public void configure(Long questionNumber, String prompt);
 	void setIsEnabled(boolean isEnabled);
-	void configureMoreInfo(String ownerObjectId, String wikiTypeName,
-			String wikiPageId);
+	void configureMoreInfo(String helpUrl);
+	void setMoreInfoVisible(boolean isVisible);
 }
