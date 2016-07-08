@@ -77,16 +77,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
-	<filter-mapping>
-		<filter-name>log4jServletFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-		<dispatcher>REQUEST</dispatcher>
-		<dispatcher>FORWARD</dispatcher>
-		<dispatcher>INCLUDE</dispatcher>
-		<dispatcher>ERROR</dispatcher>
-	</filter-mapping>
-	
 	<!-- This filter allows us to use Guice for dependency injection in the 
 		server side servlets -->
 	<filter-mapping>
