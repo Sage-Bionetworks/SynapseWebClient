@@ -58,7 +58,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 		show403();
 		this.entityId = entityId;
 		if (!authController.isLoggedIn()) {
-			synAlert.showMustLogin();
+			synAlert.showLogin();
 		} else {
 			view.showRequestAccessUI();	
 		}
@@ -97,7 +97,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 		//if it's something that Stu recognizes, then he should handle it.
 		if(ex instanceof ForbiddenException) {			
 			if(!authController.isLoggedIn()) {
-				synAlert.showMustLogin();
+				synAlert.showLogin();
 			} else {
 				view.show403();
 			}
@@ -115,15 +115,9 @@ public class StuAlert implements StuAlertView.Presenter  {
 		view.setVisible(true);
 	}
 	
-	public void showMustLogin() {
+	public void showLogin() {
 		clear();
-		synAlert.showMustLogin();
-		view.setVisible(true);
-	}
-	
-	public void showSuggestLogin() {
-		clear();
-		synAlert.showSuggestLogin();
+		synAlert.showLogin();
 		view.setVisible(true);
 	}
 	

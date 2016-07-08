@@ -73,7 +73,7 @@ public class StuAlertTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.handleException(new ForbiddenException());
 		verify(mockView).clearState();
-		verify(mockSynapseAlert).showMustLogin();
+		verify(mockSynapseAlert).showLogin();
 		verify(mockView).setVisible(true);
 	}
 	
@@ -103,9 +103,9 @@ public class StuAlertTest {
 	
 	@Test
 	public void testShowMustLogin() {
-		widget.showMustLogin();
+		widget.showLogin();
 		verify(mockView).clearState();
-		verify(mockSynapseAlert).showMustLogin();
+		verify(mockSynapseAlert).showLogin();
 		verify(mockView).setVisible(true);
 	}
 	

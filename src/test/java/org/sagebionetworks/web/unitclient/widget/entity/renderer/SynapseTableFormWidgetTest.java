@@ -112,7 +112,7 @@ public class SynapseTableFormWidgetTest {
 		verify(mockView).setFormUIVisible(false);
 		verify(mockView).setSuccessMessageVisible(false);
 		
-		verify(mockSynAlert).showMustLogin();
+		verify(mockSynAlert).showLogin();
 	}
 	
 	@Test

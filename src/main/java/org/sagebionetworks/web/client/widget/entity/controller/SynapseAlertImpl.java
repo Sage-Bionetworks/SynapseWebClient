@@ -126,18 +126,10 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	}
 	
 	@Override
-	public void showMustLogin() {
+	public void showLogin() {
 		clear();
 		view.showLoginAlert();
 	}
-	
-	@Override
-	public void showSuggestLogin() {
-		clear();
-		view.showSuggestLoginAlert();
-	}
-	
-	
 	
 	@Override
 	public void clear() {

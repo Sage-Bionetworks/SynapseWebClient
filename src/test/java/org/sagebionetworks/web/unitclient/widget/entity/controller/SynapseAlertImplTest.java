@@ -211,7 +211,7 @@ public class SynapseAlertImplTest {
 	
 	@Test
 	public void testShowMustLogin() {
-		widget.showMustLogin();
+		widget.showLogin();
 		verify(mockView, times(2)).clearState();
 		verify(mockView).showLoginAlert();
 	}

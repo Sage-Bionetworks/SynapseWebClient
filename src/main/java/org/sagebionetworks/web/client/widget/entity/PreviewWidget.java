@@ -138,7 +138,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
 		if (!synapseAlert.isUserLoggedIn()) {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
-			synapseAlert.showMustLogin();
+			synapseAlert.showLogin();
 		} else if (bundle != null) {
 			if (!(bundle.getEntity() instanceof FileEntity)) {
 				//not a file!

@@ -78,7 +78,7 @@ public class BiodallianceWidgetTest {
 		Callback widgetRefreshRequired = null;
 		widget.configure(key, descriptor, widgetRefreshRequired, wikiVersionInView);
 		//verify that view does not try to show
-		verify(mockSynAlert).showMustLogin();
+		verify(mockSynAlert).showLogin();
 	}
 	
 	@Test
