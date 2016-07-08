@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 
 public class PasswordStrengthWidget implements PasswordStrengthWidgetView.Presenter {
 
+	public static final int MAX_PASSWORD_TEST_LENGTH = 100;
 	public static final int MIN_PASSWORD_LENGTH = 8;
 	public static final String TOO_SHORT_MESSAGE = "Too short";
 	private PasswordStrengthWidgetView view;
@@ -32,6 +33,10 @@ public class PasswordStrengthWidget implements PasswordStrengthWidgetView.Presen
 		if (password.length() < MIN_PASSWORD_LENGTH) {
 			view.showWeakPasswordUI(TOO_SHORT_MESSAGE);	
 		} else {
+			if (password.length() > MAX_PASSWORD_TEST_LENGTH) {
+				//only process the first 100 characters
+				password = password.substring(0, MAX_PASSWORD_TEST_LENGTH);
+			}
 			zxcvbn.scorePassword(password);
 			int score = zxcvbn.getScore();
 			String feedback = zxcvbn.getFeedback();
