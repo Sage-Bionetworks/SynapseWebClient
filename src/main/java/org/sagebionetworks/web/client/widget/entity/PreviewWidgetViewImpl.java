@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -81,7 +82,10 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 				presenter.imagePreviewLoadFailed(event);
 		    }
 		});
-		add(image);
+		Div div = new Div();
+		div.setHeight("200px");
+		div.add(image);
+		add(div);
 		image.setUrl(previewUrl);
 		
 		currentPopupPreviewWidget = new Image(previewUrl);

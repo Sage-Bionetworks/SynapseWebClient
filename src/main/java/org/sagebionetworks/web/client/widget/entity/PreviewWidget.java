@@ -216,7 +216,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		synapseAlert.showError("Unable to load image preview");
 	}
 	
-	public void setHeight(String height) {
-		view.setHeight(height);
+	public void addStyleName(String style) {
+		view.addStyleName(style);
 	}
 }
