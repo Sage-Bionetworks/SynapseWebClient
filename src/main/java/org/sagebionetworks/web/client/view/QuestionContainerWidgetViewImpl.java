@@ -103,11 +103,9 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	}
 	
 	@Override
-	public void configureMoreInfo(String ownerObjectId, String wikiTypeName, String wikiPageId) {
-		Wiki place = new Wiki(ownerObjectId, wikiTypeName, wikiPageId);
-		moreInfoLink.setHref("#!Wiki:" + place.toToken());
+	public void configureMoreInfo(String helpUrl) {
+		moreInfoLink.setHref(helpUrl);
 	}
-	
 	
 	@Override 
 	public void configure(Long questionNumber, String questionPrompt) {
@@ -124,6 +122,11 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 		for (CheckBox checkBox: checkBoxes) {
 			checkBox.setEnabled(isEnabled);
 		}
+	}
+	
+	@Override
+	public void setMoreInfoVisible(boolean isVisible) {
+		moreInfoLink.setVisible(isVisible);
 	}
 	
 }

@@ -13,8 +13,6 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.Question;
@@ -37,7 +35,6 @@ public class QuestionContainerWidgetTest {
 	QuestionContainerWidget questionContainerWidget;
 	MultichoiceAnswer mockAnswerOne;
 	MultichoiceAnswer mockAnswerTwo;
-	WikiPageKey mockMoreInfoKey;	
 	
 	@Before
 	public void setup(){
@@ -48,7 +45,6 @@ public class QuestionContainerWidgetTest {
 		mockMultichoiceQuestion = mock(MultichoiceQuestion.class, withSettings().extraInterfaces(Question.class));
 		mockAnswerOne = mock(MultichoiceAnswer.class);
 		mockAnswerTwo = mock(MultichoiceAnswer.class);
-		mockMoreInfoKey = mock(WikiPageKey.class);		
 		
 		questionContainerWidget = new QuestionContainerWidget(mockView);
 		
@@ -62,10 +58,6 @@ public class QuestionContainerWidgetTest {
 		when(mockMultichoiceQuestion.getQuestionIndex()).thenReturn(4L);
 		//when((MultichoiceQuestion)mockMultichoiceQuestion).thenReturn(mockMultichoiceQuestion);
 		when(mockMultichoiceQuestion.getAnswers()).thenReturn(answers);
-		when(mockMultichoiceQuestion.getReference()).thenReturn(mockMoreInfoKey);
-		when(mockMoreInfoKey.getOwnerObjectId()).thenReturn("Chewie");
-		when(mockMoreInfoKey.getOwnerObjectType()).thenReturn(ObjectType.FILE);
-		when(mockMoreInfoKey.getWikiPageId()).thenReturn("123");
 	}	
 	
 	private void setExclusive(boolean isExclusive) {
@@ -75,19 +67,21 @@ public class QuestionContainerWidgetTest {
 	@Test
 	public void testConfigureRadioButtons() {
 		setExclusive(true);
+		when(mockMultichoiceQuestion.getDocLink()).thenReturn(null);
 		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
 		verify(mockView, times(2)).addRadioButton(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
-		verify(mockView).configureMoreInfo(mockMoreInfoKey.getOwnerObjectId(),
-				mockMoreInfoKey.getOwnerObjectType().name(), mockMoreInfoKey.getWikiPageId());
+		verify(mockView).setMoreInfoVisible(false);
 	}
 	
 	@Test
 	public void testConfigureCheckBoxes() {
 		setExclusive(false);
+		String docLink = "docs.synapse.org/articles/accounts_certified_users_and_qualified_researchers.html";
+		when(mockMultichoiceQuestion.getDocLink()).thenReturn(docLink); 
 		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
 		verify(mockView, times(2)).addCheckBox(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
-		verify(mockView).configureMoreInfo(mockMoreInfoKey.getOwnerObjectId(),
-		mockMoreInfoKey.getOwnerObjectType().name(), mockMoreInfoKey.getWikiPageId());
+		verify(mockView).configureMoreInfo(docLink);
+		verify(mockView).setMoreInfoVisible(true);
 	}
 	
 	

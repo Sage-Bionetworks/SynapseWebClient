@@ -3,11 +3,11 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -67,9 +67,12 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					}, wasSelected(response, answer.getAnswerIndex()));
 				}
 			}
-			final WikiPageKey moreInfoKey = question.getReference();
-			if (moreInfoKey != null && moreInfoKey.getOwnerObjectId() != null) {
-				view.configureMoreInfo(moreInfoKey.getOwnerObjectId(), moreInfoKey.getOwnerObjectType().name(), moreInfoKey.getWikiPageId());
+			String helpLink = question.getDocLink();
+			if (DisplayUtils.isDefined(helpLink)) {
+				view.setMoreInfoVisible(true);
+				view.configureMoreInfo(helpLink);
+			} else {
+				view.setMoreInfoVisible(false);
 			}
 		}
 
