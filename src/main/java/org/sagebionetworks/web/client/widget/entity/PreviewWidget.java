@@ -138,7 +138,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
 		if (!synapseAlert.isUserLoggedIn()) {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
-			synapseAlert.showMustLogin();
+			synapseAlert.showLogin();
 		} else if (bundle != null) {
 			if (!(bundle.getEntity() instanceof FileEntity)) {
 				//not a file!
@@ -216,7 +216,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		synapseAlert.showError("Unable to load image preview");
 	}
 	
-	public void setHeight(String height) {
-		view.setHeight(height);
+	public void addStyleName(String style) {
+		view.addStyleName(style);
 	}
 }

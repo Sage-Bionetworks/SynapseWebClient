@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -12,20 +12,22 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -36,16 +38,27 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class SynapseAlertImplTest {
-
+	@Mock
 	SynapseAlertView mockView;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
 	SynapseAlertImpl widget;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	JiraURLHelper mockJiraClient;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	LoginWidget mockLoginWidget;
+	
 	// a new jira odyssey
 	String newJiraKey = "SWC-2001";
 	
@@ -53,13 +66,8 @@ public class SynapseAlertImplTest {
 	public static final String JIRA_ENDPOINT_URL="http://foo.bar.com/";
 	@Before
 	public void before(){
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockJiraClient = mock(JiraURLHelper.class);
-		mockView = mock(SynapseAlertView.class);
-		mockGWT = mock(GWTWrapper.class);
-		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT);
+		MockitoAnnotations.initMocks(this);
+		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector);
 		UserSessionData mockUSD = mock(UserSessionData.class);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUSD);
 		UserProfile mockProfile = mock(UserProfile.class);
@@ -74,6 +82,7 @@ public class SynapseAlertImplTest {
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		verify(mockView).setPresenter(widget);
+		when(mockPortalGinInjector.getLoginWidget()).thenReturn(mockLoginWidget);
 	}
 	
 	@Test
@@ -103,8 +112,10 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceExceptionForbiddenNotLoggedIn() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.handleException(new ForbiddenException());
-		verify(mockView, times(2)).clearState();
-		verify(mockView).showLoginAlert();
+		verify(mockView, atLeastOnce()).clearState();
+		verify(mockPortalGinInjector).getLoginWidget();
+		verify(mockView).setLoginWidget(any(Widget.class));
+		verify(mockView).showLogin();
 	}
 	
 	@Test
@@ -198,12 +209,6 @@ public class SynapseAlertImplTest {
 	}
 	
 	@Test
-	public void testOnLoginClicked() {
-		widget.onLoginClicked();
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
-
-	@Test
 	public void testIsUserLoggedIn() {
 		widget.isUserLoggedIn();
 		verify(mockAuthenticationController).isLoggedIn();
@@ -211,9 +216,11 @@ public class SynapseAlertImplTest {
 	
 	@Test
 	public void testShowMustLogin() {
-		widget.showMustLogin();
+		widget.showLogin();
 		verify(mockView, times(2)).clearState();
-		verify(mockView).showLoginAlert();
+		verify(mockPortalGinInjector).getLoginWidget();
+		verify(mockView).setLoginWidget(any(Widget.class));
+		verify(mockView).showLogin();
 	}
 	
 	@Test

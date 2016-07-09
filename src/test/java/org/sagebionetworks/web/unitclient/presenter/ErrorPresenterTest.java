@@ -2,9 +2,11 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +64,7 @@ public class ErrorPresenterTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).setEntry(mockLogEntry);
 		verify(mockJsniUtils, times(3)).consoleError(anyString());
-		verify(mockSynAlert).showSuggestLogin();
+		verify(mockSynAlert).showLogin();
 	}
 	@Test
 	public void testShowLogEntryLoggedIn() throws RestServiceException {
@@ -73,7 +75,7 @@ public class ErrorPresenterTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).setEntry(mockLogEntry);
 		verify(mockJsniUtils, times(3)).consoleError(anyString());
-		verify(mockSynAlert, never()).showSuggestLogin();
+		verify(mockSynAlert, never()).showLogin();
 	}
 	
 	@Test

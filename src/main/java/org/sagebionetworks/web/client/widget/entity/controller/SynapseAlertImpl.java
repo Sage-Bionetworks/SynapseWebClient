@@ -2,13 +2,17 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -25,20 +29,30 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
+	PortalGinInjector ginInjector;
 	Throwable ex;
-	
+	UserListener reloadOnLoginListener;
 	@Inject
 	public SynapseAlertImpl(
 			SynapseAlertView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authController,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 		view.clearState();
+		
+		reloadOnLoginListener = new UserListener() {
+			@Override
+			public void userChanged(UserSessionData newUser) {
+				SynapseAlertImpl.this.view.reload();
+			}
+		};
 	}
 
 	@Override
@@ -55,7 +69,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {
-				view.showLoginAlert();
+				showLogin();
 			} else {
 				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
 			}
@@ -116,28 +130,19 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	}
 	
 	@Override
-	public void onLoginClicked() {
-		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
-	}
-	
-	@Override
 	public boolean isUserLoggedIn() {
 		return authController.isLoggedIn();
 	}
 	
 	@Override
-	public void showMustLogin() {
+	public void showLogin() {
 		clear();
-		view.showLoginAlert();
+		// lazy inject login widget
+		LoginWidget loginWidget = ginInjector.getLoginWidget();
+		loginWidget.setUserListener(reloadOnLoginListener);
+		view.setLoginWidget(loginWidget.asWidget());
+		view.showLogin();
 	}
-	
-	@Override
-	public void showSuggestLogin() {
-		clear();
-		view.showSuggestLoginAlert();
-	}
-	
-	
 	
 	@Override
 	public void clear() {

@@ -120,7 +120,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		
-		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
+		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
 		view.setFolderTitlebar(folderTitleBar.asWidget());
 		view.setBreadcrumb(breadcrumb.asWidget());

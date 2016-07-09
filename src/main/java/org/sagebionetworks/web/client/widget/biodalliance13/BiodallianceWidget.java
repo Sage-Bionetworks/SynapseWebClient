@@ -72,7 +72,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			List<BiodallianceSource> sources) {
 		synAlert.clear();
 		if (!authenticationController.isLoggedIn()) {
-			synAlert.showMustLogin();
+			synAlert.showLogin();
 		} else {
 			this.initChr = initChr;
 		    this.initViewStart = initViewStart;

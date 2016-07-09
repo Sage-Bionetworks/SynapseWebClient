@@ -116,6 +116,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
@@ -399,4 +400,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	// docker
 	public DockerRepoWidget createNewDockerRepoWidget();
+	
+	public LoginWidget getLoginWidget();
 }

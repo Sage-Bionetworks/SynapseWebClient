@@ -124,7 +124,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView).setSynapseAlertWidget(any(Widget.class));
-		verify(mockSynapseAlert).showMustLogin();
+		verify(mockSynapseAlert).showLogin();
 	}
 	
 	@Test
