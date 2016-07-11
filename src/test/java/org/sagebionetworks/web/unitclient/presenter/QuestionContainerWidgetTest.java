@@ -77,10 +77,12 @@ public class QuestionContainerWidgetTest {
 	public void testConfigureCheckBoxes() {
 		setExclusive(false);
 		String docLink = "docs.synapse.org/articles/accounts_certified_users_and_qualified_researchers.html";
-		when(mockMultichoiceQuestion.getDocLink()).thenReturn(docLink); 
+		String helpText = "Help text";
+		when(mockMultichoiceQuestion.getDocLink()).thenReturn(docLink);
+		when(mockMultichoiceQuestion.getHelpText()).thenReturn(helpText);
 		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
 		verify(mockView, times(2)).addCheckBox(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
-		verify(mockView).configureMoreInfo(docLink);
+		verify(mockView).configureMoreInfo(docLink, helpText);
 		verify(mockView).setMoreInfoVisible(true);
 	}
 	
