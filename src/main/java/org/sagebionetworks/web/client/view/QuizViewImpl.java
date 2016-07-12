@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,9 +37,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@UiField
 	HTMLPanel quizContainer;
-	
 	@UiField
-	DivElement quizHeader;
+	org.gwtbootstrap3.client.ui.Button tutorialButton1;
+	@UiField
+	HTML quizHeader;
 	
 	@UiField
 	DivElement quizSuccessUI;
@@ -59,9 +61,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@UiField
 	SimplePanel successContainer;
-	
-	@UiField
-	Button tutorialButton1;
 	
 	@UiField
 	Anchor tryAgainLink;
@@ -93,23 +92,18 @@ public class QuizViewImpl extends Composite implements QuizView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		successContainer.setWidget(certificateWidget.asWidget());
-		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.GETTING_STARTED), "", "");
-			}
-		};
-		
-		tutorialButton1.addClickHandler(gotoGettingStartedNewWindow);
-		quizHeader.setInnerHTML("<h3>Certification Quiz</h3>");
-		
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.CERTIFICATION));
 			}
 		});
-		
+		tutorialButton1.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "getting_started.html", "", "");
+			}
+		});
 		submitButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -123,6 +117,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		this.presenter = loginPresenter;
 		header.clear();
 		headerWidget.configure(false);
+		headerWidget.refresh();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
@@ -162,7 +157,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@Override
 	public void setQuizHeader(String quizHeader) {
-		this.quizHeader.setInnerHTML(SimpleHtmlSanitizer.sanitizeHtml(quizHeader).asString());
+		this.quizHeader.setHTML(SimpleHtmlSanitizer.sanitizeHtml(quizHeader));
 	}
 	
 	@Override
