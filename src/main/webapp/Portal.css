@@ -1030,7 +1030,6 @@ a.shortBtn {
 	max-width: none;
 }
 
-
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }
@@ -2220,6 +2219,11 @@ iframe[seamless] {
 .popover-content {
 	overflow-x: hidden;
 }
+
+.popover, #rootPanel .popover {
+	max-width: 400px;
+}
+
 
 h1, .h1, h2, .h2, h3, .h3 {
 	margin-top: 10px !important;

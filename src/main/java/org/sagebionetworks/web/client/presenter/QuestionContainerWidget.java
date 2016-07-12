@@ -70,7 +70,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 			String helpLink = question.getDocLink();
 			if (DisplayUtils.isDefined(helpLink)) {
 				view.setMoreInfoVisible(true);
-				view.configureMoreInfo(helpLink);
+				view.configureMoreInfo(helpLink, question.getHelpText());
 			} else {
 				view.setMoreInfoVisible(false);
 			}
