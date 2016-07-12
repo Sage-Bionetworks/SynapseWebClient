@@ -634,6 +634,10 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
+.margin-right-20, #rootPanel .margin-right-20 {
+	margin-right: 20px;
+}
+
 .margin-right-40 {
 	margin-right: 40px;
 }
@@ -814,23 +818,19 @@ a.shortBtn {
 .margin-bottom-60 {
 	margin-bottom: 60px;
 }
-.margin-bottom-40 {
+.margin-bottom-40, #rootPanel .margin-bottom-40 {
 	margin-bottom: 40px;
 }
 
-.margin-bottom-20 {
+.margin-bottom-20, #rootPanel .margin-bottom-20 {
 	margin-bottom: 20px;
-}
-
-.margin-bottom-20-imp {
-	margin-bottom: 20px !important;
 }
 
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
 
-.margin-bottom-5 {
+.margin-bottom-5, #rootPanel .margin-bottom-5{
 	margin-bottom: 5px;
 }
 
@@ -1029,7 +1029,6 @@ a.shortBtn {
 .max-width-none, #rootPanel .max-width-none {
 	max-width: none;
 }
-
 
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
@@ -2220,6 +2219,11 @@ iframe[seamless] {
 .popover-content {
 	overflow-x: hidden;
 }
+
+.popover, #rootPanel .popover {
+	max-width: 400px;
+}
+
 
 h1, .h1, h2, .h2, h3, .h3 {
 	margin-top: 10px !important;

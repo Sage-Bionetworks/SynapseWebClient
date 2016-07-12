@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
 	<bh:Span>
-		<b:Popover ui:field="helpPopover" title="" content="" trigger="FOCUS" placement="RIGHT" isHtml="true" container="body">
+		<b:Popover ui:field="helpPopover" title="" content="" trigger="FOCUS" placement="RIGHT" isHtml="true" container="#rootPanel">
 			<b:Anchor addStyleNames="textDecorationNone" ui:field="anchor">
 				<span ui:field="icon">
 					<span class="fa fa-question-circle" />
