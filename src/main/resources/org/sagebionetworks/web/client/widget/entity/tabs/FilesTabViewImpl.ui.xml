@@ -25,7 +25,7 @@
 					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
 			    		<bh:Div addStyleNames="highlight-title">
 			    			<bh:Text>Preview</bh:Text>
-			    			<w:HelpWidget helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and have satisfied all conditions for use." 
+			    			<w:HelpWidget helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and has satisfied all conditions for use." 
 								href="http://docs.synapse.org/articles/access_controls.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			    		</bh:Div>
 			    		<bh:Div ui:field="filePreviewContainerHighlightBox" />
