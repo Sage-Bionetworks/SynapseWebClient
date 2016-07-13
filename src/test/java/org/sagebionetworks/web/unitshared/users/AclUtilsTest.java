@@ -35,6 +35,7 @@ public class AclUtilsTest {
 	@Test
 	public void testGetPermissionLevel() {
 		assertEquals(PermissionLevel.CAN_VIEW, AclUtils.getPermissionLevel(getReadAccessTypeSet()));
+		assertEquals(PermissionLevel.CAN_MODERATE, AclUtils.getPermissionLevel(getModeratorAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SUBMIT_EVALUATION, AclUtils.getPermissionLevel(getParticipateAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SCORE_EVALUATION, AclUtils.getPermissionLevel(getScoreAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_EDIT, AclUtils.getPermissionLevel(getEditAccessTypeSet()));
@@ -60,10 +61,13 @@ public class AclUtilsTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetPermissionLevels() {		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_MODERATE, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
 				PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION,
 				PermissionLevel.CAN_MESSAGE_TEAM, PermissionLevel.CAN_ADMINISTER_TEAM})), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.READ));
+		
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_MODERATE, PermissionLevel.CAN_ADMINISTER })), 
+				AclUtils.getPermisionLevels(ACCESS_TYPE.MODERATE));
 		
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.SUBMIT));
@@ -102,6 +106,13 @@ public class AclUtilsTest {
 	private Set<ACCESS_TYPE> getReadAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
+		return set;
+	}
+	
+	private Set<ACCESS_TYPE> getModeratorAccessTypeSet() {
+		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
+		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.MODERATE);
 		return set;
 	}
 

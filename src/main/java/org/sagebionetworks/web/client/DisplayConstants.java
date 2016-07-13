@@ -118,6 +118,7 @@ public class DisplayConstants {
 	public static final String CONFIRM_DISCARD_ACL_CHANGES = "Your unsaved changes will be discarded. Are you sure?";
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
+	public static final String MENU_PERMISSION_LEVEL_CAN_MODERATE = "Can moderate";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
