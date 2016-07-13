@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -53,8 +54,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays) {
-		tableBody.insert(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplays), beforeIndex);
+	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible) {
+		tableBody.insert(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplays, deleteButtonVisible), beforeIndex);
 	}
 	
 	@Override
@@ -65,10 +66,10 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	
 	@Override
 	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
-		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay));
+		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay, true));
 	}
 	
-	private TableRow createAclEntryTableRow(final AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
+	private TableRow createAclEntryTableRow(final AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {
 		final TableRow row = new TableRow();
 		
 		// People label
@@ -94,7 +95,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		data.add(permListBox);
 		row.add(data);
 		
-		if (deleteButtonCallback == null) {
+		if (!deleteButtonVisible || deleteButtonCallback == null) {
 			// Don't allow editing the permissions and don't add delete button.
 			permListBox.setEnabled(false);
 			permissionColumnHeader.setStyleName("col-md-3");
@@ -110,8 +111,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 				}
 				
 			});
-			button.setSize(ButtonSize.SMALL);
-			button.addStyleName("glyphicon glyphicon-remove");
+			button.setSize(ButtonSize.EXTRA_SMALL);
+			button.setIcon(IconType.REMOVE);
 			button.setType(ButtonType.DANGER);
 			data.add(button);
 			row.add(data);

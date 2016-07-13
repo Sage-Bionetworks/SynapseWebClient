@@ -3,11 +3,9 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -83,7 +81,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay); // insert groups first
+			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
 		} else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
@@ -91,7 +89,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				if (permissionsGrid.getAt(insertIndex).isIndividual())
 					break;
 			}
-			permissionsGrid.insert(aclEntry, insertIndex, permList, permissionDisplay); // insert owner
+			permissionsGrid.insert(aclEntry, insertIndex, permList, permissionDisplay, false); // insert owner
 		}
 		else
 			permissionsGrid.add(aclEntry, permList, permissionDisplay);
