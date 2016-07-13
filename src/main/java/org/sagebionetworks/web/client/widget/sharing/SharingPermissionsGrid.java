@@ -43,9 +43,9 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 		return aclEntries.get(index);
 	}
 	
-	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
+	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {
 		aclEntries.add(beforeIndex, aclEntry);
-		view.insert(aclEntry, beforeIndex, permissionLevels, permissionDisplay);
+		view.insert(aclEntry, beforeIndex, permissionLevels, permissionDisplay, deleteButtonVisible);
 	}
 	
 	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
