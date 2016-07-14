@@ -393,6 +393,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				Callback replyClickedCallback = new Callback() {
 					@Override
 					public void invoke() {
+						// when showing a single reply, do nothing when that reply link is clicked.
 					}
 				};
 				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback);
@@ -409,8 +410,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	private void setReplyId(String replyId) {
 		this.replyId = replyId;
-		replyIdCallback.invoke(replyId);
+		if (replyIdCallback != null) {
+			replyIdCallback.invoke(replyId);	
+		}
 	}
+	
 	@Override
 	public void onClickDeleteThread() {
 		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new AlertCallback(){
