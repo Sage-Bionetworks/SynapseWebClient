@@ -129,8 +129,9 @@ public class ForumWidgetTest {
 		Set<Long> moderatorIds = new HashSet<Long>();
 		Callback deleteCallback = null;
 		boolean isCurrentUserModerator = false;
+		String replyId = null;
 		ArgumentCaptor<DiscussionThreadBundle> threadCaptor = ArgumentCaptor.forClass(DiscussionThreadBundle.class);
-		verify(mockDefaultThreadWidget).configure(threadCaptor.capture(), eq(isCurrentUserModerator), eq(moderatorIds), eq(deleteCallback));
+		verify(mockDefaultThreadWidget).configure(threadCaptor.capture(), eq(replyId), eq(isCurrentUserModerator), eq(moderatorIds), eq(deleteCallback));
 		DiscussionThreadBundle defaultThreadBundle = threadCaptor.getValue();
 		//verify default thread bundle stats
 		assertEquals((Long)0L, defaultThreadBundle.getNumberOfReplies());
@@ -276,6 +277,7 @@ public class ForumWidgetTest {
 
 		String entityId = "syn1";
 		String threadId = "007";
+		String replyId = null;
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
@@ -288,7 +290,7 @@ public class ForumWidgetTest {
 		verify(mockView).setDefaultThreadWidgetVisible(false);
 		ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
-		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle),
+		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(replyId),
 				eq(canModerate), eq(moderatorIds), onShowAllThreadsCallback.capture());
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class), any(DiscussionFilter.class));
 		
@@ -303,6 +305,47 @@ public class ForumWidgetTest {
 		verify(mockURLChangeCallback).invoke();
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(false);
 		verify(mockView).setDeletedThreadListVisible(false);
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureSingleThreadSingleReplySuccess() {
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
+				.getThread(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1";
+		String threadId = "007";
+		String replyId = "008";
+		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId + "&" + ForumWidget.REPLY_ID_KEY + "=" + replyId;
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+
+		verify(mockSynAlert).clear();
+		verify(mockView).setSingleThreadUIVisible(true);
+		verify(mockView).setThreadListUIVisible(false);
+		verify(mockView).setNewThreadButtonVisible(false);
+		verify(mockView).setShowAllThreadsButtonVisible(true);
+		verify(mockView).setDefaultThreadWidgetVisible(false);
+		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
+		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(replyId),
+				eq(canModerate), eq(moderatorIds), any(Callback.class));
+		verify(mockAvailableThreadListWidget, never()).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class), any(DiscussionFilter.class));
+
+		ArgumentCaptor<CallbackP> onReplyIdCallbackCaptor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockDiscussionThreadWidget).setReplyIdCallback(onReplyIdCallbackCaptor.capture());
+		
+		reset(mockParamChangeCallback);
+		
+		//test reply id callback
+		String newReplyId = "009";
+		onReplyIdCallbackCaptor.getValue().invoke(newReplyId);
+		
+		//verify param was updated
+		ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(ParameterizedToken.class);
+		verify(mockParamChangeCallback).invoke(captorToken.capture());
+		assertEquals(threadId, captorToken.getValue().get(THREAD_ID_KEY));
+		assertEquals(newReplyId, captorToken.getValue().get(REPLY_ID_KEY));
 	}
 
 	@SuppressWarnings("unchecked")
