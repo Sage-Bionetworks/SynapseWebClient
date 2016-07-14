@@ -227,9 +227,13 @@ public class ReplyWidgetTest {
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockMarkdownWidget).configure(message);
 		verify(mockView).setDeleteIconVisibility(false);
-		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
+		verify(mockEditReplyModal, never()).configure(anyString(), anyString(), any(Callback.class));
+		
+		replyWidget.onClickEditReply();
+		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
+		verify(mockEditReplyModal).show();
 	}
 
 	@Test

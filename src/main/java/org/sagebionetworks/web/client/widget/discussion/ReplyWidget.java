@@ -42,6 +42,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private Boolean isCurrentUserModerator;
 	private Callback deleteReplyCallback;
 	private Set<Long> moderatorIds;
+	private String message;
 	
 	@Inject
 	public ReplyWidget(
@@ -120,10 +121,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						String message = response.getText();
+						message = response.getText();
 						view.setLoadingMessageVisible(false);
 						markdownWidget.configure(message);
-						configureEditReplyModal(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
 					}
@@ -204,6 +204,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickEditReply() {
+		configureEditReplyModal(message);
 		editReplyModal.show();
 	}
 }
