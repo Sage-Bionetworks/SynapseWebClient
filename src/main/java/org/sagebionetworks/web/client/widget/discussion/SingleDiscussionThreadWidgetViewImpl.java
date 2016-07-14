@@ -79,7 +79,9 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Button cancelButton;
 	@UiField
 	Button saveButton;
-
+	@UiField
+	Button showAllRepliesButton;
+	
 	String threadLinkHref;
 	private Widget widget;
 	private SingleDiscussionThreadWidget presenter;
@@ -133,8 +135,19 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 				presenter.onClickSave();
 			}
 		});
+		showAllRepliesButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				presenter.onClickShowAllReplies();
+			}
+		});
 	}
 
+	@Override
+	public void setShowAllRepliesButtonVisible(boolean visible) {
+		showAllRepliesButton.setVisible(visible);
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return widget;

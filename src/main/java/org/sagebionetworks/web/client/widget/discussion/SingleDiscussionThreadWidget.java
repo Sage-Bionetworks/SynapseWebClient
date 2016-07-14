@@ -71,12 +71,12 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	GWTWrapper gwtWrapper;
 	SubscribeButtonWidget subscribeButtonWidget;
 	MarkdownEditorWidget markdownEditor;
-	private CallbackP<String> threadIdClickedCallback; 
+	private CallbackP<String> threadIdClickedCallback, replyIdCallback;
 	
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
-	private String threadId;
+	private String threadId, replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
 	private String title;
@@ -140,7 +140,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback) {
+	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
@@ -162,8 +162,12 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 		configureMessage();
 		if (!bundle.getId().equals(globalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
-			configureReplies();
-			watchReplyCount();
+			if (replyId != null) {
+				configureReply(replyId);
+			} else {
+				configureReplies();
+				watchReplyCount();	
+			}
 		}
 
 	}
@@ -222,6 +226,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
 		this.threadIdClickedCallback = threadIdClickedCallback;
 	}
+	
+	public void setReplyIdCallback(CallbackP<String> replyIdCallback) {
+		this.replyIdCallback = replyIdCallback;
+	}
 
 	public void reconfigureThread() {
 		synAlert.clear();
@@ -234,7 +242,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result, isCurrentUserModerator, moderatorIds, deleteCallback);
+				configure(result, replyId, isCurrentUserModerator, moderatorIds, deleteCallback);
 			}
 		});
 	}
@@ -303,6 +311,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void configureReplies() {
 		view.clearReplies();
+		view.setShowAllRepliesButtonVisible(false);
 		offset = 0L;
 		if (order == null) {
 			order = DEFAULT_ORDER;
@@ -346,13 +355,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 						offset += LIMIT;
 						if (!result.getResults().isEmpty()) {
 							for (DiscussionReplyBundle bundle : result.getResults()) {
+								final String replyId = bundle.getId();
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
-								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, new Callback(){
+								Callback replyClickedCallback = new Callback() {
 									@Override
 									public void invoke() {
-										reconfigureThread();
+										configureReply(replyId);
 									}
-								});
+								};
+								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback);
 								view.addReply(replyWidget.asWidget());
 							}
 						}
@@ -363,7 +374,43 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 					}
 		});
 	}
+	
+	public void configureReply(String replyId) {
+		synAlert.clear();
+		view.clearReplies();
+		view.setLoadMoreVisibility(false);
+		view.setShowAllRepliesButtonVisible(true);
+		setReplyId(replyId);
+		discussionForumClientAsync.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
 
+			@Override
+			public void onSuccess(DiscussionReplyBundle bundle) {
+				ReplyWidget replyWidget = ginInjector.createReplyWidget();
+				Callback replyClickedCallback = new Callback() {
+					@Override
+					public void invoke() {
+					}
+				};
+				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback);
+				view.addReply(replyWidget.asWidget());
+			}
+		});
+	}
+
+	@Override
+	public void onClickShowAllReplies() {
+		setReplyId(null);
+		configureReplies();
+	}
+	
+	private void setReplyId(String replyId) {
+		this.replyId = replyId;
+		replyIdCallback.invoke(replyId);
+	}
 	@Override
 	public void onClickDeleteThread() {
 		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new AlertCallback(){

@@ -63,6 +63,9 @@
 					</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="replyDetails">
+				<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
+					<b:Button ui:field="showAllRepliesButton" type="DEFAULT" size="EXTRA_SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10" visible="false">Show all replies</b:Button>
+				</bh:Div>
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 			</bh:Div>
 			<bh:Div width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">

@@ -20,6 +20,8 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 		void onClickEditThread();
 		
 		void onClickThread();
+		
+		void onClickShowAllReplies();
 	}
 
 	void setPresenter(SingleDiscussionThreadWidget presenter);
@@ -47,7 +49,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setDeleteIconVisible(boolean visible);
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
-
+	
+	void setShowAllRepliesButtonVisible(boolean visible);
+	
 	void setReplyTextBoxVisible(boolean visible);
 
 	void setCommandsVisible(boolean visible);
