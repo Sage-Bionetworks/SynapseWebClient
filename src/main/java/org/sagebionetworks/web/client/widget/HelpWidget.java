@@ -8,11 +8,16 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -35,6 +40,9 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class HelpWidget implements IsWidget {
+	// 10 second delay, then auto hide
+	public static final int POPOVER_DELAY = 10000;
+	
 	@UiField
 	SpanElement moreInfoText;
 	@UiField
@@ -49,9 +57,23 @@ public class HelpWidget implements IsWidget {
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText";
+	Timer popoverHider;
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 		anchor.getElement().setAttribute("tabindex", "0");
+		popoverHider = new Timer() { 
+		    public void run() { 
+		    	helpPopover.hide();
+		    } 
+		};
+		anchor.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				helpPopover.toggle();
+				popoverHider.cancel();
+				popoverHider.schedule(POPOVER_DELAY);
+			}
+		});
 	}
 
 	public void setText(String text) {
@@ -68,7 +90,7 @@ public class HelpWidget implements IsWidget {
 	
 	public void setHref(String fullHelpHref) {
 		if (DisplayUtils.isDefined(fullHelpHref)) {
-			this.moreHelpHTML = "<form action=\""+SafeHtmlUtils.htmlEscape(fullHelpHref)+"\" target=\"_blank\"><button class=\"btn btn-primary btn-xs right\" type=\"submit\">More info</button></form>";
+			this.moreHelpHTML = "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>";
 		}
 	}
 	
