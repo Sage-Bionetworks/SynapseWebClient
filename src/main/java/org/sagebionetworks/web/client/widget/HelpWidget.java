@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.MarkdownItImpl;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,6 +19,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -53,27 +55,20 @@ public class HelpWidget implements IsWidget {
 	Anchor anchor;
 	
 	Widget widget;
+	private String popoverElementId;
+	private String closePopoverJs;
+	
 	private static MarkdownIt markdownIt = new MarkdownItImpl();
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText";
-	Timer popoverHider;
+	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText", closeHTML = "";
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 		anchor.getElement().setAttribute("tabindex", "0");
-		popoverHider = new Timer() { 
-		    public void run() { 
-		    	helpPopover.hide();
-		    } 
-		};
-		anchor.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				helpPopover.toggle();
-				popoverHider.cancel();
-				popoverHider.schedule(POPOVER_DELAY);
-			}
-		});
+		popoverElementId = HTMLPanel.createUniqueId();
+		helpPopover.getWidget().getElement().setId(popoverElementId);
+		closePopoverJs = "window.jQuery('#"+popoverElementId+"').popover('hide')"; 
+		closeHTML = "<button class=\"btn btn-default btn-xs right margin-right-5\" onClick=\""+closePopoverJs+"\">Close</button>";
 	}
 
 	public void setText(String text) {
@@ -90,8 +85,12 @@ public class HelpWidget implements IsWidget {
 	
 	public void setHref(String fullHelpHref) {
 		if (DisplayUtils.isDefined(fullHelpHref)) {
-			this.moreHelpHTML = "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>";
+			this.moreHelpHTML = "<button class=\"btn btn-primary btn-xs right\" onClick=\"window.open('"+SafeHtmlUtils.htmlEscape(fullHelpHref)+"');"+closePopoverJs+"\">More info</button>";
 		}
+	}
+	
+	public void hidePopover() {
+		helpPopover.hide();
 	}
 	
 	@Override
@@ -99,7 +98,7 @@ public class HelpWidget implements IsWidget {
 		if (DisplayUtils.isDefined(iconStyles))
 			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);
-		helpPopover.setContent(basicHelpText + moreHelpHTML);
+		helpPopover.setContent(basicHelpText + moreHelpHTML + closeHTML);
 		return widget;
 	}
 	
