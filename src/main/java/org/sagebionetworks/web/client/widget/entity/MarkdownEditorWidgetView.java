@@ -31,6 +31,8 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	int getClientHeight();
 	void setMarkdownTextAreaHeight(int heightPx);
 	void setFocus(boolean focused);
+	void setEditorEnabled(boolean enabled);
+	
 	/**
 	 * Presenter interface
 	 */
