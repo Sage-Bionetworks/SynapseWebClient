@@ -496,6 +496,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
+		verify(mockRefreshAlert).configure(anyString());
 	}
 
 	@SuppressWarnings("unchecked")

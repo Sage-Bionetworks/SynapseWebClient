@@ -166,7 +166,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				configureReply(replyId);
 			} else {
 				configureReplies();
-				watchReplyCount();	
 			}
 		}
 
@@ -320,6 +319,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			ascending = DEFAULT_ASCENDING;
 		}
 		loadMore();
+		watchReplyCount();
 	}
 
 	@Override
