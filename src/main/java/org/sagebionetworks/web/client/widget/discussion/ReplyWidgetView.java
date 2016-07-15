@@ -14,6 +14,7 @@ public interface ReplyWidgetView extends IsWidget{
 		void onClickDeleteReply();
 
 		void onClickEditReply();
+		void onClickReplyLink();
 	}
 
 	void setPresenter(ReplyWidget presenter);

@@ -40,7 +40,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
-	private Callback deleteReplyCallback;
+	private Callback deleteReplyCallback, replyClickedCallback;
 	private Set<Long> moderatorIds;
 	
 	@Inject
@@ -71,7 +71,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback, Callback replyClickedCallback) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
@@ -79,6 +79,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
+		this.replyClickedCallback = replyClickedCallback;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
@@ -197,7 +198,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback, replyClickedCallback);
 			}
 		});
 	}
@@ -205,5 +206,10 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	@Override
 	public void onClickEditReply() {
 		editReplyModal.show();
+	}
+	
+	@Override
+	public void onClickReplyLink() {
+		replyClickedCallback.invoke();
 	}
 }

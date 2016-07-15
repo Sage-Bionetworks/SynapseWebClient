@@ -30,6 +30,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	//used to tell the discussion forum to show a single thread
 	public final static String THREAD_ID_KEY = "threadId";
+	public final static String REPLY_ID_KEY = "replyId";
 	ForumWidgetView view;
 
 	NewDiscussionThreadModal newThreadModal;
@@ -50,7 +51,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	Boolean isSingleThread = false;
 	SubscribeButtonWidget subscribeToForumButton;
 	Set<Long> moderatorIds;
-
+	ParameterizedToken params;
+	
 	// From portal.properties, what thread should we show if no threads are available?
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
 	public static DiscussionThreadBundle defaultThreadBundle;
@@ -113,7 +115,15 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		threadListWidget.setThreadIdClickedCallback(new CallbackP<String>() {
 			@Override
 			public void invoke(String threadId) {
-				showThread(threadId);
+				String replyId = null;
+				showThread(threadId, replyId);
+				urlChangeCallback.invoke();
+			}
+		});
+		singleThreadWidget.setReplyIdCallback(new CallbackP<String>() {
+			@Override
+			public void invoke(String replyId) {
+				updatePlaceToReply(replyId);
 				urlChangeCallback.invoke();
 			}
 		});
@@ -165,7 +175,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		Callback deleteCallback = null;
 		boolean isCurrentUserModerator = false;
 		resetDefaultThreadDates();
-		defaultThreadWidget.configure(defaultThreadBundle, isCurrentUserModerator, moderatorIds, deleteCallback);
+		String replyId = null;
+		defaultThreadWidget.configure(defaultThreadBundle, replyId, isCurrentUserModerator, moderatorIds, deleteCallback);
 		// show reminder on thread id click
 		defaultThreadWidget.setThreadIdClickedCallback(new CallbackP<String>() {
 			@Override
@@ -178,13 +189,23 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 	
 	public void updatePlaceToSingleThread(String threadId) {
-		ParameterizedToken params = new ParameterizedToken("");
+		params.clear();
 		params.put(THREAD_ID_KEY, threadId);
 		paramChangeCallback.invoke(params);
 	}
 	
+	public void updatePlaceToReply(String replyId) {
+		if (replyId != null) {
+			params.put(REPLY_ID_KEY, replyId);	
+		} else {
+			params.remove(REPLY_ID_KEY);
+		}
+		
+		paramChangeCallback.invoke(params);
+	}
+	
 	public void updatePlaceToForum() {
-		ParameterizedToken params = new ParameterizedToken("");
+		params.clear();
 		paramChangeCallback.invoke(params);
 	}
 	
@@ -197,16 +218,17 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.moderatorIds = moderatorIds;
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
+		this.params = params;
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
-			showThread(threadId);
+			showThread(threadId, params.get(REPLY_ID_KEY));
 		} else {
 			showForum();
 		}
 	}
 
-	public void showThread(final String threadId) {
+	public void showThread(final String threadId, final String replyId) {
 		isSingleThread = true;
 		synAlert.clear();
 		subscribeToForumButton.clear();
@@ -228,7 +250,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				singleThreadWidget.configure(result, isCurrentUserModerator, moderatorIds, new Callback(){
+				singleThreadWidget.configure(result, replyId, isCurrentUserModerator, moderatorIds, new Callback(){
 					@Override
 					public void invoke() {
 						showForum();

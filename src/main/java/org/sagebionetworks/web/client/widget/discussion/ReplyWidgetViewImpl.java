@@ -38,6 +38,9 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@UiField
 	Icon editIcon;
 	@UiField
+	Icon linkIcon;
+	
+	@UiField
 	SimplePanel editReplyModalContainer;
 	@UiField
 	Label edited;
@@ -63,6 +66,13 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickEditReply();
+			}
+		});
+		linkIcon.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent arg0) {
+				presenter.onClickReplyLink();
 			}
 		});
 	}
