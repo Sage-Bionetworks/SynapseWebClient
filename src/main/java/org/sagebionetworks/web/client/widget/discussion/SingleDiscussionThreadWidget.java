@@ -44,7 +44,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
-	public static final Long LIMIT = 20L;
+	public static final Long LIMIT = 5L;
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";

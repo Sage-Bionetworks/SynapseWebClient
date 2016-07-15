@@ -68,7 +68,7 @@ public class HelpWidget implements IsWidget {
 	
 	public void setHref(String fullHelpHref) {
 		if (DisplayUtils.isDefined(fullHelpHref)) {
-			this.moreHelpHTML = "<div><a class=\"btn btn-primary btn-xs right\" target=\"_blank\" href=\"" + SafeHtmlUtils.htmlEscape(fullHelpHref) + "\" role=\"button\">More info</a></div>";	
+			this.moreHelpHTML = "<form action=\""+SafeHtmlUtils.htmlEscape(fullHelpHref)+"\" target=\"_blank\"><button class=\"btn btn-primary btn-xs right\" type=\"submit\">More info</button></form>";
 		}
 	}
 	
