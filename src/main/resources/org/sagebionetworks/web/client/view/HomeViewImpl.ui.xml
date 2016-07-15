@@ -298,11 +298,11 @@
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Access your data anywhere"></b:Heading>
 									<b:Heading size="H6">
 										<bh:Text>Synapse provides APIs to store or access your data from the web or programmatically via one of our supported analytical clients (</bh:Text>
-										<b:Anchor target="_blank" href="http://r-docs.synapse.org/" text="R"/>
+										<b:Anchor target="_blank" href="http://docs.synapse.org/r/" text="R"/>
 										<bh:Text>,&nbsp;</bh:Text>
-										<b:Anchor target="_blank" href="http://python-docs.synapse.org/" text="Python"/>
+										<b:Anchor target="_blank" href="http://docs.synapse.org/python/" text="Python"/>
 										<bh:Text>,&nbsp;</bh:Text>
-										<b:Anchor target="_blank" href="http://python-docs.synapse.org/CommandLineClient.html" text="command line"/>
+										<b:Anchor target="_blank" href="http://docs.synapse.org/python/CommandLineClient.html" text="command line"/>
 										<bh:Text>)</bh:Text>
 									</b:Heading>
 								</t:TableData>
