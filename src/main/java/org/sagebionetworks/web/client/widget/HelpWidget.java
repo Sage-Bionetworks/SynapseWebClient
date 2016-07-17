@@ -13,6 +13,7 @@ import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -35,6 +36,9 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class HelpWidget implements IsWidget {
+	// 10 second delay, then auto hide
+	public static final int POPOVER_DELAY = 10000;
+	
 	@UiField
 	SpanElement moreInfoText;
 	@UiField
@@ -45,13 +49,20 @@ public class HelpWidget implements IsWidget {
 	Anchor anchor;
 	
 	Widget widget;
+	private String popoverElementId;
+	private String closePopoverJs;
+	
 	private static MarkdownIt markdownIt = new MarkdownItImpl();
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText";
+	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText", closeHTML = "";
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 		anchor.getElement().setAttribute("tabindex", "0");
+		popoverElementId = HTMLPanel.createUniqueId();
+		helpPopover.getWidget().getElement().setId(popoverElementId);
+		closePopoverJs = "window.jQuery('#"+popoverElementId+"').popover('hide')"; 
+		closeHTML = "<button class=\"btn btn-default btn-xs right margin-right-5\" onClick=\""+closePopoverJs+"\">Close</button>";
 	}
 
 	public void setText(String text) {
@@ -68,8 +79,12 @@ public class HelpWidget implements IsWidget {
 	
 	public void setHref(String fullHelpHref) {
 		if (DisplayUtils.isDefined(fullHelpHref)) {
-			this.moreHelpHTML = "<form action=\""+SafeHtmlUtils.htmlEscape(fullHelpHref)+"\" target=\"_blank\"><button class=\"btn btn-primary btn-xs right\" type=\"submit\">More info</button></form>";
+			this.moreHelpHTML = "<button class=\"btn btn-primary btn-xs right\" onClick=\"window.open('"+SafeHtmlUtils.htmlEscape(fullHelpHref)+"');"+closePopoverJs+"\">More info</button>";
 		}
+	}
+	
+	public void hidePopover() {
+		helpPopover.hide();
 	}
 	
 	@Override
@@ -77,7 +92,7 @@ public class HelpWidget implements IsWidget {
 		if (DisplayUtils.isDefined(iconStyles))
 			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);
-		helpPopover.setContent(basicHelpText + moreHelpHTML);
+		helpPopover.setContent(basicHelpText + moreHelpHTML + closeHTML);
 		return widget;
 	}
 	
