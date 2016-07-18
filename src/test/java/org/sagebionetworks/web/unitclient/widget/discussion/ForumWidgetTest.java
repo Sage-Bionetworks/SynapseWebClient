@@ -157,6 +157,9 @@ public class ForumWidgetTest {
 		boolean isThreads = true;
 		emptyThreadsCallback.invoke(isThreads);
 		verify(mockView).setDefaultThreadWidgetVisible(!isThreads);
+
+		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(any(CallbackP.class));
+		verify(mockDeletedThreadListWidget).setThreadIdClickedCallback(any(CallbackP.class));
 	}
 	
 	@Test

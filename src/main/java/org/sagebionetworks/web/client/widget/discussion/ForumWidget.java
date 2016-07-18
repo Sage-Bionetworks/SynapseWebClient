@@ -120,6 +120,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				urlChangeCallback.invoke();
 			}
 		});
+		deletedThreadListWidget.setThreadIdClickedCallback(new CallbackP<String>() {
+			@Override
+			public void invoke(String threadId) {
+				String replyId = null;
+				showThread(threadId, replyId);
+				urlChangeCallback.invoke();
+			}
+		});
 		singleThreadWidget.setReplyIdCallback(new CallbackP<String>() {
 			@Override
 			public void invoke(String replyId) {

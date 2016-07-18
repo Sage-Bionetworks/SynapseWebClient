@@ -90,10 +90,4 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	public void setPinnedIconVisible(boolean visible) {
 		pinnedIcon.setVisible(visible);
 	}
-
-	@Override
-	public void disableClick() {
-		showThread.setFocus(false);
-		showThread.removeStyleName("imageButton");
-	}
 }

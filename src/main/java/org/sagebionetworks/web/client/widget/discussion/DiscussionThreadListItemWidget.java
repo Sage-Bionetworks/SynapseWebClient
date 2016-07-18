@@ -75,8 +75,4 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
 		this.threadIdClickedCallback = threadIdClickedCallback;
 	}
-
-	public void disableClick() {
-		view.disableClick();
-	}
 }
