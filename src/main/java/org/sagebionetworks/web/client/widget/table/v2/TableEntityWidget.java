@@ -184,11 +184,11 @@ public class TableEntityWidget implements IsWidget,
 	 */
 	private void setQuery(Query query, boolean isFromResults) {
 		this.currentQuery = query;
-		this.queryInputWidget.configure(query.getSql(), this, this.canEdit);
+		this.queryInputWidget.configure(query.getSql(), this, this.canEditResults);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		if(!isFromResults){
-			this.queryResultsWidget.configure(query, this.canEdit, this);
+			this.queryResultsWidget.configure(query, this.canEditResults, this);
 		}
 	}
 

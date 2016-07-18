@@ -222,7 +222,7 @@ public class QueryResultEditorWidget implements
 			doHideEditor();
 		}
 	}
-
+	
 	/**
 	 * Hide the modal editor.
 	 */
