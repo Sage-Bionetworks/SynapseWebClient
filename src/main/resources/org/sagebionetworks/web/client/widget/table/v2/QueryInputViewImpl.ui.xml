@@ -19,8 +19,8 @@
 			</b:InputGroupButton>
 		</b:InputGroup>
 		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
-			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="LINK"
-				title="Reset query"></b:Button>
+			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="DEFAULT" text="Reset query"
+				size="EXTRA_SMALL" addStyleNames="margin-left-10"></b:Button>
 		</b:Alert>
 	</g:HTMLPanel>
 </ui:UiBinder>
