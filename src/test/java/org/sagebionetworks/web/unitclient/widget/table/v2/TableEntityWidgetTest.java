@@ -343,6 +343,22 @@ public class TableEntityWidgetTest {
 		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
 		verify(mockQueryResultsWidget).configure(expected, canEdit, widget);
 	}
+
+	@Test
+	public void testOnExecuteViewQuery(){
+		configureBundleWithView();
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		// Start query get passed to the results
+		boolean expectedCanEditResults = false;
+		verify(mockQueryResultsWidget).configure(startQuery, expectedCanEditResults, widget);
+	}
 	
 	@Test
 	public void testOnSchemaToggleShown(){
@@ -421,5 +437,23 @@ public class TableEntityWidgetTest {
 		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
 		// Should not be sent to the results as that is where it came from.
 		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(QueryResultsListener.class));
+	}
+	
+
+	@Test
+	public void testCanEditViewResults(){
+		configureBundleWithView();
+		//we can edit the view, but verify that the query input widget should be told that editing results is not possible
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		boolean expectedCanEditResults = false;
+		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget, expectedCanEditResults);
 	}
 }
