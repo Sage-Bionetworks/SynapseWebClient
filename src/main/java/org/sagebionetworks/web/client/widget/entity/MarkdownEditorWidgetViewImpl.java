@@ -11,8 +11,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -249,6 +247,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				formattingGuideModal.hide();
 			}
 		});
+		
 		markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
@@ -413,5 +412,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setFocus(boolean focused) {
 		markdownTextArea.setFocus(focused);
+	}
+	@Override
+	public void setEditorEnabled(boolean enabled) {
+		markdownTextArea.setEnabled(enabled);
 	}
 }

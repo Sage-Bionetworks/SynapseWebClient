@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -21,12 +23,10 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -86,7 +86,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		userSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
-				insertMarkdown(username);
+				insertMarkdown("@" + username);
+			}
+		});
+		userSelector.addModalShownHandler(new ModalShownHandler() {
+			@Override
+			public void onShown(ModalShownEvent evt) {
+				MarkdownEditorWidget.this.view.setEditorEnabled(true);
 			}
 		});
 	}
@@ -490,6 +496,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			int pos = view.getCursorPos();
 			String md = view.getMarkdown();
 			if (pos < 1 || gwt.isWhitespace(md.substring(pos-1, pos))) {
+				view.setEditorEnabled(false);
 				insertUserLink();	
 			}
 		}
