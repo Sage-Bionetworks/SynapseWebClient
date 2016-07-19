@@ -32,7 +32,7 @@
 							<b:Tooltip title="Edit reply" placement="LEFT">
 								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em" visible="false"/>
 							</b:Tooltip>
-							<b:Tooltip title="Link to this reply" placement="LEFT">
+							<b:Tooltip title="Copy link to this reply" placement="LEFT">
 								<b:Icon ui:field="linkIcon" type="LINK" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em " />
 							</b:Tooltip>
 						</bh:Div>
