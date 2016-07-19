@@ -362,8 +362,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case SET_PROJECT_BACKGROUND:
 			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
+			break;
 		case MARKDOWN_PREVIEW:
 			previewClicked();
+			break;
 		default:
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);
