@@ -57,9 +57,9 @@
 			<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
 					<b:TextBox ui:field="replyTextBox" placeholder="Write a reply..."/>
 					<bh:Div ui:field="newReplyContainer" visible="false">
-						<bh:Div ui:field="markdownEditorContainer"></bh:Div>
-						<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
-						<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving...">Save</b:Button>
+						<bh:Div ui:field="markdownEditorContainer" />
+						<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." text="Post" addStyleNames="margin-right-5 margin-top-5" />
+						<b:Button ui:field="cancelButton" type="DEFAULT" text="Cancel" addStyleNames="margin-right-5 margin-top-5" />
 					</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="replyDetails">

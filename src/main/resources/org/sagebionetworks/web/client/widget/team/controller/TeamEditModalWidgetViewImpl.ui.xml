@@ -8,7 +8,7 @@
 
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
     
-	<b:Modal ui:field="modal" fade="true"
+	<b:Modal ui:field="modal"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalHeader closable="true">
 		    <b:Heading size="H4" text="Edit Team" addStyleNames="displayInline"/>

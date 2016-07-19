@@ -6,10 +6,11 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 	    <bh:Div ui:field="mdCommands" styleName="view md-command-bar">
+	    	<b:Button ui:field="markdownPreviewButton" size="EXTRA_SMALL" height="22px" text="Preview" type="PRIMARY" addStyleNames="margin-left-2"/>
+	    	<bh:Span addStyleNames="border-left-1 margin-left-5 margin-right-5"/>
 	        <b:Tooltip placement="BOTTOM" title="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
-	        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
+	        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Button ui:field="formattingGuideButton" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
 	        <b:ButtonGroup>
 			  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
 			  <b:DropDownMenu>
@@ -106,16 +107,25 @@
 			<b:Tooltip placement="BOTTOM" title="Tag someone">
 	        	<b:Button ui:field="userButton" icon="USER_PLUS" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
+	        <b:Button ui:field="formattingGuideButton" icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="Formatting Guide" pull="RIGHT" />
 	    </bh:Div>
 	    <bh:Div>
 	        <b:TextArea ui:field="markdownTextArea" addStyleNames="hide-resize"/>
 	    </bh:Div>
-		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:SimplePanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
 		  <b:ModalFooter>
 		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY">OK</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
+		<b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="false" dataBackdrop="STATIC" dataKeyboard="false">
+		  <b:ModalBody>
+		    <g:SimplePanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
+		  </b:ModalBody>
+		  <b:ModalFooter>
+		    <b:Button ui:field="previewOkButton" type="PRIMARY">OK</b:Button>
 		  </b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

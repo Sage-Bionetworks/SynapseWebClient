@@ -6,7 +6,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	
-	<b:Modal title="Validated Synapse Profile"  closable="false" fade="true" ui:field="modal">
+	<b:Modal title="Validated Synapse Profile"  closable="false" ui:field="modal">
 		<b:ModalBody addStyleNames="bg-primary color-white">
 			<bh:Div >
 				<bh:Div height="35px">
