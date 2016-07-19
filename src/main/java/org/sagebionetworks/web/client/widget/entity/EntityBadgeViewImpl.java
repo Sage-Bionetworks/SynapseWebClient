@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
@@ -11,13 +10,11 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -257,18 +254,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		sharingSetIcon.setVisible(true);
 	}
 
-	/**
-	 * return true if the widget is in the visible part of the page
-	 */
 	@Override
 	public boolean isInViewport() {
-		int docViewTop = Window.getScrollTop();
-		int docViewBottom = docViewTop + Window.getClientHeight();
-		int elemTop = this.getAbsoluteTop();
-		int elemBottom = elemTop + this.getOffsetHeight();
-		return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+		return DisplayUtils.isInViewport(this);
 	}
-	
+
 	/*
 	 * Private Methods
 	 */

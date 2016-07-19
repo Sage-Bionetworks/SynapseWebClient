@@ -5,7 +5,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface DiscussionThreadWidgetView extends IsWidget{
+public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	public interface Presenter {
 
@@ -20,9 +20,11 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 		void onClickEditThread();
 		
 		void onClickThread();
+		
+		void onClickShowAllReplies();
 	}
 
-	void setPresenter(DiscussionThreadWidget presenter);
+	void setPresenter(SingleDiscussionThreadWidget presenter);
 
 	void addReply(Widget w);
 
@@ -34,37 +36,25 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 	
 	void setMarkdownWidget(Widget widget);
 
-	void setNumberOfReplies(String numberOfReplies, String descriptiveText);
-
-	void setNumberOfViews(String numberOfViews);
-
-	void setLastActivity(String lastActivity);
-
 	void setAuthor(Widget author);
 
 	void setCreatedOn(String createdOn);
 
-	void setNewReplyModal(Widget w);
-
 	void setAlert(Widget w);
 
-	void setLoadMoreButtonVisibility(boolean visible);
+	void setLoadMoreVisibility(boolean visible);
 
 	void clearReplies();
-
-	void addActiveAuthor(Widget user);
-
-	boolean isThreadCollapsed();
-
-	boolean isReplyCollapsed();
-
-	void setLoadingRepliesVisible(boolean visible);
 
 	void setDeleteIconVisible(boolean visible);
 
 	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
+	
+	void setShowAllRepliesButtonVisible(boolean visible);
+	
+	void setReplyTextBoxVisible(boolean visible);
 
-	void setReplyButtonVisible(boolean visible);
+	void setCommandsVisible(boolean visible);
 
 	void showErrorMessage(String errorMessage);
 
@@ -78,23 +68,27 @@ public interface DiscussionThreadWidgetView extends IsWidget{
 
 	void showSuccess(String successTitle, String successMessage);
 
-	void setThreadAuthor(Widget widget);
-
-	void showThreadDetails();
-
-	void hideThreadDetails();
-
-	void showReplyDetails();
-
-	void hideReplyDetails();
-
 	void setThreadLink(String link);
-	
+
 	void setRefreshAlert(Widget w);
+
 	void removeRefreshAlert();
 
-	void setButtonContainerWidth(String width);
 	void setPinIconVisible(boolean visible);
 	void setUnpinIconVisible(boolean visible);
-	void setPinnedIconVisible(boolean visible);
+	void setIsAuthorModerator(boolean isModerator);
+
+	boolean isLoadMoreInViewport();
+
+	boolean getLoadMoreVisibility();
+
+	boolean isLoadMoreAttached();
+
+	void resetButton();
+
+	void setNewReplyContainerVisible(boolean visible);
+
+	void setMarkdownEditorWidget(Widget widget);
+
+	void showSaving();
 }

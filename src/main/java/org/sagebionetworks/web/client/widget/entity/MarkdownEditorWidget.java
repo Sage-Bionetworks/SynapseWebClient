@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -84,7 +86,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		userSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
-				insertMarkdown(username);
+				insertMarkdown("@" + username);
+			}
+		});
+		userSelector.addModalShownHandler(new ModalShownHandler() {
+			@Override
+			public void onShown(ModalShownEvent evt) {
+				MarkdownEditorWidget.this.view.setEditorEnabled(true);
 			}
 		});
 	}
@@ -484,12 +492,22 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	@Override
 	public void onKeyPress(char c) {
 		if ('@' == c) {
-			insertUserLink();
+			// only insert a user link if this is the first character, or the character before it is whitespace
+			int pos = view.getCursorPos();
+			String md = view.getMarkdown();
+			if (pos < 1 || gwt.isWhitespace(md.substring(pos-1, pos))) {
+				view.setEditorEnabled(false);
+				insertUserLink();	
+			}
 		}
 	}
 	
 	public void insertUserLink() {
 		// pop up suggest box.  on selection, userSelector has been configured to add the username to the md.
 		userSelector.show();
+	}
+
+	public void setMarkdownFocus() {
+		view.setMarkdownFocus();
 	}
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
@@ -25,7 +24,7 @@ public interface OpenUserInvitationsWidgetView extends IsWidget, SynapseView {
 	
 	public void setMoreResultsVisible(boolean isVisible);
 	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		//use to go to user profile page
 		void goTo(Place place);
 		void removeInvitation(String ownerId);

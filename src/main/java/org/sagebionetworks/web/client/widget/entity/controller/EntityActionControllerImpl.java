@@ -13,7 +13,9 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -45,7 +47,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,6 +54,8 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
+	public static final String THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES = "the root wiki page and all subpages?";
+
 	public static final String MOVE_PREFIX = "Move ";
 
 	public static final String EDIT_WIKI_PREFIX = "Edit ";
@@ -183,7 +186,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProvenance() {
-		if(entityBundle.getEntity() instanceof FileEntity ){
+		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository){
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
@@ -429,9 +432,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isMovableType(Entity entity){
-		if(entity instanceof Project){
-			return false;
-		}else if(entity instanceof TableEntity){
+		if(entity instanceof Project || entity instanceof Table){
 			return false;
 		}
 		return true;
@@ -443,9 +444,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isWikiableType(Entity entity){
-		if(entity instanceof TableEntity){
-			return false;
-		}else if(entity instanceof Link){
+		if(entity instanceof Table || entity instanceof Link){
 			return false;
 		}
 		return true;
@@ -469,7 +468,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isSubmittableType(Entity entity){
-		if(entity instanceof TableEntity){
+		if(entity instanceof Table){
 			return false;
 		}
 		return entity instanceof Versionable;
@@ -541,11 +540,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_DOI:
 			onCreateDOI();
 			break;
+		case ADD_COMMIT:
+			onAddCommit();
+			break;
 		default:
 			break;
 		}
 	}
-	
+
+	private void onAddCommit() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	private void onChangeStorageLocation() {
 		storageLocationEditor.configure(this.entityBundle, entityUpdateHandler);
@@ -846,25 +852,47 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	public void onDeleteWiki() {
-		// Confirm the delete with the user.
-		view.showConfirmDialog(CONFIRM_DELETE_TITLE,ARE_YOU_SURE_YOU_WANT_TO_DELETE+" this wiki page and all subpages?", new Callback() {
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
+		synapseClient.getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
 			@Override
-			public void invoke() {
-				postConfirmedDeleteWiki();
+			public void onSuccess(V2WikiPage page) {
+				// Confirm the delete with the user.
+				final String parentWikiId = page.getParentWikiId();
+				String confirmMessage;
+				if (parentWikiId == null) {
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES;
+				} else if (DisplayUtils.isDefined(page.getTitle())){
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page \""+page.getTitle()+"\" and all subpages?";
+				} else {
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page ID "+page.getId()+" and all subpages?";
+				}
+				view.showConfirmDialog(CONFIRM_DELETE_TITLE, confirmMessage, new Callback() {
+					@Override
+					public void invoke() {
+						postConfirmedDeleteWiki(parentWikiId);
+					}
+				});
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
+		
 	}
 
 	/**
 	 * Called after the user has confirmed the delete of the entity.
 	 */
-	public void postConfirmedDeleteWiki() {
+	public void postConfirmedDeleteWiki(final String parentWikiId) {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
 		synapseClient.deleteV2WikiPage(key, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId()));
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId(), null, EntityArea.WIKI, parentWikiId));
 			}
 			
 			@Override
@@ -931,7 +959,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		String parentId = entityBundle.getEntity().getParentId();
 		Place gotoPlace = null;
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
-			if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
+			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

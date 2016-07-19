@@ -14,6 +14,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface ColumnModelsView extends IsWidget {
 
+	public interface EditHandler {
+		/**
+		 * Called when the edit button is pressed
+		 */
+		public void onEditColumns();
+	}
+	
 	/**
 	 * All business logic for this view belongs in the presenter.
 	 * 
@@ -44,12 +51,6 @@ public interface ColumnModelsView extends IsWidget {
 		public ColumnModelTableRowEditorWidget addNewColumn();
 		
 		/**
-		 * Called when the edit button is pressed
-		 */
-		public void onEditColumns();
-
-
-		/**
 		 * Toggle the selection.
 		 */
 		public void toggleSelect();
@@ -78,13 +79,21 @@ public interface ColumnModelsView extends IsWidget {
 		 * Delete the selected columns.
 		 */
 		public void deleteSelected();
+		
+		/**
+		 * Add column models based on the default entity view fields
+		 */
+		 void onAddDefaultViewColumns();
 	}
 
+	
 	/**
 	 * Connect the view to the presenter.
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
+	
+	public void setEditHandler(EditHandler handler);
 	
 	/**
 	 * Add a row to the table.
@@ -144,7 +153,13 @@ public interface ColumnModelsView extends IsWidget {
 	 * @return
 	 */
 	public boolean isMoveDownEnabled();
-
+	
+	/**
+	 * Is the Add Default View Columns Button visible?
+	 * @param visible
+	 */
+	 void setAddDefaultViewColumnsButtonVisible(boolean visible);
+	 
 	/**
 	 * The view can be used as a column viewer or as a column editor.
 	 *

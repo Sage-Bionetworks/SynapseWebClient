@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -13,7 +12,7 @@ public interface WizardProgressWidgetView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	void configure(int current, int total);
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void configure(int current, int total);
 	}
 }

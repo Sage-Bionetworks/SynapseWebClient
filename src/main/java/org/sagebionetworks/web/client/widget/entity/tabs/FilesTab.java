@@ -120,7 +120,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		
-		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
+		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
 		view.setFolderTitlebar(folderTitleBar.asWidget());
 		view.setBreadcrumb(breadcrumb.asWidget());
@@ -131,13 +131,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
 		
-		tab.configure("Files", view.asWidget());
+		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
 		
-		configMap = new HashMap<String,String>();
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
+		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
 		CallbackP<String> entityClicked = new CallbackP<String> () {
 			@Override
 			public void invoke(String id) {
@@ -254,10 +250,6 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	  
 	public void getTargetBundleAndDisplay(String entityId, final Long versionNumber) {
-		//only ask for it if we are showing a different entity/version
-		if (equal(currentEntityId,entityId) && equal(shownVersionNumber, versionNumber)) {
-			return;
-		}
 		shownVersionNumber = versionNumber;
 		currentEntityId = entityId;
 		synAlert.clear();
@@ -349,12 +341,13 @@ public class FilesTab implements FilesTabView.Presenter{
 		}
 
 		//Provenance
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile){
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 			view.setProvenance(provWidget.asWidget());
-			provWidget.configure(null, configMap, null, null);
+			provWidget.configure(configMap);
 		}
 		//Created By and Modified By
 		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), 

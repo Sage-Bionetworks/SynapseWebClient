@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.web.client.SynapsePresenter;
-import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,7 +12,7 @@ public interface InviteWidgetView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void validateAndSendInvite(String invitationMessage);
 		void configure(Team team);
 		void show();

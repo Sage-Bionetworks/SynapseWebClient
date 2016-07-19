@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.SubscriptionClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -39,6 +38,7 @@ import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
+import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
@@ -72,6 +72,9 @@ public class PortalServletModule extends ServletModule {
 		
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
+		
+		bind(RegisterAccountFilter.class).in(Singleton.class);
+		filter("/" + RegisterAccountFilter.URL_PATH).through(RegisterAccountFilter.class);
 		
 		// Setup the Synapse service
 		bind(SynapseClientImpl.class).in(Singleton.class);
@@ -189,7 +192,7 @@ public class PortalServletModule extends ServletModule {
 		//(which we need for GWT place handling).
 		// This is also where project aliases are handled.
 		bind(ProjectAliasServlet.class).in(Singleton.class);
-		serveRegex("\\/\\w+").with(ProjectAliasServlet.class);
+		serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
 	}
 	
 	public void handleGWTPlaces() {

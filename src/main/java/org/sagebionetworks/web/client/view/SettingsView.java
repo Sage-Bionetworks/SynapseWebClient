@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
@@ -27,10 +26,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	 */
 	public void showPasswordChangeSuccess();
 	
-	public void updateStorageUsage(Long grandTotal);
-
-	public void clearStorageUsageUI();
-	
 	public void updateNotificationCheckbox(UserProfile profile);
 	
 	void showNotificationEmailAddress(String primaryEmailAddress);
@@ -38,7 +33,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void setSubscriptionsListWidget(Widget w);
 	void setSubscriptionsVisible(boolean visible);
 	void setPasswordStrengthWidget(Widget w);
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 
 		void resetPassword(String existingPassword, String newPassword);
 

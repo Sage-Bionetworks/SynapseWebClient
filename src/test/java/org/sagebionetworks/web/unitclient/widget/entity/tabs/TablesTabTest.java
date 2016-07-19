@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -45,7 +46,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -56,7 +56,6 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -89,6 +88,8 @@ public class TablesTabTest {
 	EntityBundle mockTableEntityBundle;
 	@Mock
 	TableEntity mockTableEntity;
+	@Mock
+	EntityView mockFileViewEntity;
 	@Mock
 	Project mockProjectEntity;
 	@Mock
@@ -140,6 +141,9 @@ public class TablesTabTest {
 		when(mockTableEntity.getName()).thenReturn(tableName);
 		when(mockTableEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
+		when(mockFileViewEntity.getId()).thenReturn(tableEntityId);
+		when(mockFileViewEntity.getName()).thenReturn(tableName);
+		
 		AsyncMockStubber.callSuccessWith(mockTableEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		// setup a complex query.
@@ -175,13 +179,33 @@ public class TablesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
 		
+		verifyTableConfiguration();
+	}
+
+
+	@Test
+	public void testConfigureUsingFileView() {
+		when(mockTableEntityBundle.getEntity()).thenReturn(mockFileViewEntity);
+		String areaToken = null;
+		boolean canCertifiedUserEdit = true;
+		boolean isCertifiedUser = false;
+		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockFileViewEntity, mockEntityUpdatedHandler, areaToken);
+		
+		verifyTableConfiguration();
+	}
+	
+	private void verifyTableConfiguration() {
 		verify(mockSynapseClientAsync).getEntityBundle(eq(tableEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
 		verify(mockPortalGinInjector).createActionMenuWidget();
 		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockBasicTitleBar).configure(mockTableEntityBundle);
 		verify(mockEntityMetadata).setEntityBundle(mockTableEntityBundle, null);
-		verify(mockTableEntityWidget).configure(eq(mockTableEntityBundle), eq(canCertifiedUserEdit), eq(tab), eq(mockActionMenuWidget));
+		verify(mockTableEntityWidget).configure(eq(mockTableEntityBundle), eq(true), eq(tab), eq(mockActionMenuWidget));
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -205,7 +229,6 @@ public class TablesTabTest {
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
 	}
-
 	
 	@Test
 	public void testConfigureUsingProject() {

@@ -28,13 +28,11 @@ public interface StuAlertView extends IsWidget {
 		void onRequestAccess();
 	}
 
-	void showSynapseDown();
 	void show403();
 	void showRequestAccessUI();
 	void hideRequestAccessUI();
 	void showRequestAccessButtonLoading();
 	void show404();
-	void showReadOnly();
 	
 	void setSynAlert(Widget w);
 	void setVisible(boolean visible);

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,8 +44,8 @@ public class TabTest {
 		//and configure
 		String tabTitle = "TestTab";
 		Widget content = null;
-		tab.configure(tabTitle, content);
-		verify(mockView).configure(tabTitle, content);
+		tab.configure(tabTitle, content, "help markdown", "link");
+		verify(mockView).configure(eq(tabTitle), eq(content), anyString(), anyString());
 	}
 
 	@Test
@@ -67,6 +68,29 @@ public class TabTest {
 		//verify showing tab also attempts to update the page title
 		verify(mockSynapseJSNIUtils).setPageTitle(anyString());
 	}
+	
+	@Test
+	public void testShowTabReplaceState() {
+		tab.setEntityName("entity name");
+		boolean pushState = false;
+		tab.showTab(pushState);
+		verify(mockGlobalAppState).replaceCurrentPlace(any(Place.class));
+		verify(mockView).setActive(true);
+		//verify showing tab also attempts to update the page title
+		verify(mockSynapseJSNIUtils).setPageTitle(anyString());
+	}
+	
+	@Test
+	public void testShowTabPushState() {
+		tab.setEntityName("entity name");
+		boolean pushState = true;
+		tab.showTab(pushState);
+		verify(mockGlobalAppState).pushCurrentPlace(any(Place.class));
+		verify(mockView).setActive(true);
+		//verify showing tab also attempts to update the page title
+		verify(mockSynapseJSNIUtils).setPageTitle(anyString());
+	}
+
 	
 	@Test
 	public void testSetEntityNameAndPlaceNotActive() {

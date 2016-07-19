@@ -9,19 +9,13 @@
   <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  	
   	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
-  		<b:Alert ui:field="loginAlert" type="INFO">
-  			<bh:Strong text="Please login to access this resource." />
-  			<b:Button ui:field="loginButton" icon="SIGN_IN" addStyleNames="margin-left-10">Log in</b:Button>
-  			<bh:Div addStyleNames="margin-top-5 font-italic">
-  				<bh:Text>New to Synapse?</bh:Text>
-  				<b:Anchor text="Register" href="#!RegisterAccount:0" addStyleNames="underline margin-left-5 margin-right-5"/>
-  				<bh:Text>for a free account today!</bh:Text>
-  			</bh:Div>
-  		</b:Alert>
-  		<b:Alert ui:field="suggestLoginAlert" type="INFO">
-  			<bh:Strong text="If you feel this is due to anonymous browsing, please " />
-  			<b:Button ui:field="loginButton2" icon="SIGN_IN" addStyleNames="margin-left-10">Log in</b:Button>
-  		</b:Alert>
+  		<bh:Div ui:field="loginAlert">
+  			<b:Alert type="INFO">
+	  			<bh:Strong text="Please login to access this resource." />
+	  		</b:Alert>
+  			<bh:Div ui:field="loginWidgetContainer" />
+  		</bh:Div>
+  		
   		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp">
   			<bh:Strong ui:field="alertText"></bh:Strong>
   		</b:Alert>

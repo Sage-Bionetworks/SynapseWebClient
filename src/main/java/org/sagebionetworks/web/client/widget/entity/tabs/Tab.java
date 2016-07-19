@@ -3,14 +3,12 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -31,12 +29,12 @@ public class Tab implements TabView.Presenter {
 		view.setPresenter(this);
 	}
 	
-	public void configure(String tabTitle, Widget content) {
-		view.configure(tabTitle, content);
+	public void configure(String tabTitle, Widget content, String helpMarkdown, String helpLink) {
+		view.configure(tabTitle, content, helpMarkdown, helpLink);
 		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
 	}
 	
-	public TabListItem getTabListItem() {
+	public Widget getTabListItem() {
 		return view.getTabListItem();
 	}
 	
@@ -55,7 +53,16 @@ public class Tab implements TabView.Presenter {
 	}
 	
 	public void showTab() {
-		globalAppState.pushCurrentPlace(place);
+		showTab(true);
+	}
+	
+	public void showTab(boolean pushState) {
+		if (pushState) {
+			globalAppState.pushCurrentPlace(place);	
+		} else {
+			globalAppState.replaceCurrentPlace(place);
+		}
+		
 		view.setActive(true);
 		updatePageTitle();
 	}

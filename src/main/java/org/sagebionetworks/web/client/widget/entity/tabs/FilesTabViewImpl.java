@@ -71,7 +71,6 @@ public class FilesTabViewImpl implements FilesTabView {
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
 		filePreviewContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Preview");
-		fileProvenanceContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Provenance");
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
 		this.rLoadWidget = rLoadWidget;

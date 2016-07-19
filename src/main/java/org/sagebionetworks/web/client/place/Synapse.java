@@ -1,86 +1,68 @@
 package org.sagebionetworks.web.client.place;
 
+import java.util.LinkedList;
+
 import org.sagebionetworks.web.client.StringUtils;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class Synapse extends Place implements RestartActivityOptional{
+public class Synapse extends Place {
 	public static final String DOT_REGEX = "\\.";
+	public static final String DELIMITER = "/";
 	public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
-	public static final String VERSION_DELIMITER = "/version/";
+	public static final String VERSION = "version";
 	
-	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
-	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
-	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
-	public static final String TABLES_DELIMITER = getDelimiter(Synapse.EntityArea.TABLES);
-	public static final String DISCUSSION_DELIMITER = getDelimiter(Synapse.EntityArea.DISCUSSION);
-	
-	private String token;
+	private String synapsePlaceToken;
 	private String entityId, areaToken;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
-	private boolean noRestartActivity;
 	
 	public Synapse(String token) {
-		this.token = token;
+		this.synapsePlaceToken = token;
 		area = null;
 		areaToken = null;
+		String[] tokensArray = token.split(DELIMITER);
+		LinkedList<String> tokens = new LinkedList<String>();
+		for (int i = 0; i < tokensArray.length; i++) {
+			tokens.add(tokensArray[i]);
+		}
 		
-		//the first token is the entityId
-		int firstSlash = token.indexOf("/");
-		if (firstSlash > -1) {
-			entityId = token.substring(0, firstSlash);
-			
-			//there's more
-			String toProcess = token.substring(firstSlash);
-			//is there a version?
-			if (toProcess.contains(VERSION_DELIMITER)) {
-				String[] parts = token.split(VERSION_DELIMITER);
-				if(parts.length == 2) {
-					entityId = parts[0];
-					int slashIndex = parts[1].indexOf("/");
-					if (slashIndex > -1) {
-						//there's more information after the version
-						versionNumber = Long.parseLong(parts[1].substring(0, slashIndex));
-						toProcess = parts[1].substring(slashIndex);
-					} else {
-						versionNumber = Long.parseLong(parts[1]);
-						toProcess = "";
-					}
-				} 
+		//first token should be the entity id
+		entityId = tokens.poll();
+		
+		//look for dot version syntax in this token
+		String[] entityIdTokens = entityId.split(DOT_REGEX);
+		if (entityIdTokens.length > 1) {
+			entityId = entityIdTokens[0];
+			versionNumber = Long.parseLong(entityIdTokens[1]);
+		}
+		
+		//set the next token
+		String nextToken = tokens.poll();
+		
+		if (nextToken != null && VERSION.equals(nextToken.toLowerCase())) {
+			nextToken = null;
+			if (!tokens.isEmpty()) {
+				versionNumber = Long.parseLong(tokens.removeFirst());
+				nextToken = tokens.poll();
 			}
+		}
+		
+		if (nextToken != null) {
+			area = EntityArea.valueOf(nextToken.toUpperCase());
+		}
 			
-			if(toProcess.contains(WIKI_DELIMITER)) {
-				String[] parts = toProcess.split(WIKI_DELIMITER);
-				area = Synapse.EntityArea.WIKI;
-				if (parts.length == 2) {
-					areaToken = parts[1];
-				}
-				return;
-			} else if(toProcess.contains(ADMIN_DELIMITER)) {
-				area = Synapse.EntityArea.ADMIN;
-				return;
-			} else if(toProcess.contains(FILES_DELIMITER)) {
-				area = Synapse.EntityArea.FILES;
-				return;
-			} else if(toProcess.contains(TABLES_DELIMITER)) {
-				area = Synapse.EntityArea.TABLES;
-				String[] parts = toProcess.split(TABLES_DELIMITER);
-				if(parts.length == 2)
-					areaToken = parts[1]; 
-				return;
-			} else if(toProcess.contains(DISCUSSION_DELIMITER)) {
-				area = Synapse.EntityArea.DISCUSSION;
-				String[] parts = toProcess.split(DISCUSSION_DELIMITER);
-				if(parts.length == 2)
-					areaToken = parts[1];
-				return;
+		//remaining tokens are recognized is the area token
+		if (tokens.size() > 0) {
+			areaToken = "";
+		}
+		while (tokens.size() > 0) {
+			areaToken += tokens.poll();
+			if (tokens.size() > 0) {
+				areaToken += "/";	
 			}
-		} else {
-			//no slash
-			entityId = token;
 		}
 	}
 	
@@ -98,19 +80,19 @@ public class Synapse extends Place implements RestartActivityOptional{
 
 	private void calculateToken(String entityId, Long versionNumber,
 			Synapse.EntityArea area, String areaToken) {
-		this.token = entityId;
-		if(versionNumber != null) 
-			this.token += VERSION_DELIMITER + versionNumber;
+		this.synapsePlaceToken = entityId;
+		if(versionNumber != null)
+			this.synapsePlaceToken += "." + versionNumber;
 		if(area != null) {
-			this.token += getDelimiter(area);
+			this.synapsePlaceToken += getDelimiter(area);
 			if (areaToken != null) {
-				this.token += areaToken;
+				this.synapsePlaceToken += areaToken;
 			}
 		}
 	}
 
 	public String toToken() {
-		return token;
+		return synapsePlaceToken;
 	}
 	
 	public String getEntityId() {
@@ -154,14 +136,14 @@ public class Synapse extends Place implements RestartActivityOptional{
         }
     }
 
-	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN, DISCUSSION }
+	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN, DISCUSSION, DOCKER }
 	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, SETTINGS }
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((token == null) ? 0 : token.hashCode());
+		result = prime * result + ((synapsePlaceToken == null) ? 0 : synapsePlaceToken.hashCode());
 		return result;
 	}
 
@@ -174,22 +156,12 @@ public class Synapse extends Place implements RestartActivityOptional{
 		if (getClass() != obj.getClass())
 			return false;
 		Synapse other = (Synapse) obj;
-		if (token == null) {
-			if (other.token != null)
+		if (synapsePlaceToken == null) {
+			if (other.synapsePlaceToken != null)
 				return false;
-		} else if (!token.equals(other.token))
+		} else if (!synapsePlaceToken.equals(other.synapsePlaceToken))
 			return false;
 		return true;
-	}
-
-	@Override
-	public void setNoRestartActivity(boolean noRestart) {
-		this.noRestartActivity = noRestart;
-	}
-
-	@Override
-	public boolean isNoRestartActivity() {
-		return noRestartActivity;
 	}
 	
 	/**
@@ -202,6 +174,6 @@ public class Synapse extends Place implements RestartActivityOptional{
 		if(dotNotation == null){
 			return null;
 		}
-		return SYNAPSE_ENTITY_PREFIX+dotNotation.replaceAll(DOT_REGEX, VERSION_DELIMITER).toLowerCase();
+		return SYNAPSE_ENTITY_PREFIX+dotNotation.toLowerCase();
 	}
 }

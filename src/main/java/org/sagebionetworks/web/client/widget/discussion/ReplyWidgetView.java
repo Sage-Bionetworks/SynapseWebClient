@@ -14,6 +14,7 @@ public interface ReplyWidgetView extends IsWidget{
 		void onClickDeleteReply();
 
 		void onClickEditReply();
+		void onClickReplyLink();
 	}
 
 	void setPresenter(ReplyWidget presenter);
@@ -43,4 +44,6 @@ public interface ReplyWidgetView extends IsWidget{
 	void setMessageVisible(boolean visible);
 
 	void showSuccess(String title, String message);
+	
+	void setIsAuthorModerator(boolean isModerator);
 }

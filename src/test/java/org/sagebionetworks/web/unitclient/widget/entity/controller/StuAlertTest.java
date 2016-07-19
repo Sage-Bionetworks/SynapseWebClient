@@ -60,24 +60,6 @@ public class StuAlertTest {
 	}
 	
 	@Test
-	public void testHandleServiceExceptionReadOnly() {
-		widget.handleException(new ReadOnlyModeException());
-		verify(mockSynapseAlert).clear();
-		verify(mockView).clearState();
-		verify(mockView).showReadOnly();
-		verify(mockView).setVisible(true);
-	}
-	
-	@Test
-	public void testHandleServiceExceptionDown() {
-		widget.handleException(new SynapseDownException());
-		verify(mockSynapseAlert).clear();
-		verify(mockView).clearState();
-		verify(mockView).showSynapseDown();
-		verify(mockView).setVisible(true);
-	}
-	
-	@Test
 	public void testHandleServiceExceptionForbiddenLoggedIn() {
 		widget.handleException(new ForbiddenException());
 		verify(mockSynapseAlert).clear();
@@ -91,7 +73,7 @@ public class StuAlertTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.handleException(new ForbiddenException());
 		verify(mockView).clearState();
-		verify(mockSynapseAlert).showMustLogin();
+		verify(mockSynapseAlert).showLogin();
 		verify(mockView).setVisible(true);
 	}
 	
@@ -121,9 +103,9 @@ public class StuAlertTest {
 	
 	@Test
 	public void testShowMustLogin() {
-		widget.showMustLogin();
+		widget.showLogin();
 		verify(mockView).clearState();
-		verify(mockSynapseAlert).showMustLogin();
+		verify(mockSynapseAlert).showLogin();
 		verify(mockView).setVisible(true);
 	}
 	
@@ -133,14 +115,6 @@ public class StuAlertTest {
 		widget.showError(errorMessage);
 		verify(mockView).clearState();
 		verify(mockSynapseAlert).showError(errorMessage);
-		verify(mockView).setVisible(true);
-	}
-	
-	@Test
-	public void testShowSuggestLogin() {
-		widget.showSuggestLogin();
-		verify(mockView).clearState();
-		verify(mockSynapseAlert).showSuggestLogin();
 		verify(mockView).setVisible(true);
 	}
 	

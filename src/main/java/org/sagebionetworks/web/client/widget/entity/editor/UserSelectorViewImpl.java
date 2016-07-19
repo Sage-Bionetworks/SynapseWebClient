@@ -54,4 +54,9 @@ public class UserSelectorViewImpl implements UserSelectorView {
 	public void show() {
 		modal.show();
 	}
+	
+	@Override
+	public void addModalShownHandler(ModalShownHandler modalShownHandler) {
+		modal.addShownHandler(modalShownHandler);
+	}
 }

@@ -38,20 +38,5 @@
   				</b:Column>
   			</b:Row>
   		</g:HTMLPanel>
-  		<g:HTMLPanel ui:field="synapseDown" visible="false">
-  			<b:Row>
-  				<b:Column size="XS_12">
-	  				<b:Image responsive="true" addStyleNames="align-center margin-bottom-40" url="https://s3.amazonaws.com/static.synapse.org/stu/asleep-sm.png"/>
-	  			</b:Column>
-  				<b:Column size="XS_12" ui:field="readOnlyMessage">
-  					<b:Heading size="H3" alignment="CENTER" text="Synapse is in READ_ONLY mode for maintenance." />
-  					<b:Heading size="H3" alignment="CENTER" addStyleNames="margin-bottom-40" subText="You can continue to browse, but can not modify during this period." />	
-  				</b:Column>
-  				<b:Column size="XS_12" ui:field="synapseDownMessage">
-  					<b:Heading size="H3" alignment="CENTER" text="Synapse is down for maintenance." />
-  					<b:Heading size="H3" alignment="CENTER" addStyleNames="margin-bottom-40" subText="Sad but true. We will be back as soon as possible." />
-  				</b:Column>
-  			</b:Row>
-  		</g:HTMLPanel>
 	</bh:Div>
 </ui:UiBinder>

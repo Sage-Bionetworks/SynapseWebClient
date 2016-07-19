@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.Arrays;
 
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -10,24 +12,26 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
-import org.sagebionetworks.repo.model.EntityType;
 
 /**
  * This widget lists the tables of a given project.
@@ -37,7 +41,7 @@ import org.sagebionetworks.repo.model.EntityType;
  */
 public class TableListWidget implements TableListWidgetView.Presenter, PageChangeListener, TableCreatedHandler, IsWidget {
 	
-	public static final Long PAGE_SIZE = 10L;
+	public static final Long PAGE_SIZE = 20L;
 	public static final Long OFFSET_ZERO = 0L;
 
 	private PreflightController preflightController;
@@ -46,28 +50,46 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private PaginationWidget paginationWidget;
 	private CreateTableModalWidget createTableModalWidget;
 	private UploadTableModalWidget uploadTableModalWidget;
+	private CreateTableViewWizard createTableViewWizard;
 	private boolean canEdit;
 	private EntityQuery query;
 	private EntityBundle parentBundle;
 	private CallbackP<String> onTableClickCallback;
+	private CookieProvider cookies;
+	WizardCallback refreshTablesCallback;
 	@Inject
 	public TableListWidget(PreflightController preflightController,
 			TableListWidgetView view,
 			SynapseClientAsync synapseClient,
 			CreateTableModalWidget createTableModalWidget,
 			PaginationWidget paginationWidget,
-			UploadTableModalWidget uploadTableModalWidget) {
+			UploadTableModalWidget uploadTableModalWidget,
+			CookieProvider cookies,
+			CreateTableViewWizard createTableViewWizard) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.createTableModalWidget = createTableModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.paginationWidget = paginationWidget;
+		this.createTableViewWizard = createTableViewWizard;
+		this.cookies = cookies;
 		this.view.setPresenter(this);
 		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.addPaginationWidget(paginationWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
-	}	
+		this.view.addWizard(createTableViewWizard.asWidget());
+		refreshTablesCallback = new WizardCallback() {
+			@Override
+			public void onFinished() {
+				tableCreated();
+			}
+			
+			@Override
+			public void onCanceled() {
+			}
+		};
+	}
 	
 	/**
 	 * Configure this widget before use.
@@ -80,28 +102,36 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
-		this.query = createQuery(parentBundle.getEntity().getId());
+		view.resetSortUI();
+		onSort(EntityFieldName.createdOn.name(), SortDirection.DESC);
+	}
+	
+	public void onSort(String sortColumnName, SortDirection sortDirection) {
+		this.query = createQuery(parentBundle.getEntity().getId(), sortColumnName, sortDirection);
 		queryForOnePage(OFFSET_ZERO);
 	}
-
+	
 	/**
 	 * Create a new query.
 	 * @param parentId
 	 * @return
 	 */
-	public EntityQuery createQuery(String parentId) {
+	public EntityQuery createQuery(String parentId, String sortColumnName, SortDirection sortDirection) {
 		EntityQuery newQuery = new EntityQuery();
-		newQuery.setFilterByType(EntityType.table);
 		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.createdOn.name());
-		sort.setDirection(SortDirection.DESC);
+		sort.setColumnName(sortColumnName);
+		sort.setDirection(sortDirection);
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
-		newQuery.setConditions(Arrays.asList(condition));
+		Condition typeCondition = EntityQueryUtils.buildCondition(
+				EntityFieldName.nodeType, Operator.IN, EntityType.table.name(), EntityType.entityview.name());
+		
+		newQuery.setConditions(Arrays.asList(condition, typeCondition));
 		newQuery.setLimit(PAGE_SIZE);
 		newQuery.setOffset(OFFSET_ZERO);
 		return newQuery;
 	}
+	
 	/**
 	 * Run a query and populate the page with the results.
 	 * @param offset The offset used by the query.
@@ -130,6 +160,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		//Must have edit and showAddTables for the buttons to be visible.
 		view.setAddTableVisible(this.canEdit);
 		view.setUploadTableVisible(this.canEdit);
+		view.setAddFileViewVisible(this.canEdit && DisplayUtils.isInTestWebsite(cookies));
 	}
     
 	@Override
@@ -152,17 +183,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 * Called after a successful preflight check.
 	 */
 	private void postCheckUploadTable(){
-		this.uploadTableModalWidget.showModal(new WizardCallback() {
-			
-			@Override
-			public void onFinished() {
-				tableCreated();
-			}
-			
-			@Override
-			public void onCanceled() {			
-			}
-		});
+		this.uploadTableModalWidget.showModal(refreshTablesCallback);
 	}
 
 
@@ -170,7 +191,23 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public void onPageChange(Long newOffset) {
 		queryForOnePage(newOffset);
 	}
-
+	@Override
+	public void onAddFileView() {
+		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateFileView();
+			}
+		});
+	}
+	/**
+	 * Called after all pre-flight checks are performed on a file view.
+	 */
+	private void postCheckCreateFileView() {
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
+	}
+	
 	@Override
 	public void onAddTable() {
 		preflightController.checkCreateEntity(parentBundle, TableEntity.class.getName(), new Callback() {
@@ -186,7 +223,13 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 * Called after all pre-flight checks are performed on a table.
 	 */
 	private void postCheckCreateTable(){
-		this.createTableModalWidget.showCreateModal();
+		// use new wizard if in alpha mode
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
+			this.createTableViewWizard.showModal(refreshTablesCallback);
+		} else {
+			this.createTableModalWidget.showCreateModal();	
+		}
 	}
 	
 

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 /**
  * Abstraction for the view 
  *
@@ -37,20 +38,24 @@ public interface SynapseAlertView extends IsWidget {
 	void showError(String error);
 	
 	/**
+	 * Show info about the jira issue that was just created.
+	 */
+	void showJiraIssueOpen(String key, String url);
+	
+	
+	/**
 	 * Show a special login alert, that includes a link to the login page.
 	 */
-	void showLoginAlert();
-	/**
-	 * Show a special login alert to let the user decide if logging in might help. Includes a link to the login page.
-	 */
-	void showSuggestLoginAlert();
+	void showLogin();
 	void setPresenter(Presenter p);
-
+	void setLoginWidget(Widget w);
+	
+	void reload();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onCreateJiraIssue(String userReport);
-		void onLoginClicked();
 	}
 }

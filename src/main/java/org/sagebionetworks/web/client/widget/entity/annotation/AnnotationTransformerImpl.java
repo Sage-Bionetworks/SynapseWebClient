@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
@@ -16,6 +17,8 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.inject.Inject;
 
 public class AnnotationTransformerImpl implements AnnotationTransformer {
+	private static final String KEY = "Key \'";
+	private static final String ALREADY_DEFINED = "\' has multiple definitions.";
 	private DateTimeFormat standardFormatter;
 
 	@Inject
@@ -76,7 +79,7 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	}
 
 	@Override
-	public void updateAnnotationsFromList(Annotations annotations, List<Annotation> annotationsList) {
+	public void updateAnnotationsFromList(Annotations annotations, List<Annotation> annotationsList) throws DuplicateKeyException{
 		Map<String, List<Double>> doubleAnnotations = new LinkedHashMap<String, List<Double>>();
 		Map<String, List<String>> stringAnnotations = new LinkedHashMap<String, List<String>>();
 		Map<String, List<Long>> longAnnotations = new LinkedHashMap<String, List<Long>>();
@@ -85,15 +88,27 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 		for (Annotation annotation : annotationsList) {
 			switch (annotation.getType()) {
 			case DATE:
+				if (dateAnnotations.containsKey(annotation.getKey())) {
+					throw new DuplicateKeyException(KEY + annotation.getKey() + ALREADY_DEFINED);
+				}
 				dateAnnotations.put(annotation.getKey(), getDates(annotation.getValues()));
 				break;
 			case DOUBLE:
+				if (doubleAnnotations.containsKey(annotation.getKey())) {
+					throw new DuplicateKeyException(KEY + annotation.getKey() + ALREADY_DEFINED);
+				}
 				doubleAnnotations.put(annotation.getKey(), getDoubles(annotation.getValues()));
 				break;
 			case LONG:
+				if (longAnnotations.containsKey(annotation.getKey())) {
+					throw new DuplicateKeyException(KEY +annotation.getKey() + ALREADY_DEFINED);
+				}
 				longAnnotations.put(annotation.getKey(), getLongs(annotation.getValues()));
 				break;
 			case STRING:
+				if (stringAnnotations.containsKey(annotation.getKey())) {
+					throw new DuplicateKeyException(KEY +annotation.getKey() + ALREADY_DEFINED);
+				}
 				stringAnnotations.put(annotation.getKey(), annotation.getValues());
 				break;
 			}

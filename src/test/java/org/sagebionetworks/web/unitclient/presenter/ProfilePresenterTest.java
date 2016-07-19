@@ -43,10 +43,8 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -74,7 +72,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.client.widget.WikiModalWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -117,7 +114,6 @@ public class ProfilePresenterTest {
 	UserProfileModalWidget mockUserProfileModalWidget;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
-	String testUserJson;
 	String password = "password";
 	SortOptionEnum sort = SortOptionEnum.LATEST_ACTIVITY;
 	List<EntityHeader> myFavorites;
@@ -146,8 +142,6 @@ public class ProfilePresenterTest {
 	VerificationSubmissionWidget mockVerificationSubmissionModal;
 	@Mock
 	VerificationSubmission mockVerificationSubmission;
-	@Mock
-	WikiModalWidget mockWikiModalWidget;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -172,7 +166,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockWikiModalWidget);	
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -193,11 +187,7 @@ public class ProfilePresenterTest {
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
 		
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
-		testUser.writeToJSONObject(adapter);
-		testUserJson = adapter.toJSONString(); 
-		
-		myTeams = TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		myTeams = TeamListWidgetTest.setupUserTeams(mockSynapseClient);
 		myTeamBundles = new ArrayList<TeamRequestBundle>();
 		for (int i = 0; i < myTeams.size(); i++) {
 			myTeamBundles.add(new TeamRequestBundle(myTeams.get(i), Long.valueOf(i)));
@@ -280,10 +270,9 @@ public class ProfilePresenterTest {
 	public void testUpdateProfileView() {
 		boolean isOwner = true;
 		String userId = userProfile.getOwnerId();
-		ProfileArea initialTab = ProfileArea.PROJECTS;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(isOwner);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		profilePresenter.updateProfileView(userId, initialTab);
+		profilePresenter.updateProfileView(userId);
 		
 		verify(mockView).clear();
 		verify(mockTeamListWidget, Mockito.atLeastOnce()).clear();
@@ -334,9 +323,6 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.TEAMS);
-		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -390,8 +376,6 @@ public class ProfilePresenterTest {
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		//also verify that it is asking for the correct teams
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
@@ -418,7 +402,9 @@ public class ProfilePresenterTest {
 	public void testSettingsNotOwner() {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("2");
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
-		profilePresenter.updateProfileView("1", ProfileArea.SETTINGS);
+		when(place.getUserId()).thenReturn("4");
+		when(place.getArea()).thenReturn(ProfileArea.SETTINGS);
+		profilePresenter.setPlace(place);
 		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
 		verify(mockView).addCertifiedBadge();
 		verify(mockView, never()).setGetCertifiedVisible(anyBoolean());
@@ -429,7 +415,7 @@ public class ProfilePresenterTest {
 		//some other error occurred
 		Exception ex = new Exception("unhandled");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
-		profilePresenter.updateProfileView("1", ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView("1");
 		verify(mockView).hideLoading();
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -441,7 +427,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
-		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView(userProfile.getOwnerId());
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
 		
@@ -463,7 +449,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
 		when(mockUserBundle.getORCID()).thenReturn("an orc id");
-		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView(userProfile.getOwnerId());
 		verify(mockView).setGetCertifiedVisible(true);
 		verify(mockView, never()).addCertifiedBadge();
 		
@@ -484,7 +470,7 @@ public class ProfilePresenterTest {
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
 		when(mockUserBundle.getORCID()).thenReturn("an orc id");
 		//view another user profile
-		profilePresenter.updateProfileView("12937", ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView("12937");
 
 		verify(mockView, times(2)).setUnbindOrcIdVisible(false);
 	}
@@ -496,7 +482,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("false");
-		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView(userProfile.getOwnerId());
 		verify(mockView).setGetCertifiedVisible(false);
 		verify(mockView, never()).addCertifiedBadge();
 	}
@@ -504,8 +490,11 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testLinkOrcIdClicked() throws JSONObjectAdapterException {
+		when(place.toToken()).thenReturn(targetUserId);
+		when(place.getUserId()).thenReturn(targetUserId);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		profilePresenter.setPlace(place);
 		when(mockUserBundle.getORCID()).thenReturn("a value");
-		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
 		profilePresenter.linkOrcIdClicked();
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -522,6 +511,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetAllMyProjects() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		//when setting the filter to all, it should ask for all of my projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
@@ -540,6 +530,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetAllTheirProjects() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
@@ -549,14 +540,28 @@ public class ProfilePresenterTest {
 		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
 		//should not have refreshed team invites, since this is not the owner
 	}
+	
+	@Test
+	public void testGetProjectsDefaultFilter() {
+		profilePresenter.setPlace(place);
+		profilePresenter.setIsOwner(false);
+		//when setting the filter to all, it should ask for all of their projects
+		profilePresenter.setProjectFilterAndRefresh(null, null);
+		verify(mockView, times(2)).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+	}
+
 
 	
 	@Test
 	public void testGetProjectsCreatedByMe() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		//when setting the filter to my projects, it should query for projects created by me
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockView, times(2)).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
@@ -569,6 +574,7 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testGetFavorites() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
@@ -583,9 +589,10 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetSharedDirectlyWithMeProjects() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
 		verify(mockView, times(2)).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
@@ -597,6 +604,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetFavoritesEmpty() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		myFavorites.clear();
@@ -612,13 +620,12 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetProjectsByTeam() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
-		Team testTeam = new Team();
 		String teamId = "39448";
-		testTeam.setId(teamId);
 		
 		//when setting the filter to all, it should ask for all of my projects
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, testTeam);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, teamId);
 		verify(mockView, times(2)).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
@@ -630,52 +637,59 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetProjectsByTeamFailure() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, new Team());
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, "123");
 		verify(mockView).setProjectsError(anyString());
 	}
 	
 	@Test
 	public void testGetProjectCreatedByMeFailure() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("111");
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
-		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockView).setProjectsError(anyString());
 	}
 	
 	@Test
 	public void testApplyFilterClickedAll() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
+		verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
 	}
 	
 	@Test
 	public void testApplyFilterClickedMine() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		profilePresenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
 	@Test
 	public void testApplyFilterClickedMyParticipatedProjects() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		profilePresenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
 	@Test
 	public void testApplyFilterClickedMyTeamProjects() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		profilePresenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, null);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_TEAM_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
@@ -683,6 +697,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testApplyFilterClickedFavorites() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
@@ -801,7 +816,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testDefaultSortOption() throws JSONObjectAdapterException {
-		profilePresenter.updateProfileView("4443", ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView("4443");
 		verify(mockView).setSortText(SortOptionEnum.LATEST_ACTIVITY.sortText);
 	}
 	
@@ -876,6 +891,7 @@ public class ProfilePresenterTest {
 	//Challenge tests
 	@Test
 	public void testRefreshChallenges() {
+		profilePresenter.setPlace(place);
 		profilePresenter.tabClicked(ProfileArea.CHALLENGES);
 		verify(mockView, times(2)).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
@@ -958,6 +974,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testTeamsTabNotOwner() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(false);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockTeamListWidget).showLoading();
@@ -969,6 +986,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testTeamsTabOwner() {
+		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);	
 		verify(mockTeamListWidget).showLoading();
@@ -978,6 +996,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamsError() {
+		profilePresenter.setPlace(place);
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
@@ -987,6 +1006,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamFilters() {
+		profilePresenter.setPlace(place);
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(true);
@@ -995,6 +1015,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamFiltersEmpty() {
+		profilePresenter.setPlace(place);
 		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
@@ -1003,6 +1024,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamFiltersError() {
+		profilePresenter.setPlace(place);
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
@@ -1222,12 +1244,14 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testTabClickedTeams(){
+		profilePresenter.setPlace(place);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
 	}
 	
 	@Test
 	public void testTabClickedWhileEditing(){
+		profilePresenter.setPlace(place);
 		when(mockGlobalApplicationState.isEditing()).thenReturn(true);
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
 		
@@ -1251,15 +1275,26 @@ public class ProfilePresenterTest {
 	public void testUpdateArea() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.CHALLENGES);
-		verify(mockPlaceChanger).goTo(any(Profile.class));
+		boolean pushState = true;
+		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
+		verify(mockGlobalApplicationState).pushCurrentPlace(any(Profile.class));
+	}
+	
+	@Test
+	public void testUpdateAreaReplacestate() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		boolean pushState = false;
+		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
+		verify(mockGlobalApplicationState).replaceCurrentPlace(any(Profile.class));
 	}
 
 	@Test
 	public void testUpdateAreaNoChange() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.PROJECTS);
+		boolean pushState = true;
+		profilePresenter.updateArea(ProfileArea.PROJECTS, false);
 		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
 	}
 	
@@ -1469,7 +1504,7 @@ public class ProfilePresenterTest {
 	
 	private void viewProfile(String targetUserId, String currentUserId) {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		profilePresenter.updateProfileView(targetUserId, ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView(targetUserId);
 	}
 	
 	@Test
@@ -1584,13 +1619,13 @@ public class ProfilePresenterTest {
 	public void testShowEmailIfLoggedIn() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("123");
-		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView(userProfile.getOwnerId());
 		verify(mockView).setSynapseEmailVisible(true);
 	}
 	@Test
 	public void testHideEmailIfAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		profilePresenter.updateProfileView(userProfile.getOwnerId(), ProfileArea.PROJECTS);
+		profilePresenter.updateProfileView(userProfile.getOwnerId());
 		verify(mockView).setSynapseEmailVisible(false);
 	}
 	
@@ -1702,12 +1737,6 @@ public class ProfilePresenterTest {
 		profilePresenter.unbindOrcIdAfterConfirmation();
 		//error is shown
 		verify(mockSynAlert).handleException(ex);
-	}
-	
-	@Test
-	public void testonVerifyMoreInfoClicked() {
-		profilePresenter.onVerifyMoreInfoClicked();
-		verify(mockWikiModalWidget).show(anyString());
 	}
 	
 	@Test

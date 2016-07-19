@@ -108,11 +108,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//////Tabs
 	@UiField
-	Anchor projectsLink;
+	FocusPanel projectsLink;
 	@UiField
 	LIElement projectsListItem;
 	@UiField
-	Anchor teamsLink;
+	FocusPanel teamsLink;
 	@UiField
 	LIElement teamsListItem;
 	@UiField
@@ -120,7 +120,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement settingsListItem;
 	@UiField
-	Anchor challengesLink;
+	FocusPanel challengesLink;
 	@UiField
 	LIElement challengesListItem;
 	
@@ -274,9 +274,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button resubmitProfileValidationButton;
 	@UiField
 	Button verificationApprovedButton;
-	@UiField
-	Button whyGetValidatedButton;
 	
+	@UiField
+	Span teamNotifications;
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -352,12 +352,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Search(""));
 			}
 		});
-		whyGetValidatedButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onVerifyMoreInfoClicked();
-			}
-		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -426,13 +420,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		myProjectsFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
+				presenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null);
 			}
 		});
 		sharedDirectlyWithMeFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+				presenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
 			}
 		});		
 		
@@ -589,7 +583,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeamNotificationCount(String count) {
-		teamsLink.setHTML(DisplayConstants.TEAMS + "&nbsp" + DisplayUtils.getBadgeHtml(count));
+		teamNotifications.setHTML(DisplayUtils.getBadgeHtml(count));
 	}
 	
 	@Override
@@ -662,7 +656,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+				presenter.applyFilterClicked(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, null);
 			}
 		});
 		teamFiltersDropDownMenu.add(teamFilter);
@@ -866,7 +860,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clearTeamNotificationCount() {
-		teamsLink.setHTML(DisplayConstants.TEAMS);
+		teamNotifications.setHTML("");
 	}
 	
 	private void hideTabContainers() {
@@ -902,7 +896,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
 		}
-		presenter.updateArea(targetTab);
 	}
 	
 	private void setTabSelected(LIElement listItem, DivElement container) {

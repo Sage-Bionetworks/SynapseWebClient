@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_REPLY_DETAILS_FOR_THREAD_LIST;
-import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.SHOW_THREAD_DETAILS_FOR_THREAD_LIST;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -28,6 +29,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseAlert synAlert;
+	GWTWrapper gwtWrapper;
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
@@ -35,33 +37,66 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private Boolean isCurrentUserModerator;
 	private CallbackP<Boolean> emptyListCallback;
 	private CallbackP<String> threadIdClickedCallback;
+	Set<Long> moderatorIds;
+	private Callback invokeCheckForInViewAndLoadData;
+	private DiscussionFilter filter;
+	
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,
 			PortalGinInjector ginInjector,
 			DiscussionForumClientAsync discussionForumClientAsync,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			GWTWrapper gwtWrapper
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.synAlert = synAlert;
+		this.gwtWrapper= gwtWrapper;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		order = DEFAULT_ORDER;
 		ascending = DEFAULT_ASCENDING;
 	}
 
-	public void configure(String forumId, Boolean isCurrentUserModerator, CallbackP<Boolean> emptyListCallback) {
+	public void configure(String forumId, Boolean isCurrentUserModerator,
+			Set<Long> moderatorIds, CallbackP<Boolean> emptyListCallback,
+			DiscussionFilter filter) {
 		clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
+		this.moderatorIds = moderatorIds;
 		offset = 0L;
 		this.forumId = forumId;
+		if (filter != null) {
+			this.filter = filter;
+		} else {
+			this.filter = DEFAULT_FILTER;
+		}
+		invokeCheckForInViewAndLoadData = new Callback() {
+			@Override
+			public void invoke() {
+				checkForInViewAndLoadData();
+			}
+		};
 		loadMore();
 		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
 		view.setThreadCountAlert(threadCountAlert.asWidget());
 		threadCountAlert.configure(forumId);
+	}
+
+	public void checkForInViewAndLoadData() {
+		if (!view.isLoadMoreAttached()) {
+			//Done, view has been detached and widget was never in the viewport
+			return;
+		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility()) {
+			//try to load data!
+			loadMore();
+		} else {
+			//wait for a few seconds and see if we should load data
+			gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+		}
 	}
 
 	public void clear() {
@@ -79,39 +114,40 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 	public void loadMore() {
 		synAlert.clear();
-		view.setLoadingVisible(true);
+		view.setLoadMoreVisibility(true);
 		discussionForumClientAsync.getThreadsForForum(forumId, LIMIT, offset,
-				order, ascending, DEFAULT_FILTER,
-				new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
+				order, ascending, filter, new AsyncCallback<PaginatedResults<DiscussionThreadBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.setLoadingVisible(false);
+						view.setLoadMoreVisibility(false);
 						synAlert.handleException(caught);
 					}
 
 					@Override
 					public void onSuccess(PaginatedResults<DiscussionThreadBundle> result) {
 						for(DiscussionThreadBundle bundle: result.getResults()) {
-							DiscussionThreadWidget thread = ginInjector.createThreadWidget();
-							thread.configure(bundle, isCurrentUserModerator, new Callback(){
-
-								@Override
-								public void invoke() {
-									configure(forumId, isCurrentUserModerator, emptyListCallback);
-								}
-							}, SHOW_THREAD_DETAILS_FOR_THREAD_LIST, SHOW_REPLY_DETAILS_FOR_THREAD_LIST);
-							thread.setThreadIdClickedCallback(threadIdClickedCallback);
+							DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();
+							thread.configure(bundle);
+							if (threadIdClickedCallback != null) {
+								thread.setThreadIdClickedCallback(threadIdClickedCallback);
+							} else {
+								thread.disableClick();
+							}
 							view.addThread(thread.asWidget());
 						}
 						
 						offset += LIMIT;
 						long numberOfThreads = result.getTotalNumberOfResults();
-						view.setLoadingVisible(false);
-						view.setLoadMoreButtonVisibility(offset < numberOfThreads);
+						view.setLoadMoreVisibility(offset < numberOfThreads);
+						if (offset < numberOfThreads) {
+							gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+						}
 						if (emptyListCallback != null) {
 							emptyListCallback.invoke(numberOfThreads > 0);
 						};
+						view.setThreadHeaderVisible(numberOfThreads > 0);
+						view.setNoThreadsFoundVisible(numberOfThreads == 0);
 					}
 		});
 	}
@@ -123,6 +159,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			order = newOrder;
 			ascending = DEFAULT_ASCENDING;
 		}
-		configure(forumId, isCurrentUserModerator, emptyListCallback);
+		configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, filter);
 	}
 }

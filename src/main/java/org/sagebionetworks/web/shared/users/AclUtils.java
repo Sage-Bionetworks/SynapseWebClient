@@ -1,21 +1,18 @@
 package org.sagebionetworks.web.shared.users;
 
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.CREATE;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ_PRIVATE_SUBMISSION;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.SUBMIT;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE_SUBMISSION;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 
 public class AclUtils {
@@ -32,6 +29,8 @@ public class AclUtils {
 		
 		permToACCESS_TYPE.put(PermissionLevel.CAN_VIEW, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				READ)));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_MODERATE, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				READ, MODERATE)));
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				CREATE, READ, UPDATE)));
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(Arrays.asList(
@@ -94,4 +93,18 @@ public class AclUtils {
 		return valueOf;
 	}
 	
+	/**
+	 * Return a set of principal IDs that have the given ACCESS_TYPE in the given AccessControlList.
+	 * @return
+	 */
+	public static Set<Long> getPrincipalIds(AccessControlList acl, ACCESS_TYPE t) {
+		Set<ResourceAccess> resourceAccessSet = acl.getResourceAccess();
+		Set<Long> principalIds = new HashSet<Long>();
+		for (ResourceAccess ra : resourceAccessSet) {
+			if (ra.getAccessType().contains(t)) {
+				principalIds.add(ra.getPrincipalId());
+			}
+		}
+		return principalIds;
+	}
 }

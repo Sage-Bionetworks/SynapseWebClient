@@ -25,9 +25,7 @@
 				<g:Image ui:field="userPicture" addStyleNames="userProfileImage imageButton margin-right-2" />
 			</t:TableData>
 			<t:TableData paddingRight="2" addStyleNames="vertical-align-middle">
-				<b:Tooltip placement="BOTTOM" title="" ui:field="usernameTooltip">
-					<b:Anchor ui:field="usernameLink" />
-				</b:Tooltip>
+				<b:Anchor ui:field="usernameLink" />
 				<bh:Div>
 					<bh:Paragraph ui:field="description" />
 				</bh:Div>

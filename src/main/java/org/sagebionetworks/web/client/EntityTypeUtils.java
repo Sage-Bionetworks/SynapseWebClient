@@ -9,23 +9,30 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 
 public class EntityTypeUtils {
 
+	
 	public static String getEntityClassNameForEntityType(String entityType) {
 		String className = FileEntity.class.getName();
 		if (entityType != null) {
-			if (entityType.equalsIgnoreCase("file")) {
+			if (entityType.equalsIgnoreCase(EntityType.file.name())) {
 				className = FileEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("folder")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.folder.name())) {
 				className = Folder.class.getName();
-			} else if (entityType.equalsIgnoreCase("project")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.project.name())) {
 				className = Project.class.getName();
-			} else if (entityType.equalsIgnoreCase("table")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.table.name())) {
 				className = TableEntity.class.getName();
-			} else if (entityType.equalsIgnoreCase("link")) {
+			} else if (entityType.equalsIgnoreCase(EntityType.entityview.name())) {
+				className = EntityView.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.link.name())) {
 				className = Link.class.getName();
+			} else if (entityType.equalsIgnoreCase(EntityType.dockerrepo.name())) {
+				className = DockerRepository.class.getName();
 			}
 		}
 		return className;
@@ -49,6 +56,12 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			type = EntityType.table;
+		} else if(EntityView.class.getName().equals(className)) {
+			// EntityView
+			type = EntityType.entityview;
+		} else if(DockerRepository.class.getName().equals(className)) {
+			// Docker Repository
+			type = EntityType.dockerrepo;
 		}
 		return type;
 	}
@@ -80,7 +93,15 @@ public class EntityTypeUtils {
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			icon = IconType.TABLE;
+		} else if(EntityView.class.getName().equals(className)) {
+			// FileView
+			icon = IconType.TH_LIST;
+		} else if(DockerRepository.class.getName().equals(className)) {
+			// DockerRepository
+			// TODO: change to Docker Icon: https://github.com/wesbos/Font-Awesome-Docker-Icon
+			icon = IconType.ARCHIVE;
 		}
+		
 		return icon;
 	}
 

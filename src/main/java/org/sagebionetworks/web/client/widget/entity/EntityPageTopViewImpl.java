@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -34,8 +33,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel projectActionMenuContainer;
 	
 	@Inject
-	public EntityPageTopViewImpl(Binder uiBinder,
-			CookieProvider cookies) {
+	public EntityPageTopViewImpl(Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 

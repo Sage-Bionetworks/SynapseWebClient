@@ -75,7 +75,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		descriptor = widgetDescriptor;
 		clear();
 		if (!synAlert.isUserLoggedIn()) {
-			synAlert.showMustLogin();
+			synAlert.showLogin();
 			return;
 		}
 		view.setSubmitButtonLoading(false);

@@ -1,13 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import java.util.Set;
+
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
 
@@ -15,26 +17,23 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	private final static Long PROJECT_VERSION_NUMBER = null;
 	Tab tab;
 	DiscussionTabView view;
-	CookieProvider cookies;
 	//use this token to navigate between threads within the discussion tab
 	ParameterizedToken params;
 	ForumWidget forumWidget;
 	String entityName, entityId;
-
+	
 	@Inject
 	public DiscussionTab(
 			DiscussionTabView view,
 			Tab tab,
-			CookieProvider cookies,
 			ForumWidget forumWidget
 			) {
 		this.view = view;
 		this.tab = tab;
-		this.cookies = cookies;
 		this.forumWidget = forumWidget;
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		view.updateWidth(tab);
-		tab.configure("Discussion&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget());
+		tab.configure("Discussion&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
 		view.setPresenter(this);
 		view.setForum(forumWidget.asWidget());
 	}
@@ -43,7 +42,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
+	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, Set<Long> moderatorIds) {
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
@@ -59,7 +58,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, updateParamsCallback, updateURLCallback);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, moderatorIds, updateParamsCallback, updateURLCallback);
 	}
 
 	/**

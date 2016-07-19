@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -49,6 +50,11 @@ public class UserSelector implements UserSelectorView.Presenter {
 	}
 
 	public void onSynapseSuggestSelected(UserGroupSuggestion suggestion) {
+		if (!Boolean.parseBoolean(suggestion.isIndividual())) {
+			suggestBox.showErrorMessage(DisplayConstants.NO_USER_SELECTED);
+			return;
+		}
+		
 		usernameCallback.invoke(suggestion.getHeader().getUserName());
 		view.hide();
 	}
@@ -61,5 +67,9 @@ public class UserSelector implements UserSelectorView.Presenter {
 	public void show() {
 		clear();
 		view.show();
+	}
+	
+	public void addModalShownHandler(ModalShownHandler modalShownHandler) {
+		view.addModalShownHandler(modalShownHandler);
 	}
 }

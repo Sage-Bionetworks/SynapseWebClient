@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import java.util.Set;
+
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -38,8 +40,10 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String replyId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
-	private Callback deleteReplyCallback;
-
+	private Callback deleteReplyCallback, replyClickedCallback;
+	private Set<Long> moderatorIds;
+	private String message;
+	
 	@Inject
 	public ReplyWidget(
 			ReplyWidgetView view,
@@ -68,19 +72,24 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Callback deleteReplyCallback) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback, Callback replyClickedCallback) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
 		this.isCurrentUserModerator = isCurrentUserModerator;
+		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
+		this.replyClickedCallback = replyClickedCallback;
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(DiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
 		view.setEditedVisible(bundle.getIsEdited());
 		view.setDeleteIconVisibility(isCurrentUserModerator);
 		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
+		view.setIsAuthorModerator(isAuthorModerator);
+
 		configureMessage();
 	}
 
@@ -113,10 +122,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						String message = response.getText();
+						message = response.getText();
 						view.setLoadingMessageVisible(false);
 						markdownWidget.configure(message);
-						configureEditReplyModal(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
 					}
@@ -190,13 +198,19 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator, deleteReplyCallback);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback, replyClickedCallback);
 			}
 		});
 	}
 
 	@Override
 	public void onClickEditReply() {
+		configureEditReplyModal(message);
 		editReplyModal.show();
+	}
+	
+	@Override
+	public void onClickReplyLink() {
+		replyClickedCallback.invoke();
 	}
 }

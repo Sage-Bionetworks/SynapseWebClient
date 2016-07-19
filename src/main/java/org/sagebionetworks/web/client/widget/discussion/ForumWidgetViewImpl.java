@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,18 +31,23 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	SimplePanel singleThreadContainer;
 	@UiField
-	Span emptyUI;
-	@UiField
-	Table threadHeader;
-	@UiField
-	FocusPanel sortByReplies;
-	@UiField
-	FocusPanel sortByViews;
-	@UiField
-	FocusPanel sortByActivity;
+	SimplePanel defaultThreadContainer;
 	@UiField
 	Span subscribeButtonContainer;
+	@UiField
+	Tooltip newThreadTooltip;
+	@UiField
+	Button deletedThreadButton;
+	@UiField
+	SimplePanel deletedThreadListContainer;
+	@UiField
+	Div deleteThreadsArea;
 	
+	Timer newThreadTooltipHider = new Timer() { 
+	    public void run() {
+	    	newThreadTooltip.hide();
+	    } 
+	};
 	private Presenter presenter;
 
 	Widget widget;
@@ -62,22 +68,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 				presenter.onClickShowAllThreads();
 			}
 		});
-		sortByReplies.addClickHandler(new ClickHandler() {
+		deletedThreadButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.sortByReplies();
-			}
-		});
-		sortByViews.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.sortByViews();
-			}
-		});
-		sortByActivity.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.sortByActivity();
+				presenter.onClickDeletedThreadButton();
 			}
 		});
 	}
@@ -129,16 +123,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	}
 
 	@Override
-	public void setEmptyUIVisible(boolean visible) {
-		emptyUI.setVisible(visible);
-	}
-
-	@Override
-	public void setThreadHeaderVisible(boolean visible) {
-		threadHeader.setVisible(visible);
-	}
-
-	@Override
 	public void setNewThreadButtonVisible(boolean visible) {
 		newThreadButton.setVisible(visible);
 	}
@@ -151,5 +135,47 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void setSubscribeButton(Widget w) {
 		subscribeButtonContainer.clear();
 		subscribeButtonContainer.add(w);
+	}
+	
+	@Override
+	public void setDefaultThreadWidget(Widget w) {
+		defaultThreadContainer.clear();
+		defaultThreadContainer.add(w);
+	}
+	@Override
+	public void setDefaultThreadWidgetVisible(boolean visible) {
+		defaultThreadContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void showNewThreadTooltip() {
+		newThreadTooltip.show();
+		newThreadTooltipHider.schedule(5000);
+	}
+
+	@Override
+	public boolean isDeletedThreadListVisible() {
+		return deletedThreadListContainer.isVisible();
+	}
+
+	@Override
+	public void setDeletedThreadListVisible(boolean visible) {
+		deleteThreadsArea.setVisible(visible);
+		deletedThreadListContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedThreadList(Widget widget) {
+		deletedThreadListContainer.add(widget);
+	}
+
+	@Override
+	public void setDeletedThreadButtonVisible(boolean visible) {
+		deletedThreadButton.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedThreadButtonIcon(IconType icon) {
+		deletedThreadButton.setIcon(icon);
 	}
 }

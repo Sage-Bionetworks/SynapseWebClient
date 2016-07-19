@@ -38,7 +38,6 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -60,11 +59,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String areaToken;
 	private CookieProvider cookies;
 	private Header headerWidget;
+	Footer footerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GWTWrapper gwt;
-	
-	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
 	
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -76,6 +74,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
 			GWTWrapper gwt) {
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
@@ -85,12 +84,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.gwt = gwt;
-		//place widgets and configure
-		view.setEntityPageTopWidget(entityPageTop);
-		view.setFooterWidget(footerWidget);
-		view.setHeaderWidget(headerWidget);
-		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
-		view.setSynAlertWidget(synAlert.asWidget());
 		clear();
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
@@ -101,7 +94,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			}
 		});
 		
-		headerWidget.refresh();
 	}
 
 	@Override
@@ -121,7 +113,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
-	public boolean isValidEntityId(String entityId) {
+	public static boolean isValidEntityId(String entityId) {
 		if (entityId == null || entityId.length() == 0 || !entityId.toLowerCase().startsWith("syn")) {
 			return false;
 		}
@@ -137,6 +129,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void clear() {
+		entityPageTop.clearState();
 		synAlert.clear();
 		openTeamInvitesWidget.clear();
 		view.clear();
@@ -152,6 +145,13 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	@Override
 	public void refresh() {
 		clear();
+		headerWidget.refresh();
+		//place widgets and configure
+		view.setEntityPageTopWidget(entityPageTop);
+		view.setFooterWidget(footerWidget);
+		view.setHeaderWidget(headerWidget);
+		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
+		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
 		int mask = ENTITY | ENTITY_PATH;
@@ -180,7 +180,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					}
 					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
 					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					entityPageTop.clearState();
 					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);

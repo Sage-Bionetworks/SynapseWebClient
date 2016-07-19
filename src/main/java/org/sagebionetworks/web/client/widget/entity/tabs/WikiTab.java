@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.inject.Inject;
@@ -18,7 +19,7 @@ public class WikiTab {
 	public WikiTab(Tab tab, WikiPageWidget wikiPageWidget) {
 		this.tab = tab;
 		this.wikiPageWidget = wikiPageWidget;
-		tab.configure("Wiki", wikiPageWidget.asWidget());
+		tab.configure("Wiki", wikiPageWidget.asWidget(), "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html");
 		wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
 	}
 	
@@ -34,9 +35,12 @@ public class WikiTab {
 			Callback callback) {
 		Long versionNumber = null; //version is always null for project
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
-		
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
+	}
+	
+	public void clear() {
+		wikiPageWidget.clear();
 	}
 	
 	public Tab asTab(){

@@ -56,8 +56,10 @@ import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -401,7 +403,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return The list of ColumnModel JSON strings.
 	 * @throws RestServiceException
 	 */
-	public void setTableSchema(TableEntity entity, List<ColumnModel> newSchema)
+	public void setTableSchema(Table entity, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**
@@ -545,5 +547,7 @@ public interface SynapseClient extends RemoteService {
 	Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException;
 
 	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
+
+	List<ColumnModel> getDefaultColumnsForView(ViewType type) throws RestServiceException;
 	
 }

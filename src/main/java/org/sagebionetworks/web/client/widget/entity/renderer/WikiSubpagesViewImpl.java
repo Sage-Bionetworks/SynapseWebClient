@@ -73,7 +73,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		
 		showHideButton = DisplayUtils.createButton("");
 		editOrderButton = DisplayUtils.createButton("Edit Order");
-		editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
+		editOrderButton.addStyleName("btn btn-default btn-xs left");
 
 		editOrderButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -129,7 +129,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				
 		if (showHideButton != null) {
 			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
-			showHideButton.addStyleName("btn btn-default btn-xs left margin-right-40");
+			showHideButton.removeStyleName("right");
+			showHideButton.addStyleName("btn btn-default btn-xs margin-right-40 left");
 		}
 		
 		if (navTreeContainer != null)
@@ -161,6 +162,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				
 		if (showHideButton != null) {
 			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+			showHideButton.removeStyleName("left");
 			showHideButton.addStyleName("btn btn-default btn-xs right");		
 		}
 		

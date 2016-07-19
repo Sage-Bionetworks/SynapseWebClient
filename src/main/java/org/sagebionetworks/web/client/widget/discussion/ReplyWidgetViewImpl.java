@@ -38,11 +38,16 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@UiField
 	Icon editIcon;
 	@UiField
+	Icon linkIcon;
+	
+	@UiField
 	SimplePanel editReplyModalContainer;
 	@UiField
 	Label edited;
 	@UiField
 	HTMLPanel loadingMessage;
+	@UiField
+	Label moderatorBadge;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -61,6 +66,13 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickEditReply();
+			}
+		});
+		linkIcon.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent arg0) {
+				presenter.onClickReplyLink();
 			}
 		});
 	}
@@ -144,5 +156,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void showSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	
+	@Override
+	public void setIsAuthorModerator(boolean isModerator) {
+		moderatorBadge.setVisible(isModerator);
 	}
 }

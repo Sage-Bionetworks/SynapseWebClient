@@ -4,13 +4,16 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -37,14 +40,10 @@ public class SynapseAlertViewImpl implements
 	@UiField
 	Alert alert;
 	@UiField
-	Alert loginAlert;
-	@UiField
-	Alert suggestLoginAlert;
-	@UiField
-	Button loginButton;
-	@UiField
-	Button loginButton2;
+	Div loginAlert;
 	Presenter presenter;
+	@UiField
+	Div loginWidgetContainer;
 	
 	@Inject
 	public SynapseAlertViewImpl(Binder binder){
@@ -59,18 +58,6 @@ public class SynapseAlertViewImpl implements
 			@Override
 			public void onClick(ClickEvent event) {
 				jiraDialog.hide();
-			}
-		});
-		loginButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onLoginClicked();
-			}
-		});
-		loginButton2.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onLoginClicked();
 			}
 		});
 	}
@@ -106,20 +93,13 @@ public class SynapseAlertViewImpl implements
 		alert.setVisible(false);
 		alertText.setText("");
 		loginAlert.setVisible(false);
-		suggestLoginAlert.setVisible(false);
 		widget.setVisible(false);
 	}
 	
 	@Override
-	public void showLoginAlert() {
+	public void showLogin() {
 		widget.setVisible(true);
 		loginAlert.setVisible(true);	
-	}
-	
-	@Override
-	public void showSuggestLoginAlert() {
-		widget.setVisible(true);
-		suggestLoginAlert.setVisible(true);	
 	}
 	
 	@Override
@@ -127,5 +107,21 @@ public class SynapseAlertViewImpl implements
 		widget.setVisible(true);
 		alert.setText(error);
 		alert.setVisible(true);
+	}
+	
+	@Override
+	public void showJiraIssueOpen(String key, String url) {
+		Bootbox.alert("The new report <a target=\"_blank\" href=\"" + url + "\">"+key+"</a> has been sent. Thank you for submitting!");
+	}
+	
+	@Override
+	public void setLoginWidget(Widget w) {
+		loginWidgetContainer.clear();
+		loginWidgetContainer.add(w);
+	}
+	
+	@Override
+	public void reload() {
+		Window.Location.reload();
 	}
 }

@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -211,7 +212,7 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onNewTeamClicked() {
 		if (authenticationController.isLoggedIn())
-			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER + Synapse.ProfileArea.TEAMS));
 		else {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}

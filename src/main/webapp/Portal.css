@@ -9,15 +9,15 @@ a {color:#1e7098;text-decoration:none;}
 a:visited{color:#1e7098; text-decoration:none;}
 a:hover{color:#1e7098; text-decoration:underline;}
 a:focus{color:#1e7098; text-decoration:underline;}
-.synapse-yellow {color:#68b2bb;}
-.synapse-blue {color:#1e7098;}
-.synapse-purple {color:#7772b4;}
-.synapse-green {color:#0ea862;}
+.synapse-yellow, #rootPanel .synapse-yellow {color:#68b2bb;}
+.synapse-blue, #rootPanel .synapse-blue {color:#1e7098;}
+.synapse-purple, #rootPanel .synapse-purple {color:#7772b4;}
+.synapse-green, #rootPanel .synapse-green {color:#0ea862;}
 
-.synapse-yellow-bg {background-color:#68b2bb;}
-.synapse-blue-bg {background-color:#1e7098;}
-.synapse-purple-bg {background-color:#7772b4;}
-.synapse-green-bg {background-color:#0ea862;}
+.synapse-yellow-bg, #rootPanel .synapse-yellow-bg {background-color:#68b2bb;}
+.synapse-blue-bg, #rootPanel .synapse-blue-bg {background-color:#1e7098;}
+.synapse-purple-bg, #rootPanel .synapse-purple-bg {background-color:#7772b4;}
+.synapse-green-bg, #rootPanel .synapse-green-bg {background-color:#0ea862;}
 
 .pagination>li>a, .pagination>li>span
 {
@@ -634,6 +634,10 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
+.margin-right-20, #rootPanel .margin-right-20 {
+	margin-right: 20px;
+}
+
 .margin-right-40 {
 	margin-right: 40px;
 }
@@ -814,23 +818,19 @@ a.shortBtn {
 .margin-bottom-60 {
 	margin-bottom: 60px;
 }
-.margin-bottom-40 {
+.margin-bottom-40, #rootPanel .margin-bottom-40 {
 	margin-bottom: 40px;
 }
 
-.margin-bottom-20 {
+.margin-bottom-20, #rootPanel .margin-bottom-20 {
 	margin-bottom: 20px;
-}
-
-.margin-bottom-20-imp {
-	margin-bottom: 20px !important;
 }
 
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
 
-.margin-bottom-5 {
+.margin-bottom-5, #rootPanel .margin-bottom-5{
 	margin-bottom: 5px;
 }
 
@@ -977,16 +977,24 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: auto;
 	text-align: justify;
+	line-height: 1.6em;
 }
 
 .markdown ol { 
 	list-style-type: decimal;
-	padding-left: 24px;
+	padding-left: 15px;
+}
+.markdown ol li {
+	padding-top: 5px;
 }
 .markdown ul { 
 	list-style-type: square;
 	padding-left: 17px;
 }
+.markdown ul li {
+	padding-top: 5px;
+}
+
 .markdown strong { font-weight: bold; }
 .markdown del { text-decoration: line-through; }
 .markdown em { font-style: italic; }
@@ -1016,6 +1024,10 @@ a.shortBtn {
 
 .markdown img {
 	max-width: 100%;
+}
+
+.max-width-none, #rootPanel .max-width-none {
+	max-width: none;
 }
 
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
@@ -1214,7 +1226,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .markdown p {
-	margin: 10px 0 10px 0;
+	margin: 0px;
 }
 
 .markdown h1 {
@@ -1564,7 +1576,7 @@ ol.lowerroman {
 	padding: 5px;
 }
 
-.padding-10 {
+.padding-10, #rootPanel .padding-10 {
 	padding: 10px;
 }
 
@@ -1814,6 +1826,10 @@ ol.lowerroman {
 	position: relative;
 	top: 7px;
 }
+.movedown-9 {
+	position: relative;
+	top: 9px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
@@ -1843,6 +1859,19 @@ ol.lowerroman {
     line-height: 1.4;
     padding: 3px 7px;
     position: absolute;    
+}
+
+.highlight-title {
+	color: #333333;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 24px;
+    font-weight: 200;
+    line-height: 1.4;
+    padding: 3px 7px;
+}
+
+.highlight-title [class*="fa"] {
+	font-size: 15px;
 }
 
 .highlight-line {
@@ -1910,6 +1939,51 @@ ol.lowerroman {
 	font-size: 12px !important;
 	width: 120px;
 }
+
+.top-right {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+}
+
+.bubble {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 6px #B2B2B2;
+    display: inline-block;
+    padding: 8px 20px 8px 18px;
+    position: relative;
+    vertical-align: top;
+    margin: 5px;
+    max-width: 300px;
+}
+
+.bubble::before {
+    background-color: white;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+}
+
+
+.bubble-right::before {
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px;           
+}
+
+.bubble-left::before {
+    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
+    right: -9px;    
+}
+
 
 .separator-margin {	margin-top: 40px; margin-bottom: 40px; }
 .separator-margin-top {	margin-top: 40px; }
@@ -2146,6 +2220,11 @@ iframe[seamless] {
 	overflow-x: hidden;
 }
 
+.popover, #rootPanel .popover {
+	max-width: 400px;
+}
+
+
 h1, .h1, h2, .h2, h3, .h3 {
 	margin-top: 10px !important;
 }
@@ -2226,45 +2305,31 @@ div.input-group > input.search-textbox {
   padding: 5px 10px 30px 0px;
 }
 
-/* All levels of nav */
-.bs-sidenav > li > a {
-  padding: 5px 20px !important;
+.bs-sidenav .nav .active,
+.bs-sidenav .nav .active:hover,
+.bs-sidenav .nav .active:focus {
+	color: black !important;
+	text-decoration:none;
+	background-color: transparent;
+	border-right: 0px;
 }
 
-.nav > .active > a,
-.nav > .active:hover > a,
-.nav > .active:focus > a {
-  color: black !important;
-  text-decoration:none;
-  background-color: transparent;
-  border-right: 0px;
+.bs-sidenav .nav > li > div { 
+	padding-top:    3px;
+	padding-bottom: 3px;
 }
 
-.bs-sidenav .nav > li > a {
-  padding-top:    3px;
-  padding-bottom: 3px;
-  padding-left: 30px;
-  font-size: 1.1em;
+.bs-sidenav .nav li {
+	padding-left: 10px;
+	text-decoration:none;
+	font-size: 1.1em;
 }
-.bs-sidenav .nav .nav > li > a {
-  padding-left: 40px;
+
+.bs-sidenav .nav .nav li {
+  padding-left: 15px;
   font-size: 1em;
 }
-.bs-sidenav .nav .nav .nav > li > a {
-  padding-left: 50px;
-}
-.bs-sidenav .nav .nav .nav .nav > li > a {
-  padding-left: 60px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav > li > a {
-  padding-left: 70px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav > li > a {
-  padding-left: 80px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav .nav > li > a {
-  padding-left: 90px;
-}
+
 /*===========*/
 
 .largeIconButton {

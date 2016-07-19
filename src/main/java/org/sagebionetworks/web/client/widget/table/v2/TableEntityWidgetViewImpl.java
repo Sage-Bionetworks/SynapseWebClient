@@ -8,9 +8,11 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -35,7 +37,12 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	Collapse schemaCollapse;
 	@UiField
-	PanelBody columnDetailsPanel;
+	Collapse scopeCollapse;
+
+	@UiField
+	SimplePanel columnDetailsPanel;
+	@UiField
+	Div scopePanel;
 	@UiField
 	Alert tableMessage;
 	@UiField
@@ -49,15 +56,19 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
+	ScopeWidget scopeWidget;
 	Presenter presenter;
 
 	@Inject
 	public TableEntityWidgetViewImpl(final Binder uiBinder,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector, ScopeWidget scopeWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
 		this.columnDetailsPanel.add(this.columnModelsWidget.asWidget());
+		this.scopeWidget = scopeWidget;
+		this.scopePanel.add(scopeWidget.asWidget());
+		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");
 	}
 
 	@Override
@@ -76,13 +87,27 @@ public class TableEntityWidgetViewImpl extends Composite implements
 				presenter.onSchemaToggle(false);
 			}
 		});
+		
+		this.scopeCollapse.addShownHandler(new ShownHandler() {
+			@Override
+			public void onShown(ShownEvent event) {
+				presenter.onScopeToggle(true);
+				
+			}
+		});
+		this.scopeCollapse.addHiddenHandler(new HiddenHandler() {
+			@Override
+			public void onHidden(HiddenEvent event) {
+				presenter.onScopeToggle(false);
+			}
+		});
 	}
 
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
+		this.scopeWidget.configure(bundle, isEditable, this.presenter);
 	}
-
 
 	@Override
 	public void setQueryResultsVisible(boolean visible) {
@@ -137,5 +162,14 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	public void toggleSchema() {
 		this.schemaCollapse.toggle();
 	}
-
+	
+	@Override
+	public void toggleScope() {
+		this.scopeCollapse.toggle();
+	}
+	
+	@Override
+	public void setScopeVisible(boolean visible) {
+		scopeCollapse.setVisible(visible);
+	}
 }

@@ -72,7 +72,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.queryListener = listener;
 		if (!synapseAlert.isUserLoggedIn()) {
 			setupErrorState();
-			synapseAlert.showMustLogin();
+			synapseAlert.showLogin();
 		} else {
 			runQuery();
 		}

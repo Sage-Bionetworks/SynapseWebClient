@@ -83,4 +83,20 @@ public class PasswordStrengthWidgetTest {
 		verify(mockZxcvbn).scorePassword(passwordToTest);
 		verify(mockView).showStrongPasswordUI();
 	}
+	
+	@Test
+	public void testExtraStrongPassword() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < PasswordStrengthWidget.MAX_PASSWORD_TEST_LENGTH; i++) {
+			sb.append('a');
+		}
+		when(mockZxcvbn.getScore()).thenReturn(4);
+		widget.scorePassword(sb.toString());
+		verify(mockZxcvbn).scorePassword(sb.toString());
+		
+		reset(mockZxcvbn);
+		String tooLong = sb.toString() + "bcde";
+		widget.scorePassword(tooLong);
+		verify(mockZxcvbn).scorePassword(sb.toString());
+	}
 }

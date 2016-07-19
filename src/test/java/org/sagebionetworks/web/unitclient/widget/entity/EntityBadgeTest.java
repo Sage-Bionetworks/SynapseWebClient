@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -190,7 +191,7 @@ public class EntityBadgeTest {
 		
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(EntityBadge.DELAY_UNTIL_IN_VIEW));
+		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
 		Callback callback = captor.getValue();
 		
 		//simulate the view is now attached and in the viewport, and widget is configure, so it should ask for entity bundle
@@ -227,7 +228,7 @@ public class EntityBadgeTest {
 		
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(EntityBadge.DELAY_UNTIL_IN_VIEW));
+		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
 		Callback callback = captor.getValue();
 		
 		Mockito.reset(mockGWT);

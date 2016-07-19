@@ -5,48 +5,21 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<g:FlowPanel addStyleNames="margin-10">
-			<b:Heading size="H5" text="The browser viewing the video will use the first format that it recognizes." addStyleNames="displayInline" />
-			<b:Anchor ui:field="moreInfoLink" addStyleNames="margin-left-5" text="more information" />
-		</g:FlowPanel>
 		<b:Row addStyleNames="margin-10">
-			<b:Column size="XS_6">
-				<b:Tooltip title="MPEG 4 files with H264 video codec and AAC audio codec">
-					<b:InputGroup>
-						<b:TextBox ui:field="mp4Entity" autoComplete="false" enabled="false" />
-						<b:InputGroupButton>
-							<b:Button text="Find MP4" ui:field="mp4Button" icon="SEARCH" width="120px"/>
-						</b:InputGroupButton>
-					</b:InputGroup>
-				</b:Tooltip>
+			<b:Column size="XS_12">
+				<b:InputGroup>
+					<b:TextBox ui:field="entity" autoComplete="false" enabled="false" />
+					<b:InputGroupButton>
+						<b:Button text="Find video file" ui:field="button" icon="SEARCH" width="140px"/>
+					</b:InputGroupButton>
+				</b:InputGroup>
 			</b:Column>
-			<b:Column size="XS_6" />
-		</b:Row>
-		<b:Row addStyleNames="margin-10">
-			<b:Column size="XS_6">
-				<b:Tooltip title="Ogg files with Theora video codec and Vorbis audio codec">
-					<b:InputGroup>
-						<b:TextBox ui:field="oggEntity" autoComplete="false" enabled="false" />
-						<b:InputGroupButton>
-							<b:Button text="Find Ogg" ui:field="oggButton" icon="SEARCH" width="120px"/>
-						</b:InputGroupButton>
-					</b:InputGroup>
-				</b:Tooltip>
+			<b:Column size="XS_12" >
+				<b:Heading size="H5" ui:field="videoFormatWarning" visible="false">
+					<bh:Text>We recommend using the mp4 video format for</bh:Text>
+					<b:Anchor ui:field="moreInfoLink" target="_blank" addStyleNames="margin-left-5" text="cross-browser compatability" href="http://en.wikipedia.org/wiki/HTML5_video#Browser_support"/>
+				</b:Heading>
 			</b:Column>
-			<b:Column size="XS_6" />
-		</b:Row>
-		<b:Row addStyleNames="margin-10">
-			<b:Column size="XS_6">
-				<b:Tooltip title="WebM files with VP8 video codec and Vorbis audio codec">
-					<b:InputGroup>
-						<b:TextBox ui:field="webmEntity" autoComplete="false" enabled="false" />
-						<b:InputGroupButton>
-							<b:Button text="Find WebM" ui:field="webmButton" icon="SEARCH" width="120px"/>
-						</b:InputGroupButton>
-					</b:InputGroup>
-				</b:Tooltip>
-			</b:Column>
-			<b:Column size="XS_6" />
 		</b:Row>
 	</bh:Div>
 </ui:UiBinder>

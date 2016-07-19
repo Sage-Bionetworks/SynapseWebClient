@@ -8,6 +8,7 @@
 	<bh:Div width="98%" pull="RIGHT" addStyleNames="light-border lightGreyBackground padding-5 margin-bottom-5">
 		<bh:Div>
 			<bh:Span ui:field="author"></bh:Span>
+			<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
 		</bh:Div>
 		<bh:Div width="100%">
 			<g:HTMLPanel ui:field="loadingMessage" visible="false">
@@ -30,6 +31,9 @@
 							</b:Tooltip>
 							<b:Tooltip title="Edit reply" placement="LEFT">
 								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em" visible="false"/>
+							</b:Tooltip>
+							<b:Tooltip title="Link to this reply" placement="LEFT">
+								<b:Icon ui:field="linkIcon" type="LINK" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em " />
 							</b:Tooltip>
 						</bh:Div>
 					</b:Column>

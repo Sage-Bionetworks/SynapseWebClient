@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
 	    <div class="color-line"></div>
@@ -16,16 +17,18 @@
 	            </b:Column>    
 	    		<b:Column ui:field="commandsContainer" size="MD_3">
 		    		<b:ButtonToolBar addStyleNames="pull-right">
-						<b:ButtonGroup>
+		    			<b:ButtonGroup>
 		    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
 			    		    <b:DropDownMenu addStyleNames="dropdown-menu-right">
-								<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false">Invite User</b:AnchorListItem>
-								<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false">Edit Team</b:AnchorListItem>
-								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false">Delete Team</b:AnchorListItem>
-								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false">Leave Team</b:AnchorListItem>
+								<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false" text="Invite User" />
+								<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false" text="Edit Team" />
+								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false" text="Delete Team" />
+								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" /> 
 				    		</b:DropDownMenu>
 		    		    </b:ButtonGroup>
 					</b:ButtonToolBar>
+					<w:HelpWidget helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation." 
+						href="http://docs.synapse.org/articles/teams.html" iconStyles="lightGreyText movedown-6 font-size-18" addStyleNames="margin-right-10" pull="RIGHT" placement="LEFT" />
 	    		    <g:SimplePanel ui:field="teamEditPanel"/>
 	    			<g:SimplePanel ui:field="teamDeletePanel"/>
 	    			<g:SimplePanel ui:field="teamLeavePanel"/>

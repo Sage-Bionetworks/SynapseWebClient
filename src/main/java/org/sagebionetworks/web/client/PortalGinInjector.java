@@ -34,15 +34,15 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
-import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -116,15 +116,13 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
-import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -389,7 +387,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 
 	// discussion
-	public DiscussionThreadWidget createThreadWidget();
+	public DiscussionThreadListItemWidget createThreadListItemWidget();
 	public ReplyWidget createReplyWidget();
 	
 	public MarkdownCacheKey getMarkdownCacheKey();
@@ -399,4 +397,9 @@ public interface PortalGinInjector extends Ginjector {
 	public RefreshAlert getRefreshAlert();
 	public ReplyCountAlert getReplyCountAlert();
 	public DiscussionThreadCountAlert getDiscussionThreadCountAlert();
+
+	// docker
+	public DockerRepoWidget createNewDockerRepoWidget();
+	
+	public LoginWidget getLoginWidget();
 }

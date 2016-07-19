@@ -4,8 +4,10 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -52,7 +54,8 @@ public class TableEntityWidget implements IsWidget,
 	EntityBundle entityBundle;
 	String tableId;
 	TableBundle tableBundle;
-	boolean canEdit;
+	boolean canEdit, canEditResults;
+	boolean isView;
 	QueryChangeHandler queryChangeHandler;
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
@@ -96,9 +99,12 @@ public class TableEntityWidget implements IsWidget,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
+		this.isView = table instanceof EntityView;
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
+		// SWC-3125: Editing EntityView query results is currently blocked.
+		this.canEditResults = table instanceof TableEntity && canEdit;
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
 		this.uploadTableModalWidget.configure(table.getParentId(), tableId);
@@ -111,11 +117,12 @@ public class TableEntityWidget implements IsWidget,
 	 * Setup the actions for this widget.
 	 */
 	private void configureActions() {
-		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEdit);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEdit);
+		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		this.actionMenu.setBasicDivderVisible(canEdit);
+		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, isView);
+		this.actionMenu.setBasicDivderVisible(canEditResults);
 		// Listen to action events.
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
@@ -141,6 +148,14 @@ public class TableEntityWidget implements IsWidget,
 				view.toggleSchema();
 			}
 		});
+		
+		this.actionMenu.setActionListener(Action.TOGGLE_VIEW_SCOPE, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				view.toggleScope();
+			}
+		});
+
 	}
 
 	/**
@@ -246,7 +261,7 @@ public class TableEntityWidget implements IsWidget,
 	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		// Pass this along to the input widget.
 		this.queryInputWidget.queryExecutionFinished(wasSuccessful, resultsEditable);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEdit && resultsEditable);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEditResults && resultsEditable);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful && canEdit);
 	
 		// Set this as the query if it was successful
@@ -320,6 +335,15 @@ public class TableEntityWidget implements IsWidget,
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
 		}else{
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
+		}
+	}
+	
+	@Override
+	public void onScopeToggle(boolean shown) {
+		if(shown){
+			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_DOWN);
+		}else{
+			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_RIGHT);
 		}
 	}
 

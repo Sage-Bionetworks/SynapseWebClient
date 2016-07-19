@@ -22,13 +22,7 @@ public interface SynapseAlert extends IsWidget {
 	 * Called to instruct the widget to ask the user to login to access the resource (with a link to the login page).
 	 * Can be called when you know that the user must be logged in in order to use the widget. 
 	 */
-	void showMustLogin();
-	
-	/**
-	 * Called to instruct the widget to let the user decide if logging in might help solve a shown error.
-	 * 
-	 */
-	void showSuggestLogin();
+	void showLogin();
 	
 	/**
 	 * Convenience method to answer if the user is currently logged in.

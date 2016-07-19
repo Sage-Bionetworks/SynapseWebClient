@@ -118,6 +118,7 @@ public class DisplayConstants {
 	public static final String CONFIRM_DISCARD_ACL_CHANGES = "Your unsaved changes will be discarded. Are you sure?";
 	public static final String MENU_PERMISSION_LEVEL_IS_OWNER = "Is Owner";
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
+	public static final String MENU_PERMISSION_LEVEL_CAN_MODERATE = "Can moderate";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
@@ -292,6 +293,7 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_PROMOTE_FAILURE = "Sorry, promoting the entity failed.";
 	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
 	public static final String NO_EVALUATION_SELECTED = "Please select an evaluation and try again.";
+	public static final String NO_USER_SELECTED = "Please select a user and try again.";
 	public static final String LABEL_SUCCESS = "Success";
 	public static final String LABEL_PROMOTED = " was promoted to top.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
@@ -562,7 +564,7 @@ public class DisplayConstants {
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String ERROR_ENTER_DEPTH = "Please enter a valid depth";
-	public static final String ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE = "Please set at least one video file format";
+	public static final String ERROR_SELECT_VIDEO_FILE = "Please select a video file";
 	public static final String FIND_ENTITIES = "Find Entities";
 	public static final String FIND_ENTITY = "Find Entity";
 	
@@ -575,7 +577,8 @@ public class DisplayConstants {
 	public static final String PAGE_NEXT = "Go to the next page";
 	public static final String SWITCH_TO_STANDARD_WEBSITE = "Switch back to the release version";
 	public static final String SWITCH_TO_TEST_WEBSITE = "Try an alpha test version of the website";
-	public static final String TEST_MODE_WARNING = "This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade. Are you sure you want to switch into this mode?";
+	public static final String TEST_MODE_WARNING = "<h5>Alpha Test Mode</h5>This mode is for alpha testing features only. Please note that the <a target=\"blank\" href=\"https://s3.amazonaws.com/static.synapse.org/stu/party/stuparty.html\"> developer</a> does not guarantee an absence of errors, "
+				+ "and that the data created using alpha features may be lost during product upgrade.<br><br><strong>Are you sure you want to switch into this mode?</strong>";
 	
 	public static final String UNSUPPORTED_FOR_OWNER_TYPE = "This operation is not currently supported for the given owner type: ";
 	public static final String MY_PROJECTS = "My Projects";
@@ -745,5 +748,6 @@ public class DisplayConstants {
 	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
 	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
 	public static final String DANGER_BUTTON_STYLE = "btn-danger";
+	public static final int DELAY_UNTIL_IN_VIEW = 2000;
 }
 

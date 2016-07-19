@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -89,9 +88,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel passwordSynAlertPanel;
 	@UiField
 	Button changePasswordBtn;
-	
-	@UiField
-	Span storageUsageSpan;
+
 	@UiField
 	TextBox apiKeyContainer;
 	
@@ -158,7 +155,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
-		subscriptionsContainer.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Following");
 		
 		newEmailField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
@@ -226,20 +222,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void showLoading() {
 	}
 
-	@Override
-	public void clearStorageUsageUI() {
-		storageUsageSpan.setText(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
-	}
-	
-	@Override
-	public void updateStorageUsage(Long grandTotal) {
-		if (grandTotal == null){
-			clearStorageUsageUI();
-		}
-		else {
-			storageUsageSpan.setText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
-		}
-	}
 	
 	public void showNotificationEmailAddress(String primaryEmail) {
 		emailsPanel.clear();
@@ -327,7 +309,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		hideAPIKey();
 		resetChangePasswordUI();
-		storageUsageSpan.setText("");
 		resetAddEmailUI();
 	}
 	

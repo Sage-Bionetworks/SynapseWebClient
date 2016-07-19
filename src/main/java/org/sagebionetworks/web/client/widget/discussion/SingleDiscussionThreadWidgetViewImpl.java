@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.IconStack;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -19,15 +20,14 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetView {
+public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThreadWidgetView {
 
-	public interface Binder extends UiBinder<Widget, DiscussionThreadWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, SingleDiscussionThreadWidgetViewImpl> {}
 
 	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
@@ -38,35 +38,15 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Div threadMessage;
 	@UiField
-	Span activeUsers;
-	@UiField
-	Span numberOfReplies;
-	@UiField
-	Span numberOfViews;
-	@UiField
-	Span lastActivity;
-	@UiField
-	FocusPanel showThread;
-	@UiField
-	Div threadDetails;
-	@UiField
-	Div replyDetails;
-	@UiField
 	Span author;
 	@UiField
 	Span createdOn;
 	@UiField
-	Button loadMoreButton;
-	@UiField
-	Button replyButton;
-	@UiField
-	SimplePanel newReplyModalContainer;
+	HTMLPanel loadMore;
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div refreshAlertContainer;
-	@UiField
-	HTMLPanel loadingReplies;
 	@UiField
 	HTMLPanel loadingMessage;
 	@UiField
@@ -78,11 +58,7 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Label edited;
 	@UiField
-	Span threadAuthor;
-	@UiField
 	Span subscribeButtonContainer;
-	@UiField
-	Div threadButtonContainer;
 	@UiField
 	IconStack unpinIconStack;
 	@UiField
@@ -90,29 +66,30 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@UiField
 	Icon pinIcon;
 	@UiField
-	Icon pinnedIcon;
+	Label moderatorBadge;
+	@UiField
+	Div commandsContainer;
+	@UiField
+	TextBox replyTextBox;
+	@UiField
+	Div newReplyContainer;
+	@UiField
+	Div markdownEditorContainer;
+	@UiField
+	Button cancelButton;
+	@UiField
+	Button saveButton;
+	@UiField
+	Button showAllRepliesButton;
 	
 	String threadLinkHref;
 	private Widget widget;
-	private DiscussionThreadWidget presenter;
+	private SingleDiscussionThreadWidget presenter;
 
 	@Inject
-	public DiscussionThreadWidgetViewImpl(Binder binder) {
+	public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		loadMoreButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.loadMore();
-			}
-		});
-		showThread.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickThread();
-			}
-		});
-		replyButton.addClickHandler(new ClickHandler(){
+		replyTextBox.addClickHandler(new ClickHandler(){
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -146,15 +123,38 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				presenter.onClickUnpinThread();
 			}
 		});
+		cancelButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickCancel();
+			}
+		});
+		saveButton.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickSave();
+			}
+		});
+		showAllRepliesButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				presenter.onClickShowAllReplies();
+			}
+		});
 	}
 
+	@Override
+	public void setShowAllRepliesButtonVisible(boolean visible) {
+		showAllRepliesButton.setVisible(visible);
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
 
 	@Override
-	public void setPresenter(DiscussionThreadWidget presenter) {
+	public void setPresenter(SingleDiscussionThreadWidget presenter) {
 		this.presenter = presenter;
 	}
 
@@ -166,9 +166,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	@Override
 	public void clear() {
 		threadTitle.clear();
-		activeUsers.clear();
-		numberOfReplies.clear();
-		lastActivity.clear();
 		createdOn.clear();
 		replyListContainer.clear();
 	}
@@ -184,21 +181,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setNumberOfReplies(String numberOfReplies, String descriptiveText) {
-		this.numberOfReplies.setText(numberOfReplies);
-	}
-
-	@Override
-	public void setNumberOfViews(String numberOfViews) {
-		this.numberOfViews.setText(numberOfViews);
-	}
-
-	@Override
-	public void setLastActivity(String lastActivity) {
-		this.lastActivity.setText(lastActivity);
-	}
-
-	@Override
 	public void setAuthor(Widget author) {
 		this.author.add(author);
 	}
@@ -209,54 +191,18 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setNewReplyModal(Widget w) {
-		newReplyModalContainer.setWidget(w);
-	}
-
-	@Override
 	public void setAlert(Widget w) {
 		synAlertContainer.add(w);
 	}
 
 	@Override
-	public void setLoadMoreButtonVisibility(boolean visible) {
-		loadMoreButton.setVisible(visible);
-	}
-
-	@Override
-	public void showReplyDetails() {
-		replyDetails.setVisible(true);
-	}
-
-	@Override
-	public void hideReplyDetails() {
-		replyDetails.setVisible(false);
+	public void setLoadMoreVisibility(boolean visible) {
+		loadMore.setVisible(visible);
 	}
 
 	@Override
 	public void clearReplies() {
 		replyListContainer.clear();
-	}
-
-	@Override
-	public void addActiveAuthor(Widget user) {
-		activeUsers.add(user);
-	}
-
-	@Override
-	public boolean isThreadCollapsed() {
-		return threadDetails.isVisible();
-	}
-
-
-	@Override
-	public boolean isReplyCollapsed() {
-		return replyDetails.isVisible();
-	}
-
-	@Override
-	public void setLoadingRepliesVisible(boolean visible) {
-		loadingReplies.setVisible(visible);
 	}
 
 	@Override
@@ -278,11 +224,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
 				.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
 				.show();
-	}
-
-	@Override
-	public void setReplyButtonVisible(boolean visible) {
-		replyButton.setVisible(visible);
 	}
 
 	@Override
@@ -311,21 +252,6 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setThreadAuthor(Widget widget){
-		threadAuthor.add(widget);
-	}
-
-	@Override
-	public void showThreadDetails() {
-		threadDetails.setVisible(true);
-	}
-
-	@Override
-	public void hideThreadDetails() {
-		threadDetails.setVisible(false);
-	}
-
-	@Override
 	public void setThreadLink(String link){
 		threadLinkHref = link;
 	}
@@ -346,22 +272,62 @@ public class DiscussionThreadWidgetViewImpl implements DiscussionThreadWidgetVie
 	}
 
 	@Override
-	public void setButtonContainerWidth(String width){
-		threadButtonContainer.setWidth(width);
-	}
-	
-	@Override
 	public void setPinIconVisible(boolean visible) {
 		pinIcon.setVisible(visible);
 	}
 	
 	@Override
-	public void setPinnedIconVisible(boolean visible) {
-		pinnedIcon.setVisible(visible);
+	public void setUnpinIconVisible(boolean visible) {
+		unpinIconStack.setVisible(visible);
 	}
 	
 	@Override
-	public void setUnpinIconVisible(boolean visible) {
-		unpinIconStack.setVisible(visible);
+	public void setIsAuthorModerator(boolean isModerator) {
+		moderatorBadge.setVisible(isModerator);
+	}
+	
+	@Override
+	public void setCommandsVisible(boolean visible) {
+		commandsContainer.setVisible(visible);
+	}
+
+	@Override
+	public boolean isLoadMoreAttached() {
+		return loadMore.isAttached();
+	}
+
+	@Override
+	public boolean isLoadMoreInViewport() {
+		return DisplayUtils.isInViewport(loadMore.asWidget());
+	}
+
+	@Override
+	public boolean getLoadMoreVisibility() {
+		return loadMore.isVisible();
+	}
+
+	@Override
+	public void setReplyTextBoxVisible(boolean visible) {
+		replyTextBox.setVisible(visible);
+	}
+
+	@Override
+	public void resetButton() {
+		saveButton.state().reset();
+	}
+
+	@Override
+	public void setNewReplyContainerVisible(boolean visible) {
+		newReplyContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setMarkdownEditorWidget(Widget widget) {
+		markdownEditorContainer.add(widget);
+	}
+
+	@Override
+	public void showSaving() {
+		saveButton.state().loading();
 	}
 }

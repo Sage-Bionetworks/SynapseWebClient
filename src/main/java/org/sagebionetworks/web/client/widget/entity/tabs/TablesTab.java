@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -64,7 +65,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	CallbackP<Boolean> showProjectInfoCallack;
-	
 	@Inject
 	public TablesTab(
 			TablesTabView view,
@@ -97,7 +97,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		tab.configure("Tables", view.asWidget());
+		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
 		
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
 			@Override
@@ -149,7 +149,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
-		boolean isTable = entity instanceof TableEntity;
+		boolean isTable = entity instanceof Table;
 		
 		if (!isTable) {
 			//configure based on project
@@ -190,7 +190,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
-		boolean isTable = entity instanceof TableEntity;
+		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
@@ -267,7 +267,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			if(token != null){
 				areaToken = TABLE_QUERY_PREFIX + token;
 				tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
-				tab.showTab();
+				// replace state if configuring table query widget, push history state after configuration.
+				tab.showTab(false);
 			}
 		}
 	}

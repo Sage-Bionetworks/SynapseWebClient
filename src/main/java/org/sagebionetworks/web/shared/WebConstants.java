@@ -27,6 +27,8 @@ public class WebConstants {
 	public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
 	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
+	public static final String DOCS_BASE_URL = "http://docs.synapse.org/";
+	public static final String DOCS_URL = DOCS_BASE_URL + "articles/";
 	
 	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 	

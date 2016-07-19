@@ -108,6 +108,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
@@ -1040,7 +1041,7 @@ public class SynapseClientImplTest {
 		// verify call is directly calling the synapse client provider, and it
 		// tries to rename the entity to the filename
 		String myFileName = "testFileName.csv";
-		String testUrl = "http://mytesturl/" + myFileName;
+		String testUrl = "  http://mytesturl/" + myFileName;
 		String testId = "myTestId";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		Long fileSize=2048L;
@@ -1060,7 +1061,7 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
 		ExternalFileHandle capturedValue = captor.getValue();
-		assertEquals(testUrl, capturedValue.getExternalURL());
+		assertEquals(testUrl.trim(), capturedValue.getExternalURL());
 		assertEquals(md5, capturedValue.getContentMd5());
 //		assertEquals(fileSize, capturedValue.getContentSize());
 		
@@ -1089,7 +1090,7 @@ public class SynapseClientImplTest {
 	public void testCreateExternalFile() throws Exception {
 		// test setting file handle name
 		String parentEntityId = "syn123333";
-		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String externalUrl = "  sftp://foobar.edu/b/test.txt";
 		String fileName = "testing.txt";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		Long fileSize = 1024L;
@@ -1106,7 +1107,7 @@ public class SynapseClientImplTest {
 		ExternalFileHandle handle = captor.getValue();
 		// verify name is set
 		assertEquals(fileName, handle.getFileName());
-		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(externalUrl.trim(), handle.getExternalURL());
 		assertEquals(storageLocationId, handle.getStorageLocationId());
 		assertEquals(md5, handle.getContentMd5());
 //		assertEquals(fileSize, handle.getContentSize());
@@ -2089,18 +2090,27 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetStorageLocationSettingEmptyLocations() throws SynapseException, RestServiceException {
-		UploadDestinationListSetting setting = new UploadDestinationListSetting();
-		setting.setLocations(Collections.EMPTY_LIST);
-		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+	public void testGetStorageLocationSettingNullUploadDestination() throws SynapseException, RestServiceException {
+		assertNull(synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingDefaultUploadDestination() throws SynapseException, RestServiceException {
+		UploadDestination setting = Mockito.mock(UploadDestination.class);
+		String defaultStorageId = synapseClient.getSynapseProperties().get(SynapseClientImpl.DEFAULT_STORAGE_ID_PROPERTY_KEY);
+		when(setting.getStorageLocationId()).thenReturn(Long.parseLong(defaultStorageId));
+		when(mockSynapse.getDefaultUploadDestination(entityId)).thenReturn(setting);
+		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
+		
 		assertNull(synapseClient.getStorageLocationSetting(entityId));
 	}
 	
 	@Test
 	public void testGetStorageLocationSetting() throws SynapseException, RestServiceException {
-		UploadDestinationListSetting setting = new UploadDestinationListSetting();
-		setting.setLocations(Collections.singletonList(42L));
-		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+		UploadDestination setting = Mockito.mock(UploadDestination.class);
+		when(setting.getStorageLocationId()).thenReturn(42L);
+		when(mockSynapse.getDefaultUploadDestination(entityId)).thenReturn(setting);
 		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
 		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
 		assertEquals(mockStorageLocationSetting, synapseClient.getStorageLocationSetting(entityId));

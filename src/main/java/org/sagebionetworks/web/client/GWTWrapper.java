@@ -43,4 +43,10 @@ public interface GWTWrapper {
 	String getFormattedDateString(Date date);
 	
 	void addDaysToDate(Date date, int days);
+	
+	boolean isWhitespace(String text);
+
+	void newItem(String historyToken, boolean issueEvent);
+
+	void replaceItem(String historyToken, boolean issueEvent);
 }

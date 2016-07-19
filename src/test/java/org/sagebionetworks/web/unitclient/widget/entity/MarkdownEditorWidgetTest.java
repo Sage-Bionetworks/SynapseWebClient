@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -101,7 +103,6 @@ public class MarkdownEditorWidgetTest {
 		presenter.setWikiKey(wikiPageKey);
 	}
 	
-	
 	@Test
 	public void testConfigure() {
 		//configured in before, verify that view is reset
@@ -113,6 +114,30 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testSetPresenter() throws Exception {
 		verify(mockView).setPresenter(eq(presenter));
+	}
+	
+	@Test
+	public void testUserSelectorConfigure() {
+		String markdown = "";
+		when(mockView.getMarkdown()).thenReturn(markdown);
+		when(mockView.getCursorPos()).thenReturn(0);
+		
+		ArgumentCaptor<CallbackP> callbackCaptor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockUserSelector).configure(callbackCaptor.capture());
+		String username = "jay";
+		callbackCaptor.getValue().invoke(username);
+		
+		verify(mockView).setMarkdown("@"+username);
+		verify(mockView).setFocus(true);
+	}
+	
+	@Test
+	public void testUserSelectorModalShownHandler() {
+		ArgumentCaptor<ModalShownHandler> callbackCaptor = ArgumentCaptor.forClass(ModalShownHandler.class);
+		verify(mockUserSelector).addModalShownHandler(callbackCaptor.capture());
+		callbackCaptor.getValue().onShown(null);
+		
+		verify(mockView).setEditorEnabled(true);
 	}
 	
 	@Test
@@ -573,7 +598,28 @@ public class MarkdownEditorWidgetTest {
 		verify(mockUserSelector, never()).show();
 		presenter.onKeyPress('a');
 		verify(mockUserSelector, never()).show();
+		verify(mockView, never()).setEditorEnabled(anyBoolean());
 		presenter.onKeyPress('@');
 		verify(mockUserSelector).show();
+		verify(mockView).setEditorEnabled(false);
+	}
+
+	@Test
+	public void testOnKeyPressBeginningOfMarkdown() {
+		when(mockView.getCursorPos()).thenReturn(0);
+		when(mockView.getMarkdown()).thenReturn("");
+		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
+		presenter.onKeyPress('@');
+		verify(mockUserSelector).show();
+	}
+	
+	@Test
+	public void testOnKeyPressNotWhitespace() {
+		// typing an @ at the end of the string 'email'
+		when(mockView.getCursorPos()).thenReturn(5);
+		when(mockView.getMarkdown()).thenReturn("email");
+		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
+		presenter.onKeyPress('@');
+		verify(mockUserSelector, never()).show();
 	}
 }

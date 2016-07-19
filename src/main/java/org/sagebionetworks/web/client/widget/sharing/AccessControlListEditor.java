@@ -11,6 +11,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -77,7 +78,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
-		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 		publicPrincipalIds = new PublicPrincipalIds();
 		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
 		publicPrincipalIds.setAnonymousUserId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
@@ -98,6 +98,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.hasChangesHandler = hasChangesHandler;
 		this.entity = entity;
 		this.canChangePermission = canChangePermission;
+		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 	}
 	
 	/**
@@ -118,12 +119,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
 		}
 	}
+	
+	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_MODERATE, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	
 	public PermissionLevel[] getPermList() {
-		return new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+		if (entity instanceof Project) {
+			return PROJECT_PERMISSIONS;
+		} else {
+			return NON_PROJECT_PERMISSIONS;
+		}
 	}
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
 		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
+		permissionDisplay.put(PermissionLevel.CAN_MODERATE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_MODERATE);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		

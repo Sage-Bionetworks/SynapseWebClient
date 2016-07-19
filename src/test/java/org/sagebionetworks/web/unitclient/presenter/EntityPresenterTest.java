@@ -114,15 +114,13 @@ public class EntityPresenterTest {
 		rootWikiAttachments = new FileHandleResults();
 		AsyncMockStubber.callSuccessWith(rootWikiAttachments).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isWikiBasedEntity(anyString())).thenReturn(false);
-		
-		verify(mockView).setEntityPageTopWidget(mockEntityPageTop);
-		verify(mockView).setFooterWidget(mockFooterWidget);
-		verify(mockView).setHeaderWidget(mockHeaderWidget);
-		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
+	}	
+	
+	@Test
+	public void testConstruction() {
 		verify(mockEntityPageTop).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockHeaderWidget, never()).configure(false); // waits to configure for entity header
-		verify(mockHeaderWidget).refresh();
-	}	
+	}
 	
 	@Test
 	public void testSetPlaceAndRefreshWithVersion() {
@@ -137,9 +135,13 @@ public class EntityPresenterTest {
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).setEntityPageTopVisible(true);
-		verify(mockEntityPageTop).clearState();
+		verify(mockEntityPageTop, atLeastOnce()).clearState();
 		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
+		verify(mockView).setFooterWidget(mockFooterWidget);
+		verify(mockView).setHeaderWidget(mockHeaderWidget);
+		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
+		verify(mockHeaderWidget).refresh();
 		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
 	}
 	
@@ -155,7 +157,7 @@ public class EntityPresenterTest {
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).setEntityPageTopVisible(true);
-		verify(mockEntityPageTop).clearState();
+		verify(mockEntityPageTop, atLeastOnce()).clearState();
 		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);

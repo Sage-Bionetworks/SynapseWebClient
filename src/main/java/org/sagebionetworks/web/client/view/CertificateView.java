@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
@@ -16,7 +15,7 @@ public interface CertificateView extends IsWidget, SynapseView {
 	void showNotCertified(UserProfile profile);
 	void hideLoading();
 	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void goTo(Place place);
 		void goToLastPlace();
 		void okButtonClicked();

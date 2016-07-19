@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
@@ -18,7 +17,7 @@ public interface OpenTeamInvitationsWidgetView extends IsWidget, SynapseView {
 	
 	void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget);
 	void clear();
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		//use to go to team page
 		void goTo(Place place);
 	}

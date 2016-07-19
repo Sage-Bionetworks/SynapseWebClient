@@ -2,7 +2,10 @@ package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,12 +19,20 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 	UserProfileEditorWidget editorWidget;
 	SynapseClientAsync synapse;
 	Callback callback;
+	AuthenticationController authController;
+	ClientCache clientCache;
 	
 	@Inject
-	public UserProfileModalWidgetImpl(UserProfileModalView view, UserProfileEditorWidget editorWidget, SynapseClientAsync synapse){
+	public UserProfileModalWidgetImpl(UserProfileModalView view, 
+			UserProfileEditorWidget editorWidget, 
+			SynapseClientAsync synapse,
+			AuthenticationController authController,
+			ClientCache clientCache){
 		this.modalView = view;
 		this.editorWidget = editorWidget;
 		this.synapse = synapse;
+		this.authController = authController;
+		this.clientCache = clientCache;
 		this.modalView.setPresenter(this);
 		this.modalView.addEditorWidget(editorWidget);
 	}
@@ -48,6 +59,10 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 			@Override
 			public void onSuccess(Void result) {
 				modalView.hideModal();
+				// clear entry from the client cache
+				clientCache.remove(originalProfile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
+				//update the profile in the user session data
+				authController.updateCachedProfile(originalProfile);
 				callback.invoke();
 			}
 			
@@ -148,5 +163,4 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		}
 		return second;
 	}
-
 }

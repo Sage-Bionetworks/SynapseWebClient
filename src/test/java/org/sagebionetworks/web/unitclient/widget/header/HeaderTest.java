@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.header;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -23,7 +22,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -32,13 +30,13 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
+import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -58,6 +56,8 @@ public class HeaderTest {
 	List<EntityHeader> entityHeaders;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	StuAnnouncementWidget mockStuAnnouncementWidget;
 	
 	@Before
 	public void setup(){
@@ -72,7 +72,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockCookies);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -82,6 +82,7 @@ public class HeaderTest {
 	public void testSetPresenter() {
 		verify(mockView).setPresenter(header);
 		verify(mockView).setStagingAlertVisible(false);
+		verify(mockStuAnnouncementWidget).init();
 	}
 
 	@Test
@@ -238,11 +239,5 @@ public class HeaderTest {
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
 		header.initStagingAlert();
 		verify(mockView).setStagingAlertVisible(true);
-	}
-	
-	@Test
-	public void testOnHelpForumClick(){
-		header.onHelpForumClick();
-		verify(mockView).openNewWindow(Header.GET_SATISFACTION_SUPPORT_SITE);
 	}
 }

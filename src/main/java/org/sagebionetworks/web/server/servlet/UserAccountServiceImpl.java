@@ -3,17 +3,14 @@ package org.sagebionetworks.web.server.servlet;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.UserLoginBundle;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.springframework.web.client.RestClientException;
@@ -118,25 +115,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override 
-	public UserLoginBundle getUserLoginBundle(String sessionToken) throws RestServiceException {
-		validateService();
-		SynapseClient synapseClient = createSynapseClient(sessionToken);
-		try {
-			UserSessionData userSessionData = synapseClient.getUserSessionData();
-			UserBundle userBundle = null;
-			if (userSessionData.getSession().getAcceptsTermsOfUse()) {
-				long principalId = Long.valueOf(userSessionData.getProfile().getOwnerId());
-				// 63 is the mask equivalent for getting every UserBundle component
-				userBundle = synapseClient.getUserBundle(principalId, 63);
-			}
-			return new UserLoginBundle(userSessionData, userBundle);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
+
 	@Override
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
 		validateService();
@@ -246,19 +225,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw new RestClientException(e.getMessage());
 		}
 	}
-	
-	@Override
-	public StorageUsageSummaryList getStorageUsage() {
-		validateService();
 
-		SynapseClient client = createSynapseClient();
-		try {
-			return client.getStorageUsageSummary(null);
-		} catch (SynapseException e) {
-			throw new RestClientException("Unable to get storage usage", e);
-		}
-	}
-	
 	/**
 	 * The synapse client is stateful so we must create a new one for each request
 	 */

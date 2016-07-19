@@ -1,24 +1,15 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -26,6 +17,7 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,7 +26,6 @@ import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -45,7 +36,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
-	public static final String FAVORITE_STAR_HTML = "<span style=\"font-size:19px;color:#f0ad4e\" class=\"fa fa-star\"></span>";
 	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
 	
@@ -94,12 +84,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Heading collaborateHeading;
 	@UiField
 	Heading userDisplayName;
+	@UiField
+	Div registerWidgetContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
-	IconsImageBundle iconsImageBundle;
-	SynapseJSNIUtils synapseJSNIUtils;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
 	LoginWidget loginWidget;
@@ -108,20 +98,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
 			Header headerWidget,
 			Footer footerWidget, 
-			IconsImageBundle icons, 
-			SageImageBundle imageBundle,
 			final GlobalApplicationState globalApplicationState,
-			CookieProvider cookies,
 			final AuthenticationController authController,
-			SynapseJSNIUtils synapseJSNIUtils,
 			UserBadge userBadge,
 			RegisterWidget registerWidget,
 			LoginWidget loginWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.iconsImageBundle = icons;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.userBadge = userBadge;
 		this.loginWidget = loginWidget;
 		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);
@@ -143,8 +127,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
 			}
 		});
-		
-		registerUI.add(registerWidget.asWidget());
+		boolean isInline = false;
+		registerWidget.configure(isInline);
+		registerWidgetContainer.add(registerWidget.asWidget());
 		
 		loginWidget.setUserListener(new UserListener() {
 			@Override
@@ -197,21 +182,21 @@ public class HomeViewImpl extends Composite implements HomeView {
 		termsOfUseBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help("Governance"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "governance.html", "", "");
 			}
 		});
 		
 		gettingStartedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help("GettingStarted"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "getting_started.html", "", "");
 			}
 		});
 		
 		becomeCertifiedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Certification"));
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html", "", "");
 			}
 		});
 		
@@ -317,12 +302,5 @@ public class HomeViewImpl extends Composite implements HomeView {
 		registerUI.setVisible(false);
 		loginUI.setVisible(false);
 		userDisplayName.setText("");
-	}
-
-	private void configureNewWindowLink(Anchor a, String href, String text) {
-		a.addStyleName("link");
-		a.setTarget("_blank");
-		a.setHref(href);
-		a.setText(text);
 	}
 }

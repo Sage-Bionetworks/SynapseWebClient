@@ -9,8 +9,11 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
  */
 public enum Action {
 
+	// Docker specific
+	ADD_COMMIT,
 	// Table specific
 	TOGGLE_TABLE_SCHEMA,
+	TOGGLE_VIEW_SCOPE,
 	UPLOAD_TABLE_DATA,
 	EDIT_TABLE_DATA,
 	DOWNLOAD_TABLE_QUERY_RESULTS,

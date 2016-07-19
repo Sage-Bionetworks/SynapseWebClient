@@ -2,13 +2,18 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.client.widget.login.UserListener;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -20,23 +25,34 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
+	public static final String BROWSE_PATH = "/browse/";
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
+	PortalGinInjector ginInjector;
 	Throwable ex;
-	
+	UserListener reloadOnLoginListener;
 	@Inject
 	public SynapseAlertImpl(
 			SynapseAlertView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authController,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 		view.clearState();
+		
+		reloadOnLoginListener = new UserListener() {
+			@Override
+			public void userChanged(UserSessionData newUser) {
+				SynapseAlertImpl.this.view.reload();
+			}
+		};
 	}
 
 	@Override
@@ -44,17 +60,16 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		clear();
 		this.ex = ex;
 		boolean isLoggedIn = authController.isLoggedIn();
-		if(ex instanceof ReadOnlyModeException) {
-			view.showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
-		} else if(ex instanceof SynapseDownException) {
+		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 		} else if(ex instanceof UnauthorizedException) {
-			// send user to login page				
-			view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
+			// send user to login page
+			// invalid session token.  log out user and send to login place
+			authController.logoutUser();
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {
-				view.showLoginAlert();
+				showLogin();
 			} else {
 				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
 			}
@@ -83,11 +98,13 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void onCreateJiraIssue(final String userReport) {
 		JiraURLHelper jiraHelper = globalApplicationState.getJiraURLHelper();
 		jiraHelper.createIssueOnBackend(userReport, ex,
-			ex.getMessage(), new AsyncCallback<Void>() {
+			ex.getMessage(), new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(Void result) {
+				public void onSuccess(String key) {
 					view.hideJiraDialog();
-					view.showInfo("Report sent", "Thank you!");
+					String jiraEndpoint = globalApplicationState.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
+					String url = jiraEndpoint + BROWSE_PATH + key;
+					view.showJiraIssueOpen(key, url);
 				}
 
 				@Override
@@ -113,28 +130,19 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	}
 	
 	@Override
-	public void onLoginClicked() {
-		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
-	}
-	
-	@Override
 	public boolean isUserLoggedIn() {
 		return authController.isLoggedIn();
 	}
 	
 	@Override
-	public void showMustLogin() {
+	public void showLogin() {
 		clear();
-		view.showLoginAlert();
+		// lazy inject login widget
+		LoginWidget loginWidget = ginInjector.getLoginWidget();
+		loginWidget.setUserListener(reloadOnLoginListener);
+		view.setLoginWidget(loginWidget.asWidget());
+		view.showLogin();
 	}
-	
-	@Override
-	public void showSuggestLogin() {
-		clear();
-		view.showSuggestLoginAlert();
-	}
-	
-	
 	
 	@Override
 	public void clear() {

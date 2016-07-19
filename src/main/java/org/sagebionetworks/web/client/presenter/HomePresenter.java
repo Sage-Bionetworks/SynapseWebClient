@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.Date;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -29,7 +28,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private HomeView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private AdapterFactory adapterFactory;
 	private CookieProvider cookies;
 	private ResourceLoader resourceLoader;
 	private SynapseJSNIUtils jsniUtils;
@@ -45,7 +43,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
-			AdapterFactory adapterFactory,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader,
 			SynapseJSNIUtils jsniUtils){
@@ -53,7 +50,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;

@@ -5,16 +5,13 @@ import java.util.List;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.ValidationUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -47,7 +44,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
-	private CookieProvider cookies;
 	private PasswordStrengthWidget passwordStrengthWidget;
 	@Inject
 	public SettingsPresenter(SettingsView view,
@@ -58,7 +54,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			PortalGinInjector ginInjector,
 			UserProfileModalWidget userProfileModalWidget,
 			SubscriptionListWidget subscriptionListWidget,
-			CookieProvider cookies,
 			PasswordStrengthWidget passwordStrengthWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -69,7 +64,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
-		this.cookies = cookies;
 		this.passwordStrengthWidget = passwordStrengthWidget;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
@@ -122,6 +116,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
 									@Override
 									public void onSuccess(Void result) {
+										passwordStrengthWidget.setVisible(false);
 										view.showPasswordChangeSuccess();
 										// login user as session token
 										// has changed
@@ -194,23 +189,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		synapseClient.setNotificationEmail(email, callback);
 	}
 
-	public void updateUserStorage() {
-		userService.getStorageUsage(new AsyncCallback<StorageUsageSummaryList>() {
-			@Override
-			public void onSuccess(StorageUsageSummaryList results) {
-				StorageUsageSummaryList storageUsageSummaryList = results;
-				view.updateStorageUsage(storageUsageSummaryList.getTotalSize());
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// couldn't figure out the usage, update the view to
-				// indicate that the test was inconclusive
-				view.clearStorageUsageUI();
-			}
-		});
-	}
-
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
@@ -266,8 +244,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
+		passwordStrengthWidget.setVisible(false);
 		if (authenticationController.isLoggedIn()) {
-			updateUserStorage();
 			getUserNotificationEmail();
 			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 			subscriptionListWidget.configure();	

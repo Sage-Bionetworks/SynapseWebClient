@@ -28,8 +28,6 @@ public class StuAlertViewImpl implements
 	@UiField
 	HTMLPanel httpCode404;
 	@UiField
-	HTMLPanel synapseDown;
-	@UiField
 	Div requestAccessUI;
 	@UiField
 	Anchor requestAccessLink;
@@ -38,10 +36,6 @@ public class StuAlertViewImpl implements
 	@UiField
 	Div synAlertContainer;
 	Presenter presenter;
-	@UiField
-	Column readOnlyMessage;
-	@UiField
-	Column synapseDownMessage;
 	
 	@Inject
 	public StuAlertViewImpl(){
@@ -76,7 +70,6 @@ public class StuAlertViewImpl implements
 		httpCode404.setVisible(false);
 		requestAccessUI.setVisible(false);
 		requestLoadingUI.setVisible(false);
-		synapseDown.setVisible(false);
 	}
 	
 	
@@ -91,22 +84,6 @@ public class StuAlertViewImpl implements
 		widget.setVisible(true);
 		httpCode404.setVisible(true);
 	}
-	@Override
-	public void showSynapseDown() {
-		readOnlyMessage.setVisible(false);
-		synapseDownMessage.setVisible(true);
-		synapseDown.setVisible(true);
-		widget.setVisible(true);
-	}
-	
-	@Override
-	public void showReadOnly() {
-		readOnlyMessage.setVisible(true);
-		synapseDownMessage.setVisible(false);
-		synapseDown.setVisible(true);
-		widget.setVisible(true);
-	}
-	
 	@Override
 	public void showRequestAccessUI() {
 		requestLoadingUI.setVisible(false);
