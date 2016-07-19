@@ -50,6 +50,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class MarkdownEditorWidgetTest {
 	SynapseClientAsync mockSynapseClient; 
@@ -63,7 +64,10 @@ public class MarkdownEditorWidgetTest {
 	ResourceLoader mockResourceLoader;
 	GWTWrapper mockGwt;
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
-	MarkdownWidget mockMarkdownWidget;
+	@Mock
+	MarkdownWidget mockFormattingGuideMarkdownWidget;
+	@Mock
+	MarkdownWidget mockMarkdownPreview;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	WikiPage testPage;
@@ -83,8 +87,7 @@ public class MarkdownEditorWidgetTest {
 		mockGwt = mock(GWTWrapper.class);
 		mockView = mock(MarkdownEditorWidgetView.class);
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
-		mockMarkdownWidget = mock(MarkdownWidget.class);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockMarkdownWidget, mockUserSelector);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockFormattingGuideMarkdownWidget, mockUserSelector, mockMarkdownPreview);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		initialMarkdown = "Hello Markdown";
 		presenter.configure(initialMarkdown);
@@ -109,6 +112,7 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
+		verify(mockView).setMarkdownPreviewWidget(any(Widget.class));
 	}
 	
 	@Test
@@ -621,5 +625,12 @@ public class MarkdownEditorWidgetTest {
 		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
 		presenter.onKeyPress('@');
 		verify(mockUserSelector, never()).show();
+	}
+	
+	@Test
+	public void testPreview() throws Exception {
+		presenter.previewClicked();
+		verify(mockMarkdownPreview).configure(anyString(), any(WikiPageKey.class), any(Long.class));
+		verify(mockView).showPreviewModal();
 	}
 }
