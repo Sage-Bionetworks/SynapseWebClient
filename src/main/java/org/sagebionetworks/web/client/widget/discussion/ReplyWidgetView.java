@@ -48,5 +48,5 @@ public interface ReplyWidgetView extends IsWidget{
 	
 	void setIsAuthorModerator(boolean isModerator);
 	
-	void alert(String text);
+	void setCopyTextModal(Widget widget);
 }

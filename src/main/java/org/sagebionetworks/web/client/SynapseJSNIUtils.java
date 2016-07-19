@@ -95,6 +95,4 @@ public interface SynapseJSNIUtils {
 	
 	public String getCurrentURL();
 	public String getCurrentHostName();
-
-	boolean copyToClipboard(String text);
 }

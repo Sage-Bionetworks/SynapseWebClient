@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TopicUtils;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -40,6 +41,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	EditReplyModal editReplyModal;
 	MarkdownWidget markdownWidget;
 	GWTWrapper gwt;
+	CopyTextModal copyTextModal;
 	private String replyId, projectId, threadId;
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
@@ -58,7 +60,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			AuthenticationController authController,
 			EditReplyModal editReplyModal,
 			MarkdownWidget markdownWidget,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			CopyTextModal copyTextModal
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -70,11 +73,15 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.editReplyModal = editReplyModal;
 		this.markdownWidget = markdownWidget;
 		this.gwt = gwt;
+		this.copyTextModal = copyTextModal;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setEditReplyModal(editReplyModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
+		view.setCopyTextModal(copyTextModal.asWidget());
+		
+		copyTextModal.setTitle("Reply URL:");
 	}
 
 	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback) {
@@ -218,10 +225,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	@Override
 	public void onClickReplyLink() {
 		String url = gwt.getHostPageBaseURL() + TopicUtils.buildReplyLink(projectId, threadId, replyId).substring(1);
-		if (jsniUtils.copyToClipboard(url)) {
-			view.showSuccess("Successfully copied to your clipboard", "");
-		} else {
-			view.alert(url);
-		}
+		copyTextModal.setText(url);
+		copyTextModal.show();
 	}
 }
