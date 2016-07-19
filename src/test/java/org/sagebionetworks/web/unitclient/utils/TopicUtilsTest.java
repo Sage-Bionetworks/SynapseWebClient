@@ -6,6 +6,16 @@ import org.junit.Test;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 
 public class TopicUtilsTest {
+	
+	@Test
+	public void testBuildReplyThreadLink() {
+		String projectId = "syn123";
+		String threadId = "456";
+		String replyId = "987";
+		assertEquals("/#!Synapse:syn123/discussion/threadId=456&replyId=987",
+				TopicUtils.buildReplyLink(projectId, threadId, replyId));
+	}
+	
 	@Test
 	public void testBuildThreadLink() {
 		String projectId = "syn123";

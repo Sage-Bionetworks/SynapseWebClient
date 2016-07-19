@@ -28,6 +28,7 @@ import com.google.inject.Inject;
 
 public class ReplyWidget implements ReplyWidgetView.Presenter{
 
+	public static final String REPLY_URL = "Reply URL:";
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply?";
 	private static final String DELETE_SUCCESS_TITLE = "Reply deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A reply has been deleted.";
@@ -81,7 +82,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setCopyTextModal(copyTextModal.asWidget());
 		
-		copyTextModal.setTitle("Reply URL:");
+		copyTextModal.setTitle(REPLY_URL);
 	}
 
 	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback) {

@@ -88,6 +88,7 @@ public class ReplyWidgetTest {
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setEditReplyModal(any(Widget.class));
+		verify(mockCopyTextModal).setTitle(ReplyWidget.REPLY_URL);
 	}
 
 	@Test
@@ -355,12 +356,22 @@ public class ReplyWidgetTest {
 		boolean isDeleted = false;
 		boolean canModerate = false;
 		boolean isEdited = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
+		String projectId = "syn007";
+		String threadId = "321";
+		String replyId = "123";
+		
+		DiscussionReplyBundle bundle = createReplyBundle(replyId, "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
+		bundle.setProjectId(projectId);
+		bundle.setThreadId(threadId);
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback);
 		
+		String hostPageBaseURL = "https://www.synapse.org/";
+		when(mockGwt.getHostPageBaseURL()).thenReturn(hostPageBaseURL);
 		replyWidget.onClickReplyLink();
 		
+		verify(mockCopyTextModal).setText("https://www.synapse.org/#!Synapse:syn007/discussion/threadId=321&replyId=123");
+		verify(mockCopyTextModal).show();
 	}
 	
 	private DiscussionReplyBundle createReplyBundle(String replyId, String author,
