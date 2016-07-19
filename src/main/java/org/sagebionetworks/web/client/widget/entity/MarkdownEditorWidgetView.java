@@ -33,7 +33,7 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setFocus(boolean focused);
 	void setEditorEnabled(boolean enabled);
 	void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
-	void showPreviewModal();
+	void showPreview();
 	
 	/**
 	 * Presenter interface

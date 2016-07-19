@@ -50,7 +50,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button formattingGuideOkButton;
 	@UiField
-	public Button previewOkButton;
+	public Button writeMarkdownButton;
 	//insert widget menu commands
 	@UiField
 	public AnchorListItem attachmentLink;
@@ -177,7 +177,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public SimplePanel previewHtmlContainer;
 	@UiField
-	public Modal previewModal;
+	public Div previewUI;
+	@UiField
+	public Div writingUI;
 	
 	//this UI widget
 	Widget widget;
@@ -264,10 +266,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				presenter.onKeyPress(event.getCharCode());
 			}
 		});
-		previewOkButton.addClickHandler(new ClickHandler() {
+		writeMarkdownButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				previewModal.hide();
+				previewUI.setVisible(false);
+				writingUI.setVisible(true);
 			}
 		});
 	}
@@ -440,8 +443,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	@Override
-	public void showPreviewModal() {
-		previewModal.show();
+	public void showPreview() {
+		writingUI.setVisible(false);
+		previewUI.setVisible(true);
 	}
 
 }

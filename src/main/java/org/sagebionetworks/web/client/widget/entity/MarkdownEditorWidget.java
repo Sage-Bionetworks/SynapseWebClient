@@ -41,7 +41,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	// units are px
 	public static final int MIN_TEXTAREA_HEIGHT = 100;
-	public static final int OTHER_EDITOR_COMPONENTS_HEIGHT = 210;
+	public static final int OTHER_EDITOR_COMPONENTS_HEIGHT = 270;
 	
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -375,7 +375,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void previewClicked() {
 	    //get the html for the markdown
 		markdownPreview.configure(getMarkdown(), wikiKey, null);
-		view.showPreviewModal();
+		view.showPreview();
 	}
 
 	
