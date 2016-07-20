@@ -95,6 +95,8 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.WikiModalWidgetView;
 import org.sagebionetworks.web.client.widget.WikiModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
@@ -1298,5 +1300,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
 		bind(StuAnnouncementWidgetView.class).to(StuAnnouncementWidgetViewImpl.class);
 		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
+		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
 	}
 }

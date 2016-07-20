@@ -46,6 +46,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private String synapseVersion;
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
+	private boolean isShowingVersionAlert;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -66,6 +67,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.gwt = gwt;
 		this.view = view;
 		isEditing = false;
+		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
 	}
 	
@@ -218,7 +220,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				boolean isVersionChange = false;
 				//synapse version is set on app load
 				if(!synapseVersion.equals(versions)) {
-					view.showVersionOutOfDateGlobalMessage();
+					if (!isShowingVersionAlert) {
+						view.showVersionOutOfDateGlobalMessage();
+						isShowingVersionAlert = true;
+					}
 					isVersionChange = true;
 				}
 				if (callback != null) {
@@ -263,6 +268,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		} else {
 			initSynapsePropertiesFromServer(c);
 		}
+		view.initGlobalViewProperties();
 	}
 	
 	public void initSynapsePropertiesFromServer(final Callback c) {

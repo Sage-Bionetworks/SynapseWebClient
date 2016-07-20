@@ -9,7 +9,7 @@
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  	
  	<!-- TODO: modal to replace GovernanceDialogHelper.showAccessRequirement -->
-	<b:Modal size="LARGE" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+	<b:Modal size="LARGE" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 	  <b:ModalBody>
 	    <bh:Div ui:field="controlledUseUI" styleName="margin-bottom-20">
 	       	<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.shieldRed16}' />

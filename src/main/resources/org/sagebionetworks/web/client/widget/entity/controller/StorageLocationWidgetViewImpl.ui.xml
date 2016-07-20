@@ -6,7 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
-	    <b:Modal ui:field="modal" closable="true" fade="true"
+	    <b:Modal ui:field="modal" closable="true"
 			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 			<b:ModalHeader>
 				<b:Heading size="H4" text="Storage Location" addStyleNames="displayInline" />

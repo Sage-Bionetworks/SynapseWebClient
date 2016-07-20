@@ -363,15 +363,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 						offset += LIMIT;
 						if (!result.getResults().isEmpty()) {
 							for (DiscussionReplyBundle bundle : result.getResults()) {
-								final String replyId = bundle.getId();
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
-								Callback replyClickedCallback = new Callback() {
-									@Override
-									public void invoke() {
-										configureReply(replyId);
-									}
-								};
-								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback, isThreadDeleted);
+								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
 								view.addReply(replyWidget.asWidget());
 							}
 						}
@@ -398,13 +391,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			@Override
 			public void onSuccess(DiscussionReplyBundle bundle) {
 				ReplyWidget replyWidget = ginInjector.createReplyWidget();
-				Callback replyClickedCallback = new Callback() {
-					@Override
-					public void invoke() {
-						// when showing a single reply, do nothing when that reply link is clicked.
-					}
-				};
-				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback, isThreadDeleted);
+				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
 				view.addReply(replyWidget.asWidget());
 			}
 		});

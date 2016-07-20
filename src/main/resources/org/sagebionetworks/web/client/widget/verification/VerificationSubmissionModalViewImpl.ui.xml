@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<b:Modal ui:field="dialog" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+	<b:Modal ui:field="dialog" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 		<b:ModalBody>
 			<b:Alert ui:field="reasonAlert" type="DANGER" addStyleNames="margin-bottom-10 margin-top-10">
 				<b:Heading size="H4" text="Why was my validated user application rejected?"/>

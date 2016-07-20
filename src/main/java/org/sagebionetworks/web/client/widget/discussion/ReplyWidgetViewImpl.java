@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.DisplayConstants.*;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
+import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
@@ -34,6 +37,9 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
+	Div copyTextModalContainer;
+	
+	@UiField
 	Icon deleteIcon;
 	@UiField
 	Icon editIcon;
@@ -53,7 +59,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	private Widget widget;
 	private ReplyWidget presenter;
-
+	
 	@Inject
 	public ReplyWidgetViewImpl (Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -71,9 +77,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 			}
 		});
 		linkIcon.addClickHandler(new ClickHandler() {
-			
 			@Override
-			public void onClick(ClickEvent arg0) {
+			public void onClick(ClickEvent event) {
 				presenter.onClickReplyLink();
 			}
 		});
@@ -168,5 +173,11 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setCommandsContainerVisible(boolean visible) {
 		commandsContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setCopyTextModal(Widget widget) {
+		copyTextModalContainer.clear();
+		copyTextModalContainer.add(widget);
 	}
 }

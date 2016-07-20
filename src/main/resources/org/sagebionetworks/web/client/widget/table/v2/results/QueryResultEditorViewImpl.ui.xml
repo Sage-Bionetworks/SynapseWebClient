@@ -5,7 +5,7 @@
 	<!-- This modal dialog will contain the editor for query results -->
 	<bh:Div>
 		<b:Modal ui:field="editRowsModal" title="Edit Rows" closable="true"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="editRowsModal"
+			dataBackdrop="STATIC" dataKeyboard="false" b:id="editRowsModal"
 			size="LARGE" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<g:HTMLPanel>
@@ -43,7 +43,7 @@
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal ui:field="inProgressModal" title="Edit Rows" closable="true"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="editRowsModal"
+			dataBackdrop="STATIC" dataKeyboard="false" b:id="editRowsModal"
 			size="LARGE" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<g:SimplePanel ui:field="progressPanel" />

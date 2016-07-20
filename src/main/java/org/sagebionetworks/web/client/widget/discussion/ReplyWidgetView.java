@@ -14,6 +14,7 @@ public interface ReplyWidgetView extends IsWidget{
 		void onClickDeleteReply();
 
 		void onClickEditReply();
+		
 		void onClickReplyLink();
 	}
 
@@ -48,4 +49,6 @@ public interface ReplyWidgetView extends IsWidget{
 	void setIsAuthorModerator(boolean isModerator);
 
 	void setCommandsContainerVisible(boolean visible);
+	
+	void setCopyTextModal(Widget widget);
 }
