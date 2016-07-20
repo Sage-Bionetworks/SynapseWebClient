@@ -9,12 +9,9 @@
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
 		<bh:Div addStyleNames="overflow-x-hidden">
 			<bh:Div ui:field="deletedThread" visible="false">
-				<bh:Span addStyleNames="h4">
-					<b:Icon type="TRASH_O" size="LARGE"/>
-					Deleted Thread
-				</bh:Span>
+				<bh:Span addStyleNames="highlight-title">Deleted Thread</bh:Span>
 			</bh:Div>
-			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
+			<bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
 					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
