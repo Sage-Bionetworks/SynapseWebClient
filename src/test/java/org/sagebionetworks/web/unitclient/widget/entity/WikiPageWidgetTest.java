@@ -126,6 +126,7 @@ public class WikiPageWidgetTest {
 		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
 		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		// once to clear, once after loading shown
 		verify(mockView, times(2)).setLoadingVisible(false);
