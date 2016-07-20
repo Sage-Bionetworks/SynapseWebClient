@@ -131,8 +131,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 							thread.configure(bundle);
 							if (threadIdClickedCallback != null) {
 								thread.setThreadIdClickedCallback(threadIdClickedCallback);
-							} else {
-								thread.disableClick();
 							}
 							view.addThread(thread.asWidget());
 						}

@@ -105,10 +105,4 @@ public class DiscussionThreadListItemWidgetTest {
 		discussionThreadWidget.onClickThread();
 		verify(mockThreadIdClickedCallback).invoke(anyString());
 	}
-
-	@Test
-	public void testDisableClick() {
-		discussionThreadWidget.disableClick();
-		verify(mockView).disableClick();
-	}
 }

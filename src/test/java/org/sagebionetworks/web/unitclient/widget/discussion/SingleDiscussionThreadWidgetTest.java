@@ -166,13 +166,46 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setEditIconVisible(false);
-		verify(mockView).setEditedVisible(false);
+		verify(mockView).setEditedLabelVisible(false);
 		verify(mockView).setThreadLink(anyString());
 		verify(mockView).setPinIconVisible(false);
 		verify(mockView).setUnpinIconVisible(false);
 		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 		verify(mockRefreshAlert).configure(threadId);
+		verify(mockView).setDeletedThreadVisible(false);
+		verify(mockView).setReplyContainerVisible(true);
+		verify(mockView).setCommandsVisible(true);
+	}
+
+	@Test
+	public void testConfigureDeletedThread() {
+		boolean isDeleted = true;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		verify(mockView).clear();
+		verify(mockView).setTitle("title");
+		verify(mockView).setCreatedOn(anyString());
+		verify(mockView).setIsAuthorModerator(false);
+		verify(mockAuthorWidget).configure(anyString());
+		verify(mockView, never()).setDeleteIconVisible(false);
+		verify(mockView, never()).setEditIconVisible(false);
+		verify(mockView).setEditedLabelVisible(false);
+		verify(mockView, never()).setThreadLink(anyString());
+		verify(mockView, never()).setPinIconVisible(false);
+		verify(mockView, never()).setUnpinIconVisible(false);
+		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
+		verify(mockRefreshAlert).configure(threadId);
+		verify(mockView).setDeletedThreadVisible(true);
+		verify(mockView).setReplyContainerVisible(false);
+		verify(mockView).setCommandsVisible(false);
 	}
 
 	@Test
@@ -248,7 +281,7 @@ public class SingleDiscussionThreadWidgetTest {
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
-		verify(mockView).setEditedVisible(true);
+		verify(mockView).setEditedLabelVisible(true);
 	}
 
 	@Test
@@ -280,7 +313,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(true);
-		verify(mockView).setEditedVisible(false);
+		verify(mockView).setEditedLabelVisible(false);
 		verify(mockView).setPinIconVisible(true);
 		verify(mockView).setUnpinIconVisible(false);
 	}

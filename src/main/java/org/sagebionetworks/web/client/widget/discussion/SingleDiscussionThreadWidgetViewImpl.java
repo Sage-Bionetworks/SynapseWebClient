@@ -81,6 +81,10 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Button saveButton;
 	@UiField
 	Button showAllRepliesButton;
+	@UiField
+	Div replyContainer;
+	@UiField
+	Div deletedThread;
 	
 	String threadLinkHref;
 	private Widget widget;
@@ -242,7 +246,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setEditedVisible(Boolean visible) {
+	public void setEditedLabelVisible(Boolean visible) {
 		edited.setVisible(visible);
 	}
 
@@ -329,5 +333,15 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void showSaving() {
 		saveButton.state().loading();
+	}
+
+	@Override
+	public void setReplyContainerVisible(boolean visible) {
+		replyContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedThreadVisible(boolean visible) {
+		deletedThread.setVisible(visible);
 	}
 }

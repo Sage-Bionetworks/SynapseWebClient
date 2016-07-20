@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -55,6 +54,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	HTMLPanel loadingMessage;
 	@UiField
 	Label moderatorBadge;
+	@UiField
+	Div commandsContainer;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -168,7 +169,12 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public void setIsAuthorModerator(boolean isModerator) {
 		moderatorBadge.setVisible(isModerator);
 	}
-	
+
+	@Override
+	public void setCommandsContainerVisible(boolean visible) {
+		commandsContainer.setVisible(visible);
+	}
+
 	@Override
 	public void setCopyTextModal(Widget widget) {
 		copyTextModalContainer.clear();

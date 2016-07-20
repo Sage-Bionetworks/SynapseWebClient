@@ -7,23 +7,26 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div addStyleNames="overflow-x-hidden">
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
-		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
-			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
+		<bh:Div addStyleNames="overflow-x-hidden">
+			<bh:Div ui:field="deletedThread" visible="false">
+				<bh:Span addStyleNames="highlight-title">Deleted Thread</bh:Span>
+			</bh:Div>
+			<bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
 					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
 				</bh:Div>
 				<bh:Div width="100%">
-					<g:HTMLPanel ui:field="loadingMessage" visible="false">
-						<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-						&nbsp;Loading...
-					</g:HTMLPanel>
 					<b:Container fluid="true">
 						<b:Row>
 							<b:Column size="XS_12">
 								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10 margin-left-10"/>
 							</b:Column>
 							<b:Column size="XS_12">
+								<g:HTMLPanel ui:field="loadingMessage" visible="false">
+									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+									&nbsp;Loading...
+								</g:HTMLPanel>
 								<bh:Div ui:field="threadMessage"></bh:Div>
 							</b:Column>
 							<b:Column size="XS_12">
@@ -54,7 +57,7 @@
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
+			<bh:Div ui:field="replyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT">
 					<b:TextBox ui:field="replyTextBox" placeholder="Write a reply..."/>
 					<bh:Div ui:field="newReplyContainer" visible="false">
 						<bh:Div ui:field="markdownEditorContainer" />

@@ -85,6 +85,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private Callback refreshCallback;
 	private Set<Long> moderatorIds;
 	private Callback invokeCheckForInViewAndLoadData;
+	private boolean isThreadDeleted;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -148,10 +149,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.deleteCallback = deleteCallback;
 		this.projectId = bundle.getProjectId();
 		this.moderatorIds = moderatorIds;
+		this.isThreadDeleted = bundle.getIsDeleted();
 		configureView(bundle);
 		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
 		view.setIsAuthorModerator(isAuthorModerator);
-		
+
 		authorWidget.configure(bundle.getCreatedBy());
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
@@ -197,20 +199,24 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private void configureView(DiscussionThreadBundle bundle) {
 		view.clear();
 		view.setTitle(title);
-		Long numberOfReplies = bundle.getNumberOfReplies();
 		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
-		view.setEditedVisible(bundle.getIsEdited());
-		view.setDeleteIconVisible(isCurrentUserModerator);
+		view.setEditedLabelVisible(bundle.getIsEdited());
+		boolean isDeleted = bundle.getIsDeleted();
+		view.setDeletedThreadVisible(isDeleted);
+		view.setReplyContainerVisible(!isDeleted);
+		view.setCommandsVisible(!isDeleted);
+		if (!isDeleted) {
+			view.setDeleteIconVisible(isCurrentUserModerator);
 
-		Boolean isPinned = bundle.getIsPinned();
-		if (isPinned == null) {
-			isPinned = false;
+			Boolean isPinned = bundle.getIsPinned();
+			if (isPinned == null) {
+				isPinned = false;
+			}
+			view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
+			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
+			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
 		}
-		view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
-		view.setPinIconVisible(isCurrentUserModerator && !isPinned);
-		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
-		view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
-
 	}
 	
 	@Override
@@ -355,9 +361,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 						offset += LIMIT;
 						if (!result.getResults().isEmpty()) {
 							for (DiscussionReplyBundle bundle : result.getResults()) {
-								final String replyId = bundle.getId();
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
-								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback);
+								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
 								view.addReply(replyWidget.asWidget());
 							}
 						}
@@ -384,7 +389,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			@Override
 			public void onSuccess(DiscussionReplyBundle bundle) {
 				ReplyWidget replyWidget = ginInjector.createReplyWidget();
-				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback);
+				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
 				view.addReply(replyWidget.asWidget());
 			}
 		});

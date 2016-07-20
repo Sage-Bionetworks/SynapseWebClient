@@ -25,7 +25,7 @@
 							<bh:Span ui:field="createdOn"></bh:Span>
 							<b:Label text="Edited" ui:field="edited" visible="false" addStyleNames="margin-left-10 moveup-1"/>
 						</bh:Div>
-						<bh:Div>
+						<bh:Div ui:field="commandsContainer">
 							<b:Tooltip title="Delete reply" placement="LEFT">
 								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton line-height-1em" visible="false"/>
 							</b:Tooltip>

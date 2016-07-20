@@ -62,7 +62,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setEditThreadModal(Widget w);
 
-	void setEditedVisible(Boolean visible);
+	void setEditedLabelVisible(Boolean visible);
 
 	void setLoadingMessageVisible(boolean visible);
 
@@ -91,4 +91,8 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setMarkdownEditorWidget(Widget widget);
 
 	void showSaving();
+
+	void setReplyContainerVisible(boolean visible);
+
+	void setDeletedThreadVisible(boolean visible);
 }

@@ -17,7 +17,7 @@
 		<bh:Div ui:field="deleteThreadsArea" addStyleNames="highlight-box padding-top-0-imp margin-bottom-20" visible="false">
 			<b:Row addStyleNames="margin-top-10">
 				<b:Column size="XS_12">
-					<bh:Span addStyleNames="h4">Deleted Threads</bh:Span>
+					<bh:Span addStyleNames="highlight-title">Deleted Threads</bh:Span>
 				</b:Column>
 			</b:Row>
 			<b:Row>
