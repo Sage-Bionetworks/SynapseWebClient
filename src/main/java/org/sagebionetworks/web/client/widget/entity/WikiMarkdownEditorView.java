@@ -31,10 +31,7 @@ public interface WikiMarkdownEditorView extends IsWidget,SynapseView {
 		void cancelClicked();
 		void deleteClicked();
 		void saveClicked();
-		void previewClicked();
 	}
 	void confirm(String string, ConfirmCallback confirmCallback);
-	void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
-	void showPreviewModal();
 	void setMarkdownEditorWidget(Widget markdownEditorWidget);
 }

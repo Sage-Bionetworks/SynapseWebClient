@@ -5,25 +5,16 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<b:Modal ui:field="editorDialog" addStyleNames="modal-fullscreen" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+		<b:Modal ui:field="editorDialog" addStyleNames="modal-fullscreen" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
 				<b:TextBox ui:field="titleField" placeholder="Title" addStyleNames="font-size-32 margin-bottom-10" height="50px" />
 				<bh:Div ui:field="markdownEditorContainer"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 			    <b:Button ui:field="deleteButton" pull="LEFT" type="DANGER" >Delete Page</b:Button>
-			    <b:Button ui:field="previewButton" pull="LEFT" >Preview</b:Button>
 			    <b:Button ui:field="cancelButton" pull="RIGHT" dataDismiss="MODAL">Cancel</b:Button>
 			    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." pull="RIGHT">Save</b:Button>
 			</b:ModalFooter>
-		</b:Modal>
-		<b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
-		  <b:ModalBody>
-		    <g:SimplePanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
-		  </b:ModalBody>
-		  <b:ModalFooter>
-		    <b:Button ui:field="previewOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
-		  </b:ModalFooter>
 		</b:Modal>
 	</bh:Div>
 </ui:UiBinder>

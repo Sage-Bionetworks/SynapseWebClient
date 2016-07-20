@@ -36,14 +36,6 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 	@UiField
 	public Div markdownEditorContainer;
 	
-	//preview
-	@UiField
-	public SimplePanel previewHtmlContainer;
-	@UiField
-	public Modal previewModal;
-	@UiField
-	public Button previewButton;
-	
 	@UiField
 	public Button saveButton;
 	@UiField
@@ -67,13 +59,6 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 			}
 		};
 		
-		ClickHandler onPreview = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.previewClicked();
-			}
-		};
-		
 		ClickHandler onSave = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -87,7 +72,6 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 			}
 		};
 		
-		previewButton.addClickHandler(onPreview);
 		saveButton.addClickHandler(onSave);
 		cancelButton.addClickHandler(onCancel);
 		editorDialog.addCloseHandler(onCancel);
@@ -160,15 +144,6 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 		titleField.setValue(title);
 	}
 
-	@Override
-	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
-		previewHtmlContainer.setWidget(markdownPreviewWidget);
-	}
-
-	@Override
-	public void showPreviewModal() {
-		previewModal.show();
-	}
 	@Override
 	public void setMarkdownEditorWidget(Widget markdownEditorWidget) {
 		markdownEditorContainer.clear();

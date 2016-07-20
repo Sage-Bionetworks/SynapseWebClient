@@ -8,7 +8,7 @@
 		<g:SimplePanel ui:field="provenanceEditorPanel"/>
 		<g:SimplePanel ui:field="storageLocationEditorPanel"/>
 		 
-		<b:Modal ui:field="infoDialog" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+		<b:Modal ui:field="infoDialog" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<b:Pre ui:field="infoDialogText" /> 		
 			</b:ModalBody>

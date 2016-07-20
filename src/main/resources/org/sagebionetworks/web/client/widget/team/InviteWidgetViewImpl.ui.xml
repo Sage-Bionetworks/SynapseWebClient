@@ -5,7 +5,7 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
-    <b:Modal ui:field="inviteUIModal" title="Invite Members" closable="true" fade="true"
+    <b:Modal ui:field="inviteUIModal" title="Invite Members" closable="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 		    <b:FormGroup>

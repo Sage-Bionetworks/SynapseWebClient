@@ -57,6 +57,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	//Optional wiki page key.  If set, wiki widgets may use.
 	private WikiPageKey wikiKey;
+	private MarkdownWidget markdownPreview;
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -66,7 +67,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			WidgetRegistrar widgetRegistrar,
 			MarkdownWidget formattingGuide,
-			UserSelector userSelector
+			UserSelector userSelector,
+			MarkdownWidget markdownPreview
 			) {
 		super();
 		this.view = view;
@@ -77,10 +79,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.widgetRegistrar = widgetRegistrar;
 		this.formattingGuide = formattingGuide;
 		this.userSelector = userSelector;
+		this.markdownPreview = markdownPreview;
 		
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 		view.setFormattingGuideWidget(formattingGuide.asWidget());
+		view.setMarkdownPreviewWidget(markdownPreview.asWidget());
 		view.setAttachmentCommandsVisible(true);
 		
 		userSelector.configure(new CallbackP<String>() {
@@ -358,12 +362,22 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case SET_PROJECT_BACKGROUND:
 			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
+			break;
+		case MARKDOWN_PREVIEW:
+			previewClicked();
+			break;
 		default:
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);
 		}
 	}
 	
+	public void previewClicked() {
+	    //get the html for the markdown
+		markdownPreview.configure(getMarkdown(), wikiKey, null);
+		view.showPreview();
+	}
+
 	
 	public void surroundWithTag(String tag) {
 		surroundWithTag(tag, tag, false);

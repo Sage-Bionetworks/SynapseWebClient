@@ -27,22 +27,18 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	private SynapseClientAsync synapseClient;
 	WikiMarkdownEditorView view;
 	GlobalApplicationState globalApplicationState;
-	private MarkdownWidget markdownPreview;
 	
 	@Inject
 	public WikiMarkdownEditor(
 			WikiMarkdownEditorView view,
 			MarkdownEditorWidget editor,
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
-			MarkdownWidget markdownPreview) {
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.editor = editor;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
-		this.markdownPreview = markdownPreview;
 		view.setPresenter(this);
-		view.setMarkdownPreviewWidget(markdownPreview.asWidget());
 		view.setMarkdownEditorWidget(editor.asWidget());
 		editor.setFilesAddedCallback(new CallbackP<List<String>>() {
 			@Override
@@ -161,12 +157,6 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	
 	public WikiPage getWikiPage() {
 		return currentPage;
-	}
-	
-	public void previewClicked() {
-	    //get the html for the markdown
-		markdownPreview.configure(editor.getMarkdown(), wikiKey, null);
-		view.showPreviewModal();
 	}
 	
 	public void cancelClicked() {

@@ -11,7 +11,7 @@
   
   	<g:HTMLPanel addStyleNames="displayInline">
 	  	<b:ImageAnchor dataToggle="MODAL" dataTarget="#pythonClient" url='{sageImageBundle.logoPython45.getSafeUri.asString}'/>
-	  	<b:Modal title="Synapse Python Client" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="pythonClient">
+	  	<b:Modal title="Synapse Python Client" closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="pythonClient">
 			<b:ModalBody>
 			    <e:PythonClientEntityGetterUIWidgetViewImpl ui:field="getEntity"/>
 		  		<e:PythonClientInstallWidgetViewImpl ui:field="install"/> 

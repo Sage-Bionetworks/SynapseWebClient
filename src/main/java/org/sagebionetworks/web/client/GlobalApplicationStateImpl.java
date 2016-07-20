@@ -263,6 +263,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		} else {
 			initSynapsePropertiesFromServer(c);
 		}
+		view.initGlobalViewProperties();
 	}
 	
 	public void initSynapsePropertiesFromServer(final Callback c) {

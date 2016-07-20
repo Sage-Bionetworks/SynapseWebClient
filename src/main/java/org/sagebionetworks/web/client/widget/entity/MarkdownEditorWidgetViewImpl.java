@@ -49,7 +49,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Button editWidgetButton;
 	@UiField
 	public Button formattingGuideOkButton;
-	
+	@UiField
+	public Button writeMarkdownButton;
 	//insert widget menu commands
 	@UiField
 	public AnchorListItem attachmentLink;
@@ -169,6 +170,16 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Button videoButton;
 	@UiField
 	public Button linkButton;
+	@UiField
+	public Button markdownPreviewButton;
+	
+	//preview
+	@UiField
+	public SimplePanel previewHtmlContainer;
+	@UiField
+	public Div previewUI;
+	@UiField
+	public Div writingUI;
 	
 	//this UI widget
 	Widget widget;
@@ -229,6 +240,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
 		teamMembersLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBERS));
+		markdownPreviewButton.addClickHandler(getClickHandler(MarkdownEditorAction.MARKDOWN_PREVIEW));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
 		heading3Link.addStyleName("font-size-24");
@@ -252,6 +264,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				presenter.onKeyPress(event.getCharCode());
+			}
+		});
+		writeMarkdownButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				previewUI.setVisible(false);
+				writingUI.setVisible(true);
 			}
 		});
 	}
@@ -417,4 +436,16 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setEditorEnabled(boolean enabled) {
 		markdownTextArea.setEnabled(enabled);
 	}
+	
+	@Override
+	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
+		previewHtmlContainer.setWidget(markdownPreviewWidget);
+	}
+
+	@Override
+	public void showPreview() {
+		writingUI.setVisible(false);
+		previewUI.setVisible(true);
+	}
+
 }

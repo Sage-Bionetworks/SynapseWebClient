@@ -16,7 +16,7 @@
 			</bh:Span>
 			<!-- Confirm unsubscribe UI -->
 			<b:Modal ui:field="confirmUnsubscribeUI" title="Are you sure you want to stop receiving messages from Synapse?" closable="true"
-				fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="confirmUnsubscribeUI">
+				dataBackdrop="STATIC" dataKeyboard="false" b:id="confirmUnsubscribeUI">
 				<b:ModalBody>
 					<g:SimplePanel ui:field="unsubscribeUserBadgeContainer" />
 					<bh:Paragraph addStyleNames="margin-top-10">
