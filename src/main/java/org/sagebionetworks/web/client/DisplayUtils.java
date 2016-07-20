@@ -492,6 +492,7 @@ public class DisplayUtils {
 	public static void showError(String title, String message, Integer timeout) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.DANGER);
+		settings.setAllowDismiss(false);
 		if (timeout != null) {
 			settings.setDelay(timeout);	
 		}
