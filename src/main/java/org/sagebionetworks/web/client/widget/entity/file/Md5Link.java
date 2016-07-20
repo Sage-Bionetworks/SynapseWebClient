@@ -7,14 +7,13 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.inject.Inject;
 
-public class Md5Link extends SimplePanel {
+public class Md5Link extends FlowPanel {
 	CopyTextModal copyTextModal;
 	@Inject
 	public Md5Link(CopyTextModal modal) {
-		addStyleName("inline-block font-italic");
 		this.copyTextModal = modal;
 		copyTextModal.setTitle("md5:");
 	}
@@ -22,6 +21,7 @@ public class Md5Link extends SimplePanel {
 	public void configure(final String md5) {
 		this.clear();
 		Anchor md5Link = new Anchor("md5");
+		md5Link.addStyleName("inline-block font-italic");
 		md5Link.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
