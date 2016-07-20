@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -10,6 +13,8 @@ import org.sagebionetworks.web.client.MarkdownItImpl;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -36,9 +41,7 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class HelpWidget implements IsWidget {
-	// 10 second delay, then auto hide
-	public static final int POPOVER_DELAY = 10000;
-	
+	public static final Set<HelpWidget> POPOVERS = new HashSet<HelpWidget>();
 	@UiField
 	SpanElement moreInfoText;
 	@UiField
@@ -63,6 +66,14 @@ public class HelpWidget implements IsWidget {
 		helpPopover.getWidget().getElement().setId(popoverElementId);
 		closePopoverJs = "window.jQuery('#"+popoverElementId+"').popover('hide')"; 
 		closeHTML = "<button class=\"btn btn-default btn-xs right margin-right-5\" onClick=\""+closePopoverJs+"\">Close</button>";
+		POPOVERS.add(this);
+		anchor.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				hideOtherPopovers(HelpWidget.this);
+				helpPopover.show();
+			}
+		});
 	}
 
 	public void setText(String text) {
@@ -110,5 +121,17 @@ public class HelpWidget implements IsWidget {
 	
 	public void setPull(Pull pull) {
 		widget.addStyleName(pull.getCssName());
+	}
+	
+	public static void hideOtherPopovers(HelpWidget showingHelpWidget) {
+		for (HelpWidget h : POPOVERS) {
+			if (!showingHelpWidget.equals(h)) {
+				h.getHelpPopover().hide();	
+			}
+		}
+	}
+	
+	public Popover getHelpPopover() {
+		return helpPopover;
 	}
 }

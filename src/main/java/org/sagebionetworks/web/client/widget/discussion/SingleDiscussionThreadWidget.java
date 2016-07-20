@@ -357,13 +357,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 							for (DiscussionReplyBundle bundle : result.getResults()) {
 								final String replyId = bundle.getId();
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
-								Callback replyClickedCallback = new Callback() {
-									@Override
-									public void invoke() {
-										configureReply(replyId);
-									}
-								};
-								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback);
+								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback);
 								view.addReply(replyWidget.asWidget());
 							}
 						}
@@ -390,13 +384,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			@Override
 			public void onSuccess(DiscussionReplyBundle bundle) {
 				ReplyWidget replyWidget = ginInjector.createReplyWidget();
-				Callback replyClickedCallback = new Callback() {
-					@Override
-					public void invoke() {
-						// when showing a single reply, do nothing when that reply link is clicked.
-					}
-				};
-				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, replyClickedCallback);
+				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback);
 				view.addReply(replyWidget.asWidget());
 			}
 		});
