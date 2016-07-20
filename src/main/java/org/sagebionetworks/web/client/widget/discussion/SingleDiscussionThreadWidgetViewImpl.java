@@ -336,7 +336,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setReplyContainer(boolean visible) {
+	public void setReplyContainerVisible(boolean visible) {
 		replyContainer.setVisible(visible);
 	}
 

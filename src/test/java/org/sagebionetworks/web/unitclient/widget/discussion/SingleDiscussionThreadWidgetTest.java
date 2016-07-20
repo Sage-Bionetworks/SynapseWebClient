@@ -174,7 +174,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 		verify(mockRefreshAlert).configure(threadId);
 		verify(mockView).setDeletedThreadVisible(false);
-		verify(mockView).setReplyContainer(true);
+		verify(mockView).setReplyContainerVisible(true);
 		verify(mockView).setCommandsVisible(true);
 	}
 
@@ -204,7 +204,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 		verify(mockRefreshAlert).configure(threadId);
 		verify(mockView).setDeletedThreadVisible(true);
-		verify(mockView).setReplyContainer(false);
+		verify(mockView).setReplyContainerVisible(false);
 		verify(mockView).setCommandsVisible(false);
 	}
 

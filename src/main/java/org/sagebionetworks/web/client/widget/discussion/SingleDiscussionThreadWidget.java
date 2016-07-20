@@ -203,7 +203,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setEditedLabelVisible(bundle.getIsEdited());
 		boolean isDeleted = bundle.getIsDeleted();
 		view.setDeletedThreadVisible(isDeleted);
-		view.setReplyContainer(!isDeleted);
+		view.setReplyContainerVisible(!isDeleted);
 		view.setCommandsVisible(!isDeleted);
 		if (!isDeleted) {
 			view.setDeleteIconVisible(isCurrentUserModerator);

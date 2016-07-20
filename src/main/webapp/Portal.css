@@ -164,12 +164,6 @@ End Synapse color scheme
 	border-bottom: 1px solid #f1f1f1;
 }
 
-.red-border {
-	border: solid red;
-	border-width:0.3em;
-	padding: 2px 4px 2px 3px;
-}
-
 .sendButton {
 	display: block;
 	font-size: 16pt;
@@ -1949,12 +1943,6 @@ ol.lowerroman {
 	position: absolute;
 	top: 4px;
 	right: 4px;
-}
-
-.top-center {
-	position: absolute;
-	top: 4px;
-	right: 50%;
 }
 
 .bubble {
