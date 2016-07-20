@@ -1,23 +1,24 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.List;
-
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.EvaluationRowWidget.EvaluationActionHandler;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface AdministerEvaluationsListView extends IsWidget, SynapseView {
+public interface AdministerEvaluationsListView extends IsWidget {
 
 	/**
 	 * Set the presenter.
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
-	public void configure(List<Evaluation> evaluations);
+	void setPresenter(Presenter presenter);
+	void addRow(Evaluation ev);
+	void clear();
+	void add(IsWidget w);
+	
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter {
+	public interface Presenter extends EvaluationActionHandler {
 	}
 }

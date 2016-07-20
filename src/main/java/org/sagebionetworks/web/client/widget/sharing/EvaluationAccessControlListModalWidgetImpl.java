@@ -35,8 +35,9 @@ public class EvaluationAccessControlListModalWidgetImpl implements EvaluationAcc
 	}
 
 	@Override
-	public void configure(Evaluation entity) {
-		editor.configure(entity, this);
+	public void configure(Evaluation evaluation) {
+		editor.configure(evaluation, this);
+		view.setTitle("Sharing Settings - " + evaluation.getName() + " ("+evaluation.getId() + ")");
 		view.setPrimaryButtonVisible(true);
 		view.setDefaultButtonText(CANCEL);
 	}
