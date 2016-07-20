@@ -148,6 +148,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					public void onSuccess(WikiPage result) {
 						try {
 							updateCurrentPage(result);
+							view.setModifiedCreatedByHistoryPanelVisible(true);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
 							view.setWikiSubpagesWidgetVisible(showSubpages);
