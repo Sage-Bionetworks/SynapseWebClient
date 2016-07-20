@@ -14,8 +14,8 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -32,7 +32,7 @@ public class AdministerEvaluationsListTest {
 	public void setup() throws Exception{
 		mockView = mock(AdministerEvaluationsListView.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
-		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient, adapterFactory);
+		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient);
 		
 		ArrayList<String> evaluationResults = new ArrayList<String>();
 		

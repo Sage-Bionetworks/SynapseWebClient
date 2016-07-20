@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.evaluation;
 
 import java.util.List;
 
@@ -20,17 +20,22 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	private AdministerEvaluationsListView view;
 	private EvaluationAccessControlListModalWidget aclEditor;
 	private SynapseAlert synAlert;
+	private String entityId;
+	private CallbackP<Boolean> isChallengeCallback;
+	private EvaluationEditorModal evalEditor;
 	
 	@Inject
 	public AdministerEvaluationsList(
 			AdministerEvaluationsListView view, 
 			ChallengeClientAsync challengeClient,
 			EvaluationAccessControlListModalWidget aclEditor,
+			EvaluationEditorModal evalEditor,
 			SynapseAlert synAlert) {
 		this.challengeClient = challengeClient;
 		this.aclEditor = aclEditor;
 		this.view = view;
 		this.synAlert = synAlert;
+		this.evalEditor = evalEditor;
 		view.setPresenter(this);
 	}
 
@@ -40,6 +45,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
 	public void configure(String entityId, final CallbackP<Boolean> isChallengeCallback) {
+		this.entityId = entityId;
+		this.isChallengeCallback = isChallengeCallback;
 		view.clear();
 		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
 			@Override
@@ -49,6 +56,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 				}
 				if (isChallengeCallback != null)
 					isChallengeCallback.invoke(evaluations.size() > 0);
+				view.add(evalEditor.asWidget());
+				view.add(aclEditor.asWidget());
 			}
 			
 			@Override
@@ -57,18 +66,22 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 				view.add(synAlert);
 			}
 		});
-		
+	}
+	
+	public void refresh() {
+		configure(entityId, isChallengeCallback);
 	}
 	
 	@Override
 	public void onEditClicked(Evaluation evaluation) {
-		//TODO: new modal for editing evaluation
-		aclEditor.configure(evaluation);
-		aclEditor.showSharing(new Callback() {
+		//configure and show modal for editing evaluation
+		evalEditor.configure(evaluation, new Callback() {
 			@Override
 			public void invoke() {
+				refresh();
 			}
 		});
+		evalEditor.show();
 	}
 	
 	@Override

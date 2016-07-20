@@ -1,7 +1,7 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.widget.entity.EvaluationRowWidget.EvaluationActionHandler;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

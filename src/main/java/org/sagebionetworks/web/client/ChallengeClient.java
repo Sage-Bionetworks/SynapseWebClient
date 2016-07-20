@@ -59,4 +59,5 @@ public interface ChallengeClient extends RemoteService {
 	Set<String> getChallengeEvaluationIds(String challengeId) throws RestServiceException;
 
 	TeamSubmissionEligibility getTeamSubmissionEligibility(String evaluationId, String teamId) throws RestServiceException;
+	void updateEvaluation(Evaluation evaluation) throws RestServiceException;
 }

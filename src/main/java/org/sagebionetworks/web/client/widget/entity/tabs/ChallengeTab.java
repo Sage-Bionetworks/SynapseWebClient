@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 
 import com.google.inject.Inject;
 
