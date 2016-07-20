@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
@@ -66,5 +67,9 @@ public class UserSelector implements UserSelectorView.Presenter {
 	public void show() {
 		clear();
 		view.show();
+	}
+	
+	public void addModalShownHandler(ModalShownHandler modalShownHandler) {
+		view.addModalShownHandler(modalShownHandler);
 	}
 }
