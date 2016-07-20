@@ -202,7 +202,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedLabelVisible(bundle.getIsEdited());
 		boolean isDeleted = bundle.getIsDeleted();
-		view.setDeletedLabelVisible(isDeleted);
+		view.setDeletedThreadVisible(isDeleted);
 		view.setReplyContainer(!isDeleted);
 		view.setCommandsVisible(!isDeleted);
 		if (!isDeleted) {
@@ -216,8 +216,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
-		} else {
-			view.displayThreadDeleted();
 		}
 	}
 	

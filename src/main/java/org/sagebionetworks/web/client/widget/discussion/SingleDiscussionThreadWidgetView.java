@@ -92,9 +92,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void showSaving();
 
-	void setDeletedLabelVisible(boolean visible);
-
 	void setReplyContainer(boolean visible);
 
-	void displayThreadDeleted();
+	void setDeletedThreadVisible(boolean visible);
 }
