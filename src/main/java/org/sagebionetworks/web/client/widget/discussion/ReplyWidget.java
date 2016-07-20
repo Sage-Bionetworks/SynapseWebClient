@@ -43,6 +43,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private Callback deleteReplyCallback, replyClickedCallback;
 	private Set<Long> moderatorIds;
 	private String message;
+	private boolean isThreadDeleted;
 	
 	@Inject
 	public ReplyWidget(
@@ -72,7 +73,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setMarkdownWidget(markdownWidget.asWidget());
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback, Callback replyClickedCallback) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback, Callback replyClickedCallback, boolean isThreadDeleted) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
@@ -81,14 +82,18 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
 		this.replyClickedCallback = replyClickedCallback;
+		this.isThreadDeleted = isThreadDeleted;
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
 		view.setEditedVisible(bundle.getIsEdited());
-		view.setDeleteIconVisibility(isCurrentUserModerator);
-		view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
 		view.setIsAuthorModerator(isAuthorModerator);
+		view.setCommandsContainerVisible(!isThreadDeleted);
+		if (!isThreadDeleted) {
+			view.setDeleteIconVisibility(isCurrentUserModerator);
+			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+		}
 
 		configureMessage();
 	}
@@ -198,7 +203,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback, replyClickedCallback);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback, replyClickedCallback, isThreadDeleted);
 			}
 		});
 	}

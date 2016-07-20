@@ -27,6 +27,8 @@ import com.google.inject.Inject;
 
 public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThreadWidgetView {
 
+	private static final String RED_BORDER = "red-border";
+
 	public interface Binder extends UiBinder<Widget, SingleDiscussionThreadWidgetViewImpl> {}
 
 	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
@@ -81,6 +83,12 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Button saveButton;
 	@UiField
 	Button showAllRepliesButton;
+	@UiField
+	Div replyContainer;
+	@UiField
+	Label deleted;
+	@UiField
+	Div threadContainer;
 	
 	String threadLinkHref;
 	private Widget widget;
@@ -168,6 +176,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 		threadTitle.clear();
 		createdOn.clear();
 		replyListContainer.clear();
+		threadContainer.removeStyleName(RED_BORDER);
 	}
 
 	@Override
@@ -242,7 +251,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setEditedVisible(Boolean visible) {
+	public void setEditedLabelVisible(Boolean visible) {
 		edited.setVisible(visible);
 	}
 
@@ -329,5 +338,20 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void showSaving() {
 		saveButton.state().loading();
+	}
+
+	@Override
+	public void setDeletedLabelVisible(boolean visible) {
+		deleted.setVisible(visible);
+	}
+
+	@Override
+	public void setReplyContainer(boolean visible) {
+		replyContainer.setVisible(visible);
+	}
+
+	@Override
+	public void displayThreadDeleted() {
+		threadContainer.addStyleName(RED_BORDER);
 	}
 }

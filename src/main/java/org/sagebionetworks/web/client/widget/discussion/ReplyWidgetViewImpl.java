@@ -48,6 +48,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	HTMLPanel loadingMessage;
 	@UiField
 	Label moderatorBadge;
+	@UiField
+	Div commandsContainer;
 
 	private Widget widget;
 	private ReplyWidget presenter;
@@ -161,5 +163,10 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	@Override
 	public void setIsAuthorModerator(boolean isModerator) {
 		moderatorBadge.setVisible(isModerator);
+	}
+
+	@Override
+	public void setCommandsContainerVisible(boolean visible) {
+		commandsContainer.setVisible(visible);
 	}
 }

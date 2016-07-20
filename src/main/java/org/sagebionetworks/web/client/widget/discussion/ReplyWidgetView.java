@@ -46,4 +46,6 @@ public interface ReplyWidgetView extends IsWidget{
 	void showSuccess(String title, String message);
 	
 	void setIsAuthorModerator(boolean isModerator);
+
+	void setCommandsContainerVisible(boolean visible);
 }

@@ -7,7 +7,7 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div addStyleNames="overflow-x-hidden">
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
-		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
+		<bh:Div ui:field="threadContainer" addStyleNames="overflow-x-hidden">
 			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
@@ -54,7 +54,7 @@
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
+			<bh:Div ui:field="replyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT">
 					<b:TextBox ui:field="replyTextBox" placeholder="Write a reply..."/>
 					<bh:Div ui:field="newReplyContainer" visible="false">
 						<bh:Div ui:field="markdownEditorContainer"></bh:Div>
@@ -74,6 +74,7 @@
 					&nbsp;Loading...
 				</g:HTMLPanel>
 			</bh:Div>
+			<b:Label text="Deleted" ui:field="deleted" visible="false" type="DANGER" addStyleNames="margin-left-10 moveup-1 top-center"/>
 		</bh:Div>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
