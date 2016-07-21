@@ -29,7 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
@@ -53,6 +55,7 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -76,6 +79,7 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -121,9 +125,13 @@ public class EntityActionControllerImplTest {
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 	V2WikiPage mockWikiPageToDelete;
-
+	@Mock
+	EvaluationEditorModal mockEvalEditor;
+	@Mock
+	CookieProvider mockCookies;
 	@Before
 	public void before() {
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(EntityActionControllerView.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -156,7 +164,8 @@ public class EntityActionControllerImplTest {
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
+				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
+				mockEvalEditor, mockCookies);
 		
 		parentId = "syn456";
 		entityId = "syn123";
