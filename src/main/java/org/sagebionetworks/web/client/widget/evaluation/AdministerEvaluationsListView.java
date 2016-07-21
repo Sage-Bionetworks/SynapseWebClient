@@ -13,12 +13,12 @@ public interface AdministerEvaluationsListView extends IsWidget {
 	 */
 	void setPresenter(Presenter presenter);
 	void addRow(Evaluation ev);
-	void clear();
+	void clearRows();
 	void add(IsWidget w);
-	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter extends EvaluationActionHandler {
+		void onNewEvaluationClick();
 	}
 }

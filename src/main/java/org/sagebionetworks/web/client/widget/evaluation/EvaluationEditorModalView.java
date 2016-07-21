@@ -11,7 +11,9 @@ public interface EvaluationEditorModalView extends IsWidget {
 	String getSubmissionInstructionsMessage();
 	void setSubmissionReceiptMessage(String message);
 	String getSubmissionReceiptMessage();
+	void setSynAlert(IsWidget w);
 	void show();
+	void hide();
 	/**
 	 * Presenter interface
 	 */

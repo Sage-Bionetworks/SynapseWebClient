@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,6 +23,8 @@ public class EvaluationRowWidget implements IsWidget {
 	Button shareButton;
 	@UiField
 	Button editButton;
+	@UiField
+	Button deleteButton;
 	Widget widget;
 	
 	public interface Binder extends UiBinder<Widget, EvaluationRowWidget> {}
@@ -31,6 +36,7 @@ public class EvaluationRowWidget implements IsWidget {
 	public interface EvaluationActionHandler {
 		void onEditClicked(Evaluation evaluation);
 		void onShareClicked(Evaluation evaluation);
+		void onDeleteClicked(Evaluation evaluation);
 	}
 	
 	public EvaluationRowWidget() {
@@ -45,6 +51,18 @@ public class EvaluationRowWidget implements IsWidget {
 			@Override
 			public void onClick(ClickEvent event) {
 				handler.onEditClicked(evaluation);
+			}
+		});
+		deleteButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.showConfirmDialog("Delete Evaluation Queue?", DisplayConstants.CONFIRM_DELETE_EVAL_QUEUE + evaluation.getName(), 
+					new Callback() {
+						@Override
+						public void invoke() {
+							handler.onDeleteClicked(evaluation);
+						}
+					});
 			}
 		});
 	}

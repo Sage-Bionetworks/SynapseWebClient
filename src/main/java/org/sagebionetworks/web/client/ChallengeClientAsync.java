@@ -60,4 +60,6 @@ public interface ChallengeClientAsync {
 	void getChallengeEvaluationIds(String challengeId, AsyncCallback<Set<String>> callback);
 	void getTeamSubmissionEligibility(String evaluationId, String teamId, AsyncCallback<TeamSubmissionEligibility> callback);
 	void updateEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
+	void createEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
+	void deleteEvaluation(String evaluationId, AsyncCallback<Void> callback);
 }

@@ -36,7 +36,10 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 		this.view = view;
 		this.synAlert = synAlert;
 		this.evalEditor = evalEditor;
+		view.add(evalEditor.asWidget());
+		view.add(aclEditor.asWidget());
 		view.setPresenter(this);
+		view.add(synAlert);
 	}
 
 	/**
@@ -47,7 +50,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	public void configure(String entityId, final CallbackP<Boolean> isChallengeCallback) {
 		this.entityId = entityId;
 		this.isChallengeCallback = isChallengeCallback;
-		view.clear();
+		view.clearRows();
+		synAlert.clear();
 		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
 			@Override
 			public void onSuccess(List<Evaluation> evaluations) {
@@ -56,14 +60,12 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 				}
 				if (isChallengeCallback != null)
 					isChallengeCallback.invoke(evaluations.size() > 0);
-				view.add(evalEditor.asWidget());
-				view.add(aclEditor.asWidget());
+				
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-				view.add(synAlert);
 			}
 		});
 	}
@@ -94,6 +96,30 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 		});
 	}
 	
+	@Override
+	public void onNewEvaluationClick() {
+		evalEditor.configure(entityId, new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		});
+		evalEditor.show();
+	}
+	
+	@Override
+	public void onDeleteClicked(Evaluation evaluation) {
+		challengeClient.deleteEvaluation(evaluation.getId(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				refresh();	
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
 	
 	@Override
 	public Widget asWidget() {

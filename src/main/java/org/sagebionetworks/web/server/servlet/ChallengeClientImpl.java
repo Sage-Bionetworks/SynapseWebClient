@@ -460,4 +460,23 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		}
 	}
 	
+	@Override
+	public void createEvaluation(Evaluation evaluation) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.createEvaluation(evaluation);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}		
+	}
+	@Override
+	public void deleteEvaluation(String evaluationId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteEvaluation(evaluationId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}		
+	}
+
 }

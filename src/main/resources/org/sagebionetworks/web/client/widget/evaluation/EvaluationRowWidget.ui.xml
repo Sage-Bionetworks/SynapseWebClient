@@ -6,9 +6,10 @@
 >
 	<b:Container fluid="true" addStyleNames="border-bottom-1">
 		<b:Row>
-			<b:Column size="XS_12 MD_9">
+			<b:Column size="XS_12">
 				<b:Heading size="H5" >
 					<bh:Text ui:field="evaluationNameText"/>
+					<b:Button ui:field="deleteButton" type="DANGER" icon="TIMES" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL" height="22px"/>
 					<b:Button ui:field="shareButton" text="Share" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL"/>
 					<b:Button ui:field="editButton" icon="EDIT" text="Edit" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL"/>
 				</b:Heading>
