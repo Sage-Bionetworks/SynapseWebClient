@@ -51,6 +51,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -420,6 +421,32 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
 	}
 
+
+	@Test
+	public void testConfigureAddEvaluationNotInAlpha(){
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+	}
+	
+	@Test
+	public void testConfigureAddEvaluationInAlpha(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
+	}
+	
+	@Test
+	public void testConfigureAddEvaluationInAlphaNotProject(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+	}
 	
 	@Test
 	public void testConfigureMoveTable(){
