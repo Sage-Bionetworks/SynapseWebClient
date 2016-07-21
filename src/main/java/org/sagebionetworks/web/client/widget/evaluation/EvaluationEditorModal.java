@@ -7,10 +7,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EvaluationEditorModal implements EvaluationEditorModalView.Presenter {
+public class EvaluationEditorModal implements EvaluationEditorModalView.Presenter, IsWidget {
 	
 	private EvaluationEditorModalView view;
 	private ChallengeClientAsync challengeClient;

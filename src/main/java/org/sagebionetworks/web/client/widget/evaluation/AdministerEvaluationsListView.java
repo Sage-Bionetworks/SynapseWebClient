@@ -19,6 +19,6 @@ public interface AdministerEvaluationsListView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter extends EvaluationActionHandler {
-		void onNewEvaluationClick();
+		void onNewEvaluationClicked();
 	}
 }

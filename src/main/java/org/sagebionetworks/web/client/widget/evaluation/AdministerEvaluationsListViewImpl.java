@@ -33,7 +33,7 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 		newEvaluationButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onNewEvaluationClick();
+				presenter.onNewEvaluationClicked();
 			}
 		});
 	}

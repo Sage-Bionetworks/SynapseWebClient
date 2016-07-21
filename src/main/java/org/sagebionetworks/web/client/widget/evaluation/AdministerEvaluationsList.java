@@ -36,8 +36,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 		this.view = view;
 		this.synAlert = synAlert;
 		this.evalEditor = evalEditor;
-		view.add(evalEditor.asWidget());
-		view.add(aclEditor.asWidget());
+		view.add(evalEditor);
+		view.add(aclEditor);
 		view.setPresenter(this);
 		view.add(synAlert);
 	}
@@ -88,16 +88,12 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	
 	@Override
 	public void onShareClicked(Evaluation evaluation) {
-		aclEditor.configure(evaluation);
-		aclEditor.showSharing(new Callback() {
-			@Override
-			public void invoke() {
-			}
-		});
+		aclEditor.configure(evaluation, null);
+		aclEditor.show();
 	}
 	
 	@Override
-	public void onNewEvaluationClick() {
+	public void onNewEvaluationClicked() {
 		evalEditor.configure(entityId, new Callback() {
 			@Override
 			public void invoke() {
