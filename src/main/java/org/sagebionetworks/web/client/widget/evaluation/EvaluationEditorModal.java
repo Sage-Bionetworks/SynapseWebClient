@@ -22,10 +22,10 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 	private AsyncCallback<Void> rpcCallback;
 	@Inject
 	public EvaluationEditorModal(EvaluationEditorModalView view, 
-			ChallengeClientAsync synapseClient,
+			ChallengeClientAsync challengeClient,
 			SynapseAlert synAlert) {
 		this.view = view;
-		this.challengeClient = synapseClient;
+		this.challengeClient = challengeClient;
 		this.synAlert = synAlert;
 		
 		rpcCallback = new AsyncCallback<Void>() {
