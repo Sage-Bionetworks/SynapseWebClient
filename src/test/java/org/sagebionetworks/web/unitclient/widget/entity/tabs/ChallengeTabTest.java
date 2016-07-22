@@ -16,10 +16,10 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 
 import com.google.gwt.user.client.ui.Widget;
 

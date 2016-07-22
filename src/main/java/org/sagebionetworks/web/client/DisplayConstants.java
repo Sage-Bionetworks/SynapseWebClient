@@ -680,6 +680,8 @@ public class DisplayConstants {
 	public static final String COLUMN_CREATION_FAILED = "Column creation failed. Please try again.";
 	public static final String TABLE_UPDATE_FAILED = "Updating the table failed. Please try again.";
 	
+	public static final String CONFIRM_DELETE_EVAL_QUEUE = "Are you sure you want to delete evaluation queue: ";
+	
 	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
 	

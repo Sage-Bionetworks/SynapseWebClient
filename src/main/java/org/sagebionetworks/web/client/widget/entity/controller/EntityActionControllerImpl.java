@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -32,7 +33,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -41,6 +41,8 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -100,6 +102,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
+	EvaluationEditorModal evalEditor;
+	CookieProvider cookies;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -116,11 +120,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			UploadDialogWidget uploader,
 			WikiMarkdownEditor wikiEditor,
 			ProvenanceEditorWidget provenanceEditor,
-			StorageLocationWidget storageLocationEditor) {
+			StorageLocationWidget storageLocationEditor,
+			EvaluationEditorModal evalEditor,
+			CookieProvider cookies) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
-		this.view.addAccessControlListModalWidget(accessControlListModalWidget);
 		this.preflightController = preflightController;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
@@ -134,9 +139,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.wikiEditor = wikiEditor;
 		this.provenanceEditor = provenanceEditor;
 		this.storageLocationEditor = storageLocationEditor;
-		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
-		this.view.addProvenanceEditorModalWidget(provenanceEditor.asWidget());
-		this.view.addStorageLocationModalWidget(storageLocationEditor.asWidget());
+		this.evalEditor = evalEditor;
+		this.cookies = cookies;
+		this.view.addWidget(wikiEditor.asWidget());
+		this.view.addWidget(provenanceEditor.asWidget());
+		this.view.addWidget(storageLocationEditor.asWidget());
+		this.view.addWidget(accessControlListModalWidget);
+		this.view.addWidget(evalEditor.asWidget());
 	}
 
 	@Override
@@ -182,6 +191,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureCreateDOI();
 			configureEditProjectMetadataAction();
 			configureEditFileMetadataAction();
+			configureAddEvaluationAction();
 		}
 	}
 	
@@ -374,6 +384,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
+	private void configureAddEvaluationAction(){
+		if(entityBundle.getEntity() instanceof Project && DisplayUtils.isInTestWebsite(cookies)){
+			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
+			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
+		}else{
+			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		}
+	}
+
+	
 	private void configureEditFileMetadataAction(){
 		if(entityBundle.getEntity() instanceof FileEntity){
 			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
@@ -543,6 +565,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case ADD_COMMIT:
 			onAddCommit();
 			break;
+		case ADD_EVALUATION_QUEUE:
+			onAddEvaluationQueue();
+			break;
 		default:
 			break;
 		}
@@ -551,6 +576,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void onAddCommit() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void onAddEvaluationQueue() {
+		evalEditor.configure(entity.getId(), new Callback() {
+			@Override
+			public void invoke() {
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			}
+		});
+		evalEditor.show();
 	}
 
 	private void onChangeStorageLocation() {

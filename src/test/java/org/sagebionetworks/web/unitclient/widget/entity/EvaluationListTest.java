@@ -15,8 +15,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.widget.entity.EvaluationList;
-import org.sagebionetworks.web.client.widget.entity.EvaluationListView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationList;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 public class EvaluationListTest {
