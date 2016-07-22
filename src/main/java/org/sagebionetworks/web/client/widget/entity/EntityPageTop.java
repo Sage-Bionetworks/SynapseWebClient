@@ -203,16 +203,23 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		}
 		// set area token
-		if (area == EntityArea.WIKI) {
-			wikiAreaToken = areaToken;
-		} else if (area == EntityArea.TABLES) {
-			tablesAreaToken = areaToken;
-		} else if (area == EntityArea.DISCUSSION) {
-			discussionAreaToken = areaToken;
-		} else if (area == EntityArea.DOCKER) {
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				dockerAreaToken = areaToken;
-			}
+		
+		switch (area) {
+			case WIKI:
+				wikiAreaToken = areaToken;
+				break;
+			case TABLES:
+				tablesAreaToken = areaToken;
+				break;
+			case DISCUSSION:
+				discussionAreaToken = areaToken;
+				break;
+			case DOCKER:
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					dockerAreaToken = areaToken;
+				}
+				break;
+			default:
 		}
 
 		dockerTab.asTab().setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
