@@ -9,7 +9,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.LIMIT;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -155,7 +154,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String threadId = "1";
-		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -185,7 +184,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String threadId = "1";
-		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -216,7 +215,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isPinned = false;
 		String threadId = "1";
 		when(mockGlobalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY)).thenReturn(threadId);
-		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -233,7 +232,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String threadId = "1";
-		DiscussionThreadBundle threadBundle = createThreadBundle(threadId, "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -246,7 +245,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -264,7 +263,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		moderatorIds.add(Long.parseLong(CREATED_BY));
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -277,7 +276,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = true;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -291,7 +290,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CREATED_BY);
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -304,7 +303,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -324,7 +323,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = true;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -338,7 +337,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = true;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -352,7 +351,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -372,7 +371,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -391,7 +390,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = true;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
@@ -410,7 +409,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = true;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -459,7 +458,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -482,7 +481,7 @@ public class SingleDiscussionThreadWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
 			.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.setReplyIdCallback(mockReplyIdCallback);
@@ -508,7 +507,7 @@ public class SingleDiscussionThreadWidgetTest {
 		AsyncMockStubber.callFailureWith(ex)
 			.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, replyId, canModerate, moderatorIds, mockCallback);
@@ -539,11 +538,11 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
-		bundleList = createReplyBundleList(2);
+		bundleList = DiscussionTestUtils.createReplyBundleList(2);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
@@ -569,10 +568,10 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		bundleList = createReplyBundleList(0);
+		bundleList = DiscussionTestUtils.createReplyBundleList(0);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
@@ -597,7 +596,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		AsyncMockStubber.callFailureWith(new Exception())
@@ -624,10 +623,10 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 2L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		bundleList = createReplyBundleList(2);
+		bundleList = DiscussionTestUtils.createReplyBundleList(2);
 		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(LIMIT+1);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
@@ -655,7 +654,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String threadId = "123";
-		DiscussionThreadBundle bundle = createThreadBundle(threadId, "title", Arrays.asList("1"),
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle(threadId, "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
@@ -677,7 +676,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle("123", "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		String url = "url";
@@ -703,7 +702,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle bundle = createThreadBundle("123", "title", Arrays.asList("1"),
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle("123", "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
@@ -738,7 +737,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -758,7 +757,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = true;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		DiscussionThreadBundle threadBundle = createThreadBundle("1", "title",
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -797,7 +796,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String threadId = "123";
-		DiscussionThreadBundle bundle = createThreadBundle(threadId, "title", Arrays.asList("1"),
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle(threadId, "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
 		reset(mockView);
@@ -914,33 +913,5 @@ public class SingleDiscussionThreadWidgetTest {
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(exception);
 		verify(mockView).resetButton();
-	}
-
-	private DiscussionThreadBundle createThreadBundle(String threadId, String title,
-			List<String> activeAuthors, Long numberOfReplies, Long numberOfViews,
-			Date lastActivity, String messageKey, Boolean isDeleted, String createdBy,
-			Boolean isEdited, Boolean isPinned) {
-		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
-		threadBundle.setId(threadId);
-		threadBundle.setTitle(title);
-		threadBundle.setActiveAuthors(activeAuthors);
-		threadBundle.setNumberOfReplies(numberOfReplies);
-		threadBundle.setNumberOfViews(numberOfViews);
-		threadBundle.setLastActivity(lastActivity);
-		threadBundle.setMessageKey(messageKey);
-		threadBundle.setIsDeleted(isDeleted);
-		threadBundle.setCreatedBy(createdBy);
-		threadBundle.setIsEdited(isEdited);
-		threadBundle.setIsPinned(isPinned);
-		return threadBundle;
-	}
-
-	private List<DiscussionReplyBundle> createReplyBundleList(int numberOfBundle) {
-		List<DiscussionReplyBundle> list = new ArrayList<DiscussionReplyBundle>();
-		for (int i = 0; i < numberOfBundle; i++) {
-			DiscussionReplyBundle bundle = new DiscussionReplyBundle();
-			list.add(bundle);
-		}
-		return list;
 	}
 }
