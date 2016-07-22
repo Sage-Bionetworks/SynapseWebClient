@@ -168,6 +168,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		defaultThreadBundle.setIsPinned(false);
 		defaultThreadBundle.setNumberOfReplies(0L);
 		defaultThreadBundle.setNumberOfViews(1L);
+		defaultThreadBundle.setIsDeleted(false);
 		return defaultThreadBundle;
 	}
 	

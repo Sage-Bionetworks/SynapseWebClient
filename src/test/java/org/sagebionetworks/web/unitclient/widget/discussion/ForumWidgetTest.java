@@ -6,6 +6,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Set;
 
 import static junit.framework.Assert.*;
@@ -416,5 +418,27 @@ public class ForumWidgetTest {
 		verify(mockView).setDeletedThreadListVisible(true);
 		verify(mockDeletedThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), eq((CallbackP)null), eq(DiscussionFilter.DELETED_ONLY));
 		verify(mockView).setDeletedThreadButtonIcon(IconType.TOGGLE_DOWN);
+	}
+
+	@Test
+	public void testCreateDefaultTest(){
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle(
+				"1", "2", "3", "title", "messageKey", false, false, false, "4",
+				new Date(System.currentTimeMillis()),
+				new Date(System.currentTimeMillis()),
+				new Date(System.currentTimeMillis()), "etag",
+				Arrays.asList("5"), 2L, 8L);
+		DiscussionThreadBundle defaultThread = forumWidget.createDefaultThread(bundle);
+		assertEquals(defaultThread.getId(), bundle.getId());
+		assertEquals(defaultThread.getCreatedBy(), bundle.getCreatedBy());
+		assertEquals(defaultThread.getMessageKey(), bundle.getMessageKey());
+		assertEquals(defaultThread.getProjectId(), bundle.getProjectId());
+		assertEquals(defaultThread.getTitle(), bundle.getTitle());
+		assertNotNull(defaultThread.getActiveAuthors());
+		assertNotNull(defaultThread.getIsDeleted());
+		assertNotNull(defaultThread.getIsEdited());
+		assertNotNull(defaultThread.getIsPinned());
+		assertNotNull(defaultThread.getNumberOfReplies());
+		assertNotNull(defaultThread.getNumberOfViews());
 	}
 }
