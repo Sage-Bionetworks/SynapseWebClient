@@ -23,11 +23,7 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView{
 	@UiField
 	Modal addExternalRepoModal;
 	@UiField
-	TextBox registryHost;
-	@UiField
-	TextBox port;
-	@UiField
-	TextBox repoPath;
+	TextBox repoName;
 	@UiField
 	Div synAlertContainer;
 
@@ -72,25 +68,13 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView{
 	}
 
 	@Override
-	public String getRegistryHost() {
-		return registryHost.getText();
-	}
-
-	@Override
-	public String getPort() {
-		return port.getText();
-	}
-
-	@Override
-	public String getRepoPath() {
-		return repoPath.getText();
+	public String getRepoName() {
+		return repoName.getText();
 	}
 
 	@Override
 	public void clear() {
-		registryHost.setText("");
-		repoPath.setText("");
-		port.setText("");
+		repoName.setText("");
 		saveButton.state().reset();
 	}
 
