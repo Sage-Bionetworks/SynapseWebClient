@@ -12,7 +12,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -199,6 +198,8 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	
 	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+		this.currentEntity = targetEntity;
+		this.currentEntityId = targetEntity.getId();
 		this.handler = handler;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
