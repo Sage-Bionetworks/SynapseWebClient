@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.HasRpcToken;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.rpc.XsrfToken;
 import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.inject.Inject;
@@ -47,6 +46,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
 	private XsrfTokenServiceAsync xsrfTokenService;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public AuthenticationControllerImpl(
@@ -65,7 +65,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
 		this.xsrfTokenService = xsrfTokenService;
-		((ServiceDefTarget)xsrfTokenService).setServiceEntryPoint(gwt.getModuleBaseURL() + "xsrf");
+		this.gwt = gwt;
+		gwt.asServiceDefTarget(xsrfTokenService).setServiceEntryPoint(gwt.getModuleBaseURL() + "xsrf");
 	}
 
 	@Override
@@ -139,18 +140,18 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-	
+
 	private void updateXsrfToken(final UserSessionData userSessionData, final AsyncCallback<UserSessionData> callback) {
 		xsrfTokenService.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
-		  public void onSuccess(XsrfToken token) {
-			((HasRpcToken) synapseClient).setRpcToken(token);
-			localStorage.put(XSRF_TOKEN_KEY, token.getToken());
-			callback.onSuccess(userSessionData);
-		  }
+			public void onSuccess(XsrfToken token) {
+				gwt.asHasRpcToken(synapseClient).setRpcToken(token);
+				localStorage.put(XSRF_TOKEN_KEY, token.getToken());
+				callback.onSuccess(userSessionData);
+			}
 
-		  public void onFailure(Throwable caught) {
-			  callback.onFailure(caught);
-		  }
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
 		});
 	}
 

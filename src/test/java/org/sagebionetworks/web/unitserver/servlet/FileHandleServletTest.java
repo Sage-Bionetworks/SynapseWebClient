@@ -39,6 +39,10 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.user.client.rpc.RpcTokenException;
+import com.google.gwt.util.tools.shared.Md5Utils;
+import com.google.gwt.util.tools.shared.StringUtils;
+
 public class FileHandleServletTest {
 
 	HttpServletRequest mockRequest;
@@ -164,6 +168,8 @@ public class FileHandleServletTest {
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 		
 		setupFileEntity();
+		String xsrfToken = StringUtils.toHexString(Md5Utils.getMd5Digest(sessionToken.getBytes()));
+		when(mockRequest.getParameter(WebConstants.XSRF_TOKEN_KEY)).thenReturn(xsrfToken);
 		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -176,6 +182,26 @@ public class FileHandleServletTest {
 		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
+	}
+	
+	@Test (expected=RpcTokenException.class)
+	public void testDoGetLoggedInFileEntityInvalidXsrfToken() throws Exception {
+		String sessionToken = "fake";
+		String invalidXsrfToken = "wrong";
+		//set up general synapse client configuration test
+		String authBaseUrl = "authbase";
+		String repoServiceUrl = "repourl";
+		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
+		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
+		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		
+		setupFileEntity();
+		
+		when(mockRequest.getParameter(WebConstants.XSRF_TOKEN_KEY)).thenReturn(invalidXsrfToken);
+		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
 	}
 	
 	@Test
