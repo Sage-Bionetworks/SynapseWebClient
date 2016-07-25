@@ -260,7 +260,7 @@ public class AuthenticationControllerImplTest {
 		
 		//verify xsrf token has been updated
 		verify(mockServiceHasRpcToken).setRpcToken(mockXsrfToken);
-		verify(mockClientCache).put(AuthenticationControllerImpl.XSRF_TOKEN_KEY, xsrfToken);
+		verify(mockClientCache).put(eq(AuthenticationControllerImpl.XSRF_TOKEN_KEY), eq(xsrfToken), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
 	}

@@ -145,7 +145,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		xsrfTokenService.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
 			public void onSuccess(XsrfToken token) {
 				gwt.asHasRpcToken(synapseClient).setRpcToken(token);
-				localStorage.put(XSRF_TOKEN_KEY, token.getToken());
+				localStorage.put(XSRF_TOKEN_KEY, token.getToken(), DateUtils.getDayFromNow().getTime());
 				callback.onSuccess(userSessionData);
 			}
 
