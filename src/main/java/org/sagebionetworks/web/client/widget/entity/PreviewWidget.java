@@ -16,13 +16,13 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -46,18 +46,21 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	SynapseJSNIUtils synapseJSNIUtils;
 	SynapseAlert synapseAlert;
 	SynapseClientAsync synapseClient;
+	AuthenticationController authController;
 	
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseAlert synapseAlert,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			AuthenticationController authController) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
 		this.synapseClient = synapseClient;
+		this.authController = authController;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -154,18 +157,19 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
+		String xsrfToken = authController.getCurrentXsrfToken();
 		if (previewType != PreviewFileType.NONE) {
 			FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
-				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false), 
-									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
+				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
+									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, xsrfToken));
 			}
 			else { //must be a text type of some kind
 				//try to load the text of the preview, if available
 				//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
-				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true));
+				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true, xsrfToken));
 				try {
 					requestBuilder.sendRequest(null, new RequestCallback() {
 						public void onError(final Request request, final Throwable e) {

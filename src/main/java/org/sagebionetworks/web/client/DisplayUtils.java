@@ -1299,8 +1299,8 @@ public class DisplayUtils {
 					wikiIdParam;
 	}
 		
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
-		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, String xsrfToken){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false, xsrfToken);
 	}
 	
 	public static String getParamForNoCaching() {
@@ -1326,12 +1326,13 @@ public class DisplayUtils {
 	 * @param entityid
 	 * @return
 	 */
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy, String xsrfToken){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
-				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + "&" + 
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken +
 				versionParam;
 	}
 

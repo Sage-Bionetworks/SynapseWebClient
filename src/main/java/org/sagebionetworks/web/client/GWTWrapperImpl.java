@@ -17,6 +17,8 @@ import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
+import com.google.gwt.user.client.rpc.HasRpcToken;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -138,5 +140,14 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public void replaceItem(String historyToken, boolean issueEvent) {
 		History.replaceItem(historyToken, issueEvent);
+	}
+	
+	@Override
+	public ServiceDefTarget asServiceDefTarget(Object serviceAsync) {
+		return (ServiceDefTarget)serviceAsync;
+	}
+	@Override
+	public HasRpcToken asHasRpcToken(Object service) {
+		return (HasRpcToken) service;
 	}
 }
