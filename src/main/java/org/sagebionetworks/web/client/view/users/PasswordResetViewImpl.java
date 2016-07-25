@@ -285,11 +285,6 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	}
 
 	@Override
-	public void showMessage(String message) {
-		contentHtml.setInnerHTML(message);
-	}
-
-	@Override
 	public void showLoading() {
 		loadingPanel.setWidget(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		loadingPanel.setVisible(true);		
