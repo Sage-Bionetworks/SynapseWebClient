@@ -17,8 +17,6 @@ public interface PasswordResetView extends IsWidget, SynapseView {
 	
 	public void showResetForm();
 	
-	public void showMessage(String message);
-	
 	public void showPasswordResetSuccess();
 	
 	public void showRequestSentSuccess();

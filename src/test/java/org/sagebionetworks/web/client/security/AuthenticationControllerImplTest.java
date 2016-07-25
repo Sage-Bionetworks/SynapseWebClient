@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.security;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +26,8 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -34,6 +36,10 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.HasRpcToken;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.rpc.XsrfToken;
+import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 
 
 /**
@@ -43,32 +49,48 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class AuthenticationControllerImplTest {
 
 	AuthenticationControllerImpl authenticationController;
+	@Mock
 	CookieProvider mockCookieProvider;
+	@Mock
 	UserAccountServiceAsync mockUserAccountService;
 	UserSessionData sessionData;
 	@Mock
 	SessionStorage mockSessionStorage;
 	@Mock
 	ClientCache mockClientCache;
+	@Mock
+	XsrfTokenServiceAsync mockXsrfTokenService;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
+	@Mock
+	GWTWrapper mockGWT;
+	@Mock
+	ServiceDefTarget mockServiceDefTarget;
+	@Mock
+	XsrfToken mockXsrfToken;
+	@Mock
+	HasRpcToken mockServiceHasRpcToken;
+	
+	String xsrfToken = "12barbaz34";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		mockCookieProvider = mock(CookieProvider.class);
-		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		
 		//by default, return a valid user session data if asked
 		sessionData = new UserSessionData();
 		sessionData.setIsSSO(false);
 		sessionData.setProfile(new UserProfile());
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1111");
+		when(mockXsrfToken.getToken()).thenReturn(xsrfToken);
+		AsyncMockStubber.callSuccessWith(mockXsrfToken).when(mockXsrfTokenService).getNewXsrfToken(any(AsyncCallback.class));
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory);
+		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
+		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT);
 	}
 	
 	@Test
@@ -207,6 +229,8 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testLoginUser() {
+		verify(mockServiceDefTarget).setServiceEntryPoint(anyString());
+		
 		String username = "testusername";
 		String password = "pw";
 		String oldAuthReceipt = "1234";
@@ -233,6 +257,11 @@ public class AuthenticationControllerImplTest {
 		
 		//verify the new receipt is cached
 		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
+		
+		//verify xsrf token has been updated
+		verify(mockServiceHasRpcToken).setRpcToken(mockXsrfToken);
+		verify(mockClientCache).put(eq(AuthenticationControllerImpl.XSRF_TOKEN_KEY), eq(xsrfToken), anyLong());
+		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
 	}
 	

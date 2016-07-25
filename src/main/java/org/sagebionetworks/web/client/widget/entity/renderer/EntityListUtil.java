@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -49,7 +47,7 @@ public class EntityListUtil {
 			final SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
 			final boolean isLoggedIn,
 			List<EntityGroupRecord> records, final int rowIndex,
-			final RowLoadedHandler handler) throws IllegalArgumentException {
+			final RowLoadedHandler handler, final String xsrfToken) throws IllegalArgumentException {
 		if(records == null || rowIndex >= records.size()) {
 			throw new IllegalArgumentException();
 		}
@@ -64,7 +62,7 @@ public class EntityListUtil {
 				try {				
 					// Old behavior.
 					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record,
-							synapseJSNIUtils, bundle.getEntity().getDescription()));
+							synapseJSNIUtils, bundle.getEntity().getDescription(), xsrfToken));
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -134,7 +132,7 @@ public class EntityListUtil {
 	private static EntityGroupRecordDisplay createRecordDisplay(
 			boolean isLoggedIn, EntityBundle bundle,
 			EntityGroupRecord record, SynapseJSNIUtils synapseJSNIUtils, 
-			String description)
+			String description, String xsrfToken)
 			throws JSONObjectAdapterException {
 		Entity referencedEntity = bundle.getEntity();
 
@@ -151,7 +149,7 @@ public class EntityListUtil {
 			if(bundle.getEntity() instanceof FileEntity)
 				downloadUrl = "#" + nameLinkUrl;
 		}  else if(referencedEntity instanceof FileEntity) {					
-			downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((FileEntity) referencedEntity).getVersionNumber(), false);
+			downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((FileEntity) referencedEntity).getVersionNumber(), false, xsrfToken);
 		}
 		
 		// version

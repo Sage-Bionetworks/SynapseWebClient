@@ -55,7 +55,7 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
 					}
-				});
+				}, authenticationController.getCurrentXsrfToken());
 			}			
 		}		
 	}

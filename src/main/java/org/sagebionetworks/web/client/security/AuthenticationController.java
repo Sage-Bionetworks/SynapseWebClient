@@ -64,4 +64,6 @@ public interface AuthenticationController {
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);
 	
 	public void updateCachedProfile(UserProfile updatedProfile);
+	
+	public String getCurrentXsrfToken();
 }
