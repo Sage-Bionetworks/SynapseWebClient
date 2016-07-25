@@ -28,7 +28,6 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -109,7 +108,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				@Override
 				public void invoke() {
 					try {
-						String result = markdownIt.markdown2Html(SafeHtmlUtils.htmlEscapeAllowEntities(md), uniqueSuffix);
+						String result = markdownIt.markdown2Html(md, uniqueSuffix);
 						//avoid cache for new md processor until it is in good shape.
 //						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
 						loadHtml(uniqueSuffix, result);
