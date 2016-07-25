@@ -12,7 +12,7 @@ public interface VideoWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(WikiPageKey wikiKey, String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height, boolean isLoggedIn, Long wikiVersion);
+	public void configure(WikiPageKey wikiKey, String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height, boolean isLoggedIn, Long wikiVersion, String xsrfToken);
 	
 	/**
 	 * Presenter interface

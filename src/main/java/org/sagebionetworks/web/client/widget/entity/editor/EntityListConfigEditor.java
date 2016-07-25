@@ -59,7 +59,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
 					}
-				});
+				}, authenticationController.getCurrentXsrfToken());
 			}			
 		}
 
@@ -80,7 +80,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 				public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 					view.setEntityGroupRecordDisplay(addedIndex, entityGroupRecordDisplay, isLoggedIn);
 				}
-			});	
+			}, authenticationController.getCurrentXsrfToken());	
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
 		}

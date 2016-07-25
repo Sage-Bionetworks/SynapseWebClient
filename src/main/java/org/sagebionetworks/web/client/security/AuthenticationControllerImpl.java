@@ -34,6 +34,7 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
+	public static final String XSRF_TOKEN_KEY = "org.sagebionetworks.XSRFToken";
 	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
@@ -109,6 +110,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		localStorage.remove(USER_SESSION_DATA_CACHE_KEY);
+		localStorage.remove(XSRF_TOKEN_KEY);
 		sessionStorage.clear();
 		currentUser = null;
 	}
@@ -142,6 +144,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		xsrfTokenService.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
 		  public void onSuccess(XsrfToken token) {
 			((HasRpcToken) synapseClient).setRpcToken(token);
+			localStorage.put(XSRF_TOKEN_KEY, token.getToken());
 			callback.onSuccess(userSessionData);
 		  }
 
@@ -233,5 +236,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
+	}
+	@Override
+	public String getCurrentXsrfToken() {
+		return localStorage.get(XSRF_TOKEN_KEY);
 	}
 }

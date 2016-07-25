@@ -99,6 +99,7 @@ public class WebConstants {
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
 
 	public static final String PROXY_PARAM_KEY = "proxy";
+	public static final String XSRF_TOKEN_KEY = "xsrfToken";
 	
 	public static final String REDIRECT_URL_KEY = "redirect";
 
