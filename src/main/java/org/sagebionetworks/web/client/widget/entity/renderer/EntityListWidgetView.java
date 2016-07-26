@@ -12,7 +12,7 @@ public interface EntityListWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure();
+	public void configure(boolean showDescription);
 	
 	public void setEntityGroupRecordDisplay(final int rowIndex,
 			final EntityGroupRecordDisplay display, boolean isLoggedIn);

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -17,9 +18,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -37,14 +36,14 @@ public class EntityListRenderer extends SimplePanel {
 	private static final String HEADER_NOTE = "Note";
 	private static final String HEADER_EDIT_MENU = " ";
 	
-	private static final int HEADER_NAME_IDX = 0;
-	private static final int HEADER_DOWNLOAD_IDX = 1;
-	private static final int HEADER_VERSION_IDX = 2;
-	private static final int HEADER_DESC_IDX = 3;
-	private static final int HEADER_DATE_IDX = 4;
-	private static final int HEADER_CREATEDBY_IDX = 5;
-	private static final int HEADER_NOTE_IDX = 6;
-	private static final int HEADER_EDIT_MENU_IDX = 7;
+	private int headerNameIndex;
+	private int headerDownloadIndex;
+	private int headerVersionIndex;
+	private int headerDescriptionIndex;
+	private int headerDateIndex;
+	private int headerCreatedByIndex;
+	private int headerNoteIndex;
+	private int headerEditMenuIndex;
 
 	
 	private IconsImageBundle iconsImageBundle;		
@@ -59,12 +58,12 @@ public class EntityListRenderer extends SimplePanel {
 	}
 			
 	public EntityListRenderer(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, boolean canEdit) {
+			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, boolean canEdit, boolean showDescription) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
 		
-		setWidget(initTable(canEdit));
+		setWidget(initTable(canEdit, showDescription));
 				
 		uniqueId = Random.nextInt();
 	}
@@ -88,8 +87,7 @@ public class EntityListRenderer extends SimplePanel {
 		if(display.getDownloadUrl() != null && !"".equals(display.getDownloadUrl())) {
 			Anchor link = new Anchor();
 			link.setHref(display.getDownloadUrl());
-			link.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.NavigateDown16())));
-			link.setStyleName("link");
+			link.setIcon(IconType.DOWNLOAD);
 			if(isLoggedIn) {
 				// logged in users want to stay on the entity list page when downloading
 				link.setTarget("_new");
@@ -113,23 +111,25 @@ public class EntityListRenderer extends SimplePanel {
 	
 	private void setRow(int rowIndex, Widget nameLink, Widget downloadLink,
 			SafeHtml version, HTML description, Date date,
-			String createdByPrincipalId, SafeHtml note) {			
-		table.setWidget(rowIndex, HEADER_NAME_IDX, nameLink);
-		table.setWidget(rowIndex, HEADER_DOWNLOAD_IDX, downloadLink);			
-		if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);			
-		table.setWidget(rowIndex, HEADER_DESC_IDX, description);
-		table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : synapseJSNIUtils.convertDateToSmallString(date) + "</br>&nbsp;");
+			String createdByPrincipalId, SafeHtml note) {
+		table.setWidget(rowIndex, headerNameIndex, nameLink);
+		table.setWidget(rowIndex, headerDownloadIndex, downloadLink);			
+		if(version != null) table.setHTML(rowIndex, headerVersionIndex, version);
+		if (headerDescriptionIndex > -1) {
+			table.setWidget(rowIndex, headerDescriptionIndex, description);	
+		}
+		table.setHTML(rowIndex, headerDateIndex, date == null ? "" : synapseJSNIUtils.convertDateToSmallString(date) + "</br>&nbsp;");
 		//set userbadge widget
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 		createdByBadge.configure(createdByPrincipalId);
-		table.setWidget(rowIndex, HEADER_CREATEDBY_IDX, createdByBadge.asWidget());
+		table.setWidget(rowIndex, headerCreatedByIndex, createdByBadge.asWidget());
 		updateRowNote(rowIndex, note);
 	}
 	
 	public void updateRowNote(int rowIndex, SafeHtml note) {
 		HTML noteDiv = new HTML(note);
 		noteDiv.addStyleName(ClientProperties.STYLE_BREAK_WORD);			
-		table.setWidget(rowIndex, HEADER_NOTE_IDX, noteDiv);
+		table.setWidget(rowIndex, headerNoteIndex, noteDiv);
 	}
 	
 	public void removeRow(int rowIndex) {
@@ -145,50 +145,60 @@ public class EntityListRenderer extends SimplePanel {
 		if(deleteRow != null) {
 			menu.showDelete(deleteRow);
 		}
-		table.setWidget(rowIndex, HEADER_EDIT_MENU_IDX, menu.asWidget());
+		if (headerEditMenuIndex > -1) {
+			table.setWidget(rowIndex, headerEditMenuIndex, menu.asWidget());	
+		}
 	}
 	
 	/*
 	 * Private Methods
 	 */
-	private Widget initTable(boolean canEdit) {
+	private Widget initTable(boolean canEdit, boolean showDescription) {
 		table = new BootstrapTable();
 		table.addStyleName("table-striped table-bordered table-condensed");
+		int colIndex = 0;
 		List<String> headerRow = new ArrayList<String>();
-		headerRow.add(HEADER_NAME_IDX, HEADER_NAME);
-		headerRow.add(HEADER_DOWNLOAD_IDX, HEADER_DOWNLOAD);
-		headerRow.add(HEADER_VERSION_IDX, HEADER_VERSION);
-		headerRow.add(HEADER_DESC_IDX, HEADER_DESC);
-		headerRow.add(HEADER_DATE_IDX, HEADER_DATE);
-		headerRow.add(HEADER_CREATEDBY_IDX, HEADER_CREATEDBY);
-		headerRow.add(HEADER_NOTE_IDX, HEADER_NOTE);	
+		headerNameIndex = colIndex++;
+		headerRow.add(headerNameIndex, HEADER_NAME);
+		headerDownloadIndex = colIndex++;
+		headerRow.add(headerDownloadIndex, HEADER_DOWNLOAD);
+		headerVersionIndex = colIndex++;
+		headerRow.add(headerVersionIndex, HEADER_VERSION);
+		headerDescriptionIndex = -1;
+		if (showDescription) {
+			headerDescriptionIndex = colIndex++;
+			headerRow.add(headerDescriptionIndex, HEADER_DESC);	
+		}
+		headerDateIndex = colIndex++;
+		headerRow.add(headerDateIndex, HEADER_DATE);
+		
+		headerCreatedByIndex = colIndex++;
+		headerRow.add(headerCreatedByIndex, HEADER_CREATEDBY);
+		
+		headerNoteIndex = colIndex++;
+		headerRow.add(headerNoteIndex, HEADER_NOTE);
+		headerEditMenuIndex = -1;
 		if(canEdit) {
-			headerRow.add(HEADER_EDIT_MENU_IDX, HEADER_EDIT_MENU);
+			headerEditMenuIndex = colIndex++;
+			headerRow.add(headerEditMenuIndex, HEADER_EDIT_MENU);
 		}
 		List<List<String>> tableHeaderRows = new ArrayList<List<String>>();
 		tableHeaderRows.add(headerRow);
 		table.setHeaders(tableHeaderRows);			
 
-		table.setWidth("100%");		
-		if(!canEdit) {
-			table.getColumnFormatter().setWidth(0, "23%");
-			table.getColumnFormatter().setWidth(1, "7%");
-			table.getColumnFormatter().setWidth(2, "7%");
-			table.getColumnFormatter().setWidth(3, "23%");
-			table.getColumnFormatter().setWidth(4, "10%");
-			table.getColumnFormatter().setWidth(5, "10%");
-			table.getColumnFormatter().setWidth(6, "20%");
-		} else {				
-			table.getColumnFormatter().setWidth(0, "20%");
-			table.getColumnFormatter().setWidth(1, "7%");
-			table.getColumnFormatter().setWidth(2, "7%");
-			table.getColumnFormatter().setWidth(3, "20%");
-			table.getColumnFormatter().setWidth(4, "10%");
-			table.getColumnFormatter().setWidth(5, "10%");
-			table.getColumnFormatter().setWidth(6, "20%");				
-			table.getColumnFormatter().setWidth(7, "6%"); // edit column
+		table.setWidth("100%");
+		// leave name column width unset (to take the extra, which ranges from 20%-46%)
+		table.getColumnFormatter().setWidth(headerDownloadIndex, "28px");
+		table.getColumnFormatter().setWidth(headerVersionIndex, "7%");
+		if (showDescription) {
+			table.getColumnFormatter().setWidth(headerDescriptionIndex, "20%");
 		}
-		
+		table.getColumnFormatter().setWidth(headerDateIndex, "10%");
+		table.getColumnFormatter().setWidth(headerCreatedByIndex, "10%");
+		table.getColumnFormatter().setWidth(headerNoteIndex, "20%");
+		if (canEdit) {
+			table.getColumnFormatter().setWidth(headerEditMenuIndex, "6%");
+		}
 		return table;
 	}
 
