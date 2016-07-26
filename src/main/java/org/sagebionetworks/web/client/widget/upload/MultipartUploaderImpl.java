@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import java.util.Collections;
+import java.util.Date;
 
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.AddPartState;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -65,7 +65,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	//Keep track of the part number (1-based index) that we are currently trying to upload.
 	private int currentPartNumber;
 	private int completedPartCount;
-	
+	private long startTime, nextProgressPoint;
+	private String uploadSpeed;
 	//in alpha mode, upload log is sent to the js console
 	private boolean isDebugLevelLogging = false;
 	
@@ -147,6 +148,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				public void onSuccess(MultipartUploadStatus status) {
 					currentStatus = status;
 					currentPartNumber = 0;
+					startTime = new Date().getTime();
+					nextProgressPoint = 2000;
+					uploadSpeed = "";
 					totalPartCount = currentStatus.getPartsState().length();
 					completedPartCount = getCompletedPartCount(currentStatus.getPartsState());
 					attemptToUploadNextPart();
@@ -225,12 +229,20 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					log("attemptChunkUpload: uploading file chunk. ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
 					ProgressCallback progressCallback = new ProgressCallback() {
 						@Override
-						public void updateProgress(double value) {
+						public void updateProgress(double loaded, double total) {
 							//Note:  0 <= value <= 1
 							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-							double currentProgress = (((double)(completedPartCount)) + value)/((double)totalPartCount);
+							double currentPartPercent = loaded / total;
+							double currentProgress = (((double)(completedPartCount)) + currentPartPercent)/((double)totalPartCount);
 							String progressText = percentFormat.format(currentProgress*100.0) + "%";
-							handler.updateProgress(currentProgress, progressText);
+							// update uploadSpeed every couple of seconds
+							long msElapsed = (new Date().getTime() - startTime);
+							if (msElapsed > 0 && (msElapsed > nextProgressPoint)) {
+								double totalBytesTransfered = (request.getPartSizeBytes() * completedPartCount) + loaded;
+								uploadSpeed = "("+DisplayUtils.getFriendlySize(totalBytesTransfered / (msElapsed / 1000), true) + "/s)";
+								nextProgressPoint += 2000;
+							}
+							handler.updateProgress(currentProgress, progressText, uploadSpeed);
 						}
 					};
 					synapseJsniUtils.uploadFileChunk(BINARY_CONTENT_TYPE, fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
