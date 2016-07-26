@@ -580,7 +580,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private Anchor createPaginationAnchor(String anchorName, String currentSearchJSON, final long newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);
+		a.setHTML(SafeHtmlUtils.htmlEscape(anchorName));
 		a.setHref(DisplayUtils.getSearchHistoryToken(currentSearchJSON, newStart));
 		return a;
 	}

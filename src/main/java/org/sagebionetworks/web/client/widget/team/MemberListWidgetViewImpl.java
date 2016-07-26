@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -217,7 +218,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);
+		a.setHTML(SafeHtmlUtils.htmlEscape(anchorName));
 		a.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {
