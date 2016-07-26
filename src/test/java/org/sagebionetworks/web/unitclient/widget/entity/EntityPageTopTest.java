@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -199,7 +200,7 @@ public class EntityPageTopTest {
 		reset(mockView);
 		pageTop.configure(mockProjectEntity, null, mockProjectHeader, null, null);
 		showProjectInfoCallback.invoke(null);
-		verify(mockView).setProjectInformationVisible(true);
+		verify(mockView, atLeastOnce()).setProjectInformationVisible(true);
 	}
 	
 	@Test
