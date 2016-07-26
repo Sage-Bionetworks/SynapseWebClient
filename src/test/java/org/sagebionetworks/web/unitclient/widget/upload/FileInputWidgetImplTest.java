@@ -38,6 +38,8 @@ public class FileInputWidgetImplTest {
 		multipartUploaderStub.setFileHandle(fileHandleId);
 		String[] progress = new String[]{"one","two", "three"};
 		multipartUploaderStub.setProgressText(progress);
+		String[] uploadSpeed = new String[]{"1 MB/s","2 MB/s", "3 MB/s"};
+		multipartUploaderStub.setUploadSpeed(uploadSpeed);
 		widget.uploadSelectedFile(mockHandler);
 		verify(mockView).setInputEnabled(false);
 		// update at the start and end, plus each actual update
@@ -53,6 +55,8 @@ public class FileInputWidgetImplTest {
 		multipartUploaderStub.setFileHandle(fileHandleId);
 		String[] progress = new String[]{"one","two", "three"};
 		multipartUploaderStub.setProgressText(progress);
+		String[] uploadSpeed = new String[]{"1 MB/s","2 MB/s", "3 MB/s"};
+		multipartUploaderStub.setUploadSpeed(uploadSpeed);
 		String error = "an error";
 		multipartUploaderStub.setError(error);
 		widget.uploadSelectedFile(mockHandler);

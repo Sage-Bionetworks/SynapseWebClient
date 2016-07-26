@@ -230,10 +230,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					ProgressCallback progressCallback = new ProgressCallback() {
 						@Override
 						public void updateProgress(double loaded, double total) {
-							//Note:  0 <= value <= 1
-							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-							double currentPartPercent = loaded / total;
-							double currentProgress = (((double)(completedPartCount)) + currentPartPercent)/((double)totalPartCount);
+							//0 < currentPartProgress < 1.  We need to add this to the chunks that have already been uploaded. And divide by the total chunk count.
+							double currentPartProgress = loaded / total;
+							double currentProgress = (((double)(completedPartCount)) + currentPartProgress)/((double)totalPartCount);
 							String progressText = percentFormat.format(currentProgress*100.0) + "%";
 							// update uploadSpeed every couple of seconds
 							long msElapsed = (new Date().getTime() - startTime);

@@ -13,6 +13,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 	String fileHandle;
 	String error;
 	String[] progressText;
+	String[] uploadSpeed;
 
 	@Override
 	public void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId) {
@@ -33,7 +34,8 @@ public class MultipartUploaderStub implements MultipartUploader {
 		if(this.progressText != null){
 			int index = 0;
 			for(String message: progressText){
-				handler.updateProgress(index++, message);
+				String currentUploadSpeed = uploadSpeed[index];
+				handler.updateProgress(index++, message, currentUploadSpeed);
 			}
 		}
 		if(error != null){
@@ -53,5 +55,9 @@ public class MultipartUploaderStub implements MultipartUploader {
 
 	public void setProgressText(String...progressText) {
 		this.progressText = progressText;
+	}
+	
+	public void setUploadSpeed(String...uploadSpeed) {
+		this.uploadSpeed = uploadSpeed;
 	}
 }
