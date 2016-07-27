@@ -148,7 +148,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
-				view.setMediaObjectPanel(team);
+				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
 				view.setTeamEmailAddress(getTeamEmail(team.getName()));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 

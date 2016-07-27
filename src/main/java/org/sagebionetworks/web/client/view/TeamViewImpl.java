@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
@@ -184,10 +183,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	@Override
-	public void setMediaObjectPanel(Team team) {
+	public void setMediaObjectPanel(Team team, String xsrfToken) {
 		String pictureUrl = null;
 		if (team.getIcon() != null) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()) + "&imageId=" + team.getIcon();
+			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken) + "&imageId=" + team.getIcon();
 		}
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());

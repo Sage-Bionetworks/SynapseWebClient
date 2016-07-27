@@ -61,6 +61,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -130,7 +131,6 @@ public class DisplayUtils {
 		if(icon == null) return null;		
 		return "<span class=\"iconSpan\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
 	}
-	
 	public static String getFriendlySize(double size, boolean abbreviatedUnits) {
 		NumberFormat df = NumberFormat.getDecimalFormat();
 		if(size >= TB) {
@@ -780,8 +780,8 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
-			boolean preview, Long wikiVersion) {
-		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview);
+			boolean preview, Long wikiVersion, String xsrfToken) {
+		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview, xsrfToken);
 		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
 	}
 	
@@ -793,7 +793,7 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview, String xsrfToken){
 		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
 //		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
 //		return repoServicesUrl 
@@ -807,6 +807,7 @@ public class DisplayUtils {
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken + "&" +
 				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
 					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam;
@@ -835,24 +836,6 @@ public class DisplayUtils {
 				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken +
 				versionParam;
 	}
-
-	/**
-	 * Create the url to a Table cell file handle.
-	 * @param baseFileHandleUrl
-	 * @param details
-	 * @param preview
-	 * @param proxy
-	 * @return
-	 */
-	public static String createTableCellFileEntityUrl(String baseFileHandleUrl, TableCellFileHandle details, boolean preview, boolean proxy){		
-		return baseFileHandleUrl + "?" +
-				WebConstants.ENTITY_PARAM_KEY + "=" + details.getTableId() + "&" +
-				WebConstants.TABLE_COLUMN_ID + "=" + details.getColumnId() + "&" +
-				WebConstants.TABLE_ROW_ID + "=" + details.getRowId() + "&" +
-				WebConstants.TABLE_ROW_VERSION_NUMBER + "=" + details.getVersionNumber() + "&" +
-				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
-				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy);
-	}
 	
 	/**
 	 * Create the url to a Team icon filehandle.
@@ -860,9 +843,10 @@ public class DisplayUtils {
 	 * @param teamId
 	 * @return
 	 */
-	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
+	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId, String xsrfToken){
 		return baseFileHandleUrl + "?" +
-				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId + "&" +
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
 
 
