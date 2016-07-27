@@ -350,6 +350,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			if (isWikiTabShown) {
 				//initially push the configured place into the browser history
 				tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				view.setProjectInformationVisible(true);
 			}
 	
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){

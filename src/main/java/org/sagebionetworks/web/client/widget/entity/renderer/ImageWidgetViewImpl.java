@@ -51,10 +51,10 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		// If the wiki page is showing a different/old version, we need to get the URL to that version's attachments
 		if(wikiVersion != null) {
 			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false, xsrfToken) :
-				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion);
+				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion, xsrfToken);
 		} else {
 			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false, xsrfToken) :
-				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
+				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, xsrfToken);
 		}
 		
 		image = new Image();

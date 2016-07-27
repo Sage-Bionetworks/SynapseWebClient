@@ -9,13 +9,16 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
@@ -37,12 +40,15 @@ public class FileCellRendererImplTest {
 	Throwable error;
 	Stubber succesStubber;
 	Stubber failureStubber;
-	
+	@Mock
+	AuthenticationController mockAuthController;
+	String xsrfToken = "98208";
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(FileCellRendererView.class);
 		mockFileHandleProvider = Mockito.mock(AsynchTableFileHandleProvider.class);
-		renderer = new FileCellRendererImpl(mockView, mockFileHandleProvider);
+		renderer = new FileCellRendererImpl(mockView, mockFileHandleProvider, mockAuthController);
 		tableId = "syn123";
 		column = new ColumnModel();
 		column.setId("456");
@@ -64,11 +70,12 @@ public class FileCellRendererImplTest {
 				return null;
 			}
 		}).when(mockFileHandleProvider).requestFileHandle(any(TableFileHandleRequest.class));
+		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
 	public void testCreateAnchorHref(){
-		String expectedHref = "/Portal/filehandle?entityId=syn123&columnId=456&rowId=15&rowVersionNumber=2";
+		String expectedHref = "/Portal/filehandle?entityId=syn123&columnId=456&rowId=15&rowVersionNumber=2&xsrfToken=98208";
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	
