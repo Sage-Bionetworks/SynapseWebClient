@@ -37,7 +37,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	}
 	
 	@Override
-	public void setTeam(final Team team, String description) {
+	public void setTeam(final Team team, String description, String xsrfToken) {
 		clear();
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
@@ -51,7 +51,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		};
 		String pictureUrl = null;
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
+			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken);
 		}
 		
 		addBadgeMedia(DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5));

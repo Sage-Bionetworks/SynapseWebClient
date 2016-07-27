@@ -13,7 +13,7 @@ public interface BigTeamBadgeView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void setTeam(Team team, String description);
+	public void setTeam(Team team, String description, String xsrfToken);
 
 	public void showLoadError(String principalId);
 	
