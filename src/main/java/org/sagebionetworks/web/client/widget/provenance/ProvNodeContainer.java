@@ -58,7 +58,7 @@ public class ProvNodeContainer extends FlowPanel {
 		messageContent = new HTML();
 		messageContainer.add(messageContent);
 		messagePopup = DisplayUtils.addPopover(messageContainer, "");
-		this.add(messageContainer);
+		this.add(messagePopup);
 		messageContainer.setVisible(false);
 	}
 	
