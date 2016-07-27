@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -13,9 +14,12 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private AuthenticationController authController;
 	@Inject
-	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
+	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils,
+			AuthenticationController authController) {
 		this.synapseJsniUtils= synapseJsniUtils;
+		this.authController = authController;
 	}
 	
 	@Override
@@ -26,7 +30,7 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 		this.setStyleName("displayInline");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a class=\"link\" href=\"");
-		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
+		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, authController.getCurrentXsrfToken()));
 		sb.append("\">");
 		int lastDotIndex = fileName.lastIndexOf(".");
 		boolean isPreviewed = false;
@@ -35,7 +39,7 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 			if (DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
 				sb.append("<img class=\"imageDescriptor\" ");
 				sb.append(" src=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true, authController.getCurrentXsrfToken()));
 				sb.append("\"></img>");
 				isPreviewed = true;
 			}

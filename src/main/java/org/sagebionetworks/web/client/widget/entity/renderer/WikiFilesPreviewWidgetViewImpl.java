@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -19,10 +20,12 @@ public class WikiFilesPreviewWidgetViewImpl extends FlowPanel implements WikiFil
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private AuthenticationController authController;
 	
 	@Inject
-	public WikiFilesPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
+	public WikiFilesPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, AuthenticationController authController) {
 		this.synapseJsniUtils = synapseJsniUtils;
+		this.authController = authController;
 	}
 	
 	@Override
@@ -47,10 +50,10 @@ public class WikiFilesPreviewWidgetViewImpl extends FlowPanel implements WikiFil
 				sb.append("<div class=\"preview-image-loading view\" >");
 				sb.append(ClientProperties.IMAGE_CENTERING_TABLE_START);
 				sb.append("<a class=\"item-preview spec-border-ie\" href=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),false));
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),false, authController.getCurrentXsrfToken()));
 				sb.append("\"><img class=\"center-in-div\" ");
 				sb.append(" src=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),true));
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),true, authController.getCurrentXsrfToken()));
 				sb.append("\"></img></a>");
 				sb.append(ClientProperties.IMAGE_CENTERING_TABLE_END);
 				sb.append("</div>");

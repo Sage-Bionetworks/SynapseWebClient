@@ -79,7 +79,6 @@ import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -167,38 +166,6 @@ public class DisplayUtils {
 	public static String getIconThumbnailHtml(ImageResource icon) {
 		if(icon == null) return null;	
 		return "<span class=\"thumbnail-image-container\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
-	}
-	
-	/**
-	 * Returns an HTML String of the suggestion of the user/group associated with the given header.
-	 * @param header header of the displayed usergroup.
-	 * @param width css style width of the created element (e.g. "150px", "3em")
-	 * @param baseFileHandleUrl
-	 * @param baseProfileAttachmentUrl
-	 * @return
-	 */
-	public static String getUserGroupDisplaySuggestionHtml(UserGroupHeader header, String width, String baseFileHandleUrl, String baseProfileAttachmentUrl) {
-		StringBuilder result = new StringBuilder();
-		result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
-		result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
-		if (header.getIsIndividual()) {
-			result.append(baseProfileAttachmentUrl);
-			result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
-		} else {
-			result.append(baseFileHandleUrl);
-			result.append("?teamId=" + header.getOwnerId() + "\" />");
-		}
-		result.append("<span class=\"search-item movedown-1 margin-right-5\">");
-		if (header.getIsIndividual()) {
-			result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
-		}
-		result.append("<span>" + header.getUserName() + "</span> ");
-		result.append("</span>");
-		if (!header.getIsIndividual()) {
-			result.append("(Team)");
-		}
-		result.append("</div>");
-		return result.toString();
 	}
 	
 	/**
@@ -1267,8 +1234,8 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
-			boolean preview, Long wikiVersion) {
-		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview);
+			boolean preview, Long wikiVersion, String xsrfToken) {
+		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview, xsrfToken);
 		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
 	}
 	
@@ -1280,7 +1247,7 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview, String xsrfToken){
 		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
 //		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
 //		return repoServicesUrl 
@@ -1294,6 +1261,7 @@ public class DisplayUtils {
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken + "&" +
 				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
 					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam;
@@ -1305,19 +1273,6 @@ public class DisplayUtils {
 	
 	public static String getParamForNoCaching() {
 		return WebConstants.NOCACHE_PARAM + new Date().getTime();
-	}
-	
-	/**
-	 * Create a url that points to the FileHandleServlet.
-	 * WARNING: A GET request to this url will cause the file contents to be downloaded on the Servlet and sent back in the response.
-	 * USE TO REQUEST SMALL FILES ONLY and CACHE THE RESULTS
-	 * @param baseURl
-	 * @param encodedRedirectUrl
-	 * @return
-	 */
-	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
-		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE +"&" + 
-				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
 	}
 	
 	/**
@@ -1335,24 +1290,6 @@ public class DisplayUtils {
 				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken +
 				versionParam;
 	}
-
-	/**
-	 * Create the url to a Table cell file handle.
-	 * @param baseFileHandleUrl
-	 * @param details
-	 * @param preview
-	 * @param proxy
-	 * @return
-	 */
-	public static String createTableCellFileEntityUrl(String baseFileHandleUrl, TableCellFileHandle details, boolean preview, boolean proxy){		
-		return baseFileHandleUrl + "?" +
-				WebConstants.ENTITY_PARAM_KEY + "=" + details.getTableId() + "&" +
-				WebConstants.TABLE_COLUMN_ID + "=" + details.getColumnId() + "&" +
-				WebConstants.TABLE_ROW_ID + "=" + details.getRowId() + "&" +
-				WebConstants.TABLE_ROW_VERSION_NUMBER + "=" + details.getVersionNumber() + "&" +
-				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
-				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy);
-	}
 	
 	/**
 	 * Create the url to a Team icon filehandle.
@@ -1360,9 +1297,10 @@ public class DisplayUtils {
 	 * @param teamId
 	 * @return
 	 */
-	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
+	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId, String xsrfToken){
 		return baseFileHandleUrl + "?" +
-				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId + "&" +
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
 
 
