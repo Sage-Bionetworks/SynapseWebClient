@@ -21,6 +21,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -166,7 +167,7 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	
 	private Anchor createPaginationAnchor(String anchorName, String searchTerm, final int newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);
+		a.setHTML(SimpleHtmlSanitizer.sanitizeHtml(anchorName));
 		a.setHref(DisplayUtils.getPeopleSearchHistoryToken(searchTerm, newStart));
 		return a;
 	}

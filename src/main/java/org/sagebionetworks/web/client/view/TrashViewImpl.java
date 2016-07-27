@@ -20,10 +20,13 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -35,8 +38,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
 
 public class TrashViewImpl extends Composite implements TrashView {
 	
@@ -407,7 +408,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	
 	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
 		Anchor a = new Anchor();
-		a.setHTML(anchorName);
+		a.setHTML(SafeHtmlUtils.htmlEscape(anchorName));
 		a.setHref(DisplayUtils.getTrashHistoryToken("", newStart));
 		return a;
 	}
