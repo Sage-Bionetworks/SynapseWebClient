@@ -9,7 +9,7 @@ import org.sagebionetworks.web.shared.TeamMemberBundle;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface MemberListWidgetView extends IsWidget, SynapseView {
+public interface MemberListWidgetView extends IsWidget {
 	
 	/**
 	 * Set this view's presenter
@@ -17,16 +17,19 @@ public interface MemberListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(List<TeamMemberBundle> members, String searchTerm, boolean isAdmin);
-	
+	void addMembers(List<TeamMemberBundle> members, boolean isAdmin);
+	void clearMembers();
+	void setSynAlert(IsWidget widget);
+	void setLoadMoreVisibility(boolean visible);
+	boolean isLoadMoreAttached();
+	boolean isLoadMoreInViewport();
+	boolean getLoadMoreVisibility();
+	void showInfo(String message);
 	public interface Presenter {
 		//used for the user profile links
 		void goTo(Place place);
 		void removeMember(String principalId);
 		void setIsAdmin(String principalId, boolean isAdmin);
-		void jumpToOffset(int offset);
 		void search(String searchTerm);
-		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
-		void clear();
 	}
 }
