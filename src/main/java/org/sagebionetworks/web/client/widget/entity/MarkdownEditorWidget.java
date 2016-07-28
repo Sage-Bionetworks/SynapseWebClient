@@ -90,7 +90,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		userSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
-				insertMarkdown("@" + username);
+				insertMarkdown(username);
 			}
 		});
 		userSelector.addModalShownHandler(new ModalShownHandler() {
