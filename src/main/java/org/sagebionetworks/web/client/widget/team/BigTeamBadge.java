@@ -22,6 +22,7 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	public BigTeamBadge(BigTeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.authController = authController;
 		view.setPresenter(this);
 	}
 	
