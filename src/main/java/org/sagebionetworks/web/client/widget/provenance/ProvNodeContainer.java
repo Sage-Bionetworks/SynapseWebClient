@@ -1,20 +1,24 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
-import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
-import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.event.dom.client.HasMouseOutHandlers;
+import com.google.gwt.event.dom.client.HasMouseOverHandlers;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
-public class ProvNodeContainer extends FlowPanel {	
+public class ProvNodeContainer extends FlowPanel implements HasMouseOverHandlers, HasMouseOutHandlers {	
 	
 	HTML messageContent;
-	Popover messagePopup;
 	FlowPanel messageContainer;
 	Tooltip tip;
 	
@@ -31,34 +35,51 @@ public class ProvNodeContainer extends FlowPanel {
 			this.content = new FlowPanel();
 			content.add(widget);
 		}
-		tip = new Tooltip(content);
-		tip.setIsAnimated(false);
-		tip.setIsHtml(true);
-		tip.setPlacement(Placement.BOTTOM);
-		tip.setTrigger(Trigger.HOVER);
 		
-		this.add(tip);
+		setupTooltip("");
 		setupMessage();
 	}
 	
-	public void showMessage(String display, String detailedMessage) {
+	public void setupTooltip(String title) {
+		if (tip != null) {
+			this.remove(tip);
+		}
+		tip = new Tooltip(content);
+		tip.setIsAnimated(false);
+		tip.setIsHtml(true);
+		tip.setTitle(title);
+		tip.setPlacement(Placement.RIGHT);
+		tip.setTrigger(Trigger.HOVER);
+		tip.addTooltipInnerClassName("width-200");
+		
+		this.add(tip);
+	}
+
+	public HandlerRegistration addMouseOverHandler(MouseOverHandler handler) {
+		return addDomHandler(handler, MouseOverEvent.getType());
+	}
+	public HandlerRegistration addMouseOutHandler(MouseOutHandler handler) {
+		return addDomHandler(handler, MouseOutEvent.getType());
+	}
+	
+	public void showTooltip() {
+		if (tip != null) {
+			tip.show();	
+		}
+	}
+	
+	public void showMessage(String display) {
 		SafeHtmlBuilder html = new SafeHtmlBuilder();
 		if(display != null) html.appendHtmlConstant(display);
 		messageContent.setHTML(html.toSafeHtml());
-		messagePopup.setWidget(new HTML(detailedMessage));
 		messageContainer.setVisible(true);
-	}
-
-	public Tooltip getTip() {
-		return tip;
 	}
 	
 	private void setupMessage() {
 		messageContainer = new FlowPanel();				
 		messageContent = new HTML();
 		messageContainer.add(messageContent);
-		messagePopup = DisplayUtils.addPopover(messageContainer, "");
-		this.add(messagePopup);
+		this.add(messageContainer);
 		messageContainer.setVisible(false);
 	}
 	

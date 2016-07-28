@@ -64,7 +64,6 @@ public class ProvViewUtil {
 		FlowPanel label = new FlowPanel();
 		label.addStyleName(PROV_ACTIVITY_LABEL_STYLE);
 
-		
 		if(node.getType() == ActivityType.UNDEFINED) {		
 			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);
 			Div undefinedContainer = new Div();
