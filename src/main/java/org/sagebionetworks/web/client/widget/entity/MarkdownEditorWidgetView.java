@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,7 +42,7 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	public interface Presenter {
 		void handleCommand(MarkdownEditorAction action);
 		void markdownEditorClicked();
-		void onKeyPress(char c);
+		void onKeyPress(KeyPressEvent event);
 	}
 	
 	void addTextAreaKeyUpHandler(KeyUpHandler keyUpHandler);
