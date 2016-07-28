@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 
 /**
  * This is a widget container that will call you back if the Loading spinner is in the viewport (and visible).
- * You tell it if there are more items to load.
+ * Tell it if there are more items to load by calling setIsMore() with true or false.
  * 
  * @author jayhodgson
  *
