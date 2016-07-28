@@ -889,6 +889,15 @@ public class ProfilePresenterTest {
 	
 	
 	//Challenge tests
+	
+	@Test
+	public void testChallengePlace() {
+		when(place.getArea()).thenReturn(ProfileArea.CHALLENGES);
+		profilePresenter.setPlace(place);
+		profilePresenter.getMoreChallenges();
+		verify(mockView).setTabSelected(ProfileArea.CHALLENGES);
+	}
+
 	@Test
 	public void testRefreshChallenges() {
 		profilePresenter.setPlace(place);
