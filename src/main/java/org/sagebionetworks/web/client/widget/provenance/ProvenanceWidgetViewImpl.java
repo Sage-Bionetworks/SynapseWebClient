@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
@@ -175,9 +174,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		} else if(node instanceof ActivityGraphNode) {
 			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
 			// create tool tip for defined activities only
-			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
-				addUndefinedToolTip(container);
-			} else {
+			if(((ActivityGraphNode) node).getType() != ActivityType.UNDEFINED) {
 				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
 			}
 			return container;
@@ -241,16 +238,6 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			}
 		});
 	}
-
-	private void addUndefinedToolTip(FlowPanel container) {
-		Anchor a = new Anchor();
-		a.setHref(WebConstants.PROVENANCE_API_URL);
-		a.setText(DisplayConstants.HOW_TO_DEFINE_ACTIVITY);
-		a.setTarget("_blank");		
-		a.setStyleName("link");
-		ProvViewUtil.createMessageConfig(DisplayConstants.DEFINE_ACTIVITY, a.toString(), container);
-	}
-
 	
 	private static native void connect(String parentId, String childId) /*-{
 		jsPlumbInstance.connect({source:parentId, target:childId, overlays:jsP_overlays	});
