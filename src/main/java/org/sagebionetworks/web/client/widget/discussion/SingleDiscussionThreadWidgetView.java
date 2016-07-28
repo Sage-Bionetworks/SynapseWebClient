@@ -59,7 +59,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setEditedLabelVisible(Boolean visible);
 
 	void setLoadingMessageVisible(boolean visible);
-	void setLoadMoreWidgetContainer(IsWidget loadMoreWidgetContainer);
+	void setRepliesContainer(IsWidget container);
 	void showSuccess(String successTitle, String successMessage);
 
 	void setThreadLink(String link);

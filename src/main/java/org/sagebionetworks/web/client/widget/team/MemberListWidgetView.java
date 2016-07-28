@@ -17,7 +17,7 @@ public interface MemberListWidgetView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	void setLoadMoreContainer(LoadMoreWidgetContainer loadMoreWidget);
+	void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget);
 	void addMembers(List<TeamMemberBundle> members, boolean isAdmin);
 	void clearMembers();
 	void setSynAlert(IsWidget widget);

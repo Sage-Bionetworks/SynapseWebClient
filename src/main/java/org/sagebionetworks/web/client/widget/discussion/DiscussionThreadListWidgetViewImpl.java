@@ -4,13 +4,13 @@ import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -63,9 +63,9 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	}
 
 	@Override
-	public void setLoadMoreWidgetContainer(LoadMoreWidgetContainer loadMoreContainer) {
+	public void setThreadsContainer(IsWidget container) {
 		threadListContainer.clear();
-		threadListContainer.add(loadMoreContainer);
+		threadListContainer.add(container);
 	}
 	
 	@Override

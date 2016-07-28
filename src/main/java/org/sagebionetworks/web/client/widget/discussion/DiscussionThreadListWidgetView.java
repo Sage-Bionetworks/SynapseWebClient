@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -21,5 +19,5 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	void setThreadHeaderVisible(boolean visible);
 	
 	void setNoThreadsFoundVisible(boolean visible);
-	void setLoadMoreWidgetContainer(LoadMoreWidgetContainer loadMoreContainer);
+	void setThreadsContainer(IsWidget container);
 }

@@ -66,7 +66,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		add(synAlertContainer);
 	}
 	@Override
-	public void setLoadMoreContainer(LoadMoreWidgetContainer loadMoreWidget) {
+	public void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget) {
 		this.loadMoreWidget = loadMoreWidget;
 		loadMoreWidgetContainer.clear();
 		loadMoreWidgetContainer.add(loadMoreWidget);

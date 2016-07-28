@@ -26,7 +26,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
 	private SynapseAlert synAlert;
-	private LoadMoreWidgetContainer loadMoreWidgetContainer;
+	private LoadMoreWidgetContainer membersContainer;
 	
 	@Inject
 	public MemberListWidget(
@@ -34,17 +34,17 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			SynapseClientAsync synapseClient, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			LoadMoreWidgetContainer loadMoreWidgetContainer,
+			LoadMoreWidgetContainer membersContainer,
 			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
+		this.membersContainer = membersContainer;
 		this.synAlert = synAlert;
-		view.setLoadMoreContainer(loadMoreWidgetContainer);
-		loadMoreWidgetContainer.configure(new Callback() {
+		view.setMembersContainer(membersContainer);
+		membersContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
 				loadMore();
@@ -78,7 +78,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 				offset += MEMBER_LIMIT;
 				
 				long numberOfMembers = results.getTotalNumberOfResults();
-				loadMoreWidgetContainer.setIsMore(offset < numberOfMembers);
+				membersContainer.setIsMore(offset < numberOfMembers);
 				view.addMembers(memberList.getResults(), isAdmin);
 			}
 			@Override

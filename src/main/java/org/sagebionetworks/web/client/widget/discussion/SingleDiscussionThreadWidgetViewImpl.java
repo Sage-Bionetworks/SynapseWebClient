@@ -162,9 +162,9 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setLoadMoreWidgetContainer(IsWidget loadMoreWidgetContainer) {
+	public void setRepliesContainer(IsWidget container) {
 		replyListContainer.clear();
-		replyListContainer.add(loadMoreWidgetContainer);
+		replyListContainer.add(container);
 	}
 
 	@Override

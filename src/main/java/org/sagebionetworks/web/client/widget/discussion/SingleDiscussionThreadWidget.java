@@ -132,7 +132,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				loadMore();
 			}
 		});
-		view.setLoadMoreWidgetContainer(loadMoreWidgetContainer);
+		view.setRepliesContainer(loadMoreWidgetContainer);
 		subscribeButtonWidget.showIconOnly();
 		refreshCallback = new Callback() {
 			@Override

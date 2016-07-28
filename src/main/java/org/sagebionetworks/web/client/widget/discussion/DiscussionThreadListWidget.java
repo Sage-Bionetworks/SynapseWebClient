@@ -61,7 +61,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 				loadMore();
 			}
 		});
-		view.setLoadMoreWidgetContainer(loadMoreWidgetContainer);
+		view.setThreadsContainer(loadMoreWidgetContainer);
 	}
 
 	public void configure(String forumId, Boolean isCurrentUserModerator,
