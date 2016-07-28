@@ -26,8 +26,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setPresenter(SingleDiscussionThreadWidget presenter);
 
-	void addReply(Widget w);
-
 	void clear();
 
 	void setTitle(String title);
@@ -41,10 +39,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setCreatedOn(String createdOn);
 
 	void setAlert(Widget w);
-
-	void setLoadMoreVisibility(boolean visible);
-
-	void clearReplies();
 
 	void setDeleteIconVisible(boolean visible);
 
@@ -65,7 +59,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setEditedLabelVisible(Boolean visible);
 
 	void setLoadingMessageVisible(boolean visible);
-
+	void setLoadMoreWidgetContainer(IsWidget loadMoreWidgetContainer);
 	void showSuccess(String successTitle, String successMessage);
 
 	void setThreadLink(String link);
@@ -77,12 +71,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setPinIconVisible(boolean visible);
 	void setUnpinIconVisible(boolean visible);
 	void setIsAuthorModerator(boolean isModerator);
-
-	boolean isLoadMoreInViewport();
-
-	boolean getLoadMoreVisibility();
-
-	boolean isLoadMoreAttached();
 
 	void resetButton();
 

@@ -71,12 +71,6 @@
 				</bh:Div>
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 			</bh:Div>
-			<bh:Div width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
-				<g:HTMLPanel ui:field="loadMore" visible="false">
-					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-					&nbsp;Loading...
-				</g:HTMLPanel>
-			</bh:Div>
 		</bh:Div>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>

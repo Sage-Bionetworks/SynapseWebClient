@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
@@ -42,30 +43,33 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	private TextBox searchField;
 	private SimplePanel memberSearchContainer;
 	private SimplePanel synAlertContainer;
-	private FlowPanel membersContainer;
-	private Div loadingWidget;
+	private SimplePanel loadMoreWidgetContainer;
+	private LoadMoreWidgetContainer loadMoreWidget;
+	private Div membersPanel;
 	@Inject
 	public MemberListWidgetViewImpl(SageImageBundle sageImageBundle,
 			PortalGinInjector portalGinInjector) {
 		this.portalGinInjector = portalGinInjector;
 		memberSearchContainer = new SimplePanel();
 		synAlertContainer = new SimplePanel();
-		Div membersPanel = new Div();
+		membersPanel = new Div();
 		membersPanel.addStyleName("light-border padding-10");
 		Div membersTitle = new Div();
 		membersTitle.addStyleName("highlight-title");
 		membersTitle.add(new Text(DisplayConstants.MEMBERS));
-		membersContainer = new FlowPanel();
 		membersPanel.add(membersTitle);
-		membersPanel.add(membersContainer);
-		loadingWidget = DisplayUtils.getLoadingWidget(sageImageBundle);
-		loadingWidget.addStyleName("center-block center");
-		membersPanel.add(loadingWidget);
+		loadMoreWidgetContainer = new SimplePanel();
+		membersPanel.add(loadMoreWidgetContainer);
 		configureSearchBox();
 		add(memberSearchContainer);
 		add(membersPanel);
 		add(synAlertContainer);
-		loadingWidget.setVisible(false);
+	}
+	@Override
+	public void setLoadMoreContainer(LoadMoreWidgetContainer loadMoreWidget) {
+		this.loadMoreWidget = loadMoreWidget;
+		loadMoreWidgetContainer.clear();
+		loadMoreWidgetContainer.add(loadMoreWidget);
 	}
 	
 	@Override
@@ -166,12 +170,12 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			singleRow.add(mediaContainer);
 		}
 		
-		membersContainer.add(singleRow);
+		loadMoreWidget.add(singleRow);
 	}
 	
 	@Override
 	public void clearMembers() {
-		membersContainer.clear();
+		loadMoreWidget.clear();
 	}
 	
 	private ListBox getAccessCombo(final String ownerId, boolean isAdmin) {
@@ -190,26 +194,6 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		accessCombo.setSelectedIndex(isAdmin ? 1 : 0);
 		
 		return accessCombo;
-	}
-	
-	@Override
-	public boolean getLoadMoreVisibility() {
-		return loadingWidget.isVisible();
-	}
-	
-	@Override
-	public boolean isLoadMoreAttached() {
-		return loadingWidget.isAttached();
-	}
-	
-	@Override
-	public boolean isLoadMoreInViewport() {
-		return DisplayUtils.isInViewport(loadingWidget.asWidget());
-	}
-	
-	@Override
-	public void setLoadMoreVisibility(boolean visible) {
-		loadingWidget.setVisible(visible);
 	}
 	
 	@Override

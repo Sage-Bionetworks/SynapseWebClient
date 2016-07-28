@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.team;
 
 
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 
@@ -26,9 +25,8 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private TeamMemberPagedResults memberList;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
-	private GWTWrapper gwtWrapper;
-	private Callback invokeCheckForInViewAndLoadData;
 	private SynapseAlert synAlert;
+	private LoadMoreWidgetContainer loadMoreWidgetContainer;
 	
 	@Inject
 	public MemberListWidget(
@@ -36,21 +34,22 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			SynapseClientAsync synapseClient, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			GWTWrapper gwtWrapper,
+			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.gwtWrapper = gwtWrapper;
+		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
 		this.synAlert = synAlert;
-		invokeCheckForInViewAndLoadData = new Callback() {
+		view.setLoadMoreContainer(loadMoreWidgetContainer);
+		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
-				checkForInViewAndLoadData();
+				loadMore();
 			}
-		};
+		});
 	}
 
 	public void configure(String teamId, boolean isAdmin, Callback teamUpdatedCallback) {
@@ -79,10 +78,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 				offset += MEMBER_LIMIT;
 				
 				long numberOfMembers = results.getTotalNumberOfResults();
-				view.setLoadMoreVisibility(offset < numberOfMembers);
-				if (offset < numberOfMembers) {
-					gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-				}
+				loadMoreWidgetContainer.setIsMore(offset < numberOfMembers);
 				view.addMembers(memberList.getResults(), isAdmin);
 			}
 			@Override
@@ -142,18 +138,5 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();
-	}
-	
-	public void checkForInViewAndLoadData() {
-		if (!view.isLoadMoreAttached()) {
-			//Done, view has been detached and widget was never in the viewport
-			return;
-		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility()) {
-			//try to load data!
-			loadMore();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-		}
 	}
 }

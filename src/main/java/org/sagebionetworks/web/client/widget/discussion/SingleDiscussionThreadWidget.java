@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -22,6 +21,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.validation.ValidationResult;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -68,7 +68,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	GlobalApplicationState globalApplicationState;
 	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
-	GWTWrapper gwtWrapper;
+	LoadMoreWidgetContainer repliesContainer;
 	SubscribeButtonWidget subscribeButtonWidget;
 	MarkdownEditorWidget markdownEditor;
 	private CallbackP<String> threadIdClickedCallback, replyIdCallback;
@@ -84,7 +84,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private String projectId;
 	private Callback refreshCallback;
 	private Set<Long> moderatorIds;
-	private Callback invokeCheckForInViewAndLoadData;
 	private boolean isThreadDeleted;
 	
 	@Inject
@@ -101,7 +100,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			GlobalApplicationState globalApplicationState,
 			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
-			GWTWrapper gwtWrapper,
+			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			SubscribeButtonWidget subscribeButtonWidget
 			) {
 		this.ginInjector = ginInjector;
@@ -116,7 +115,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.globalApplicationState = globalApplicationState;
 		this.editThreadModal = editThreadModal;
 		this.markdownWidget = markdownWidget;
-		this.gwtWrapper = gwtWrapper;
+		this.repliesContainer = loadMoreWidgetContainer;
 		this.subscribeButtonWidget = subscribeButtonWidget;
 		
 		view.setPresenter(this);
@@ -127,6 +126,13 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		
+		loadMoreWidgetContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
+		view.setLoadMoreWidgetContainer(loadMoreWidgetContainer);
 		subscribeButtonWidget.showIconOnly();
 		refreshCallback = new Callback() {
 			@Override
@@ -155,13 +161,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setIsAuthorModerator(isAuthorModerator);
 
 		authorWidget.configure(bundle.getCreatedBy());
-		invokeCheckForInViewAndLoadData = new Callback() {
-			@Override
-			public void invoke() {
-				checkForInViewAndLoadData();
-			}
-		};
-
 		configureMessage();
 		if (!bundle.getId().equals(globalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
 			if (replyId != null) {
@@ -171,19 +170,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		}
 
-	}
-
-	public void checkForInViewAndLoadData() {
-		if (!view.isLoadMoreAttached()) {
-			//Done, view has been detached and widget was never in the viewport
-			return;
-		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility()) {
-			//try to load data!
-			loadMore();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-		}
 	}
 
 	/**
@@ -198,6 +184,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	private void configureView(DiscussionThreadBundle bundle) {
 		view.clear();
+		repliesContainer.clear();
 		view.setTitle(title);
 		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedLabelVisible(bundle.getIsEdited());
@@ -315,7 +302,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 
 	public void configureReplies() {
-		view.clearReplies();
+		repliesContainer.clear();
 		view.setShowAllRepliesButtonVisible(false);
 		offset = 0L;
 		if (order == null) {
@@ -344,14 +331,13 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	@Override
 	public void loadMore() {
 		synAlert.clear();
-		view.setLoadMoreVisibility(true);
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset,
 				order, ascending, DEFAULT_FILTER,
 				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.setLoadMoreVisibility(false);
+						repliesContainer.setIsMore(false);
 						synAlert.handleException(caught);
 					}
 
@@ -363,21 +349,18 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 							for (DiscussionReplyBundle bundle : result.getResults()) {
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
 								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
-								view.addReply(replyWidget.asWidget());
+								repliesContainer.add(replyWidget.asWidget());
 							}
 						}
-						view.setLoadMoreVisibility(offset < result.getTotalNumberOfResults());
-						if (offset < result.getTotalNumberOfResults()) {
-							gwtWrapper.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-						}
+						repliesContainer.setIsMore(offset < result.getTotalNumberOfResults());
 					}
 		});
 	}
 	
 	public void configureReply(String replyId) {
 		synAlert.clear();
-		view.clearReplies();
-		view.setLoadMoreVisibility(false);
+		repliesContainer.clear();
+		repliesContainer.setIsMore(false);
 		view.setShowAllRepliesButtonVisible(true);
 		setReplyId(replyId);
 		discussionForumClientAsync.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>() {
@@ -390,7 +373,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			public void onSuccess(DiscussionReplyBundle bundle) {
 				ReplyWidget replyWidget = ginInjector.createReplyWidget();
 				replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
-				view.addReply(replyWidget.asWidget());
+				repliesContainer.add(replyWidget.asWidget());
 			}
 		});
 	}
