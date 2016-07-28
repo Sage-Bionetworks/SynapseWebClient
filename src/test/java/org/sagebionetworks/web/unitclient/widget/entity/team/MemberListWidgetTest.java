@@ -7,10 +7,8 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +19,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
@@ -47,9 +45,9 @@ public class MemberListWidgetTest {
 	Callback mockTeamUpdatedCallback;
 	boolean isAdmin;
 	@Mock
-	GWTWrapper mockGWT;
-	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	LoadMoreWidgetContainer mockMembersContainer;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -59,7 +57,7 @@ public class MemberListWidgetTest {
 		mockView = mock(MemberListWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockGWT, mockSynAlert);
+		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer, mockSynAlert);
 		isAdmin = true;
 		
 		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
@@ -95,6 +93,7 @@ public class MemberListWidgetTest {
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addMembers(anyList(), anyBoolean());
+		verify(mockMembersContainer).configure(any(Callback.class));
 	}
 	@Test
 	public void testConfigureFailure() {
@@ -160,52 +159,5 @@ public class MemberListWidgetTest {
 		verify(mockSynAlert).handleException(ex);
 		//called twice.  once during configuration, and once to refresh members to get correct admin state
 		verify(mockSynapseClient, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testCheckForInViewAndLoadDataNotAttached() {
-		when(mockView.isLoadMoreAttached()).thenReturn(false);
-		widget.checkForInViewAndLoadData();
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
-		verify(mockSynapseClient, never()).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testCheckForInViewAndLoadDataAttachedNotInViewport() {
-		when(mockView.isLoadMoreAttached()).thenReturn(true);
-		when(mockView.isLoadMoreInViewport()).thenReturn(false);
-		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
-		verify(mockSynapseClient, never()).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testCheckForInViewAndLoadDataAttachedNotVisible() {
-		when(mockView.isLoadMoreAttached()).thenReturn(true);
-		when(mockView.isLoadMoreInViewport()).thenReturn(true);
-		when(mockView.getLoadMoreVisibility()).thenReturn(false);
-		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
-		verify(mockSynapseClient, never()).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testCheckForInViewAndLoadDataAttachedVisible() {
-		when(mockView.isLoadMoreAttached()).thenReturn(true);
-		when(mockView.isLoadMoreInViewport()).thenReturn(false);
-		when(mockView.getLoadMoreVisibility()).thenReturn(true);
-		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
-		verify(mockSynapseClient, never()).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testCheckForInViewAndLoadDataAttachedInViewAndVisible() {
-		when(mockView.isLoadMoreAttached()).thenReturn(true);
-		when(mockView.isLoadMoreInViewport()).thenReturn(true);
-		when(mockView.getLoadMoreVisibility()).thenReturn(true);
-		widget.checkForInViewAndLoadData();
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 }
