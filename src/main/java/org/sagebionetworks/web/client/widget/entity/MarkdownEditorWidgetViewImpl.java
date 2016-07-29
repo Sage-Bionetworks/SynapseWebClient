@@ -263,7 +263,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
-				presenter.onKeyPress(event.getCharCode());
+				presenter.onKeyPress(event);
 			}
 		});
 		writeMarkdownButton.addClickHandler(new ClickHandler() {

@@ -69,7 +69,7 @@ public class TeamEditModalWidgetTest {
 	String newIcon = "newIcon";
 	Exception caught = new Exception("this is an exception");
 	private AccessControlList acl;
-	
+	String xsrfToken = "zxcvbn";
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	
@@ -89,6 +89,7 @@ public class TeamEditModalWidgetTest {
 		mockFileUpload = mock(FileUpload.class);
 		mockFileMeta = mock(FileMetadata.class);
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID.toString());
+		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 		presenter = new TeamEditModalWidget(mockSynAlert, mockView, mockSynapseClient,
 				mockUploader, mockJSNIUtils, mockAuthenticationController, mockGlobalApplicationState);
 		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).getTeamAcl(eq(TEAM_ID.toString()), any(AsyncCallback.class));
@@ -164,11 +165,15 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testConfirmSuccessfulChanges() {
 		presenter.configureAndShow(mockTeam);
-		when(mockFileUpload.getFileHandleId()).thenReturn("newIcon");
+		String fileHandleId = "newIcon";
+		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
 		
 		finishedUploadingCallback.invoke(mockFileUpload);
 		verify(mockView, times(2)).hideLoading();
-		verify(mockView, times(2)).setImageURL(anyString());
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockView, times(2)).setImageURL(captor.capture());
+		assertTrue(captor.getValue().contains(fileHandleId));
+		assertTrue(captor.getValue().contains(xsrfToken));
 		verify(mockFileUpload).getFileHandleId();
 		
 		presenter.onConfirm();
