@@ -561,11 +561,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
 				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet) {
-					DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT);
+					valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
+				} else {
+					valueContainer.add(a);
 				}
 				
 				a.addClickHandler(clickHandler);	
-				valueContainer.add(a);
 				flowPanel.add(valueContainer);
 				i++;
 			}		

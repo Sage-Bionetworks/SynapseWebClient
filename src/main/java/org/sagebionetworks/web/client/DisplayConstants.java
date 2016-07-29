@@ -488,8 +488,7 @@ public class DisplayConstants {
 	
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
-	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
-	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
+	public static final String PROVENANCE_BASIC_HELP = "Provenance tracks the relationship between data, code and analytical results.";
 	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
 	public static final String DATA_USE = "Conditions For Use";
 	public static final String ACCESS_TO_DATA = "Access to these data is";

@@ -28,8 +28,7 @@ public class Md5Link extends FlowPanel {
 				showMd5Dialog(md5);
 			}
 		});
-		DisplayUtils.addTooltip(md5Link, md5, Placement.BOTTOM);
-		this.add(md5Link);
+		this.add(DisplayUtils.addTooltip(md5Link, md5, Placement.BOTTOM));
 		this.add(copyTextModal.asWidget());
 	}
 	

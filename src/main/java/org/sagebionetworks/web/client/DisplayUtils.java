@@ -953,8 +953,7 @@ public class DisplayUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
-		lc.add(htmlPanel);
+		lc.add(DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM));
 
 		return lc;
 	}

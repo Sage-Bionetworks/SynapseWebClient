@@ -2101,6 +2101,10 @@ a.projectTitle:hover {
 	top: 10px;
 }
 
+.width-200 {
+	width: 200px;
+}
+
 .width-150 {
 	width: 150px;
 }

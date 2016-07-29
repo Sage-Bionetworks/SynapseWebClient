@@ -132,8 +132,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	@Override
 	public void setRequestCount(String count) {
 		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
-		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
-		notificationsPanel.setWidget(widget);
+		notificationsPanel.setWidget(DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP));
 	}
 
 	/*
