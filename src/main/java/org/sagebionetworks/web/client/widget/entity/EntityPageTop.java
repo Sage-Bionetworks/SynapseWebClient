@@ -246,7 +246,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void onFailure(Throwable caught) {
 				projectBundleLoadError = caught;
 				configureCurrentAreaTab();
-			}	
+			}
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
@@ -259,6 +259,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		adminTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
+		//configure the challenge tab regardless
+		configureAdminTab();
 		switch (area) {
 			case FILES:
 				configureFilesTab();
@@ -273,7 +275,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				break;
 			case ADMIN:
-				configureAdminTab();
 				tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				break;
 			case DISCUSSION:
