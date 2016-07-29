@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -38,6 +39,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	String uploadedFileHandleId;
 	String baseImageURL;
 	Long authenticatedUserGroupId;
+	AuthenticationController authController;
 	
 	@Inject
 	public TeamEditModalWidget(
@@ -53,6 +55,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		this.synapseClient = synapseClient;
 		this.uploader = uploader;
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
+		this.authController = authenticationController;
 		authenticatedUserGroupId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 		uploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
@@ -60,7 +63,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(baseImageURL + "?rawFileHandleId=" + uploadedFileHandleId);
+				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId, authController.getCurrentXsrfToken()));
 			}
 		});
 		ImageFileValidator imageValidator = new ImageFileValidator();
@@ -129,7 +132,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		view.clear();
 		view.configure(team);
 		if (team.getIcon() != null)
-			view.setImageURL(baseImageURL + "?rawFileHandleId=" + team.getIcon());
+			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon(), authController.getCurrentXsrfToken()));
 		else
 			view.setDefaultIconVisible();
 		

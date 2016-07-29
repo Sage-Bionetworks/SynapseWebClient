@@ -846,7 +846,18 @@ public class DisplayUtils {
 				WebConstants.TEAM_PARAM_KEY + "=" + teamId + "&" +
 				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
-
+	
+	/**
+	 * Create the url to the raw file handle id (must be the owner to access)
+	 * @param baseURl
+	 * @param rawFileHandleId
+	 * @return
+	 */
+	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId, String xsrfToken){
+		return baseFileHandleUrl + "?" +
+				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId + "&" +
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+	}
 
 	public static String createEntityVersionString(Reference ref) {
 		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
