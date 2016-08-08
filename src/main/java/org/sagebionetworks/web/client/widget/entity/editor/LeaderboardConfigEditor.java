@@ -7,27 +7,23 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationList;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class SubmissionTableConfigEditor implements SubmissionTableConfigView.Presenter, WidgetEditorPresenter {
+public class LeaderboardConfigEditor implements LeaderboardConfigView.Presenter, WidgetEditorPresenter {
 	
-	private SubmissionTableConfigView view;
+	private LeaderboardConfigView view;
 	private Map<String, String> descriptor;
 	private static final String DEFAULT_PAGE_SIZE = "100";
-	EvaluationList evaluationSelector;
 	
 	@Inject
-	public SubmissionTableConfigEditor(SubmissionTableConfigView view, EvaluationList evaluationSelector) {
+	public LeaderboardConfigEditor(LeaderboardConfigView view) {
 		this.view = view;
 		view.setPresenter(this);
 		view.initView();
-		this.evaluationSelector = evaluationSelector;
-		view.setEvaluationSelector(evaluationSelector.asWidget());
 	}
 	
 	@Override
@@ -35,9 +31,9 @@ public class SubmissionTableConfigEditor implements SubmissionTableConfigView.Pr
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
 		String uri = tableConfig.getUri();
-		if (uri != null && uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX)) {
+		if (uri != null && uri.startsWith(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX)) {
 			//strip off prefix and decode query string
-			uri = URL.decodeQueryString(uri.substring(ClientProperties.QUERY_SERVICE_PREFIX.length()));
+			uri = URL.decodeQueryString(uri.substring(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX.length()));
 			tableConfig.setUri(uri);
 		}
 		view.configure(tableConfig);
@@ -59,10 +55,12 @@ public class SubmissionTableConfigEditor implements SubmissionTableConfigView.Pr
 		if (!DisplayUtils.isDefined(queryString)) {
 			throw new IllegalArgumentException("A query is required.");
 		}
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, ClientProperties.QUERY_SERVICE_PREFIX + URL.encodeQueryString(view.getQueryString()));
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + URL.encodeQueryString(view.getQueryString()));
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, "rows");
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS, Boolean.TRUE.toString());
 		List<APITableColumnConfig> configs = view.getConfigs();
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, configs);
 	}

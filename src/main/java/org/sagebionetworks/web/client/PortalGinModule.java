@@ -265,6 +265,8 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
@@ -287,6 +289,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
@@ -971,6 +975,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// API Table Column manager	
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
+		bind(APITableColumnConfigView.class).to(APITableColumnConfigViewImpl.class);
 
 		//single subpages view
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
@@ -1005,6 +1010,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TabbedTableConfigView.class).to(TabbedTableConfigViewImpl.class);
 		bind(APITableConfigView.class).to(APITableConfigViewImpl.class);
 		bind(QueryTableConfigView.class).to(QueryTableConfigViewImpl.class);
+		bind(LeaderboardConfigView.class).to(LeaderboardConfigViewImpl.class);
 		bind(EntityListConfigView.class).to(EntityListConfigViewImpl.class);
 		bind(ShinySiteConfigView.class).to(ShinySiteConfigViewImpl.class);
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);

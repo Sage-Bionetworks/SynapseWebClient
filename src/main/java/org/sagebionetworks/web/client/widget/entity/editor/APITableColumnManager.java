@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -15,63 +15,165 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 		SynapseWidgetPresenter {
 
 	private APITableColumnManagerView view;
-	private List<APITableColumnConfig> configs;
+	private PortalGinInjector ginInjector;
+	private boolean changingSelection = false;
+	private Callback selectionChangedCallback;
+	private List<APITableColumnConfigView> columns;
 	
 	@Inject
-	public APITableColumnManager(APITableColumnManagerView view) {
+	public APITableColumnManager(APITableColumnManagerView view, PortalGinInjector ginInjector) {
 		this.view = view;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
+		selectionChangedCallback = new Callback() {
+			@Override
+			public void invoke() {
+				checkSelectionState();
+			}
+		};
 	}
 	
 	@Override
 	public void configure(List<APITableColumnConfig> configs) {
-		this.configs = configs;
-		view.configure(configs);
+		columns = new ArrayList<APITableColumnConfigView>();
+		if (configs != null) {
+			for (APITableColumnConfig data : configs) {
+				APITableColumnConfigView column = ginInjector.getAPITableColumnConfigView();
+				column.setSelectionChangedCallback(selectionChangedCallback);
+				column.configure(data);
+				columns.add(column);
+			}
+		}
+		refreshColumns();
 	}
 
+
+	private void refreshColumns() {
+		view.clearColumns();
+		for (APITableColumnConfigView column : columns) {
+			view.addColumn(column.asWidget());
+		}
+		boolean columnsVisible = columns.size() > 0;
+		view.setButtonToolbarVisible(columnsVisible);
+		view.setHeaderColumnsVisible(columnsVisible);
+		view.setNoColumnsUIVisible(!columnsVisible);
+		checkSelectionState();
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 	
 	@Override
-	public void addColumnConfig(String rendererName, String inputColumnNames,
-			String displayColumnName, COLUMN_SORT_TYPE sort) {
-		if (rendererName == null || inputColumnNames == null || rendererName.trim().length() == 0 || inputColumnNames.trim().length() == 0) {
-			throw new IllegalArgumentException("Renderer and Input Columns are required");
-		}
-		APITableColumnConfig newConfig = new APITableColumnConfig();
-		newConfig.setRendererFriendlyName(rendererName);
-		String[] inputColNamesArray = inputColumnNames.split(",");
-		Set<String> inputColumnNamesSet = new HashSet<String>();
-		for (int i = 0; i < inputColNamesArray.length; i++) {
-			inputColumnNamesSet.add(inputColNamesArray[i].trim());
-		}
-		newConfig.setInputColumnNames(inputColumnNamesSet);
-		if (displayColumnName == null || displayColumnName.trim().length()==0) {
-			displayColumnName = APITableWidget.getSingleInputColumnName(newConfig);
-		}
-		if (sort == null) {
-			sort = COLUMN_SORT_TYPE.NONE;
-		}
-		newConfig.setSort(sort);
-		newConfig.setDisplayColumnName(displayColumnName);
-		configs.add(newConfig);
-		view.configure(configs);
+	public void addColumnConfig() {
+		APITableColumnConfigView column = ginInjector.getAPITableColumnConfigView();
+		column.setSelectionChangedCallback(selectionChangedCallback);
+		column.configure(new APITableColumnConfig());
+		columns.add(column);
+		refreshColumns();
 	}
 	
-	@Override
-	public void deleteColumnConfig(APITableColumnConfig config) {
-		if(config != null) {
-			configs.remove(config);
-			view.configure(configs);
-		} else {
-			view.showErrorMessage("Column configuration token not set");
+
+	public void selectAll() {
+		changeAllSelection(true);
+	}
+
+	public void selectNone() {
+		changeAllSelection(false);
+	}
+
+	public void onMoveUp() {
+		int index = findFirstSelected();
+		APITableColumnConfigView sourceEditor = columns.get(index);
+		columns.remove(index);
+		columns.add(index-1, sourceEditor);
+		refreshColumns();
+	}
+
+	public void onMoveDown() {
+		int index = findFirstSelected();
+		APITableColumnConfigView sourceEditor = columns.get(index);
+		columns.remove(index);
+		columns.add(index+1, sourceEditor);
+		refreshColumns();
+	}
+
+	public void deleteSelected() {
+		Iterator<APITableColumnConfigView> it = columns.iterator();
+		while(it.hasNext()){
+			APITableColumnConfigView column = it.next();
+			if(column.isSelected()){
+				it.remove();
+			}
+		}
+		refreshColumns();
+	}
+
+	/**
+	 * Find the first selected row.
+	 * @return
+	 */
+	private int findFirstSelected(){
+		int index = 0;
+		for(APITableColumnConfigView row: columns){
+			if(row.isSelected()){
+				return index;
+			}
+			index++;
+		}
+		throw new IllegalStateException("Nothing selected");
+	}
+	
+	public void selectionChanged(boolean isSelected) {
+		checkSelectionState();
+	}
+	
+	/**
+	 * Change the selection state of all rows to the passed value.
+	 * 
+	 * @param select
+	 */
+	private void changeAllSelection(boolean select){
+		try{
+			changingSelection = true;
+			// Select all 
+			for(APITableColumnConfigView column: columns){
+				column.setSelected(select);
+			}
+		}finally{
+			changingSelection = false;
+		}
+		checkSelectionState();
+	}
+	
+	/**
+	 * The current selection state determines which buttons are enabled.
+	 */
+	public void checkSelectionState(){
+		if(!changingSelection){
+			int index = 0;
+			int count = 0;
+			int lastIndex = 0;
+			for(APITableColumnConfigView column: columns) {
+				if(column.isSelected()){
+					count++;
+					lastIndex = index;
+				}
+				index++;
+			}
+			view.setCanDelete(count > 0);
+			view.setCanMoveUp(count == 1 && lastIndex > 0);
+			view.setCanMoveDown(count == 1 && lastIndex < columns.size()-1);
 		}
 	}
 	
 	//expose for unit testing purposes
 	public List<APITableColumnConfig> getColumnConfigs() {
-		return configs;
+		List<APITableColumnConfig> newConfigs = new ArrayList<APITableColumnConfig>();
+		for (APITableColumnConfigView column : columns) {
+			newConfigs.add(column.getConfig());
+		}
+		return newConfigs;
 	}
 }

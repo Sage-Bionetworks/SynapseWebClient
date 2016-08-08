@@ -4,27 +4,23 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SubmissionTableConfigViewImpl implements SubmissionTableConfigView {
+public class LeaderboardConfigViewImpl implements LeaderboardConfigView {
 
-	public interface SubmissionTableConfigViewImplUiBinder extends UiBinder<Widget, SubmissionTableConfigViewImpl> {}
+	public interface ViewImplUiBinder extends UiBinder<Widget, LeaderboardConfigViewImpl> {}
 	private Presenter presenter;
 	private APITableColumnManager columnsManager;
 	
 	private Widget widget;
 	@UiField
-	TextBox evaluationField;
-	@UiField
-	Div evaluationSelectorContainer;
+	TextBox queryField;
 	@UiField
 	CheckBox isPagingField;
 	@UiField
@@ -34,7 +30,7 @@ public class SubmissionTableConfigViewImpl implements SubmissionTableConfigView 
 	SimplePanel columnManagerContainer;
 	
 	@Inject
-	public SubmissionTableConfigViewImpl(SubmissionTableConfigViewImplUiBinder binder, APITableColumnManager columnsManager) {
+	public LeaderboardConfigViewImpl(ViewImplUiBinder binder, APITableColumnManager columnsManager) {
 		widget = binder.createAndBindUi(this);
 		this.columnsManager = columnsManager;
 		columnManagerContainer.setWidget(columnsManager.asWidget());
@@ -50,12 +46,6 @@ public class SubmissionTableConfigViewImpl implements SubmissionTableConfigView 
 		queryField.setValue(tableConfig.getUri());
 		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		isPagingField.setValue(tableConfig.isPaging());
-	}
-	
-	@Override
-	public void setEvaluationSelector(IsWidget w) {
-		evaluationSelectorContainer.clear();
-		evaluationSelectorContainer.add(w);
 	}
 	
 	@Override

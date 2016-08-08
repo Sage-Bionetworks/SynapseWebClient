@@ -71,6 +71,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getSynapseAPICallConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseQueryConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.LEADERBOARD_CONTENT_TYPE)) {
+			presenter = ginInjector.getLeaderboardConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getAttachmentConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.ENTITYLIST_CONTENT_TYPE)) {
@@ -125,7 +127,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE) || 
+				contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE) ||
+				contentTypeKey.equals(WidgetConstants.LEADERBOARD_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {
 			presenter = ginInjector.getTableOfContentsRenderer();
@@ -252,6 +256,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, WidgetConstants.TABBED_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.API_TABLE_CONTENT_TYPE, WidgetConstants.API_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, WidgetConstants.QUERY_TABLE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.LEADERBOARD_CONTENT_TYPE, WidgetConstants.LEADERBOARD_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ENTITYLIST_CONTENT_TYPE, WidgetConstants.ENTITYLIST_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE, WidgetConstants.SYNAPSE_TABLE_FRIENDLY_NAME);

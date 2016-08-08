@@ -1,29 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ListBox;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -35,114 +24,82 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 	@UiField
 	Button addColumnButton;
 
-	// new column modal
 	@UiField
-	Modal newColumnModal;
+	Table columnRenderersContainer;
 	@UiField
-	ListBox rendererField;
+	SelectionToolbar selectionToolbar;
 	@UiField
-	ListBox sortField;
+	Span noColumnsUI;
 	@UiField
-	TextBox inputColumnNamesField;
-	@UiField
-	TextBox displayColumnNamesField;
-	@UiField
-	Button newColumnOkButton;
-	@UiField
-	Button newColumnCancelButton;
-	@UiField
-	Div columnRenderersTable;
-
+	Table columnHeaders;
+	
 	private Presenter presenter;
-	private boolean isEmpty;
 	private Widget widget;
 	IconsImageBundle iconsImageBundle;
-
+	PortalGinInjector portalGinInjector;
+	
 	@Inject
 	public APITableColumnManagerViewImpl(
 			APITableColumnManagerViewImplUiBinder binder,
-			IconsImageBundle iconsImageBundle) {
+			IconsImageBundle iconsImageBundle,
+			PortalGinInjector portalGinInjector) {
 		widget = binder.createAndBindUi(this);
 		this.iconsImageBundle = iconsImageBundle;
+		this.portalGinInjector = portalGinInjector;
 		addColumnButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				resetColumnModal();
-				newColumnModal.show();
+				presenter.addColumnConfig();
 			}
 		});
-		KeyDownHandler newColumn = new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					newColumnOkButton.click();
-				}
-			}
-		};
-		displayColumnNamesField.addKeyDownHandler(newColumn);
-		inputColumnNamesField.addKeyDownHandler(newColumn);
-		newColumnOkButton.addClickHandler(new ClickHandler() {
+		
+		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.addColumnConfig(rendererField.getValue(rendererField
-						.getSelectedIndex()), inputColumnNamesField.getValue(),
-						displayColumnNamesField.getValue(), COLUMN_SORT_TYPE
-								.valueOf(sortField.getValue(sortField
-										.getSelectedIndex())));
-				newColumnModal.hide();
+				presenter.deleteSelected();
 			}
 		});
-		newColumnCancelButton.addClickHandler(new ClickHandler() {
+		selectionToolbar.setMovedownClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				newColumnModal.hide();
+				presenter.onMoveDown();
 			}
 		});
-	}
-
-	private void resetColumnModal() {
-		rendererField.setSelectedIndex(0);
-		sortField.setSelectedIndex(0);
-		inputColumnNamesField.setValue("");
-		displayColumnNamesField.setValue("");
+		
+		selectionToolbar.setMoveupClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onMoveUp();
+			}
+		});
+		selectionToolbar.setSelectAllClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.selectAll();
+			}
+		});
+		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.selectNone();
+			}
+		});
 	}
 
 	@Override
-	public void configure(List<APITableColumnConfig> configs) {
-		isEmpty = configs == null || configs.size() == 0;
-		if (isEmpty) {
-			addNoConfigRow();
-		} else {
-			populateTable(configs);
-		}
+	public void clearColumns() {
+		columnRenderersContainer.clear();
 	}
-
-	private void addNoConfigRow() {
-		columnRenderersTable.clear();
-		columnRenderersTable.add(new HTML(DisplayConstants.TEXT_NO_COLUMNS));
+	
+	@Override
+	public void addColumn(IsWidget widget) {
+		columnRenderersContainer.add(widget);
 	}
-
-	private void populateTable(List<APITableColumnConfig> configs) {
-		columnRenderersTable.clear();
-		for (final APITableColumnConfig data : configs) {
-			Div row = new Div();
-			row.add(new InlineHTML(data.getDisplayColumnName()));
-
-			AbstractImagePrototype img = AbstractImagePrototype
-					.create(iconsImageBundle.deleteButtonGrey16());
-			Anchor deleteColumnButton = DisplayUtils.createIconLink(img,
-					new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							presenter.deleteColumnConfig(data);
-						}
-					});
-			deleteColumnButton.addStyleName("margin-left-5");
-			row.add(deleteColumnButton);
-			columnRenderersTable.add(row);
-		}
+	@Override
+	public void setNoColumnsUIVisible(boolean visible) {
+		noColumnsUI.setVisible(visible);
 	}
-
+	
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -169,5 +126,27 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void setCanDelete(boolean canDelete) {
+		selectionToolbar.setCanDelete(canDelete);
+	}
+	
+	@Override
+	public void setCanMoveDown(boolean canMoveDown) {
+		selectionToolbar.setCanMoveDown(canMoveDown);
+	}
+	@Override
+	public void setCanMoveUp(boolean canMoveUp) {
+		selectionToolbar.setCanMoveUp(canMoveUp);
+	}
+	@Override
+	public void setButtonToolbarVisible(boolean visible) {
+		selectionToolbar.setVisible(visible);
+	}
+	@Override
+	public void setHeaderColumnsVisible(boolean visible) {
+		columnHeaders.setVisible(visible);
 	}
 }

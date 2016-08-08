@@ -8,7 +8,7 @@
 		<bh:Div>
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel for="query">Query</b:FormLabel>
+					<b:FormLabel for="query">Evaluation Queue Query</b:FormLabel>
 					<b:TextBox ui:field="queryField" name="query" b:id="query" />
 				</b:FormGroup>
 				<b:FormGroup>

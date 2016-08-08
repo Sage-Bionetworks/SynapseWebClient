@@ -73,6 +73,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem queryLink;
 	@UiField
+	public AnchorListItem leaderboardLink;
+	@UiField
 	public AnchorListItem referenceLink;
 	@UiField
 	public AnchorListItem previewLink;
@@ -198,6 +200,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		linkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		provenanceGraphLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PROV_GRAPH));
 		queryLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_QUERY_TABLE));
+		leaderboardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LEADERBOARD));
 		referenceLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REFERENCE));
 		submitToEvaluationLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION));
 		tableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TABLE));

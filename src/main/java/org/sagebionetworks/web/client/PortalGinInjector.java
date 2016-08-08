@@ -63,6 +63,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
@@ -71,6 +72,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ExternalImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
@@ -260,6 +262,7 @@ public interface PortalGinInjector extends Ginjector {
 	public LinkConfigEditor getLinkConfigEditor();
 	public APITableConfigEditor getSynapseAPICallConfigEditor();
 	public QueryTableConfigEditor getSynapseQueryConfigEditor();
+	public LeaderboardConfigEditor getLeaderboardConfigEditor();
 	public TabbedTableConfigEditor getTabbedTableConfigEditor();
 	public EntityTreeBrowser getEntityTreeBrowser();
 	public EntityListConfigEditor getEntityListConfigEditor();
@@ -303,6 +306,9 @@ public interface PortalGinInjector extends Ginjector {
 	public CytoscapeWidget getCytoscapeRenderer();
 	public SynapseTableFormWidget getSynapseTableFormWidget();
 	public TeamMembersWidget getTeamMembersWidget();
+	
+	//////API Table Column Editor
+	public APITableColumnConfigView getAPITableColumnConfigView();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
