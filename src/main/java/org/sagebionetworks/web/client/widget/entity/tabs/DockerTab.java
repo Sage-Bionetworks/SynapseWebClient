@@ -8,6 +8,9 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
@@ -20,6 +23,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -161,7 +165,10 @@ public class DockerTab implements DockerTabView.Presenter{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearDockerRepoWidget();
 		if (isRepo) {
-			breadcrumb.configure(bundle.getPath(), EntityArea.DOCKER);
+			List<LinkData> links = new ArrayList<LinkData>();
+			Place ownerObjectPlace = new Synapse(projectEntityId);
+			links.add(new LinkData(projectBundle.getEntity().getName(), ownerObjectPlace));
+			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
 			repoWidget.configure(bundle, handler);
