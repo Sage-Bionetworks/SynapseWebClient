@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -99,6 +100,7 @@ public class DockerTabTest {
 		when(mockDockerRepoEntity.getId()).thenReturn(dockerRepoEntityId);
 		when(mockDockerRepoEntity.getName()).thenReturn(dockerRepoName);
 		when(mockDockerRepoEntityBundle.getEntity()).thenReturn(mockDockerRepoEntity);
+		when(mockDockerRepoEntity.getRepositoryName()).thenReturn(dockerRepoName);
 		when(mockGinInjector.createNewDockerRepoWidget()).thenReturn(mockDockerRepoWidget);
 		when(mockDockerRepoEntityBundle.getPath()).thenReturn(mockPath);
 	}
@@ -186,10 +188,13 @@ public class DockerTabTest {
 		verify(mockBreadcrumb).configure(listCaptor.capture(), anyString());
 		List<LinkData> list = listCaptor.getValue();
 		assertNotNull(list);
-		assertEquals(1, list.size());
-		Place place = new Synapse(projectEntityId);
-		assertEquals(list.get(0).getPlace(), place);
+		assertEquals(2, list.size());
+		assertEquals(list.get(0).getPlace(), new Synapse(projectEntityId));
 		assertEquals(list.get(0).getText(), projectName);
+		assertEquals(list.get(0).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()));
+		assertEquals(list.get(1).getPlace(), new Synapse(dockerRepoEntityId));
+		assertEquals(list.get(1).getText(), dockerRepoName);
+		assertEquals(list.get(1).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(DockerRepository.class.getName()));
 		verify(mockGinInjector).createNewDockerRepoWidget();
 		verify(mockView).setDockerRepoWidget(any(Widget.class));
 		verify(mockDockerRepoListWidget, never()).configure(mockProjectEntityBundle);
