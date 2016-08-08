@@ -88,11 +88,13 @@ public class DockerTab implements DockerTabView.Presenter{
 			};
 		});
 
-		dockerRepoListWidget.setRepoClickedCallback(new CallbackP<String>() {
+		dockerRepoListWidget.setRepoClickedCallback(new CallbackP<EntityBundle>() {
 			@Override
-			public void invoke(String entityId) {
+			public void invoke(EntityBundle bundle) {
 				areaToken = null;
-				getTargetBundleAndDisplay(entityId);
+				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
+				setTargetBundle(bundle);
+				tab.showTab();
 			}
 		});
 	}
@@ -172,7 +174,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	private void getTargetBundleAndDisplay(final String entityId) {
 		synAlert.clear();
 		view.clearDockerRepoWidget();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | DOI;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
