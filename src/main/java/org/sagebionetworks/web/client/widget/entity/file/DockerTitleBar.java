@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -9,13 +9,13 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidgetPresenter {
+public class DockerTitleBar implements BasicTitleBarView.Presenter, SynapseWidgetPresenter {
 	
 	private BasicTitleBarView view;
 	private AuthenticationController authenticationController;
 	private FavoriteWidget favWidget;
 	@Inject
-	public BasicTitleBar(BasicTitleBarView view, AuthenticationController authenticationController, FavoriteWidget favWidget) {
+	public DockerTitleBar(BasicTitleBarView view, AuthenticationController authenticationController, FavoriteWidget favWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.favWidget = favWidget;
@@ -24,11 +24,11 @@ public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidget
 		view.setFavoritesWidget(favWidget.asWidget());
 	}	
 	
-	public void configure(EntityBundle bundle) {
-		favWidget.configure(bundle.getEntity().getId());
+	public void configure(DockerRepository repo) {
+		favWidget.configure(repo.getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
-		view.setTitle(bundle.getEntity().getName());
-		view.setIconType(EntityTypeUtils.getIconTypeForEntity(bundle.getEntity()));
+		view.setTitle(repo.getRepositoryName());
+		view.setIconType(EntityTypeUtils.getIconTypeForEntity(repo));
 	}
 	
 	public void clearState() {
@@ -42,8 +42,4 @@ public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidget
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-    
-	/*
-	 * Private Methods
-	 */
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -16,7 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -39,11 +38,11 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	private ActionMenuWidget actionMenu;
 	private EntityMetadata metadata;
 	private ModifiedCreatedByWidget modifiedCreatedBy;
-	private BasicTitleBar dockerTitleBar;
+	private DockerTitleBar dockerTitleBar;
 	private EntityActionController controller;
 	private boolean isAnnotationsShown;
 	private boolean canEdit;
-	private Entity entity;
+	private DockerRepository entity;
 
 	@Inject
 	public DockerRepoWidget(
@@ -53,7 +52,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 			WikiPageWidget wikiPageWidget,
 			ProvenanceWidget provWidget,
 			ActionMenuWidget actionMenu,
-			BasicTitleBar dockerTitleBar,
+			DockerTitleBar dockerTitleBar,
 			EntityMetadata metadata,
 			ModifiedCreatedByWidget modifiedCreatedBy,
 			EntityActionController controller
@@ -84,17 +83,17 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	}
 
 	public void configure(EntityBundle bundle, final EntityUpdatedHandler handler) {
-		this.entity = bundle.getEntity();
+		this.entity = (DockerRepository)bundle.getEntity();
 		this.handler = handler;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		metadata.setEntityUpdatedHandler(handler);
 		metadata.setEntityBundle(bundle, null);
-		dockerTitleBar.configure(bundle);
+		dockerTitleBar.configure(entity);
 		modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 		configureWikiPage(bundle);
 		configureProvenance(entity.getId());
 		configureActionMenu(bundle);
-		view.setDockerPullCommand(DOCKER_PULL_COMMAND + bundle.getEntity().getName());
+		view.setDockerPullCommand(DOCKER_PULL_COMMAND + entity.getRepositoryName());
 	}
 
 	private void configureActionMenu(EntityBundle bundle) {
