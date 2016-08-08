@@ -188,13 +188,10 @@ public class DockerTabTest {
 		verify(mockBreadcrumb).configure(listCaptor.capture(), anyString());
 		List<LinkData> list = listCaptor.getValue();
 		assertNotNull(list);
-		assertEquals(2, list.size());
+		assertEquals(1, list.size());
 		assertEquals(list.get(0).getPlace(), new Synapse(projectEntityId));
 		assertEquals(list.get(0).getText(), projectName);
 		assertEquals(list.get(0).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()));
-		assertEquals(list.get(1).getPlace(), new Synapse(dockerRepoEntityId));
-		assertEquals(list.get(1).getText(), dockerRepoName);
-		assertEquals(list.get(1).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(DockerRepository.class.getName()));
 		verify(mockGinInjector).createNewDockerRepoWidget();
 		verify(mockView).setDockerRepoWidget(any(Widget.class));
 		verify(mockDockerRepoListWidget, never()).configure(mockProjectEntityBundle);

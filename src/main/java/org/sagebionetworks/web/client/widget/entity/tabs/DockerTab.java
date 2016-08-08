@@ -171,8 +171,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			Place projectPlace = new Synapse(projectEntityId);
 			Place repoPlace = new Synapse(entity.getId());
 			links.add(new LinkData(projectBundle.getEntity().getName(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
-			links.add(new LinkData(((DockerRepository)entity).getRepositoryName(), EntityTypeUtils.getIconTypeForEntityClassName(DockerRepository.class.getName()), repoPlace));
-			breadcrumb.configure(links, null);
+			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
 			repoWidget.configure(bundle, handler);
