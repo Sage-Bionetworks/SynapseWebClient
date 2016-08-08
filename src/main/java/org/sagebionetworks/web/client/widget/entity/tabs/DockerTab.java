@@ -8,11 +8,16 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -20,6 +25,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -88,11 +94,13 @@ public class DockerTab implements DockerTabView.Presenter{
 			};
 		});
 
-		dockerRepoListWidget.setRepoClickedCallback(new CallbackP<String>() {
+		dockerRepoListWidget.setRepoClickedCallback(new CallbackP<EntityBundle>() {
 			@Override
-			public void invoke(String entityId) {
+			public void invoke(EntityBundle bundle) {
 				areaToken = null;
-				getTargetBundleAndDisplay(entityId);
+				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
+				setTargetBundle(bundle);
+				tab.showTab();
 			}
 		});
 	}
@@ -159,7 +167,11 @@ public class DockerTab implements DockerTabView.Presenter{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearDockerRepoWidget();
 		if (isRepo) {
-			breadcrumb.configure(bundle.getPath(), EntityArea.DOCKER);
+			List<LinkData> links = new ArrayList<LinkData>();
+			Place projectPlace = new Synapse(projectEntityId);
+			Place repoPlace = new Synapse(entity.getId());
+			links.add(new LinkData(projectBundle.getEntity().getName(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
+			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
 			repoWidget.configure(bundle, handler);
@@ -172,7 +184,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	private void getTargetBundleAndDisplay(final String entityId) {
 		synAlert.clear();
 		view.clearDockerRepoWidget();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | DOI;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {

@@ -50,9 +50,7 @@ public class AddExternalRepositoryModalTest {
 	@Test
 	public void testOnSave() {
 		modal.onSave();
-		verify(mockView).getRegistryHost();
-		verify(mockView).getPort();
-		verify(mockView).getRepoPath();
+		verify(mockView).getRepoName();
 		verify(mockSynapseClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
 	}
 

@@ -58,17 +58,11 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		String registryHost = view.getRegistryHost();
-		String port = view.getPort();
-		String repoPath = view.getRepoPath();
-		// TODO: validate input
+		String repoName = view.getRepoName();
 		DockerRepository dockerRepo = new DockerRepository();
 		dockerRepo.setEntityType(DockerRepository.class.getName());
 		dockerRepo.setParentId(parentId);
-		dockerRepo.setIsManaged(false);
-		// TODO: replace this method with Bruce's
-		String name = buildRepoName(registryHost, port, repoPath);
-		dockerRepo.setName(name);
+		dockerRepo.setRepositoryName(repoName);
 		synapseClient.createEntity(dockerRepo, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity dockerRepo) {
@@ -83,20 +77,4 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 			}
 		});
 	}
-
-	private String buildRepoName(String registryHost, String port, String repoPath) {
-		String name = "";
-		if (registryHost != null && !registryHost.equals("")) {
-			name += registryHost;
-			if (port != null && !registryHost.equals("")) {
-				name += ":"+port;
-			}
-		}
-		if (name.length() > 0) {
-			name += "/";
-		}
-		name += repoPath;
-		return name;
-	}
-
 }
