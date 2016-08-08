@@ -239,15 +239,20 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	public static void updateProgress(JavaScriptObject evt) {
 		if (SynapseJSNIUtilsImpl.progressCallback != null) {
-			//parse out value
-			double currentProgress = _getProgress(evt);
-			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress);
+			SynapseJSNIUtilsImpl.progressCallback.updateProgress(_getLoaded(evt), _getTotal(evt));
 		}
 	}
 	
-	private final static native double _getProgress(JavaScriptObject evt) /*-{
+	private final static native double _getLoaded(JavaScriptObject evt) /*-{
 		if (evt.lengthComputable) {
-			return evt.loaded / evt.total;
+			return evt.loaded;
+		}
+		return 0;
+	}-*/;
+	
+	private final static native double _getTotal(JavaScriptObject evt) /*-{
+		if (evt.lengthComputable) {
+			return evt.total;
 		}
 		return 0;
 	}-*/;

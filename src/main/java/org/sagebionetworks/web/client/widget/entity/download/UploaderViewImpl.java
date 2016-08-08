@@ -24,6 +24,7 @@ import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EventHandlerUtils;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -104,6 +104,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private HTML spinningProgressContainer;
 	private Input fileUploadInput;
 	private Heading fileUploadLabel = new Heading(HeadingSize.H5);
+	private Italic uploadSpeedLabel = new Italic();
 	FlowPanel container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
@@ -125,6 +126,8 @@ public class UploaderViewImpl extends FlowPanel implements
 		this.progressBar = new ProgressBar();
 		progressBar.setType(ProgressBarType.INFO);
 		progressContainer.add(progressBar);
+		uploadSpeedLabel.addStyleName("margin-left-5");
+		progressContainer.add(uploadSpeedLabel);
 		
 		this.formPanel = new FormPanel();
 		this.externalLinkFormPanel = new Form();
@@ -232,6 +235,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		enableMultipleFileUploads(true);
 		fileUploadInput.setValue(null);
 		fileUploadLabel.setText("");
+		uploadSpeedLabel.setHTML("");
 	}
 	
 	@Override
@@ -323,9 +327,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void updateProgress(double value, String text) {
+	public void updateProgress(double value, String text, String uploadSpeed) {
 		progressBar.setText(text);
 		progressBar.setPercent(value*100);
+		uploadSpeedLabel.setHTML(SafeHtmlUtils.htmlEscapeAllowEntities(uploadSpeed.replaceAll(" ", "&nbsp;")));
 	}
 	
 	@Override
@@ -338,12 +343,14 @@ public class UploaderViewImpl extends FlowPanel implements
 		//try to hide the loading progress bar.  ignore any errors
 		resetProgress();
 		progressContainer.setVisible(false);
+		uploadSpeedLabel.setHTML("");
 		spinningProgressContainer.setHTML("");
 		spinningProgressContainer.setVisible(false);
 	}
 	private void resetProgress() {
 		progressBar.setPercent(0.0);
 		progressBar.setText("");
+		uploadSpeedLabel.setHTML("");
 	}
 	
 	@Override

@@ -10,6 +10,8 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -17,6 +19,9 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.HasRpcToken;
+import com.google.gwt.user.client.rpc.XsrfToken;
+import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.inject.Inject;
 
 /**
@@ -28,6 +33,7 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
+	public static final String XSRF_TOKEN_KEY = "org.sagebionetworks.XSRFToken";
 	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
@@ -38,6 +44,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private SessionStorage sessionStorage;
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
+	private SynapseClientAsync synapseClient;
+	private XsrfTokenServiceAsync xsrfTokenService;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public AuthenticationControllerImpl(
@@ -45,12 +54,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			UserAccountServiceAsync userAccountService, 
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
-			AdapterFactory adapterFactory){
+			AdapterFactory adapterFactory,
+			XsrfTokenServiceAsync xsrfTokenService,
+			SynapseClientAsync synapseClient,
+			GWTWrapper gwt){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
+		this.synapseClient = synapseClient;
+		this.xsrfTokenService = xsrfTokenService;
+		this.gwt = gwt;
+		gwt.asServiceDefTarget(xsrfTokenService).setServiceEntryPoint(gwt.getModuleBaseURL() + "xsrf");
 	}
 
 	@Override
@@ -95,6 +111,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		localStorage.remove(USER_SESSION_DATA_CACHE_KEY);
+		localStorage.remove(XSRF_TOKEN_KEY);
 		sessionStorage.clear();
 		currentUser = null;
 	}
@@ -114,12 +131,26 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
-				callback.onSuccess(userSessionData);
+				updateXsrfToken(userSessionData, callback);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				logoutUser();
 				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE + " " + caught.getMessage()));
+			}
+		});
+	}
+
+	private void updateXsrfToken(final UserSessionData userSessionData, final AsyncCallback<UserSessionData> callback) {
+		xsrfTokenService.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
+			public void onSuccess(XsrfToken token) {
+				gwt.asHasRpcToken(synapseClient).setRpcToken(token);
+				localStorage.put(XSRF_TOKEN_KEY, token.getToken(), DateUtils.getDayFromNow().getTime());
+				callback.onSuccess(userSessionData);
+			}
+
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
 			}
 		});
 	}
@@ -206,5 +237,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
+	}
+	@Override
+	public String getCurrentXsrfToken() {
+		return localStorage.get(XSRF_TOKEN_KEY);
 	}
 }

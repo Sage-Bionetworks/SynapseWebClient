@@ -10,7 +10,7 @@
 	<b:Modal ui:field="uiModal"
 		dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		<b:ModalHeader>
-			<b:Heading size="H4" text="Sharing Settings" addStyleNames="displayInline" />
+			<b:Heading size="H4" text="Sharing Settings" addStyleNames="displayInline" ui:field="modalTitle" />
 			<w:HelpWidget helpMarkdown="Sharing of content can be done using multiple access levels. Only Administrators can add, delete ,or change access levels for other people." 
 					addStyleNames="margin-left-5" placement="BOTTOM"/>
 		</b:ModalHeader>

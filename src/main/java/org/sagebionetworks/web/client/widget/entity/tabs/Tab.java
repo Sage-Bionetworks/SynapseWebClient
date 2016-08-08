@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,7 +21,7 @@ public class Tab implements TabView.Presenter {
 	Synapse place;
 	String entityName;
 	List<CallbackP<Tab>> onClickCallbacks;
-	
+	boolean isContentStale;
 	@Inject
 	public Tab(TabView view, GlobalApplicationState globalAppState, SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
@@ -84,7 +85,7 @@ public class Tab implements TabView.Presenter {
 	}
 	
 	public void addTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		onClickCallbacks.add(onClickCallback);
+		onClickCallbacks.add(0, onClickCallback);
 	}
 	
 	@Override
@@ -94,6 +95,14 @@ public class Tab implements TabView.Presenter {
 		}
 	}
 	
+	public boolean isContentStale() {
+		return isContentStale;
+	}
+
+	public void setContentStale(boolean isContentStale) {
+		this.isContentStale = isContentStale;
+	}
+
 	/**
 	 * For testing purposes only
 	 * @param entityName
@@ -101,4 +110,5 @@ public class Tab implements TabView.Presenter {
 	public void setEntityName(String entityName) {
 		this.entityName = entityName;
 	}
+	
 }

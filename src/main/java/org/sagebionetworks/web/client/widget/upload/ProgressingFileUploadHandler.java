@@ -12,8 +12,8 @@ public interface ProgressingFileUploadHandler extends FileUploadHandler {
 	 * Called as the file upload progresses.
 	 * 
 	 * @param currentProgress The percent complete.
-	 * @param progressText A progress message.
+	 * @param uploadSpeed calculated upload speed
 	 */
-	void updateProgress(double currentProgress, String progressText);
+	void updateProgress(double currentProgress, String progressText, String uploadSpeed);
 
 }

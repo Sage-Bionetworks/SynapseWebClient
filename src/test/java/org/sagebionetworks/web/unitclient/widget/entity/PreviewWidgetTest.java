@@ -22,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -58,27 +60,31 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class PreviewWidgetTest {
 	PreviewWidget previewWidget;
-	PreviewWidgetView mockView; 
+	@Mock
+	PreviewWidgetView mockView;
+	@Mock
 	RequestBuilderWrapper mockRequestBuilder;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
 	EntityBundle testBundle;
 	FileEntity testEntity;
 	List<FileHandle> testFileHandleList;
+	@Mock
 	Response mockResponse;
+	@Mock
 	SynapseAlert mockSynapseAlert;
+	@Mock
+	AuthenticationController mockAuthController;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
 	
 	@Before
 	public void before() throws Exception{
-		mockView = mock(PreviewWidgetView.class);
-		mockRequestBuilder = mock(RequestBuilderWrapper.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockSynapseAlert = mock(SynapseAlert.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient);
+		MockitoAnnotations.initMocks(this);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();

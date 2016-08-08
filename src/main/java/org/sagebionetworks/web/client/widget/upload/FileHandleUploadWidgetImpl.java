@@ -155,7 +155,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 					@Override
 					public void updateProgress(double currentProgress,
-							String progressText) {
+							String progressText, String uploadSpeed) {
 						view.updateProgress(currentProgress*100, progressText);
 					}
 		}, null);

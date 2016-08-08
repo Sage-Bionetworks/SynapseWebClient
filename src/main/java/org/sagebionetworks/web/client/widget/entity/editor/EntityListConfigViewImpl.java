@@ -77,7 +77,7 @@ public class EntityListConfigViewImpl extends FlowPanel implements EntityListCon
 	
 	@Override
 	public void configure() {	
-		renderer = new EntityListRenderer(iconsImageBundle,	synapseJSNIUtils, ginInjector, false);
+		renderer = new EntityListRenderer(iconsImageBundle,	synapseJSNIUtils, ginInjector, false, false);
 		tableContainer.clear();
 		tableContainer.add(renderer);
 	}

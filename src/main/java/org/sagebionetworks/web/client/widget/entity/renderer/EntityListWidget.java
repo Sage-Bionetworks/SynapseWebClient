@@ -44,7 +44,12 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 		descriptor = widgetDescriptor;
 		final boolean isLoggedIn = authenticationController.isLoggedIn();
 		
-		view.configure();
+		boolean showDescription = true;
+		if (descriptor.containsKey(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY)) {
+			showDescription = Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY));
+		}
+		
+		view.configure(showDescription);
 
 		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
 		if(records != null) {
@@ -55,7 +60,7 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
 					}
-				});
+				}, authenticationController.getCurrentXsrfToken());
 			}			
 		}		
 	}

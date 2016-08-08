@@ -25,6 +25,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -90,7 +91,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		userSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
-				insertMarkdown("@" + username);
+				insertMarkdown(username);
 			}
 		});
 		userSelector.addModalShownHandler(new ModalShownHandler() {
@@ -267,7 +268,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TOC_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
 		case INSERT_USER_LINK:
-			insertMarkdown("@");
 			insertUserLink();
 			break;
 		case INSERT_USER_TEAM_BADGE:
@@ -504,13 +504,14 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	@Override
-	public void onKeyPress(char c) {
-		if ('@' == c) {
+	public void onKeyPress(KeyPressEvent event) {
+		if ('@' == event.getCharCode()) {
 			// only insert a user link if this is the first character, or the character before it is whitespace
 			int pos = view.getCursorPos();
 			String md = view.getMarkdown();
 			if (pos < 1 || gwt.isWhitespace(md.substring(pos-1, pos))) {
-				view.setEditorEnabled(false);
+				event.preventDefault();
+				event.stopPropagation();
 				insertUserLink();	
 			}
 		}
@@ -518,6 +519,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void insertUserLink() {
 		// pop up suggest box.  on selection, userSelector has been configured to add the username to the md.
+		insertMarkdown("@");
 		userSelector.show();
 	}
 

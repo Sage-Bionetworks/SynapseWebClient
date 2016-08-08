@@ -47,7 +47,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		final boolean isLoggedIn = authenticationController.isLoggedIn();
-		
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY, Boolean.FALSE.toString());
 		view.configure();
 
 		records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
@@ -59,7 +59,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
 					}
-				});
+				}, authenticationController.getCurrentXsrfToken());
 			}			
 		}
 
@@ -80,7 +80,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 				public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 					view.setEntityGroupRecordDisplay(addedIndex, entityGroupRecordDisplay, isLoggedIn);
 				}
-			});	
+			}, authenticationController.getCurrentXsrfToken());	
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
 		}

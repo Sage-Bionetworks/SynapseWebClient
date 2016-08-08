@@ -21,6 +21,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -41,8 +42,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Span author;
 	@UiField
 	Span createdOn;
-	@UiField
-	HTMLPanel loadMore;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -163,15 +162,15 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void addReply(Widget w) {
-		replyListContainer.add(w);
+	public void setRepliesContainer(IsWidget container) {
+		replyListContainer.clear();
+		replyListContainer.add(container);
 	}
 
 	@Override
 	public void clear() {
 		threadTitle.clear();
 		createdOn.clear();
-		replyListContainer.clear();
 	}
 
 	@Override
@@ -197,16 +196,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setAlert(Widget w) {
 		synAlertContainer.add(w);
-	}
-
-	@Override
-	public void setLoadMoreVisibility(boolean visible) {
-		loadMore.setVisible(visible);
-	}
-
-	@Override
-	public void clearReplies() {
-		replyListContainer.clear();
 	}
 
 	@Override
@@ -293,21 +282,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setCommandsVisible(boolean visible) {
 		commandsContainer.setVisible(visible);
-	}
-
-	@Override
-	public boolean isLoadMoreAttached() {
-		return loadMore.isAttached();
-	}
-
-	@Override
-	public boolean isLoadMoreInViewport() {
-		return DisplayUtils.isInViewport(loadMore.asWidget());
-	}
-
-	@Override
-	public boolean getLoadMoreVisibility() {
-		return loadMore.isVisible();
 	}
 
 	@Override

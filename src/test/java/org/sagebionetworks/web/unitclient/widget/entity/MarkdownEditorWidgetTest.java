@@ -49,6 +49,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -75,6 +76,8 @@ public class MarkdownEditorWidgetTest {
 	String fileHandleId2 = "45";
 	@Mock
 	UserSelector mockUserSelector;
+	@Mock
+	KeyPressEvent mockKeyEvent;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -131,7 +134,7 @@ public class MarkdownEditorWidgetTest {
 		String username = "jay";
 		callbackCaptor.getValue().invoke(username);
 		
-		verify(mockView).setMarkdown("@"+username);
+		verify(mockView).setMarkdown(username);
 		verify(mockView).setFocus(true);
 	}
 	
@@ -598,14 +601,18 @@ public class MarkdownEditorWidgetTest {
 	
 	@Test
 	public void testOnKeyPress() {
-		presenter.onKeyPress('1');
+		when(mockKeyEvent.getCharCode()).thenReturn('1');
+		presenter.onKeyPress(mockKeyEvent);
 		verify(mockUserSelector, never()).show();
-		presenter.onKeyPress('a');
+		when(mockKeyEvent.getCharCode()).thenReturn('a');
+		presenter.onKeyPress(mockKeyEvent);
 		verify(mockUserSelector, never()).show();
 		verify(mockView, never()).setEditorEnabled(anyBoolean());
-		presenter.onKeyPress('@');
+		when(mockKeyEvent.getCharCode()).thenReturn('@');
+		presenter.onKeyPress(mockKeyEvent);
 		verify(mockUserSelector).show();
-		verify(mockView).setEditorEnabled(false);
+		verify(mockKeyEvent).preventDefault();
+		verify(mockKeyEvent).stopPropagation();
 	}
 
 	@Test
@@ -613,7 +620,8 @@ public class MarkdownEditorWidgetTest {
 		when(mockView.getCursorPos()).thenReturn(0);
 		when(mockView.getMarkdown()).thenReturn("");
 		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
-		presenter.onKeyPress('@');
+		when(mockKeyEvent.getCharCode()).thenReturn('@');
+		presenter.onKeyPress(mockKeyEvent);
 		verify(mockUserSelector).show();
 	}
 	
@@ -623,7 +631,8 @@ public class MarkdownEditorWidgetTest {
 		when(mockView.getCursorPos()).thenReturn(5);
 		when(mockView.getMarkdown()).thenReturn("email");
 		when(mockGwt.isWhitespace(anyString())).thenReturn(false);
-		presenter.onKeyPress('@');
+		when(mockKeyEvent.getCharCode()).thenReturn('@');
+		presenter.onKeyPress(mockKeyEvent);
 		verify(mockUserSelector, never()).show();
 	}
 	

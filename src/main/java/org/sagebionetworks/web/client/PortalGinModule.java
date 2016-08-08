@@ -97,6 +97,8 @@ import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
 import org.sagebionetworks.web.client.widget.WikiModalWidgetView;
 import org.sagebionetworks.web.client.widget.WikiModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
@@ -141,8 +143,6 @@ import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalVi
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -165,12 +165,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListView;
-import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EvaluationListView;
-import org.sagebionetworks.web.client.widget.entity.EvaluationListViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
@@ -391,6 +385,14 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabsView;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabsViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
@@ -951,9 +953,6 @@ public class PortalGinModule extends AbstractGinModule {
 		//Evaluation selector
 		bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
 		
-		//Single Evaluation link selection
-		bind(EvaluationLinksListView.class).to(EvaluationLinksListViewImpl.class);
-		
 		//Administer Evaluations list 
 		bind(AdministerEvaluationsListView.class).to(AdministerEvaluationsListViewImpl.class);
 		
@@ -1301,5 +1300,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(StuAnnouncementWidgetView.class).to(StuAnnouncementWidgetViewImpl.class);
 		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
 		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
+		
+		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
+		bind(LoadMoreWidgetContainerView.class).to(LoadMoreWidgetContainerViewImpl.class);
 	}
 }

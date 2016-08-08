@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -46,6 +45,7 @@ public class EntityListWidgetTest {
 	Map<String, String> descriptor;
 	Folder syn456;
 	EntityGroupRecord record456; 
+	String xsrfToken = "12345";
 	
 	@Before
 	public void setup() throws Exception{		
@@ -54,7 +54,7 @@ public class EntityListWidgetTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-
+		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 		// create gettable entity
 		syn456 = new Folder();
 		syn456.setId("syn456");
@@ -89,10 +89,26 @@ public class EntityListWidgetTest {
 		records.add(record456);			
 		String encoded = EntityListUtil.recordsToString(records);
 		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
-				
-		widget.configure(null, descriptor, null, null);
 		
-		verify(mockView).configure();	
+		widget.configure(null, descriptor, null, null);
+		//expect to show the description if no param is specified (backwards compatible)
+		boolean showDescription = true;
+		verify(mockView).configure(showDescription);	
+		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
+	}
+	
+	@Test
+	public void testConfigureHideDescription() {		
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		records.add(record456);			
+		String encoded = EntityListUtil.recordsToString(records);
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY, Boolean.FALSE.toString());
+		
+		widget.configure(null, descriptor, null, null);
+		//expect to show the description if no param is specified (backwards compatible)
+		boolean showDescription = false;
+		verify(mockView).configure(showDescription);	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
 	}
 	
@@ -103,7 +119,7 @@ public class EntityListWidgetTest {
 		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
 		
 		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController.isLoggedIn(),
-					records, 0, handler);
+					records, 0, handler, xsrfToken);
 		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
 	}
 	
@@ -134,7 +150,7 @@ public class EntityListWidgetTest {
 		String resultDescription = "Description =)";
 		
 		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController.isLoggedIn(),
-					records, 0, handler);
+					records, 0, handler, xsrfToken);
 
 		// The wiki description was used.
 		ArgumentCaptor<EntityGroupRecordDisplay> arg = ArgumentCaptor.forClass(EntityGroupRecordDisplay.class);

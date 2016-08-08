@@ -699,6 +699,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			view.addChallengeWidget(widget);
+			if (currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
+				// SWC-3213: extra call to make sure challenge tab is currently shown
+				view.setTabSelected(ProfileArea.CHALLENGES);
+			}
 		}
 	}
 	

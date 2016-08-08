@@ -1,14 +1,13 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.ModalSize;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,7 +32,8 @@ public class AccessControlListModalWidgetViewImpl implements
 	Button primaryButton;
 	@UiField
 	Button defaultButton;
-
+	@UiField
+	Heading modalTitle;
 	Modal modal;
 
 	@Inject
@@ -93,5 +93,10 @@ public class AccessControlListModalWidgetViewImpl implements
 		}else{
 			this.primaryButton.state().reset();
 		}
+	}
+	
+	@Override
+	public void setTitle(String title) {
+		modalTitle.setText(title);	
 	}
 }

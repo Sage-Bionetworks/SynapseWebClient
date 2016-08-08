@@ -442,7 +442,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				clearState();
 			} else {
 				//finish upload
-				view.updateProgress(.99d, "99%");
+				view.updateProgress(.99d, "99%", "");
 				uploadSuccess();
 			}
 		} else {
@@ -695,11 +695,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	@Override
-	public void updateProgress(double currentProgress, String progressText) {
+	public void updateProgress(double currentProgress, String progressText, String uploadSpeed) {
 		view.showProgressBar();
 		double percentOfAllFiles = calculatePercentOverAllFiles(this.fileNames.length, this.currIndex, currentProgress);
-		String textOfAllFiles = percentFormat.format(percentOfAllFiles*100.0) + "%";
-		view.updateProgress(percentOfAllFiles, textOfAllFiles);
+		String textOfAllFiles = percentFormat.format(percentOfAllFiles*100.0) + "% ";
+		view.updateProgress(percentOfAllFiles, textOfAllFiles, uploadSpeed);
 	}
 
 	@Override

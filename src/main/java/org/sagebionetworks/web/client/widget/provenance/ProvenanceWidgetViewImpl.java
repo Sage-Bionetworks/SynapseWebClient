@@ -5,10 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.shared.event.HideEvent;
-import org.gwtbootstrap3.client.shared.event.HideHandler;
-import org.gwtbootstrap3.client.shared.event.ShowEvent;
-import org.gwtbootstrap3.client.shared.event.ShowHandler;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
@@ -20,7 +16,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
@@ -34,6 +29,11 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -175,9 +175,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		} else if(node instanceof ActivityGraphNode) {
 			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
 			// create tool tip for defined activities only
-			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
-				addUndefinedToolTip(container);
-			} else {
+			if(((ActivityGraphNode) node).getType() != ActivityType.UNDEFINED) {
 				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
 			}
 			return container;
@@ -191,13 +189,12 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final ProvNodeContainer nodeContainer, final String title) {					
-		nodeContainer.getTip().setTitle(DisplayUtils.getLoadingHtml(sageImageBundle));
-		nodeContainer.getTip().addShowHandler(new ShowHandler() {
+	private void addToolTipToContainer(final ProvGraphNode node, final ProvNodeContainer nodeContainer, final String title) {
+		nodeContainer.setupTooltip(DisplayUtils.getLoadingHtml(sageImageBundle));
+		final HandlerRegistration mouseOverRegistration = nodeContainer.addMouseOverHandler(new MouseOverHandler() {
 			@Override
-			public void onShow(ShowEvent showEvent) {
+			public void onMouseOver(MouseOverEvent event) {
 				node.setShowingTooltip(true);
-				//load the tooltip contents only once
 				if(filledPopoverIds.containsKey(node.getId())) {
 					return;
 				}  
@@ -222,10 +219,9 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 							 @Override
 							public void execute() {
 								boolean isShowingTooltip = node.isShowingTooltip();
-								nodeContainer.getTip().setTitle(rendered);
-								nodeContainer.getTip().reconfigure();
+								nodeContainer.setupTooltip(rendered);
 								if (isShowingTooltip)
-									nodeContainer.getTip().show();
+									nodeContainer.showTooltip();
 							}
 						 });
 					}
@@ -233,24 +229,14 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			}
 		});
 		
-		nodeContainer.getTip().addHideHandler(new HideHandler() {
-			
+		nodeContainer.addMouseOutHandler(new MouseOutHandler() {
 			@Override
-			public void onHide(HideEvent hideEvent) {
+			public void onMouseOut(MouseOutEvent event) {
 				node.setShowingTooltip(false);
+				mouseOverRegistration.removeHandler();
 			}
 		});
 	}
-
-	private void addUndefinedToolTip(FlowPanel container) {
-		Anchor a = new Anchor();
-		a.setHref(WebConstants.PROVENANCE_API_URL);
-		a.setText(DisplayConstants.HOW_TO_DEFINE_ACTIVITY);
-		a.setTarget("_blank");		
-		a.setStyleName("link");
-		ProvViewUtil.createMessageConfig(DisplayConstants.DEFINE_ACTIVITY, a.toString(), container);
-	}
-
 	
 	private static native void connect(String parentId, String childId) /*-{
 		jsPlumbInstance.connect({source:parentId, target:childId, overlays:jsP_overlays	});
@@ -377,7 +363,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		for(String nodeId : notCurrentNodeIds) {
 			ProvNodeContainer container = nodeToContainer.get(nodeId);
 			if(container != null) {
-				container.showMessage("<span class=\"small moveup-5\">(" + DisplayConstants.OLD_VERSION + ")</span>", DisplayConstants.THERE_IS_A_NEWER_VERSION);				
+				container.showMessage("<span class=\"small moveup-5\">(" + DisplayConstants.OLD_VERSION + ")</span>");				
 			}
 		}
 	}

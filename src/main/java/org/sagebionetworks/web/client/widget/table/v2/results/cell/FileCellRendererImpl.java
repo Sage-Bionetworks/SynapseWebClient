@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.StringUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -18,11 +19,13 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	String fileHandleId;
 	CellAddress address;
 	AsynchTableFileHandleProvider fileHandleProvider;
-
+	AuthenticationController authController;
+	
 	@Inject
-	public FileCellRendererImpl(FileCellRendererView view, AsynchTableFileHandleProvider provider) {
+	public FileCellRendererImpl(FileCellRendererView view, AsynchTableFileHandleProvider provider, AuthenticationController authController) {
 		this.view = view;
 		this.fileHandleProvider = provider;
+		this.authController = authController;
 	}
 
 	@Override
@@ -83,6 +86,10 @@ public class FileCellRendererImpl implements FileCellRenderer {
 		builder.append(WebConstants.TABLE_ROW_VERSION_NUMBER);
 		builder.append("=");
 		builder.append(address.getRowVersion());
+		builder.append("&");
+		builder.append(WebConstants.XSRF_TOKEN_KEY);
+		builder.append("=");
+		builder.append(authController.getCurrentXsrfToken());
 		return builder.toString();
 	}
 

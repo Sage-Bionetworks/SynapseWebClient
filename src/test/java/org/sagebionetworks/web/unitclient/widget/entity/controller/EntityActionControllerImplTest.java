@@ -29,7 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
@@ -49,10 +51,12 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -63,7 +67,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -77,6 +80,8 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -121,9 +126,13 @@ public class EntityActionControllerImplTest {
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 	V2WikiPage mockWikiPageToDelete;
-
+	@Mock
+	EvaluationEditorModal mockEvalEditor;
+	@Mock
+	CookieProvider mockCookies;
 	@Before
 	public void before() {
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(EntityActionControllerView.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -156,7 +165,8 @@ public class EntityActionControllerImplTest {
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
+				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
+				mockEvalEditor, mockCookies);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -411,6 +421,32 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
 	}
 
+
+	@Test
+	public void testConfigureAddEvaluationNotInAlpha(){
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+	}
+	
+	@Test
+	public void testConfigureAddEvaluationInAlpha(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
+	}
+	
+	@Test
+	public void testConfigureAddEvaluationInAlphaNotProject(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+	}
 	
 	@Test
 	public void testConfigureMoveTable(){
