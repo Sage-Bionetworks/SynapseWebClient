@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -25,7 +28,8 @@ public class LeaderboardConfigViewImpl implements LeaderboardConfigView {
 	CheckBox isPagingField;
 	@UiField
 	CheckBox isRowVisibleField;
-	
+	@UiField
+	Button autoAddColumns;
 	@UiField
 	SimplePanel columnManagerContainer;
 	
@@ -34,6 +38,12 @@ public class LeaderboardConfigViewImpl implements LeaderboardConfigView {
 		widget = binder.createAndBindUi(this);
 		this.columnsManager = columnsManager;
 		columnManagerContainer.setWidget(columnsManager.asWidget());
+		autoAddColumns.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.autoAddColumns();
+			}
+		});
 	}
 	
 	@Override
@@ -51,6 +61,11 @@ public class LeaderboardConfigViewImpl implements LeaderboardConfigView {
 	@Override
 	public List<APITableColumnConfig> getConfigs() {
 		return columnsManager.getColumnConfigs();
+	}
+	
+	@Override
+	public void setConfigs(List<APITableColumnConfig> newColumnConfigs) {
+		columnsManager.configure(newColumnConfigs);
 	}
 	
 	@Override

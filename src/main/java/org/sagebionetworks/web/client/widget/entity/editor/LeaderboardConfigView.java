@@ -18,13 +18,14 @@ public interface LeaderboardConfigView extends IsWidget, WidgetEditorView {
 	public Boolean isPaging();
 	public Boolean isShowRowNumbers();
 	public List<APITableColumnConfig> getConfigs();
+	public void setConfigs(List<APITableColumnConfig> newColumnConfigs);
 	public void configure(APITableConfig tableConfig);
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
+		void autoAddColumns();
 	}
 
 	
