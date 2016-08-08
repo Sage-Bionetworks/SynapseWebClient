@@ -10,7 +10,7 @@
 				<b:FormGroup>
 					<b:FormLabel for="query">Evaluation Query</b:FormLabel>
 					<b:TextBox ui:field="queryField" name="query" b:id="query" placeholder="select * from evaluation_12345" />
-					<b:Button ui:field="autoAddColumns" icon="REFRESH" addStyleNames="margin-10" text="Refresh columns" />
+					<b:Button ui:field="autoAddColumns" icon="REFRESH" addStyleNames="margin-top-10" text="Refresh Columns" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:CheckBox ui:field="isPagingField" text="Support pagination"/>
