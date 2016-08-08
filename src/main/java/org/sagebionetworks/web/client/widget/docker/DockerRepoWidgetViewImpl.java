@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
-	private static final String FULL_WIDTH = "100%";
 	@UiField
 	PanelBody dockerRepoWikiPageContainer;
 	@UiField
@@ -76,7 +75,6 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@Override
 	public void setDockerPullCommand(String command) {
 		dockerPullCommand.setText(command);
-		dockerPullCommand.setWidth(FULL_WIDTH);
 	}
 
 	@Override

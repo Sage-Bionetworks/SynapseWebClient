@@ -185,7 +185,7 @@ public class DockerTabTest {
 		verify(mockView, atLeastOnce()).clearDockerRepoWidget();
 		verify(mockShowProjectInfoCallback).invoke(false);
 		ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
-		verify(mockBreadcrumb).configure(listCaptor.capture(), anyString());
+		verify(mockBreadcrumb).configure(listCaptor.capture(), eq(dockerRepoName));
 		List<LinkData> list = listCaptor.getValue();
 		assertNotNull(list);
 		assertEquals(1, list.size());

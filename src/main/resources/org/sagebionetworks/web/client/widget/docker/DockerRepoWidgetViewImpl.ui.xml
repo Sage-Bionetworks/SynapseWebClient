@@ -19,7 +19,7 @@
 							<b:Heading size="H3" text="Docker Pull Command"/>
 						</b:PanelHeader>
 						<b:PanelBody>
-							<g:TextBox ui:field="dockerPullCommand" addStyleNames="border-none noBackground" readOnly="true" />
+							<g:TextBox ui:field="dockerPullCommand" addStyleNames="border-none noBackground" readOnly="true" width="100%"/>
 						</b:PanelBody>
 					</b:Panel>
 					<b:Panel addStyleNames="margin-top-15">
