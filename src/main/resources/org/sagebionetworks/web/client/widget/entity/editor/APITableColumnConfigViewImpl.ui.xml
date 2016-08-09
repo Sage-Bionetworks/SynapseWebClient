@@ -16,7 +16,7 @@
 		<t:TableData paddingRight="5" addStyleNames="hidden-xs">
 			<b:TextBox ui:field="displayName" />
 		</t:TableData>
-		<t:TableData width="100px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+		<t:TableData width="130px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 			<b:ListBox ui:field="rendererField">
 				<g:item>none</g:item>
 				<g:item>userid</g:item>

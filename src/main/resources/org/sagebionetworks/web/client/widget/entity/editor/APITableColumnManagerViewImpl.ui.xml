@@ -25,7 +25,7 @@
 						<t:TableHeader paddingRight="5" addStyleNames="hidden-xs">
 							<bh:Span text="Display Name" />
 						</t:TableHeader>
-						<t:TableHeader width="100px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+						<t:TableHeader width="130px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 							<bh:Span text="Renderer" />
 						</t:TableHeader>
 						<t:TableHeader width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
