@@ -19,12 +19,14 @@ public interface QueryTableConfigView extends IsWidget, WidgetEditorView {
 	public Boolean isShowRowNumbers();
 	public List<APITableColumnConfig> getConfigs();
 	public void configure(APITableConfig tableConfig);
-	
+	public void setQueryPlaceholder(String placeHolder);
+	public void setConfigs(List<APITableColumnConfig> newColumnConfigs);
+
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
+		void autoAddColumns();
 	}
 
 	
