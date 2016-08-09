@@ -5,6 +5,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -23,6 +24,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
@@ -54,6 +56,8 @@ public class QueryTableConfigEditorTest {
 	String testJSON = "{totalNumberOfResults=10,results={}}";
 	String testQuery = "select+*+from+table";
 	String decodedTestQuery = "select * from table";
+	String col1Name = "field1";
+	String col2Name = "field2";
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -63,9 +67,9 @@ public class QueryTableConfigEditorTest {
 		testReturnJSONObject.put("totalNumberOfResults", 100);
 		//and create some results
 		JSONObjectAdapter result1 = testReturnJSONObject.createNew();
-		fillInResult(result1, new String[]{"field1", "field2"}, new String[]{"result1 value 1", "result1 value 2"});
+		fillInResult(result1, new String[]{col1Name, col2Name}, new String[]{"result1 value 1", "result1 value 2"});
 		JSONObjectAdapter result2 = testReturnJSONObject.createNew();
-		fillInResult(result2, new String[]{"field1", "field2"}, new String[]{"result2 value 1", "result2 value 2"});
+		fillInResult(result2, new String[]{col1Name, col2Name}, new String[]{"result2 value 1", "result2 value 2"});
 		JSONArrayAdapter results = new JSONArrayAdapterImpl();
 		results.put(0, result2);
 		results.put(0, result1);
@@ -85,7 +89,7 @@ public class QueryTableConfigEditorTest {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, "myTableStyle");
 		
 		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		
+		when(mockView.getQueryString()).thenReturn(testQuery);
 	}
 	
 	private void fillInResult(JSONObjectAdapter result, String[] fieldNames, String[] fieldValues) throws JSONObjectAdapterException {
@@ -141,6 +145,13 @@ public class QueryTableConfigEditorTest {
 		editor.configure(mockWikiKey, descriptor, null);
 		editor.autoAddColumns();
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		verify(mockView).setConfigs(captor.capture());
+		List<APITableColumnConfig> configs = captor.getValue();
+		assertEquals(2, configs.size());
+		String column1 = configs.get(0).getInputColumnNames().iterator().next();
+		String column2 = configs.get(1).getInputColumnNames().iterator().next();
+		assertTrue(column1.equals(col1Name) || column1.equals(col2Name));
+		assertTrue(column2.equals(col1Name) || column2.equals(col2Name));
 	}
 }
