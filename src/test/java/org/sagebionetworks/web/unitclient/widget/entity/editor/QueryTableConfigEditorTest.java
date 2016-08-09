@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +16,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -28,14 +29,11 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class QueryTableConfigEditorTest {
@@ -56,8 +54,8 @@ public class QueryTableConfigEditorTest {
 	String testJSON = "{totalNumberOfResults=10,results={}}";
 	String testQuery = "select+*+from+table";
 	String decodedTestQuery = "select * from table";
-	String col1Name = "field1";
-	String col2Name = "field2";
+	String col1Name = WebConstants.DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID;
+	String col2Name = WebConstants.DEFAULT_COL_NAME_MODIFIED_ON;
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -149,9 +147,20 @@ public class QueryTableConfigEditorTest {
 		verify(mockView).setConfigs(captor.capture());
 		List<APITableColumnConfig> configs = captor.getValue();
 		assertEquals(2, configs.size());
-		String column1 = configs.get(0).getInputColumnNames().iterator().next();
-		String column2 = configs.get(1).getInputColumnNames().iterator().next();
-		assertTrue(column1.equals(col1Name) || column1.equals(col2Name));
-		assertTrue(column2.equals(col1Name) || column2.equals(col2Name));
+		APITableColumnConfig columnConfig1, columnConfig2;
+		String aColumnName = configs.get(0).getInputColumnNames().iterator().next();
+		
+		if (aColumnName.equals(col1Name)) {
+			columnConfig1 = configs.get(0);
+			columnConfig2 = configs.get(1);
+		} else {
+			columnConfig1 = configs.get(1);
+			columnConfig2 = configs.get(0);
+		}
+		
+		assertTrue(columnConfig1.getInputColumnNames().iterator().next().equals(col1Name));
+		assertTrue(columnConfig2.getInputColumnNames().iterator().next().equals(col2Name));
+		assertTrue(columnConfig1.getRendererFriendlyName().equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID));
+		assertTrue(columnConfig2.getRendererFriendlyName().equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE));
 	}
 }
