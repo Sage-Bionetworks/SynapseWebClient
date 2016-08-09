@@ -5,35 +5,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.SynapseProfileProxy;
-import org.sagebionetworks.table.query.ParseException;
-import org.sagebionetworks.table.query.TableQueryParser;
-import org.sagebionetworks.table.query.model.OrderByClause;
-import org.sagebionetworks.table.query.model.OrderingSpecification;
-import org.sagebionetworks.table.query.model.Pagination;
-import org.sagebionetworks.table.query.model.QuerySpecification;
-import org.sagebionetworks.table.query.model.SortKey;
-import org.sagebionetworks.table.query.model.SortSpecification;
-import org.sagebionetworks.table.query.model.SortSpecificationList;
-import org.sagebionetworks.table.query.model.TableExpression;
-import org.sagebionetworks.table.query.util.SqlElementUntils;
-import org.sagebionetworks.web.shared.NodeType;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
-import org.springframework.web.client.HttpClientErrorException;
 
 public class ServiceUtils {
-
-	private static final String ERROR_REASON = "reason";
 
 	private static Logger logger = Logger.getLogger(ServiceUtils.class.getName());
 	

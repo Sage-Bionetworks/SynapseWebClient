@@ -13,16 +13,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
  * 
  */
 public class AddAttachmentHelper {
-	
-	public interface Callback {
-		/**
-		 * When the user selects save this will be called.
-		 * 
-		 * @param attachment
-		 */
-		public void onSaveAttachment(UploadResult result);
-	}
-	
 	public static UploadResult getUploadResult(String html){
 		UploadResult result = new UploadResult();
 		result.setUploadStatus(UploadStatus.SUCCESS);

@@ -99,8 +99,6 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
-import org.sagebionetworks.web.client.widget.WikiModalWidgetView;
-import org.sagebionetworks.web.client.widget.WikiModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -369,8 +367,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEd
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
@@ -1014,7 +1010,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
 		bind(ReferenceWidgetView.class).to(ReferenceWidgetViewImpl.class);
-		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
 		bind(EntityListWidgetView.class).to(EntityListWidgetViewImpl.class);
 		bind(ShinySiteWidgetView.class).to(ShinySiteWidgetViewImpl.class);		
 		bind(ImageWidgetView.class).to(ImageWidgetViewImpl.class);
@@ -1257,7 +1252,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ACTView.class).to(ACTViewImpl.class);
 		bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
 		bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
-		bind(WikiModalWidgetView.class).to(WikiModalWidgetViewImpl.class);
 
 		// discussion
 		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);

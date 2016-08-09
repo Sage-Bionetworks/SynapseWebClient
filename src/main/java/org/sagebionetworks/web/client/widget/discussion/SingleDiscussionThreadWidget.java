@@ -51,11 +51,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
 	private static final String NEW_REPLY_SUCCESS_TITLE = "Reply created";
 	private static final String NEW_REPLY_SUCCESS_MESSAGE = "A new reply has been created.";
-	public static final String REPLY = "reply";
-	public static final String REPLIES = "replies";
 	public static final String CREATED_ON_PREFIX = "posted ";
-	public static final String NO_INDENTATION_WIDTH = "100%";
-	public static final String INDENTATION_WIDTH = "98%";
 	public static final String DEFAULT_MARKDOWN = "";
 	SingleDiscussionThreadWidgetView view;
 	SynapseAlert synAlert;
