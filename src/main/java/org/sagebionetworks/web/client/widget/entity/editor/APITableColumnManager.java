@@ -176,4 +176,8 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 		}
 		return newConfigs;
 	}
+	
+	public List<APITableColumnConfigView> getColumnEditors() {
+		return columns;
+	}
 }
