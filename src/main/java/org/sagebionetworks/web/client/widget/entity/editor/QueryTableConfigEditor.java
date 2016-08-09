@@ -30,7 +30,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private String servicePrefix;
-	private boolean includeIsQueryTableResults;
+	
 	@Inject
 	public QueryTableConfigEditor(QueryTableConfigView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
@@ -39,7 +39,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		view.setPresenter(this);
 		view.initView();
 		servicePrefix = ClientProperties.QUERY_SERVICE_PREFIX;
-		includeIsQueryTableResults = false;
 	}
 	
 	@Override
@@ -81,9 +80,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
-		if (includeIsQueryTableResults) {
-			updateDescriptor(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS, Boolean.TRUE.toString());
-		}
 		List<APITableColumnConfig> configs = view.getConfigs();
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, configs);
 	}
