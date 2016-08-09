@@ -19,16 +19,16 @@
 	        	<t:Table ui:field="columnHeaders" width="100%" height="30px">
 					<t:TableRow>
 						<t:TableHeader width="35px"/> <!-- select checkbox -->
-						<t:TableHeader width="100px" paddingRight="5">
-							<bh:Span text="Renderer" />
-						</t:TableHeader>
-						<t:TableHeader width="120px" paddingRight="5">
+						<t:TableHeader width="170px" paddingRight="5">
 							<bh:Span text="Column Name" />
 						</t:TableHeader>
-						<t:TableHeader width="120px" paddingRight="5">
+						<t:TableHeader paddingRight="5" addStyleNames="hidden-xs">
 							<bh:Span text="Display Name" />
 						</t:TableHeader>
-						<t:TableHeader width="75px" paddingRight="5">
+						<t:TableHeader width="100px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+							<bh:Span text="Renderer" />
+						</t:TableHeader>
+						<t:TableHeader width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 							<bh:Span text="Sort" />
 						</t:TableHeader>
 					</t:TableRow>

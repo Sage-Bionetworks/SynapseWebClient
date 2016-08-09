@@ -10,7 +10,13 @@
 		<t:TableData width="35px">
 			<b:CheckBox ui:field="select" />
 		</t:TableData>
-		<t:TableData width="100px">
+		<t:TableData width="170px" paddingRight="5">
+	    	<b:TextBox ui:field="columnName" />
+		</t:TableData>
+		<t:TableData paddingRight="5" addStyleNames="hidden-xs">
+			<b:TextBox ui:field="displayName" />
+		</t:TableData>
+		<t:TableData width="100px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 			<b:ListBox ui:field="rendererField">
 				<g:item>none</g:item>
 				<g:item>userid</g:item>
@@ -20,13 +26,7 @@
 				<g:item>synapseid</g:item>
 			</b:ListBox>
 		</t:TableData>
-		<t:TableData width="120px" paddingRight="5">
-	    	<b:TextBox ui:field="columnName" />
-		</t:TableData>
-		<t:TableData width="120px" paddingRight="5">
-			<b:TextBox ui:field="displayName" />
-		</t:TableData>
-		<t:TableData width="75px" paddingRight="5">
+		<t:TableData width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 			<b:ListBox ui:field="sortField">
 				<g:item>NONE</g:item>
 				<g:item>DESC</g:item>
