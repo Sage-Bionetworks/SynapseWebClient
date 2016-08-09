@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -18,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,16 +26,18 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	
 	private QueryTableConfigView view;
 	private Map<String, String> descriptor;
-	private static final String DEFAULT_PAGE_SIZE = "100";
+	public static final String DEFAULT_PAGE_SIZE = "100";
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private String servicePrefix;
+	private GWTWrapper gwt;
 	
 	@Inject
-	public QueryTableConfigEditor(QueryTableConfigView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter) {
+	public QueryTableConfigEditor(QueryTableConfigView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.initView();
 		servicePrefix = ClientProperties.QUERY_SERVICE_PREFIX;
@@ -49,7 +51,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		if (uri != null) {
 			//strip off prefix and decode query string
 			if (uri.startsWith(servicePrefix)) {
-				uri = URL.decodeQueryString(uri.substring(servicePrefix.length()));
+				uri = gwt.decodeQueryString(uri.substring(servicePrefix.length()));
 			} 
 			tableConfig.setUri(uri);
 		} 
@@ -178,7 +180,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	}
 	
 	private String getServicePathFromView() {
-		return servicePrefix + URL.encodeQueryString(view.getQueryString());
+		return servicePrefix + gwt.encodeQueryString(view.getQueryString());
 	}
 	
 
