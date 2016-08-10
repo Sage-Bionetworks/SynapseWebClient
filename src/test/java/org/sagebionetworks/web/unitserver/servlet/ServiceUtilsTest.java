@@ -21,9 +21,6 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.ServiceUtils;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
 
 /**

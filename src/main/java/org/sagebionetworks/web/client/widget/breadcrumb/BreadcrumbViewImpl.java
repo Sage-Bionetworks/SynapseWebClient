@@ -10,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,10 +18,6 @@ import com.google.inject.Inject;
 public class BreadcrumbViewImpl implements BreadcrumbView {
 	private static final int MAX_BREADCRUMB_LENGTH = 25;
 	
-	public interface BreadcrumbViewImplUiBinder extends
-			UiBinder<Widget, BreadcrumbViewImpl> {
-	}
-
 	FlowPanel panel;
 	private Presenter presenter;
 

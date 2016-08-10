@@ -24,7 +24,6 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
-import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
@@ -115,10 +114,6 @@ public class PortalServletModule extends ServletModule {
 		// Setup the User Account service mapping
 		bind(StackConfigServiceImpl.class).in(Singleton.class);
 		serve("/Portal/stackConfig").with(StackConfigServiceImpl.class);
-	
-		// setup the NCBO servlet
-		bind(NcboSearchService.class).in(Singleton.class);
-		serve("/Portal/ncbo/search").with(NcboSearchService.class);
 		
 		// setup the Simple Search servlet
 		bind(SimpleSearchService.class).in(Singleton.class);
