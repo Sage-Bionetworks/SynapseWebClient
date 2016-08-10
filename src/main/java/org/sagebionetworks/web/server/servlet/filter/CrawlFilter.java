@@ -328,7 +328,7 @@ public class CrawlFilter implements Filter {
 				+ "</title></head><body>");
 		html.append("<h1>" + team.getName() + "</h1>");
 		html.append("<h3>" + team.getDescription() + "</h3>");
-		TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(team.getId(), "", 3000, 0);
+		TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(team.getId(), "", 20, 0);
 		for (TeamMemberBundle teamMember : teamMembers.getResults()) {
 			try {
 				html.append(getUserProfileString(teamMember.getUserProfile()) + "<br>");
