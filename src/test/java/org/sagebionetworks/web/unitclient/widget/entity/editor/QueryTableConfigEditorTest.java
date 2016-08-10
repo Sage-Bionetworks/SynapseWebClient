@@ -147,20 +147,15 @@ public class QueryTableConfigEditorTest {
 		verify(mockView).setConfigs(captor.capture());
 		List<APITableColumnConfig> configs = captor.getValue();
 		assertEquals(2, configs.size());
-		APITableColumnConfig columnConfig1, columnConfig2;
-		String aColumnName = configs.get(0).getInputColumnNames().iterator().next();
-		
-		if (aColumnName.equals(col1Name)) {
-			columnConfig1 = configs.get(0);
-			columnConfig2 = configs.get(1);
-		} else {
-			columnConfig1 = configs.get(1);
-			columnConfig2 = configs.get(0);
-		}
-		
-		assertTrue(columnConfig1.getInputColumnNames().iterator().next().equals(col1Name));
-		assertTrue(columnConfig2.getInputColumnNames().iterator().next().equals(col2Name));
-		assertTrue(columnConfig1.getRendererFriendlyName().equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID));
-		assertTrue(columnConfig2.getRendererFriendlyName().equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE));
+		APITableColumnConfig columnConfig1 = configs.get(0);
+		APITableColumnConfig columnConfig2 = configs.get(1);
+		String columnConfig1Name = columnConfig1.getInputColumnNames().iterator().next();
+		String columnConfig2Name = columnConfig2.getInputColumnNames().iterator().next();
+		assertTrue(columnConfig1Name.equals(col1Name) || columnConfig1Name.equals(col2Name));
+		assertTrue(columnConfig2Name.equals(col1Name) || columnConfig2Name.equals(col2Name));
+		String columnConfig1Renderer = columnConfig1.getRendererFriendlyName();
+		String columnConfig2Renderer = columnConfig2.getRendererFriendlyName();
+		assertTrue(columnConfig1Renderer.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID) || columnConfig1Renderer.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE));
+		assertTrue(columnConfig2Renderer.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID) || columnConfig2Renderer.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE));
 	}
 }
