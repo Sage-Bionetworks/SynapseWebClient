@@ -20,5 +20,6 @@ public class LeaderboardConfigEditorTest {
 		MockitoAnnotations.initMocks(this);
 		editor = new LeaderboardConfigEditor(mockQueryTableEditor);
 		verify(mockQueryTableEditor).setServicePrefix(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX);
+		verify(mockQueryTableEditor).setQueryPlaceholder(LeaderboardConfigEditor.LEADERBOARD_QUERY_PLACEHOLDER);
 	}
 }

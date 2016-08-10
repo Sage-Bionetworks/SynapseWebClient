@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -179,6 +180,10 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		return defaultRendererName;
 	}
 	
+	public void setQueryPlaceholder(String placeHolder) {
+		view.setQueryPlaceholder(placeHolder);
+	}
+	
 	private String getServicePathFromView() {
 		return servicePrefix + gwt.encodeQueryString(view.getQueryString());
 	}
@@ -187,6 +192,8 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	public String getQueryString() {
 		return view.getQueryString();
 	}
+	
+	
 	/*
 	 * Private Methods
 	 */
