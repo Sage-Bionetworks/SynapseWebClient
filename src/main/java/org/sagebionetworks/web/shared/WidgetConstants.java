@@ -56,6 +56,10 @@ public class WidgetConstants {
 	public static final String QUERY_TABLE_CONTENT_TYPE = "querytable";
 	public static final String QUERY_TABLE_FRIENDLY_NAME = "Query Table";
 	
+	public static final String LEADERBOARD_CONTENT_TYPE = "leaderboard";
+	public static final String LEADERBOARD_FRIENDLY_NAME = "Leaderboard";
+	
+	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
 

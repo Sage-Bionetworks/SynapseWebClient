@@ -255,6 +255,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_QUERY_TABLE:
 			insertNewWidget(WidgetConstants.QUERY_TABLE_CONTENT_TYPE);
 			break;
+		case INSERT_LEADERBOARD:
+			insertNewWidget(WidgetConstants.LEADERBOARD_CONTENT_TYPE);
+			break;
 		case INSERT_REFERENCE:
 			insertNewWidget(WidgetConstants.REFERENCE_CONTENT_TYPE);
 			break;

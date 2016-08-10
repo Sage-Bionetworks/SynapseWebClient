@@ -14,19 +14,28 @@ public interface APITableColumnManagerView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-		
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void configure(List<APITableColumnConfig> configs);
-		void deleteColumnConfig(APITableColumnConfig config);
-		void addColumnConfig(String rendererName, String inputColumnNames, String displayColumnName, COLUMN_SORT_TYPE sort);
+		void addColumnConfig();
+		void onMoveDown();
+		void onMoveUp();
+		void deleteSelected();
+		void selectNone();
+		void selectAll();
 	}
 
-	/**
-	 * Configures attachments view for this entity
-	 * @param entity
-	 */
-	public void configure(List<APITableColumnConfig> configs);
+	void addColumn(IsWidget widget);
+	void clearColumns();
+	void setHeaderColumnsVisible(boolean visible);
+	void setNoColumnsUIVisible(boolean visible);
+	
+	//selection toolbar state
+	void setCanDelete(boolean canDelete);
+	void setCanMoveUp(boolean canMoveUp);
+	void setCanMoveDown(boolean canMoveDown);
+	void setButtonToolbarVisible(boolean visible);
 }

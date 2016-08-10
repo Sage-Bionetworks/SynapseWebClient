@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +15,10 @@ import org.junit.Test;
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
 
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 public class APITableConfigTest {
@@ -121,5 +125,25 @@ public class APITableConfigTest {
 			assertTrue(e.getMessage().indexOf(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + 0) > -1);
 			throw e;
 		}
+	}
+	
+	@Test
+	public void testUpdateDescriptorWithColumnConfigsCleanup() {
+		String oldDefinition = "outofdate";
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + 0, oldDefinition);
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + 1, oldDefinition);
+		
+		List<APITableColumnConfig> configs = new ArrayList<APITableColumnConfig>();
+		APITableColumnConfig newColumnDefinition = new APITableColumnConfig();
+		newColumnDefinition.setInputColumnNames(new HashSet<String>());
+		newColumnDefinition.setSort(COLUMN_SORT_TYPE.NONE);
+		configs.add(newColumnDefinition);
+		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, configs);
+		
+		// first definition updated
+		assertTrue(descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + 0));
+		assertNotSame(oldDefinition, descriptor.get(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + 0));
+		// second definition removed
+		assertFalse(descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + 1));
 	}
 }

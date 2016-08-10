@@ -22,6 +22,7 @@
 				    <b:AnchorListItem ui:field="genomeBrowserLink" text="Genome Browser"/>
 				    <b:AnchorListItem ui:field="imageLink" text="Image"/>
 				    <b:AnchorListItem ui:field="joinTeamLink" text="Join Team Button"/>
+				    <b:AnchorListItem ui:field="leaderboardLink" text="Leaderboard"/>
 				    <b:AnchorListItem ui:field="linkLink" text="Link"/>
 				    <b:AnchorListItem ui:field="provenanceGraphLink" text="Provenance Graph"/>
 				    <b:AnchorListItem ui:field="referenceLink" text="Reference"/>

@@ -263,6 +263,8 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
@@ -967,6 +969,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// API Table Column manager	
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
+		bind(APITableColumnConfigView.class).to(APITableColumnConfigViewImpl.class);
 
 		//single subpages view
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
