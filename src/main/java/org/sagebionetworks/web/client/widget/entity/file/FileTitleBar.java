@@ -9,11 +9,13 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,24 +30,29 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	private EntityBundle entityBundle;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, GlobalApplicationState globalAppState) {
+			SynapseClientAsync synapseClient, GlobalApplicationState globalAppState, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 	}	
 	
-	public void configure(EntityBundle bundle) {		
+	public void configure(EntityBundle bundle) {
 		view.setPresenter(this);
 		this.entityBundle = bundle;
 
 		// Get EntityType
 		EntityType entityType = EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass());
 		view.createTitlebar(bundle, entityType, authenticationController);
+		FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
+		view.setFileClientsHelp(clientsHelp.asWidget());
+		clientsHelp.configure(entityBundle.getEntity().getId());
 	}
 	
 	/**

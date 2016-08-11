@@ -18,12 +18,10 @@ public interface FilesTabView extends IsWidget {
 	void setWikiPage(Widget w);
 	void setSynapseAlert(Widget w);
 	void setProvenanceVisible(boolean visible);
-	void setProgrammaticClientsVisible(boolean visible);
 	void setWikiPageWidgetVisible(boolean visible);
 	void setFileBrowserVisible(boolean visible);
 	void setPreviewVisible(boolean visible);
 	void clearActionMenuContainer();
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 	void setRefreshAlert(Widget w);
-	void setClientsHelp(Widget w);
 }

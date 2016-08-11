@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
@@ -30,7 +29,6 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -63,6 +61,9 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Anchor authorizedDirectDownloadLink;
 	@UiField
+	Div clientsHelpContainer;
+	
+	@UiField
 	SimplePanel md5LinkContainer;
 	@UiField
 	Icon entityIcon;
@@ -78,6 +79,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	DivElement externalUrlUI;
 	@UiField
 	SpanElement externalUrl;
+	@UiField
+	Heading entityName;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -190,32 +193,24 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			}
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
+		entityName.setText(entity.getName());
 		if (directDownloadUrl != null) {
-			Button downloadIcon = new Button();
-			downloadIcon.setText("Download");
-			downloadIcon.setIcon(IconType.DOWNLOAD);
-			downloadIcon.setSize(ButtonSize.LARGE);
-			downloadIcon.setType(ButtonType.PRIMARY);
-			downloadIcon.addStyleName("margin-left-5");
 			//special case, if this starts with sftp proxy, then handle
 			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 			if (directDownloadUrl.startsWith(sftpProxy)) {
 				authorizedDirectDownloadLink.setVisible(true);
-				authorizedDirectDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
-				authorizedDirectDownloadLink.add(downloadIcon);
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
 				presenter.queryForSftpLoginInstructions(url);
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadLink.setHref(directDownloadUrl);
-				directDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
-				directDownloadLink.add(downloadIcon);
 			}
+			clientsHelpContainer.setVisible(true);
 		}
 		else {
-			licensedDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
 			licensedDownloadLink.setVisible(true);
+			clientsHelpContainer.setVisible(false);
 		}
 	}
 	@Override
@@ -254,5 +249,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Override
 	public void setFileLocation(String location) {
 		fileLocation.setInnerText(location);
+	}
+	@Override
+	public void setFileClientsHelp(Widget w) {
+		clientsHelpContainer.clear();
+		clientsHelpContainer.add(w);
 	}
 }

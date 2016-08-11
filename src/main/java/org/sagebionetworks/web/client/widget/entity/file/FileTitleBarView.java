@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface FileTitleBarView extends IsWidget, SynapseView {
 
@@ -34,7 +35,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	void setLoginInstructions(String instructions);
 
 	void setFileLocation(String location);
-
+	void setFileClientsHelp(Widget w);
 	/**
 	 * Presenter interface
 	 */

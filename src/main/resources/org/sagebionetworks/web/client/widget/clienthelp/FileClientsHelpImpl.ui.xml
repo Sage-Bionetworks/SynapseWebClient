@@ -4,10 +4,10 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<b:Anchor dataToggle="MODAL" dataTarget="#clientHelpModal" text="other options" addStyleNames="font-italic"/>
+		<b:Anchor dataToggle="MODAL" dataTarget="#clientHelpModal" text="other download options" addStyleNames="font-italic"/>
 		<b:Modal closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="clientHelpModal">
 			<b:ModalHeader>
-			    <b:Heading size="H4" text="Download" addStyleNames="displayInline"/>
+			    <b:Heading size="H4" text="Download Options" addStyleNames="displayInline"/>
 			    <w:HelpWidget helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](http://docs.synapse.org/articles/api_documentation.html) is available online." 
 								href="http://docs.synapse.org/articles/getting_started.html#installing-synapse-clients" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			</b:ModalHeader>
@@ -22,7 +22,7 @@
 						<b:TabPane active="true" b:id="commandLineTab">
 						  	<g:HTMLPanel>
 								<pre>
-									<code class="powerShell">
+									<code class="nohighlight">
 										# Login<br/>
 										synapse -u synapse_username -p synapse_password<br/>
 										<br/>
@@ -35,7 +35,7 @@
 						<b:TabPane b:id="pythonTab">
 							<g:HTMLPanel>
 								<pre>
-									<code class="python">
+									<code class="nohighlight">
 										import synapseclient<br/>
 										<br/>
 										syn = synapseclient.Synapse()<br/>
@@ -53,7 +53,7 @@
 						<b:TabPane b:id="rTab">
 							<g:HTMLPanel>
 								<pre>
-									<code class="r">
+									<code class="nohighlight">
 										library(synapseClient)<br/>
 										synapseLogin('username','password')<br/>
 										<br/>

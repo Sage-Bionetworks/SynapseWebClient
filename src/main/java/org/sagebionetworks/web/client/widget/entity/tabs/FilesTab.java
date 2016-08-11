@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
@@ -186,7 +185,6 @@ public class FilesTab {
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
 		modifiedCreatedBy.setVisible(false);
 	}
@@ -335,12 +333,6 @@ public class FilesTab {
 			filesBrowser.configure(currentEntityId, bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser());	
 		}
 		
-		//Programmatic Clients
-		view.setProgrammaticClientsVisible(isFile);
-		if (isFile) {
-			configureProgrammaticClients(currentEntityId, shownVersionNumber);	
-		}
-
 		//Provenance
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));
@@ -378,12 +370,6 @@ public class FilesTab {
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 		}
-	}
-	
-	public void configureProgrammaticClients(String entityId, Long versionNumber) {
-		FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
-		view.setClientsHelp(clientsHelp.asWidget());
-		clientsHelp.configure(entityId);
 	}
 	
 	public void initActionMenu(EntityBundle bundle) {

@@ -26,10 +26,6 @@ public class FilesTabViewImpl implements FilesTabView {
 	@UiField
 	Div fileProvenanceContainerHighlightBox;
 	@UiField
-	Column fileClientsHelpContainer;
-	@UiField
-	SimplePanel fileClientsHelp;
-	@UiField
 	SimplePanel fileModifiedAndCreatedContainer;
 	@UiField
 	SimplePanel fileBreadcrumbContainer;
@@ -127,16 +123,6 @@ public class FilesTabViewImpl implements FilesTabView {
 	@Override
 	public void setProvenanceVisible(boolean visible) {
 		fileProvenanceContainer.setVisible(visible);
-	}
-	@Override
-	public void setProgrammaticClientsVisible(boolean visible) {
-		fileClientsHelpContainer.setVisible(visible);
-	}
-	
-	@Override
-	public void setClientsHelp(Widget w) {
-		fileClientsHelp.clear();
-		fileClientsHelp.add(w);	
 	}
 	
 	@Override

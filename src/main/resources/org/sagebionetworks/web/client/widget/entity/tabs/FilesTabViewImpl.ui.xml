@@ -41,16 +41,6 @@
 			    		<bh:Div ui:field="fileProvenanceContainerHighlightBox" />
 			    	</g:FlowPanel>
 				</b:Column>
-				<b:Column size="MD_6" ui:field="fileClientsHelpContainer">
-					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
-						<bh:Div addStyleNames="highlight-title">
-			    			<bh:Text>Programmatic Access</bh:Text>
-			    			<w:HelpWidget helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](http://docs.synapse.org/articles/api_documentation.html) is available online." 
-								href="http://docs.synapse.org/articles/getting_started.html#installing-synapse-clients" addStyleNames="margin-left-5" placement="BOTTOM"/>
-			    		</bh:Div>
-						<g:SimplePanel ui:field="fileClientsHelp"/>
-					</g:FlowPanel>
-				</b:Column>
 			</b:Row>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
 		</b:Column>

@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,14 +24,12 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 	@UiField
 	SpanElement id8;
 	Widget widget;
-	SynapseJSNIUtils synapseJsniUtils;
 	String entityId = null;
 	public interface Binder extends UiBinder<Widget, FileClientsHelpImpl> {}
 
 	@Inject
-	public FileClientsHelpImpl(Binder binder, SynapseJSNIUtils synapseJsniUtils) {
+	public FileClientsHelpImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		this.synapseJsniUtils = synapseJsniUtils;
 	}
 
 	@Override
@@ -54,6 +48,5 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 		id6.setInnerHTML(entityId);
 		id7.setInnerHTML(entityId);
 		id8.setInnerHTML(entityId);
-		synapseJsniUtils.highlightCodeBlocks();
 	}
 }
