@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.ClientsHelp;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
@@ -56,7 +57,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class FilesTab implements FilesTabView.Presenter{
+public class FilesTab {
 	Tab tab;
 	FilesTabView view;
 	FileTitleBar fileTitleBar;
@@ -71,6 +72,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	ClientsHelp clientsHelp;
 	
 	Entity currentEntity;
 	String currentEntityId;
@@ -101,7 +103,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy
+			ModifiedCreatedByWidget modifiedCreatedBy,
+			ClientsHelp clientsHelp
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -117,7 +120,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
 		this.modifiedCreatedBy = modifiedCreatedBy;
-		view.setPresenter(this);
+		this.clientsHelp = clientsHelp;
 		
 		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
@@ -129,6 +132,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
+		view.setClientsHelp(clientsHelp.asWidget());
 		
 		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
 		
@@ -338,7 +342,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		//Programmatic Clients
 		view.setProgrammaticClientsVisible(isFile);
 		if (isFile) {
-			view.configureProgrammaticClients(currentEntityId, shownVersionNumber);	
+			configureProgrammaticClients(currentEntityId, shownVersionNumber);	
 		}
 
 		//Provenance
@@ -380,6 +384,14 @@ public class FilesTab implements FilesTabView.Presenter{
 		}
 	}
 	
+	public void configureProgrammaticClients(String entityId, Long versionNumber) {
+		String commandLine = COMMAND_LINE_TEMPLATE.replaceAll(REPLACE_ENTITY_ID, entityId);
+		String java = JAVA_TEMPLATE.replaceAll(REPLACE_ENTITY_ID, entityId);
+		String python = PYTHON_TEMPLATE.replaceAll(REPLACE_ENTITY_ID, entityId);
+		String r = R_TEMPLATE.replaceAll(REPLACE_ENTITY_ID, entityId);
+		clientsHelp.configure(commandLine, java, python, r);
+	}
+	
 	public void initActionMenu(EntityBundle bundle) {
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
 		view.setActionMenu(actionMenu.asWidget());
@@ -415,6 +427,40 @@ public class FilesTab implements FilesTabView.Presenter{
 		return currentEntity;
 	}
 	
+	public static final String R_TEMPLATE = 
+			"library(synapseClient)\n" + 
+			"synapseLogin('username','password')\n" + 
+			"\n" + 
+			"# Obtain a pointer and download the data\n" + 
+			"syn12345 <- synGet(id='syn12345')\n" + 
+			"\n" + 
+			"# Load the data\n" + 
+			"syn12345 <- synGet(id='syn12345', load=T)";
+	public static final String PYTHON_TEMPLATE = 
+			"import synapseclient\n" + 
+			"\n" + 
+			"syn = synapseclient.Synapse()\n" + 
+			"syn.login('synapse_username','password')\n" + 
+			"\n" + 
+			"# Obtain a pointer and download the data\n" + 
+			"syn12345 = syn.get('syn12345')\n" + 
+			"\n" + 
+			"# Get the path to the local copy of the data file\n" + 
+			"filepath = syn12345.path";
+	public static final String JAVA_TEMPLATE = 
+			"import org.sagebionetworks.client.Synapse;\n" + 
+			" 	\n" + 
+			"Synapse synapseClient = new Synapse();	  \n" + 
+			"synapseClient.login('synapse_username', 'password');\n" + 
+			"\n" + 
+			"Entity syn12345 = synapseClient.getEntityById(\"syn12345\");";
+	public static final String COMMAND_LINE_TEMPLATE = 
+			"# Login\n" + 
+			"synapse -u synapse_username -p synapse_password\n" + 
+			"\n" + 
+			"# Download file\n" + 
+			"synapse get syn12345";
+	public static final String REPLACE_ENTITY_ID = "syn12345";
 	public Tab asTab(){
 		return tab;
 	}
