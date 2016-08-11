@@ -19,13 +19,13 @@
 			    	<t:TableRow>
 			        	<t:TableData paddingRight="2">
 							<b:Anchor ui:field="directDownloadLink">
-								<button class="btn btn-primary btn-lg"><i class="fa fa-download" />Download</button>
+								<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
 							</b:Anchor>
 							<b:Anchor ui:field="authorizedDirectDownloadLink">
-								<button class="btn btn-primary btn-lg"><i class="fa fa-download" />Download</button>
+								<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
 							</b:Anchor>
 							<b:Anchor ui:field="licensedDownloadLink">
-								<button class="btn btn-primary btn-lg"><i class="fa fa-download" />Download</button>
+								<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
 							</b:Anchor>
 			            </t:TableData>
 			        </t:TableRow>
