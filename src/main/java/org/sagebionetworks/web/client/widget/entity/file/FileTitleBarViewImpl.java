@@ -194,6 +194,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		entityName.setText(entity.getName());
+		clientsHelpContainer.setVisible(false);
 		if (directDownloadUrl != null) {
 			//special case, if this starts with sftp proxy, then handle
 			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
@@ -205,12 +206,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadLink.setHref(directDownloadUrl);
+				clientsHelpContainer.setVisible(true);
 			}
-			clientsHelpContainer.setVisible(true);
 		}
 		else {
 			licensedDownloadLink.setVisible(true);
-			clientsHelpContainer.setVisible(false);
 		}
 	}
 	@Override
