@@ -95,8 +95,6 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.ClientsHelp;
-import org.sagebionetworks.web.client.widget.ClientsHelpImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
@@ -121,6 +119,8 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
@@ -1303,6 +1303,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
 		bind(LoadMoreWidgetContainerView.class).to(LoadMoreWidgetContainerViewImpl.class);
 		
-		bind(ClientsHelp.class).to(ClientsHelpImpl.class);
+		bind(FileClientsHelp.class).to(FileClientsHelpImpl.class);
 	}
 }

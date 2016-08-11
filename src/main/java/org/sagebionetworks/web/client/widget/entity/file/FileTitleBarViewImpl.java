@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -188,7 +191,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		if (directDownloadUrl != null) {
-			Icon downloadIcon = new Icon(IconType.DOWNLOAD);
+			Button downloadIcon = new Button();
+			downloadIcon.setText("Download");
+			downloadIcon.setIcon(IconType.DOWNLOAD);
+			downloadIcon.setSize(ButtonSize.LARGE);
+			downloadIcon.setType(ButtonType.PRIMARY);
 			downloadIcon.addStyleName("margin-left-5");
 			//special case, if this starts with sftp proxy, then handle
 			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
