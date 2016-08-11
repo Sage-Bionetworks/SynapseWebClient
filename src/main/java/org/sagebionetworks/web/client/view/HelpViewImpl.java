@@ -66,7 +66,6 @@ public class HelpViewImpl extends Composite implements HelpView {
 
 	@Override
 	public void showHelpPage(WikiPageKey wikiKey) {
-		
 		mainContainer.clear();
 		mainContainer.add(wikiPage.asWidget());
 		wikiPage.configure(wikiKey, false, new WikiPageWidget.Callback() {
@@ -76,7 +75,7 @@ public class HelpViewImpl extends Composite implements HelpView {
 			@Override
 			public void noWikiFound() {
 			}
-		}, false);
+		}, true);
 	}
 	
 	@Override

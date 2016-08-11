@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -93,7 +93,8 @@ public class EntityListConfigEditorTest {
 		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
 				
 		editor.configure(null, descriptor, null);
-		
+		//by editing a widget, it always attempts to hide the description.  but you have to touch the entity list to get the update.
+		assertFalse(Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY)));
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
 	}

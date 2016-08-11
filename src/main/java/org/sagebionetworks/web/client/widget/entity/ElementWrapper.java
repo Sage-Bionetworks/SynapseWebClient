@@ -20,4 +20,8 @@ public class ElementWrapper {
 	public void setAttribute(String attr, String value) {
 		element.setAttribute(attr, value);
 	}
+	
+	public void removeAllChildren() {
+		element.removeAllChildren();
+	}
 }

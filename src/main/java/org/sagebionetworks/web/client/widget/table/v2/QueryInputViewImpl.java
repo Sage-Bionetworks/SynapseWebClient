@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -101,7 +102,7 @@ public class QueryInputViewImpl implements QueryInputView{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(REST_DOC_URL, "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
 			}
 		});
 	}

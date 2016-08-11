@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -15,12 +16,16 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
+
+	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
+	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
 
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS
@@ -31,19 +36,30 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private FavoriteWidget favWidget;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	private StuAnnouncementWidget stuAnnouncementWidget;
 	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget) {
+			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, StuAnnouncementWidget stuAnnouncementWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.favWidget = favWidget;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
-		view.setProjectFavoriteWidget(favWidget);
+		this.stuAnnouncementWidget = stuAnnouncementWidget;
 		view.setPresenter(this);
+		stuAnnouncementWidget.init();
+		initStagingAlert();
+	}
+	
+	public void initStagingAlert() {
+		String hostName = synapseJSNIUtils.getCurrentHostName().toLowerCase();
+		boolean visible = !hostName.contains(WWW_SYNAPSE_ORG);
+		view.setStagingAlertVisible(visible);
 	}
 	
 	public void setMenuItemActive(MenuItems menuItem) {
@@ -92,15 +108,20 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setUser(userSessionData);
 		view.refresh();
 		view.setSearchVisible(true);
+		view.setProjectFavoriteWidget(favWidget);
+		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 	}
 
 	@Override
 	public void onTrashClick() {
-		globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));	
+		globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
 
 	@Override
 	public void onLogoutClick() {
+		//explicitly logging out, clear the current and last place.
+		globalApplicationState.clearCurrentPlace();
+		globalApplicationState.clearLastPlace();
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));	
 	}
 	
@@ -130,23 +151,25 @@ public class Header implements HeaderView.Presenter, IsWidget {
 
 	@Override
 	public void onFavoriteClick() {
-		view.showFavoritesLoading();
-		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> favorites) {
-				view.clearFavorite();
-				globalApplicationState.setFavorites(favorites);
-				if (favorites == null || favorites.size() == 0) {
-					view.setEmptyFavorite();
-				} else {
-					view.addFavorite(favorites);
-				}		
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.clearFavorite();
-				view.setEmptyFavorite();	
-			}
-		});
+		if(authenticationController.isLoggedIn()) {
+			view.showFavoritesLoading();
+			synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+				@Override
+				public void onSuccess(List<EntityHeader> favorites) {
+					view.clearFavorite();
+					globalApplicationState.setFavorites(favorites);
+					if (favorites == null || favorites.size() == 0) {
+						view.setEmptyFavorite();
+					} else {
+						view.addFavorite(favorites);
+					}		
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.clearFavorite();
+					view.setEmptyFavorite();	
+				}
+			});
+		}
 	}
 }

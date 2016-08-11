@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -94,6 +95,13 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
 	}
 	
+	private void configureBundleWithView() {
+		EntityView view = new EntityView();
+		view.setId("syn456");
+		view.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
+		entityBundle.setEntity(view);
+	}
+
 	@Test
 	public void testGetDefaultPageSizeMaxUnder(){
 		tableBundle.setMaxRowsPerPage(4L);
@@ -176,6 +184,36 @@ public class TableEntityWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureViewEdit(){
+		boolean canEdit = true;
+		configureBundleWithView();
+		
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		// SWC-3125: block edit and upload (until feature available on the backend)
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		
+		verify(mockActionMenu).setBasicDivderVisible(false);
+	}
+	@Test
+	public void testConfigureViewNoEdit(){
+		boolean canEdit = false;
+		configureBundleWithView();
+		
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		
+		verify(mockActionMenu).setBasicDivderVisible(false);
+	}
+		
+	@Test
 	public void testNoColumnsWithEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = true;
@@ -225,6 +263,26 @@ public class TableEntityWidgetTest {
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+	}
+
+	@Test
+	public void testViewQueryExecutionFinishedSuccess(){
+		configureBundleWithView();
+		boolean canEdit = true;
+		boolean wasExecutionSuccess = true;
+		boolean resultsEditable = true;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		reset(mockActionMenu);
+		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess, resultsEditable);
+		verify(mockQueryChangeHandler).onQueryChange(startQuery);
+		
+		// SWC-3125: block edit (until feature available on the backend)
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 	
@@ -284,6 +342,22 @@ public class TableEntityWidgetTest {
 		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
 		verify(mockQueryResultsWidget).configure(expected, canEdit, widget);
+	}
+
+	@Test
+	public void testOnExecuteViewQuery(){
+		configureBundleWithView();
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		// Start query get passed to the results
+		boolean expectedCanEditResults = false;
+		verify(mockQueryResultsWidget).configure(startQuery, expectedCanEditResults, widget);
 	}
 	
 	@Test
@@ -363,5 +437,23 @@ public class TableEntityWidgetTest {
 		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
 		// Should not be sent to the results as that is where it came from.
 		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(QueryResultsListener.class));
+	}
+	
+
+	@Test
+	public void testCanEditViewResults(){
+		configureBundleWithView();
+		//we can edit the view, but verify that the query input widget should be told that editing results is not possible
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		boolean expectedCanEditResults = false;
+		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget, expectedCanEditResults);
 	}
 }

@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 
@@ -74,8 +73,8 @@ public class FileHandleUploadWidgetImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
-				handler.updateProgress(0.1, "10%");
-				handler.updateProgress(0.9, "90%");
+				handler.updateProgress(0.1, "10%", "100 KB/s");
+				handler.updateProgress(0.9, "90%", "10 MB/s");
 				handler.uploadSuccess(successFileHandle);
 				return null;
 			}
@@ -107,8 +106,8 @@ public class FileHandleUploadWidgetImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
-				handler.updateProgress(0.1, "10%");
-				handler.updateProgress(0.9, "90%");
+				handler.updateProgress(0.1, "10%", "100 KB/s");
+				handler.updateProgress(0.9, "90%", "10 MB/s");
 				handler.uploadFailed(error);
 				return null;
 			}
@@ -153,8 +152,8 @@ public class FileHandleUploadWidgetImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
-				handler.updateProgress(0.1, "10%");
-				handler.updateProgress(0.9, "90%");
+				handler.updateProgress(0.1, "10%", "100 KB/s");
+				handler.updateProgress(0.9, "90%", "10 MB/s");
 				handler.uploadFailed(error);
 				return null;
 			}

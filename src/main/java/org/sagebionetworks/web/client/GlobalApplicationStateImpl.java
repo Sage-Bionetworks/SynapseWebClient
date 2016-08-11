@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -17,7 +18,6 @@ import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
@@ -27,6 +27,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+	public static final String PROPERTIES_LOADED_KEY = "org.sagebionetworks.web.client.properties-loaded";
+	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
@@ -37,13 +39,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private boolean isEditing;
-	private HashMap<String, String> synapseProperties;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
-	
+	private ClientCache localStorage;
+	private GWTWrapper gwt;
+	private boolean isShowingVersionAlert;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -51,15 +54,20 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			EventBus eventBus, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils synapseJSNIUtils, 
-			ClientLogger logger) {
+			ClientLogger logger,
+			ClientCache localStorage, 
+			GWTWrapper gwt) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
+		this.localStorage = localStorage;
+		this.gwt = gwt;
 		this.view = view;
 		isEditing = false;
+		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
 	}
 	
@@ -136,6 +144,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void clearLastPlace() {
 		cookieProvider.removeCookie(CookieKeys.LAST_PLACE);
 	}
+	@Override
+	public void clearCurrentPlace() {
+		cookieProvider.removeCookie(CookieKeys.CURRENT_PLACE);
+	}
 	
 	@Override
 	public void gotoLastPlace() {
@@ -208,7 +220,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				boolean isVersionChange = false;
 				//synapse version is set on app load
 				if(!synapseVersion.equals(versions)) {
-					view.showVersionOutOfDateGlobalMessage();
+					if (!isShowingVersionAlert) {
+						view.showVersionOutOfDateGlobalMessage();
+						isShowingVersionAlert = true;
+					}
 					isVersionChange = true;
 				}
 				if (callback != null) {
@@ -237,12 +252,34 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public void initSynapseProperties(final Callback c) {
+		String isLoaded = localStorage.get(PROPERTIES_LOADED_KEY);
+		if (isLoaded != null) {
+			// we have properties locally, defer updating properties from server
+			gwt.scheduleDeferred(new Callback() {
+				@Override
+				public void invoke() {
+					initSynapsePropertiesFromServer(new Callback() {
+						public void invoke() {}
+					});
+				}
+			});
+			initWikiEntitiesAndVersions(c);
+			
+		} else {
+			initSynapsePropertiesFromServer(c);
+		}
+		view.initGlobalViewProperties();
+	}
+	
+	public void initSynapsePropertiesFromServer(final Callback c) {
 		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
-				synapseProperties = properties;
-				initWikiEntities(properties);
-				initSynapseVersions(c);
+				for (String key : properties.keySet()) {
+					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+				}
+				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+				initWikiEntitiesAndVersions(c);
 			}
 			
 			@Override
@@ -250,6 +287,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				c.invoke();
 			}
 		});
+	}
+	
+	public void initWikiEntitiesAndVersions(Callback c) {
+		initWikiEntities();
+		initSynapseVersions(c);
 	}
 	
 	public void initSynapseVersions(final Callback c) {
@@ -270,10 +312,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public String getSynapseProperty(String key) {
-		if (synapseProperties != null)
-			return synapseProperties.get(key);
-		else 
-			return null;
+		return localStorage.get(key);
 	}
 
 	@Override
@@ -289,26 +328,50 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	 * Setup the wiki based entities.
 	 * @param properties
 	 */
-	private void initWikiEntities(HashMap<String, String> properties) {
+	private void initWikiEntities() {
 		wikiBasedEntites = new HashSet<String>();
-		wikiBasedEntites.add(properties.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(localStorage.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
 	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change
+		setCurrentPlaceInHistory(targetPlace, true);
+	}
+	
+	@Override
+	public void replaceCurrentPlace(Place targetPlace) {
+		setCurrentPlaceInHistory(targetPlace, false);
+	}
+	
+	
+	private void setCurrentPlaceInHistory(Place targetPlace, boolean pushState) {
+		//only push this place into the history if it is a place change
 		if (targetPlace != null && !(targetPlace.equals(getCurrentPlace()))) {
 			setLastPlace(getCurrentPlace());
 			setCurrentPlace(targetPlace);
 			String token = appPlaceHistoryMapper.getToken(targetPlace);
-			this.synapseJSNIUtils.pushHistoryState(token);
+			if (pushState) {
+				gwt.newItem(token, false);
+			} else {
+				gwt.replaceItem(token, false);
+			}
+			
+			recordPlaceVisit(targetPlace);
 		}
 	}
-
+	
+	
+	@Override
+	public void recordPlaceVisit(Place targetPlace) {
+		String token = appPlaceHistoryMapper.getToken(targetPlace);
+		synapseJSNIUtils.recordPageVisit(token);
+	}
+	
 	@Override
 	public void initOnPopStateHandler() {
 		this.synapseJSNIUtils.initOnPopStateHandler();
@@ -316,5 +379,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	public String getSynapseVersion() {
 		return synapseVersion;
+	}
+	
+	@Override
+	public void refreshPage() {
+		//get the place associated to the current url
+		AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
+		String currentUrl = synapseJSNIUtils.getCurrentURL();
+		String place = DEFAULT_REFRESH_PLACE;
+		int index = currentUrl.indexOf("!");
+		if (index > -1) {
+			place = currentUrl.substring(index);
+		}
+		Place currentPlace = appPlaceHistoryMapper.getPlace(place); 
+		getPlaceChanger().goTo(currentPlace);
 	}
 }

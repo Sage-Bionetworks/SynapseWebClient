@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
@@ -10,6 +11,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -21,15 +23,18 @@ import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -66,6 +71,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	SpanElement fileLocation;
 	@UiField
 	SimplePanel favoritePanel;
+	@UiField
+	DivElement externalUrlUI;
+	@UiField
+	SpanElement externalUrl;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -132,18 +141,20 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 
-		entityIcon.setType(DisplayUtils.getIconTypeForEntity(entity));
+		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
 		
 		//fileHandle is null if user can't access the filehandle associated with this file entity
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;
 		fileNameContainer.setVisible(isFilenamePanelVisible);
 		if (isFilenamePanelVisible) {
+			fileName.setInnerText(entityBundle.getFileName());
 			//don't ask for the size if it's external, just display that this is external data
-			if (fileHandle instanceof ExternalFileHandle) {
+			boolean isExternalFile = fileHandle instanceof ExternalFileHandle;
+			UIObject.setVisible(externalUrlUI, isExternalFile);
+			if (isExternalFile) {
 				ExternalFileHandle externalFileHandle = (ExternalFileHandle)fileHandle;
-				fileName.setInnerText(externalFileHandle.getExternalURL());
-
+				externalUrl.setInnerText(externalFileHandle.getExternalURL());
 				if (externalFileHandle.getContentSize() != null) {
 					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
 				} else {
@@ -157,7 +168,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				}
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
-				fileName.setInnerText(entityBundle.getFileName());
 				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 				presenter.setS3Description();
 
@@ -178,22 +188,26 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		if (directDownloadUrl != null) {
+			Icon downloadIcon = new Icon(IconType.DOWNLOAD);
+			downloadIcon.addStyleName("margin-left-5");
 			//special case, if this starts with sftp proxy, then handle
 			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 			if (directDownloadUrl.startsWith(sftpProxy)) {
 				authorizedDirectDownloadLink.setVisible(true);
-				authorizedDirectDownloadLink.setText(entity.getName());
+				authorizedDirectDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
+				authorizedDirectDownloadLink.add(downloadIcon);
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
 				presenter.queryForSftpLoginInstructions(url);
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadLink.setHref(directDownloadUrl);
-				directDownloadLink.setText(entity.getName());
+				directDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
+				directDownloadLink.add(downloadIcon);
 			}
 		}
 		else {
-			licensedDownloadLink.setText(entity.getName());
+			licensedDownloadLink.setHTML(SafeHtmlUtils.htmlEscape(entity.getName()));
 			licensedDownloadLink.setVisible(true);
 		}
 	}

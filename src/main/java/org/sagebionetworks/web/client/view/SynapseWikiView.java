@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -15,7 +14,7 @@ public interface SynapseWikiView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);	
 	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		public void configure(WikiPageKey wikiKey);
 	}
 

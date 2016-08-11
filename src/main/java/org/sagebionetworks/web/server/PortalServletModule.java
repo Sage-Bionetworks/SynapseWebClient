@@ -11,7 +11,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
+import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
+import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
@@ -20,24 +23,29 @@ import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
-import org.sagebionetworks.web.server.servlet.NcboSearchService;
+import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
+import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
+import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
+import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
-import org.sagebionetworks.web.server.servlet.oauth2.OAuth2Servlet;
+import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
+import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.WithTokenizers;
+import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
@@ -65,13 +73,27 @@ public class PortalServletModule extends ServletModule {
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
 		
+		bind(RegisterAccountFilter.class).in(Singleton.class);
+		filter("/" + RegisterAccountFilter.URL_PATH).through(RegisterAccountFilter.class);
+		
 		// Setup the Synapse service
 		bind(SynapseClientImpl.class).in(Singleton.class);
 		serve("/Portal/synapseclient").with(SynapseClientImpl.class);
 		
+		// Cross-Site Request Forgery protection
+		bind(XsrfTokenServiceServlet.class).in(Singleton.class);
+		serve("/Portal/xsrf").with(XsrfTokenServiceServlet.class);
+
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
+		
+		// Subscription service
+		bind(SubscriptionClientImpl.class).in(Singleton.class);
+		serve("/Portal/subscriptionclient").with(SubscriptionClientImpl.class);
+		
+		bind(UserProfileClientImpl.class).in(Singleton.class);
+		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
 		
 		// Setup the Search service
 		bind(SearchServiceImpl.class).in(Singleton.class);
@@ -92,10 +114,6 @@ public class PortalServletModule extends ServletModule {
 		// Setup the User Account service mapping
 		bind(StackConfigServiceImpl.class).in(Singleton.class);
 		serve("/Portal/stackConfig").with(StackConfigServiceImpl.class);
-	
-		// setup the NCBO servlet
-		bind(NcboSearchService.class).in(Singleton.class);
-		serve("/Portal/ncbo/search").with(NcboSearchService.class);
 		
 		// setup the Simple Search servlet
 		bind(SimpleSearchService.class).in(Singleton.class);
@@ -109,6 +127,15 @@ public class PortalServletModule extends ServletModule {
 		bind(FileHandleServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET).with(FileHandleServlet.class);
 		
+		// FileHandleAssociation download
+		bind(FileHandleAssociationServlet.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET).with(FileHandleAssociationServlet.class);
+
+		// Multipart file upload
+		bind(MultipartFileUploadClientImpl.class).in(Singleton.class);
+		serve("/Portal/multipartFileUploadClient").with(MultipartFileUploadClientImpl.class);
+
+		
 		// FileHandle upload
 		bind(FileEntityResolverServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_ENTITY_RESOLVER_SERVLET).with(FileEntityResolverServlet.class);
@@ -121,15 +148,27 @@ public class PortalServletModule extends ServletModule {
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
 		serve("/Portal/linkedin").with(LinkedInServiceImpl.class);
-		
+
+		// Setup the Discussion Forum service mapping
+		bind(DiscussionForumClientImpl.class).in(Singleton.class);
+		serve("/Portal/discussionforumclient").with(DiscussionForumClientImpl.class);
+
+		// Discussion message download
+		bind(DiscussionMessageServlet.class).in(Singleton.class);
+		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
+
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);
 		serve("/Portal/jira").with(JiraClientImpl.class);
 		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
 		
 		// OAuth2 
-		bind(OAuth2Servlet.class).in(Singleton.class);
-		serve("/Portal/oauth2callback").with(OAuth2Servlet.class);
+		bind(OAuth2SessionServlet.class).in(Singleton.class);
+		serve("/Portal/oauth2callback").with(OAuth2SessionServlet.class);
+		
+		bind(OAuth2AliasServlet.class).in(Singleton.class);
+		serve("/Portal/oauth2AliasCallback").with(OAuth2AliasServlet.class);
+
 		
 		// The Rest template provider should be a singleton.
 		bind(RestTemplateProviderImpl.class).in(Singleton.class);
@@ -153,7 +192,7 @@ public class PortalServletModule extends ServletModule {
 		//(which we need for GWT place handling).
 		// This is also where project aliases are handled.
 		bind(ProjectAliasServlet.class).in(Singleton.class);
-		serveRegex("\\/\\w+").with(ProjectAliasServlet.class);
+		serveRegex("^\\/\\w+$").with(ProjectAliasServlet.class);
 	}
 	
 	public void handleGWTPlaces() {

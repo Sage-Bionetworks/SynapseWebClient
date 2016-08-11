@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -14,16 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -115,21 +106,17 @@ public class ProjectAliasServlet extends HttpServlet {
 		try {
 			SynapseClient client = createNewClient(token);
 			perThreadRequest.set(httpRqst);
-			String alias = requestURL.getPath().substring(1);
-
-			EntityQuery query = getEntityQuery(alias);
-			EntityQueryResults results = client.entityQuery(query);
-			String newPath = "/";
-			if (results.getTotalEntityCount() == 1) {
-				EntityQueryResult result = results.getEntities().get(0);
-				newPath = "/#!Synapse:" + result.getId();
-			} else {
-				String error = "The requested URL " + requestURL.getPath() + " was not found on this server.";
-				if (token == null) {
-					error += " \nPlease log in and try again.";
-				}
-				throw new SynapseNotFoundException(error);
+			String path = requestURL.getPath().substring(1);
+			String[] tokens = path.split("/");
+			EntityId entityId = client.getEntityIdByAlias(tokens[0]);
+			StringBuilder newPathBuilder = new StringBuilder();
+			newPathBuilder.append("/#!Synapse:");
+			newPathBuilder.append(entityId.getId());
+			for (int i = 1; i < tokens.length; i++) {
+				newPathBuilder.append("/");
+				newPathBuilder.append(tokens[i]);
 			}
+			String newPath = newPathBuilder.toString();
 			URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), newPath);
 			response.sendRedirect(response.encodeRedirectURL(redirectURL.toString()));
 		} catch (SynapseException e) {
@@ -174,21 +161,4 @@ public class ProjectAliasServlet extends HttpServlet {
 		String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
 		return base;
 	}
-	
-	/**
-	 * Uses the Project Alias feature
-	 * @param alias
-	 * @return
-	 */
-	public EntityQuery getEntityQuery(String alias) {
-		EntityQuery query = new EntityQuery();
-		Condition condition = EntityQueryUtils.buildCondition(
-				EntityFieldName.alias, Operator.EQUALS, alias);
-		query.setConditions(Arrays.asList(condition));
-		query.setFilterByType(EntityType.project);
-		query.setLimit(1L);
-		query.setOffset(0L);
-		return query;
-	}
-
 }

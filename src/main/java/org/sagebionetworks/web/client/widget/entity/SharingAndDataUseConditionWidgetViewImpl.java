@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.html.Br;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -9,8 +10,10 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -59,6 +62,11 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	public void configure(EntityBundle bundle, boolean showChangeLink) {
 		container.clear();
 		
+		HelpWidget helpWidget = new HelpWidget();
+		helpWidget.setHelpMarkdown("##### Sharing Settings: Controls who can view the content.\nBy default, folders and files inherit  the Sharing Settings of the parent folder or project.");
+		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#sharing-setting");
+		container.add(helpWidget.asWidget());
+		
 		//add share settings
 		container.add(new InlineHTML("<h5 class=\"inline-block\">"+ DisplayConstants.SHARING_PUBLIC_TITLE +"</h5>"));
 		final SimplePanel sharingDescriptionContainer = new SimplePanel();
@@ -67,13 +75,14 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			public void onSuccess(Boolean isPublic) {
 				//add the proper description into the container
 				String description = isPublic ? DisplayConstants.SHARING_PUBLIC_DESCRIPTION : DisplayConstants.SHARING_PRIVATE_DESCRIPTION;
-				sharingDescriptionContainer.add(new HTML("<p class=\"margin-left-10 nobottommargin\">"+description+"</p>"));
+				sharingDescriptionContainer.add(new HTML("<p class=\"margin-left-20 nobottommargin\">"+description+"</p>"));
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				showErrorMessage(caught.getMessage());
 			}
 		});
+		
 		Widget publicPrivateBadgeWidget = publicPrivateBadge.asWidget();
 		publicPrivateBadgeWidget.addStyleName("inline-block margin-left-10 moveup-2");
 		container.add(publicPrivateBadgeWidget);
@@ -102,8 +111,14 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			container.add(changeLinkContainer);
 		}
 		container.add(sharingDescriptionContainer);
+		container.add(new Br());
 		
-		container.add(new InlineHTML("<br><h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));
+		helpWidget = new HelpWidget();
+		helpWidget.setHelpMarkdown("##### Conditions For Use: Controls how the data can be used.\nBy default, folders and files inherit the Conditions For Use of the parent folder.");
+		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#conditions-for-use");
+		container.add(helpWidget.asWidget());
+
+		container.add(new InlineHTML("<h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));
 		restrictionWidget.configure(bundle, showChangeLink, true, false, new Callback() {
 			@Override
 			public void invoke() {
@@ -118,7 +133,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			//and add description
 			RESTRICTION_LEVEL level = restrictionWidget.getRestrictionLevel();
 			String description = RESTRICTION_LEVEL.OPEN.equals(level) ? DisplayConstants.DATA_USE_UNRESTRICTED_DATA_DESCRIPTION : DisplayConstants.DATA_USE_RESTRICTED_DESCRIPTION;
-			container.add(new HTML("<p class=\"margin-left-10 margin-bottom-20\">"+description+"</p>"));
+			container.add(new HTML("<p class=\"margin-left-20 margin-bottom-20\">"+description+"</p>"));
 		}
 					
 	}

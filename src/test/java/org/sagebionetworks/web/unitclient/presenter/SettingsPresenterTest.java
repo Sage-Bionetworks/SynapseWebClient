@@ -19,12 +19,12 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummary;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -43,11 +42,15 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class SettingsPresenterTest {
 	
@@ -58,8 +61,7 @@ public class SettingsPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserService;
 	GlobalApplicationState mockGlobalApplicationState;
-	PlaceChanger mockPlaceChanger;	
-	CookieProvider mockCookieProvider;
+	PlaceChanger mockPlaceChanger;
 	SynapseClientAsync mockSynapseClient;
 	GWTWrapper mockGWT;
 	PortalGinInjector mockInjector;
@@ -73,14 +75,19 @@ public class SettingsPresenterTest {
 	String email = "testuser@test.com";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
+	@Mock
+	SubscriptionListWidget mockSubscriptionListWidget;
+	@Mock
+	PasswordStrengthWidget mockPasswordStrengthWidget;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(SettingsView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockCookieProvider = mock(CookieProvider.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGWT = mock(GWTWrapper.class);
 		mockInjector = mock(PortalGinInjector.class);
@@ -88,8 +95,10 @@ public class SettingsPresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWT, mockInjector, mockUserProfileModalWidget);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
+				mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget,mockPasswordStrengthWidget);	
 		verify(mockView).setPresenter(profilePresenter);
+		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -121,7 +130,8 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).showPasswordChangeSuccess();		
+		verify(mockView).showPasswordChangeSuccess();
+		verify(mockPasswordStrengthWidget).setVisible(false);
 	}
 	
 	@Test
@@ -136,11 +146,12 @@ public class SettingsPresenterTest {
 	@Test
 	public void testResetPasswordFailChangePw() throws RestServiceException {		
 		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		Exception ex = new Exception("pw change failed");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockSynAlert).showError("Password Change failed. Please try again.");
-		verify(mockView).setCurrentPasswordInError(true);
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
@@ -152,25 +163,6 @@ public class SettingsPresenterTest {
 		profilePresenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));		
-	}
-	
-	@Test
-	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
-		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
-		Long totalSize = 12345l;
-		usageSummary.setTotalSize(totalSize);
-		usageSummary.setTotalCount(54321L);
-		usageSummary.setSummaryList(new ArrayList<StorageUsageSummary>());
-		
-		AsyncMockStubber.callSuccessWith(usageSummary).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
-		profilePresenter.updateUserStorage();
-		verify(mockView).updateStorageUsage(eq(totalSize));
-	}
-	@Test
-	public void testUsageFailure() throws RestServiceException {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));
-		profilePresenter.updateUserStorage();
-		verify(mockView).clearStorageUsageUI();
 	}
 	
 	//if notification settings are null, should still successfully update with user specified notification setting
@@ -266,10 +258,18 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testAdditionalEmailValidationFailure() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		Exception ex = new Exception("unexpected exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		profilePresenter.additionalEmailValidation(email);
 		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showEmailChangeFailed(anyString());
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testAdditionalEmailValidationInvalidEmail() throws JSONObjectAdapterException {
+		String email = "invalidEmailAddress";
+		profilePresenter.additionalEmailValidation(email);
+		verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
 	}
 	
 	@Test (expected=IllegalStateException.class)
@@ -328,8 +328,20 @@ public class SettingsPresenterTest {
 	@Test
 	public void testAsWidget() {
 		profilePresenter.asWidget();
-		verify(mockSynAlert, times(8)).clear();
-		verify(mockView).hideAPIKey();
+		verify(mockSynAlert, times(5)).clear();
+		verify(mockPasswordStrengthWidget).setVisible(false);
+		verify(mockView).clear();
+		verify(mockView).asWidget();
+		verify(mockSubscriptionListWidget).configure();
+	}
+	
+	@Test
+	public void testAsWidgetAnonymousSWC2943() {
+		//used to result in NPE before fix for SWC-2943
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		profilePresenter.asWidget();
+		verify(mockView).clear();
 		verify(mockView).asWidget();
 	}
 	

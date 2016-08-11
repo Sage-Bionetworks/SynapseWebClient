@@ -42,6 +42,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Anchor changeLink;
 	@UiField
 	Anchor showLink;
+	@UiField
+	Button showUnmetLink;
 	
 	@UiField
 	Span flagUI;
@@ -132,6 +134,14 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				showLinkClickHandler.onClick(event);
 			}
 		});
+		
+		showUnmetLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showLinkClickHandler.onClick(event);
+			}
+		});
+
 		
 		flagModalOkButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -233,6 +243,13 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		showLink.setVisible(true);
 		this.showLinkClickHandler = showLinkClickHandler;
 	}
+	
+	@Override
+	public void showShowUnmetLink(ClickHandler showLinkClickHandler) {
+		linkUI.setVisible(true);
+		showUnmetLink.setVisible(true);
+		this.showLinkClickHandler = showLinkClickHandler;
+	}
 	@Override
 	public void showNoRestrictionsUI() {
 		noneUI.setVisible(true);
@@ -247,6 +264,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		flagUI.setVisible(false);
 		anonymousFlagUI.setVisible(false);
 		showLink.setVisible(false);
+		showUnmetLink.setVisible(false);
 		changeLink.setVisible(false);
 		showLinkClickHandler = null;
 		changeLinkClickHandler = null;

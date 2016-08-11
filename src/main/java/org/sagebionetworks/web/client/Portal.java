@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -15,7 +14,6 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -94,25 +92,12 @@ public class Portal implements EntryPoint {
 								// start version timer
 								ginjector.getVersionTimer().start();
 								
-								AsyncCallback<UserSessionData> sessionLoadedCallback = new AsyncCallback<UserSessionData>() {
-									@Override
-									public void onSuccess(UserSessionData result) {
-										proceed();
-									}
-									@Override
-									public void onFailure(Throwable caught) {
-										proceed();
-									}
-									
-									private void proceed() {
-										// Goes to place represented on URL or default place
-										historyHandler.handleCurrentHistory();
-										loading.hide();		
-									}
-								};
-								
 								// load the previous session, if there is one
-								ginjector.getAuthenticationController().reloadUserSessionData(sessionLoadedCallback);
+								ginjector.getAuthenticationController().reloadUserSessionData();
+								
+								// Goes to place represented on URL or default place
+								historyHandler.handleCurrentHistory();
+								loading.hide();
 							}
 						});
 						

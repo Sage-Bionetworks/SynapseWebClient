@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 
@@ -15,7 +10,9 @@ import static junit.framework.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -34,6 +31,7 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -54,6 +52,8 @@ public class NewAccountPresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthController;
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	PasswordStrengthWidget mockPasswordStrengthWidget;
 	
 	String username = "Ms.Information";
 	String firstName = "Hello";
@@ -61,6 +61,7 @@ public class NewAccountPresenterTest {
 	String testSessionToken = "1239381foobar";
 	@Before
 	public void setup() {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(NewAccountView.class);
 		
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -69,7 +70,7 @@ public class NewAccountPresenterTest {
 		gwtStub = new GWTStub();
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, gwtStub);			
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, gwtStub, mockPasswordStrengthWidget);			
 		verify(mockView).setPresenter(newAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
@@ -147,6 +148,8 @@ public class NewAccountPresenterTest {
 		String emailValidationToken = "a&b&c=123";
 		newAccountPresenter.setEmailValidationToken(emailValidationToken);
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
+		verify(mockView).setLoading(true);
+		verify(mockView).setLoading(false);
 		verify(mockUserService).createUserStep2(eq(userName), eq(firstName), eq(lastName), eq(password), eq(emailValidationToken), any(AsyncCallback.class));
 		
 		//should go to the login place with the new session token

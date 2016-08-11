@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 /**
  * Abstraction for the view 
  * @author John
@@ -35,25 +34,11 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void showInfoDialog(String header, String message);
 
 	/**
-	 * This dialog must be added to the page.
-	 * @param accessControlListModalWidget
-	 */
-	void addAccessControlListModalWidget(IsWidget accessControlListModalWidget);
-	
-	/**
-	 * This dialog must be added to the page.
-	 * @param modalWidget
-	 */
-	void addMarkdownEditorModalWidget(IsWidget modalWidget);
-
-	/**
 	 * Prompt the user to enter a string value.
 	 * @param prompt
 	 * @param callback
 	 */
 	void showPromptDialog(String prompt, PromptCallback callback);
 
-
-	void addProvenanceEditorModalWidget(Widget asWidget);
-	void addStorageLocationModalWidget(Widget asWidget);
+	void addWidget(IsWidget asWidget);
 }

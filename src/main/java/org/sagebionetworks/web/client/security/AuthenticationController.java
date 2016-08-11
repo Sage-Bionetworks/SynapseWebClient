@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.security;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-
+import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface AuthenticationController {
@@ -54,7 +54,7 @@ public interface AuthenticationController {
 	/**
 	 * Redownload the user's session data 
 	 */
-	void reloadUserSessionData(AsyncCallback<UserSessionData> callback);
+	void reloadUserSessionData();
 
 	public void getTermsOfUse(AsyncCallback<String> callback);
 	
@@ -64,4 +64,6 @@ public interface AuthenticationController {
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);
 	
 	public void updateCachedProfile(UserProfile updatedProfile);
+	
+	public String getCurrentXsrfToken();
 }

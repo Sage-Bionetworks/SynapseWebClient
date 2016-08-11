@@ -9,14 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
-import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
-import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
@@ -25,12 +21,7 @@ import org.springframework.http.HttpStatus;
 
 import com.google.inject.Inject;
 
-public class OAuth2Servlet extends HttpServlet {
-	
-
-	private static final String REGISTER_ACCOUNT = "/#!RegisterAccount:";
-	private static final String LOGIN_PLACE = "/#!LoginPlace:";
-	
+public abstract class OAuth2Servlet extends HttpServlet {
 	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
@@ -55,21 +46,8 @@ public class OAuth2Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		String provideString = req.getParameter(WebConstants.OAUTH2_PROVIDER);
-		OAuthProvider provider = OAuthProvider.valueOf(provideString);
-		// This code will be provided after the user authenticates with a provider.
-		String athenticationCode = req.getParameter(WebConstants.OAUTH2_CODE);
-		String redirectUrl = createRedirectUrl(req, provider);
-		// If we do not have a code 
-		if(athenticationCode == null){
-			redirectToProvider(req, resp, provider, redirectUrl);
-		}else{
-			validateUser(resp, provider, athenticationCode, redirectUrl);
-		}
-	}
-
+	public abstract void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException;
 	
 	/**
 	 * Create a redirect URL.
@@ -109,42 +87,19 @@ public class OAuth2Servlet extends HttpServlet {
 	}
 
 	/**
-	 * Step two, use the resulting authentication code to sign-in with Synapse.
-	 * @param resp
-	 * @param provider
-	 * @param athenticationCode
-	 * @throws IOException
-	 */
-	public void validateUser(HttpServletResponse resp, OAuthProvider provider,
-			String athenticationCode, String redirectUrl) throws IOException {
-		try {
-			SynapseClient client = createSynapseClient();
-			OAuthValidationRequest request = new OAuthValidationRequest();
-			request.setAuthenticationCode(athenticationCode);
-			request.setProvider(provider);
-			request.setRedirectUrl(redirectUrl);
-			Session token = client.validateOAuthAuthenticationCode(request);
-			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
-		} catch (SynapseNotFoundException e) {
-			// Send the user to register
-			resp.sendRedirect(REGISTER_ACCOUNT+e.getMessage());
-		}catch (SynapseForbiddenException e) {
-			resp.setStatus(HttpStatus.FORBIDDEN.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (SynapseServerException e) {
-			resp.setStatus(e.getStatusCode());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (SynapseException e) {
-			// 400 error
-			resp.setStatus(HttpStatus.BAD_REQUEST.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}
-	}
-	/**
 	 * Creates a Synapse client that can only make anonymous calls
 	 */
-	private SynapseClient createSynapseClient() {
+	protected SynapseClient createSynapseClient() {
+		return createSynapseClient(null);
+	}
+	/**
+	 * Creates a Synapse client
+	 */
+	protected SynapseClient createSynapseClient(String sessionToken) {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
+		if (sessionToken != null) {
+			synapseClient.setSessionToken(sessionToken);	
+		}
 		synapseClient.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		return synapseClient;
 	}

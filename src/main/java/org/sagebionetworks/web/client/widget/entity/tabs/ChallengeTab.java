@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 
 import com.google.inject.Inject;
 
@@ -23,15 +23,16 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 		this.evaluationList = evaluationList;
 		
 		view.setEvaluationList(evaluationList.asWidget());
-		tab.configure("Challenge", view.asWidget());
+		tab.configure("Challenge", view.asWidget(), "Challenges are computational contests organized through the Dream Challenges.", "http://dreamchallenges.org");
+		tab.setTabListItemVisible(false);
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 	
-	public void configure(String entityId) {
-		tab.setPlace(new Synapse(entityId, null, EntityArea.ADMIN, null));
+	public void configure(String entityId, String entityName) {
+		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.ADMIN, null));
 		tab.setTabListItemVisible(false);
 		evaluationList.configure(entityId, new CallbackP<Boolean>() {
 			@Override

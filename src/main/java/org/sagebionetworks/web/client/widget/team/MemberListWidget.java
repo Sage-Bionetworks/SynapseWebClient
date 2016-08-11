@@ -1,16 +1,12 @@
 package org.sagebionetworks.web.client.widget.team;
 
 
-import java.util.List;
-
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.search.PaginationUtil;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 
 import com.google.gwt.place.shared.Place;
@@ -19,7 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class MemberListWidget implements MemberListWidgetView.Presenter {
-	public static int MEMBER_LIMIT = 100;
+	public static int MEMBER_LIMIT = 20;
 	private int offset;
 	private String searchTerm, teamId;
 	private boolean isAdmin;
@@ -29,6 +25,8 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private TeamMemberPagedResults memberList;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
+	private SynapseAlert synAlert;
+	private LoadMoreWidgetContainer membersContainer;
 	
 	@Inject
 	public MemberListWidget(
@@ -36,45 +34,56 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			SynapseClientAsync synapseClient, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			JSONObjectAdapter jsonObjectAdapter) {
+			LoadMoreWidgetContainer membersContainer,
+			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
+		this.membersContainer = membersContainer;
+		this.synAlert = synAlert;
+		view.setMembersContainer(membersContainer);
+		membersContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
 	}
 
-	public void configure(String teamId, String initialSearchTerm, int initialOffset, boolean isAdmin, Callback teamUpdatedCallback) {
+	public void configure(String teamId, boolean isAdmin, Callback teamUpdatedCallback) {
 		this.teamId = teamId;
 		this.isAdmin = isAdmin;
 		this.teamUpdatedCallback = teamUpdatedCallback;
-		refreshMembers(initialSearchTerm, initialOffset);
+		view.clearMembers();
+		offset = 0;
+		loadMore();
 	};
-	
-	public void configure(String teamId, boolean isAdmin, Callback teamUpdatedCallback) {
-		configure(teamId, null, 0, isAdmin, teamUpdatedCallback);
-	};
-	
-	@Override
+
 	public void clear() {
-		view.clear();
+		view.clearMembers();
 	}
 	
-	public void refreshMembers(final String searchTerm, int offset) {
-		this.searchTerm = searchTerm;
-		this.offset = offset;
-		
+	public void refresh() {
+		configure(teamId, isAdmin, teamUpdatedCallback);
+	}
+	
+	public void loadMore() {
+		synAlert.clear();
 		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults results) {
 				memberList = results;
-				view.configure(memberList.getResults(), searchTerm, isAdmin);
+				offset += MEMBER_LIMIT;
+				
+				long numberOfMembers = results.getTotalNumberOfResults();
+				membersContainer.setIsMore(offset < numberOfMembers);
+				view.addMembers(memberList.getResults(), isAdmin);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -86,45 +95,48 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	
 	@Override
 	public void removeMember(String principalId) {
+		synAlert.clear();
 		synapseClient.deleteTeamMember(authenticationController.getCurrentUserPrincipalId(), principalId, teamId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				//success, refresh the team
-				view.showInfo("Successfully removed the member", "");
+				view.showInfo("Successfully removed the member");
 				teamUpdatedCallback.invoke();			
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	}
 	
 	@Override
-	public void jumpToOffset(int offset) {
-		//everything remains the same except for the offset
-		refreshMembers(searchTerm, offset);
-	}
-
-	@Override
-	public void search(String searchTerm) {
-		//New search term, and the offset must reset
-		refreshMembers(searchTerm, 0);
+	public void setIsAdmin(String principalId, boolean isAdmin) {
+		synAlert.clear();
+		synapseClient.setIsTeamAdmin(authenticationController.getCurrentUserPrincipalId(), principalId, teamId, isAdmin, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				//success, refresh the team
+				view.showInfo("Successfully updated the team member");
+				teamUpdatedCallback.invoke();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				refresh();
+			}
+		});
 	}
 	
 	@Override
-	public List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow) {
-		Long nResults = memberList.getTotalNumberOfResults();
-		if(nResults == null)
-			return null;
-		return PaginationUtil.getPagination(nResults.intValue(), offset, nPerPage, nPagesToShow);
+	public void search(String searchTerm) {
+		//New search term, and the offset must reset
+		this.searchTerm = searchTerm;
+		refresh();
 	}
 	
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();
 	}
-	
 }

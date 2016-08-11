@@ -32,7 +32,7 @@ public class GWTCacheControlFilter implements Filter {
 			FilterChain filterChain) throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		String requestURI = httpRequest.getRequestURI().toLowerCase();
+		String requestURI = httpRequest.getRequestURI().toLowerCase().trim();
 		long now = new Date().getTime();
 		httpResponse.setDateHeader("Date", now);
 		if (requestURI.contains(".cache.")) {
@@ -42,7 +42,7 @@ public class GWTCacheControlFilter implements Filter {
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
-		else if (requestURI.contains(".nocache.")) {
+		else if (requestURI.contains(".nocache.") || requestURI.equals("/") || requestURI.isEmpty()) {
 			//do not cache
 			//http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
 			httpResponse.setDateHeader("Expires", 0);

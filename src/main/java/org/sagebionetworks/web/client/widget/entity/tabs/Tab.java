@@ -3,35 +3,39 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.place.shared.Place;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class Tab implements TabView.Presenter {
 	TabView view;
 	GlobalApplicationState globalAppState;
-	Place place;
-	List<CallbackP<Tab>> onClickCallbacks;
+	SynapseJSNIUtils synapseJSNIUtils;
 	
+	Synapse place;
+	String entityName;
+	List<CallbackP<Tab>> onClickCallbacks;
+	boolean isContentStale;
 	@Inject
-	public Tab(TabView view, GlobalApplicationState globalAppState) {
+	public Tab(TabView view, GlobalApplicationState globalAppState, SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
 		this.globalAppState = globalAppState;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
 	}
 	
-	public void configure(String tabTitle, Widget content) {
-		view.configure(tabTitle, content);
+	public void configure(String tabTitle, Widget content, String helpMarkdown, String helpLink) {
+		view.configure(tabTitle, content, helpMarkdown, helpLink);
 		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
 	}
 	
-	public TabListItem getTabListItem() {
+	public Widget getTabListItem() {
 		return view.getTabListItem();
 	}
 	
@@ -43,13 +47,37 @@ public class Tab implements TabView.Presenter {
 		return view.getTabPane();
 	}
 	
-	public void setPlace(Place place) {
+	public void setEntityNameAndPlace(String entityName, Synapse place) {
 		this.place = place;
+		this.entityName = entityName;
+		updatePageTitle();
 	}
 	
 	public void showTab() {
-		globalAppState.pushCurrentPlace(place);
+		showTab(true);
+	}
+	
+	public void showTab(boolean pushState) {
+		if (pushState) {
+			globalAppState.pushCurrentPlace(place);	
+		} else {
+			globalAppState.replaceCurrentPlace(place);
+		}
+		
 		view.setActive(true);
+		updatePageTitle();
+	}
+	
+	public void updatePageTitle() {
+		if (view.isActive()) {
+			if (entityName != null) {
+				String entityId = "";
+				if (place != null) {
+					entityId = " - " +  place.getEntityId();
+				}
+				synapseJSNIUtils.setPageTitle(entityName + entityId);
+			}
+		}
 	}
 	
 	public void hideTab() {
@@ -57,7 +85,7 @@ public class Tab implements TabView.Presenter {
 	}
 	
 	public void addTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		onClickCallbacks.add(onClickCallback);
+		onClickCallbacks.add(0, onClickCallback);
 	}
 	
 	@Override
@@ -66,4 +94,21 @@ public class Tab implements TabView.Presenter {
 			callbackP.invoke(this);
 		}
 	}
+	
+	public boolean isContentStale() {
+		return isContentStale;
+	}
+
+	public void setContentStale(boolean isContentStale) {
+		this.isContentStale = isContentStale;
+	}
+
+	/**
+	 * For testing purposes only
+	 * @param entityName
+	 */
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+	
 }

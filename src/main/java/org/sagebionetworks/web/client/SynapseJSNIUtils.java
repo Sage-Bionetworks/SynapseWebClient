@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -25,13 +26,34 @@ public interface SynapseJSNIUtils {
 	
 	public void highlightCodeBlocks();
 	
-	public void tablesorter(String id);
+	public void loadTableSorters();
 	
 	public String convertDateToSmallString(Date toFormat);
+	/**
+	 * Return a friendly relative date string.  Like "4 hours ago"
+	 * @param toFormat
+	 * @return
+	 */
+	public String getRelativeTime(Date toFormat);
+	/**
+	 * Return a friendly calendar date string.  Like "Yesterday at 3:32 PM"
+	 * @param toFormat
+	 * @return
+	 */
+	public String getCalendarTime(Date toFormat);
+	/**
+	 * Return a friendly calendar date string.  Like "January 20, 2016 3:47 PM"
+	 * @param toFormat
+	 * @return
+	 */
+	public String getLongFriendlyDate(Date toFormat);
+	
 	
 	public String getBaseFileHandleUrl();
 	
 	public String getBaseProfileAttachmentUrl();
+	
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId);
 
 	public int randomNextInt();
 	
@@ -49,8 +71,10 @@ public interface SynapseJSNIUtils {
 	
 	public String getContentType(String fileFieldId, int index);
 	public boolean isFileAPISupported();
+	public boolean isElementExists(String elementId);
 	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, int index, MD5Callback callback);
+	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback);
 	public double getFileSize(String fileFieldId, int index);
 	String[] getMultipleUploadFileNames(String fileFieldId);
 	public void consoleLog(String message);
@@ -61,26 +85,14 @@ public interface SynapseJSNIUtils {
 	public void processWithMathJax(Element element);	
 
 	public void loadCss(String url, Callback<Void, Exception> callback);
-	
-	/**
-	 * Replace the current history state with a new token using history.replaceState().
-	 * @see https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history
-	 * @param token
-	 */
-	public void replaceHistoryState(String token);
-
-	/**
-	 * push a new state to the current history state with a token using history.pushState().
-	 * @param token
-	 */
-	public void pushHistoryState(String token);
 
 	/**
 	 * initialize the behavior for on pop state
 	 */
 	public void initOnPopStateHandler();
 	
-	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int height);
+	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int tweetCount);
 	
-	public void refreshWindowFromCache();
+	public String getCurrentURL();
+	public String getCurrentHostName();
 }

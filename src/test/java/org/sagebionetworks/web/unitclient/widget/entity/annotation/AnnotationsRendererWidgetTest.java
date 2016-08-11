@@ -59,10 +59,11 @@ public class AnnotationsRendererWidgetTest {
 		
 		annotationList.clear();
 		boolean canEdit = true;
-		widget.configure(mockBundle, canEdit);
+		boolean isCurrentVersion = true;
+		widget.configure(mockBundle, canEdit, isCurrentVersion);
 		
 		verify(mockView).showNoAnnotations();
-		verify(mockView).setEditUIVisible(canEdit);
+		verify(mockView).setEditUIVisible(true);
 		
 		assertTrue(widget.isEmpty());
 	}
@@ -70,10 +71,22 @@ public class AnnotationsRendererWidgetTest {
 	@Test
 	public void testConfigureAnnotations() {
 		boolean canEdit = false;
-		widget.configure(mockBundle, canEdit);
+		boolean isCurrentVersion = true;
+		widget.configure(mockBundle, canEdit, isCurrentVersion);
 		
 		verify(mockView).configure(annotationList);
-		verify(mockView).setEditUIVisible(canEdit);
+		verify(mockView).setEditUIVisible(false);
+		
+		assertFalse(widget.isEmpty());
+	}
+	@Test
+	public void testConfigureAnnotationsNotCurrentVersion() {
+		boolean canEdit = true;
+		boolean isCurrentVersion = false;
+		widget.configure(mockBundle, canEdit, isCurrentVersion);
+		
+		verify(mockView).configure(annotationList);
+		verify(mockView).setEditUIVisible(false);
 		
 		assertFalse(widget.isEmpty());
 	}
@@ -89,7 +102,7 @@ public class AnnotationsRendererWidgetTest {
 	public void testOnEdit() {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
 		EntityUpdatedHandler updateHandler = mock(EntityUpdatedHandler.class);
-		widget.configure(mockBundle, true);
+		widget.configure(mockBundle, true, true);
 		widget.setEntityUpdatedHandler(updateHandler);
 		
 		//test that on edit, we pass the bundle and update handler to the edit dialog
@@ -107,7 +120,7 @@ public class AnnotationsRendererWidgetTest {
 	@Test
 	public void testOnEditFailedPreflight() {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		widget.configure(mockBundle, true);
+		widget.configure(mockBundle, true, true);
 		//test that on edit, we pass the bundle and update handler to the edit dialog
 		widget.onEdit();
 		

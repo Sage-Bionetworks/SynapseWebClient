@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -14,9 +14,9 @@ public interface UserAccountService extends RemoteService {
 
 	public void sendPasswordResetEmail(String emailAddress) throws RestServiceException;
 	
-	public void changePassword(String sessionToken, String newPassword);
+	public void changePassword(String sessionToken, String newPassword) throws RestServiceException;
 
-	public Session initiateSession(String username, String password) throws RestServiceException;
+	public LoginResponse initiateSession(LoginRequest loginRequest) throws RestServiceException;
 	
 	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException;
 	
@@ -34,6 +34,5 @@ public interface UserAccountService extends RemoteService {
 	public String getTermsOfUse();
 	
 	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
-	
-	public StorageUsageSummaryList getStorageUsage();
+
 }

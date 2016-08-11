@@ -112,6 +112,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			}
 				
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 		}
 	}
 	

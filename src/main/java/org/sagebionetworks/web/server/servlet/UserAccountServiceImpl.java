@@ -4,17 +4,15 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
-import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -85,23 +83,23 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public void changePassword(String sessionToken, String newPassword) {
+	public void changePassword(String sessionToken, String newPassword) throws RestServiceException {
 		validateService();
 		
 		SynapseClient client = createAnonymousSynapseClient();
 		try {
 			client.changePassword(sessionToken, newPassword);
 		} catch (SynapseException e) {
-			throw new RestClientException("Password change failed", e);
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public Session initiateSession(String username, String password) throws RestServiceException {
+	public LoginResponse initiateSession(LoginRequest loginRequest) throws RestServiceException {
 		validateService();
 		SynapseClient synapseClient = createAnonymousSynapseClient();
 		try {
-			return synapseClient.login(username, password);
+			return synapseClient.login(loginRequest);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -110,7 +108,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	@Override 
 	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {
 		validateService();
-		
 		SynapseClient synapseClient = createSynapseClient(sessionToken);
 		try {
 			return synapseClient.getUserSessionData();
@@ -118,7 +115,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
 		validateService();
@@ -228,19 +225,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw new RestClientException(e.getMessage());
 		}
 	}
-	
-	@Override
-	public StorageUsageSummaryList getStorageUsage() {
-		validateService();
 
-		SynapseClient client = createSynapseClient();
-		try {
-			return client.getStorageUsageSummary(null);
-		} catch (SynapseException e) {
-			throw new RestClientException("Unable to get storage usage", e);
-		}
-	}
-	
 	/**
 	 * The synapse client is stateful so we must create a new one for each request
 	 */

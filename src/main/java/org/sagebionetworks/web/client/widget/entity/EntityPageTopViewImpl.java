@@ -3,10 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -34,23 +31,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel projectDescriptionContainer;
 	@UiField
 	SimplePanel projectActionMenuContainer;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public EntityPageTopViewImpl(Binder uiBinder,
-			SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookies) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		
+	public EntityPageTopViewImpl(Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-	
 
-	
-	@Override
-	public void setPageTitle(String title) {
-		synapseJSNIUtils.setPageTitle(title);
-	}
 	@Override
 	public void setActionMenu(Widget w) {
 		projectActionMenuContainer.add(w);

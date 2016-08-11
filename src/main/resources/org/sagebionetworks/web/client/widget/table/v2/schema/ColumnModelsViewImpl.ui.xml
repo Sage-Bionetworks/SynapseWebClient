@@ -53,6 +53,8 @@
 			Column</b:Button>
 		<b:Button ui:field="editColumnsButton" icon="GEAR" type="INFO">Edit
 			Schema</b:Button>
+		<b:Button ui:field="addDefaultViewColumnsButton" type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
+ 			Default View Columns</b:Button>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

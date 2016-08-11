@@ -13,7 +13,7 @@
 		<bh:Div styleName="margin-top-15" />
 		<b:Progress ui:field="progressContainer" visible="false">
 			<b:ProgressBar ui:field="progressBar" type="INFO"
-				percent="1" text="1%" />
+				percent="0" text="0%" />
 		</b:Progress>
 		<b:Alert ui:field="alert" visible="false" type="DANGER"/>
 	</g:HTMLPanel>

@@ -32,7 +32,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 	private static final int MAX_IMAGE_WIDTH = 940;
 	//if image fails to load from the given source, it will try to load from the cache (this is for the case when the image has been uploaded, but the wiki has not yet been saved)
 	private boolean hasTriedCache;
-	
+	private Image image;
 	@Inject
 	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, GlobalApplicationState globalApplicationState, ClientCache clientCache) {
 		this.synapseJsniUtils = synapseJsniUtils;
@@ -42,7 +42,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 
 	@Override
 	public void configure(WikiPageKey wikiKey, final String fileName,
-			final String scale, String alignment, final String synapseId, final boolean isLoggedIn, Long wikiVersion) {
+			final String scale, String alignment, final String synapseId, final boolean isLoggedIn, Long wikiVersion, String xsrfToken) {
 		this.clear();
 		hasTriedCache = false;
 		// Add a html panel that contains the image src from the attachments server (to pull asynchronously)
@@ -50,15 +50,14 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		final String url;
 		// If the wiki page is showing a different/old version, we need to get the URL to that version's attachments
 		if(wikiVersion != null) {
-			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false) :
-				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion);
+			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false, xsrfToken) :
+				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion, xsrfToken);
 		} else {
-			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false) :
-				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
+			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, null, false, xsrfToken) :
+				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, xsrfToken);
 		}
 		
-		final Image image = new Image();
-		image.addStyleName("maxWidth100");
+		image = new Image();
 		if (synapseId != null) {
 			image.addStyleName("imageButton");
 			image.addClickHandler(new ClickHandler() {
@@ -149,6 +148,12 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		image.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		add(image);
 		image.setUrl(url);
+	}
+	
+	public void addStyleName(String style) {
+		if (image != null) {
+			image.addStyleName(style);
+		}
 	}
 
 	public void showError(String error) {

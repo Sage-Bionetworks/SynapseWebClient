@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -24,6 +26,7 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	private Div evaluationSubmitterContainer = new Div();
 	@Inject
 	public SubmitToEvaluationWidgetViewImpl() {
+		this.addStyleName("min-height-48");
 	}
 	
 	@Override
@@ -45,8 +48,11 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	
 	@Override
 	public void showUnavailable(String message) {
-		if (message != null && message.trim().length() > 0)
-			add(new HTML(DisplayUtils.getAlertHtmlSpan(SafeHtmlUtils.htmlEscape(message), "", BootstrapAlertType.INFO)));
+		if (message != null && message.trim().length() > 0) {
+			Alert alert = new Alert(SafeHtmlUtils.htmlEscape(message), AlertType.INFO);
+			alert.addStyleName("displayInline");
+			add(alert);
+		}
 	}
 	
 	@Override

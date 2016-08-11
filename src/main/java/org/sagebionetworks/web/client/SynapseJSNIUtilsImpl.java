@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
@@ -17,6 +19,7 @@ import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
@@ -34,7 +37,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _recordPageVisit(String token) /*-{
-		$wnd._gaq.push(['_trackPageview', token]);
+		$wnd.ga('set', 'page', '/#'+token);
+		$wnd.ga('send', 'pageview');
 	}-*/;
 	
 	@Override
@@ -71,28 +75,54 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	public static native void _highlightCodeBlocks() /*-{
-	  $wnd.jQuery('code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+	  $wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
 	}-*/;
 	
 	@Override
-	public void tablesorter(String id) {
-		_tablesorter(id);
+	public void loadTableSorters() {
+		_tablesorter();
 	}
 	
-	private static native void _tablesorter(String id) /*-{
-		$wnd.jQuery('#'+id).tablesorter();
+	private static native void _tablesorter() /*-{
+		$wnd.jQuery('table.markdowntable').tablesorter();
 	}-*/;
 	
 	private static native void _bindBootstrapPopover(String id) /*-{
 		$wnd.jQuery('#'+id).popover();
 	}-*/;
+	
+	private static native String _getRelativeTime(String s) /*-{
+		return $wnd.moment(s).fromNow();
+	}-*/;
+	private static native String _getCalendarTime(String s) /*-{
+		return $wnd.moment(s).calendar();
+	}-*/;
+	
+	private static native String _getLongFriendlyDate(String s) /*-{
+		return $wnd.moment(s).format('LLLL');
+	}-*/;
 
 	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
+	private static DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
+	
 	@Override
 	public String convertDateToSmallString(Date toFormat) {
 		return smallDateFormat.format(toFormat);
 	}
-
+	@Override
+	public String getRelativeTime(Date toFormat) {
+		return _getRelativeTime(iso8601Format.format(toFormat));
+	}
+	@Override
+	public String getCalendarTime(Date toFormat) {
+		return _getCalendarTime(iso8601Format.format(toFormat));
+	}
+	
+	@Override
+	public String getLongFriendlyDate(Date toFormat) {
+		return _getLongFriendlyDate(iso8601Format.format(toFormat));
+	}
+	
 	@Override
 	public String getBaseFileHandleUrl() {
 		return GWT.getModuleBaseURL()+"filehandle";
@@ -101,6 +131,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	@Override
 	public String getBaseProfileAttachmentUrl() {
 		return GWT.getModuleBaseURL() + "profileAttachment";
+	}
+	
+	@Override
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
+		return GWT.getModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
+				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
+				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 
 	@Override
@@ -193,24 +231,28 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-  		if(contentType) {
-  			xhr.setRequestHeader('Content-type', contentType);
-  		}
+  		//explicitly set content type
+  		xhr.setRequestHeader('Content-type', contentType);
   		xhr.send(fileSliceToUpload);
 	}-*/;
 	
 	
 	public static void updateProgress(JavaScriptObject evt) {
 		if (SynapseJSNIUtilsImpl.progressCallback != null) {
-			//parse out value
-			double currentProgress = _getProgress(evt);
-			SynapseJSNIUtilsImpl.progressCallback.updateProgress(currentProgress);
+			SynapseJSNIUtilsImpl.progressCallback.updateProgress(_getLoaded(evt), _getTotal(evt));
 		}
 	}
 	
-	private final static native double _getProgress(JavaScriptObject evt) /*-{
+	private final static native double _getLoaded(JavaScriptObject evt) /*-{
 		if (evt.lengthComputable) {
-			return evt.loaded / evt.total;
+			return evt.loaded;
+		}
+		return 0;
+	}-*/;
+	
+	private final static native double _getTotal(JavaScriptObject evt) /*-{
+		if (evt.lengthComputable) {
+			return evt.total;
 		}
 		return 0;
 	}-*/;
@@ -256,6 +298,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    return out;
 	}-*/;
 	
+	public boolean isElementExists(String elementId) {
+		return Document.get().getElementById(elementId) != null;
+	};
+	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
 	 */
@@ -297,12 +343,47 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	        var start = currentChunk * chunkSize,
 	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-	
+			console.log("MD5 full file: loading next chunk: start=", start, " end=", end);
 	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
 		};
        $wnd.loadNext();
 	}-*/;
 
+	/**
+	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
+	 */
+	@Override
+	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback) {
+		_getFilePartMd5(fileFieldId, currentChunk, chunkSize.doubleValue(), fileIndex, md5Callback);
+	}
+	private final static native void _getFilePartMd5(String fileFieldId, int currentChunk, double chunkSize, int fileIndex, MD5Callback md5Callback) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var file = fileToUploadElement.files[fileIndex];
+		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
+		spark = new $wnd.SparkMD5.ArrayBuffer();
+        $wnd.frOnload = function(e) {
+            spark.append(e.target.result); // append array buffer
+           // Call instance method setMD5() on md5Callback with the final md5
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+        };
+        $wnd.frOnerror = function () {
+        	console.warn("unable to calculate file part md5");
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+        };
+        
+        $wnd.loadPart = function() { 
+            var fileReader = new FileReader();
+	        fileReader.onload = $wnd.frOnload;
+	        fileReader.onerror = $wnd.frOnerror;
+			var start = currentChunk * chunkSize,
+	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+	        
+	        console.log("MD5 file part: loading chunk: start=", start, " end=", end);
+	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		};
+       $wnd.loadPart();
+	}-*/;
+	
 	@Override
 	public boolean isFileAPISupported() {
 		return _isFileAPISupported();
@@ -431,31 +512,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 		img.src = cssUrl;
 	}-*/;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.SynapseJSNIUtils#replaceHistoryState(java.lang.String)
-	 */
-	@Override
-	public void replaceHistoryState(String token) {
-		_replaceHistoryState(token);
-	}
 	
-	private static native void _replaceHistoryState(String token)/*-{
-		var stateObj = { source: 'replaceState' };
-		$wnd.history.replaceState( stateObj , '', '#'+token );
-	}-*/;
-
-	@Override
-	public void pushHistoryState(String token) {
-		_pushHistoryState(token);
-	}
-
-	private static native void _pushHistoryState(String token)/*-{
-		var stateObj = { source: 'pushState' };
-		$wnd.history.pushState( stateObj , '', '#'+token );
-	}-*/;
-
 	@Override
 	public void initOnPopStateHandler() {
 		_initOnPopStateHandler();
@@ -473,33 +530,33 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void refreshWindowFromCache() {
-		_refreshWindowFromCache();
-	}
-	
-	private static native void _refreshWindowFromCache()/*-{
-		//pass false so to not force reloading the current page from the server
-		$wnd.location.reload(false);
-	}-*/;
-	
-	@Override
 	public void showTwitterFeed(String dataWidgetId, String elementId,
-			String linkColor, String borderColor, int height) {
-		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, height);		
+			String linkColor, String borderColor, int tweetCount) {
+		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, tweetCount);		
 	}
 
 	private final static native void _showTwitterFeed(String dataWidgetId,
 			String elementId, String linkColorHex, String borderColorHex,
-			int heightInPx) /*-{
+			int tweetCount) /*-{
 		if (typeof $wnd.twttr !== 'undefined') {
 			var element = $doc.getElementById(elementId);
 			$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-				height : heightInPx,
 				chrome : "nofooter noheader",
 				linkColor : linkColorHex,
-				borderColor : borderColorHex
+				borderColor : borderColorHex,
+				tweetLimit : tweetCount
 			});
 		}
 		
 	}-*/;
+	
+	@Override
+	public String getCurrentURL() {
+		return Location.getHref();
+	}
+	
+	@Override
+	public String getCurrentHostName() {
+		return Location.getHostName();
+	}
 }

@@ -2,17 +2,24 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
+import org.sagebionetworks.repo.model.verification.VerificationState;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -20,9 +27,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -39,13 +48,13 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -61,10 +70,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
+	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
+	
+	public static int PROFILE = 0x1;
+	public static int ORC_ID = 0x2;
+	public static int VERIFICATION_SUBMISSION = 0x4;
+	public static int IS_CERTIFIED = 0x8;
+	public static int IS_VERIFIED = 0x10;
+	public static int IS_ACT_MEMBER = 0x20;
 	
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
+	private UserProfileClientAsync userProfileClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -83,14 +101,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private int currentProjectOffset, currentChallengeOffset;
 	public final static int PROJECT_PAGE_SIZE=100;
 	public final static int CHALLENGE_PAGE_SIZE=100;
+	public ProfileArea currentArea;
 	public ProjectFilterEnum filterType;
-	public Team filterTeam;
+	public String filterTeamId;
 	public SortOptionEnum currentProjectSort;
 	public TeamListWidget myTeamsWidget;
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
-
+	public VerificationSubmissionWidget verificationModal;
+	public UserBundle currentUserBundle;
+	public Map<String, Boolean> isACTMemberMap;
+	public Callback resubmitVerificationCallback;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -105,7 +127,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			UserProfileClientAsync userProfileClient,
+			VerificationSubmissionWidget verificationModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -120,6 +144,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		this.userProfileClient = userProfileClient;
+		this.verificationModal = verificationModal;
+		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -134,6 +161,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
 		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
 		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
+		resubmitVerificationCallback = new Callback() {
+			@Override
+			public void invoke() {
+				newVerificationSubmissionClicked();
+			}
+		};
 	}
 
 	
@@ -181,27 +214,33 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	@Override
-	public void updateArea(ProfileArea area) {
-		if (area != null && !area.equals(place.getArea())) {
-			place.setArea(area);
-			place.setNoRestartActivity(true);
-			globalApplicationState.getPlaceChanger().goTo(place);
+	public void updateArea(ProfileArea area, boolean pushState) {
+		if (area != null && place != null && !area.equals(place.getArea())) {
+			place.setArea(area, filterType, filterTeamId);
+			if (pushState) {
+				globalApplicationState.pushCurrentPlace(place);	
+			} else {
+				globalApplicationState.replaceCurrentPlace(place);
+			}
 		}
 	}
-
+	
 	// Configuration
-	public void updateProfileView(String userId, final ProfileArea initialTab) {
+	public void updateProfileView(String userId) {
 		inviteCount = 0;
 		openRequestCount = 0;
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
+		if (currentArea == null || (ProfileArea.SETTINGS.equals(currentArea) && !isOwner)) {
+			currentArea = ProfileArea.PROJECTS;
+		}
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clear();
 		view.showLoading();
 		view.setSortText(currentProjectSort.sortText);
-		view.setProfileEditButtonVisible(isOwner);	
+		view.setProfileEditButtonVisible(isOwner);
+		view.setOrcIDLinkButtonVisible(isOwner);
 		view.showTabs(isOwner);
 		myTeamsWidget.clear();
 		myTeamsWidget.configure(false);
@@ -211,27 +250,48 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			initUserFavorites(new Callback() {
 				@Override
 				public void invoke() {
-					getUserProfile(initialTab);
+					getUserProfile();
+					boolean pushState = false;
+					showTab(currentArea, pushState);
 				}
 			});
-			tabClicked(initialTab);
 		} else {
-			if (initialTab == ProfileArea.SETTINGS) 
-				getUserProfile(ProfileArea.PROJECTS);
-			else
-				getUserProfile(initialTab);
-			tabClicked(initialTab == ProfileArea.SETTINGS ? ProfileArea.PROJECTS : initialTab);
+			getUserProfile();
+			boolean pushState = false;
+			showTab(currentArea, pushState);
 		}
 	}
 	
-	private void getUserProfile(final ProfileArea initialTab) {
-		this.profileSynAlert.clear();
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+	private void getUserProfile() {
+		//ask for everything in the user bundle
+		currentUserBundle = null;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED;
+		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
+		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
+		view.setOrcIdVisible(false);
+		view.setUnbindOrcIdVisible(false);
+		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
-			public void onSuccess(UserProfile profile) {
-					initializeShowHideProfile(isOwner);
-					getIsCertifiedAndUpdateView(profile, isOwner);
+			public void onSuccess(UserBundle bundle) {
+				view.hideLoading();
+				currentUserBundle = bundle;
+				initializeShowHideProfile(isOwner);
+				boolean isCertified = bundle.getIsCertified();
+				if (isCertified) {
+					view.addCertifiedBadge();
+				} else {
+					initializeShowHideCertification(isOwner);
 				}
+				initializeVerificationUI();
+				view.setProfile(bundle.getUserProfile(), isOwner);
+				String orcId = bundle.getORCID();
+				if (orcId != null && orcId.length() > 0) {
+					view.setOrcId(orcId);
+					view.setOrcIdVisible(true);
+					view.setUnbindOrcIdVisible(isOwner);
+					view.setOrcIDLinkButtonVisible(false);
+				}
+			}
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
@@ -240,32 +300,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner) {
-		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
-		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
+	@Override
+	public void unbindOrcId() {
+		view.showConfirmDialog("Unlink","Are you sure you want to unlink this ORC ID from your Synapse user profile?", new Callback() {
 			@Override
-			public void onSuccess(String passingRecordJson) {
-				try {
-					view.hideLoading();
-					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					if (passingRecord != null)
-						view.addCertifiedBadge();
-					view.setProfile(profile, isOwner);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void invoke() {
+				unbindOrcIdAfterConfirmation();
+			}
+		});
+	}
+	
+	public void unbindOrcIdAfterConfirmation() {
+		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date
+				view.showInfo("Success", "ORC ID has been unbound.");
+				globalApplicationState.refreshPage();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.hideLoading();
-				if (caught instanceof NotFoundException) {
-					view.setProfile(profile, isOwner);
-					initializeShowHideCertification(isOwner);
-				}
-				else
-					view.showErrorMessage(caught.getMessage());
+				profileSynAlert.handleException(caught);
 			}
-		});
+		});	
 	}
 	
 	public void initializeShowHideProfile(boolean isOwner) {
@@ -304,6 +361,87 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//not the owner
 			//hide certification message
 			view.setGetCertifiedVisible(false);
+		}
+	}
+	
+	public void initializeVerificationUI() {
+		//verification UI is hidden by default (in view.clear())
+		boolean isVerified = currentUserBundle.getIsVerified();
+		//The UI is depends on the current state
+		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+		if (isVerified) {
+			List<VerificationState> stateHistory = submission.getStateHistory();
+			VerificationState latestState = stateHistory.get(stateHistory.size()-1);
+			String dateVerified = gwt.getFormattedDateString(latestState.getCreatedOn());
+			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid(), dateVerified);
+		}
+		
+		if (submission == null) {
+			//no submission.  if the owner, provide way to submit
+			initializeShowHideVerification(isOwner);
+		} else {
+			//there's a submission in a state other than approved.  Show UI if owner or act member
+			getIsACTMemberAndShowVerificationUI(submission);
+		}
+	}
+	
+	public void initializeShowHideVerification(boolean isOwner){
+		if (isOwner) {
+			boolean isVerificationAlertVisible = false;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+					isVerificationAlertVisible = true;	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
+			}
+			view.setVerificationAlertVisible(isVerificationAlertVisible);
+			//show the submit verification button if the full alert isn't visible
+			view.setVerificationButtonVisible(!isVerificationAlertVisible);
+		}
+	}
+	
+	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
+		if (authenticationController.isLoggedIn()) {
+			//do we know if the current user is an act member?
+			Boolean isActMember = isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId());
+			if (isActMember == null) {
+				//we don't know, find out.
+				int mask = IS_ACT_MEMBER;
+				userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
+					@Override
+					public void onSuccess(UserBundle userBundle) {
+						isACTMemberMap.put(authenticationController.getCurrentUserPrincipalId(), userBundle.getIsACTMember());
+						showVerificationUI(submission, userBundle.getIsACTMember());
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						view.hideLoading();
+						profileSynAlert.handleException(caught);
+					}
+				});	
+			} else {
+				showVerificationUI(submission, isActMember);
+			}
+		}
+	}
+	
+	public void showVerificationUI(VerificationSubmission submission, Boolean isACTMember) {
+		if (isOwner || isACTMember) {
+			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+			if (currentState.getState() == VerificationStateEnum.SUSPENDED) {
+				view.setVerificationSuspendedButtonVisible(true);
+				view.setResubmitVerificationButtonVisible(isOwner);
+			} else if (currentState.getState() == VerificationStateEnum.REJECTED) {
+				view.setVerificationRejectedButtonVisible(true);
+				view.setResubmitVerificationButtonVisible(isOwner);
+			} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
+				view.setVerificationSubmittedButtonVisible(true);
+			} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
+				view.setVerificationDetailsButtonVisible(true);
+			}
 		}
 	}
 	
@@ -354,9 +492,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param filterType
 	 * @param team
 	 */
-	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
+	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, String filterTeamId) {
+		if (filterType == null) {
+			filterType = ProjectFilterEnum.ALL;
+		}
 		this.filterType = filterType;
-		filterTeam = team;
+		this.filterTeamId = filterTeamId;
+		if (place != null)
+			place.setArea(ProfileArea.PROJECTS, filterType, filterTeamId);
 		refreshProjects();
 	}
 
@@ -370,17 +513,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.setAllProjectsFilterSelected();
 					getMyProjects(ProjectListType.MY_PROJECTS, ProjectFilterEnum.ALL, currentProjectOffset);
 					break;
-				case MINE:
+				case CREATED_BY_ME:
 					view.setMyProjectsFilterSelected();
-					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.MINE, currentProjectOffset);
+					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.CREATED_BY_ME, currentProjectOffset);
 					break;
-				case MY_PARTICIPATED_PROJECTS:
+				case SHARED_DIRECTLY_WITH_ME:
 					view.setSharedDirectlyWithMeFilterSelected();
-					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, currentProjectOffset);
+					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, currentProjectOffset);
 					break;
-				case MY_TEAM_PROJECTS:
+				case ALL_MY_TEAM_PROJECTS:
 					view.setTeamsFilterSelected();
-					getMyProjects(ProjectListType.MY_TEAM_PROJECTS, ProjectFilterEnum.MY_TEAM_PROJECTS, currentProjectOffset);
+					getMyProjects(ProjectListType.MY_TEAM_PROJECTS, ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, currentProjectOffset);
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
@@ -503,7 +646,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
@@ -556,6 +699,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			view.addChallengeWidget(widget);
+			if (currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
+				// SWC-3213: extra call to make sure challenge tab is currently shown
+				view.setTabSelected(ProfileArea.CHALLENGES);
+			}
 		}
 	}
 	
@@ -568,7 +715,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentChallengeOffset += CHALLENGE_PAGE_SIZE;
 		view.setIsMoreChallengesVisible(currentChallengeOffset < totalNumberOfResults);
 	}
-
 	
 	public void getFavorites() {
 		view.showProjectsLoading(true);
@@ -688,11 +834,32 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		teamSynAlert.clear();
 		String token = place.toToken();
+		currentArea = place.getArea();
+		filterType = place.getProjectFilter();
+		filterTeamId = place.getTeamId();
+		view.setPresenter(this);
+		if (token.equals("oauth_bound")) {
+			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
+			token = "v";
+		}
+		if (token.equals("v") || token.startsWith("v/") || token.isEmpty()) {
+			Place gotoPlace = null;
+			if (authenticationController.isLoggedIn()) {
+				//replace url with current user id
+				token = authenticationController.getCurrentUserPrincipalId() + token.substring(1);
+				gotoPlace = new Profile(token);
+			} else {
+				//does not make sense, go home
+				gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+			}
+			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			return;
+		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
-			updateProfileView(place.getUserId(), place.getArea());
+			updateProfileView(place.getUserId());
 		}
-		else if(!"".equals(token) && token != null) {
+		else {
 			//if this contains an oauth_token, it's from linkedin
 			if (token.contains("oauth_token"))
 			{
@@ -724,10 +891,30 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
 				editMyProfile();
 			} else {
-				//otherwise, this is a user id
-				updateProfileView(place.getUserId(), place.getArea());
+				//if this is a number, then treat it as a a user id
+				try{
+					Long.parseLong(place.getUserId());
+					updateProfileView(place.getUserId());
+				} catch (NumberFormatException nfe) {
+					getUserIdFromUsername(token);
+				}
 			}
 		}
+	}
+	
+	public void getUserIdFromUsername(String userName) {
+		synapseClient.getUserIdFromUsername(userName, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userId) {
+				place.setUserId(userId);
+				updateProfileView(userId);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				profileSynAlert.handleException(caught);
+			}
+		});
 	}
 	
 	@Override
@@ -798,6 +985,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return isOwner;
 	}
 	
+	public void showTab(ProfileArea tab, boolean pushState) {
+		updateArea(tab, pushState);
+		refreshData(tab);
+		view.setTabSelected(tab);
+	}
+	
 	@Override
 	public void tabClicked(final ProfileArea tab) {
 		if (tab == null) {
@@ -809,23 +1002,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
-					refreshData(tab);
-					view.setTabSelected(tab);
+					boolean pushState = true;
+					showTab(tab, pushState);
 				}
 			};
 			view.showConfirmDialog("",
 					DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE,
 					yesCallback);
 		} else {
-			refreshData(tab);
-			view.setTabSelected(tab);
+			boolean pushState = true;
+			showTab(tab, pushState);
 		}
 	}
 	
 	private void refreshData(ProfileArea tab) {
 		switch (tab) {
 			case PROJECTS:
-				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+				setProjectFilterAndRefresh(filterType, filterTeamId);
 				break;
 			case TEAMS:
 				refreshTeams();
@@ -868,7 +1061,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void applyFilterClicked(ProjectFilterEnum filterType, Team team) {
-		setProjectFilterAndRefresh(filterType, team);
+		String filterTeamId = null;
+		if (team != null) {
+			filterTeamId = team.getId();
+		}
+		setProjectFilterAndRefresh(filterType, filterTeamId);
+		globalApplicationState.pushCurrentPlace(place);
 	}
 	
 	@Override
@@ -877,6 +1075,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
 		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
+	}
+	@Override
+	public void setVerifyDismissed() {
+		//set verify message visible=false for a year
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
+		//and show button instead
+		view.setVerificationButtonVisible(true);
+	}
+	
+	@Override
+	public void setVerifyUndismissed() {
+		cookies.removeCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
 	}
 	
 	/**
@@ -945,7 +1157,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				public void onSuccess(UserProfile linkedInProfile) {
 					// Give the user a chance to edit the profile.
 					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
-
 						@Override
 						public void invoke() {
 							profileUpdated();
@@ -957,6 +1168,44 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					profileSynAlert.handleException(caught);								
 				}
 			});
+		}
+	}
+	
+	@Override
+	public void editVerificationSubmissionClicked() {
+		//edit the existing submission
+		verificationModal.configure(
+				currentUserBundle.getVerificationSubmission(), 
+				isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId()), 
+				true) //isModal
+			.setResubmitCallback(resubmitVerificationCallback)
+			.show();		
+	}
+	
+	@Override
+	public void newVerificationSubmissionClicked() {
+		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
+		if (currentUserBundle.getVerificationSubmission() != null) {
+			attachments = currentUserBundle.getVerificationSubmission().getAttachments();
+		}
+		
+		//create a new submission
+		verificationModal.configure(
+				currentUserBundle.getUserProfile(), 
+				currentUserBundle.getORCID(), 
+				true, //isModal
+				attachments) 
+			.show();
+	}
+	
+	@Override
+	public void linkOrcIdClicked() {
+		String orcId = currentUserBundle.getORCID();
+		if (orcId != null && orcId.length() > 0) {
+			//already set!
+			view.showErrorMessage("An ORC ID has already been linked to your Synapse account.");
+		} else {
+			DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
 		}
 	}
 }

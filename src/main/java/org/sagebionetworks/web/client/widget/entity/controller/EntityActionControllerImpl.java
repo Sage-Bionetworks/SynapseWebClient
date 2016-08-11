@@ -13,13 +13,16 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -30,14 +33,16 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -51,10 +56,12 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
+	public static final String THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES = "the root wiki page and all subpages?";
+
 	public static final String MOVE_PREFIX = "Move ";
 
 	public static final String EDIT_WIKI_PREFIX = "Edit ";
-	public static final String EDIT_WIKI_SUFFIX = " Wiki";
+	public static final String WIKI = " Wiki";
 	
 	public static final String THE = "The ";
 
@@ -88,12 +95,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UserEntityPermissions permissions;
 	String enityTypeDisplay;
 	boolean isUserAuthenticated;
+	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
-	MarkdownEditorWidget wikiEditor;
+	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
+	EvaluationEditorModal evalEditor;
+	CookieProvider cookies;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -108,13 +118,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
-			MarkdownEditorWidget wikiEditor,
+			WikiMarkdownEditor wikiEditor,
 			ProvenanceEditorWidget provenanceEditor,
-			StorageLocationWidget storageLocationEditor) {
+			StorageLocationWidget storageLocationEditor,
+			EvaluationEditorModal evalEditor,
+			CookieProvider cookies) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
-		this.view.addAccessControlListModalWidget(accessControlListModalWidget);
 		this.preflightController = preflightController;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
@@ -128,14 +139,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.wikiEditor = wikiEditor;
 		this.provenanceEditor = provenanceEditor;
 		this.storageLocationEditor = storageLocationEditor;
-		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
-		this.view.addProvenanceEditorModalWidget(provenanceEditor.asWidget());
-		this.view.addStorageLocationModalWidget(storageLocationEditor.asWidget());
+		this.evalEditor = evalEditor;
+		this.cookies = cookies;
+		this.view.addWidget(wikiEditor.asWidget());
+		this.view.addWidget(provenanceEditor.asWidget());
+		this.view.addWidget(storageLocationEditor.asWidget());
+		this.view.addWidget(accessControlListModalWidget);
+		this.view.addWidget(evalEditor.asWidget());
 	}
 
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, String wikiPageId, EntityUpdatedHandler handler) {
+			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityUpdatedHandler handler) {
 		this.entityBundle = entityBundle;
 		this.wikiPageId = wikiPageId;
 		this.entityUpdateHandler = handler;
@@ -143,6 +158,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
+		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
@@ -163,6 +179,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureEditWiki();
 			configureViewWikiSource();
 			configureAddWikiSubpage();
+			configureDeleteWikiAction();
 			configureMove();
 			configureLink();
 			configureSubmit();
@@ -174,14 +191,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureCreateDOI();
 			configureEditProjectMetadataAction();
 			configureEditFileMetadataAction();
+			configureAddEvaluationAction();
 		}
 	}
 	
 	private void configureProvenance() {
-		if(entityBundle.getEntity() instanceof FileEntity ){
+		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository){
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
-			actionMenu.addActionListener(Action.EDIT_PROVENANCE, this);
+			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
 		} else {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
@@ -192,7 +210,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Folder || entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
-			actionMenu.addActionListener(Action.CHANGE_STORAGE_LOCATION, this);
+			actionMenu.setActionListener(Action.CHANGE_STORAGE_LOCATION, this);
 		} else {
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, false);
 			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, false);
@@ -204,7 +222,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.CREATE_DOI, false);
 		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
 		if (canEdit) {
-			actionMenu.addActionListener(Action.CREATE_DOI, this);
+			actionMenu.setActionListener(Action.CREATE_DOI, this);
 			if (entityBundle.getDoi() == null) {
 				//show command if not returned, thus not in existence
 				actionMenu.setActionVisible(Action.CREATE_DOI, true);
@@ -241,7 +259,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof FileEntity ){
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanCertifiedUserEdit());
-			actionMenu.addActionListener(Action.UPLOAD_NEW_FILE, this);
+			actionMenu.setActionListener(Action.UPLOAD_NEW_FILE, this);
 		}else{
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
 			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, false);
@@ -252,8 +270,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(isWikiableType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
-			actionMenu.addActionListener(Action.EDIT_WIKI_PAGE, this);
-			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+enityTypeDisplay+EDIT_WIKI_SUFFIX);
+			actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
+			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+enityTypeDisplay+WIKI);
 		}else{
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
@@ -265,7 +283,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(isWikiableType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
-			actionMenu.addActionListener(Action.VIEW_WIKI_SOURCE, this);
+			actionMenu.setActionListener(Action.VIEW_WIKI_SOURCE, this);
 		}else{
 			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, false);
 			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
@@ -277,7 +295,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
-			actionMenu.addActionListener(Action.ADD_WIKI_SUBPAGE, this);
+			actionMenu.setActionListener(Action.ADD_WIKI_SUBPAGE, this);
 		}else{
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
 			actionMenu.setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
@@ -290,7 +308,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.MOVE_ENTITY, permissions.getCanEdit());
 			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+enityTypeDisplay);
-			actionMenu.addActionListener(Action.MOVE_ENTITY, this);
+			actionMenu.setActionListener(Action.MOVE_ENTITY, this);
 		}else{
 			actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
 			actionMenu.setActionEnabled(Action.MOVE_ENTITY, false);
@@ -301,7 +319,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(isLinkType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.CREATE_LINK, true);
 			actionMenu.setActionEnabled(Action.CREATE_LINK, true);
-			actionMenu.addActionListener(Action.CREATE_LINK, this);
+			actionMenu.setActionListener(Action.CREATE_LINK, this);
 		}else{
 			actionMenu.setActionVisible(Action.CREATE_LINK, false);
 			actionMenu.setActionEnabled(Action.CREATE_LINK, false);
@@ -348,7 +366,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(isSubmittableType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, true);
 			actionMenu.setActionEnabled(Action.SUBMIT_TO_CHALLENGE, true);
-			actionMenu.addActionListener(Action.SUBMIT_TO_CHALLENGE, this);
+			actionMenu.setActionListener(Action.SUBMIT_TO_CHALLENGE, this);
 		}else{
 			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, false);
 			actionMenu.setActionEnabled(Action.SUBMIT_TO_CHALLENGE, false);
@@ -359,18 +377,30 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
-			actionMenu.addActionListener(Action.EDIT_PROJECT_METADATA, this);
+			actionMenu.setActionListener(Action.EDIT_PROJECT_METADATA, this);
 		}else{
 			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, false);
 			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, false);
 		}
 	}
 	
+	private void configureAddEvaluationAction(){
+		if(entityBundle.getEntity() instanceof Project && DisplayUtils.isInTestWebsite(cookies)){
+			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
+			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
+		}else{
+			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		}
+	}
+
+	
 	private void configureEditFileMetadataAction(){
 		if(entityBundle.getEntity() instanceof FileEntity){
 			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
-			actionMenu.addActionListener(Action.EDIT_FILE_METADATA, this);
+			actionMenu.setActionListener(Action.EDIT_FILE_METADATA, this);
 		} else{
 			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, false);
 			actionMenu.setActionEnabled(Action.EDIT_FILE_METADATA, false);
@@ -382,7 +412,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
 			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
-			actionMenu.addActionListener(Action.CHANGE_ENTITY_NAME, this);
+			actionMenu.setActionListener(Action.CHANGE_ENTITY_NAME, this);
 		} else {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, false);
@@ -393,13 +423,24 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
 		actionMenu.setActionEnabled(Action.DELETE_ENTITY, permissions.getCanDelete());
 		actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+enityTypeDisplay);
-		actionMenu.addActionListener(Action.DELETE_ENTITY, this);
+		actionMenu.setActionListener(Action.DELETE_ENTITY, this);
 	}
+	private void configureDeleteWikiAction(){
+		if(entityBundle.getEntity() instanceof Project){
+			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
+			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
+			actionMenu.setActionListener(Action.DELETE_WIKI_PAGE, this);
+		} else {
+			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, false);
+			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, false);
+		}
+	}
+	
 	
 	private void configureShareAction(){
 		actionMenu.setActionEnabled(Action.SHARE, true);
 		actionMenu.setActionVisible(Action.SHARE, true);
-		actionMenu.addActionListener(Action.SHARE, this);
+		actionMenu.setActionListener(Action.SHARE, this);
 		if(permissions.getCanPublicRead()){
 			actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
 		}else{
@@ -413,9 +454,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isMovableType(Entity entity){
-		if(entity instanceof Project){
-			return false;
-		}else if(entity instanceof TableEntity){
+		if(entity instanceof Project || entity instanceof Table){
 			return false;
 		}
 		return true;
@@ -427,9 +466,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isWikiableType(Entity entity){
-		if(entity instanceof TableEntity){
-			return false;
-		}else if(entity instanceof Link){
+		if(entity instanceof Table || entity instanceof Link){
 			return false;
 		}
 		return true;
@@ -453,7 +490,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isSubmittableType(Entity entity){
-		if(entity instanceof TableEntity){
+		if(entity instanceof Table){
 			return false;
 		}
 		return entity instanceof Versionable;
@@ -498,6 +535,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case VIEW_WIKI_SOURCE:
 			onViewWikiSource();
 			break;
+		case DELETE_WIKI_PAGE:
+			onDeleteWiki();
+			break;
 		case ADD_WIKI_SUBPAGE:
 			onAddWikiSubpage();
 			break;
@@ -522,11 +562,32 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_DOI:
 			onCreateDOI();
 			break;
+		case ADD_COMMIT:
+			onAddCommit();
+			break;
+		case ADD_EVALUATION_QUEUE:
+			onAddEvaluationQueue();
+			break;
 		default:
 			break;
 		}
 	}
+
+	private void onAddCommit() {
+		// TODO Auto-generated method stub
+		
+	}
 	
+	private void onAddEvaluationQueue() {
+		evalEditor.configure(entity.getId(), new Callback() {
+			@Override
+			public void invoke() {
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			}
+		});
+		evalEditor.show();
+	}
 
 	private void onChangeStorageLocation() {
 		storageLocationEditor.configure(this.entityBundle, entityUpdateHandler);
@@ -580,15 +641,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckLink(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					createLink(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				createLink(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();
@@ -645,15 +702,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove(){
-		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
-				if(selected.getTargetId() != null) {
-					moveEntity(selected.getTargetId());
-					entityFinder.hide();
-				} else {
-					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-				}
+				moveEntity(selected.getTargetId());
+				entityFinder.hide();
 			}
 		});
 		entityFinder.show();
@@ -664,9 +717,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @param target
 	 */
 	private void moveEntity(String target){
-		Entity entity = entityBundle.getEntity();
-		entity.setParentId(target);
-		synapseClient.updateEntity(entity, new AsyncCallback<Entity>() {
+		String entityId = entityBundle.getEntity().getId();
+		synapseClient.moveEntity(entityId, target, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {
@@ -747,7 +799,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	            @Override
 	            public void onSuccess(WikiPage result) {
 	                view.showInfo("'" + name + "' Page Added", "");
-	                entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
+	                globalApplicationState.getPlaceChanger().goTo(newPlace);
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
@@ -781,10 +834,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onEditFileMetadata() {
-		Synapse place = ((Synapse)globalApplicationState.getCurrentPlace());
-		Long version = place.getVersionNumber();
 		// Can only edit file metadata of the current file version
-		if (version == null) {
+		if (isCurrentVersion) {
 			// Validate the user can update this entity.
 			preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
 				@Override
@@ -835,6 +886,58 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}
 		});
 	}
+	
+	public void onDeleteWiki() {
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
+		synapseClient.getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
+			@Override
+			public void onSuccess(V2WikiPage page) {
+				// Confirm the delete with the user.
+				final String parentWikiId = page.getParentWikiId();
+				String confirmMessage;
+				if (parentWikiId == null) {
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES;
+				} else if (DisplayUtils.isDefined(page.getTitle())){
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page \""+page.getTitle()+"\" and all subpages?";
+				} else {
+					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page ID "+page.getId()+" and all subpages?";
+				}
+				view.showConfirmDialog(CONFIRM_DELETE_TITLE, confirmMessage, new Callback() {
+					@Override
+					public void invoke() {
+						postConfirmedDeleteWiki(parentWikiId);
+					}
+				});
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+		
+	}
+
+	/**
+	 * Called after the user has confirmed the delete of the entity.
+	 */
+	public void postConfirmedDeleteWiki(final String parentWikiId) {
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		synapseClient.deleteV2WikiPage(key, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId(), null, EntityArea.WIKI, parentWikiId));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+
 	
 	@Override
 	public void onDeleteEntity() {
@@ -892,7 +995,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		String parentId = entityBundle.getEntity().getParentId();
 		Place gotoPlace = null;
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
-			if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
+			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

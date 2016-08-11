@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -313,7 +314,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+			@Override
+			public String getLongFriendlyDate(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void bindBootstrapTooltip(String id) {
 				// TODO Auto-generated method stub
@@ -355,7 +360,7 @@ public class ProvUtilsTest {
 				
 			}
 			@Override
-			public void tablesorter(String id) {
+			public void loadTableSorters() {
 				// TODO Auto-generated method stub
 				
 			}
@@ -365,7 +370,16 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
-
+			@Override
+			public String getRelativeTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public String getCalendarTime(Date toFormat) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			@Override
 			public void uploadUrlToGenomeSpace(String url, String filename) {
 				// TODO Auto-generated method stub
@@ -410,12 +424,23 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
-
+			@Override
+			public void getFilePartMd5(String fileFieldId, int currentChunk,
+					Long chunkSize, int fileIndex, MD5Callback md5Callback) {
+				// TODO Auto-generated method stub
+				
+			}
 			@Override
 			public void getFileMd5(String fileFieldId, int index,
 					MD5Callback callback) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public boolean isElementExists(String elementId) {
+				// TODO Auto-generated method stub
+				return false;
 			}
 
 			@Override
@@ -436,18 +461,6 @@ public class ProvUtilsTest {
 			}
 
 			@Override
-			public void replaceHistoryState(String token) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void pushHistoryState(String token) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
 			public void initOnPopStateHandler() {
 				// TODO Auto-generated method stub
 			}
@@ -458,9 +471,19 @@ public class ProvUtilsTest {
 				
 			}
 			@Override
-			public void refreshWindowFromCache() {
+			public String getCurrentURL() {
 				// TODO Auto-generated method stub
-				
+				return null;
+			}
+			@Override
+			public String getCurrentHostName() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		};
 	}

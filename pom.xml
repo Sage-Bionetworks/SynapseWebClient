@@ -10,14 +10,14 @@
 	<name>Synapse Portal</name>
 
 	<properties>
-		<!-- Synapse Web Client "Dave jira". -->
+		<!-- Synapse Web Client -->
 		<!-- GWT needs at least java 1.5 -->
-		<maven.compiler.source>1.6</maven.compiler.source>
-		<maven.compiler.target>1.6</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>109.0</synapse.version>
-		<gwtVersion>2.7.0</gwtVersion>
+		<synapse.version>2016-07-21-2248-49be131</synapse.version>
+		<gwtVersion>2.8.0-beta1</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
 		<ginVersion>2.1.2</ginVersion>
@@ -25,12 +25,12 @@
 		<schema-to-pojo.version>0.3.11</schema-to-pojo.version>
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
-		<log4j.version>2.0-beta8</log4j.version>
-		<markdown.version>2015-10-14-d491778-18</markdown.version>
-		<gwtboostrap3.version>1.2-gwt-2.7.0</gwtboostrap3.version>
+		<log4j.version>2.6.1</log4j.version>
+		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
+		<gwtboostrap3.version>1.4-gwt-2.7.0</gwtboostrap3.version>
 		<gwtboostrap3.extras.version>1.0-gwt-2.7.0</gwtboostrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gwtvisualizationwrappers.version>1.5-gwt-2.7.0</gwtvisualizationwrappers.version>
+		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
 
 	<repositories>
@@ -197,16 +197,14 @@
 					<runTarget>Portal.html</runTarget>
 					<hostedWebapp>${webappDirectory}</hostedWebapp>
 					<i18nMessagesBundle>org.sagebionetworks.web.client.Messages</i18nMessagesBundle>
-					<!-- There are the GWT tests -->
-					<includes>**/*GwtTest*.java</includes>
-					<!-- Run the GWT test with the headless html unit. -->
-					<mode>htmlunit</mode>
 					<module>org.sagebionetworks.web.Portal</module>
 					<!-- GWT compiler options -->
 			        <compileReport>true</compileReport>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
-			        <extraJvmArgs>-Xmx1536m -Xms1024m -XX:PermSize=128m -XX:MaxPermSize=256m</extraJvmArgs>
+
+			        <sourceLevel>auto</sourceLevel>
+			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
@@ -462,6 +460,7 @@
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
 			<version>${gwtVersion}</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
@@ -473,7 +472,7 @@
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-codeserver</artifactId>
 			<version>${gwtVersion}</version>
-			<scope>runtime</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -624,11 +623,6 @@
       		<artifactId>nekohtml</artifactId>
        		<version>1.9.14</version>
     	</dependency>
-		<dependency>
-		        <groupId>net.sourceforge.htmlunit</groupId>
-		        <artifactId>htmlunit</artifactId>
-		        <version>2.8</version>
-		</dependency>
 		<dependency>
 		        <groupId>org.apache.james</groupId>
 		        <artifactId>apache-mime4j</artifactId>

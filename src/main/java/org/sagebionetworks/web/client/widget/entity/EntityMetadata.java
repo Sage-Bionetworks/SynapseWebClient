@@ -83,7 +83,8 @@ public class EntityMetadata implements Presenter {
 			}
 		});
 		doiWidget.configure(bundle.getDoi(), en.getId());
-		annotationsWidget.configure(bundle, canEdit);
+		boolean isCurrentVersion = versionNumber == null;
+		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 	}	
 

@@ -10,16 +10,6 @@
 		<param-value>/WEB-INF/portal-context.xml</param-value>
 	</context-param>
 
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
-	<listener>
-		<listener-class>org.apache.logging.log4j.core.web.Log4jServletContextListener</listener-class>
-	</listener>
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
-	<filter>
-		<filter-name>log4jServletFilter</filter-name>
-		<filter-class>org.apache.logging.log4j.core.web.Log4jServletFilter</filter-class>
-	</filter>
-	
 	<!-- This listener will load other application context file in addition 
 		to springweb-servlet.xml -->
 	<listener>
@@ -77,16 +67,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
-	<filter-mapping>
-		<filter-name>log4jServletFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-		<dispatcher>REQUEST</dispatcher>
-		<dispatcher>FORWARD</dispatcher>
-		<dispatcher>INCLUDE</dispatcher>
-		<dispatcher>ERROR</dispatcher>
-	</filter-mapping>
-	
 	<!-- This filter allows us to use Guice for dependency injection in the 
 		server side servlets -->
 	<filter-mapping>
@@ -110,6 +90,13 @@
 		<servlet-name>jUnitHostImpl</servlet-name>
 		<servlet-class>com.google.gwt.junit.server.JUnitHostImpl</servlet-class>
 	</servlet>
+	
+	<!-- The context param that read by XsrfTokenServiceServlet -->
+	<context-param>
+		<param-name>gwt.xsrf.session_cookie_name</param-name>
+		<param-value>org.sagebionetworks.security.user.login.token</param-value>
+	</context-param>
+	
 	<servlet-mapping>
 		<servlet-name>jUnitHostImpl</servlet-name>
 		<url-pattern>/Portal/junithost/*</url-pattern>

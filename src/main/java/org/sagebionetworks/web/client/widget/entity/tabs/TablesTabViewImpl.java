@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,9 +20,7 @@ public class TablesTabViewImpl implements TablesTabView {
 
 	@UiField
 	Button tableLearnMoreButton;
-	@UiField
-	Button tableAPIDocsButton;
-
+	
 	@UiField
 	SimplePanel tableTitlebarContainer;
 	
@@ -55,14 +54,7 @@ public class TablesTabViewImpl implements TablesTabView {
 		tableLearnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(TABLES_LEARN_MORE_URL, "", "");
-			}
-		});
-
-		tableAPIDocsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(TABLES_API_DOCS_URL, "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
 			}
 		});
 	}

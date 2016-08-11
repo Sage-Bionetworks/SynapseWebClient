@@ -10,7 +10,7 @@
   
   	<g:HTMLPanel addStyleNames="displayInline">
 	  	<b:ImageAnchor dataToggle="MODAL" dataTarget="#commandLineClient" url='{sageImageBundle.logoCommandLine45.getSafeUri.asString}'/>
-	  	<b:Modal title="Synapse Command Line Client" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="commandLineClient">
+	  	<b:Modal title="Synapse Command Line Client" closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="commandLineClient">
 			<b:ModalBody>
 			    <e:CommandLineClientEntityGetterUIWidgetViewImpl ui:field="getEntity"/>
 		  		<e:CommandLineClientInstallWidgetViewImpl ui:field="install"/> 

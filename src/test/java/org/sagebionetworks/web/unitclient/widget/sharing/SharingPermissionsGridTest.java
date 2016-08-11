@@ -1,20 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.sharing;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.ListBox;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
@@ -87,9 +81,10 @@ public class SharingPermissionsGridTest {
 		grid.add(entry1, null, null);
 		grid.add(entry3, null, null);
 		
-		grid.insert(entry2, 1, null, null);
+		boolean deleteButtonVisible = true;
+		grid.insert(entry2, 1, null, null, deleteButtonVisible);
 		
-		verify(mockView).insert(eq(entry2), eq(1),eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null));
+		verify(mockView).insert(entry2, 1,(PermissionLevel[]) null, (Map<PermissionLevel,String>) null, deleteButtonVisible);
 		
 		assertTrue(grid.getAt(1) == entry2);
 	}

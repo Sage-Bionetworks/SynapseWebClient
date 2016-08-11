@@ -31,7 +31,7 @@ public interface PromptModalView extends IsWidget {
 	 */
 	public void configure(String title, String label, String buttonText, String name);
 	
-	public String getName();
+	public String getValue();
 	
 	/**
 	 * Show an error message..

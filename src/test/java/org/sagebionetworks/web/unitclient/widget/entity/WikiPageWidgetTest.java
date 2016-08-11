@@ -43,7 +43,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -127,13 +126,15 @@ public class WikiPageWidgetTest {
 		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
 		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		// once to clear, once after loading shown
 		verify(mockView, times(2)).setLoadingVisible(false);
+		verify(mockView, never()).scrollWikiHeadingIntoView();
 	}
 	
 	@Test
-	public void testConfigureNoWikiPageNotFoundIsEmbedded(){
+	public void testConfigureNoWikiPageNotFound(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		boolean showSubpages = true;
 		boolean canEdit = false;
@@ -144,10 +145,11 @@ public class WikiPageWidgetTest {
 		verify(mockView).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockView).setNoWikiCannotEditMessageVisible(true);
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 	
 	@Test
-	public void testConfigureNoWikiPageNotFoundCanEditIsEmbedded(){
+	public void testConfigureNoWikiPageNotFoundCanEdit(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		boolean showSubpages = true;
 		boolean canEdit = true;
@@ -158,53 +160,20 @@ public class WikiPageWidgetTest {
 		verify(mockView).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockView).setNoWikiCanEditMessageVisible(true);
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 
 	@Test
-	public void testConfigureNoWikiPageErrorIsEmbedded(){
+	public void testConfigureNoWikiPageError(){
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		boolean canEdit = false;
 		boolean showSubpages = true;
 		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
-	
-	@Test
-	public void testConfigureNoWikiPageNotEmbedded(){
-		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
-		boolean showSubpages = false;
-		boolean canEdit = false;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, mockCallback, showSubpages);
-		verify(mockSynapseAlert).show404();
-		verify(mockCallback).noWikiFound();
-	}
-	
-	@Test
-	public void testConfigureNoWikiPageEmbeddedCanEdit(){
-		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
-		boolean showSubpages = true;
-		boolean canEdit = true;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, mockCallback, showSubpages);
-		verify(mockSynapseAlert).handleException(any(Exception.class));
-	}
-	
-	@Test
-	public void testConfigureWikiForbiddenNotEmbedded(){
-		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = false;
-		boolean canEdit = false;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
-		verify(mockSynapseAlert).show403();
-	}
-	
-	//also show a 404 if we get an empty entity list
+
 	@Test
 	public void testEmptyEntityList() throws JSONObjectAdapterException {
 		boolean showSubpages = false;
@@ -215,7 +184,7 @@ public class WikiPageWidgetTest {
 		headers.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		presenter.setOwnerObjectName(mockCallbackP);
-		verify(mockSynapseAlert).show404();
+		verify(mockSynapseAlert).handleException(any(NotFoundException.class));
 	}
 	
 	@Test
@@ -226,6 +195,7 @@ public class WikiPageWidgetTest {
 		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 	
 	@Test
@@ -259,6 +229,7 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).setDiffVersionAlertVisible(false);
+		verify(mockView).scrollWikiHeadingIntoView();
 		verify(mockCallbackP).invoke(anyString());
 		//also verify that the created by and modified by are updated when wiki page is reloaded
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
@@ -275,6 +246,8 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.reloadWikiPage();
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView, never()).scrollWikiHeadingIntoView();
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 	
 	@Test

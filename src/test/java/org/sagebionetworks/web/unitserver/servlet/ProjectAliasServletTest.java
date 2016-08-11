@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
@@ -40,8 +41,11 @@ public class ProjectAliasServletTest {
 	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	ProjectAliasServlet servlet;
-	String testAliasUrl = "https://www.synapse.org/MyAlias";
+	String testAlias = "MyAlias";
+	String testAliasUrl = "https://www.synapse.org/" + testAlias;
 	String testAliasSynapseId = "syn3334444";
+	String testFilesPath = "/files";
+	
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		servlet = new ProjectAliasServlet();
@@ -70,22 +74,16 @@ public class ProjectAliasServletTest {
 		sb.append(testAliasUrl);
 		when(mockRequest.getRequestURL()).thenReturn(sb);
 		
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(1L);
-		List<EntityQueryResult> entities = new ArrayList<EntityQueryResult>();
-		EntityQueryResult result = new EntityQueryResult();
-		result.setId(testAliasSynapseId);
-		entities.add(result);
-		results.setEntities(entities);
-
-		when(mockSynapse.entityQuery(any(EntityQuery.class))).thenReturn(results);
+		EntityId id = new EntityId();
+		id.setId(testAliasSynapseId);
+		when(mockSynapse.getEntityIdByAlias(anyString())).thenReturn(id);
 	}
 	
 
 	@Test
 	public void testHappyCaseRedirect() throws Exception {
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockSynapse).entityQuery(any(EntityQuery.class));
+		verify(mockSynapse).getEntityIdByAlias(anyString());
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).encodeRedirectURL(captor.capture());
 		assertTrue(captor.getValue().endsWith("/#!Synapse:"+testAliasSynapseId));
@@ -93,11 +91,24 @@ public class ProjectAliasServletTest {
 	}
 	
 	@Test
+	public void testWithPathRedirect() throws Exception {
+		mockRequest = mock(HttpServletRequest.class);
+		StringBuffer sb = new StringBuffer();
+		sb.append(testAliasUrl);
+		sb.append(testFilesPath);
+		when(mockRequest.getRequestURL()).thenReturn(sb);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getEntityIdByAlias(eq(testAlias));
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockResponse).encodeRedirectURL(captor.capture());
+		assertTrue(captor.getValue().endsWith("/#!Synapse:"+testAliasSynapseId + testFilesPath));
+		verify(mockResponse).sendRedirect(anyString());
+	}
+	
+	@Test
 	public void testNoAliasMapping() throws Exception {
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(0L);
-		results.setEntities(new ArrayList<EntityQueryResult>());
-		when(mockSynapse.entityQuery(any(EntityQuery.class))).thenReturn(results);
+		
+		when(mockSynapse.getEntityIdByAlias(anyString())).thenThrow(new SynapseNotFoundException("not found"));
 		
 		servlet.doGet(mockRequest, mockResponse);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);

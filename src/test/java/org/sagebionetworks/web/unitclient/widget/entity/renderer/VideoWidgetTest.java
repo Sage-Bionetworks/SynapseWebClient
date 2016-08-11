@@ -25,12 +25,14 @@ public class VideoWidgetTest {
 	VideoWidgetView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	AuthenticationController mockAuthController;
+	String xsrfToken = "12345";
 	@Before
 	public void setup(){
 		mockView = mock(VideoWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		widget = new VideoWidget(mockView, mockAuthController);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
@@ -51,9 +53,9 @@ public class VideoWidgetTest {
 		descriptor.put(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY, webMVideoId);
 		descriptor.put(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY, oggVideoId);
 		descriptor.put(WidgetConstants.VIDEO_WIDGET_WIDTH_KEY, width);
-		descriptor.put(WidgetConstants.VIDEO_WIDGET_HEIGHT_KEY, height);
+		descriptor.put(WidgetConstants.HEIGHT_KEY, height);
 		
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), anyBoolean(), anyLong());
+		verify(mockView).configure(eq(wikiKey), eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), anyBoolean(), anyLong(), eq(xsrfToken));
 	}
 }

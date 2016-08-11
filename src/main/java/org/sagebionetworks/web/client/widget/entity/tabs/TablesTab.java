@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -58,13 +59,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	Throwable projectBundleLoadError;
 	String projectEntityId;
 	String areaToken;
-	SynapseAlert synAlert;
+	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	CallbackP<Boolean> showProjectInfoCallack;
-	
 	@Inject
 	public TablesTab(
 			TablesTabView view,
@@ -74,7 +74,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			Breadcrumb breadcrumb,
 			EntityMetadata metadata,
 			QueryTokenProvider queryTokenProvider,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			ModifiedCreatedByWidget modifiedCreatedBy
@@ -97,7 +97,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		tab.configure("Tables", view.asWidget());
+		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
 		
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
 			@Override
@@ -149,7 +149,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
-		boolean isTable = entity instanceof TableEntity;
+		boolean isTable = entity instanceof Table;
 		
 		if (!isTable) {
 			//configure based on project
@@ -161,12 +161,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	
 	public void showProjectLevelUI() {
-		tab.setPlace(new Synapse(projectEntityId, null, EntityArea.TABLES, null));
+		String title = projectEntityId;
 		if (projectBundle != null) {
+			title = projectBundle.getEntity().getName();
 			setTargetBundle(projectBundle);	
 		} else {
 			showError(projectBundleLoadError);
 		}
+		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
 	}
 	
 	public void resetView() {
@@ -188,7 +190,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
-		boolean isTable = entity instanceof TableEntity;
+		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
@@ -229,27 +231,29 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				TablesTab.this.metadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
+		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
 		return actionMenu;
 	}
 	
-	public void getTargetBundleAndDisplay(String entityId) {
+	public void getTargetBundleAndDisplay(final String entityId) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(entityId, null, null, null));
 				setTargetBundle(bundle);
 				tab.showTab();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				tab.setEntityNameAndPlace(entityId, new Synapse(entityId, null, null, null));
 				showError(caught);
 				tab.showTab();
 			}			
 		};
-		tab.setPlace(new Synapse(entityId, null, null, null));
+		
 		synapseClient.getEntityBundle(entityId, mask, callback);
 	}
 	
@@ -262,8 +266,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
 				areaToken = TABLE_QUERY_PREFIX + token;
-				tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
-				tab.showTab();
+				tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
+				// replace state if configuring table query widget, push history state after configuration.
+				tab.showTab(false);
 			}
 		}
 	}

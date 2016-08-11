@@ -46,9 +46,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -218,13 +218,26 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
-	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
+	public void testShowSingleAvailableEvaluation() throws RestServiceException, JSONObjectAdapterException {
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(1);
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		evaluationList.add(new Evaluation());
 		availableEvaluations.setResults(evaluationList);
-		
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		submitter.configure(entity, null);
+		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockView).showModal1(anyBoolean(), any(List.class));
+	}
+	@Test
+	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
+		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
+		availableEvaluations.setTotalNumberOfResults(2);
+		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		evaluationList.add(new Evaluation());
+		evaluationList.add(new Evaluation());
+		availableEvaluations.setResults(evaluationList);
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		verify(mockView).showModal1(anyBoolean(), any(List.class));

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -18,9 +19,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -60,7 +59,6 @@ public class HomePresenterTest {
 	CookieProvider mockCookies;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	GWTWrapper mockGwtWrapper;
-	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
@@ -107,13 +105,12 @@ public class HomePresenterTest {
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
-				adapter,
 				mockCookies,
 				mockResourceLoader,
 				mockSynapseJSNIUtils
 				);
 		verify(mockView).setPresenter(homePresenter);
-		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		TeamListWidgetTest.setupUserTeams(mockSynapseClient);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		testSessionData = new UserSessionData();
@@ -154,7 +151,7 @@ public class HomePresenterTest {
 	public void testNewsFeed() throws JSONObjectAdapterException {
 		homePresenter.loadNewsFeed();
 		
-		verify(mockView).prepareTwitterContainer(anyString());
+		verify(mockView).prepareTwitterContainer(anyString(), anyInt());
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(false);
 		homePresenter.twitterContainerReady("twitterElementId");
 		verify(mockResourceLoader).isLoaded(any(WebResource.class));
@@ -162,7 +159,7 @@ public class HomePresenterTest {
 		
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 		homePresenter.twitterContainerReady("twitterElementId");
-		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), anyInt());
+		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), eq(HomePresenter.TWEET_COUNT));
 	}	
 	
 	

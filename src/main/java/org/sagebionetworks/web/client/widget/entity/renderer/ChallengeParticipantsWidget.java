@@ -17,9 +17,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Presenter, WidgetRendererPresenter, PageChangeListener {
+public class ChallengeParticipantsWidget implements UserListView.Presenter, WidgetRendererPresenter, PageChangeListener {
 	
-	private ChallengeParticipantsView view;
+	private UserListView view;
 	private Map<String,String> descriptor;
 	private ChallengeClientAsync challengeClient;
 	private String challengeId;
@@ -30,7 +30,7 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 	public static final Long DEFAULT_OFFSET = 0L;
 	
 	@Inject
-	public ChallengeParticipantsWidget(ChallengeParticipantsView view, 
+	public ChallengeParticipantsWidget(UserListView view, 
 			DetailedPaginationWidget paginationWidget, 
 			ChallengeClientAsync synapseClient) {
 		this.view = view;
@@ -63,7 +63,7 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 	public void onPageChange(final Long newOffset) {
 		view.hideErrors();
 		view.showLoading();
-		view.clearParticipants();
+		view.clearUsers();
 		challengeClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<UserProfilePagedResults>() {
 			@Override
 			public void onSuccess(UserProfilePagedResults results) {
@@ -72,10 +72,10 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 					//configure the pager, and the participant list
 					paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, results.getTotalNumberOfResults(), ChallengeParticipantsWidget.this);
 					for (UserProfile userProfile : results.getResults()) {
-						view.addParticipant(userProfile);
+						view.addUser(userProfile);
 					}
 				} else {
-					view.showNoParticipants();
+					view.showNoUsers();
 				}
 			}
 			@Override

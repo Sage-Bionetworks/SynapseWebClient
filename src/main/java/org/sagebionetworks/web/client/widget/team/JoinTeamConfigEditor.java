@@ -52,8 +52,8 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	public void configure(WikiPageKey wikiKey,
 			Map<String, String> widgetDescriptor, DialogCallback window) {
 		this.descriptor = widgetDescriptor;
-		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) {
-			synClient.getTeam(descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY), new AsyncCallback<Team>() {
+		if (descriptor.containsKey(WidgetConstants.TEAM_ID_KEY)) {
+			synClient.getTeam(descriptor.get(WidgetConstants.TEAM_ID_KEY), new AsyncCallback<Team>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					jsniUtils.consoleError(caught.getMessage());
@@ -87,8 +87,8 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 		}
 		view.setIsMemberMessage(isMemberMessage);
 		String successMessage = WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE;
-		if (descriptor.containsKey(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE)) {
-			successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
+		if (descriptor.containsKey(WidgetConstants.SUCCESS_MESSAGE)) {
+			successMessage = descriptor.get(WidgetConstants.SUCCESS_MESSAGE);
 		}
 		view.setSuccessMessage(successMessage);
 		String buttonText = "Join";
@@ -107,13 +107,13 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	public void updateDescriptorFromView() throws IllegalArgumentException {
 		GroupSuggestion suggestion = (GroupSuggestion)teamSuggestBox.getSelectedSuggestion();
 		if (suggestion != null) {
-			descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, suggestion.getId());
+			descriptor.put(WidgetConstants.TEAM_ID_KEY, suggestion.getId());
 		}
-		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) {
+		if (descriptor.containsKey(WidgetConstants.TEAM_ID_KEY)) {
 			descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, String.valueOf(view.getIsChallenge()));
 			descriptor.put(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON, String.valueOf(view.getIsSimpleRequest()));
 			descriptor.put(WidgetConstants.IS_MEMBER_MESSAGE, view.getIsMemberMessage());
-			descriptor.put(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE, view.getSuccessMessage());
+			descriptor.put(WidgetConstants.SUCCESS_MESSAGE, view.getSuccessMessage());
 			descriptor.put(WidgetConstants.JOIN_TEAM_BUTTON_TEXT, view.getButtonText());
 			descriptor.put(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT, view.getRequestOpenInfotext());
 		} else {

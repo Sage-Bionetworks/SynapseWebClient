@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformerImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -244,7 +245,7 @@ public class AnnotationTransformerImplTest {
 	}
 
 	@Test
-	public void testUpdateAnnotationsFromList() {
+	public void testUpdateAnnotationsFromList() throws DuplicateKeyException {
 		//update annotations
 		String stringKey = "string";
 		String stringValue = "banana";
@@ -283,7 +284,60 @@ public class AnnotationTransformerImplTest {
 		assertEquals(longValue, longAnnotationsAfter.get(longKey).get(0));
 		assertEquals(dateValue, dateAnnotationsAfter.get(dateKey).get(0));
 	}
+	
+	@Test (expected=DuplicateKeyException.class)
+	public void testUpdateAnnotationsFromListDuplicateStringKey() throws DuplicateKeyException {
+		String key = "string";
+		List<Annotation> annotationsList = new ArrayList<Annotation>();
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.STRING, key, Collections.singletonList("value1")));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.STRING, key, Collections.singletonList("value2")));
+		transformer.updateAnnotationsFromList(initializedAnnotations, annotationsList);
+	}
+	
+	@Test (expected=DuplicateKeyException.class)
+	public void testUpdateAnnotationsFromListDuplicateDateKey() throws DuplicateKeyException {
+		String key = "date";
+		List<Annotation> annotationsList = new ArrayList<Annotation>();
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.DATE, key, Collections.singletonList(Long.toString(new Date().getTime()))));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.DATE, key, Collections.singletonList(Long.toString(new Date().getTime()))));
+		transformer.updateAnnotationsFromList(initializedAnnotations, annotationsList);
+	}
+	
+	@Test (expected=DuplicateKeyException.class)
+	public void testUpdateAnnotationsFromListDuplicateDoubleKey() throws DuplicateKeyException {
+		String key = "double";
+		List<Annotation> annotationsList = new ArrayList<Annotation>();
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.DOUBLE, key, Collections.singletonList(Double.toString(6.28))));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.DOUBLE, key, Collections.singletonList(Double.toString(3.14))));
+		transformer.updateAnnotationsFromList(initializedAnnotations, annotationsList);
+	}
+	@Test (expected=DuplicateKeyException.class)
+	public void testUpdateAnnotationsFromListDuplicateLongKey() throws DuplicateKeyException {
+		String key = "long";
+		List<Annotation> annotationsList = new ArrayList<Annotation>();
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.LONG, key, Collections.singletonList(Long.toString(2016L))));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.LONG, key, Collections.singletonList(Long.toString(1977L))));
+		transformer.updateAnnotationsFromList(initializedAnnotations, annotationsList);
+	}
+	
+	public void testUpdateAnnotationsFromListDuplicateKeyDifferentTypes() throws DuplicateKeyException {
+		String key = "dupekey";
+		List<Annotation> annotationsList = new ArrayList<Annotation>();
+		String stringValue = "2001";
+		Long longValue = 1977L;
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.STRING, key, Collections.singletonList(stringValue)));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.LONG, key, Collections.singletonList(Long.toString(longValue))));
+		transformer.updateAnnotationsFromList(initializedAnnotations, annotationsList);
+		Map<String, List<String>> stringAnnotationsAfter = initializedAnnotations.getStringAnnotations();
+		Map<String, List<Long>> longAnnotationsAfter = initializedAnnotations.getLongAnnotations();
+		assertTrue(stringAnnotationsAfter.containsKey(key));
+		assertTrue(longAnnotationsAfter.containsKey(key));
+		
+		assertEquals(stringValue, stringAnnotationsAfter.get(key).get(0));
+		assertEquals(longValue, longAnnotationsAfter.get(key).get(0));
+	}
 
+	
 	@Test
 	public void testGetDoubles() {
 		List<String> testList = new ArrayList<String>();

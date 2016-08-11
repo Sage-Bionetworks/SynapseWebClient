@@ -12,7 +12,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -28,8 +27,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntitySelectedEvent;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -43,13 +40,15 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -69,12 +68,14 @@ public class FilesTab implements FilesTabView.Presenter{
 	WikiPageWidget wikiPageWidget;
 	EntityUpdatedHandler handler;
 	PortalGinInjector ginInjector;
-	SynapseAlert synAlert;
+	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	
 	Entity currentEntity;
 	String currentEntityId;
-	Long currentVersionNumber;
+	Long shownVersionNumber;
+	boolean isMostRecentVersion;
 	boolean annotationsShown, fileHistoryShown;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
@@ -96,7 +97,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			FilesBrowser filesBrowser,
 			PreviewWidget previewWidget,
 			WikiPageWidget wikiPageWidget,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
@@ -118,7 +119,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		
-		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
+		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
 		view.setFolderTitlebar(folderTitleBar.asWidget());
 		view.setBreadcrumb(breadcrumb.asWidget());
@@ -129,13 +130,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
 		
-		tab.configure("Files", view.asWidget());
+		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
 		
-		configMap = new HashMap<String,String>();
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
+		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
 		CallbackP<String> entityClicked = new CallbackP<String> () {
 			@Override
 			public void invoke(String id) {
@@ -154,7 +151,7 @@ public class FilesTab implements FilesTabView.Presenter{
 				String entityId = synapse.getEntityId();
 				Long versionNumber = synapse.getVersionNumber();
 				if (entityId.equals(projectEntityId)) {
-				    currentVersionNumber = null;
+				    shownVersionNumber = null;
 				    showProjectLevelUI();
 				    tab.showTab();
 				} else {
@@ -201,8 +198,9 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	
 	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+		this.currentEntity = targetEntity;
+		this.currentEntityId = targetEntity.getId();
 		this.handler = handler;
-		synAlert.clear();
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
 		filesBrowser.setEntityUpdatedHandler(handler);
@@ -212,24 +210,28 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
-		
-		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, null, null));
+		tab.setEntityNameAndPlace(targetEntity.getName(), new Synapse(currentEntityId, shownVersionNumber, null, null));
 		//if we are not being configured with a file or folder, then project level should be shown
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
 			showProjectLevelUI();
 		} else {
+			RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
+			view.setRefreshAlert(refreshAlert.asWidget());
+			refreshAlert.configure(targetEntity.getId(), ObjectType.ENTITY);
 			getTargetBundleAndDisplay(targetEntity.getId(), versionNumber);
 		}
 	}
 	
 	public void showProjectLevelUI() {
-		tab.setPlace(new Synapse(projectEntityId, null, EntityArea.FILES, null));
+		String title = projectEntityId;
 		if (projectBundle != null) {
-			setTargetBundle(projectBundle);	
+			setTargetBundle(projectBundle);
+			title = projectBundle.getEntity().getName();
 		} else {
 			showError(projectBundleLoadError);
 		}
+		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.FILES, null));
 	}
 	
 	public void showError(Throwable error) {
@@ -248,44 +250,41 @@ public class FilesTab implements FilesTabView.Presenter{
 		return a == b || (a != null && a.equals(b));
 	}
 	  
-	public void getTargetBundleAndDisplay(String entityId, Long versionNumber) {
-		//only ask for it if we are showing a different entity/version
-		if (equal(currentEntityId,entityId) && equal(currentVersionNumber, versionNumber)) {
-			return;
-		}
-		
+	public void getTargetBundleAndDisplay(String entityId, final Long versionNumber) {
+		shownVersionNumber = versionNumber;
 		currentEntityId = entityId;
-		currentVersionNumber = versionNumber;
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME;
-		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
+
 			@Override
-			public void onSuccess(EntityBundle bundle) {
+			public void onFailure(Throwable caught) {
+				showError(caught);
+				tab.setEntityNameAndPlace(currentEntityId, new Synapse(currentEntityId, shownVersionNumber, null, null));
+				tab.showTab();
+			}
+
+			@Override
+			public void onSuccess(EntityBundlePlus result) {
+				EntityBundle bundle = result.getEntityBundle();
+				// either versionNumber and result.getLatestVersionNumber will both be null if non-Versionable
+				isMostRecentVersion = versionNumber == null || versionNumber == result.getLatestVersionNumber();
+				// will be null for non-Versionable entities
 				if (bundle.getEntity() instanceof Link) {
 					//short circuit.  redirect to target entity
 					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
 					//go to link target
 					String entityId = ref.getTargetId();
-					Long versionNumber = ref.getTargetVersionNumber();
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
+					shownVersionNumber = ref.getTargetVersionNumber();
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, shownVersionNumber, null, null));
 					return;
 				}
 				setTargetBundle(bundle);
 				tab.showTab();
 			}
 			
-			@Override
-			public void onFailure(Throwable caught) {
-				showError(caught);
-				tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, null, null));
-				tab.showTab();
-			}	
 		};
-		if (versionNumber == null) {
-			synapseClient.getEntityBundle(entityId, mask, callback);
-		} else {
-			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
-		}
+		synapseClient.getEntityBundlePlusForVersion(entityId, versionNumber, mask, ebpCallback);
 	}
 	
 	
@@ -322,12 +321,12 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setMetadataVisible(isMetadataVisible);
 		if (isMetadataVisible) {
 			initActionMenu(bundle);
-			metadata.setEntityBundle(bundle, currentVersionNumber);
+			metadata.setEntityBundle(bundle, shownVersionNumber);
 			//File History
-			metadata.setFileHistoryVisible(isFile && currentVersionNumber != null);	
+			metadata.setFileHistoryVisible(isFile && shownVersionNumber != null);	
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
-		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, area, null));
+		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, shownVersionNumber, area, null));
 		
 		//File Browser
 		boolean isFilesBrowserVisible = isProject || isFolder;
@@ -339,16 +338,17 @@ public class FilesTab implements FilesTabView.Presenter{
 		//Programmatic Clients
 		view.setProgrammaticClientsVisible(isFile);
 		if (isFile) {
-			view.configureProgrammaticClients(currentEntityId, currentVersionNumber);	
+			view.configureProgrammaticClients(currentEntityId, shownVersionNumber);	
 		}
 
 		//Provenance
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, currentVersionNumber));
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile){
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 			view.setProvenance(provWidget.asWidget());
-			provWidget.configure(null, configMap, null, null);
+			provWidget.configure(configMap);
 		}
 		//Created By and Modified By
 		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), 
@@ -369,11 +369,11 @@ public class FilesTab implements FilesTabView.Presenter{
 						view.setWikiPageWidgetVisible(false);
 					}
 				};
-			wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), currentVersionNumber), canEdit, wikiCallback, false);
+			wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), shownVersionNumber), canEdit, wikiCallback, false);
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
 				public void invoke(String wikiPageId) {
-					wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), wikiPageId, currentVersionNumber), canEdit, wikiCallback, false);
+					wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), wikiPageId, shownVersionNumber), canEdit, wikiCallback, false);
 				}
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
@@ -404,7 +404,7 @@ public class FilesTab implements FilesTabView.Presenter{
 				FilesTab.this.metadata.setFileHistoryVisible(fileHistoryShown);
 			}
 		});
-		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
+		controller.configure(actionMenu, bundle, isMostRecentVersion, bundle.getRootWikiId(), handler);
 	}
 	
 	/**

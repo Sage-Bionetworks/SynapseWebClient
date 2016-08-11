@@ -6,13 +6,14 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,20 +40,10 @@ public class SynapseAlertViewImpl implements
 	@UiField
 	Alert alert;
 	@UiField
-	HTMLPanel httpCode403;
-	@UiField
-	HTMLPanel httpCode404;
-	
-	@UiField
-	Alert loginAlert;
-	@UiField
-	Button loginButton;
-	@UiField
-	Div requestAccessUI;
-	@UiField
-	Button requestAccessButton;
-	
+	Div loginAlert;
 	Presenter presenter;
+	@UiField
+	Div loginWidgetContainer;
 	
 	@Inject
 	public SynapseAlertViewImpl(Binder binder){
@@ -67,18 +58,6 @@ public class SynapseAlertViewImpl implements
 			@Override
 			public void onClick(ClickEvent event) {
 				jiraDialog.hide();
-			}
-		});
-		loginButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onLoginClicked();
-			}
-		});
-		requestAccessButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRequestAccess();
 			}
 		});
 	}
@@ -115,13 +94,10 @@ public class SynapseAlertViewImpl implements
 		alertText.setText("");
 		loginAlert.setVisible(false);
 		widget.setVisible(false);
-		httpCode403.setVisible(false);
-		httpCode404.setVisible(false);
-		requestAccessUI.setVisible(false);
 	}
 	
 	@Override
-	public void showLoginAlert() {
+	public void showLogin() {
 		widget.setVisible(true);
 		loginAlert.setVisible(true);	
 	}
@@ -134,28 +110,18 @@ public class SynapseAlertViewImpl implements
 	}
 	
 	@Override
-	public void show403() {
-		widget.setVisible(true);
-		httpCode403.setVisible(true);
+	public void showJiraIssueOpen(String key, String url) {
+		Bootbox.alert("The new report <a target=\"_blank\" href=\"" + url + "\">"+key+"</a> has been sent. Thank you for submitting!");
 	}
 	
 	@Override
-	public void show404() {
-		widget.setVisible(true);
-		httpCode404.setVisible(true);
+	public void setLoginWidget(Widget w) {
+		loginWidgetContainer.clear();
+		loginWidgetContainer.add(w);
 	}
 	
 	@Override
-	public void showRequestAccessUI() {
-		requestAccessButton.state().reset();
-		requestAccessUI.setVisible(true);
-	}
-	@Override
-	public void hideRequestAccessUI() {
-		requestAccessUI.setVisible(false);
-	}
-	@Override
-	public void showRequestAccessButtonLoading() {
-		requestAccessButton.state().loading();	
+	public void reload() {
+		Window.Location.reload();
 	}
 }

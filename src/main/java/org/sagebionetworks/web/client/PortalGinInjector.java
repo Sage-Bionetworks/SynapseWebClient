@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
@@ -23,6 +24,8 @@ import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
+import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
+import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
@@ -35,10 +38,13 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
+import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -57,12 +63,16 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ExternalImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
@@ -90,6 +100,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
@@ -97,15 +108,23 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -116,12 +135,14 @@ import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
@@ -137,8 +158,12 @@ import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
+import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -218,7 +243,10 @@ public interface PortalGinInjector extends Ginjector {
 	public ActionMenuWidget createActionMenuWidget();
 	
 	public EntityActionController createEntityActionController();
-		
+	public ACTPresenter getACTPresenter();
+	public SynapseForumPresenter getSynapseForumPresenter();
+	public SubscriptionPresenter getSubscriptionPresenter();
+	
 	/*
 	 *  Markdown Widgets
 	 */
@@ -229,10 +257,12 @@ public interface PortalGinInjector extends Ginjector {
 	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
+	public ExternalImageConfigEditor getExternalImageConfigEditor();
 	public AttachmentConfigEditor getAttachmentConfigEditor();
 	public LinkConfigEditor getLinkConfigEditor();
 	public APITableConfigEditor getSynapseAPICallConfigEditor();
 	public QueryTableConfigEditor getSynapseQueryConfigEditor();
+	public LeaderboardConfigEditor getLeaderboardConfigEditor();
 	public TabbedTableConfigEditor getTabbedTableConfigEditor();
 	public EntityTreeBrowser getEntityTreeBrowser();
 	public EntityListConfigEditor getEntityListConfigEditor();
@@ -245,6 +275,7 @@ public interface PortalGinInjector extends Ginjector {
 	public PreviewConfigEditor getPreviewConfigEditor();
 	public BiodallianceEditor getBiodallianceEditor();
 	public BiodallianceSourceEditor getBiodallianceSourceEditor();
+	public CytoscapeConfigEditor getCytoscapeConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -272,6 +303,12 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeTeamsWidget getChallengeTeamsWidget();
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	public BiodallianceWidget getBiodallianceRenderer();
+	public CytoscapeWidget getCytoscapeRenderer();
+	public SynapseTableFormWidget getSynapseTableFormWidget();
+	public TeamMembersWidget getTeamMembersWidget();
+	
+	//////API Table Column Editor
+	public APITableColumnConfigView getAPITableColumnConfigView();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -308,7 +345,9 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityIdCellEditor createEntityIdCellEditor();
 	public EntityIdCellRenderer createEntityIdCellRenderer();
 	public EnumCellEditor createEnumCellEditor();
+	public EnumFormCellEditor createEnumFormCellEditor();
 	public BooleanCellEditor createBooleanCellEditor();
+	public BooleanFormCellEditor createBooleanFormCellEditor();
 	public DateCellEditor createDateCellEditor();
 	public DateCellRenderer createDateCellRenderer();
 	public DoubleCellEditor createDoubleCellEditor();
@@ -336,9 +375,6 @@ public interface PortalGinInjector extends Ginjector {
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();
 
-	public BasicPaginationWidget createBasicPaginationWidget();
-
-
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 
 	public SortableTableHeader createSortableTableHeader();
@@ -351,4 +387,25 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 	public ModifiedCreatedByWidget getModifiedCreatedByWidget();
+	public FileHandleLink getFileHandleLink();
+	public VerificationSubmissionWidget getVerificationSubmissionWidget();
+	public VerificationSubmissionModalViewImpl getVerificationSubmissionModalViewImpl();
+	public VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
+
+	// discussion
+	public DiscussionThreadListItemWidget createThreadListItemWidget();
+	public ReplyWidget createReplyWidget();
+	
+	public MarkdownCacheKey getMarkdownCacheKey();
+	public MarkdownCacheValue getMarkdownCacheValue();
+	
+	public TopicRowWidget getTopicRowWidget();
+	public RefreshAlert getRefreshAlert();
+	public ReplyCountAlert getReplyCountAlert();
+	public DiscussionThreadCountAlert getDiscussionThreadCountAlert();
+
+	// docker
+	public DockerRepoWidget createNewDockerRepoWidget();
+	
+	public LoginWidget getLoginWidget();
 }

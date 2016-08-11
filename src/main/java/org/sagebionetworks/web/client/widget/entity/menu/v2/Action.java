@@ -9,8 +9,11 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
  */
 public enum Action {
 
+	// Docker specific
+	ADD_COMMIT,
 	// Table specific
 	TOGGLE_TABLE_SCHEMA,
+	TOGGLE_VIEW_SCOPE,
 	UPLOAD_TABLE_DATA,
 	EDIT_TABLE_DATA,
 	DOWNLOAD_TABLE_QUERY_RESULTS,
@@ -24,6 +27,7 @@ public enum Action {
 	MOVE_ENTITY,
 	DELETE_ENTITY,
 	EDIT_WIKI_PAGE,
+	DELETE_WIKI_PAGE,
 	VIEW_WIKI_SOURCE,
 	ADD_WIKI_SUBPAGE,
 	CREATE_LINK,
@@ -31,5 +35,6 @@ public enum Action {
 	UPLOAD_NEW_FILE,
 	EDIT_PROVENANCE,
 	CREATE_DOI,
-	TOGGLE_FILE_HISTORY
+	TOGGLE_FILE_HISTORY,
+	ADD_EVALUATION_QUEUE
 }

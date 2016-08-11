@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.place.shared.Place;
@@ -71,20 +70,22 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	@Inject
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
-			SynapseAlert synapseAlert, WikiHistoryWidget historyWidget,
+			SynapseAlert synAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
 			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
-			ModifiedCreatedByWidget modifiedCreatedBy) {
+			ModifiedCreatedByWidget modifiedCreatedBy
+			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.synapseAlert = synapseAlert;
+		this.synapseAlert = synAlert;
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
 		this.breadcrumb = breadcrumb;
 		this.modifiedCreatedBy = modifiedCreatedBy;
+		this.synapseAlert = synAlert;
 		view.setPresenter(this);
-		view.setSynapseAlertWidget(synapseAlert);
+		view.setSynapseAlertWidget(synAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
@@ -147,6 +148,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					public void onSuccess(WikiPage result) {
 						try {
 							updateCurrentPage(result);
+							view.setModifiedCreatedByHistoryPanelVisible(true);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
 							view.setWikiSubpagesWidgetVisible(showSubpages);
@@ -251,7 +253,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 						String ownerObjectName = theHeader.getName();
 						callback.invoke(ownerObjectName);
 					} else {
-						show404();
+						onFailure(new NotFoundException());
 					}
 				}
 				
@@ -286,9 +288,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 						if (caught instanceof NotFoundException) {
 							if (callback != null)
 								callback.noWikiFound();
-						}
-						else if (caught instanceof ForbiddenException) {
-							show403();
 						}
 						else {
 							synapseAlert.handleException(caught);
@@ -374,6 +373,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					if (wikiReloadHandler != null) {
 						wikiReloadHandler.invoke(currentPage.getId());
 					}
+					view.scrollWikiHeadingIntoView();
 				} catch (Exception e) {
 					onFailure(e);
 				}
@@ -389,6 +389,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	private void handleGetV2WikiPageAsV1Failure(Throwable caught) {
 		view.setLoadingVisible(false);
+		view.setModifiedCreatedByHistoryPanelVisible(false);
 		// if it is because of a missing root (and we have edit permission),
 		// then the pages browser should have a Create Wiki button
 		if (caught instanceof NotFoundException && callback != null) {
@@ -396,24 +397,16 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		}
 		if (showSubpages) {
 			view.setMarkdownVisible(false);
-			view.setWikiHistoryVisible(false);			
-			if (caught instanceof NotFoundException) {
-				if (canEdit) {
-					view.setNoWikiCanEditMessageVisible(true);
-				}else {
-					view.setNoWikiCannotEditMessageVisible(true);
-				}
-			} else {
-				synapseAlert.handleException(caught);
+			view.setWikiHistoryVisible(false);
+		}
+		if (caught instanceof NotFoundException) {
+			if (canEdit) {
+				view.setNoWikiCanEditMessageVisible(true);
+			}else {
+				view.setNoWikiCannotEditMessageVisible(true);
 			}
 		} else {
-			if (caught instanceof NotFoundException) {
-				show404();
-			} else if (caught instanceof ForbiddenException) {
-				show403();
-			} else {
-				synapseAlert.handleException(caught);
-			}
+			synapseAlert.handleException(caught);
 		}
 	}
 
@@ -425,17 +418,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void restoreClicked() {
 		showRestoreWarning(versionInView);
 	}
-	
-	public void show404() {
-		view.setMainPanelVisible(false);
-		synapseAlert.show404();
-	}
-	
-	public void show403() {
-		view.setMainPanelVisible(false);
-		synapseAlert.show403();
-	}
-	
+
 	// For testing only
 	public void setWikiPageKey(WikiPageKey wikiKey) {
 		this.wikiKey = wikiKey;

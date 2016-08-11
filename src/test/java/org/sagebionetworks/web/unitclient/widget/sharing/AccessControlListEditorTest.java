@@ -28,6 +28,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -221,7 +222,18 @@ public class AccessControlListEditorTest {
 		ughrp.setChildren(children);
 		return ughrp;
 	}
-
+	
+	@Test
+	public void testProjectPermissionLevels() {
+		assertEquals(AccessControlListEditor.PROJECT_PERMISSIONS, acle.getPermList());
+	}
+	
+	@Test
+	public void testNonProjectPermissionLevels() {
+		acle.configure(new Folder(), false, null);
+		assertEquals(AccessControlListEditor.NON_PROJECT_PERMISSIONS, acle.getPermList());
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void createAclTest() throws Exception {		

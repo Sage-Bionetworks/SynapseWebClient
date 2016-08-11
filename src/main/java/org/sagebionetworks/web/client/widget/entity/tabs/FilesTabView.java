@@ -28,4 +28,5 @@ public interface FilesTabView extends IsWidget {
 	void setPreviewVisible(boolean visible);
 	void clearActionMenuContainer();
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
+	void setRefreshAlert(Widget w);
 }

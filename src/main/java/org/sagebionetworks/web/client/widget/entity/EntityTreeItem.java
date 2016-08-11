@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -66,5 +65,8 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	public void setClickHandler(ClickHandler handler) {
 		entityBadge.setClickHandler(handler);
 	}
-
+	
+	public void setState(boolean open, boolean fireEvents) {
+		treeItem.setState(open, fireEvents);
+	}
 }

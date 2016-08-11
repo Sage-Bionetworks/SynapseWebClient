@@ -15,7 +15,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -23,6 +25,8 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -32,6 +36,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
+import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -44,21 +49,30 @@ public class HeaderTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	PlaceChanger mockPlaceChanger;
 	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
-
+	@Mock
+	CookieProvider mockCookies;
+	@Mock
+	StuAnnouncementWidget mockStuAnnouncementWidget;
+	
 	@Before
 	public void setup(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(HeaderView.class);		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockFavWidget = mock(FavoriteWidget.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget);
+		//by default, mock that we are on the production website
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -67,6 +81,8 @@ public class HeaderTest {
 	@Test
 	public void testSetPresenter() {
 		verify(mockView).setPresenter(header);
+		verify(mockView).setStagingAlertVisible(false);
+		verify(mockStuAnnouncementWidget).init();
 	}
 
 	@Test
@@ -98,6 +114,8 @@ public class HeaderTest {
 	@Test
 	public void testOnLogoutClick() {
 		header.onLogoutClick();
+		verify(mockGlobalApplicationState).clearCurrentPlace();
+		verify(mockGlobalApplicationState).clearLastPlace();
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Place place = captor.getValue();
@@ -132,6 +150,7 @@ public class HeaderTest {
 
 	@Test
 	public void testOnFavoriteClickEmptyCase() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		header.onFavoriteClick();
 		verify(mockView).clearFavorite();
 		verify(mockView).setEmptyFavorite();
@@ -139,6 +158,7 @@ public class HeaderTest {
 
 	@Test
 	public void testOnFavoriteClickNonEmptyCase() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		EntityHeader entityHeader1 = new EntityHeader();
 		entityHeader1.setId("syn012345");
 		EntityHeader entityHeader2 = new EntityHeader();
@@ -153,6 +173,7 @@ public class HeaderTest {
 	@Test
 	public void testFavoriteRoundTrip() {
 		// After User Logged in
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		UserSessionData userSessionData = new UserSessionData();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
 		header.onFavoriteClick();
@@ -176,6 +197,17 @@ public class HeaderTest {
 	}
 	
 	@Test
+	public void testFavoriteAnonymous() {
+		// SWC-2805: User is not logged in.  This is an odd case, since the favorites menu should not be shown.
+		// in this case, do not even try to update the favorites, will show whatever we had (possibly stale, like the rest of the page).
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		header.onFavoriteClick();
+		verify(mockView, never()).showFavoritesLoading();
+		verify(mockView, never()).clearFavorite();
+		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testShowLargeLogo() {
 		header.configure(true);
 		verify(mockView).showLargeLogo();
@@ -186,5 +218,26 @@ public class HeaderTest {
 		header.configure(false);
 		verify(mockView, never()).showLargeLogo();
 		verify(mockView).showSmallLogo();
+	}
+	
+	@Test
+	public void testInitStagingAlert() {
+		//case insensitive
+		Mockito.reset(mockView);
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("WwW.SynapsE.ORG");
+		header.initStagingAlert();
+		verify(mockView).setStagingAlertVisible(false);
+
+		//staging
+		Mockito.reset(mockView);
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("staging.synapse.org");
+		header.initStagingAlert();
+		verify(mockView).setStagingAlertVisible(true);
+
+		//local
+		Mockito.reset(mockView);
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
+		header.initStagingAlert();
+		verify(mockView).setStagingAlertVisible(true);
 	}
 }

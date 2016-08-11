@@ -43,21 +43,25 @@ public class EntityViewImpl implements EntityView {
 
 	@Override
 	public void setHeaderWidget(IsWidget headerWidget) {
+		headerPanel.clear();
 		headerPanel.setWidget(headerWidget);
 	}
 	
 	@Override
 	public void setFooterWidget(IsWidget footerWidget) {
+		footerPanel.clear();
 		footerPanel.setWidget(footerWidget);
 	}
 
 	@Override
 	public void setEntityPageTopWidget(IsWidget entityPageTopWidget) {
+		entityPageTopPanel.clear();
 		entityPageTopPanel.setWidget(entityPageTopWidget);
 	}
 		
 	@Override
 	public void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidget) {
+		openInvitesPanel.clear();
 		openInvitesPanel.setWidget(openTeamInvitesWidget);
 	}
 

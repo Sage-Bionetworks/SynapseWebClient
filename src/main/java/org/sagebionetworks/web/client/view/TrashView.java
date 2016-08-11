@@ -3,10 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
@@ -27,7 +24,7 @@ public interface TrashView extends IsWidget, SynapseView {
 	void refreshTable();
 	void displayFailureMessage(String title, String message);
 	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		/**
 		 * Permanently deletes all Entities in the trash.
 		 */

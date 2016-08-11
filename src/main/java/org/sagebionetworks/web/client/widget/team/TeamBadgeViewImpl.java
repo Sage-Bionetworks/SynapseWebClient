@@ -40,6 +40,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		addStyleName("displayInline");
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("displayInline");
 		
@@ -47,7 +48,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 	
 	@Override
-	public void setTeam(final Team team, Integer maxNameLength) {
+	public void setTeam(final Team team, Integer maxNameLength, String xsrfToken) {
 		clear();
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
@@ -68,7 +69,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			};
 			if (team.getIcon() != null && team.getIcon().length() > 0) {
 				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
+				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken));
 				profilePicture.setHeight("24px");
 				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);
@@ -131,8 +132,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	@Override
 	public void setRequestCount(String count) {
 		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
-		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
-		notificationsPanel.setWidget(widget);
+		notificationsPanel.setWidget(DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP));
 	}
 
 	/*

@@ -15,6 +15,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -44,18 +46,21 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	SynapseJSNIUtils synapseJSNIUtils;
 	SynapseAlert synapseAlert;
 	SynapseClientAsync synapseClient;
+	AuthenticationController authController;
 	
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseAlert synapseAlert,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			AuthenticationController authController) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
 		this.synapseClient = synapseClient;
+		this.authController = authController;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -101,6 +106,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		if (version == null && entityId.contains(".")) {
+			String[] tokens = entityId.split("\\.");
+			entityId = tokens[0];
+			version = tokens[1];
+		}
+		
 		int mask = ENTITY  | FILE_HANDLES;
 		AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<EntityBundle>() {
 			@Override
@@ -113,21 +124,24 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				configure(bundle);
 			}
 		};
-		
-		if (version == null) {
-			synapseClient.getEntityBundle(entityId, mask, entityBundleCallback);
+		if (EntityPresenter.isValidEntityId(entityId)) {
+			if (version == null) {
+				synapseClient.getEntityBundle(entityId, mask, entityBundleCallback);
+			} else {
+				synapseClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+			}
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+			view.addSynapseAlertWidget(synapseAlert.asWidget());
+			synapseAlert.showError("Preview error: " + entityId + " does not appear to be a valid Synapse identifier.");
 		}
 	}
 	
 	public void configure(EntityBundle bundle) {
 		view.clear();
-		
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
 		if (!synapseAlert.isUserLoggedIn()) {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
-			synapseAlert.showMustLogin();
+			synapseAlert.showLogin();
 		} else if (bundle != null) {
 			if (!(bundle.getEntity() instanceof FileEntity)) {
 				//not a file!
@@ -143,18 +157,19 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
+		String xsrfToken = authController.getCurrentXsrfToken();
 		if (previewType != PreviewFileType.NONE) {
 			FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
-				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false), 
-									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
+				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
+									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, xsrfToken));
 			}
 			else { //must be a text type of some kind
 				//try to load the text of the preview, if available
 				//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
-				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true));
+				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true, xsrfToken));
 				try {
 					requestBuilder.sendRequest(null, new RequestCallback() {
 						public void onError(final Request request, final Throwable e) {
@@ -205,7 +220,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		synapseAlert.showError("Unable to load image preview");
 	}
 	
-	public void setHeight(String height) {
-		view.setHeight(height);
+	public void addStyleName(String style) {
+		view.addStyleName(style);
 	}
 }

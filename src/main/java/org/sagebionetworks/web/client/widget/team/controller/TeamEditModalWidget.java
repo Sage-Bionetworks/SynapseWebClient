@@ -1,8 +1,14 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import java.util.Set;
+
+import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -13,6 +19,7 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,28 +33,37 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	SynapseAlert synAlert;
 	Callback refreshCallback;
 	Team team;
+	AccessControlList teamACL;
 	SynapseClientAsync synapseClient;
 	FileHandleUploadWidget uploader;
 	String uploadedFileHandleId;
 	String baseImageURL;
+	Long authenticatedUserGroupId;
+	AuthenticationController authController;
 	
 	@Inject
-	public TeamEditModalWidget(SynapseAlert synAlert,
-			final TeamEditModalWidgetView view, SynapseClientAsync synapseClient,
-			final FileHandleUploadWidget uploader, final SynapseJSNIUtils jsniUtils,
-			final AuthenticationController authenticationController) {
+	public TeamEditModalWidget(
+			SynapseAlert synAlert,
+			final TeamEditModalWidgetView view, 
+			SynapseClientAsync synapseClient,
+			final FileHandleUploadWidget uploader, 
+			SynapseJSNIUtils jsniUtils,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState) {
 		this.synAlert = synAlert;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.uploader = uploader;
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
+		this.authController = authenticationController;
+		authenticatedUserGroupId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 		uploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(baseImageURL + "?rawFileHandleId=" + uploadedFileHandleId);
+				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId, authController.getCurrentXsrfToken()));
 			}
 		});
 		ImageFileValidator imageValidator = new ImageFileValidator();
@@ -84,7 +100,8 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			team.setCanPublicJoin(canPublicJoin);
 			if (uploadedFileHandleId != null)
 				team.setIcon(uploadedFileHandleId);
-			synapseClient.updateTeam(team, new AsyncCallback<Team>() {
+			updateACLFromView();
+			synapseClient.updateTeam(team, teamACL, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team result) {
 					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
@@ -108,17 +125,18 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	}
 	
 	// resets view including widgets with ui, then shows the modal
-	@Override
-	public void show() {
+	private void show() {
 		uploader.reset();
 		synAlert.clear();
 		view.hideLoading();
 		view.clear();
 		view.configure(team);
 		if (team.getIcon() != null)
-			view.setImageURL(baseImageURL + "?rawFileHandleId=" + team.getIcon());
+			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon(), authController.getCurrentXsrfToken()));
 		else
 			view.setDefaultIconVisible();
+		
+		updateViewFromACL();
 		view.show();
 	}
 	
@@ -127,10 +145,60 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		view.hide();
 	}
 	
-	@Override
-	public void configure(Team team) {
+	public void configureAndShow(Team team) {
 		uploadedFileHandleId = null;
 		this.team = team;
+		//get the messaging parameter, and show
+		synapseClient.getTeamAcl(team.getId(), new AsyncCallback<AccessControlList>() {
+			public void onSuccess(AccessControlList result) {
+				teamACL = result;
+				show();
+			};
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.showError(caught.getMessage());
+			}
+		});
 	}
-
+	public void updateViewFromACL() {
+		//look for authenticated users principal ID from resource access set.
+		ResourceAccess ra = getResourceAccess(authenticatedUserGroupId);
+		if (ra != null) {
+			view.setAuthenticatedUsersCanSendMessageToTeam(ModelConstants.TEAM_MESSENGER_PERMISSIONS.equals(ra.getAccessType()));
+		} else {
+			view.setAuthenticatedUsersCanSendMessageToTeam(false);
+		}
+	}
+	
+	public void updateACLFromView() {
+		if (view.canAuthenticatedUsersSendMessageToTeam()) {
+			//add authenticated users principal id to the ACL (team messenger permission)
+			//add/update
+			ResourceAccess ra = getResourceAccess(authenticatedUserGroupId);
+			if (ra == null) {
+				ra = new ResourceAccess();
+				ra.setPrincipalId(authenticatedUserGroupId);
+			}
+			ra.setAccessType(ModelConstants.TEAM_MESSENGER_PERMISSIONS);
+			teamACL.getResourceAccess().add(ra);
+		} else {
+			//remove authenticated users (if exists and is set to team messenger permission)
+			ResourceAccess ra = getResourceAccess(authenticatedUserGroupId);
+			if (ra != null && ModelConstants.TEAM_MESSENGER_PERMISSIONS.equals(ra.getAccessType())) {
+				teamACL.getResourceAccess().remove(ra);
+			}
+		}
+	}
+	
+	private ResourceAccess getResourceAccess(Long principalId) {
+		Set<ResourceAccess> resourceAccessSet = teamACL.getResourceAccess();
+		for (ResourceAccess ra : resourceAccessSet) {
+			if(principalId.equals(ra.getPrincipalId())) {
+				//found
+				return ra;
+			}
+		}
+		return null;
+	}
 }

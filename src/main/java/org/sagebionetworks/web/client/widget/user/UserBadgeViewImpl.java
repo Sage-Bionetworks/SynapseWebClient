@@ -2,9 +2,10 @@ package org.sagebionetworks.web.client.widget.user;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.base.HasHref;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -13,6 +14,7 @@ import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,17 +25,19 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@UiField
 	TableData loadingUI;
 	@UiField
-	Icon defaultUserPicture;
+	FocusPanel defaultUserPicture;
 	@UiField
 	Image userPicture;
-	@UiField
-	Tooltip usernameTooltip;
 	@UiField
 	Anchor usernameLink;
 	@UiField
 	Paragraph description;
 	@UiField
 	Paragraph errorLoadingUI;
+	@UiField
+	Strong defaultUserPictureLetter;
+	@UiField
+	Icon squareIcon;
 	
 	private Presenter presenter;
 	Widget widget;
@@ -48,7 +52,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 			}
 		};
 		userPicture.addClickHandler(badgeClicked);
-		usernameLink.addClickHandler(badgeClicked);
+		defaultUserPicture.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {
 			@Override
@@ -58,6 +62,15 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		});
 	}
 	
+	@Override
+	public void setDefaultPictureColor(String color) {
+		squareIcon.setColor(color);
+		defaultUserPictureLetter.setColor(color);
+	}
+	@Override
+	public void setDefaultPictureLetter(String letter) {
+		defaultUserPictureLetter.setText(letter);
+	}
 	public void clear() {
 		loadingUI.setVisible(false);
 		defaultUserPicture.setVisible(false);
@@ -81,7 +94,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void setSize(BadgeSize size) {
-		defaultUserPicture.addStyleName(size.getDefaultPictureStyle());
+		if (DisplayUtils.isDefined(size.getDefaultPictureStyle())) {
+			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
+		}
 		usernameLink.setStyleName(size.textStyle());
 		userPicture.setHeight(size.pictureHeight());
 		usernameLink.setVisible(size.isTextVisible());
@@ -91,7 +106,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void setDisplayName(String displayName, String shortDisplayName) {
 		loadingUI.setVisible(false);
 		usernameLink.setText(shortDisplayName);
-		usernameTooltip.setTitle(displayName);
 	}
 	
 	@Override
@@ -132,7 +146,15 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public Widget asWidget() {
 		return widget;
 	}
-
+	@Override
+	public void setHref(String href) {
+		usernameLink.setHref(href);
+	}
+	
+	@Override
+	public void clearHref() {
+		usernameLink.setHref(HasHref.EMPTY_HREF);
+	}
 	/*
 	 * Private Methods
 	 */

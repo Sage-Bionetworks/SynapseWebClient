@@ -17,12 +17,10 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
@@ -43,10 +41,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private Search place;
 	private SearchView view;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private IconsImageBundle iconsImageBundle;
 	private SynapseAlert synAlert;
 	
 	private SearchQuery currentSearch;
@@ -55,21 +51,16 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private Date searchStartTime;
 	
-	
 	@Inject
 	public SearchPresenter(SearchView view,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
-			IconsImageBundle iconsImageBundle,
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.iconsImageBundle = iconsImageBundle;
 		this.synAlert = synAlert;
 		currentSearch = getBaseSearchQuery();
 		view.setPresenter(this);
@@ -102,8 +93,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
     }
 
 	@Override
-	public void setSearchTerm(String queryTerm) {		
-		globalApplicationState.getPlaceChanger().goTo(new Search(queryTerm));
+	public void setSearchTerm(String queryTerm) {
+		SearchUtil.searchForTerm(queryTerm, globalApplicationState, synapseClient);
 	}
 
 	@Override
@@ -230,7 +221,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public IconType getIconForHit(Hit hit) {
 		if(hit == null) return null;
 		EntityType type = EntityType.valueOf(hit.getNode_type());
-		return DisplayUtils.getIconTypeForEntityClassName(EntityTypeUtils.getEntityTypeClassName(type));
+		return org.sagebionetworks.web.client.EntityTypeUtils.getIconTypeForEntityClassName(EntityTypeUtils.getEntityTypeClassName(type));
 	}
 	
 	@Override

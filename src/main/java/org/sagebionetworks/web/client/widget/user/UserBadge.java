@@ -28,6 +28,8 @@ import com.google.inject.Inject;
 
 public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresenter, WidgetRendererPresenter, IsWidget {
 	
+	public static final String DEFAULT_COLOR = "lightgrey";
+	public static final String DEFAULT_LETTER = "S";
 	private UserBadgeView view;
 	SynapseClientAsync synapseClient;
 	private Integer maxNameLength;
@@ -40,6 +42,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	boolean useCachedImage;
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
+	public static final String[] COLORS = {"chocolate","black","firebrick","maroon","olive","limegreen","forestgreen","darkturquoise","teal","blue","navy","darkmagenta","purple", "stateblue","orangered","forestblue", "blueviolet"};
 	
 	@Inject
 	public UserBadge(UserBadgeView view, 
@@ -82,6 +85,10 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		} else if (isShowCompany) {
 			view.showDescription(profile.getCompany());
 		}
+		
+		if (customClickHandler == null) {
+			view.setHref("#!Profile:" + profile.getOwnerId());
+		}
 		useCachedImage = true;
 		configurePicture();
 	}
@@ -103,10 +110,34 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			}
 			view.showCustomUserPicture(url);
 		} else {
+			view.setDefaultPictureLetter(getDefaultPictureLetter(profile));
+			view.setDefaultPictureColor(getDefaultPictureColor(profile));
 			view.showAnonymousUserPicture();
 		}
 	}
 	
+	public String getDefaultPictureColor(UserProfile profile) {
+		if (profile == null) {
+			return DEFAULT_COLOR;
+		}
+		return getColor(profile.getUserName().hashCode());
+	}
+	
+	public String getColor(int hashcode) {
+		int index = Math.abs(hashcode % COLORS.length);
+		return COLORS[index];
+	}
+	
+	public String getDefaultPictureLetter(UserProfile profile) {
+		if (profile == null) {
+			return DEFAULT_LETTER;
+		}
+		if (DisplayUtils.isDefined(profile.getFirstName())) {
+			return (""+profile.getFirstName().charAt(0)).toUpperCase();
+		} else {
+			return (""+profile.getUserName().charAt(0)).toUpperCase();
+		}
+	}
 	/**
 	 * Wiki configure
 	 */
@@ -143,6 +174,31 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 	}
 	
+	public void configureWithUsername(final String username) {
+		//get user profile and configure
+		view.clear();
+		view.showLoading();
+		
+		String principalId = clientCache.get(username + WebConstants.USERNAME_SUFFIX);
+		if (principalId != null) {
+			configure(principalId);	
+		} else {
+			// get the user profile from the username
+			synapseClient.getUserProfileFromUsername(username, new AsyncCallback<UserProfile>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showLoadError(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(UserProfile userProfile) {
+					clientCache.put(username + WebConstants.USERNAME_SUFFIX, userProfile.getOwnerId());
+					configure(userProfile);
+				}
+			});
+		}
+	}
+	
+	
 	public void configure(String principalId, boolean isShowCompany) {
 		this.isShowCompany = isShowCompany;
 		configure(principalId);
@@ -161,6 +217,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	 */
 	public void setCustomClickHandler(ClickHandler clickHandler) {
 		customClickHandler = clickHandler;
+		view.clearHref();
 	}	
 	
 	@Override

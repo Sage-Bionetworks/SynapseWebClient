@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -163,8 +162,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Add dummy item to childItem to make expandable.
 		// Pass in something to tell it to add a createDummy item for folder
 		// expansion or not
-		if (childToAdd.isExpandable()) {
-			childToAdd.asTreeItem().addItem(createDummyItem());
+		if (!childToAdd.isExpandable()) {
+			childToAdd.asTreeItem().removeItems();
 		}
 	}
 
@@ -227,12 +226,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	 */
 
 	private void selectEntity(EntityTreeItem itemToSelect) {
-		if (selectedItem != null) {
-			selectedItem.asWidget().removeStyleName("entityTreeItem-selected");
-		}
+		clearSelection();
 		selectedItem = itemToSelect;
 		selectedItem.asWidget().addStyleName("entityTreeItem-selected");
 		presenter.setSelection(selectedItem.getHeader().getId());
+	}
+	
+	@Override
+	public void clearSelection() {
+		if (selectedItem != null) {
+			selectedItem.asWidget().removeStyleName("entityTreeItem-selected");
+		}
 	}
 
 	/**
@@ -281,5 +285,4 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public void showLoading() {
 		setLoadingVisible(true);
 	}
-
 }

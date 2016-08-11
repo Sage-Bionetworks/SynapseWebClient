@@ -32,25 +32,31 @@
 		<meta http-equiv="pragma" content="no-cache" />
 		<!-- end cache control -->
 		
-		<link rel="shortcut icon" href="favicon.ico?v=2" />
+		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
-		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" media="print" />
 		<link rel="stylesheet" type="text/css" href="Portal.css" />
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css"/>
 				
 		<!-- head.js -->
 		<script src="js/head.load.min.js"></script>
 		<script>
-	            head
-		        .js("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
-		        .js("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js")
- 		        .js("js/slides.min.jquery.js")
-		        .js("js/spark-md5.min.js")
-		        .js("js/swfobject/swfobject.js")
-		        .js("js/jquery.tablesorter.min.js")
-		        .js("js/jquery.tablesorter.scinot.js")
-		        .js("js/highlight.pack.js")
-		        .js("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js")
-		        .js("js/init-nchart.js");
+			head
+			.js("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
+			.js("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js")
+			.js("js/slides.min.jquery.js")
+			.js("js/spark-md5.min.js")
+			.js("js/swfobject/swfobject.js")
+			.js("js/jquery.tablesorter.min.js")
+			.js("js/jquery.tablesorter.scinot.js")
+			.js("js/highlight.pack.js")
+			.js("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js")
+			.js("js/init-nchart.js")
+			.js("js/moment_min.js")
+			.js("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js")
+			.js("js/markdown-it-plugins-7.min.js")
+			.js("js/polyfill.js")
+			;
 	   	</script>    
 	
 		<title>Sage Synapse : Contribute to the Cure</title>
@@ -66,21 +72,16 @@
 		<!-- Search autocomplete script. Temporary -->
 	
 		<!-- put this last -->
+		<!-- Google Analytics -->
 		<script type="text/javascript">
-		
-		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-29804340-1']);
-		  _gaq.push(['_trackPageview']);
-		
-		  (function() {
-		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  })();
-		
+			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+			ga('create', 'UA-29804340-1', 'auto');
+			ga('send', 'pageview');
 		</script>
+		<script async src='//www.google-analytics.com/analytics.js'></script>
+		<!-- End Google Analytics -->
 	</head>
-	<body class="overflow-y-auto">
+	<body style="overflow-y: auto">
 		<div>
 			<!-- GWT history support -->
 			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
@@ -113,5 +114,8 @@
 	
 		</div>
 		<div class="clear"></div>
+		<script>
+			head.js("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.3.0/zxcvbn.js");
+		</script>
 	</body>
 </html>

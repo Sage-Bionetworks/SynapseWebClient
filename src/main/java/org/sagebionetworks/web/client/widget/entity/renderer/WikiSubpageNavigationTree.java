@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -42,7 +43,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		view.clear();
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.currentWikiKey = currentWikiKey;
-
+		boolean isCurrentWikiRoot = false;
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (V2WikiHeader header : wikiHeaders) {
 
@@ -51,9 +52,15 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 			if (header.getParentId() == null) {
 				targetPlace = ownerObjectLink;
 				pageTitle = ownerObjectName;
+				isCurrentWikiRoot = currentWikiKey.getWikiPageId() == null || currentWikiKey.getWikiPageId().equals(header.getId());
 			} else {
 				targetPlace = WikiSubpagesWidget.getLinkPlace(currentWikiKey.getOwnerObjectId(), currentWikiKey.getVersion(), header.getId(), isEmbeddedInOwnerPage);
-				pageTitle = header.getTitle();
+				if (DisplayUtils.isDefined(header.getTitle())){
+					pageTitle = header.getTitle();	
+				} else {
+					pageTitle = header.getId();
+				}
+				
 			}
 			WikiPageKey wikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), header.getId(), currentWikiKey.getVersion());
 
@@ -70,10 +77,11 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 			} else {
 				SubpageNavTreeNode child = headerToNode.get(header);
 				SubpageNavTreeNode parent = idToNode.get(header.getParentId());
+				parent.setCollapsed(isCurrentWikiRoot);
 				parent.getChildren().add(child);
 			}
 		}
-		
+		overallRoot.setCollapsed(false);
 		view.configure(overallRoot);
 	}
 
@@ -98,12 +106,14 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		private String pageTitle;
 		private Place targetPlace;
 		private WikiPageKey wikiPageKey;
+		private boolean collapsed;
 
 		public SubpageNavTreeNode(String pageTitle, Place targetPlace, WikiPageKey wikiPageKey) {
 			this.pageTitle = pageTitle;
 			this.targetPlace = targetPlace;
 			this.children = new ArrayList<SubpageNavTreeNode>();
 			this.wikiPageKey = wikiPageKey;
+			collapsed = false;
 		}
 
 		/*
@@ -113,6 +123,12 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		public String getPageTitle()                        {       return this.pageTitle;       }
 		public Place getTargetPlace()                       {       return this.targetPlace;     }
 		public WikiPageKey getWikiPageKey()                 {       return this.wikiPageKey;     }
+		public boolean isCollapsed() {
+			return collapsed;
+		}
+		public void setCollapsed(boolean collapsed) {
+			this.collapsed = collapsed;
+		}
 	}
 
 	@Override

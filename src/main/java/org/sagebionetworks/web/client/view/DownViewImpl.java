@@ -1,19 +1,16 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DownViewImpl extends Composite implements DownView {
+public class DownViewImpl implements DownView {
 	
 	@UiField
 	SimplePanel header;
@@ -21,20 +18,16 @@ public class DownViewImpl extends Composite implements DownView {
 	SimplePanel footer;
 
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
-	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
 	private Footer footerWidget;
 	
 	public interface Binder extends UiBinder<Widget, DownViewImpl> {}
+	Widget widget;
 	
 	@Inject
-	public DownViewImpl(Binder uiBinder, IconsImageBundle icons,
-			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle) {
-		initWidget(uiBinder.createAndBindUi(this));
-		this.iconsImageBundle = icons;
-		this.sageImageBundle = sageImageBundle;
+	public DownViewImpl(Binder uiBinder,
+			Header headerWidget, Footer footerWidget) {
+		widget = uiBinder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
@@ -70,7 +63,11 @@ public class DownViewImpl extends Composite implements DownView {
 		DisplayUtils.showInfo(title, message);
 	}
 
-
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
+	
 	@Override
 	public void clear() {
 	}

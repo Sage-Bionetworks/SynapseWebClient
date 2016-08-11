@@ -9,8 +9,8 @@ import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.gwtbootstrap3.client.ui.html.UnorderedList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -44,6 +44,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	private Presenter presenter;
 	private MyEntitiesBrowser myEntitiesBrowser;	
 	private EntitySearchBox entitySearchBox;
+	private EntityFinderArea currentArea;
 	
 	//the modal dialog
 	private Modal modal;
@@ -88,9 +89,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	TextBox synapseIdTextBox;
 	@UiField
 	Button lookupSynapseIdButton;
+	@UiField
+	Div synAlertContainer;
 	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private Long maxVersion = 0L;
+	boolean isFinderComponentsInitialized;
 	@Inject
 	public EntityFinderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -113,10 +117,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				modal.hide();
 			}
 		});
-		createMyEntityBrowserWidget();		
-		createSearchBoxWidget();			
-		createEnterIdWidget();
-		showTopRightContainer(myEntitiesBrowserContainer);
 		
 		ClickHandler currentVersionClickHandler = new ClickHandler() {
 			@Override
@@ -136,6 +136,18 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				updateSelectedView();
 			}
 		});
+		isFinderComponentsInitialized = false;
+	}
+	
+	@Override
+	public void initFinderComponents(EntityFilter filter) {
+		if (!isFinderComponentsInitialized || !filter.equals(myEntitiesBrowser.getEntityFilter())) {
+			isFinderComponentsInitialized = true;
+			createMyEntityBrowserWidget();		
+			createSearchBoxWidget();			
+			createEnterIdWidget();
+			myEntitiesBrowser.setEntityFilter(filter);
+		}
 	}
 	
 	private void hideAllRightTopWidgets() {
@@ -144,11 +156,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		enterIdWidgetContainer.setVisible(false);
 	}
 	
-	private void showTopRightContainer(Widget container) {
+	private void showTopRightContainer(Widget container, EntityFinderArea newArea) {
 		versionUI.setVisible(false);
 		versionDropDownMenu.clear();
 		hideAllRightTopWidgets();
 		container.setVisible(true);
+		currentArea = newArea;
 	}
 	
 	@Override 
@@ -179,7 +192,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		myEntitiesBrowser.refresh();
 		synapseIdTextBox.clear();
 		entitySearchBox.clearSelection();
-		showTopRightContainer(myEntitiesBrowserContainer);
 	}
 
 	/*
@@ -202,19 +214,35 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(selectedEntityId);
 			}
 		});
-
+		myEntitiesBrowserContainer.clear();
 		myEntitiesBrowserContainer.setWidget(myEntitiesBrowser.asWidget());
 
 		// list entry
 		Widget entry = createNewLeftEntry(DisplayConstants.BROWSE_MY_ENTITIES, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-	        	showTopRightContainer(myEntitiesBrowserContainer);
+	        	setBrowseAreaVisible();
 	        }
 	    });
+		browseMyEntitiesContainer.clear();
 		browseMyEntitiesContainer.setWidget(entry);
 	}
-
+	@Override
+	public void setBrowseAreaVisible() {
+		showTopRightContainer(myEntitiesBrowserContainer, EntityFinderArea.BROWSE);
+	}
+	@Override
+	public void setSearchAreaVisible() {
+		showTopRightContainer(entitySearchWidgetContainer, EntityFinderArea.SEARCH);
+	}
+	@Override
+	public void setSynapseIdAreaVisible() {
+		showTopRightContainer(enterIdWidgetContainer, EntityFinderArea.SYNAPSE_ID);
+	}
+	@Override
+	public EntityFinderArea getCurrentArea() {
+		return currentArea;
+	}
 	private void createSearchBoxWidget() {
 		// Search Widget
 		entitySearchBox.setEntitySelectedHandler(new EntitySearchBox.EntitySelectedHandler() {			
@@ -231,9 +259,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		Widget entry = createNewLeftEntry(DisplayConstants.LABEL_SEARCH, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-	        	showTopRightContainer(entitySearchWidgetContainer);
+	        	setSearchAreaVisible();
 	        }
 	    });
+		searchContainer.clear();
 		searchContainer.setWidget(entry);
 	}	
 
@@ -268,9 +297,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		final Widget entry = createNewLeftEntry(DisplayConstants.ENTER_SYNAPSE_ID, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-	        	showTopRightContainer(enterIdWidgetContainer);
+	        	setSynapseIdAreaVisible();
 	        }
 	    });
+		enterSynapseIdContainer.clear();
 		enterSynapseIdContainer.setWidget(entry);
 	}
 				
@@ -362,6 +392,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		presenter.setSelectedEntity(selectedRef);
 	}
 	
+	
 	@Override
 	public void show() {
 		//show modal
@@ -376,6 +407,17 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@Override
 	public Widget asWidget() {
 		return modal;
+	}
+	
+	@Override
+	public boolean isShowing() {
+		return modal.isAttached() && modal.isVisible();
+	}
+	
+	@Override
+	public void setSynAlert(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }
 

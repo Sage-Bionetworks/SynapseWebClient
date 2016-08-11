@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -22,13 +23,17 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateView;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -38,7 +43,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.springframework.mock.web.MockAsyncContext;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -60,9 +64,13 @@ public class GlobalApplicationStateImplTest {
 	ClientLogger mockLogger;
 	GlobalApplicationStateView mockView;
 	HashMap<String, String> testProps;
-	
+	@Mock
+	ClientCache mockLocalStorage;
+	@Mock
+	GWTWrapper mockGWT;
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
 		mockPlaceController = Mockito.mock(PlaceController.class);
 		mockEventBus = Mockito.mock(EventBus.class);
@@ -76,7 +84,7 @@ public class GlobalApplicationStateImplTest {
 		testProps = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger, mockLocalStorage, mockGWT);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -178,6 +186,12 @@ public class GlobalApplicationStateImplTest {
 		captor = ArgumentCaptor.forClass(VersionState.class);
 		verify(callback).onSuccess(captor.capture());
 		assertEquals("v1", captor.getValue().getVersion());
+		
+		AsyncMockStubber.callSuccessWith("v3").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		globalApplicationState.checkVersionCompatibility(callback);
+		//showVersionOutOfDateGlobalMessage() has still only been called once, despite detecting another version change
+		verify(mockView).showVersionOutOfDateGlobalMessage();
+		
 	}
 	
 	@Test
@@ -188,13 +202,41 @@ public class GlobalApplicationStateImplTest {
 		Callback mockCallback = mock(Callback.class);
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
+		verify(mockView).initGlobalViewProperties();
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
+		verify(mockLocalStorage).put(eq(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY), eq(Boolean.TRUE.toString()), anyLong());
+		when(mockLocalStorage.get(key)).thenReturn(value);
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
 		//also sets synapse versions on app load
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		assertEquals("v1", globalApplicationState.getSynapseVersion());
 		verify(mockCallback).invoke();
+	}
+	
+	@Test
+	public void testSynapsePropertiesCached() {
+		Callback mockCallback = mock(Callback.class);
+		when(mockLocalStorage.get(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY)).thenReturn(Boolean.TRUE.toString());
+		globalApplicationState.initSynapseProperties(mockCallback);
+		
+		verify(mockSynapseClient, never()).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		assertEquals("v1", globalApplicationState.getSynapseVersion());
+		verify(mockCallback).invoke();
+		
+		ArgumentCaptor<Callback> deferredCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockGWT).scheduleDeferred(deferredCallback.capture());
+		
+		//invoke this deferred callback
+		String key = "k1";
+		String value = "bar";
+		testProps.put(key, value);
+		deferredCallback.getValue().invoke();
+		//local synapse properties are updated
+		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
 	}
 	
 	@Test
@@ -236,6 +278,12 @@ public class GlobalApplicationStateImplTest {
 	}
 	
 	@Test
+	public void testClearCurrentPlace() {
+		globalApplicationState.clearCurrentPlace();
+		verify(mockCookieProvider).removeCookie(CookieKeys.CURRENT_PLACE);
+	}
+	
+	@Test
 	public void testPushCurrentPlace(){
 		String newToken = "/some/new/token";
 		Place mockPlace = mock(Place.class);
@@ -244,7 +292,7 @@ public class GlobalApplicationStateImplTest {
 		//should have set the last place (to the current), and the current place (as requested)
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
-		verify(mockSynapseJSNIUtils).pushHistoryState(newToken);
+		verify(mockGWT).newItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
 		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
@@ -253,12 +301,69 @@ public class GlobalApplicationStateImplTest {
 		//verify that these were still only called once
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
-		verify(mockSynapseJSNIUtils).pushHistoryState(newToken);
+		verify(mockGWT).newItem(newToken, false);
+	}
+	
+	@Test
+	public void testReplaceCurrentPlace(){
+		String newToken = "/some/new/token";
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		//should have set the last place (to the current), and the current place (as requested)
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
+		verify(mockGWT).replaceItem(newToken, false);
+		
+		//if I push the same place again, it should not push the history state again
+		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
+		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		//verify that these were still only called once
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
+		verify(mockGWT).replaceItem(newToken, false);
 	}
 
 	@Test
 	public void testInitOnPopStateHandler() {
 		globalApplicationState.initOnPopStateHandler();
 		verify(mockSynapseJSNIUtils).initOnPopStateHandler();
+	}
+	
+	@Test
+	public void testRefreshPage() {
+		Synapse place = new Synapse("syn1234");
+		// Start with the current place 
+		when(mockPlaceController.getWhere()).thenReturn(place);
+
+		Place mockPlace = mock(Place.class);
+		String historyToken = "!Synapse:syn123";
+		String currentUrl = "https://www.synapse.org/#"+historyToken;
+		when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
+		when(mockAppPlaceHistoryMapper.getPlace(historyToken)).thenReturn(mockPlace);
+		
+		globalApplicationState.refreshPage();
+		verify(mockPlaceController).goTo(mockPlace);
+		
+		reset(mockPlaceController);
+		when(mockPlaceController.getWhere()).thenReturn(place);
+		historyToken = "!Synapse:syn123/wiki/12345";
+		currentUrl = "https://www.synapse.org/#"+historyToken;
+		when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
+		when(mockAppPlaceHistoryMapper.getPlace(historyToken)).thenReturn(mockPlace);
+	
+		globalApplicationState.refreshPage();
+		verify(mockPlaceController).goTo(mockPlace);
+		
+		reset(mockPlaceController, mockAppPlaceHistoryMapper);
+		when(mockPlaceController.getWhere()).thenReturn(place);
+		historyToken = "";
+		currentUrl = "https://www.synapse.org/"+historyToken;
+		when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
+		globalApplicationState.refreshPage();
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockAppPlaceHistoryMapper).getPlace(captor.capture());
+		assertEquals(GlobalApplicationStateImpl.DEFAULT_REFRESH_PLACE, captor.getValue());
 	}
 }

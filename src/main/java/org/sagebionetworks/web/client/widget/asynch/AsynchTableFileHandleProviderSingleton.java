@@ -107,7 +107,7 @@ public class AsynchTableFileHandleProviderSingleton implements AsynchTableFileHa
 	 * Called after results are successfully fetched.
 	 * The order of the rows in both the request and results must match.
 	 * @param thisRequest
-	 * @param result
+	 * @param valid
 	 */
 	private void requestSuccess(Map<String, List<Callback<FileHandle, Throwable>>> map, TableFileHandleResults results) {
 		// Extract all unique fileHandles.

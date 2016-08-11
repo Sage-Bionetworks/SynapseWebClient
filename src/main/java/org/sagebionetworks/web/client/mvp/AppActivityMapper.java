@@ -26,11 +26,11 @@ import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
-import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
@@ -95,6 +95,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Certificate.class);
 		openAccessPlaces.add(StandaloneWiki.class);
 		openAccessPlaces.add(SignedToken.class);
+		openAccessPlaces.add(SynapseForumPlace.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);
@@ -108,17 +109,18 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(Trash.class);
 		excludeFromLastPlace.add(Certificate.class);
 		excludeFromLastPlace.add(SignedToken.class);
+		excludeFromLastPlace.add(Down.class);
 	}
 
 	@Override
 	public Activity getActivity(Place place) {
-		synapseJSNIUtils.recordPageVisit(synapseJSNIUtils.getCurrentHistoryToken());
-	    
 		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
 	    
 	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
-		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
+		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
+		
+		globalApplicationState.recordPlaceVisit(place);
 		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
@@ -152,10 +154,6 @@ public class AppActivityMapper implements ActivityMapper {
 			lastActivity = presenter;
 			return presenter;
 		} else {
-			// check if this is a no-restart place change
-			if(place instanceof RestartActivityOptional && ((RestartActivityOptional)place).isNoRestartActivity() && lastActivity != null) {
-				return lastActivity;
-			}
 			if(loading != null) loading.showWidget();
 			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
 			bulkPresenterProxy.setGinjector(ginjector);

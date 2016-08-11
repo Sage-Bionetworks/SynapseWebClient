@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
@@ -15,14 +14,13 @@ public interface TeamView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter {
 		void goTo(Place place);
 		void refresh(String teamId);
 		void showEditModal();
 		void showDeleteModal();
 		void showLeaveModal();
 		void showInviteModal();
-		void shareButtonClicked();
 		void clear();
 	}
 
@@ -37,10 +35,8 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setOpenMembershipRequestWidget(Widget asWidget);
 	void setOpenUserInvitationsWidget(Widget asWidget);
 	void setMemberListWidget(Widget asWidget);
-	void setAclModalWidget(Widget asWidget);
 	void setPublicJoinVisible(Boolean canPublicJoin);
 	void setTotalMemberCount(String string);
-	void setMediaObjectPanel(Team team);
+	void setMediaObjectPanel(Team team, String xsrfToken);
 	void setTeamEmailAddress(String teamEmail);
-	void setShareButtonVisible(boolean isVisible);
 }

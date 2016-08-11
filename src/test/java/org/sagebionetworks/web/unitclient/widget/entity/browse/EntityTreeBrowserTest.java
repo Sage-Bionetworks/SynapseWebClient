@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -20,13 +21,14 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -226,7 +228,9 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testConfigure() {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		headers.add(new EntityHeader());
+		EntityHeader header = new EntityHeader();
+		header.setType(Project.class.getName());
+		headers.add(header);
 		
 		entityTreeBrowser.configure(headers);
 		verify(mockView).clear();
@@ -267,7 +271,7 @@ public class EntityTreeBrowserTest {
 		Long versionNumber;
 		id = "12";
 		name = "project 1";
-		type = "project";
+		type = Project.class.getName();
 		versionNumber = 1L;
 		headers.add(createEntityHeader(id, name, type, versionNumber));
 		
@@ -277,7 +281,7 @@ public class EntityTreeBrowserTest {
 		EntityQueryResult result = results.getEntities().get(0);
 		assertEquals(id, result.getId());
 		assertEquals(name, result.getName());
-		assertEquals(type, result.getEntityType());
+		assertEquals(EntityType.project.name(), result.getEntityType());
 		assertEquals(versionNumber, result.getVersionNumber());
 		
 		id = "24";
@@ -295,4 +299,16 @@ public class EntityTreeBrowserTest {
 		assertEquals(type, result.getEntityType());
 		assertEquals(versionNumber, result.getVersionNumber());
 	}
+	
+	@Test
+	public void testIsExpandable() {
+		EntityQueryResult result = new EntityQueryResult();
+		result.setEntityType("folder");
+		assertTrue(entityTreeBrowser.isExpandable(result));
+		result.setEntityType("project");
+		assertTrue(entityTreeBrowser.isExpandable(result));
+		result.setEntityType("file");
+		assertFalse(entityTreeBrowser.isExpandable(result));
+	}
+	
 }

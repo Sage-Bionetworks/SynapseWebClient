@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +42,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class UserBadgeTest {
 
+	private static final String DOEBOY = "doeboy";
+	private static final String DOE = "Doe";
+	private static final String FIRST_NAME = "John";
+	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -59,9 +63,9 @@ public class UserBadgeTest {
 	@Before
 	public void before(){
 		profile = new UserProfile();
-		profile.setFirstName("John");
-		profile.setLastName("Doe");
-		profile.setUserName("doeboy");
+		profile.setFirstName(FIRST_NAME);
+		profile.setLastName(DOE);
+		profile.setUserName(DOEBOY);
 		profile.setProfilePicureFileHandleId("1234");
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
@@ -104,6 +108,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 		verify(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
+		verify(mockView).setHref("#!Profile:" + profile.getOwnerId());
 	}
 	
 	@Test
@@ -138,6 +143,7 @@ public class UserBadgeTest {
 		userBadge.configure(profile);
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
 		userBadge.setCustomClickHandler(mockClickHandler);
+		verify(mockView).clearHref();
 		userBadge.badgeClicked(null);
 		verify(mockClickHandler).onClick(any(ClickEvent.class));
 	}
@@ -165,5 +171,58 @@ public class UserBadgeTest {
 		verify(mockSynapseClient, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
 	}
-
+	
+	@Test
+	public void testGetDefaultPictureLetter() {
+		//first name is "John"
+		assertEquals("J", userBadge.getDefaultPictureLetter(profile));
+		profile.setFirstName(null);
+		//username is "doeboy"
+		assertEquals("D", userBadge.getDefaultPictureLetter(profile));
+		//null profile?
+		assertEquals(UserBadge.DEFAULT_LETTER, userBadge.getDefaultPictureLetter(null));
+	}
+	
+	@Test
+	public void testGetDefaultPictureColor() {
+		assertEquals(UserBadge.DEFAULT_COLOR, userBadge.getDefaultPictureColor(null));
+		
+		//verify no errors when trying to get the color for a range of values 
+		//(like an array index out of bounds, or a null color response)
+		for (int i = 0; i < 100; i++) {
+			assertNotNull(userBadge.getColor(i));
+		}
+		
+		//test negative hashcode
+		assertNotNull(userBadge.getColor(-418745608));
+	}
+	
+	@Test
+	public void testConfigureFromUsernameAsync() throws Exception {
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
+		userBadge.configureWithUsername(DOEBOY);
+		verify(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
+		verify(mockView).setDisplayName(eq(displayName), anyString());
+	}
+	
+	@Test
+	public void testConfigureFromUsernameAsyncFailure() throws Exception {
+		String errorMessage = "not found";
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
+		userBadge.configureWithUsername(DOEBOY);
+		verify(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
+		verify(mockView).showLoadError(errorMessage);
+	}
+	
+	@Test
+	public void testConfigureFromUsernameFromCache() throws Exception {
+		userBadge.setMaxNameLength(max);
+		when(mockCache.get(anyString())).thenReturn(principalId, (String)null);
+		
+		userBadge.configureWithUsername(DOEBOY);
+		verify(mockCache, times(2)).get(anyString());
+		verify(mockSynapseClient, never()).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
+		verify(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+	}
 }

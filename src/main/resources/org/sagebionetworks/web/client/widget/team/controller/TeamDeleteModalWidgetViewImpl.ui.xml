@@ -5,14 +5,14 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<b:Modal ui:field="modal" title="Delete Team?" closable="true" fade="true"
+	<b:Modal ui:field="modal" title="Delete Team?" closable="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 		    <bh:Text>Are you sure you want to delete this Team?</bh:Text>
 			<g:SimplePanel ui:field="synAlertPanel"/>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Confirming..." >OK</b:Button>
+			<b:Button ui:field="primaryButton" type="DANGER" dataLoadingText="Deleting..." >Delete</b:Button>
 			<b:Button ui:field="cancelButton" type="DEFAULT"
 				dataDismiss="MODAL">Cancel</b:Button>
 		</b:ModalFooter>

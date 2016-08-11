@@ -28,7 +28,7 @@ public class ReferenceWidgetViewImpl extends FlowPanel implements ReferenceWidge
 		
 		Anchor a = new Anchor();
 		a.setHTML("[" + id + "]");
-		a.addStyleName("link");
+		a.addStyleName("link margin-left-5");
 		a.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

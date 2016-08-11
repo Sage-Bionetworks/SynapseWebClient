@@ -15,9 +15,9 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -28,7 +28,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -52,29 +52,29 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private SynapseAlert synAlert;
+	private StuAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
 	private String areaToken;
 	private CookieProvider cookies;
 	private Header headerWidget;
+	Footer footerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
-	private SynapseJSNIUtils synapseJSNIUtils; 
-	
-	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
+	private GWTWrapper gwt;
 	
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
 			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
-			SynapseJSNIUtils synJSNIUtils) {
+			GWTWrapper gwt) {
 		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
@@ -83,24 +83,17 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
-		this.synapseJSNIUtils = synJSNIUtils;
-		
-		//place widgets and configure
-		view.setEntityPageTopWidget(entityPageTop);
-		view.setFooterWidget(footerWidget);
-		view.setHeaderWidget(headerWidget);
-		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
-		view.setSynAlertWidget(synAlert);
+		this.gwt = gwt;
 		clear();
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				//reload current window
-				synapseJSNIUtils.refreshWindowFromCache();
+				//get the place based on the current url
+				globalApplicationState.refreshPage();
 			}
 		});
 		
-		headerWidget.refresh();
 	}
 
 	@Override
@@ -120,8 +113,23 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
+	public static boolean isValidEntityId(String entityId) {
+		if (entityId == null || entityId.length() == 0 || !entityId.toLowerCase().startsWith("syn")) {
+			return false;
+		}
+		
+		//try to parse the actual syn id
+		try {
+			Long.parseLong(entityId.substring("syn".length()).trim());
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+	
 	@Override
 	public void clear() {
+		entityPageTop.clearState();
 		synAlert.clear();
 		openTeamInvitesWidget.clear();
 		view.clear();
@@ -137,10 +145,17 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	@Override
 	public void refresh() {
 		clear();
+		headerWidget.refresh();
+		//place widgets and configure
+		view.setEntityPageTopWidget(entityPageTop);
+		view.setFooterWidget(footerWidget);
+		view.setHeaderWidget(headerWidget);
+		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
+		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
 		int mask = ENTITY | ENTITY_PATH;
-		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				view.setLoadingVisible(false);
@@ -165,7 +180,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					}
 					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
 					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					entityPageTop.clearState();
 					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);
@@ -187,10 +201,21 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				}
 			}			
 		};
-		if (versionNumber == null) {
-			synapseClient.getEntityBundle(entityId, mask, callback);
+		
+		if(isValidEntityId(entityId)) {
+			if (versionNumber == null) {
+				synapseClient.getEntityBundle(entityId, mask, callback);
+			} else {
+				synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+			}
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+			//invalid entity detected, indicate that the page was not found
+			gwt.scheduleDeferred(new Callback() {
+				@Override
+				public void invoke() {
+					callback.onFailure(new NotFoundException());		
+				}
+			});
 		}
 	}
 	

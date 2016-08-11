@@ -2,6 +2,7 @@
 package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -16,8 +17,8 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -35,8 +36,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -49,11 +48,14 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -89,6 +91,8 @@ public interface SynapseClientAsync {
 	
 	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
 
+	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
+	
 	void getEntityVersions(String entityId, int offset, int limit,
 			AsyncCallback<PaginatedResults<VersionInfo>> callback);
 
@@ -98,9 +102,6 @@ public interface SynapseClientAsync {
 
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);
-
-	void getEntityReferencedBy(String entityId,
-			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
 	void logDebug(String message, AsyncCallback<Void> callback);
 
@@ -195,8 +196,6 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
-	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
 	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
@@ -242,8 +241,6 @@ public interface SynapseClientAsync {
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	
-	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
-	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
 
@@ -271,10 +268,10 @@ public interface SynapseClientAsync {
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
-	void updateTeam(Team team, AsyncCallback<Team> callback);
+	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
-	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
+	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<Void> callback);
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
 	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
@@ -290,9 +287,6 @@ public interface SynapseClientAsync {
 	void submitCertificationQuizResponse(QuizResponse response,
 			AsyncCallback<PassingRecord> callback);
 	
-	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, Long storageLocationId, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
-	void getChunkedPresignedUrl(ChunkRequest request, AsyncCallback<String> callback) throws RestServiceException;
-	void combineChunkedFileUpload(List<ChunkRequest> requests, AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
@@ -314,7 +308,7 @@ public interface SynapseClientAsync {
 	
 	void getAPIKey(AsyncCallback<String> callback);
 
-	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);
+	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
@@ -337,7 +331,7 @@ public interface SynapseClientAsync {
 	 * @param newSchema
 	 * @param callback
 	 */
-	void setTableSchema(TableEntity entity, List<ColumnModel> newSchema,
+	void setTableSchema(Table entity, List<ColumnModel> newSchema,
 			AsyncCallback<Void> callback);
 	
 	/**
@@ -423,10 +417,10 @@ public interface SynapseClientAsync {
 			AsyncCallback<TableFileHandleResults> callback);
 
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
-
+	
+	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
+	
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
-
-	void getEntityInfo(String entityId, AsyncCallback<EntityBundlePlus> callback);
 
 	void getOrCreateActivityForEntityVersion(String entityId,
 			Long versionNumber, AsyncCallback<Activity> callback);
@@ -445,4 +439,14 @@ public interface SynapseClientAsync {
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
+	
+	void setIsTeamAdmin(String currentUserId, String targetUserId,
+			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
+
+	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
+	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
+
+	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
+
+	void getDefaultColumnsForView(ViewType type, AsyncCallback<List<ColumnModel>> callback);
 }

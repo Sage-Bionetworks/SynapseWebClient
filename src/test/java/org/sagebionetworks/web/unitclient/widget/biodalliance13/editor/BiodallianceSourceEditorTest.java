@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -87,8 +88,8 @@ public class BiodallianceSourceEditorTest {
 	@Test
 	public void testConstructorAndUpdateViewFromSource() {
 		verify(mockView).setPresenter(editor);
-		verify(mockEntityFinder).configure(eq(true), any(SelectedHandler.class));
-		verify(mockIndexEntityFinder).configure(eq(true), any(SelectedHandler.class));
+		verify(mockEntityFinder).configure(eq(EntityFilter.FILE), eq(true), any(SelectedHandler.class));
+		verify(mockIndexEntityFinder).configure(eq(EntityFilter.FILE), eq(true), any(SelectedHandler.class));
 		
 		verify(mockView).setSourceName(sourceName);
 		verify(mockView).setEntityFinderText(entityId+"." + version);
@@ -201,7 +202,7 @@ public class BiodallianceSourceEditorTest {
 		editor.entitySelected(ref);
 		
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(errorMessage);
+		verify(mockEntityFinder).showError(errorMessage);
 	}
 	
 	@Test
@@ -211,7 +212,7 @@ public class BiodallianceSourceEditorTest {
 		ref.setTargetId(selectedEntityId);
 		when(mockEntityBundle.getEntity()).thenReturn(new Project());
 		editor.entitySelected(ref);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockEntityFinder).showError(anyString());
 	}
 
 	@Test
@@ -223,7 +224,7 @@ public class BiodallianceSourceEditorTest {
 		
 		editor.entitySelected(ref);
 		
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockEntityFinder).showError(anyString());
 	}
 	@Test
 	public void testEntitySelectedVersion() {
@@ -258,7 +259,7 @@ public class BiodallianceSourceEditorTest {
 		editor.entitySelected(ref);
 		
 		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(errorMessage);
+		verify(mockEntityFinder).showError(errorMessage);
 	}
 
 
@@ -295,7 +296,7 @@ public class BiodallianceSourceEditorTest {
 		editor.indexEntitySelected(ref);
 		
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(errorMessage);
+		verify(mockIndexEntityFinder).showError(errorMessage);
 	}
 	
 	@Test
@@ -305,7 +306,7 @@ public class BiodallianceSourceEditorTest {
 		ref.setTargetId(selectedEntityId);
 		when(mockEntityBundle.getEntity()).thenReturn(new Project());
 		editor.indexEntitySelected(ref);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockIndexEntityFinder).showError(anyString());
 	}
 
 	@Test
@@ -317,7 +318,7 @@ public class BiodallianceSourceEditorTest {
 		
 		editor.indexEntitySelected(ref);
 		
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockIndexEntityFinder).showError(anyString());
 	}
 	@Test
 	public void testIndexEntitySelectedVersion() {
@@ -351,7 +352,7 @@ public class BiodallianceSourceEditorTest {
 		editor.indexEntitySelected(ref);
 		
 		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(errorMessage);
+		verify(mockIndexEntityFinder).showError(errorMessage);
 	}
 	
 	

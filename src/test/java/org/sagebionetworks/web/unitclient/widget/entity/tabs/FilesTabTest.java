@@ -7,12 +7,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +23,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -37,7 +33,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -49,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -57,6 +53,8 @@ import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -85,7 +83,7 @@ public class FilesTabTest {
 	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
-	SynapseAlert mockSynapseAlert;
+	StuAlert mockSynapseAlert;
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock
@@ -94,6 +92,8 @@ public class FilesTabTest {
 	EntityBundle mockProjectEntityBundle;
 	@Mock
 	EntityBundle mockEntityBundle;
+	@Mock
+	EntityBundlePlus mockEntityBundlePlus;
 	@Mock
 	FileEntity mockFileEntity;
 	@Mock
@@ -122,11 +122,15 @@ public class FilesTabTest {
 	CallbackP<Boolean> mockProjectInfoCallback;
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
-	
+	@Mock
+	RefreshAlert mockRefreshAlert;
 	FilesTab tab;
 	String projectEntityId = "syn9";
+	String projectName = "proyecto";
 	String folderEntityId = "syn1";
+	String folderName = "folder 1";
 	String fileEntityId = "syn4444";
+	String fileName = "filename.txt";
 	String entityId = "syn7777777";
 	String linkEntityId = "syn333";
 	Long linkEntityVersion=3L;
@@ -137,8 +141,9 @@ public class FilesTabTest {
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(entityId);
+		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
-		
+		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
 		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
 				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
 				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy);
@@ -148,11 +153,15 @@ public class FilesTabTest {
 		when(mockEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFolderEntity.getId()).thenReturn(folderEntityId);
+		when(mockFolderEntity.getName()).thenReturn(folderName);
 		when(mockFileEntity.getId()).thenReturn(fileEntityId);
+		when(mockFileEntity.getName()).thenReturn(fileName);
 		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
+		when(mockEntityBundlePlus.getEntityBundle()).thenReturn(mockEntityBundle);
+		when(mockEntityBundlePlus.getLatestVersionNumber()).thenReturn(null);
 		
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClientAsync).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundlePlus).when(mockSynapseClientAsync).getEntityBundlePlusForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
@@ -171,7 +180,6 @@ public class FilesTabTest {
 		verify(mockView).setMetadata(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
-		
 		verify(mockFilesBrowser).setEntityClickedHandler(any(CallbackP.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
 	}
@@ -217,13 +225,15 @@ public class FilesTabTest {
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(entityId, canCertifiedUserAddChild, isCertifiedUser);
 		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab, times(3)).setPlace(captor.capture());
-		Synapse place = (Synapse)captor.getValue();
-		assertEquals(entityId, place.getEntityId());
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), captor.capture());
+		Synapse place = captor.getValue();
+		assertEquals(projectEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.FILES, place.getArea());
 		assertNull(place.getAreaToken());
+		
+		verify(mockRefreshAlert, never()).configure(anyString(), any(ObjectType.class));
 	}
 	
 	@Test
@@ -238,7 +248,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
 		
-		verify(mockSynapseClientAsync).getEntityBundleForVersion(eq(fileEntityId), eq(version), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).getEntityBundlePlusForVersion(eq(fileEntityId), eq(version), anyInt(), any(AsyncCallback.class));
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -276,21 +286,17 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).createActionMenuWidget();
 		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockPortalGinInjector).getProvenanceRenderer();
-		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab, times(2)).setPlace(captor.capture());
+
+		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
+
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(fileName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(fileEntityId, place.getEntityId());
 		assertEquals(version, place.getVersionNumber());
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
-		
-		//quick test to verify that reconfiguring with the same entity/version should cause nothing to change (certainly should not ask for the entity bundle again).
-		reset(mockSynapseClientAsync);
-		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
-		
-		verifyZeroInteractions(mockSynapseClientAsync);
 	}
 	
 
@@ -307,7 +313,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockFolderEntity, mockEntityUpdatedHandler, version);
 		
-		verify(mockSynapseClientAsync).getEntityBundle(eq(folderEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).getEntityBundlePlusForVersion(eq(folderEntityId), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -320,7 +326,10 @@ public class FilesTabTest {
 		verify(mockView).setMetadataVisible(true);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
-		
+
+		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockRefreshAlert).configure(folderEntityId, ObjectType.ENTITY);
+
 		verify(mockBasicTitleBar).configure(mockEntityBundle);
 		
 		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
@@ -343,8 +352,8 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).createActionMenuWidget();
 		verify(mockPortalGinInjector).createEntityActionController();
 		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab, times(2)).setPlace(captor.capture());
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(folderName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(folderEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
@@ -393,7 +402,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, null, projectLoadError);
 		tab.showProjectLevelUI();
 		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.FILES, null);
-		verify(mockTab).setPlace(expectedPlace);
+		verify(mockTab).setEntityNameAndPlace(projectEntityId, expectedPlace);
 		verify(mockSynapseAlert).handleException(projectLoadError);
 	}
 }

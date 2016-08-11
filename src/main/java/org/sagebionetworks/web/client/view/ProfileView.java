@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
@@ -61,6 +60,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setShowProfileButtonVisible(boolean isVisible);
 	void setHideProfileButtonVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
+	void setOrcIDLinkButtonVisible(boolean isVisible);
 	void setProjectSortVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
 	void addSortOption(SortOptionEnum sort);
@@ -68,8 +68,17 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setGetCertifiedVisible(boolean isVisible);
 	void setEmptyProjectUIVisible(boolean b);
 	void setSynapseEmailVisible(boolean isVisible);
-	
-	public interface Presenter extends SynapsePresenter {
+	void setOrcIdVisible(boolean isVisible);
+	void setUnbindOrcIdVisible(boolean isVisible);
+	void setOrcId(String href);
+	void setVerificationAlertVisible(boolean isVisible);
+	void setVerificationButtonVisible(boolean isVisible);
+	void setResubmitVerificationButtonVisible(boolean isVisible);
+	void setVerificationSuspendedButtonVisible(boolean isVisible);
+	void setVerificationRejectedButtonVisible(boolean isVisible);
+	void setVerificationSubmittedButtonVisible(boolean isVisible);
+	void setVerificationDetailsButtonVisible(boolean isVisible);
+	public interface Presenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -77,10 +86,10 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void createTeam(final String teamName);
 		void goTo(Place place);
 		void refreshTeams();
-		void updateArea(ProfileArea area);
 		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
+		void unbindOrcId();
 		void certificationBadgeClicked();
 		void getMoreProjects();
 		void getMoreChallenges();
@@ -90,6 +99,11 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 		void refreshTeamInvites();
+		void newVerificationSubmissionClicked();
+		void editVerificationSubmissionClicked();
+		void setVerifyDismissed();
+		void setVerifyUndismissed();
+		void linkOrcIdClicked();
 	}
 
 	void addMyTeamProjectsFilter();
@@ -107,6 +121,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 
 	void addCertifiedBadge();
+	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);
 
 	void showTabs(boolean isOwner);
 

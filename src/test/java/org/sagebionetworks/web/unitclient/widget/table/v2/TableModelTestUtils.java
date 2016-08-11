@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertNull;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,10 +18,8 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.util.csv.CsvNullReader;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -85,7 +82,10 @@ public class TableModelTestUtils {
 					break;
 				case LINK:
 					defaultValue = "http";
-					break;		
+					break;
+				case LARGETEXT:
+					defaultValue = null;
+					break;
 				default:
 					throw new IllegalStateException("huh? missing enum");
 				}
@@ -281,6 +281,8 @@ public class TableModelTestUtils {
 		case ENTITYID:
 			return "syn"+i;
 		case LINK:
+			return "";
+		case LARGETEXT:
 			return "";	
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());
@@ -349,17 +351,6 @@ public class TableModelTestUtils {
 		CSVWriter csvWriter = new CSVWriter(writer);
 		csvWriter.writeAll(input);
 		return writer.toString();
-	}
-	
-	/**
-	 * Create a reader that wraps the passed row data.
-	 * @param input List of rows where each row is represented by a string array.
-	 * @return
-	 */
-	public static CsvNullReader createReader(List<String[]> input) {
-		String csv = createCSVString(input);
-		StringReader reader = new StringReader(csv);
-		return new CsvNullReader(reader);
 	}
 	
 	/**

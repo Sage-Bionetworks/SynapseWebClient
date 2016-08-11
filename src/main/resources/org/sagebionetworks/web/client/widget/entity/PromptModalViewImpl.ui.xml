@@ -6,7 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<!-- Dialog for creating a new table -->
-	<b:Modal ui:field="modal" title="Title goes here" closable="true" fade="true"
+	<b:Modal ui:field="modal" title="Title goes here" closable="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 			<bh:Div>
@@ -19,8 +19,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Saving..." >Button text goes here</b:Button>
-			<b:Button ui:field="defaultButton" type="DEFAULT"
-				dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="defaultButton" type="DEFAULT">Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>

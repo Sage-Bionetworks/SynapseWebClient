@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
 		<b:InputGroup ui:field="queryInputGroup" visible="true">
 			<b:FormGroup ui:field="inputFormGroup">
@@ -18,8 +19,8 @@
 			</b:InputGroupButton>
 		</b:InputGroup>
 		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
-			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="LINK"
-				title="Reset query"></b:Button>
+			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="DEFAULT" text="Reset query"
+				size="EXTRA_SMALL" addStyleNames="margin-left-10"></b:Button>
 		</b:Alert>
 	</g:HTMLPanel>
 </ui:UiBinder>

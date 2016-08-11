@@ -9,15 +9,15 @@ a {color:#1e7098;text-decoration:none;}
 a:visited{color:#1e7098; text-decoration:none;}
 a:hover{color:#1e7098; text-decoration:underline;}
 a:focus{color:#1e7098; text-decoration:underline;}
-.synapse-yellow {color:#68b2bb;}
-.synapse-blue {color:#1e7098;}
-.synapse-purple {color:#7772b4;}
-.synapse-green {color:#0ea862;}
+.synapse-yellow, #rootPanel .synapse-yellow {color:#68b2bb;}
+.synapse-blue, #rootPanel .synapse-blue {color:#1e7098;}
+.synapse-purple, #rootPanel .synapse-purple {color:#7772b4;}
+.synapse-green, #rootPanel .synapse-green {color:#0ea862;}
 
-.synapse-yellow-bg {background-color:#68b2bb;}
-.synapse-blue-bg {background-color:#1e7098;}
-.synapse-purple-bg {background-color:#7772b4;}
-.synapse-green-bg {background-color:#0ea862;}
+.synapse-yellow-bg, #rootPanel .synapse-yellow-bg {background-color:#68b2bb;}
+.synapse-blue-bg, #rootPanel .synapse-blue-bg {background-color:#1e7098;}
+.synapse-purple-bg, #rootPanel .synapse-purple-bg {background-color:#7772b4;}
+.synapse-green-bg, #rootPanel .synapse-green-bg {background-color:#0ea862;}
 
 .pagination>li>a, .pagination>li>span
 {
@@ -29,6 +29,16 @@ a:focus{color:#1e7098; text-decoration:underline;}
 	background-color: #1e7098;
 	border-color:#1e7098;
 }
+
+@media (min-width: 1500px) {
+	th.visible-xl, td.visible-xl {
+		display: table-cell !important;
+	}	
+}
+.visible-xl{
+	display:none !important;
+}
+
 .btn-link {
 	color: #1e7098;
 }
@@ -153,7 +163,6 @@ End Synapse color scheme
 .light-border-bottom {
 	border-bottom: 1px solid #f1f1f1;
 }
-
 
 .sendButton {
 	display: block;
@@ -624,6 +633,10 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
+.margin-right-20, #rootPanel .margin-right-20 {
+	margin-right: 20px;
+}
+
 .margin-right-40 {
 	margin-right: 40px;
 }
@@ -666,7 +679,9 @@ a.shortBtn {
 .min-height-48 {
 	min-height: 48px;
 }
-
+.min-width-25 {
+	min-width: 25px;
+}
 .profile-image-40px {
 	width: 40px;	
 }
@@ -706,22 +721,26 @@ a.shortBtn {
 .margin-left-1 {
 	margin-left: 1px;
 }
-.margin-left-2 {
+.margin-left-2, #rootPanel .margin-left-2 {
 	margin-left: 2px;
 }
 .margin-left-3 {
 	margin-left: 3px;
 }
 
-.margin-left-5 {
+.margin-left-5, #rootPanel .margin-left-5 {
 	margin-left: 5px;
 }
 .margin-left-9 {
 	margin-left: 9px;
 }
-.margin-left-10 {
+.margin-left-10, #rootPanel .margin-left-10{
 	margin-left: 10px;
 }
+.margin-left-12 {
+	margin-left: 12px;
+}
+
 .margin-left-15 {
 	margin-left: 15px;
 }
@@ -798,23 +817,19 @@ a.shortBtn {
 .margin-bottom-60 {
 	margin-bottom: 60px;
 }
-.margin-bottom-40 {
+.margin-bottom-40, #rootPanel .margin-bottom-40 {
 	margin-bottom: 40px;
 }
 
-.margin-bottom-20 {
+.margin-bottom-20, #rootPanel .margin-bottom-20 {
 	margin-bottom: 20px;
-}
-
-.margin-bottom-20-imp {
-	margin-bottom: 20px !important;
 }
 
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
 
-.margin-bottom-5 {
+.margin-bottom-5, #rootPanel .margin-bottom-5{
 	margin-bottom: 5px;
 }
 
@@ -961,16 +976,24 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: auto;
 	text-align: justify;
+	line-height: 1.6em;
 }
 
 .markdown ol { 
 	list-style-type: decimal;
-	padding-left: 24px;
+	padding-left: 15px;
+}
+.markdown ol li {
+	padding-top: 5px;
 }
 .markdown ul { 
 	list-style-type: square;
 	padding-left: 17px;
 }
+.markdown ul li {
+	padding-top: 5px;
+}
+
 .markdown strong { font-weight: bold; }
 .markdown del { text-decoration: line-through; }
 .markdown em { font-style: italic; }
@@ -997,6 +1020,15 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
+
+.markdown img {
+	max-width: 100%;
+}
+
+.max-width-none, #rootPanel .max-width-none {
+	max-width: none;
+}
+
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }
@@ -1112,6 +1144,10 @@ span.font-size-13,
 i.font-size-1x {
 	font-size:1em;
 }
+.font-size-1-5x,
+i.font-size-1-5x {
+	font-size:1.5em;
+}
 .font-size-lg,
 i.font-size-lg {
 	font-size:1.33em;
@@ -1192,6 +1228,26 @@ h1, h2, h3, h4, h5, h6 {
 	margin: 0px;
 }
 
+.markdown h1 {
+	padding: 35px 0 12px 0;
+}
+.markdown h2 {
+	padding: 29px 0 10px 0;
+}
+.markdown h3 {
+	padding: 23px 0 8px 0;
+}
+.markdown h4 {
+	padding: 17px 0 6px 0;
+}
+.markdown h5 {
+	padding: 11px 0 4px 0;
+}
+.markdown h6 {
+	padding: 5px 0 2px 0;
+}
+
+
 .previewtable {
   border: 1px solid #dddddd;
   border-collapse: separate;
@@ -1214,6 +1270,7 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  margin: 10px 0 10px 0;
 }
 
 .markdowntable td {
@@ -1225,7 +1282,8 @@ h1, h2, h3, h4, h5, h6 {
   border-left: 1px solid #dddddd;
   border-top: 1px solid #dddddd;
   padding: 2px 4px;
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 1.1em;
 }
 
 /* Markdown table styles */
@@ -1354,6 +1412,14 @@ h1, h2, h3, h4, h5, h6 {
 	background-color: #fff !important;
 }	
 
+.greyBackground {
+	background-color: #ccc;
+}
+
+.lightGreyBackground {
+	background-color: #F9F9F9;
+}
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;
@@ -1406,10 +1472,6 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 
 /**table of contents styling **/
 /** .8em to 1.2em **/
-.toc-indent4 {
-	font-size: .8em;
-	margin-left: 125px;
-}
 .toc-indent0 {
 	font-size: 1.2em;
 	margin-left: 5px;
@@ -1425,7 +1487,16 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 .toc-indent3 {
 	font-size: 0.9em;
 	margin-left: 95px;
-}	
+}
+.toc-indent4 {
+	font-size: .8em;
+	margin-left: 125px;
+}
+.toc-indent5 {
+	font-size: .8em;
+	margin-left: 150px;
+}
+
 
 strong {
 	font-weight: bold;
@@ -1504,7 +1575,7 @@ ol.lowerroman {
 	padding: 5px;
 }
 
-.padding-10 {
+.padding-10, #rootPanel .padding-10 {
 	padding: 10px;
 }
 
@@ -1677,6 +1748,13 @@ ol.lowerroman {
 	top: -35px;
 }
 
+.small-icon, i.fa.small-icon {
+	font-size: 6px;
+	top: -.7em;
+	position: relative;
+}
+
+
 .moveup-70 {
 	position: relative;
 	top: -70px;
@@ -1705,13 +1783,18 @@ ol.lowerroman {
 	position: relative;
 	top: -4px;
 }
-
+.moveup-3 {
+	position: relative;
+	top: -3px;
+}
 .moveup-2 {
 	position: relative;
 	top: -2px;
 }
-
-
+.moveup-1 {
+	position: relative;
+	top: -1px;
+}
 .movedown-1 {
 	position: relative;
 	top: 1px;
@@ -1742,6 +1825,10 @@ ol.lowerroman {
 	position: relative;
 	top: 7px;
 }
+.movedown-9 {
+	position: relative;
+	top: 9px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
@@ -1771,6 +1858,19 @@ ol.lowerroman {
     line-height: 1.4;
     padding: 3px 7px;
     position: absolute;    
+}
+
+.highlight-title {
+	color: #333333;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 24px;
+    font-weight: 200;
+    line-height: 1.4;
+    padding: 3px 7px;
+}
+
+.highlight-title [class*="fa"] {
+	font-size: 15px;
 }
 
 .highlight-line {
@@ -1839,6 +1939,51 @@ ol.lowerroman {
 	width: 120px;
 }
 
+.top-right {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+}
+
+.bubble {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 6px #B2B2B2;
+    display: inline-block;
+    padding: 8px 20px 8px 18px;
+    position: relative;
+    vertical-align: top;
+    margin: 5px;
+    max-width: 300px;
+}
+
+.bubble::before {
+    background-color: white;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+}
+
+
+.bubble-right::before {
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px;           
+}
+
+.bubble-left::before {
+    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
+    right: -9px;    
+}
+
+
 .separator-margin {	margin-top: 40px; margin-bottom: 40px; }
 .separator-margin-top {	margin-top: 40px; }
 .separator-header-home { margin-top: 20px; }
@@ -1890,6 +2035,10 @@ a.projectTitle:hover {
 
 .overflowHidden {
     overflow: hidden;
+}
+
+.table-layout-fixed {
+    table-layout: fixed;
 }
 
 .colAdaptiveHeight{ 
@@ -1952,6 +2101,10 @@ a.projectTitle:hover {
 	top: 10px;
 }
 
+.width-200 {
+	width: 200px;
+}
+
 .width-150 {
 	width: 150px;
 }
@@ -1998,6 +2151,10 @@ a.projectTitle:hover {
 	font-family: "Brush Script MT", cursive;
 }
 
+.halfOpacity {
+	opacity: .5;
+}
+
 .fullOpacityImp {
 	opacity: 1 !important;
 }
@@ -2006,6 +2163,10 @@ a.projectTitle:hover {
 Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
 .modal-fullscreen [class*="modal-dialog"] {
 	width: 95%;
+}
+
+.gwt-TreeItem-selected [class*="link"] {
+	text-decoration: underline;
 }
 
 /* Prevent body from scrolling when modal is open
@@ -2034,6 +2195,10 @@ iframe[seamless] {
 	overflow-x: hidden;
 }
 
+.line-height-1em {
+	line-height: 1em;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
@@ -2057,6 +2222,11 @@ iframe[seamless] {
 .popover-content {
 	overflow-x: hidden;
 }
+
+.popover, #rootPanel .popover {
+	max-width: 400px;
+}
+
 
 h1, .h1, h2, .h2, h3, .h3 {
 	margin-top: 10px !important;
@@ -2138,45 +2308,31 @@ div.input-group > input.search-textbox {
   padding: 5px 10px 30px 0px;
 }
 
-/* All levels of nav */
-.bs-sidenav > li > a {
-  padding: 5px 20px !important;
+.bs-sidenav .nav .active,
+.bs-sidenav .nav .active:hover,
+.bs-sidenav .nav .active:focus {
+	color: black !important;
+	text-decoration:none;
+	background-color: transparent;
+	border-right: 0px;
 }
 
-.nav > .active > a,
-.nav > .active:hover > a,
-.nav > .active:focus > a {
-  color: black !important;
-  text-decoration:none;
-  background-color: transparent;
-  border-right: 0px;
+.bs-sidenav .nav > li > div { 
+	padding-top:    3px;
+	padding-bottom: 3px;
 }
 
-.bs-sidenav .nav > li > a {
-  padding-top:    3px;
-  padding-bottom: 3px;
-  padding-left: 30px;
-  font-size: 1.1em;
+.bs-sidenav .nav li {
+	padding-left: 10px;
+	text-decoration:none;
+	font-size: 1.1em;
 }
-.bs-sidenav .nav .nav > li > a {
-  padding-left: 40px;
+
+.bs-sidenav .nav .nav li {
+  padding-left: 15px;
   font-size: 1em;
 }
-.bs-sidenav .nav .nav .nav > li > a {
-  padding-left: 50px;
-}
-.bs-sidenav .nav .nav .nav .nav > li > a {
-  padding-left: 60px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav > li > a {
-  padding-left: 70px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav > li > a {
-  padding-left: 80px;
-}
-.bs-sidenav .nav .nav .nav .nav .nav .nav .nav > li > a {
-  padding-left: 90px;
-}
+
 /*===========*/
 
 .largeIconButton {
@@ -2318,6 +2474,10 @@ td.datePickerMonth {
 
 .border-bottom-1 {
   border-bottom: 1px solid #dddddd;
+}
+
+.border-left-1 {
+  border-left: 1px solid #dddddd;
 }
 
 /* Provenance graph css */
@@ -2950,6 +3110,31 @@ div.colborder {
 		background-image:url('../images/social/f.png');
 		background-position: -0px -26px;
 	}
+
+/* SWC-3048: override webkit scrollbar appearance, so that they're shown */
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+    width: 11px;
+}
+
+.frame::-webkit-scrollbar:horizontal {
+    height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid white; /* should match background, can't be transparent */
+    background-color: rgba(0, 0, 0, .5);
+}
+
+::-webkit-scrollbar-track { 
+    background-color: #fff; 
+    border-radius: 8px; 
+} 
 
 
 /*-------------------------------------------------------*/

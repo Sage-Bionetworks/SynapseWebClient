@@ -4,10 +4,10 @@ package org.sagebionetworks.web.client.view;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.sagebionetworks.web.client.place.Wiki;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -24,6 +24,8 @@ import com.google.inject.Inject;
 
 public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetView, IsWidget {
 	
+	public static final String NEED_HELP_TEXT = "Need help answering this question?";
+
 	@UiField
 	FlowPanel questionContainer;
 	
@@ -31,7 +33,7 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	Heading questionHeader;
 	
 	@UiField
-	Anchor moreInfoLink;
+	Div helpContainer;
 		
 	@UiField
 	Icon successIcon;
@@ -103,11 +105,14 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	}
 	
 	@Override
-	public void configureMoreInfo(String ownerObjectId, String wikiTypeName, String wikiPageId) {
-		Wiki place = new Wiki(ownerObjectId, wikiTypeName, wikiPageId);
-		moreInfoLink.setHref("#!Wiki:" + place.toToken());
+	public void configureMoreInfo(String helpUrl, String helpText) {
+		helpContainer.clear();
+		HelpWidget help = new HelpWidget();
+		help.setHref(helpUrl);
+		help.setHelpMarkdown(helpText);
+		help.setText(NEED_HELP_TEXT);
+		helpContainer.add(help);
 	}
-	
 	
 	@Override 
 	public void configure(Long questionNumber, String questionPrompt) {
@@ -124,6 +129,11 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 		for (CheckBox checkBox: checkBoxes) {
 			checkBox.setEnabled(isEnabled);
 		}
+	}
+	
+	@Override
+	public void setMoreInfoVisible(boolean isVisible) {
+		helpContainer.setVisible(isVisible);
 	}
 	
 }

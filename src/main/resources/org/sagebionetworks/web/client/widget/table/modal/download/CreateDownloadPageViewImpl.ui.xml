@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:b.select="urn:import:org.gwtbootstrap3.extras.select.client.ui">
+	>
 
 	<bh:Div>
 		<bh:Div>

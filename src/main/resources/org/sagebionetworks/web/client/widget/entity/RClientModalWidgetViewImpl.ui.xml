@@ -10,7 +10,7 @@
   
   	<g:HTMLPanel addStyleNames="displayInline">
 	  	<b:ImageAnchor dataToggle="MODAL" dataTarget="#rClient" ui:field="rImageButton" url='{sageImageBundle.logoR45.getSafeUri.asString}'/>
-	  	<b:Modal title="Synapse R Client" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="rClient">
+	  	<b:Modal title="Synapse R Client" closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="rClient">
 			<b:ModalBody>
 		  		<e:RClientEntityGetterUIWidgetViewImpl ui:field="getEntity"/>
 		  		<e:RClientInstallWidgetViewImpl ui:field="install"/>

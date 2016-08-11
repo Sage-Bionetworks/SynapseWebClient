@@ -11,28 +11,22 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class EntityBundlePlus implements IsSerializable {
 	EntityBundle entityBundle;
-	UserProfile profile;
-	public EntityBundle getEntityBundle() {
-		return entityBundle;
+	Long latestVersionNumber;
+	
+	@Override
+	public String toString() {
+		return "EntityBundlePlus [entityBundle=" + entityBundle + ", latestVersionNumber=" + latestVersionNumber + "]";
 	}
-	public void setEntityBundle(EntityBundle entityBundle) {
-		this.entityBundle = entityBundle;
-	}
-	public UserProfile getProfile() {
-		return profile;
-	}
-	public void setProfile(UserProfile profile) {
-		this.profile = profile;
-	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((entityBundle == null) ? 0 : entityBundle.hashCode());
-		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
+		result = prime * result + ((entityBundle == null) ? 0 : entityBundle.hashCode());
+		result = prime * result + ((latestVersionNumber == null) ? 0 : latestVersionNumber.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -47,17 +41,29 @@ public class EntityBundlePlus implements IsSerializable {
 				return false;
 		} else if (!entityBundle.equals(other.entityBundle))
 			return false;
-		if (profile == null) {
-			if (other.profile != null)
+		if (latestVersionNumber == null) {
+			if (other.latestVersionNumber != null)
 				return false;
-		} else if (!profile.equals(other.profile))
+		} else if (!latestVersionNumber.equals(other.latestVersionNumber))
 			return false;
 		return true;
 	}
-	@Override
-	public String toString() {
-		return "EntityBundlePlus [entityBundle=" + entityBundle + ", profile="
-				+ profile + "]";
+
+	public Long getLatestVersionNumber() {
+		return latestVersionNumber;
 	}
+
+	public void setLatestVersionNumber(Long latestVersionNumber) {
+		this.latestVersionNumber = latestVersionNumber;
+	}
+
+	public EntityBundle getEntityBundle() {
+		return entityBundle;
+	}
+	
+	public void setEntityBundle(EntityBundle entityBundle) {
+		this.entityBundle = entityBundle;
+	}
+	
 	
 }

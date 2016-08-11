@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.LinkedGroup;
+import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -31,9 +34,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 
 	@UiField
-	LinkedGroup tablesList;
+	ListGroup tablesList;
 	@UiField
 	Button addTable;
+	@UiField
+	Button addFileView;
+	
 	@UiField
 	Button uploadTable;
 	@UiField
@@ -41,7 +47,19 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	SimplePanel uploadTableModalPanel;
 	@UiField
+	SimplePanel fileViewWizardContainer;
+	@UiField
 	SimplePanel paginationPanel;
+	@UiField
+	AnchorListItem createdOnDesc;
+	@UiField
+	AnchorListItem createdOnAsc;
+	@UiField
+	AnchorListItem nameAsc;
+	@UiField
+	AnchorListItem nameDesc;
+	@UiField
+	Button sortButton;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -49,13 +67,42 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Inject
 	public TableListWidgetViewImpl(Binder binder) {
 		this.panel = binder.createAndBindUi(this);
+		createdOnDesc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(createdOnDesc.getText());
+				presenter.onSort(EntityFieldName.createdOn.name(), SortDirection.DESC);
+			}
+		});
+		createdOnAsc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(createdOnAsc.getText());
+				presenter.onSort(EntityFieldName.createdOn.name(), SortDirection.ASC);
+			}
+		});
+		nameDesc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(nameDesc.getText());
+				presenter.onSort(EntityFieldName.name.name(), SortDirection.DESC);
+			}
+		});
+
+		nameAsc.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sortButton.setText(nameAsc.getText());
+				presenter.onSort(EntityFieldName.name.name(), SortDirection.ASC);
+			}
+		});
 	}
 
 	@Override
 	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
 		for(final EntityQueryResult header: tables){
-			tablesList.add(new EntityLinkedGroupItem(HeadingSize.H3, header, new ClickHandler() {
+			tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.onTableClicked(header.getId());
@@ -65,12 +112,23 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 	
 	@Override
+	public void resetSortUI() {
+		sortButton.setText(createdOnDesc.getText());	
+	}
+	
+	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		this.addTable.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onAddTable();
+			}
+		});
+		this.addFileView.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddFileView();
 			}
 		});
 		this.uploadTable.addClickHandler(new ClickHandler() {
@@ -109,7 +167,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void setAddTableVisible(boolean visibile) {
 		this.addTable.setVisible(visibile);
 	}
-
+	
+	@Override
+	public void setAddFileViewVisible(boolean visible) {
+		addFileView.setVisible(visible);
+	}
+	
 	@Override
 	public void setUploadTableVisible(boolean visibile) {
 		this.uploadTable.setVisible(visibile);
@@ -134,5 +197,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void addUploadTableModal(IsWidget uploadTableModalWidget) {
 		this.uploadTableModalPanel.add(uploadTableModalWidget);
 	}
+	
+	@Override
+	public void addWizard(IsWidget wizard) {
+		fileViewWizardContainer.clear();
+		fileViewWizardContainer.add(wizard);
+	}
+	
 
 }

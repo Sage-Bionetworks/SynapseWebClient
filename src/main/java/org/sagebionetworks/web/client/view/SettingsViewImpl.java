@@ -5,14 +5,12 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -21,6 +19,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -68,10 +68,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	TextBox newEmailField;
 	@UiField
-	Span newEmailError;
-	@UiField
-	Div newEmailAlert;
-	@UiField
 	Button addEmailButton;
 
 	
@@ -92,14 +88,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel passwordSynAlertPanel;
 	@UiField
 	Button changePasswordBtn;
-	
-	@UiField
-	Span storageUsageSpan;
+
 	@UiField
 	TextBox apiKeyContainer;
 	
-	@UiField
-	HTMLPanel notificationsPanel;
 	@UiField
 	CheckBox emailNotificationsCheckbox;
 	@UiField
@@ -113,7 +105,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel notificationSynAlertPanel;
 	@UiField
 	SimplePanel apiSynAlertPanel;
-	
+	@UiField
+	Div subscriptionsContainer;
+	@UiField
+	Div passwordStrengthContainer;
+
 	private Presenter presenter;
 	
 	@Inject
@@ -155,8 +151,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		});
 		forgotPasswordContainer.addStyleName("inline-block");
 		forgotPasswordContainer.add(forgotPasswordLink);
-		emailSettingsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Address");
-		notificationsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Settings");
+		emailSettingsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email");
 		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
@@ -172,10 +167,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		addEmailButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (checkEmailFormat()) {
-					addEmailButton.setEnabled(false);
-					presenter.addEmail(newEmailField.getValue());
-				}
+				presenter.addEmail(newEmailField.getValue());
 			}
 		});
 		editProfileButton.addClickHandler(new ClickHandler() {
@@ -189,6 +181,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			@Override
 			public void onClick(ClickEvent event) {
 				apiKeyContainer.selectAll();
+			}
+		});
+		password1Field.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				presenter.passwordChanged(password1Field.getText());
 			}
 		});
 	}
@@ -224,20 +222,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void showLoading() {
 	}
 
-	@Override
-	public void clearStorageUsageUI() {
-		storageUsageSpan.setText(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
-	}
-	
-	@Override
-	public void updateStorageUsage(Long grandTotal) {
-		if (grandTotal == null){
-			clearStorageUsageUI();
-		}
-		else {
-			storageUsageSpan.setText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
-		}
-	}
 	
 	public void showNotificationEmailAddress(String primaryEmail) {
 		emailsPanel.clear();
@@ -323,25 +307,16 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void clear() {
+		hideAPIKey();
 		resetChangePasswordUI();
-		storageUsageSpan.setText("");
 		resetAddEmailUI();
-	}
-	
-	@Override
-	public void showEmailChangeFailed(String error) {
-		addEmailButton.setEnabled(true);
-		DisplayUtils.show(newEmailError);
-		newEmailError.setTitle(error);
 	}
 	
 	private void resetAddEmailUI() {
 		emailsPanel.clear();
 		newEmailField.setValue("");
-		DisplayUtils.hide(newEmailError);
 		addEmailButton.setEnabled(true);
 		DisplayUtils.hide(changeEmailUI);
-		DisplayUtils.hide(newEmailAlert);
 	}
 	
 	@Override
@@ -354,24 +329,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		setPassword1InError(false);
 		setPassword2InError(false);
 	}
-
-	private boolean checkEmailFormat(){
-		DisplayUtils.hide(newEmailError);
-		if (ValidationUtils.isValidEmail(newEmailField.getValue())) {
-			return true;
-		}
-		else {
-			DisplayUtils.show(newEmailError);
-			newEmailError.setTitle(WebConstants.INVALID_EMAIL_MESSAGE);
-			return false;
-		}
-	}
 	
 	@Override
 	public void showEmailChangeSuccess(String message) {
 		DisplayUtils.hide(changeEmailUI);
-		DisplayUtils.show(newEmailAlert);
-		newEmailAlert.setTitle(message);
+		DisplayUtils.showInfoDialog("", message, null);
 	}
 
 	@Override
@@ -401,6 +363,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void hideAPIKey() {
+		apiKeyContainer.setText("");
 		apiKeyUI.setVisible(false);
 		changeApiKey.setVisible(false);
 		showApiKey.setVisible(true);
@@ -416,9 +379,24 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changePasswordBtn.setEnabled(isEnabled);
 	}
 
-
 	@Override
 	public void setPasswordSynAlertWidget(IsWidget synAlert) {
 		passwordSynAlertPanel.setWidget(synAlert);
+	}
+	@Override
+	public void setSubscriptionsListWidget(Widget w) {
+		subscriptionsContainer.clear();
+		subscriptionsContainer.add(w);
+	}
+	
+	@Override
+	public void setSubscriptionsVisible(boolean visible) {
+		subscriptionsContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void setPasswordStrengthWidget(Widget w) {
+		passwordStrengthContainer.clear();
+		passwordStrengthContainer.add(w);
 	}
 }

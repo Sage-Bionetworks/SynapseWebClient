@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -17,10 +19,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -71,7 +74,9 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@UiField
 	DivElement password2Error;
 	
-
+	@UiField
+	Div passwordStrengthContainer;
+	
 	@UiField
 	Button registerBtn;
 	
@@ -114,7 +119,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			public void onClick(ClickEvent event) {
 				if(checkUsernameFormat() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
 					// formatting is ok. submit to presenter (will fail if one is taken)
-					registerBtn.setEnabled(false);
 					presenter.completeRegistration(userNameField.getValue(), firstNameField.getValue(), lastNameField.getValue(), password1Field.getValue());
 				}
 			}
@@ -131,6 +135,12 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			@Override
 			public void onBlur(BlurEvent event) {
 				checkPassword1();
+			}
+		});
+		password1Field.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				presenter.passwordChanged(password1Field.getText());
 			}
 		});
 		
@@ -169,8 +179,16 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	
 	@Override
 	public void showErrorMessage(String errorMessage) {
-		registerBtn.setEnabled(true);
 		DisplayUtils.showErrorMessage(errorMessage);
+	}
+	
+	@Override
+	public void setLoading(boolean loading) {
+		if(!loading){
+			this.registerBtn.state().reset();
+		}else{
+			this.registerBtn.state().loading();
+		}
 	}
 	
 	@Override
@@ -202,6 +220,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	}
 
 	private boolean checkPassword1() {
+		presenter.passwordChanged(password1Field.getText());
 		DisplayUtils.hideFormError(password1, password1Error);
 		if (!DisplayUtils.isDefined(password1Field.getText())){
 			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
@@ -234,5 +253,11 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@Override
 	public void setEmail(String email) {
 		emailField.setValue(email);
+	}
+	
+	@Override
+	public void setPasswordStrengthWidget(Widget w) {
+		passwordStrengthContainer.clear();
+		passwordStrengthContainer.add(w);
 	}
 }

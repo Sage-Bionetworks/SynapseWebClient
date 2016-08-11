@@ -91,10 +91,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	Widget widget;
 
-	public interface OwnerObjectNameCallback{
-		public void ownerObjectNameInitialized();
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -136,6 +132,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void setWikiHeadingText(String title) {
 		wikiHeading.setText(title);
+	}
+	
+	@Override
+	public void scrollWikiHeadingIntoView() {
+		wikiHeading.getElement().scrollIntoView();
 	}
 	
 	@Override

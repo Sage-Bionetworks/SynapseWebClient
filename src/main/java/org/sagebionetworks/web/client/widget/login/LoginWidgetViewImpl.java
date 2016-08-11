@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
@@ -53,7 +54,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
 		final FormPanel form = new FormPanel();
-		form.setAction("/expect_404");
+		form.setAction("/expect_405");
 		signInBtn = new SubmitButton();
 		signInBtn.addStyleName("btn btn-large btn-primary");
 		signInBtn.setText(DisplayConstants.SIGN_IN);
@@ -131,12 +132,13 @@ public class LoginWidgetViewImpl extends Composite implements
 
 	@Override
 	public void showError(String message) {
-		DisplayUtils.showErrorMessage(message);
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+SafeHtmlUtils.htmlEscapeAllowEntities(message)+"</h4>");
+		clear();
 	}
 
 	@Override
 	public void showAuthenticationFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">If you are confident that the credentials filled in are correct, please report this issue to synapseInfo@sagebase.org</span>");
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">Please try again.</span>");
 		clear();
 	}
 
@@ -147,9 +149,13 @@ public class LoginWidgetViewImpl extends Composite implements
 	}
 
 	@Override
+	public void clearUsername() {
+		username.setValue("");	
+	}
+	
+	@Override
 	public void clear() {		
 		password.setValue("");
-		username.setValue("");
 		signInBtn.setEnabled(true);
 		signInBtn.setText(DisplayConstants.SIGN_IN);
 	}

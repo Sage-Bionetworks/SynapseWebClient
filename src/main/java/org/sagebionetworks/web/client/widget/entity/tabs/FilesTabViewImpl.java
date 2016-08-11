@@ -47,6 +47,8 @@ public class FilesTabViewImpl implements FilesTabView {
 	SimplePanel fileActionMenuContainer;
 	@UiField
 	SimplePanel synapseAlertContainer;
+	@UiField
+	SimplePanel refreshAlertContainer;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
 	private Presenter presenter;
@@ -69,7 +71,6 @@ public class FilesTabViewImpl implements FilesTabView {
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
 		filePreviewContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Preview");
-		fileProvenanceContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Provenance");
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
 		this.rLoadWidget = rLoadWidget;
@@ -197,4 +198,8 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
 		fileModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);
 	}
+	@Override
+	public void setRefreshAlert(Widget w) {
+		refreshAlertContainer.setWidget(w);
+	};
 }

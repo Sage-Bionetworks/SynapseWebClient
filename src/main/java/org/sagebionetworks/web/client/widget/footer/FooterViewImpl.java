@@ -4,10 +4,13 @@ import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -16,7 +19,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,11 +38,12 @@ public class FooterViewImpl extends Composite implements FooterView {
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
-	
+	private GlobalApplicationState globalAppState;
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies) {
+	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.cookies = cookies;
+		this.globalAppState = globalAppState;
 		initDebugModeLink();		
 		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
 	}
@@ -51,22 +54,21 @@ public class FooterViewImpl extends Composite implements FooterView {
 			public void onClick(ClickEvent event) {
 				if (!DisplayUtils.isInTestWebsite(cookies)) {
 					//verify
-					DisplayUtils.showConfirmDialog(
-							"Alpha Test Mode", 
-							DisplayConstants.TEST_MODE_WARNING, 
-							new Callback() {
-								@Override
-								public void invoke() {
-									//switch to pre-release test website mode
-									DisplayUtils.setTestWebsite(true, cookies);
-									Window.scrollTo(0, 0);
-									Window.Location.reload();
-								}
-							});
+					Bootbox.confirm(DisplayConstants.TEST_MODE_WARNING, new ConfirmCallback() {
+						@Override
+						public void callback(boolean isConfirmed) {
+							if (isConfirmed) {
+								//switch to pre-release test website mode
+								DisplayUtils.setTestWebsite(true, cookies);
+								Window.scrollTo(0, 0);
+								globalAppState.refreshPage();
+							}
+						}
+					});
 				} else {
 					//switch back to standard mode
 					DisplayUtils.setTestWebsite(false, cookies);
-					Window.Location.reload();
+					globalAppState.refreshPage();
 				}
 				
 			}

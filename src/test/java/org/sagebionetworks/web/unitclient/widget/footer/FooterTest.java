@@ -35,4 +35,12 @@ public class FooterTest {
 		footer.asWidget();
 		verify(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
 	}
+	
+	@Test
+	public void testAsWidgetNullVersion(){
+		VersionState versionState = new VersionState(null, false);
+		AsyncMockStubber.callSuccessWith(versionState).when(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
+		footer.asWidget();
+		verify(mockView).setVersion(Footer.UNKNOWN, Footer.UNKNOWN);
+	}
 }

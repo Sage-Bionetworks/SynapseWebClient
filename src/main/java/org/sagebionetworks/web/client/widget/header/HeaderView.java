@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface HeaderView extends IsWidget {
 	/**
@@ -16,6 +17,7 @@ public interface HeaderView extends IsWidget {
 	public void setPresenter(Presenter presenter);
 	public void setMenuItemActive(MenuItems menuItem);
 	public void removeMenuItemActive(MenuItems menuItem);
+	void setStuAnnouncementWidget(Widget w);
 	public void refresh();
 	/**
 	 * Sets the search box to visible or not
@@ -46,5 +48,7 @@ public interface HeaderView extends IsWidget {
 	void setProjectFavoriteWidget(IsWidget favWidget);
 	void showProjectFavoriteWidget();
 	void hideProjectFavoriteWidget();
+	void setStagingAlertVisible(boolean visible);
+	void openNewWindow(String url);
 	void clear();
 }

@@ -10,6 +10,7 @@
 				<b:FormGroup>
 					<b:FormLabel for="query">Query</b:FormLabel>
 					<b:TextBox ui:field="queryField" name="query" b:id="query" />
+					<b:Button ui:field="autoAddColumns" icon="REFRESH" addStyleNames="margin-top-10" text="Refresh Columns" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:CheckBox ui:field="isPagingField" text="Support pagination"/>
@@ -19,11 +20,7 @@
 				</b:FormGroup>
 			</b:FieldSet>
 		</bh:Div>
-		<b:Panel>
-			<b:PanelBody>
-				<g:SimplePanel ui:field="columnManagerContainer"/>
-			</b:PanelBody>
-		</b:Panel>
+		<g:SimplePanel ui:field="columnManagerContainer"/>
 	</bh:Div>
 	
 </ui:UiBinder>

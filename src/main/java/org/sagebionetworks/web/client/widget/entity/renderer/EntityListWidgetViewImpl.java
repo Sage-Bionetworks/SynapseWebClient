@@ -25,9 +25,9 @@ public class EntityListWidgetViewImpl extends FlowPanel implements EntityListWid
 	}
 	
 	@Override
-	public void configure() {
-		this.clear();		
-		renderer = new EntityListRenderer(iconsImageBundle, synapseJSNIUtils, ginInjector, false);
+	public void configure(boolean showDescription) {
+		this.clear();
+		renderer = new EntityListRenderer(iconsImageBundle, synapseJSNIUtils, ginInjector, false, showDescription);
 		this.add(renderer);
 	}	
 	

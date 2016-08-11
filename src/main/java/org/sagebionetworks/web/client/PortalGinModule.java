@@ -9,6 +9,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.ClientCacheImpl;
+import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cache.SessionStorageImpl;
 import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -19,12 +21,16 @@ import org.sagebionetworks.web.client.factory.RendererFactory;
 import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
 import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
+import org.sagebionetworks.web.client.view.ACTView;
+import org.sagebionetworks.web.client.view.ACTViewImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
@@ -69,6 +75,10 @@ import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
+import org.sagebionetworks.web.client.view.SubscriptionView;
+import org.sagebionetworks.web.client.view.SubscriptionViewImpl;
+import org.sagebionetworks.web.client.view.SynapseForumView;
+import org.sagebionetworks.web.client.view.SynapseForumViewImpl;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiViewImpl;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
@@ -85,6 +95,10 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -105,10 +119,28 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
+import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -131,12 +163,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListView;
-import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EvaluationListView;
-import org.sagebionetworks.web.client.widget.entity.EvaluationListViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
@@ -176,6 +202,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
+import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
@@ -194,6 +222,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
@@ -216,6 +245,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDial
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlertViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
@@ -232,6 +263,8 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetV
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
@@ -242,8 +275,12 @@ import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.ExternalImageConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.ExternalImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
@@ -266,6 +303,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiView;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorView;
+import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
@@ -288,10 +327,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsView;
-import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeView;
+import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
@@ -308,8 +347,12 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
@@ -326,10 +369,12 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEd
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
@@ -338,18 +383,32 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabsView;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabsViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
+import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
+import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidgetView;
+import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.login.ZxcvbnWrapper;
+import org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
@@ -372,6 +431,8 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
+import org.sagebionetworks.web.client.widget.refresh.RefreshAlertViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
@@ -388,6 +449,14 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
+import org.sagebionetworks.web.client.widget.subscription.TopicWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
 import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -406,6 +475,12 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePa
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1ViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
@@ -440,6 +515,8 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormView;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowFormViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
@@ -454,6 +531,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -474,6 +553,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
@@ -488,6 +569,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
@@ -530,6 +613,8 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.upload.FileHandleListView;
+import org.sagebionetworks.web.client.widget.upload.FileHandleListViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -586,6 +671,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntitySchemaCacheImpl
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
 		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
+		
+		// cache place presenters
+		bind(ProfilePresenter.class).in(Singleton.class);
+		bind(EntityPresenter.class).in(Singleton.class);
 		
 		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		
@@ -851,6 +940,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
 
 		// MyEntitiesBrowser
+		bind(MyEntitiesBrowser.class).in(Singleton.class);
 		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
 		// Wiki Attachments		
@@ -860,9 +950,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//Evaluation selector
 		bind(EvaluationListView.class).to(EvaluationListViewImpl.class);
-		
-		//Single Evaluation link selection
-		bind(EvaluationLinksListView.class).to(EvaluationLinksListViewImpl.class);
 		
 		//Administer Evaluations list 
 		bind(AdministerEvaluationsListView.class).to(AdministerEvaluationsListViewImpl.class);
@@ -882,6 +969,7 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// API Table Column manager	
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
+		bind(APITableColumnConfigView.class).to(APITableColumnConfigViewImpl.class);
 
 		//single subpages view
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
@@ -908,6 +996,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(IFrameConfigView.class).to(IFrameConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
+		bind(ExternalImageConfigView.class).to(ExternalImageConfigViewImpl.class);
 		bind(AttachmentConfigViewImpl.class).in(Singleton.class);
 		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
@@ -924,7 +1013,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
 		bind(ReferenceWidgetView.class).to(ReferenceWidgetViewImpl.class);
-		bind(YouTubeWidgetView.class).to(YouTubeWidgetViewImpl.class);
 		bind(EntityListWidgetView.class).to(EntityListWidgetViewImpl.class);
 		bind(ShinySiteWidgetView.class).to(ShinySiteWidgetViewImpl.class);		
 		bind(ImageWidgetView.class).to(ImageWidgetViewImpl.class);
@@ -1121,7 +1209,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
 		
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
-		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
+		bind(UserListView.class).to(UserListViewImpl.class);
 		
 		bind(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
@@ -1160,6 +1248,57 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FilesTabView.class).to(FilesTabViewImpl.class);
 		bind(TablesTabView.class).to(TablesTabViewImpl.class);
 		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
+		bind(DiscussionTabView.class).to(DiscussionTabViewImpl.class);
+		bind(DockerTabView.class).to(DockerTabViewImpl.class);
 		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
+		bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
+		bind(ACTView.class).to(ACTViewImpl.class);
+		bind(CytoscapeConfigView.class).to(CytoscapeConfigViewImpl.class);
+		bind(CytoscapeView.class).to(CytoscapeViewImpl.class);
+
+		// discussion
+		bind(DiscussionThreadModalView.class).to(DiscussionThreadModalViewImpl.class);
+		bind(ReplyModalView.class).to(ReplyModalViewImpl.class);
+		bind(DiscussionThreadListWidgetView.class).to(DiscussionThreadListWidgetViewImpl.class);
+		bind(DiscussionThreadListItemWidgetView.class).to(DiscussionThreadListItemWidgetViewImpl.class);
+		bind(SingleDiscussionThreadWidgetView.class).to(SingleDiscussionThreadWidgetViewImpl.class);
+		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
+		bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
+
+		// docker
+		bind(DockerRepoListWidgetView.class).to(DockerRepoListWidgetViewImpl.class);
+		bind(DockerRepoWidgetView.class).to(DockerRepoWidgetViewImpl.class);
+		bind(AddExternalRepoModalView.class).to(AddExternalRepoModalViewImpl.class);
+		
+		bind(SessionStorage.class).to(SessionStorageImpl.class);
+		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
+		bind(WikiMarkdownEditorView.class).to(WikiMarkdownEditorViewImpl.class);
+		bind(StuAlertView.class).to(StuAlertViewImpl.class);
+		
+		bind(SynapseTableFormWidgetView.class).to(SynapseTableFormWidgetViewImpl.class);
+		bind(RowFormView.class).to(RowFormViewImpl.class);
+		bind(RadioCellEditorView.class).to(RadioCellEditorViewImpl.class);
+		bind(BooleanFormCellEditor.class).to(BooleanFormCellEditorImpl.class);
+		bind(EnumFormCellEditor.class).to(EnumFormCellEditorImpl.class);
+		
+		bind(MarkdownIt.class).to(MarkdownItImpl.class);
+		bind(SubscriptionView.class).to(SubscriptionViewImpl.class);
+		bind(TopicWidgetView.class).to(TopicWidgetViewImpl.class);
+		bind(SubscribeButtonWidgetView.class).to(SubscribeButtonWidgetViewImpl.class);
+		bind(SubscriptionListWidgetView.class).to(SubscriptionListWidgetViewImpl.class);
+		bind(TopicRowWidgetView.class).to(TopicRowWidgetViewImpl.class);
+		bind(RefreshAlertView.class).to(RefreshAlertViewImpl.class);
+		bind(PasswordStrengthWidgetView.class).to(PasswordStrengthWidgetViewImpl.class);
+		bind(ZxcvbnWrapper.class).to(ZxcvbnWrapperImpl.class);
+		
+		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
+		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
+		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
+		bind(StuAnnouncementWidgetView.class).to(StuAnnouncementWidgetViewImpl.class);
+		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
+		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
+		
+		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
+		bind(LoadMoreWidgetContainerView.class).to(LoadMoreWidgetContainerViewImpl.class);
 	}
 }

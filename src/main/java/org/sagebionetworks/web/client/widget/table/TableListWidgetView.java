@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -26,6 +27,12 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 */
 		void onAddTable();
 
+		
+		/**
+		 * Add file view button pushed
+		 */
+		void onAddFileView();
+		
 		/**
 		 * Upload table button pushed.
 		 */
@@ -34,6 +41,13 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 * Report when a table is clicked
 		 */
 		void onTableClicked(String entityId);
+		
+		/**
+		 * called on sort
+		 * @param sortColumnName
+		 * @param sortDirection
+		 */
+		void onSort(String sortColumnName, SortDirection sortDirection);
 	}
 
 	/**
@@ -47,6 +61,13 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * @param enabled
 	 */
 	public void setAddTableVisible(boolean enabled);
+	
+	/**
+	 * Show/hide the add file view button.
+	 * @param visible
+	 */
+	public void setAddFileViewVisible(boolean visible);
+	
 	
 	/**
 	 * Show or hide the upload tables button.
@@ -79,6 +100,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void addUploadTableModal(IsWidget uploadTableModalWidget);
 
-	
+	public void addWizard(IsWidget wizard);
+	void resetSortUI();
 	
 }

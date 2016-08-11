@@ -26,7 +26,9 @@ public class WebConstants {
 	
 	public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
-	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
+	public static final String DOCS_BASE_URL = "http://docs.synapse.org/";
+	public static final String DOCS_URL = DOCS_BASE_URL + "articles/";
+	public static final String PROVENANCE_API_URL = DOCS_URL + "provenance.html";
 	
 	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 	
@@ -97,6 +99,7 @@ public class WebConstants {
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
 
 	public static final String PROXY_PARAM_KEY = "proxy";
+	public static final String XSRF_TOKEN_KEY = "xsrfToken";
 	
 	public static final String REDIRECT_URL_KEY = "redirect";
 
@@ -104,6 +107,12 @@ public class WebConstants {
 
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 
+	/** FileHandleAssociation servlet params **/
+	public static final String ASSOCIATED_OBJECT_ID_PARAM_KEY = "associatedObjectId";
+	public static final String ASSOCIATED_OBJECT_TYPE_PARAM_KEY = "associatedObjectType";
+	public static final String FILE_HANDLE_ID_PARAM_KEY = "fileHandleId";
+	/** END FileHandleAssociation servlet params **/
+	
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	
 	public static final String TEAM_PARAM_KEY = "teamId";
@@ -164,6 +173,8 @@ public class WebConstants {
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
 	
+	public static final String FORUM_SYNAPSE_ID_PROPERTY ="org.sagebionetworks.portal.forum_project_id";
+	
 	//Workshop
 	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.collaboratorium_synapse_id";
 	public static final String STAGE_I_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageI_synapse_id";
@@ -177,6 +188,7 @@ public class WebConstants {
 	public static final String STAGE_IX_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIX_synapse_id";
 	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
 	
+	public static final String FILE_HANDLE_ASSOCIATION_SERVLET = "filehandleassociation";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
@@ -216,6 +228,8 @@ public class WebConstants {
 	public static final String STAGE_X = "StageX";
 	
 	public static final String CERTIFICATION = "Certification";
+	public static final String VALIDATION = "Validation";
+	public static final String FORUM = "Forum";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
@@ -231,6 +245,7 @@ public class WebConstants {
 	
 	//ClientCache key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
+	public static final String USERNAME_SUFFIX = "_USERNAME_2_ID";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
 
 	public static final String TABLE_COLUMN_ID = "columnId";
@@ -265,5 +280,15 @@ public class WebConstants {
 	
 	public static final String OAUTH2_PROVIDER = "oauth2provider";
 	public static final String OAUTH2_CODE = "code";
-	
+
+	// discussion message
+	public static final String DISCUSSION_MESSAGE_SERVLET = "/discussion/messageUrl";
+	public static final String MESSAGE_KEY_PARAM = "messageKey";
+	public static final String TYPE_PARAM = "type";
+	public static final String THREAD_TYPE = "thread";
+	public static final String REPLY_TYPE = "reply";
+
+	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
+
+	public static final String CONTENT_TYPE = "Content-Type";
 }

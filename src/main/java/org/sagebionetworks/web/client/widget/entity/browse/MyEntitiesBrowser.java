@@ -1,17 +1,22 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -21,9 +26,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +45,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private SynapseClientAsync synapseClient;
 	private SelectedHandler selectedHandler;
 	AdapterFactory adapterFactory;
+	private Place cachedPlace;
+	private String cachedUserId;
 	
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
@@ -67,7 +76,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	}	
 
 	public void clearState() {
-		view.clear();
+		if (isSameContext()) {
+			view.clearSelection();
+		} else {
+			view.clear();
+		}
 	}
 
 	@Override
@@ -78,8 +91,36 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	}
 	
 	public void refresh() {
-		loadUserUpdateable();
-		loadFavorites();
+		//do not reload if the session is unchanged, and the context (project) is unchanged.
+		if (!isSameContext()) {
+			loadCurrentContext();
+			loadUserUpdateable();
+			loadFavorites();
+			updateContext();
+		}
+	}
+
+	public boolean isSameContext() {
+		if (globalApplicationState.getCurrentPlace() == null || authenticationController.getCurrentUserPrincipalId() == null) {
+			return false;
+		}
+		return globalApplicationState.getCurrentPlace().equals(cachedPlace) && authenticationController.getCurrentUserPrincipalId().equals(cachedUserId);
+	}
+	public void updateContext() {
+		cachedPlace = globalApplicationState.getCurrentPlace();
+		cachedUserId = authenticationController.getCurrentUserPrincipalId();
+	}
+	
+	public void clearCurrentContent() {
+		cachedPlace = null;
+		cachedUserId = null;
+	}
+	
+	public Place getCachedCurrentPlace() {
+		return cachedPlace;
+	}
+	public String getCachedUserId() {
+		return cachedUserId;
 	}
 	
 	/**
@@ -95,9 +136,37 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		selectedHandler.onSelection(selectedEntityId);
 	}
 
+	public void loadCurrentContext() {
+		view.getCurrentContextTreeBrowser().clear();
+		//get the entity path, and ask for each entity to add to the tree
+		Place currentPlace = globalApplicationState.getCurrentPlace();
+		boolean isSynapsePlace = currentPlace instanceof Synapse;
+		view.setCurrentContextTabVisible(isSynapsePlace);
+		if (isSynapsePlace) {
+			String entityId = ((Synapse) currentPlace).getEntityId();
+			int mask = ENTITY_PATH;
+			synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+				
+				public void onSuccess(EntityBundle result) {
+					EntityPath path = result.getPath();
+					List<EntityHeader> pathHeaders = path.getPath();
+					//remove the high level root, so that the first item in the list is the Project
+					List<EntityHeader> projectHeader = new ArrayList<EntityHeader>();
+					if (pathHeaders.size() > 1) {
+						projectHeader.add(pathHeaders.get(1));		
+					}
+					//add to the current context tree, and show all children of this container (or siblings if leaf)
+					view.getCurrentContextTreeBrowser().configure(projectHeader);
+				};
+			});
+		}
+	}
 	@Override
 	public void loadUserUpdateable() {
-		view.showLoading();
 		view.getEntityTreeBrowser().clear();
 		if (authenticationController.isLoggedIn()) {
 			synapseClient.executeEntityQuery(createMyProjectQuery(), new AsyncCallback<EntityQueryResults>() {
@@ -106,7 +175,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
 					for (EntityQueryResult result : results.getEntities()) {
 						EntityHeader h = new EntityHeader();
-						h.setType(EntityType.project.name());
+						h.setType(Project.class.getName());
 						h.setId(result.getId());
 						h.setName(result.getName());
 						headers.add(h);
@@ -159,6 +228,18 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
+	}
+	
+	public void setEntityFilter(EntityFilter filter) {
+		getEntityTreeBrowser().setEntityFilter(filter);
+		getFavoritesTreeBrowser().setEntityFilter(filter);
+		view.getCurrentContextTreeBrowser().setEntityFilter(filter);
+		clearCurrentContent();
+		refresh();
+	}
+	
+	public EntityFilter getEntityFilter() {
+		return getEntityTreeBrowser().getEntityFilter();
 	}
 
 	

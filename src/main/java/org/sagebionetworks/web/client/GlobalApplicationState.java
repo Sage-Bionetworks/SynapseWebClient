@@ -103,6 +103,8 @@ public interface GlobalApplicationState {
 	String getSynapseProperty(String key);
 	
 	void clearLastPlace();
+	void clearCurrentPlace();
+	
 	
 	public boolean isWikiBasedEntity(String entityId);
 
@@ -117,4 +119,11 @@ public interface GlobalApplicationState {
 	 * This method initializes the handler for on pop state event.
 	 */
 	public void initOnPopStateHandler();
+	
+	public void refreshPage();
+	
+	public void recordPlaceVisit(Place targetPlace);
+
+	void replaceCurrentPlace(Place targetPlace);
+
 }

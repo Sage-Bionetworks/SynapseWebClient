@@ -5,7 +5,7 @@
 
 	<g:HTMLPanel>
 		<b:Modal ui:field="editModal" title="Annotations" closable="true"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="editAnnotationsModal">
+			dataBackdrop="STATIC" dataKeyboard="false" b:id="editAnnotationsModal">
 			<b:ModalBody>
 				<t:Table width="80%">
 					<t:TableRow>
@@ -22,7 +22,7 @@
 				</t:Table>
 				<g:FlowPanel ui:field="editorsPanel"/>
 				<b:Button ui:field="addAnnotationButton" icon="PLUS" type="INFO">Add Annotation</b:Button>
-				<b:Alert type="DANGER" ui:field="alert" visible="false" title="Error"/>
+				<b:Alert type="DANGER" ui:field="alert" visible="false" title="Error" addStyleNames="margin-top-10"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="saveButton" type="PRIMARY"
