@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownload
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -67,7 +68,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		view.setPresenter(this);
 		this.entityBundle = bundle;
 		licensedDownloader.configure(entityBundle);
-		
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		view.setClientsHelpVisible(false);
 		if (directDownloadUrl != null) {
@@ -93,7 +93,9 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		view.setFileClientsHelp(clientsHelp.asWidget());
 		clientsHelp.configure(entityBundle.getEntity().getId());
 	}
-	
+	public void setClientsHelpVisible(boolean visible) {
+		view.setClientsHelpVisible(visible);
+	}
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -107,12 +109,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
 	}
-	
-	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
-		String dataFileHandleId = fileEntity.getDataFileHandleId();
-		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
-	}
-
 	
 	public void queryForSftpLoginInstructions(String url) {
 		synapseClient.getHost(url, new AsyncCallback<String>() {
@@ -136,5 +132,9 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	@Override
 	public void onAuthorizedDirectDownloadClicked() {
 		loginModalWidget.showModal();
+	}
+	
+	public void setSize(ButtonSize size) {
+		view.setButtonSize(size);
 	}
 }

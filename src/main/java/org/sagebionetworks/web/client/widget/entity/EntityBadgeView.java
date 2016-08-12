@@ -31,7 +31,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void setModifiedByWidget(Widget w);
 	void setModifiedByWidgetVisible(boolean visible);
 	void setIcon(IconType iconType);
-	
+	void setFileDownloadButton(Widget w);
 	void setAnnotations(String html);
 	void setSize(String s);
 	void setMd5(String s);

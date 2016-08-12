@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,6 +29,12 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	Span clientsHelpContainer;
 	@UiField
 	Span synAlertContainer;
+	@UiField
+	ButtonElement directDownloadButton;
+	@UiField
+	ButtonElement authorizedDownloadButton;
+	@UiField
+	ButtonElement licensedDownloadButton;
 	
 	interface FileDownloadButtonViewImplUiBinder extends UiBinder<Widget, FileDownloadButtonViewImpl> {}
 
@@ -103,5 +112,22 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		clientsHelpContainer.clear();
 		clientsHelpContainer.add(w);
 	}
-
+	
+	private void removeButtonSizeStyles(ButtonElement el) {
+		for (ButtonSize size : ButtonSize.values()) {
+			String cssName = size.getCssName();
+			if (DisplayUtils.isDefined(cssName))
+				el.removeClassName(cssName);
+		}
+	}
+	
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		removeButtonSizeStyles(directDownloadButton);
+		removeButtonSizeStyles(authorizedDownloadButton);
+		removeButtonSizeStyles(licensedDownloadButton);
+		directDownloadButton.addClassName(size.getCssName());
+		authorizedDownloadButton.addClassName(size.getCssName());
+		licensedDownloadButton.addClassName(size.getCssName());
+	}
 }

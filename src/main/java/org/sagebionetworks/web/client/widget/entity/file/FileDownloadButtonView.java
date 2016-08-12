@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface FileDownloadButtonView extends IsWidget {
 
@@ -16,6 +16,7 @@ public interface FileDownloadButtonView extends IsWidget {
 	void setDirectDownloadLinkVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void setFileClientsHelp(IsWidget w);
+	void setButtonSize(ButtonSize size);
 	/**
 	 * Presenter interface
 	 */

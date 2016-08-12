@@ -10,15 +10,17 @@
 
 	<bh:Span>
  		<b:Anchor ui:field="directDownloadLink">
-			<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
+			<button class="btn btn-primary btn-lg" ui:field="directDownloadButton"><i class="fa fa-download margin-right-5" />Download</button>
 		</b:Anchor>
 		<b:Anchor ui:field="authorizedDirectDownloadLink">
-			<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
+			<button class="btn btn-primary btn-lg" ui:field="authorizedDownloadButton"><i class="fa fa-download margin-right-5" />Download</button>
 		</b:Anchor>
 		<b:Anchor ui:field="licensedDownloadLink">
-			<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
+			<button class="btn btn-primary btn-lg" ui:field="licensedDownloadButton"><i class="fa fa-download margin-right-5" />Download</button>
 		</b:Anchor>
-  		<bh:Span ui:field="clientsHelpContainer"/>
+		<bh:Span ui:field="clientsHelpButtonSize">
+  			<bh:Span ui:field="clientsHelpContainer"/>
+  		</bh:Span>
   		<bh:Span ui:field="synAlertContainer"/>
 	</bh:Span>
 </ui:UiBinder>
