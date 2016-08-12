@@ -3,7 +3,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<bh:Div>
+	<bh:Span>
 		<b:Anchor dataToggle="MODAL" dataTarget="#clientHelpModal" text="other download options" addStyleNames="font-italic"/>
 		<b:Modal closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="clientHelpModal">
 			<b:ModalHeader>
@@ -73,5 +73,5 @@
 			    <b:Button type="PRIMARY" text="OK" dataDismiss="MODAL"/>
 			</b:ModalFooter>
 		</b:Modal>
-	</bh:Div>
+	</bh:Span>
 </ui:UiBinder>

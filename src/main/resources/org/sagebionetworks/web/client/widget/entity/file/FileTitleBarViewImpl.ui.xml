@@ -14,27 +14,7 @@
 			 	<b:Heading size="H2" addStyleNames="displayInline"><b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/></b:Heading>
 			 	<b:Heading size="H2" ui:field="entityName" addStyleNames="displayInline"/>
 			 	<b:Heading size="H2" addStyleNames="displayInline margin-right-10"><g:SimplePanel ui:field="favoritePanel"/></b:Heading>
-			 	
-			 	<t:Table addStyleNames="displayInline">
-			    	<t:TableRow>
-			        	<t:TableData paddingRight="2">
-							<b:Anchor ui:field="directDownloadLink">
-								<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
-							</b:Anchor>
-							<b:Anchor ui:field="authorizedDirectDownloadLink">
-								<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
-							</b:Anchor>
-							<b:Anchor ui:field="licensedDownloadLink">
-								<button class="btn btn-primary btn-lg"><i class="fa fa-download margin-right-5" />Download</button>
-							</b:Anchor>
-			            </t:TableData>
-			        </t:TableRow>
-			        <t:TableRow>
-			        	<t:TableData paddingRight="2">
-			    			<bh:Div ui:field="clientsHelpContainer"/>        	
-			            </t:TableData>
-			        </t:TableRow>
-				</t:Table>
+			 	<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
 			</div>
 			<g:HTMLPanel ui:field="fileNameContainer">
 				<span class="boldText">Download file as:</span>

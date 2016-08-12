@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -11,28 +9,18 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
-import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
@@ -42,11 +30,8 @@ import com.google.inject.Inject;
 public class FileTitleBarViewImpl extends Composite implements FileTitleBarView {
 
 	private Presenter presenter;
-	private LicensedDownloader licensedDownloader;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
-	private GlobalApplicationState globalAppState;
-	private LoginModalWidget loginModalWidget;
 	
 	@UiField
 	HTMLPanel panel;
@@ -54,14 +39,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	HTMLPanel fileFoundContainer;
 	@UiField
 	HTMLPanel fileNameContainer;
-	@UiField
-	Anchor licensedDownloadLink;
-	@UiField
-	Anchor directDownloadLink;
-	@UiField
-	Anchor authorizedDirectDownloadLink;
-	@UiField
-	Div clientsHelpContainer;
 	
 	@UiField
 	SimplePanel md5LinkContainer;
@@ -81,6 +58,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	SpanElement externalUrl;
 	@UiField
 	Heading entityName;
+	@UiField
+	Span fileDownloadButtonContainer;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -90,44 +69,16 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
-			LicensedDownloader licensedDownloaderHandler,
 			FavoriteWidget favoriteWidget,
-			GlobalApplicationState globalAppState,
-			Md5Link md5Link,
-			LoginModalWidget loginRequiredModalWidget) {
-		this.licensedDownloader = licensedDownloaderHandler;
+			Md5Link md5Link) {
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
-		this.globalAppState = globalAppState;
-		this.loginModalWidget = loginRequiredModalWidget;
+		
 		initWidget(uiBinder.createAndBindUi(this));
 		md5LinkContainer.addStyleName("inline-block margin-left-5");
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
-		loginRequiredModalWidget.setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
-		licensedDownloadLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				//if there is an href, ignore it
-				event.preventDefault();
-				licensedDownloader.onDownloadButtonClicked();
-			}
-		});
-		
-		ClickHandler authorizedDirectDownloadClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				loginModalWidget.showModal();
-			}
-		};
-		authorizedDirectDownloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
-	}
-	
-	private void hideAll() {
-		licensedDownloadLink.setVisible(false);
-		directDownloadLink.setVisible(false);
-		authorizedDirectDownloadLink.setVisible(false);
 	}
 	
 	@Override
@@ -135,13 +86,9 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController) {
-		
-		hideAll();
 		Entity entity = entityBundle.getEntity();
 
 		favoriteWidget.configure(entity.getId());
-		
-		licensedDownloader.configure(entityBundle);
 		
 		md5Link.clear();
 		md5LinkContainer.clear();
@@ -153,6 +100,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;
 		fileNameContainer.setVisible(isFilenamePanelVisible);
+		entityName.setText(entity.getName());
 		if (isFilenamePanelVisible) {
 			fileName.setInnerText(entityBundle.getFileName());
 			//don't ask for the size if it's external, just display that this is external data
@@ -184,38 +132,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				} 
 			}
 		}
-		
-		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
-		licensedDownloader.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent(event);
-			}
-		});
-		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
-		entityName.setText(entity.getName());
-		clientsHelpContainer.setVisible(false);
-		if (directDownloadUrl != null) {
-			//special case, if this starts with sftp proxy, then handle
-			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
-			if (directDownloadUrl.startsWith(sftpProxy)) {
-				authorizedDirectDownloadLink.setVisible(true);
-				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
-				presenter.queryForSftpLoginInstructions(url);
-			} else {
-				directDownloadLink.setVisible(true);
-				directDownloadLink.setHref(directDownloadUrl);
-				clientsHelpContainer.setVisible(true);
-			}
-		}
-		else {
-			licensedDownloadLink.setVisible(true);
-		}
-	}
-	@Override
-	public void setLoginInstructions(String instructions) {
-		loginModalWidget.setInstructionMessage(instructions);
 	}
 	
 	@Override
@@ -250,9 +166,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public void setFileLocation(String location) {
 		fileLocation.setInnerText(location);
 	}
+
 	@Override
-	public void setFileClientsHelp(Widget w) {
-		clientsHelpContainer.clear();
-		clientsHelpContainer.add(w);
+	public void setFileDownloadButton(Widget w) {
+		fileDownloadButtonContainer.clear();
+		fileDownloadButtonContainer.add(w);
 	}
 }
