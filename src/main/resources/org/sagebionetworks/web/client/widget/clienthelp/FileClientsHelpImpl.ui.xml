@@ -4,7 +4,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Span>
-		<b:Anchor dataToggle="MODAL" dataTarget="#clientHelpModal" text="other download options" addStyleNames="font-italic"/>
+		<b:Anchor dataToggle="MODAL" dataTarget="#clientHelpModal" text="other&#160;download&#160;options" addStyleNames="font-italic"/>
 		<b:Modal closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="clientHelpModal">
 			<b:ModalHeader>
 			    <b:Heading size="H4" text="Download Options" addStyleNames="displayInline"/>
