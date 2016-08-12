@@ -23,6 +23,8 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -81,6 +83,12 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		isConfigured = false;
 		isAttached = false;
 		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
+		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				getEntityBundle();
+			}
+		});
 	}
 	public void startCheckingIfAttachedAndConfigured() {
 		if (isAttached && isConfigured) {
