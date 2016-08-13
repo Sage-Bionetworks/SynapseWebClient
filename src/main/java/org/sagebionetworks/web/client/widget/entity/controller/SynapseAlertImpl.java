@@ -18,6 +18,7 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -75,6 +76,8 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			}
 		} else if(ex instanceof NotFoundException) {
 			view.showError(DisplayConstants.ERROR_NOT_FOUND  + " " + ex.getMessage());
+		} else if (ex instanceof TooManyRequestsException) {
+			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS  + "\n\n" + ex.getMessage());
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!

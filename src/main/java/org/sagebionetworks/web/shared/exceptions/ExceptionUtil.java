@@ -40,6 +40,8 @@ public class ExceptionUtil {
 				return new ConflictException(ex.getMessage());
 			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
 				return new SynapseDownException(ex.getMessage());
+			} else if (sse.getStatusCode()==429) {
+				return new TooManyRequestsException(ex.getMessage());
 			}
 		}
 		return new UnknownErrorException(ex.getMessage());
