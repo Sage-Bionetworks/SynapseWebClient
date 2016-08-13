@@ -246,6 +246,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel teamSynAlertPanel;
 	@UiField
 	FocusPanel alertFocusPanel;
+	@UiField
+	FlowPanel challengeSynAlertPanel;
 	
 	@UiField
 	Alert verifyAlert;
@@ -526,6 +528,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setChallengeSynAlertWidget(Widget synAlert) {
+		challengeSynAlertPanel.clear();
+		challengeSynAlertPanel.add(synAlert);
+	}
+	
+	@Override
 	public void setTeamSynAlertWidget(Widget teamSynAlert) {
 		teamSynAlertPanel.setWidget(teamSynAlert);
 	}
@@ -668,17 +676,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setTeamsFilterVisible(boolean isVisible) {
 		teamFilters.setVisible(isVisible);	
 	}
-	
-	@Override
-	public void setTeamsError(String error) {
-		DisplayUtils.showErrorMessage(error);
-	}
-
-	@Override
-	public void setProjectsError(String error) {
-		DisplayUtils.showErrorMessage(error);
-	}
-	
+		
 	@Override
 	public void setEmptyProjectUIVisible(boolean b) {
 		emptyProjectUI.setVisible(b);
@@ -723,10 +721,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setIsMoreChallengesVisible(boolean isVisible) {
 		moreChallengesButton.setVisible(isVisible);
-	}
-	@Override
-	public void setChallengesError(String error) {
-		DisplayUtils.showErrorMessage(error);
 	}
 	
 	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {

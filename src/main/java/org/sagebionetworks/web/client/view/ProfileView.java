@@ -30,14 +30,11 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void setProfile(UserProfile profile, boolean isOwner);
 	void refreshHeader();
-	void setProjectsError(String string);
 	void addProjectWidget(Widget widget);
 	void addChallengeWidget(Widget widget);
-	void setChallengesError(String error);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
-	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
 	void clearProjects();
 	void setSortText(String text);
@@ -119,6 +116,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setProjectSynAlertWidget(Widget profileSynAlert);
 
 	void setTeamSynAlertWidget(Widget profileSynAlert);
+	void setChallengeSynAlertWidget(Widget challengeSynAlert);
 
 	void addCertifiedBadge();
 	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);

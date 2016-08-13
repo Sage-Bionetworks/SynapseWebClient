@@ -94,7 +94,7 @@ public class DisplayConstants {
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
-	
+	public static final String ERROR_TOO_MANY_REQUESTS = "Synapse is over capacity.  You've been temporarily blocked from Synapse due to a high level of activity.  Please wait a moment and try again.";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
 	public static final String ERROR_NOT_AUTHORIZED = "Sorry, you are not authorized to modify the requested entity.";
 	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
