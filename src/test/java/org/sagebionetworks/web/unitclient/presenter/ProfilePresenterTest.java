@@ -286,9 +286,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testStart() {
-		verify(mockInjector, times(3)).getSynapseAlertWidget();
+		verify(mockInjector, times(4)).getSynapseAlertWidget();
 		profilePresenter.setPlace(place);
-		verify(mockInjector, times(3)).getSynapseAlertWidget();
+		verify(mockInjector, times(4)).getSynapseAlertWidget();
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
 		
@@ -641,7 +641,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, "123");
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -651,7 +651,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("111");
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -720,7 +720,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		profilePresenter.getMyProjects(ProjectListType.MY_PROJECTS, ProjectFilterEnum.ALL, 0);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -735,7 +735,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
 		profilePresenter.getUserProjects(1);
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
 	@Test
@@ -784,12 +784,12 @@ public class ProfilePresenterTest {
 	public void testCreateProjectEmptyName() {
 		profilePresenter.createProject("");
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		Mockito.reset(mockView);
+		verify(mockSynAlert).showError(anyString());
+		Mockito.reset(mockSynAlert);
 		
 		profilePresenter.createProject(null);
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 
 	@Test
@@ -804,7 +804,7 @@ public class ProfilePresenterTest {
 	public void testCreateProjectNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.createProject("valid name");
-		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+		verify(mockSynAlert).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
 	}
 	
 	// Project Sorting tests
@@ -865,11 +865,11 @@ public class ProfilePresenterTest {
 	public void testCreateTeamEmptyName() {
 		profilePresenter.createTeam("");
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		Mockito.reset(mockView);	
+		verify(mockSynAlert).showError(anyString());
+		Mockito.reset(mockSynAlert);	
 		profilePresenter.createTeam(null);
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 
 	@Test
@@ -884,7 +884,7 @@ public class ProfilePresenterTest {
 	public void testCreateTeamNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		profilePresenter.createTeam("valid name");
-		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_TEAM_NAME_EXISTS));
+		verify(mockSynAlert).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 	}
 	
 	
@@ -946,7 +946,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.getTeamBundles("12345",true);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setTeamsError(ex.getMessage());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
@@ -977,7 +977,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).
 				getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.getTeamBundles("12345", true);
-		verify(mockView).setTeamsError(ex.getMessage());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	
@@ -1007,10 +1007,11 @@ public class ProfilePresenterTest {
 	public void testGetTeamsError() {
 		profilePresenter.setPlace(place);
 		String errorMessage = "error loading teams";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setTeamsError(errorMessage);
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test

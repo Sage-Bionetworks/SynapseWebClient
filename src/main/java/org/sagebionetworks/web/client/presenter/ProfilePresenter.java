@@ -109,6 +109,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
+	public SynapseAlert challengeSynAlert;
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
 	public Map<String, Boolean> isACTMemberMap;
@@ -154,6 +155,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		profileSynAlert = ginInjector.getSynapseAlertWidget();
 		projectSynAlert = ginInjector.getSynapseAlertWidget();
 		teamSynAlert = ginInjector.getSynapseAlertWidget();
+		challengeSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 		view.addMyTeamsWidget(myTeamsWidget);
@@ -161,6 +163,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
 		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
 		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
+		view.setChallengeSynAlertWidget(challengeSynAlert.asWidget());
 		resubmitVerificationCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -574,6 +577,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getTeamBundles(String userId, final boolean includeRequestCount) {
+		teamSynAlert.clear();
 		myTeamsWidget.clear();
 		myTeamsWidget.showLoading();
 		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
@@ -604,13 +608,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onFailure(Throwable caught) {
 				myTeamsWidget.clear();
 				view.setTeamsFilterVisible(false);
-				view.setTeamsError(caught.getMessage());
+				teamSynAlert.handleException(caught);
 			}
 		});
 	}
 	
 	
 	public void getMoreChallenges() {
+		challengeSynAlert.clear();
 		view.showChallengesLoading(true);
 		challengeClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
 			@Override
@@ -621,12 +626,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	            @Override
 			public void onFailure(Throwable caught) {
 				view.showChallengesLoading(false);
-				view.setChallengesError("Could not load challenges:" + caught.getMessage());
+				challengeSynAlert.handleException(caught);
 			}
 		});
 	}
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
+		projectSynAlert.clear();
 		view.showProjectsLoading(true);
 		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
@@ -639,12 +645,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showProjectsLoading(false);
-				view.setProjectsError("Could not load my projects:" + caught.getMessage());
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
 	
 	public void getTeamProjects(int offset) {
+		projectSynAlert.clear();
 		view.showProjectsLoading(true);
 		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
 			@Override
@@ -657,12 +664,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showProjectsLoading(false);
-				view.setProjectsError("Could not load team projects:" + caught.getMessage());
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
 
 	public void getUserProjects(int offset) {
+		projectSynAlert.clear();
 		view.showProjectsLoading(true);
 		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
@@ -673,7 +681,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showProjectsLoading(false);
-				view.setProjectsError("Could not load user projects:" + caught.getMessage());
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -717,6 +725,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getFavorites() {
+		projectSynAlert.clear();
 		view.showProjectsLoading(true);
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
@@ -744,7 +753,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showProjectsLoading(false);
-				view.setProjectsError("Could not load user favorites:" + caught.getMessage());
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -755,7 +764,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
-			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			projectSynAlert.showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
 			return;
 		}
 		
@@ -769,7 +778,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+					projectSynAlert.showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
 					projectSynAlert.handleException(caught);
 				}
@@ -783,7 +792,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		teamSynAlert.clear();
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
-			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			teamSynAlert.showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
 
@@ -797,7 +806,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+					teamSynAlert.showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
 					teamSynAlert.handleException(caught);
 				}

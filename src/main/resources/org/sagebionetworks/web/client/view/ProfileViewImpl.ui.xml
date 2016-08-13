@@ -243,6 +243,7 @@
 									<div class="clearfix">
 									    <b:Button ui:field="moreChallengesButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
 									</div>
+									<g:FlowPanel ui:field="challengeSynAlertPanel"/>
 							    </div>
 							    <div class="tab-background padding-10 container-fluid" ui:field="teamsTabContainer">
 							    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
