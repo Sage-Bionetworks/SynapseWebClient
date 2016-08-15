@@ -38,6 +38,9 @@
 								<b:Anchor href="mailto:synapseInfo@sagebase.org" text="Contact us" addStyleNames="color-white margin-left-10"/>	
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-center">
+								<b:Anchor ui:field="reportAbuseLink" text="Report abuse" addStyleNames="color-white margin-left-10" />
+							</t:TableData>
+							<t:TableData paddingRight="2" addStyleNames="text-align-center">
 								<b:Anchor href="http://creativecommons.org/licenses/by/3.0/legalcode" text="Creative Commons License" addStyleNames="color-white margin-left-10"/>
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-right">
