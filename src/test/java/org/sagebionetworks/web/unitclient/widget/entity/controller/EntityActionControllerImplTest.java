@@ -965,6 +965,7 @@ public class EntityActionControllerImplTest {
 		assertFalse(controller.isSubmittableType(new Project()));
 		assertFalse(controller.isSubmittableType(new TableEntity()));
 		assertTrue(controller.isSubmittableType(new FileEntity()));
+		assertTrue(controller.isSubmittableType(new DockerRepository()));
 		assertFalse(controller.isSubmittableType(new Folder()));
 		assertFalse(controller.isSubmittableType(new Link()));
 	}
