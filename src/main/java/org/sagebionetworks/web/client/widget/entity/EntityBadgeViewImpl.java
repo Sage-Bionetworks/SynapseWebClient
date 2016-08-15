@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -70,6 +71,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Tooltip errorField;
 	@UiField
 	Icon errorIcon;
+	@UiField
+	Span fileDownloadButtonContainer;
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -258,7 +261,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
 	}
-
+	@Override
+	public void setFileDownloadButton(Widget w) {
+		fileDownloadButtonContainer.clear();
+		fileDownloadButtonContainer.add(w);
+	}
 	/*
 	 * Private Methods
 	 */

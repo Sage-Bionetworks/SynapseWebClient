@@ -7,7 +7,11 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.Date;
@@ -45,7 +49,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -217,9 +220,7 @@ public class FilesTabTest {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
-		
 		verify(mockView, times(2)).clearActionMenuContainer();
-		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
@@ -276,8 +277,6 @@ public class FilesTabTest {
 		verify(mockProjectInfoCallback).invoke(false);
 		
 		verify(mockView, times(2)).clearActionMenuContainer();
-		verify(mockView).setProgrammaticClientsVisible(true);
-		verify(mockView).configureProgrammaticClients(fileEntityId, version);
 		verify(mockView).setProvenanceVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -342,7 +341,6 @@ public class FilesTabTest {
 		verify(mockProjectInfoCallback).invoke(false);
 		
 		verify(mockView, times(2)).clearActionMenuContainer();
-		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -391,7 +389,6 @@ public class FilesTabTest {
 		verify(mockView).setFileBrowserVisible(false);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockBreadcrumb).clear();
-		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).setVisible(false);
 	}
