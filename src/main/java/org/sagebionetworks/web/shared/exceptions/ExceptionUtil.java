@@ -11,6 +11,7 @@ import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
+import org.sagebionetworks.web.server.servlet.SynapseRetryProxy;
 
 public class ExceptionUtil {
 
@@ -40,7 +41,7 @@ public class ExceptionUtil {
 				return new ConflictException(ex.getMessage());
 			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
 				return new SynapseDownException(ex.getMessage());
-			} else if (sse.getStatusCode()==429) {
+			} else if (sse.getStatusCode()==SynapseRetryProxy.SC_TOO_MANY_REQUESTS) {
 				return new TooManyRequestsException(ex.getMessage());
 			}
 		}
