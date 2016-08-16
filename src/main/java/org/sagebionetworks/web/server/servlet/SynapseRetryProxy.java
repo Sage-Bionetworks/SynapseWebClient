@@ -26,7 +26,7 @@ public class SynapseRetryProxy {
 	/** 429 Too Many Requests (RFC 6585) */
 	public static final int SC_TOO_MANY_REQUESTS = 429;
 	
-	public static final int MAX_RETRY_COUNT = 5;
+	public static final int MAX_RETRY_COUNT = 10;
 	
 	/**
 	 * Create a proxy of the Synapse Java that profiles all calls. 
@@ -63,8 +63,8 @@ public class SynapseRetryProxy {
 							return response;
 						} catch(InvocationTargetException ex) {
 							Throwable cause = ex.getCause();
-							if (cause instanceof UndeclaredThrowableException && ((UndeclaredThrowableException)cause).getUndeclaredThrowable() instanceof SynapseServerException) {
-								SynapseServerException synapseServerException = (SynapseServerException)((UndeclaredThrowableException)cause).getUndeclaredThrowable();
+							if (cause instanceof SynapseServerException) {
+								SynapseServerException synapseServerException = (SynapseServerException)cause;
 								if (synapseServerException.getStatusCode() == SC_TOO_MANY_REQUESTS) {
 									// if 429, we can retry
 									throw new RetryException(ex);
