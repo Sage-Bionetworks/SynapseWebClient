@@ -56,7 +56,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class FilesTab implements FilesTabView.Presenter{
+public class FilesTab {
 	Tab tab;
 	FilesTabView view;
 	FileTitleBar fileTitleBar;
@@ -117,7 +117,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
 		this.modifiedCreatedBy = modifiedCreatedBy;
-		view.setPresenter(this);
 		
 		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
@@ -186,7 +185,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
 		modifiedCreatedBy.setVisible(false);
 	}
@@ -335,12 +333,6 @@ public class FilesTab implements FilesTabView.Presenter{
 			filesBrowser.configure(currentEntityId, bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser());	
 		}
 		
-		//Programmatic Clients
-		view.setProgrammaticClientsVisible(isFile);
-		if (isFile) {
-			view.configureProgrammaticClients(currentEntityId, shownVersionNumber);	
-		}
-
 		//Provenance
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));

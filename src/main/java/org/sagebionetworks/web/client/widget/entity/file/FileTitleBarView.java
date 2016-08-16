@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface FileTitleBarView extends IsWidget, SynapseView {
 
@@ -31,10 +32,8 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 			EntityType entityType, 
 			AuthenticationController authenticationController);
 
-	void setLoginInstructions(String instructions);
-
 	void setFileLocation(String location);
-
+	void setFileDownloadButton(Widget w);
 	/**
 	 * Presenter interface
 	 */
@@ -44,9 +43,6 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		
 		boolean isUserLoggedIn();
 		
-		
-		void queryForSftpLoginInstructions(String directDownloadUrl);
-
 		/**
 		 * A file that is stored in S3 could be in Synapse Storage or in a private S3 bucket.
 		 * This method is used to set the correct location of a file in S3. 

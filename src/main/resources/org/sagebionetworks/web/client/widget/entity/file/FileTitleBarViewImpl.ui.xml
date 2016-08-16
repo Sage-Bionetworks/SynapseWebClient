@@ -5,18 +5,17 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
-			<h2 style="margin-bottom: 8px;">
-			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/>
-			 	<b:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT"/>
-			 	<b:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT" />
-			 	
-			 	<b:Anchor ui:field="licensedDownloadLink" styleName="downloadLink link" icon="DOWNLOAD" iconPosition="RIGHT"/>
-			 	<g:SimplePanel ui:field="favoritePanel"/>
-			</h2>
+			<div>
+			 	<b:Heading size="H2" addStyleNames="displayInline"><b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/></b:Heading>
+			 	<b:Heading size="H2" ui:field="entityName" addStyleNames="displayInline"/>
+			 	<b:Heading size="H2" addStyleNames="displayInline margin-right-10"><g:SimplePanel ui:field="favoritePanel"/></b:Heading>
+			 	<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
+			</div>
 			<g:HTMLPanel ui:field="fileNameContainer">
 				<span class="boldText">Download file as:</span>
 				<span ui:field="fileName"/>

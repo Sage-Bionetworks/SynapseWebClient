@@ -2,14 +2,17 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -20,12 +23,15 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -48,6 +54,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private Callback invokeCheckForInViewAndLoadData;
 	private boolean isConfigured;
 	private boolean isAttached;
+	private FileDownloadButton fileDownloadButton;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -55,7 +62,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			UserBadge modifiedByUserBadge,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			FileDownloadButton fileDownloadButton) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -63,6 +71,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
+		this.fileDownloadButton = fileDownloadButton;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 		invokeCheckForInViewAndLoadData = new Callback() {
@@ -73,6 +82,13 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		};
 		isConfigured = false;
 		isAttached = false;
+		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
+		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				getEntityBundle();
+			}
+		});
 	}
 	public void startCheckingIfAttachedAndConfigured() {
 		if (isAttached && isConfigured) {
@@ -98,7 +114,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
+		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
 		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -165,6 +181,12 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		
 		if (DisplayUtils.isDefined(rootWikiId)) {
 			view.showHasWikiIcon();
+		}
+		
+		if (eb.getEntity() instanceof FileEntity) {
+			fileDownloadButton.configure(eb);
+			fileDownloadButton.setClientsHelpVisible(false);
+			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 	}
 	

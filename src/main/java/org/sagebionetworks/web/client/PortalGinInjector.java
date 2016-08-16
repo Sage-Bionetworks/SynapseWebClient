@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceE
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
@@ -410,4 +411,5 @@ public interface PortalGinInjector extends Ginjector {
 	public DockerCommitRowWidget createNewDockerCommitRowWidget();
 	
 	public LoginWidget getLoginWidget();
+	public FileClientsHelp getFileClientsHelp();
 }

@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
@@ -45,12 +46,14 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class EntityBadgeTest {
 
@@ -79,6 +82,8 @@ public class EntityBadgeTest {
 	AccessControlList mockBenefactorAcl;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	FileDownloadButton mockFileDownloadButton;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -97,7 +102,7 @@ public class EntityBadgeTest {
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT);
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT, mockFileDownloadButton);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
@@ -204,6 +209,29 @@ public class EntityBadgeTest {
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
+		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
+		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
+	}
+	
+	@Test
+	public void testGetFileEntityBundle() {
+		//verify download button is configured and shown
+		String entityId = "syn12345";
+		FileEntity testFile = new FileEntity();
+		testFile.setModifiedBy("4444");
+		testFile.setId(entityId);
+		setupEntity(testFile);
+		configure();
+		widget.getEntityBundle();
+		
+		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).showPublicIcon();
+		verify(mockView).showAnnotationsIcon();
+		verify(mockView).setAnnotations(anyString());
+		verify(mockView).setAnnotations(anyString());
+		verify(mockView).showHasWikiIcon();
+		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
+		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}
 	
 	/**
