@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -16,7 +15,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,7 +24,6 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	private Div evaluationSubmitterContainer = new Div();
 	@Inject
 	public SubmitToEvaluationWidgetViewImpl() {
-		this.addStyleName("min-height-48");
 	}
 	
 	@Override
@@ -50,7 +47,6 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	public void showUnavailable(String message) {
 		if (message != null && message.trim().length() > 0) {
 			Alert alert = new Alert(SafeHtmlUtils.htmlEscape(message), AlertType.INFO);
-			alert.addStyleName("displayInline");
 			add(alert);
 		}
 	}
