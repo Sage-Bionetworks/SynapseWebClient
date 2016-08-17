@@ -4,16 +4,24 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -37,9 +45,14 @@ public class SignedTokenPresenterTest {
 	public static final String TEST_TOKEN = "314159bar";
 	public static final String TEST_HOME_PAGE_BASE = "https://www.synapse.org/";
 	public static final String SUCCESS_RESPONSE_MESSAGE = "successfully did something";
-	
+	List<AccessRequirement> accessRequirements;
+	@Mock
+	AccessRequirement mockAccessRequirement;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 	@Before
 	public void setup(){
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(SignedTokenView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
@@ -64,6 +77,10 @@ public class SignedTokenPresenterTest {
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setUnsubscribingUserBadge(any(Widget.class));
+		// by default, the team has no access requirements (so it should just handle the signed token like any other signed token request).
+		accessRequirements = new ArrayList<AccessRequirement>();
+		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 	
 	@Test
@@ -74,7 +91,7 @@ public class SignedTokenPresenterTest {
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView, times(2)).clear();
-		verify(mockView, times(4)).setLoadingVisible(anyBoolean());
+		verify(mockView, atLeast(2)).setLoadingVisible(anyBoolean());
 		verify(mockView).showSuccess(SUCCESS_RESPONSE_MESSAGE);
 	}
 	
@@ -87,7 +104,27 @@ public class SignedTokenPresenterTest {
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).handleException(ex);
 		verify(mockView, times(2)).clear();
-		verify(mockView, times(4)).setLoadingVisible(anyBoolean());
+		verify(mockView, atLeast(2)).setLoadingVisible(anyBoolean());
+	}
+	
+	@Test
+	public void testSetPlaceWithAccessRequirements() {
+		accessRequirements.add(mockAccessRequirement);
+		presenter.setPlace(testPlace);
+		
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).clear();
+		verify(mockPlaceChanger).goTo(any(Team.class));
+	}
+	
+	@Test
+	public void testSetPlaceFailureToGetTeamAccessRequirements() {
+		Exception ex = new Exception("something bad happened");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		presenter.setPlace(testPlace);
+		
+		verify(mockSynapseAlert).handleException(ex);
 	}
 	
 	@Test

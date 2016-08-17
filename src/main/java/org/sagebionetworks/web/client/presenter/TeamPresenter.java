@@ -151,19 +151,17 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
 				view.setTeamEmailAddress(getTeamEmail(team.getName()));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
-
-				if (teamMembershipStatus != null) {
-					if (!teamMembershipStatus.getIsMember())
-						//not a member, add Join widget
-						joinTeamWidget.configure(teamId, false, teamMembershipStatus,
-								refreshCallback, null, null, null, null, false);
-					else {
-						view.showMemberMenuItems();
-						if (isAdmin) {
-							openMembershipRequestsWidget.configure(teamId, refreshCallback);
-							openUserInvitationsWidget.configure(teamId, refreshCallback);
-							view.showAdminMenuItems();
-						}
+				
+				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
+					//not a member, add Join widget
+					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
+							refreshCallback, null, null, null, null, false);
+				} else {
+					view.showMemberMenuItems();
+					if (isAdmin) {
+						openMembershipRequestsWidget.configure(teamId, refreshCallback);
+						openUserInvitationsWidget.configure(teamId, refreshCallback);
+						view.showAdminMenuItems();
 					}
 				}
 			}
