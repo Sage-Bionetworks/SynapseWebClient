@@ -1852,7 +1852,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void requestMembership(String currentUserId, String teamId,
+	public TeamMembershipStatus requestMembership(String currentUserId, String teamId,
 			String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1878,9 +1878,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
 				synapseClient.createMembershipRequest(membershipRequest, joinTeamEndpoint, settingsEndpoint);
 			}
+			return synapseClient.getTeamMembershipStatus(teamId, currentUserId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+		
 	}
 
 	@Override
