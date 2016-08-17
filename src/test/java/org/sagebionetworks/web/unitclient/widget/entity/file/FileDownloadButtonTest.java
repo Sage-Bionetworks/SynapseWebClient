@@ -10,6 +10,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -98,8 +99,10 @@ public class FileDownloadButtonTest {
 		verify(mockView).clear();
 		verify(mockView).setDirectDownloadLink(directDownloadURL);
 		verify(mockView).setDirectDownloadLinkVisible(true);
-		verify(mockView).setClientsHelpVisible(false);
-		verify(mockView).setClientsHelpVisible(true);
+		// First use in SWC of Mockito.InOrder. Supports multiple mocks. This verification correctly fails if you swap the lines below.
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setClientsHelpVisible(false);
+		inOrder.verify(mockView).setClientsHelpVisible(true);
 		
 		verify(mockFileClientsHelp).configure(ENTITY_ID);
 	}

@@ -110,7 +110,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.configure(teamId, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(status).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
 		when(mockGwt.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
