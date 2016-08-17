@@ -236,20 +236,24 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		};
 		synapseClient.getUserProfile(null, callback);
 	}
-
-	// configuration
-	public void resetView() {
+	
+	public void clear() {
 		view.clear();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
 		passwordStrengthWidget.setVisible(false);
+	}
+	
+	public void configure() {
+		clear();
 		if (authenticationController.isLoggedIn()) {
 			getUserNotificationEmail();
 			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
-			subscriptionListWidget.configure();	
+			subscriptionListWidget.configure();
 		}
+		this.view.render();
 	}
 
 	@Override
@@ -325,11 +329,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 					}
 				});
 	}
-
-	// The entry point of this class, called from the ProfilePresenter
+	
 	public Widget asWidget() {
-		resetView();
-		this.view.render();
 		return view.asWidget();
 	}
 	

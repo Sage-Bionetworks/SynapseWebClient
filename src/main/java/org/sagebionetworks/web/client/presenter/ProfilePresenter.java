@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
@@ -91,7 +92,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 	private OpenTeamInvitationsWidget openInvitesWidget;
-
+	
+	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
 	private int inviteCount;
@@ -99,8 +101,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentProjectOffset, currentChallengeOffset;
-	public final static int PROJECT_PAGE_SIZE=100;
-	public final static int CHALLENGE_PAGE_SIZE=100;
+	public final static int PROJECT_PAGE_SIZE=20;
+	public final static int CHALLENGE_PAGE_SIZE=20;
 	public ProfileArea currentArea;
 	public ProjectFilterEnum filterType;
 	public String filterTeamId;
@@ -114,6 +116,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public UserBundle currentUserBundle;
 	public Map<String, Boolean> isACTMemberMap;
 	public Callback resubmitVerificationCallback;
+	public LoadMoreWidgetContainer loadMoreProjectsWidgetContainer;
+	public Callback getMoreProjectsCallback;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -130,7 +134,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal) {
+			VerificationSubmissionWidget verificationModal,
+			SettingsPresenter settingsPresenter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -147,6 +152,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
+		this.settingsPresenter = settingsPresenter;
 		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -168,6 +174,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void invoke() {
 				newVerificationSubmissionClicked();
+			}
+		};
+		getMoreProjectsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				getMoreProjects();
 			}
 		};
 	}
@@ -245,6 +257,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setProfileEditButtonVisible(isOwner);
 		view.setOrcIDLinkButtonVisible(isOwner);
 		view.showTabs(isOwner);
+		settingsPresenter.clear();
 		myTeamsWidget.clear();
 		myTeamsWidget.configure(false);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
@@ -478,8 +491,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void refreshProjects() {
 		currentProjectOffset = 0;
-		view.clearProjects();
-		getMoreProjects();		
+		loadMoreProjectsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
+		view.setProjectContainer(loadMoreProjectsWidgetContainer.asWidget());
+		loadMoreProjectsWidgetContainer.setIsMore(true);
+		loadMoreProjectsWidgetContainer.configure(getMoreProjectsCallback);
 		//also refresh the teams tab
 		refreshTeams();
 	}
@@ -633,7 +648,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		projectSynAlert.clear();
-		view.showProjectsLoading(true);
 		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
@@ -644,7 +658,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showProjectsLoading(false);
 				projectSynAlert.handleException(caught);
 			}
 		});
@@ -652,7 +665,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		projectSynAlert.clear();
-		view.showProjectsLoading(true);
 		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
@@ -663,7 +675,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showProjectsLoading(false);
 				projectSynAlert.handleException(caught);
 			}
 		});
@@ -671,7 +682,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		projectSynAlert.clear();
-		view.showProjectsLoading(true);
 		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
@@ -680,23 +690,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showProjectsLoading(false);
 				projectSynAlert.handleException(caught);
 			}
 		});
 	}
 	
 	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
-		view.showProjectsLoading(false);
-		view.clearProjects();
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
+			badge.addStyleName("margin-bottom-10 col-xs-12");
 			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
 			Widget widget = badge.asWidget();
-			view.addProjectWidget(widget);
+			loadMoreProjectsWidgetContainer.add(widget);
 		}
-		if (projectHeaders.isEmpty())
-			view.setEmptyProjectUIVisible(true);
 	}
 	
 	public void addChallengeResults(List<ChallengeBundle> challenges) {
@@ -716,7 +722,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void projectPageAdded(int totalNumberOfResults) {
 		currentProjectOffset += PROJECT_PAGE_SIZE;
-		view.setIsMoreProjectsVisible(currentProjectOffset < totalNumberOfResults);
+		loadMoreProjectsWidgetContainer.setIsMore(currentProjectOffset < totalNumberOfResults);
 	}
 	
 	public void challengePageAdded(Long totalNumberOfResults) {
@@ -726,14 +732,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getFavorites() {
 		projectSynAlert.clear();
-		view.showProjectsLoading(true);
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				if (filterType == ProjectFilterEnum.FAVORITES) {
 					//convert to Project Headers
 					if (result.size() == 0) {
-						view.showProjectsLoading(false);
 						view.setFavoritesHelpPanelVisible(true);
 					} else {
 						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
@@ -746,13 +750,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							headers.add(projectHeader);
 						}
 						addProjectResults(headers, null);
-						view.setIsMoreProjectsVisible(false);	
+						loadMoreProjectsWidgetContainer.setIsMore(false);
 					}
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showProjectsLoading(false);
 				projectSynAlert.handleException(caught);
 			}
 		});
@@ -1032,8 +1035,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			case TEAMS:
 				refreshTeams();
 				break;
-			case CHALLENGES:
 			case SETTINGS:
+				settingsPresenter.configure();
+				view.setSettingsWidget(settingsPresenter.asWidget());
+				break;
+			case CHALLENGES:
 			default:
 				break;
 		}
