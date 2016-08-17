@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import org.sagebionetworks.client.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
+import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.client.DockerClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -30,6 +30,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	private Boolean ascending;
 	private CallbackP<DockerCommit> commitClickedCallback;
 	private String entityId;
+	private Callback emptyCommitCallback;
 
 	@Inject
 	public DockerCommitListWidget(
@@ -57,7 +58,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 
 	public void loadMore() {
 		synAlert.clear();
-		dockerClient.getCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<PaginatedResults<DockerCommit>>(){
+		dockerClient.getDockerCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<PaginatedResults<DockerCommit>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -67,21 +68,24 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 
 					@Override
 					public void onSuccess(PaginatedResults<DockerCommit> result) {
-						for(final DockerCommit commit: result.getResults()) {
-							DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
-							dockerCommitRow.configure(commit);
-							dockerCommitRow.setOnClickCallback(new CallbackP<DockerCommit>(){
-
-								@Override
-								public void invoke(DockerCommit param) {
-									commitClickedCallback.invoke(commit);
-								}
-							});
-							commitsContainer.add(dockerCommitRow.asWidget());
-						}
-						
-						offset += LIMIT;
 						long numberOfCommits = result.getTotalNumberOfResults();
+						if (numberOfCommits == 0) {
+							emptyCommitCallback.invoke();
+						} else {
+							for(final DockerCommit commit: result.getResults()) {
+								DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
+								dockerCommitRow.configure(commit);
+								dockerCommitRow.setOnClickCallback(new CallbackP<DockerCommit>(){
+	
+									@Override
+									public void invoke(DockerCommit param) {
+										commitClickedCallback.invoke(commit);
+									}
+								});
+								commitsContainer.add(dockerCommitRow.asWidget());
+							}
+						}
+						offset += LIMIT;
 						commitsContainer.setIsMore(offset < numberOfCommits);
 					}
 		});
@@ -103,6 +107,10 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	public void setEmptyListCallback(Callback callback) {
+		this.emptyCommitCallback = callback;
 	}
 
 }

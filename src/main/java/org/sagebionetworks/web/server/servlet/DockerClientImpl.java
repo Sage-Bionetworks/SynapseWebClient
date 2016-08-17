@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
-import org.sagebionetworks.client.DockerCommitSortBy;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
+import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DockerClient;
 import org.sagebionetworks.web.shared.PaginatedResults;

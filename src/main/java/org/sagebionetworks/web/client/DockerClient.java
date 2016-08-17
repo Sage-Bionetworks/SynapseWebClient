@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.client.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
+import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
