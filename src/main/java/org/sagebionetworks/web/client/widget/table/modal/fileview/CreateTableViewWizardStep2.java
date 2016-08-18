@@ -105,14 +105,15 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
+		synapseClient.setTableSchema(entity.getId(), newSchema, new AsyncCallback<String>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
-			public void onSuccess(Void result) {
+			public void onSuccess(String token) {
+				TODO: monitor job until it's done (new widget for this kind of async update?)?
 				presenter.setLoading(false);
 				presenter.onFinished();
 			}}); 

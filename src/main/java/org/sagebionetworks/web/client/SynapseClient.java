@@ -398,10 +398,10 @@ public interface SynapseClient extends XsrfProtectedService {
 	 *            ID of the table that will be updated.
 	 * @param schema
 	 *            Each string in the list must be a ColumnModel JSON string.
-	 * @return The list of ColumnModel JSON strings.
+	 * @return token returned by startTableTransactionJob.
 	 * @throws RestServiceException
 	 */
-	public void setTableSchema(Table entity, List<ColumnModel> newSchema)
+	public String setTableSchema(String tableEntityId, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -112,12 +113,14 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
+import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -2701,24 +2704,49 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void setTableSchema(Table table, List<ColumnModel> models)
+	public String setTableSchema(String tableId, List<ColumnModel> models)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			// Create any models that do not have an ID
-			List<String> newSchema = new LinkedList<String>();
-			for (ColumnModel m : models) {
-				if (m.getId() == null) {
-					ColumnModel clone = synapseClient.createColumnModel(m);
-					m.setId(clone.getId());
-				}
-				newSchema.add(m.getId());
+			// Create any models that do not have an ID, or that have changed
+			List<ColumnModel> oldColumnModels = synapseClient.getColumnModelsForTableEntity(tableId);
+			Map<String, ColumnModel> oldColumnModelId2Model = new HashMap<String, ColumnModel>();
+			for (ColumnModel columnModel : oldColumnModels) {
+				oldColumnModelId2Model.put(columnModel.getId(), columnModel);
 			}
-			table.setColumnIds(newSchema);	
-			table = synapseClient.putEntity(table);
+			List<ColumnChange> changes = new ArrayList<ColumnChange>();
+			for (ColumnModel m : models) {
+				String oldColumnId = m.getId();
+				if (m.getId() == null) {
+					ColumnModel newColumnModel = synapseClient.createColumnModel(m);
+					changes.add(createNewColumnChange(null, newColumnModel.getId()));
+				} else {
+					// any changes to the existing column model?
+					ColumnModel oldColumnModel = oldColumnModelId2Model.get(m.getId());
+					if (!oldColumnModel.equals(m)) {
+						m.setId(null);
+						ColumnModel newColumnModel = synapseClient.createColumnModel(m);
+						changes.add(createNewColumnChange(oldColumnModel.getId(), newColumnModel.getId()));
+					}
+				}
+			}
+			if (!changes.isEmpty()) {
+				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
+				newTableSchemaChangeRequest.setEntityId(tableId);
+				newTableSchemaChangeRequest.setChanges(changes);
+				return synapseClient.startTableTransactionJob(Collections.singletonList(newTableSchemaChangeRequest), tableId);
+			} 
+			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
+	}
+	
+	private ColumnChange createNewColumnChange(String oldColumnId, String newColumnId) {
+		ColumnChange columnChange = new ColumnChange();
+		columnChange.setOldColumnId(oldColumnId);
+		columnChange.setNewColumnId(newColumnId);
+		return columnChange;
 	}
 	
 	@Override

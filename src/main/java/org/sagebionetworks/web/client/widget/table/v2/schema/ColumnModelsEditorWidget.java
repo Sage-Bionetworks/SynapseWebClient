@@ -73,7 +73,10 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
-		// Assign an id to this column
+		return createColumnModelEditorWidget(cm);
+	}
+	
+	private ColumnModelTableRowEditorWidget createColumnModelEditorWidget(ColumnModel cm) {
 		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
 		// bind this row for navigation.
 		if(this.keyboardNavigationHandler != null){
@@ -102,12 +105,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		for(ColumnModel cm: models){
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
-				ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
-				ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
-				rowViewer.setSelectable(true);
-				rowViewer.setSelectionPresenter(this);
-				editor.addColumn(rowViewer);
-				this.editorRows.add(rowViewer);
+				createColumnModelEditorWidget(cm);
 				columnModelIds.add(columnModelId);
 			}
 		}

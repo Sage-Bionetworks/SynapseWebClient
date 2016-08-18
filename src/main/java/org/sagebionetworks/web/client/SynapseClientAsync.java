@@ -53,7 +53,6 @@ import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -325,14 +324,14 @@ public interface SynapseClientAsync {
 	
 	/**
 	 * Set a table's schema. Any ColumnModel that does not have an ID will be
-	 * treated as a column add.
+	 * treated as a column add.  Any ColumnModel that has an ID will be treated as a column update.
 	 * 
 	 * @param entity
 	 * @param newSchema
 	 * @param callback
 	 */
-	void setTableSchema(Table entity, List<ColumnModel> newSchema,
-			AsyncCallback<Void> callback);
+	void setTableSchema(String tableEntityId, List<ColumnModel> newSchema,
+			AsyncCallback<String> callback);
 	
 	/**
 	 * Validate a table query.

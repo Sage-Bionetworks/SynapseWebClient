@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.job;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -121,7 +122,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// Get the models from the view and save them
 		baseView.setLoading();
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema((Table)bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
+		synapseClient.setTableSchema(bundle.getEntity().getId(), newSchema, new AsyncCallback<String>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -129,7 +130,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 			
 			@Override
-			public void onSuccess(Void result) {
+			public void onSuccess(String token) {
+				TODO: monitor job until it's done (new widget for this kind of async update?)?
 				// Hide the dialog
 				baseView.hideEditor();
 				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
