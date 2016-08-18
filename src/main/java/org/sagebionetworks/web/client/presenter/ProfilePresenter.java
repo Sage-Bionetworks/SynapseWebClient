@@ -1225,5 +1225,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
 		}
 	}
+	
+	// used for targeted unit test only
+	public void setLoadMoreProjectsWidgetContainer(LoadMoreWidgetContainer loadMoreProjectsWidgetContainer) {
+		this.loadMoreProjectsWidgetContainer = loadMoreProjectsWidgetContainer;
+	}
 }
 
