@@ -4,7 +4,6 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Span>
-		<bh:Span>Digest: </bh:Span>
 		<g:TextBox ui:field="digest" addStyleNames="border-none noBackground" readOnly="true"/>
 	</bh:Span>
 </ui:UiBinder>

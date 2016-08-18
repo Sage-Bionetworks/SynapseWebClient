@@ -6,15 +6,15 @@
 	<g:FocusPanel ui:field="row" addStyleNames="imageButton">
 		<b:Column size="XS_12">
 			<b:Row>
-				<b:Column size = "XS_4">
+				<b:Column size = "XS_4" addStyleNames="lead">
 					<b:Icon type="TAG"/>
-					<bh:Span ui:field="tag"/>
+					<bh:Span ui:field="tag" addStyleNames="margin-left-5"/>
 				</b:Column>
 				<b:Column size = "XS_4">
-					<bh:Span ui:field="digest" width="20%"/>
+					<bh:Span ui:field="digest"/>
 				</b:Column>
 				<b:Column size = "XS_4">
-					<bh:Span ui:field="createdOn"/>
+					<g:TextBox ui:field="createdOn" addStyleNames="border-none noBackground" readOnly="true"/>
 				</b:Column>
 			</b:Row>
 		</b:Column>

@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DigestWidget {
+public class DigestWidget implements DigestWidgetView.Presenter {
 
 	private DigestWidgetView view;
 
@@ -14,5 +15,9 @@ public class DigestWidget {
 
 	public void configure(String digest) {
 		view.setDigest(digest);
+	}
+
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }

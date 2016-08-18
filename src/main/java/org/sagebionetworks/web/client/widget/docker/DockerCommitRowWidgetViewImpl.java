@@ -11,6 +11,7 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,7 +21,7 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 	@UiField
 	Span tag;
 	@UiField
-	Span createdOn;
+	TextBox createdOn;
 	@UiField
 	Span digest;
 	@UiField
@@ -59,8 +60,9 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 	}
 
 	@Override
-	public void setDigest(String digest) {
-		this.digest.setText(digest);
+	public void setDigest(Widget widget) {
+		this.digest.clear();
+		this.digest.add(widget);
 	}
 
 	@Override
