@@ -54,6 +54,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -331,7 +332,7 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void setTableSchema(String tableEntityId, List<ColumnModel> newSchema,
-			AsyncCallback<String> callback);
+			AsyncCallback<TableSchemaChangeRequest> callback);
 	
 	/**
 	 * Validate a table query.

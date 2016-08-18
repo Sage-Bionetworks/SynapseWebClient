@@ -118,9 +118,9 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -2704,7 +2704,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public String setTableSchema(String tableId, List<ColumnModel> models)
+	public TableSchemaChangeRequest setTableSchema(String tableId, List<ColumnModel> models)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2734,7 +2734,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
 				newTableSchemaChangeRequest.setEntityId(tableId);
 				newTableSchemaChangeRequest.setChanges(changes);
-				return synapseClient.startTableTransactionJob(Collections.singletonList(newTableSchemaChangeRequest), tableId);
+				synapseClient.startTableTransactionJob(Collections.singletonList((TableUpdateRequest)newTableSchemaChangeRequest), tableId);
+				return newTableSchemaChangeRequest;
 			} 
 			return null;
 		} catch (SynapseException e) {

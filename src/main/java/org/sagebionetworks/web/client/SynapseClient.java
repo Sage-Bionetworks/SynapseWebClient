@@ -57,6 +57,7 @@ import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -401,7 +402,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @return token returned by startTableTransactionJob.
 	 * @throws RestServiceException
 	 */
-	public String setTableSchema(String tableEntityId, List<ColumnModel> newSchema)
+	public TableSchemaChangeRequest setTableSchema(String tableEntityId, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**
