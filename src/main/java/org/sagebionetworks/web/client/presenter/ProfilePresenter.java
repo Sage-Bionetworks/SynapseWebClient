@@ -259,6 +259,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showTabs(isOwner);
 		settingsPresenter.clear();
 		myTeamsWidget.clear();
+		view.clearTeamNotificationCount();
 		myTeamsWidget.configure(false);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
@@ -271,6 +272,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					showTab(currentArea, pushState);
 				}
 			});
+			// refresh owner teams to update the team notification count
+			refreshTeams();
 		} else {
 			getUserProfile();
 			boolean pushState = false;
@@ -495,8 +498,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setProjectContainer(loadMoreProjectsWidgetContainer.asWidget());
 		loadMoreProjectsWidgetContainer.setIsMore(true);
 		loadMoreProjectsWidgetContainer.configure(getMoreProjectsCallback);
-		//also refresh the teams tab
-		refreshTeams();
 	}
 	
 	public void refreshChallenges() {
