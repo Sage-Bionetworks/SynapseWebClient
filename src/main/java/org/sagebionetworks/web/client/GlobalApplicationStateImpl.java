@@ -27,6 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+	public static final String RECENTLY_CHECKED_SYNAPSE_VERSION = "org.sagebionetworks.web.client.recently-checked-synapse-version";
 	public static final String PROPERTIES_LOADED_KEY = "org.sagebionetworks.web.client.properties-loaded";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
@@ -215,15 +216,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void checkVersionCompatibility(final AsyncCallback<VersionState> callback) {
 		//have we checked recently?
-		String cachedVersion = localStorage.get("SYNAPSE_VERSION");
+		String cachedVersion = localStorage.get(RECENTLY_CHECKED_SYNAPSE_VERSION);
 		if (cachedVersion != null) {
 			if (callback != null) {
 				callback.onSuccess(new VersionState(synapseVersion, false));
 			}
 			return;
 		}
-		// don't check for the next 1 minute
-		localStorage.put("SYNAPSE_VERSION", synapseVersion, new Date(System.currentTimeMillis() + 1000*60).getTime());
+		// don't check for the next minute
+		localStorage.put(RECENTLY_CHECKED_SYNAPSE_VERSION, Boolean.TRUE.toString(), new Date(System.currentTimeMillis() + 1000*60).getTime());
 		
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
