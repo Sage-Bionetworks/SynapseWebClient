@@ -496,8 +496,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentProjectOffset = 0;
 		loadMoreProjectsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
 		view.setProjectContainer(loadMoreProjectsWidgetContainer.asWidget());
-		loadMoreProjectsWidgetContainer.setIsMore(true);
+		loadMoreProjectsWidgetContainer.setIsMore(false);
 		loadMoreProjectsWidgetContainer.configure(getMoreProjectsCallback);
+		getMoreProjects();
 	}
 	
 	public void refreshChallenges() {
