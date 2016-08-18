@@ -6,14 +6,16 @@
 	<g:FocusPanel ui:field="row" addStyleNames="imageButton">
 		<b:Column size="XS_12">
 			<b:Row>
-				<b:Icon type="TAG"/>
-				<bh:Span ui:field="tag"/>
-			</b:Row>
-			<b:Row>
-				<bh:Span>Digest: </bh:Span><bh:Span ui:field="digest"/>
-			</b:Row>
-			<b:Row>
-				<bh:Span>Added on: </bh:Span><bh:Span ui:field="createdOn"/>
+				<b:Column size = "XS_4">
+					<b:Icon type="TAG"/>
+					<bh:Span ui:field="tag"/>
+				</b:Column>
+				<b:Column size = "XS_4">
+					<bh:Span ui:field="digest" width="20%"/>
+				</b:Column>
+				<b:Column size = "XS_4">
+					<bh:Span ui:field="createdOn"/>
+				</b:Column>
 			</b:Row>
 		</b:Column>
 	</g:FocusPanel>
