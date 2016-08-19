@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -410,4 +411,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public LoginWidget getLoginWidget();
 	public FileClientsHelp getFileClientsHelp();
+	public LoadMoreWidgetContainer getLoadMoreProjectsWidgetContainer();
 }
