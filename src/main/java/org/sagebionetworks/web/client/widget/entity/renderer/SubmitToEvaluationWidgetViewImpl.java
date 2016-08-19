@@ -47,6 +47,7 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	public void showUnavailable(String message) {
 		if (message != null && message.trim().length() > 0) {
 			Alert alert = new Alert(SafeHtmlUtils.htmlEscape(message), AlertType.INFO);
+			alert.addStyleName("displayInlineBlock");
 			add(alert);
 		}
 	}
