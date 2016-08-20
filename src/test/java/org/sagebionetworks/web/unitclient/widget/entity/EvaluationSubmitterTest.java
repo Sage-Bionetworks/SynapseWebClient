@@ -9,12 +9,12 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +23,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.MemberSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.Submission;
@@ -37,6 +39,8 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -46,6 +50,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
@@ -64,16 +71,29 @@ public class EvaluationSubmitterTest {
 	private static final String EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 1 Submission Receipt Message";
 	public static final String HOST_PAGE_URL = "http://localhost:8080/test/";
 	EvaluationSubmitter submitter;
+	@Mock
 	EvaluationSubmitterView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	ChallengeClientAsync mockChallengeClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
-	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	EvaluationSubmitter mockEvaluationSubmitter;
+	@Mock
 	GWTWrapper mockGWTWrapper;
+	@Mock
 	PortalGinInjector mockInjector;
+	@Mock
+	DockerCommitListWidget mockDockerCommitListWidget;
+	@Mock
+	DockerCommit mockCommit;
+	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
 	FileEntity entity;
 	EntityBundle bundle;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
@@ -88,17 +108,9 @@ public class EvaluationSubmitterTest {
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
-		mockView = mock(EvaluationSubmitterView.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		mockGWTWrapper = mock(GWTWrapper.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		mockInjector = mock(PortalGinInjector.class);
+		MockitoAnnotations.initMocks(this);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper, mockInjector);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper, mockInjector, mockDockerCommitListWidget);
 		verify(mockView).setChallengesSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setTeamSelectSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setContributorsSynAlertWidget(mockSynAlert.asWidget());
@@ -148,6 +160,7 @@ public class EvaluationSubmitterTest {
 		
 		setupTeamSubmissionEligibility();
 		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
+		when(mockCommit.getDigest()).thenReturn("digest");
 	}
 	
 	public void setupTeamSubmissionEligibility() {
@@ -438,5 +451,43 @@ public class EvaluationSubmitterTest {
 		verify(mockView).clearContributors();
 		verify(mockView).setTeamInEligibleError("");
 	}
-	//TODO: add tests for onindividual and onteam
+
+	@Test
+	public void testOnDockerCommitNextButtonNoCommitsSelected() {
+		configureSubmitter();
+		submitter.onDockerCommitNextButton();
+		verify(mockView).showErrorMessage(NO_COMMITS_SELECTED_MSG);
+	}
+
+	@Test
+	public void testOnDockerCommitNextButton() {
+		configureSubmitter();
+		submitter.setDigest(mockCommit);
+		submitter.onDockerCommitNextButton();
+		verify(mockView, never()).showErrorMessage(NO_COMMITS_SELECTED_MSG);
+		verify(mockView).hideDockerCommitModal();
+	}
+
+	@Test
+	public void testConfigureWithDockerEntity() {
+		String entityId = "syn123";
+		DockerRepository dockerEntity = new DockerRepository();
+		dockerEntity.setId(entityId);
+		submitter.configure(dockerEntity, null);
+		// challengeListSynAlert.clear();
+		// teamSelectSynAlert.clear();
+		// contributorSynAlert.clear();
+		verify(mockSynAlert, times(3)).clear();
+		verify(mockView).resetNextButton();
+		verify(mockView).setContributorsLoading(false);
+		ArgumentCaptor<Callback> emptyCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockDockerCommitListWidget).setEmptyListCallback(emptyCallbackCaptor.capture());
+		verify(mockDockerCommitListWidget).configure(entityId, true);
+		verify(mockDockerCommitListWidget).setDockerCommitClickCallback(any(CallbackP.class));
+		verify(mockView).showDockerCommitModal();
+
+		emptyCallbackCaptor.getValue().invoke();
+		verify(mockView).hideDockerCommitModal();
+		verify(mockView).showErrorMessage(ZERO_COMMITS_ERROR);
+	}
 }
