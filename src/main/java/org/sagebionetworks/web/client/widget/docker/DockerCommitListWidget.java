@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -31,6 +32,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	private CallbackP<DockerCommit> commitClickedCallback;
 	private String entityId;
 	private Callback emptyCommitCallback;
+	private boolean withRadio = false;
 
 	@Inject
 	public DockerCommitListWidget(
@@ -82,7 +84,14 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 										commitClickedCallback.invoke(commit);
 									}
 								});
-								commitsContainer.add(dockerCommitRow.asWidget());
+								if (withRadio) {
+									RadioWidget radioWidget = ginInjector.createNewRadioWidget();
+									radioWidget.add(dockerCommitRow.asWidget());
+									commitsContainer.add(radioWidget.asWidget());
+								} else {
+									
+									commitsContainer.add(dockerCommitRow.asWidget());
+								}
 							}
 						}
 						offset += LIMIT;
@@ -91,8 +100,9 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 		});
 	}
 
-	public void configure(String entityId) {
+	public void configure(String entityId, boolean withRadio) {
 		this.entityId = entityId;
+		this.withRadio = withRadio;
 		commitsContainer.clear();
 		offset = 0L;
 		ascending = false;

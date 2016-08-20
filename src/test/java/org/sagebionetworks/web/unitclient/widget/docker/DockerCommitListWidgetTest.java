@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.DockerClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
@@ -48,6 +49,8 @@ public class DockerCommitListWidgetTest {
 	private PortalGinInjector mockGinInjector;
 	@Mock
 	private DockerCommitRowWidget mockCommitRow;
+	@Mock
+	private RadioWidget mockRadioWidget;
 	@Mock
 	private Callback mockCallback;
 	private DockerCommitListWidget dockerCommitListWidget;
@@ -78,7 +81,8 @@ public class DockerCommitListWidgetTest {
 
 	@Test
 	public void testConfigure() {
-		dockerCommitListWidget.configure(entityId);
+		boolean withRadio = false;
+		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDockerClient).getDockerCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
@@ -86,13 +90,14 @@ public class DockerCommitListWidgetTest {
 
 	@Test
 	public void testLoadMoreZeroResult() {
+		boolean withRadio = false;
 		AsyncMockStubber.callSuccessWith(mockDockerCommitPage)
 				.when(mockDockerClient).getDockerCommits(anyString(),
 						anyLong(), anyLong(), any(DockerCommitSortBy.class),
 						anyBoolean(), any(AsyncCallback.class));
 		when(mockDockerCommitPage.getTotalNumberOfResults()).thenReturn(0L);
 		dockerCommitListWidget.setEmptyListCallback(mockCallback);
-		dockerCommitListWidget.configure(entityId);
+		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDockerClient).getDockerCommits(eq(entityId),
@@ -105,6 +110,7 @@ public class DockerCommitListWidgetTest {
 
 	@Test
 	public void testLoadMoreSuccess() {
+		boolean withRadio = false;
 		when(mockGinInjector.createNewDockerCommitRowWidget()).thenReturn(mockCommitRow);
 		AsyncMockStubber.callSuccessWith(mockDockerCommitPage)
 				.when(mockDockerClient).getDockerCommits(anyString(),
@@ -114,7 +120,7 @@ public class DockerCommitListWidgetTest {
 		DockerCommit commit = new DockerCommit();
 		dockerCommitList.add(commit);
 		when(mockDockerCommitPage.getResults()).thenReturn(dockerCommitList);
-		dockerCommitListWidget.configure(entityId);
+		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitRow).configure(commit);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
@@ -126,13 +132,39 @@ public class DockerCommitListWidgetTest {
 	}
 
 	@Test
+	public void testLoadMoreSuccessWithRadio() {
+		boolean withRadio = true;
+		when(mockGinInjector.createNewDockerCommitRowWidget()).thenReturn(mockCommitRow);
+		when(mockGinInjector.createNewRadioWidget()).thenReturn(mockRadioWidget);
+		AsyncMockStubber.callSuccessWith(mockDockerCommitPage)
+				.when(mockDockerClient).getDockerCommits(anyString(),
+						anyLong(), anyLong(), any(DockerCommitSortBy.class),
+						anyBoolean(), any(AsyncCallback.class));
+		when(mockDockerCommitPage.getTotalNumberOfResults()).thenReturn(1L);
+		DockerCommit commit = new DockerCommit();
+		dockerCommitList.add(commit);
+		when(mockDockerCommitPage.getResults()).thenReturn(dockerCommitList);
+		dockerCommitListWidget.configure(entityId, withRadio);
+		verify(mockCommitRow).configure(commit);
+		verify(mockRadioWidget).add(any(Widget.class));
+		verify(mockCommitsContainer).clear();
+		verify(mockSynAlert).clear();
+		verify(mockDockerClient).getDockerCommits(eq(entityId),
+				anyLong(), anyLong(), any(DockerCommitSortBy.class),
+				anyBoolean(), any(AsyncCallback.class));
+		verify(mockCommitsContainer).add(any(Widget.class));
+		verify(mockCommitsContainer).setIsMore(false);
+	}
+
+	@Test
 	public void testLoadMoreFailure() {
+		boolean withRadio = false;
 		Throwable exception = new Throwable();
 		AsyncMockStubber.callFailureWith(exception)
 				.when(mockDockerClient).getDockerCommits(anyString(),
 						anyLong(), anyLong(), any(DockerCommitSortBy.class),
 						anyBoolean(), any(AsyncCallback.class));
-		dockerCommitListWidget.configure(entityId);
+		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDockerClient).getDockerCommits(eq(entityId),
