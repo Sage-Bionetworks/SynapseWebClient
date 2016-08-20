@@ -5,7 +5,6 @@ import java.util.Date;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -36,6 +35,9 @@ public class FooterViewImpl extends Composite implements FooterView {
 	@UiField
 	Span repoVersionSpan;
 	
+	@UiField
+	Anchor reportAbuseLink;
+	
 	private Presenter presenter;
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
@@ -46,6 +48,13 @@ public class FooterViewImpl extends Composite implements FooterView {
 		this.globalAppState = globalAppState;
 		initDebugModeLink();		
 		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
+		reportAbuseLink.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onReportAbuseClicked();
+			}
+		});
 	}
 	
 	private void initDebugModeLink() {
@@ -86,5 +95,9 @@ public class FooterViewImpl extends Composite implements FooterView {
 		if(repoVersion == null) repoVersion = "--";
 		portalVersionSpan.setText(portalVersion);
 		repoVersionSpan.setText(repoVersion);		
+	}
+	@Override
+	public void open(String url) {
+		DisplayUtils.newWindow(url, "_blank", "");
 	}
 }

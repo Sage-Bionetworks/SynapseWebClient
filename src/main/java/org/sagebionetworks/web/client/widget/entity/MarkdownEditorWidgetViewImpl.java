@@ -272,8 +272,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		writeMarkdownButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				previewUI.setVisible(false);
-				writingUI.setVisible(true);
+				showEditMode();
 			}
 		});
 	}
@@ -449,6 +448,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void showPreview() {
 		writingUI.setVisible(false);
 		previewUI.setVisible(true);
+	}
+	
+	@Override
+	public void showEditMode() {
+		previewUI.setVisible(false);
+		writingUI.setVisible(true);	
 	}
 
 }

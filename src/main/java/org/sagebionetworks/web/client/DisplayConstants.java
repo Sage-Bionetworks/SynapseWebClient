@@ -274,6 +274,6 @@ public class DisplayConstants {
 	// Button styles
 	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
 	public static final String DANGER_BUTTON_STYLE = "btn-danger";
-	public static final int DELAY_UNTIL_IN_VIEW = 2000;
+	public static final int DELAY_UNTIL_IN_VIEW = 1200;
 }
 

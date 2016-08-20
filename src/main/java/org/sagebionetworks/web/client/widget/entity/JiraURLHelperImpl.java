@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -43,6 +42,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	private static final String FLAG_ISSUE_SUMMARY = "Request for ACT to review data";
 	private static final String ACCESS_RESTRCTION_ISSUE_SUMMARY = "Request for ACT to add data restriction";
 	private static final String ACCESS_REQUEST_ISSUE_SUMMARY = "Request for ACT to grant access to data";
+	private static final String REPORT_ABUSE_REQUEST_ISSUE_SUMMARY = "Request for ACT to review abusive content";
 	
 	private static final String DEFAULT_FLAG_DESCRIPTION = "By creating this issue, I wish to alert "+
 	"the Synapse Access and Compliance Team that this data is posted inappropriately because...";
@@ -51,6 +51,10 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	
 	private static final String DEFAULT_ACCESS_DESCRIPTION = "By clicking 'Create', below, I request that the Synapse Access "+
 		"and Compliance Team contact me with further information on how to access this data.";
+	
+	private static final String DEFAULT_REPORT_ABUSE_DESCRIPTION = "By creating this issue, I wish to alert "+
+			"the Synapse team that the page above is in violation (for example: abusive or harmful content, spam, inappropriate ads).\n"
+			+ "Please provide additional information about the issue that you’re reporting:\n\n";
 	
 	/**
 	 * properties used in the interface to Jira for Governance
@@ -199,6 +203,29 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 				accessRequirementId);		
 	}
 	
+	@Override
+	public String createReportAbuseIssueURL() {
+		String principalId = "";
+		String userDisplayName = "";
+		String userEmailAddress = "";
+		if (authenticationController.isLoggedIn()) {
+	    	UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+	    	principalId = authenticationController.getCurrentUserPrincipalId();
+	    	userDisplayName = DisplayUtils.getDisplayName(profile);
+	    	userEmailAddress = DisplayUtils.getPrimaryEmail(profile);
+	    }
+		String currentURL = gwt.getCurrentURL();
+		return createIssueURL(jiraProjectId, 
+				flag_issue_type, 
+				REPORT_ABUSE_REQUEST_ISSUE_SUMMARY, 
+				default_issue_reporter, 
+				gwt.encodeQueryString(currentURL + "\n\n" + DEFAULT_REPORT_ABUSE_DESCRIPTION),
+				principalId, 
+				userDisplayName, 
+				userEmailAddress,
+				null,
+				null);
+	}
 	
 	@Override
 	public void createIssueOnBackend(

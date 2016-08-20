@@ -116,6 +116,7 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
 		verify(mockView).setMarkdownPreviewWidget(any(Widget.class));
+		verify(mockView).showEditMode();
 	}
 	
 	@Test

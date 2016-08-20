@@ -56,7 +56,7 @@ public class SettingsPresenterTest {
 	
 	private static final String APIKEY = "MYAPIKEY";
 	private static final String APIKEY2 = "MYAPIKEY2";
-	SettingsPresenter profilePresenter;
+	SettingsPresenter presenter;
 	SettingsView mockView;
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserService;
@@ -95,9 +95,9 @@ public class SettingsPresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
+		presenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
 				mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget,mockPasswordStrengthWidget);	
-		verify(mockView).setPresenter(profilePresenter);
+		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
@@ -129,7 +129,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
-		profilePresenter.resetPassword(password, newPassword);
+		presenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
 		verify(mockPasswordStrengthWidget).setVisible(false);
 	}
@@ -138,7 +138,7 @@ public class SettingsPresenterTest {
 	public void testResetPasswordFailInitialLogin() throws RestServiceException {		
 		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		
-		profilePresenter.resetPassword(password, newPassword);
+		presenter.resetPassword(password, newPassword);
 		verify(mockSynAlert).showError("Incorrect password. Please enter your existing Synapse password.");
 		verify(mockView).setCurrentPasswordInError(true);
 	}
@@ -149,7 +149,7 @@ public class SettingsPresenterTest {
 		Exception ex = new Exception("pw change failed");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
-		profilePresenter.resetPassword(password, newPassword);
+		presenter.resetPassword(password, newPassword);
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -160,7 +160,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
-		profilePresenter.resetPassword(password, newPassword);
+		presenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));		
 	}
@@ -171,7 +171,7 @@ public class SettingsPresenterTest {
 		boolean sendEmailNotifications = true;
 		boolean markEmailedMessagesAsRead = true;
 		assertNull(profile.getNotificationSettings());
-		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
+		presenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
 		
 		ArgumentCaptor<UserProfile> argument = ArgumentCaptor.forClass(UserProfile.class);
 		//should have called updateUserProfile
@@ -195,7 +195,7 @@ public class SettingsPresenterTest {
 		notificationSettings.setSendEmailNotifications(true);
 		profile.setNotificationSettings(notificationSettings);
 		assertNotNull(profile.getNotificationSettings());
-		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
+		presenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
 		
 		ArgumentCaptor<UserProfile> argument = ArgumentCaptor.forClass(UserProfile.class);
 		//should have called updateUserProfile
@@ -210,14 +210,14 @@ public class SettingsPresenterTest {
 	@Test
 	public void testUpdateMyNotificationSettingsFailure() throws JSONObjectAdapterException {
 		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
-		profilePresenter.updateMyNotificationSettings(true, true);
+		presenter.updateMyNotificationSettings(true, true);
 		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testGetUserNotificationEmail() throws JSONObjectAdapterException {
-		profilePresenter.getUserNotificationEmail();
+		presenter.getUserNotificationEmail();
 		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		verify(mockView).showNotificationEmailAddress(eq(email));
 	}
@@ -226,14 +226,14 @@ public class SettingsPresenterTest {
 	public void testGetUserNotificationEmailFailure() throws JSONObjectAdapterException {
 		Exception caught = new Exception("unexpected exception");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
-		profilePresenter.getUserNotificationEmail();
+		presenter.getUserNotificationEmail();
 		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test
 	public void testSetUserNotificationEmail() throws JSONObjectAdapterException {
-		profilePresenter.setUserNotificationEmail(email);
+		presenter.setUserNotificationEmail(email);
 		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
 		//reload profile
 		verify(mockPlaceChanger).goTo(any(Profile.class));
@@ -243,7 +243,7 @@ public class SettingsPresenterTest {
 	public void testSetUserNotificationEmailFailure() throws JSONObjectAdapterException {
 		Exception caught = new Exception("unexpected exception");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		profilePresenter.setUserNotificationEmail(email);
+		presenter.setUserNotificationEmail(email);
 		verify(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 
@@ -251,7 +251,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testAdditionalEmailValidation() throws JSONObjectAdapterException {
-		profilePresenter.additionalEmailValidation(email);
+		presenter.additionalEmailValidation(email);
 		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showEmailChangeSuccess(anyString());
 	}
@@ -260,7 +260,7 @@ public class SettingsPresenterTest {
 	public void testAdditionalEmailValidationFailure() throws JSONObjectAdapterException {
 		Exception ex = new Exception("unexpected exception");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		profilePresenter.additionalEmailValidation(email);
+		presenter.additionalEmailValidation(email);
 		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -268,57 +268,57 @@ public class SettingsPresenterTest {
 	@Test
 	public void testAdditionalEmailValidationInvalidEmail() throws JSONObjectAdapterException {
 		String email = "invalidEmailAddress";
-		profilePresenter.additionalEmailValidation(email);
+		presenter.additionalEmailValidation(email);
 		verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
 	}
 	
 	@Test (expected=IllegalStateException.class)
 	public void testAddEmailNullEmails(){
 		profile.setEmails(null);
-		profilePresenter.addEmail(email);
+		presenter.addEmail(email);
 	}
 	
 	@Test (expected=IllegalStateException.class)
 	public void testAddEmailEmptyEmails(){
 		profile.setEmails(new ArrayList());
-		profilePresenter.addEmail(email);
+		presenter.addEmail(email);
 	}
 	
 	@Test
 	public void testAddEmailNewEmail(){
 		String email2 = "testuser2@test.com";
-		profilePresenter.addEmail(email2);
+		presenter.addEmail(email2);
 		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testAddEmailExistingEmail(){
-		profilePresenter.addEmail(email);
+		presenter.addEmail(email);
 		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testGetAPIKey() {
-		profilePresenter.getAPIKey();
+		presenter.getAPIKey();
 		verify(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		verify(mockView).setApiKey(APIKEY);
 
 		//verify not cached
-		profilePresenter.getAPIKey();
+		presenter.getAPIKey();
 		verify(mockSynapseClient, times(2)).getAPIKey(any(AsyncCallback.class));
 	}
 	@Test
 	public void testGetAPIKeyFailure() {
 		Exception e = new Exception();
 		AsyncMockStubber.callFailureWith(e).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
-		profilePresenter.getAPIKey();
+		presenter.getAPIKey();
 		verify(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(e);
 	}
 	
 	@Test
 	public void testOnEditProfile() {
-		profilePresenter.onEditProfile();
+		presenter.onEditProfile();
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockUserProfileModalWidget).showEditProfile(anyString(), captor.capture());
 		captor.getValue().invoke();
@@ -326,28 +326,32 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testAsWidget() {
-		profilePresenter.asWidget();
+	public void testConfigure() {
+		presenter.configure();
 		verify(mockSynAlert, times(5)).clear();
 		verify(mockPasswordStrengthWidget).setVisible(false);
 		verify(mockView).clear();
-		verify(mockView).asWidget();
 		verify(mockSubscriptionListWidget).configure();
 	}
 	
 	@Test
-	public void testAsWidgetAnonymousSWC2943() {
-		//used to result in NPE before fix for SWC-2943
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
-		profilePresenter.asWidget();
-		verify(mockView).clear();
+	public void testAsWidget() {
+		presenter.asWidget();
 		verify(mockView).asWidget();
 	}
 	
 	@Test
+	public void testConfigureAnonymousSWC2943() {
+		//used to result in NPE before fix for SWC-2943
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		presenter.configure();
+		verify(mockView).clear();
+	}
+	
+	@Test
 	public void testConfirmAPIKeyChange(){
-		profilePresenter.changeApiKey();
+		presenter.changeApiKey();
 		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
 		verify(mockView).showConfirm(anyString(),  captor.capture());
 		
@@ -366,7 +370,7 @@ public class SettingsPresenterTest {
 	public void testAPIKeyChangeConfirmedFailure(){
 		Exception e = new Exception();
 		AsyncMockStubber.callFailureWith(e).when(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
-		profilePresenter.changeApiKeyPostConfirmation();
+		presenter.changeApiKeyPostConfirmation();
 		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(e);
 	}
@@ -374,7 +378,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testChangePasswordCurrentPasswordFailure() {
 		when(mockView.getCurrentPasswordField()).thenReturn("");
-		profilePresenter.changePassword();
+		presenter.changePassword();
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
@@ -386,7 +390,7 @@ public class SettingsPresenterTest {
 	public void testChangePasswordPassword1Failure() {
 		when(mockView.getCurrentPasswordField()).thenReturn(password);
 		when(mockView.getPassword1Field()).thenReturn("");
-		profilePresenter.changePassword();
+		presenter.changePassword();
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
@@ -400,7 +404,7 @@ public class SettingsPresenterTest {
 		when(mockView.getCurrentPasswordField()).thenReturn(password);
 		when(mockView.getPassword1Field()).thenReturn(newPassword);
 		when(mockView.getPassword2Field()).thenReturn("");
-		profilePresenter.changePassword();
+		presenter.changePassword();
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
@@ -412,7 +416,7 @@ public class SettingsPresenterTest {
 		when(mockView.getCurrentPasswordField()).thenReturn(password);
 		when(mockView.getPassword1Field()).thenReturn(newPassword);
 		when(mockView.getPassword2Field()).thenReturn(newPassword + "abc");
-		profilePresenter.changePassword();
+		presenter.changePassword();
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
@@ -426,7 +430,7 @@ public class SettingsPresenterTest {
 		when(mockView.getCurrentPasswordField()).thenReturn(password);
 		when(mockView.getPassword1Field()).thenReturn(newPassword);
 		when(mockView.getPassword2Field()).thenReturn(newPassword);
-		profilePresenter.changePassword();
+		presenter.changePassword();
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
@@ -436,7 +440,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testClearPasswordErrors() {
-		profilePresenter.clearPasswordErrors();
+		presenter.clearPasswordErrors();
 		verify(mockSynAlert).clear();
 		verify(mockView).setCurrentPasswordInError(false);
 		verify(mockView).setPassword1InError(false);
