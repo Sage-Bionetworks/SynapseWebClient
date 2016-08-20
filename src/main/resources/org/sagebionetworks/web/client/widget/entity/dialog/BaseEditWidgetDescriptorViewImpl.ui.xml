@@ -17,8 +17,8 @@
 		</bh:Div>
 	  </b:ModalBody>
 	  <b:ModalFooter>
+	      <b:Button ui:field="okButton" type="PRIMARY" >Save</b:Button>
 	      <b:Button type="DEFAULT" dataDismiss="MODAL" >Cancel</b:Button>
-	      <b:Button ui:field="okButton" type="PRIMARY" >Insert</b:Button>
 	  </b:ModalFooter>
 	</b:Modal>
 	
