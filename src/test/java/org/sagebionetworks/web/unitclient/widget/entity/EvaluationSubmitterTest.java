@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -489,5 +490,41 @@ public class EvaluationSubmitterTest {
 		emptyCallbackCaptor.getValue().invoke();
 		verify(mockView).hideDockerCommitModal();
 		verify(mockView).showErrorMessage(ZERO_COMMITS_ERROR);
+	}
+
+	@Test
+	public void testSubmitDockerRepo() throws RestServiceException{
+		String entityId = "syn123";
+		DockerRepository dockerEntity = new DockerRepository();
+		dockerEntity.setId(entityId);
+		submitter.configure(dockerEntity, null);
+		submitter.setDigest(mockCommit);
+		submitter.onDockerCommitNextButton();
+
+		Challenge testChallenge = getTestChallenge();
+		AsyncMockStubber.callSuccessWith(testChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		Team testTeam = new Team();
+		testTeam.setId("80");
+		testTeam.setName("test team");
+		List<Team> submissionTeams = Collections.singletonList(testTeam);
+		AsyncMockStubber.callSuccessWith(submissionTeams).when(mockChallengeClient).getSubmissionTeams(anyString(), anyString(), any(AsyncCallback.class));
+		
+		Evaluation testEvaluation = new Evaluation();
+		testEvaluation.setContentSource("syn9999");
+		submitter.onNextClicked(new Reference(), "named submission", testEvaluation);
+		
+		submitter.onTeamSubmissionOptionClicked();
+		submitter.onTeamSelected(0);
+		Long eligibleMemberId = 60L;
+		MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+		memberEligibility.setPrincipalId(eligibleMemberId);
+		memberEligibility.setIsEligible(true);
+		memberEligibilityList.add(memberEligibility);
+		submitter.getContributorList(new Evaluation(), new Team());
+
+		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
+		submitter.onDoneClicked();
+		verify(mockChallengeClient).createTeamSubmission(captor.capture(), anyString(), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
+		assertNotNull(captor.getValue().getDockerDigest());
 	}
 }
