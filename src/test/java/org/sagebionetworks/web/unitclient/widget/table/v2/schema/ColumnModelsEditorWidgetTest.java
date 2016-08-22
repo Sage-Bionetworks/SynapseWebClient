@@ -101,7 +101,7 @@ public class ColumnModelsEditorWidgetTest {
 		// This should add a new string column
 		widget.addNewColumn();
 		// the new row should be added to the keyboard navigator
-		verify(mockKeyboardNavigationHandler).bindRow(any(RowOfWidgets.class));
+		verify(mockKeyboardNavigationHandler, times(schema.size() + 1)).bindRow(any(RowOfWidgets.class));
 		// A string should be added...
 		ColumnModel newModel = new ColumnModel();
 		newModel.setColumnType(ColumnModelsEditorWidget.DEFAULT_NEW_COLUMN_TYPE);
@@ -126,9 +126,10 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testSelectAll(){
-		verify(mockEditor).setCanDelete(false);
-		verify(mockEditor).setCanMoveUp(false);
-		verify(mockEditor).setCanMoveDown(false);
+		// checks selection state each time a column editor is added, and once when columns are initialized.
+		verify(mockEditor, times(schema.size() + 1)).setCanDelete(false);
+		verify(mockEditor, times(schema.size() + 1)).setCanMoveUp(false);
+		verify(mockEditor, times(schema.size() + 1)).setCanMoveDown(false);
 		
 		// Add three columns
 		reset(mockEditor);

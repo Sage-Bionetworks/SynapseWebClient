@@ -36,7 +36,7 @@ public enum AsynchType implements IsSerializable{
 	TableCSVDownload(DownloadFromTableRequest.class, DownloadFromTableResult.class),
 	S3FileCopy(S3FileCopyRequest.class, S3FileCopyResults.class),
 	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
-	TableUpdateTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
+	TableTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
 	
 	Class<? extends AsynchronousRequestBody> requestClass;
 	Class<? extends AsynchronousResponseBody> responseClass;

@@ -144,7 +144,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	
 	public void startTrackingJob(TableSchemaChangeRequest request) {
 		this.baseView.setJobTrackingWidgetVisible(true);
-		this.jobTrackingWidget.startAndTrackJob(UPDATING_SCHEMA, false, AsynchType.TableUpdateTransaction, request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				baseView.setJobTrackingWidgetVisible(false);

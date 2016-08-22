@@ -32,6 +32,7 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
+	public static final String SCHEMA_UPDATE_CANCELLED = "Schema update cancelled";
 	public static final String FINISH = "Finish";
 	ColumnModelsEditorWidget editor;
 	String tableId;
@@ -127,7 +128,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	
 	public void startTrackingJob(TableSchemaChangeRequest request) {
 		presenter.setLoading(true);
-		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableUpdateTransaction, request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				presenter.setErrorMessage(failure.getMessage());
@@ -140,7 +141,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			}
 			@Override
 			public void onCancel() {
-				presenter.setErrorMessage("Schema update cancelled");
+				presenter.setErrorMessage(SCHEMA_UPDATE_CANCELLED);
 			}
 		});
 	}
