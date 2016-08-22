@@ -125,6 +125,11 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
+import org.sagebionetworks.repo.model.table.ColumnChange;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -221,7 +226,14 @@ public class SynapseClientImplTest {
 	UserGroupHeader mockUserGroupHeader;
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
-	
+	@Mock
+	ColumnModel mockOldColumnModel;
+	@Mock
+	ColumnModel mockNewColumnModel;
+	@Mock
+	ColumnModel mockNewColumnModelAfterCreate;
+	public static final String OLD_COLUMN_MODEL_ID = "4444";
+	public static final String NEW_COLUMN_MODEL_ID = "837837";
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
@@ -276,7 +288,9 @@ public class SynapseClientImplTest {
 		userEvaluationPermissions.setCanChangePermissions(true);
 		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2)).thenReturn(
 				userEvaluationPermissions);
-
+		when(mockOldColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
+		when(mockNewColumnModelAfterCreate.getId()).thenReturn(NEW_COLUMN_MODEL_ID);
+		
 		// Setup the path
 		path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
@@ -2274,5 +2288,55 @@ public class SynapseClientImplTest {
 		//test error from backend
 		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
 		synapseClient.getUserIdFromUsername("bad-request");
+	}
+	
+	@Test
+	public void testGetTableUpdateTransactionRequestNoChange()  throws RestServiceException, SynapseException {
+		String tableId = "syn93939";
+		
+		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
+		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
+		assertNull(synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels));
+	}
+	
+	@Test
+	public void testGetTableUpdateTransactionRequestNewColumn()  throws RestServiceException, SynapseException {
+		String tableId = "syn93939";
+		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
+		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
+		when(mockSynapse.createColumnModel(any(ColumnModel.class))).thenReturn(mockNewColumnModelAfterCreate);
+		List<ColumnModel> newColumnModels = Collections.singletonList(mockNewColumnModel);
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, newColumnModels);
+		verify(mockSynapse).createColumnModel(mockNewColumnModel);
+		assertEquals(tableId, request.getEntityId());
+		List<TableUpdateRequest> tableUpdates = request.getChanges();
+		assertEquals(1, tableUpdates.size());
+		TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest)tableUpdates.get(0);
+		List<ColumnChange> changes = schemaChange.getChanges();
+		assertEquals(1, changes.size());
+		ColumnChange columnChange = changes.get(0);
+		assertNull(columnChange.getOldColumnId());
+		assertEquals(NEW_COLUMN_MODEL_ID, columnChange.getNewColumnId());
+	}
+	
+	@Test
+	public void testGetTableUpdateTransactionRequestUpdateColumn()  throws RestServiceException, SynapseException {
+		String tableId = "syn93939";
+		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
+		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
+		when(mockSynapse.createColumnModel(any(ColumnModel.class))).thenReturn(mockNewColumnModelAfterCreate);
+		when(mockNewColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
+		List<ColumnModel> newColumnModels = Collections.singletonList(mockNewColumnModel);
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, newColumnModels);
+		verify(mockSynapse).createColumnModel(mockNewColumnModel);
+		assertEquals(tableId, request.getEntityId());
+		List<TableUpdateRequest> tableUpdates = request.getChanges();
+		assertEquals(1, tableUpdates.size());
+		TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest)tableUpdates.get(0);
+		List<ColumnChange> changes = schemaChange.getChanges();
+		assertEquals(1, changes.size());
+		ColumnChange columnChange = changes.get(0);
+		assertEquals(OLD_COLUMN_MODEL_ID, columnChange.getOldColumnId());
+		assertEquals(NEW_COLUMN_MODEL_ID, columnChange.getNewColumnId());
 	}
 }
