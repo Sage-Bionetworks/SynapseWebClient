@@ -2716,7 +2716,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			}
 			List<ColumnChange> changes = new ArrayList<ColumnChange>();
 			for (ColumnModel m : models) {
-				String oldColumnId = m.getId();
 				if (m.getId() == null) {
 					ColumnModel newColumnModel = synapseClient.createColumnModel(m);
 					changes.add(createNewColumnChange(null, newColumnModel.getId()));

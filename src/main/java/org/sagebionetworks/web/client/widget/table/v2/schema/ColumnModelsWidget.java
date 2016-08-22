@@ -60,6 +60,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.baseView.setViewer(this.viewer);
 		this.baseView.setEditor(this.editor);
 		this.baseView.setJobTrackingWidget(jobTrackingWidget);
+		this.baseView.setJobTrackingWidgetVisible(false);
 		this.synapseClient = synapseClient;
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
@@ -142,19 +143,23 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	}
 	
 	public void startTrackingJob(TableSchemaChangeRequest request) {
+		this.baseView.setJobTrackingWidgetVisible(true);
 		this.jobTrackingWidget.startAndTrackJob(UPDATING_SCHEMA, false, AsynchType.TableUpdateTransaction, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
+				baseView.setJobTrackingWidgetVisible(false);
 				baseView.showError(failure.getMessage());
 			}
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				baseView.setJobTrackingWidgetVisible(false);
 				// Hide the dialog
 				baseView.hideEditor();
 				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			@Override
 			public void onCancel() {
+				baseView.setJobTrackingWidgetVisible(false);
 				baseView.showEditor();
 			}
 		});

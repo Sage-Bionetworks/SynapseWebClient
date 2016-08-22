@@ -30,6 +30,7 @@ public interface ColumnModelsViewBase extends IsWidget {
 
 	public void setEditor(IsWidget editor);
 	public void setJobTrackingWidget(IsWidget jobTrackingWidget);
+	public void setJobTrackingWidgetVisible(boolean visible);
 	/**
 	 * Show the editor.
 	 */

@@ -103,4 +103,8 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 		jobTrackerWidgetContainer.clear();
 		jobTrackerWidgetContainer.add(jobTrackingWidget);
 	}
+	@Override
+	public void setJobTrackingWidgetVisible(boolean visible) {
+		jobTrackerWidgetContainer.setVisible(visible);
+	}
 }
