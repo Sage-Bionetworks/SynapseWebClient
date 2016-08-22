@@ -99,7 +99,7 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
-import org.sagebionetworks.web.client.widget.RadioWidgetView;
+import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
@@ -137,8 +137,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadMo
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
-import org.sagebionetworks.web.client.widget.docker.DigestWidgetView;
-import org.sagebionetworks.web.client.widget.docker.DigestWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidgetView;
@@ -1283,7 +1281,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AddExternalRepoModalView.class).to(AddExternalRepoModalViewImpl.class);
 		bind(DockerCommitRowWidgetView.class).to(DockerCommitRowWidgetViewImpl.class);
 		bind(DockerCommitListWidgetView.class).to(DockerCommitListWidgetViewImpl.class);
-		bind(DigestWidgetView.class).to(DigestWidgetViewImpl.class);
 		
 		bind(SessionStorage.class).to(SessionStorageImpl.class);
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
@@ -1315,7 +1312,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
 		bind(LoadMoreWidgetContainerView.class).to(LoadMoreWidgetContainerViewImpl.class);
-		bind(RadioWidgetView.class).to(RadioWidgetViewImpl.class);
+		bind(RadioWidget.class).to(RadioWidgetViewImpl.class);
 		
 		bind(FileClientsHelp.class).to(FileClientsHelpImpl.class);
 		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);

@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import java.util.UUID;
+
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.client.DockerClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -26,13 +29,15 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	private SynapseAlert synAlert;
 	private LoadMoreWidgetContainer commitsContainer;
 	private PortalGinInjector ginInjector;
+	private GWTWrapper gwtWrapper;
 	private Long offset;
 	private DockerCommitSortBy order;
 	private Boolean ascending;
-	private CallbackP<DockerCommit> commitClickedCallback;
 	private String entityId;
 	private Callback emptyCommitCallback;
 	private boolean withRadio = false;
+	private DockerCommit currentCommit;
+	private String radioGroupName;
 
 	@Inject
 	public DockerCommitListWidget(
@@ -40,12 +45,14 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 			DockerClientAsync dockerClient,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer commitsContainer,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			GWTWrapper gwtWrapper) {
 		this.view = view;
 		this.dockerClient = dockerClient;
 		this.synAlert = synAlert;
 		this.commitsContainer = commitsContainer;
 		this.ginInjector = ginInjector;
+		this.gwtWrapper = gwtWrapper;
 		view.setPresenter(this);
 		commitsContainer.configure(new Callback() {
 			@Override
@@ -72,7 +79,9 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 					public void onSuccess(PaginatedResults<DockerCommit> result) {
 						long numberOfCommits = result.getTotalNumberOfResults();
 						if (numberOfCommits == 0) {
-							emptyCommitCallback.invoke();
+							if (emptyCommitCallback != null) {
+								emptyCommitCallback.invoke();
+							}
 						} else {
 							for(final DockerCommit commit: result.getResults()) {
 								DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
@@ -81,12 +90,13 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	
 									@Override
 									public void invoke(DockerCommit param) {
-										commitClickedCallback.invoke(commit);
+										currentCommit = param;
 									}
 								});
 								if (withRadio) {
 									RadioWidget radioWidget = ginInjector.createNewRadioWidget();
 									radioWidget.add(dockerCommitRow.asWidget());
+									radioWidget.setGroupName(radioGroupName);
 									commitsContainer.add(radioWidget.asWidget());
 								} else {
 									
@@ -104,14 +114,14 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 		this.entityId = entityId;
 		this.withRadio = withRadio;
 		commitsContainer.clear();
+		currentCommit = null;
 		offset = 0L;
 		ascending = false;
 		order = DEFAULT_ORDER;
+		if (withRadio) {
+			radioGroupName = gwtWrapper.getUniqueElementId();
+		}
 		loadMore();
-	}
-
-	public void setDockerCommitClickCallback(CallbackP<DockerCommit> callback) {
-		this.commitClickedCallback = callback;
 	}
 
 	@Override
@@ -123,4 +133,8 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 		this.emptyCommitCallback = callback;
 	}
 
+	@Override
+	public DockerCommit getCurrentCommit() {
+		return currentCommit;
+	}
 }

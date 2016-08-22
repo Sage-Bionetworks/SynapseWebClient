@@ -52,7 +52,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
@@ -115,6 +114,7 @@ public class EvaluationSubmitterTest {
 		verify(mockView).setChallengesSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setTeamSelectSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setContributorsSynAlertWidget(mockSynAlert.asWidget());
+		verify(mockView).setDockerCommitSynAlert(mockSynAlert.asWidget());
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
@@ -457,15 +457,17 @@ public class EvaluationSubmitterTest {
 	public void testOnDockerCommitNextButtonNoCommitsSelected() {
 		configureSubmitter();
 		submitter.onDockerCommitNextButton();
-		verify(mockView).showErrorMessage(NO_COMMITS_SELECTED_MSG);
+		ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
+		verify(mockSynAlert).handleException(captor.capture());
+		assertEquals(captor.getValue().getMessage(), NO_COMMITS_SELECTED_MSG);
 	}
 
 	@Test
 	public void testOnDockerCommitNextButton() {
 		configureSubmitter();
-		submitter.setDigest(mockCommit);
+		when(mockDockerCommitListWidget.getCurrentCommit()).thenReturn(mockCommit);
 		submitter.onDockerCommitNextButton();
-		verify(mockView, never()).showErrorMessage(NO_COMMITS_SELECTED_MSG);
+		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockView).hideDockerCommitModal();
 	}
 
@@ -478,13 +480,12 @@ public class EvaluationSubmitterTest {
 		// challengeListSynAlert.clear();
 		// teamSelectSynAlert.clear();
 		// contributorSynAlert.clear();
-		verify(mockSynAlert, times(3)).clear();
+		verify(mockSynAlert, times(4)).clear();
 		verify(mockView).resetNextButton();
 		verify(mockView).setContributorsLoading(false);
 		ArgumentCaptor<Callback> emptyCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockDockerCommitListWidget).setEmptyListCallback(emptyCallbackCaptor.capture());
 		verify(mockDockerCommitListWidget).configure(entityId, true);
-		verify(mockDockerCommitListWidget).setDockerCommitClickCallback(any(CallbackP.class));
 		verify(mockView).showDockerCommitModal();
 
 		emptyCallbackCaptor.getValue().invoke();

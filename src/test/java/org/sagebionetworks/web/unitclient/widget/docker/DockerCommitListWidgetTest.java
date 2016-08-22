@@ -20,9 +20,11 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.client.DockerClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
@@ -52,6 +54,8 @@ public class DockerCommitListWidgetTest {
 	@Mock
 	private RadioWidget mockRadioWidget;
 	@Mock
+	private GWTWrapper mockGwtWrapper;
+	@Mock
 	private Callback mockCallback;
 	private DockerCommitListWidget dockerCommitListWidget;
 	private String entityId;
@@ -60,7 +64,7 @@ public class DockerCommitListWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		dockerCommitListWidget = new DockerCommitListWidget(mockView, mockDockerClient, mockSynAlert, mockCommitsContainer, mockGinInjector);
+		dockerCommitListWidget = new DockerCommitListWidget(mockView, mockDockerClient, mockSynAlert, mockCommitsContainer, mockGinInjector, mockGwtWrapper);
 
 		entityId = "syn123";
 		dockerCommitList = new ArrayList<DockerCommit>();
@@ -134,6 +138,8 @@ public class DockerCommitListWidgetTest {
 	@Test
 	public void testLoadMoreSuccessWithRadio() {
 		boolean withRadio = true;
+		String id = "uniqueId";
+		when(mockGwtWrapper.getUniqueElementId()).thenReturn(id);
 		when(mockGinInjector.createNewDockerCommitRowWidget()).thenReturn(mockCommitRow);
 		when(mockGinInjector.createNewRadioWidget()).thenReturn(mockRadioWidget);
 		AsyncMockStubber.callSuccessWith(mockDockerCommitPage)
@@ -147,6 +153,7 @@ public class DockerCommitListWidgetTest {
 		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitRow).configure(commit);
 		verify(mockRadioWidget).add(any(Widget.class));
+		verify(mockRadioWidget).setGroupName(id);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDockerClient).getDockerCommits(eq(entityId),

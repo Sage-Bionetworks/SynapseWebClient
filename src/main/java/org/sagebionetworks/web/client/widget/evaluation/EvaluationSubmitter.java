@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView.Presenter;
@@ -68,6 +67,7 @@ public class EvaluationSubmitter implements Presenter {
 	boolean isIndividualSubmission;
 	private String dockerDigest;
 	private Set<String> evaluationIds;
+	private SynapseAlert dockerCommitSynAlert;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -89,9 +89,11 @@ public class EvaluationSubmitter implements Presenter {
 		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();
 		this.teamSelectSynAlert = ginInjector.getSynapseAlertWidget();
 		this.contributorSynAlert = ginInjector.getSynapseAlertWidget();
+		this.dockerCommitSynAlert = ginInjector.getSynapseAlertWidget();
 		this.view.setChallengesSynAlertWidget(challengeListSynAlert.asWidget());
 		this.view.setTeamSelectSynAlertWidget(teamSelectSynAlert.asWidget());
 		this.view.setContributorsSynAlertWidget(contributorSynAlert.asWidget());
+		this.view.setDockerCommitSynAlert(dockerCommitSynAlert.asWidget());
 		this.view.setDockerCommitList(dockerCommitList.asWidget());
 	}
 	
@@ -111,32 +113,30 @@ public class EvaluationSubmitter implements Presenter {
 		challengeListSynAlert.clear();
 		teamSelectSynAlert.clear();
 		contributorSynAlert.clear();
+		dockerCommitSynAlert.clear();
 		view.resetNextButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		this.evaluationIds = evaluationIds;
 		if (submissionEntity instanceof DockerRepository) {
-			dockerDigest = null;
-			dockerCommitList.setEmptyListCallback(new Callback(){
-
-				@Override
-				public void invoke() {
-					view.hideDockerCommitModal();
-					view.showErrorMessage(ZERO_COMMITS_ERROR);
-				}
-			});
-			dockerCommitList.configure(submissionEntity.getId(), true);
-			dockerCommitList.setDockerCommitClickCallback(new CallbackP<DockerCommit>(){
-
-				@Override
-				public void invoke(DockerCommit commit) {
-					setDigest(commit);
-				}
-			});
-			view.showDockerCommitModal();
+			configureWithDockerCommit(submissionEntity);
 		} else {
 			configureWithEvaluations();
 		}
+	}
+
+	public void configureWithDockerCommit(Entity submissionEntity) {
+		dockerDigest = null;
+		dockerCommitList.setEmptyListCallback(new Callback(){
+
+			@Override
+			public void invoke() {
+				view.hideDockerCommitModal();
+				view.showErrorMessage(ZERO_COMMITS_ERROR);
+			}
+		});
+		dockerCommitList.configure(submissionEntity.getId(), true);
+		view.showDockerCommitModal();
 	}
 
 	private void configureWithEvaluations() {
@@ -492,9 +492,11 @@ public class EvaluationSubmitter implements Presenter {
 
 	@Override
 	public void onDockerCommitNextButton() {
-		if (dockerDigest == null) {
-			view.showErrorMessage(NO_COMMITS_SELECTED_MSG);
+		DockerCommit commit = dockerCommitList.getCurrentCommit();
+		if (commit == null) {
+			dockerCommitSynAlert.handleException(new Throwable(NO_COMMITS_SELECTED_MSG));
 		} else {
+			dockerDigest = commit.getDigest();
 			view.hideDockerCommitModal();
 			configureWithEvaluations();
 		}

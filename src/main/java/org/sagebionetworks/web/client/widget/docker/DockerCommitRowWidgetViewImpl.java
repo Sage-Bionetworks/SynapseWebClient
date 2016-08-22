@@ -23,7 +23,7 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 	@UiField
 	TextBox createdOn;
 	@UiField
-	Span digest;
+	TextBox digest;
 	@UiField
 	FocusPanel row;
 
@@ -60,9 +60,8 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 	}
 
 	@Override
-	public void setDigest(Widget widget) {
-		this.digest.clear();
-		this.digest.add(widget);
+	public void setDigest(String digest) {
+		this.digest.setText(digest);
 	}
 
 	@Override

@@ -12,7 +12,7 @@
 					<bh:Span ui:field="tag" addStyleNames="margin-left-5"/>
 				</t:TableData>
 				<t:TableData width="200px">
-					<bh:Span ui:field="digest"/>
+					<g:TextBox ui:field="digest" addStyleNames="border-none noBackground" readOnly="true"/>
 				</t:TableData>
 				<t:TableData width="200px" addStyleNames="visible-lg">
 					<g:TextBox ui:field="createdOn" addStyleNames="border-none noBackground" readOnly="true"/>

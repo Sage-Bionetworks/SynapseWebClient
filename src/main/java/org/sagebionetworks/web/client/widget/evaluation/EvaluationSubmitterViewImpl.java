@@ -99,6 +99,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	SimplePanel contributorSynAlertPanel;
 	@UiField
+	SimplePanel dockerCommitListSynAlertPanel;
+	@UiField
 	FormGroup evaluationListUI;
 	@UiField
 	Modal dockerCommitModal;
@@ -414,4 +416,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		evaluationListUI.setVisible(visible);
 	}
 
+	@Override
+	public void setDockerCommitSynAlert(Widget widget) {
+		this.dockerCommitListSynAlertPanel.clear();
+		this.dockerCommitListSynAlertPanel.add(widget);
+	}
 }

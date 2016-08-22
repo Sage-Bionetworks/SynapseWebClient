@@ -2,45 +2,22 @@ package org.sagebionetworks.web.client.widget;
 
 import java.util.Iterator;
 
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
-public class RadioWidget implements IsWidget, HasWidgets, RadioWidgetView.Presenter{
-
-	private RadioWidgetView view;
-
-	@Inject
-	public RadioWidget(
-			RadioWidgetView view
-			) {
-		this.view = view;
+public interface RadioWidget {
+	public interface Presenter{
 	}
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+	Widget asWidget();
 
-	@Override
-	public void add(Widget widget) {
-		view.add(widget);
-	}
+	void add(Widget widget);
 
-	@Override
-	public void clear() {
-		view.clear();
-	}
+	void clear();
 
-	@Override
-	public Iterator<Widget> iterator() {
-		return view.iterator();
-	}
+	Iterator<Widget> iterator();
 
-	@Override
-	public boolean remove(Widget widget) {
-		return view.remove(widget);
-	}
+	boolean remove(Widget widget);
+
+	void setGroupName(String groupName);
 
 }

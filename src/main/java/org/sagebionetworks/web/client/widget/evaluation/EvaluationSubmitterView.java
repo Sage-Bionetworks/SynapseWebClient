@@ -51,4 +51,5 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void showDockerCommitModal();
 	void hideDockerCommitModal();
 	void setDockerCommitList(Widget widget);
+	void setDockerCommitSynAlert(Widget widget);
 }

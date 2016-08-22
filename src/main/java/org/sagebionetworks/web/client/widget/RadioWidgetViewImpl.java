@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RadioWidgetViewImpl implements RadioWidgetView{
+public class RadioWidgetViewImpl implements RadioWidget{
 	@UiField
 	FocusPanel item;
 	@UiField
@@ -58,6 +58,11 @@ public class RadioWidgetViewImpl implements RadioWidgetView{
 	@Override
 	public boolean remove(Widget widget) {
 		return item.remove(widget);
+	}
+
+	@Override
+	public void setGroupName(String groupName) {
+		radio.setName(groupName);
 	}
 
 }
