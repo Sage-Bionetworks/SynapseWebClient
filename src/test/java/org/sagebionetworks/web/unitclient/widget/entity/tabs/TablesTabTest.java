@@ -226,7 +226,7 @@ public class TablesTabTest {
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(tableEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
-		assertNull(place.getArea());
+		assertEquals(EntityArea.TABLES, place.getArea());
 		assertNull(place.getAreaToken());
 	}
 	
@@ -283,17 +283,18 @@ public class TablesTabTest {
 		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
 		
 		reset(mockTab);
-		String queryToken = queryTokenProvider.queryToToken(query);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
 		tab.onQueryChange(query);
 		
 		Synapse place = getNewPlace(tableName);
 		assertEquals(EntityArea.TABLES, place.getArea());
-		assertTrue(place.getAreaToken().contains(queryToken));
+		assertTrue(place.getAreaToken().isEmpty());
 	}
 	
 	@Test
 	public void testSetTableQueryWithToken() {
 		query.setOffset(1L);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(new Query());
 		String startToken = queryTokenProvider.queryToToken(query);
 		// Start with a token.
 		

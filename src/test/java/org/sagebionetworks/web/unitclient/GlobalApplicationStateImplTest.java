@@ -194,6 +194,27 @@ public class GlobalApplicationStateImplTest {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCheckVersionCompatibilityCheckedRecently() {
+		when(mockLocalStorage.get(GlobalApplicationStateImpl.RECENTLY_CHECKED_SYNAPSE_VERSION)).thenReturn(Boolean.TRUE.toString());
+		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
+		globalApplicationState.initSynapseProperties(new Callback() {
+			@Override
+			public void invoke() {}
+		});
+		
+		reset(mockSynapseClient);
+		globalApplicationState.checkVersionCompatibility(callback);
+		
+		verify(mockSynapseClient, never()).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
+		//verify callback was given the correct version
+		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
+		verify(callback).onSuccess(captor.capture());
+		assertEquals("v1", captor.getValue().getVersion());
+	}
+	
 	@Test
 	public void testInitSynapseProperties() {
 		String key = "k1";

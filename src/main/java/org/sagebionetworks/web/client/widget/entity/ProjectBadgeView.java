@@ -22,7 +22,7 @@ public interface ProjectBadgeView extends IsWidget {
 	String getSimpleDateString(Date date);
 	void setFavoritesWidget(Widget widget);
 	boolean isAttached();
-	
+	void addStyleName(String style);
 	/**
 	 * Presenter interface
 	 */

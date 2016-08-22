@@ -205,18 +205,8 @@
 													</b:ButtonGroup>
 												</b:ButtonGroup>
 												<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10"/>	
-												<g:SimplePanel ui:field="emptyProjectUI" addStyleNames="smallGreyText padding-15">
-												    	<bh:Text>- Empty</bh:Text>
-												</g:SimplePanel>
 											</b:Column>
 										</b:Row>
-										<div ui:field="projectsLoadingUI" >
-											<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-											&nbsp;Loading...
-										</div>
-										<div class="clearfix">
-										    <b:Button ui:field="moreProjectsButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
-										</div>
 										<g:FlowPanel ui:field="favoritesHelpPanel" addStyleNames="help-panel" visible="false">
 											<b:BlockQuote styleName="panel">
 												<b:Icon type="STAR" pull="LEFT" addStyleNames="font-size-90 favoriteIcon" />

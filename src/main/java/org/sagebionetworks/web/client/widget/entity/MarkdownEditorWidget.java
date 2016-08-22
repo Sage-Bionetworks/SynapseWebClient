@@ -107,6 +107,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.clear();
 		view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.configure(markdown);
+		view.showEditMode();
 		if (formattingGuideWikiPageKey == null) {
 			//get the page name to wiki key map
 			getFormattingGuideWikiKey(new CallbackP<WikiPageKey>() {
