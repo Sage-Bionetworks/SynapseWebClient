@@ -116,6 +116,7 @@ public class EvaluationSubmitter implements Presenter {
 		this.submissionEntity = submissionEntity;
 		this.evaluationIds = evaluationIds;
 		if (submissionEntity instanceof DockerRepository) {
+			dockerDigest = null;
 			dockerCommitList.setEmptyListCallback(new Callback(){
 
 				@Override
@@ -403,6 +404,9 @@ public class EvaluationSubmitter implements Presenter {
 		newSubmission.setEntityId(entityId);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
 		newSubmission.setVersionNumber(versionNumber);
+		if (submissionEntity instanceof DockerRepository) {
+			newSubmission.setDockerDigest(dockerDigest);
+		}
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
 		if (!isIndividualSubmission && !selectedTeamEligibleMembers.isEmpty()) {
