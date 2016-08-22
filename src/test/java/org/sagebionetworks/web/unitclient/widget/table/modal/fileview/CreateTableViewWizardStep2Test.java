@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -55,7 +56,7 @@ public class CreateTableViewWizardStep2Test {
 	@Mock
 	JobTrackingWidget mockJobTrackingWidget;
 	@Mock
-	TableSchemaChangeRequest mockTableSchemaChangeRequest;
+	TableUpdateTransactionRequest mockTableSchemaChangeRequest;
 	
 	@Before
 	public void before(){
@@ -65,7 +66,7 @@ public class CreateTableViewWizardStep2Test {
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).setTableSchema(anyString(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -147,7 +148,7 @@ public class CreateTableViewWizardStep2Test {
 		widget.configure(tableEntity, TableType.table);
 		String error = "error message";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setTableSchema(anyString(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), any(AsyncCallback.class));
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();

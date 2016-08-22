@@ -6,7 +6,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -129,7 +130,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// Get the models from the view and save them
 		baseView.setLoading();
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema(bundle.getEntity().getId(), newSchema, new AsyncCallback<TableSchemaChangeRequest>(){
+		synapseClient.getTableUpdateTransactionRequest(bundle.getEntity().getId(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -137,12 +138,23 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 			
 			@Override
-			public void onSuccess(TableSchemaChangeRequest request) {
-				startTrackingJob(request);
+			public void onSuccess(TableUpdateTransactionRequest request) {
+				if (request == null) {
+					finished();
+				} else {
+					startTrackingJob(request);	
+				}
 			}}); 
 	}
 	
-	public void startTrackingJob(TableSchemaChangeRequest request) {
+	public void finished() {
+		baseView.setJobTrackingWidgetVisible(false);
+		// Hide the dialog
+		baseView.hideEditor();
+		updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	}
+	
+	public void startTrackingJob(TableUpdateTransactionRequest request) {
 		this.baseView.setJobTrackingWidgetVisible(true);
 		this.jobTrackingWidget.startAndTrackJob(UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 			@Override
@@ -152,10 +164,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				baseView.setJobTrackingWidgetVisible(false);
-				// Hide the dialog
-				baseView.hideEditor();
-				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				finished();
 			}
 			@Override
 			public void onCancel() {

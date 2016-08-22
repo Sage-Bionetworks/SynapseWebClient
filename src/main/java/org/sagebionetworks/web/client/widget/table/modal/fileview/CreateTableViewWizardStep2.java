@@ -7,10 +7,9 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -114,19 +113,28 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema(entity.getId(), newSchema, new AsyncCallback<TableSchemaChangeRequest>(){
+		synapseClient.getTableUpdateTransactionRequest(entity.getId(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
-			public void onSuccess(TableSchemaChangeRequest request) {
-				startTrackingJob(request);
+			public void onSuccess(TableUpdateTransactionRequest request) {
+				if (request == null) {
+					finished();
+				} else {
+					startTrackingJob(request);	
+				}
 			}}); 
 	}
+	public void finished() {
+		// Hide the dialog
+		presenter.setLoading(false);
+		presenter.onFinished();
+	}
 	
-	public void startTrackingJob(TableSchemaChangeRequest request) {
+	public void startTrackingJob(TableUpdateTransactionRequest request) {
 		presenter.setLoading(true);
 		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 			@Override
@@ -135,9 +143,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			}
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				// Hide the dialog
-				presenter.setLoading(false);
-				presenter.onFinished();
+				finished();
 			}
 			@Override
 			public void onCancel() {

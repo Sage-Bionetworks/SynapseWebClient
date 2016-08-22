@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -81,7 +82,7 @@ public class ColumnModelsWidgetTest {
 	@Mock
 	List<ColumnModel> mockDefaultColumnModels;
 	@Mock
-	TableSchemaChangeRequest mockTableSchemaChangeRequest;
+	TableUpdateTransactionRequest mockTableSchemaChangeRequest;
 	@Mock
 	JobTrackingWidget mockJobTrackingWidget;
 	
@@ -114,7 +115,7 @@ public class ColumnModelsWidgetTest {
 		});
 		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget);
 		when(mockEditor.validate()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).setTableSchema(anyString(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -274,7 +275,7 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		String errorMessage = "Something went wrong";
-		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(anyString(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
