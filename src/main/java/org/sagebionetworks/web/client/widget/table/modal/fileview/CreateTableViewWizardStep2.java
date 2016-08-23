@@ -113,7 +113,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.getTableUpdateTransactionRequest(entity.getId(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
+		synapseClient.getTableUpdateTransactionRequest(entity.getId(), new ArrayList<ColumnModel>(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setErrorMessage(caught.getMessage());

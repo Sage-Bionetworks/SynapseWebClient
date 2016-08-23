@@ -401,7 +401,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @return token returned by startTableTransactionJob.
 	 * @throws RestServiceException
 	 */
-	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableEntityId, List<ColumnModel> newSchema)
+	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldColumnModels, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**

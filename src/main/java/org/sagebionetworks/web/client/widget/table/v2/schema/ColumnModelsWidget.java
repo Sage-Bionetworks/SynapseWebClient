@@ -130,7 +130,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// Get the models from the view and save them
 		baseView.setLoading();
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.getTableUpdateTransactionRequest(bundle.getEntity().getId(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
+		synapseClient.getTableUpdateTransactionRequest(bundle.getEntity().getId(), bundle.getTableBundle().getColumnModels(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 
 			@Override
 			public void onFailure(Throwable caught) {

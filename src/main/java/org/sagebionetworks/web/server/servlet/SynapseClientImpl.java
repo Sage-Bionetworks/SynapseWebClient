@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -130,6 +131,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -2705,31 +2707,56 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> models)
+	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldColumnModels, List<ColumnModel> models)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// Create any models that do not have an ID, or that have changed
-			List<ColumnModel> oldColumnModels = synapseClient.getColumnModelsForTableEntity(tableId);
 			Map<String, ColumnModel> oldColumnModelId2Model = new HashMap<String, ColumnModel>();
 			for (ColumnModel columnModel : oldColumnModels) {
 				oldColumnModelId2Model.put(columnModel.getId(), columnModel);
 			}
-			List<ColumnChange> changes = new ArrayList<ColumnChange>();
+			
+			List<ColumnModel> newSchema = new ArrayList<ColumnModel>();
 			for (ColumnModel m : models) {
-				if (m.getId() == null) {
-					ColumnModel newColumnModel = synapseClient.createColumnModel(m);
-					changes.add(createNewColumnChange(null, newColumnModel.getId()));
-				} else {
+				// copy column model
+				ColumnModel copy = new ColumnModel();
+				JSONObjectAdapter adapter = adapterFactory.createNew();
+				m.writeToJSONObject(adapter);
+				copy.initializeFromJSONObject(adapter);
+				
+				if (copy.getId() != null) {
 					// any changes to the existing column model?
-					ColumnModel oldColumnModel = oldColumnModelId2Model.get(m.getId());
-					if (!oldColumnModel.equals(m)) {
-						m.setId(null);
-						ColumnModel newColumnModel = synapseClient.createColumnModel(m);
-						changes.add(createNewColumnChange(oldColumnModel.getId(), newColumnModel.getId()));
+					ColumnModel oldColumnModel = oldColumnModelId2Model.get(copy.getId());
+					if (!oldColumnModel.equals(copy)) {
+						copy.setId(null);
 					}
 				}
+				newSchema.add(copy);
 			}
+			newSchema = synapseClient.createColumnModels(newSchema);
+			
+			List<ColumnChange> changes = new ArrayList<ColumnChange>();
+			// now that all columns have been created, figure out the column changes (create, update, and no-op)
+			// keep track of column ids to figure out what columns were deleted.
+			Set<String> columnIds = new HashSet<String>();
+			for (int i = 0; i < models.size(); i++) {
+				String oldColumnId = models.get(i).getId();
+				String newColumnId = newSchema.get(i).getId();
+				columnIds.add(oldColumnId);
+				columnIds.add(newColumnId);
+				if (!Objects.equals(oldColumnId, newColumnId)) {
+					changes.add(createNewColumnChange(oldColumnId, newColumnId));	
+				}
+			}
+			// delete columns that are not represented in the changes already (create or update)
+			for (ColumnModel oldColumnModel : oldColumnModels) {
+				String oldColumnId = oldColumnModel.getId();
+				if (!columnIds.contains(oldColumnId)) {
+					changes.add(createNewColumnChange(oldColumnId, null));
+				}
+			}
+			
 			if (!changes.isEmpty()) {
 				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
 				newTableSchemaChangeRequest.setEntityId(tableId);
@@ -2742,6 +2769,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
 	

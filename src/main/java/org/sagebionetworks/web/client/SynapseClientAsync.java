@@ -331,7 +331,7 @@ public interface SynapseClientAsync {
 	 * @param newSchema
 	 * @param callback
 	 */
-	void getTableUpdateTransactionRequest(String tableEntityId, List<ColumnModel> newSchema,
+	void getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldColumnModels, List<ColumnModel> newSchema,
 			AsyncCallback<TableUpdateTransactionRequest> callback);
 	
 	/**
