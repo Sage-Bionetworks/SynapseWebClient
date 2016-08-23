@@ -2728,7 +2728,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				if (copy.getId() != null) {
 					// any changes to the existing column model?
 					ColumnModel oldColumnModel = oldColumnModelId2Model.get(copy.getId());
-					if (!oldColumnModel.equals(copy)) {
+					if (oldColumnModel != null && !oldColumnModel.equals(copy)) {
 						copy.setId(null);
 					}
 				}
