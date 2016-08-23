@@ -465,7 +465,7 @@ public class EvaluationSubmitterTest {
 		configureSubmitter();
 		when(mockDockerCommitListWidget.getCurrentCommit()).thenReturn(mockCommit);
 		submitter.onDockerCommitNextButton();
-		verify(mockSynAlert, never()).handleException(any(Throwable.class));
+		verify(mockSynAlert, never()).showError(NO_COMMITS_SELECTED_MSG);
 		verify(mockView).hideDockerCommitModal();
 	}
 
