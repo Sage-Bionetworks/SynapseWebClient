@@ -4,13 +4,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Calendar;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.util.RetryException;
 import org.sagebionetworks.util.TimeUtils;
@@ -65,7 +64,9 @@ public class SynapseRetryProxy {
 						} catch(InvocationTargetException ex) {
 							Throwable cause = ex.getCause();
 							if (cause instanceof SynapseTooManyRequestsException) {
-								// if 429, we can retry
+								// if 429, we can retry.  send full exception trace to logger.debug to inform developer that we have a problem.
+								Calendar now = Calendar.getInstance();
+								log.debug("THROTTLED! Attempted to call " + method.getName() + " at " + now.getTime(), cause);
 								throw new RetryException(cause);
 							}
 							throw ex;
