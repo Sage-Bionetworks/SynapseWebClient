@@ -324,14 +324,14 @@ public interface SynapseClientAsync {
 	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
 	
 	/**
-	 * Set a table's schema. Any ColumnModel that does not have an ID will be
-	 * treated as a column add.  Any ColumnModel that has an ID will be treated as a column update.
+	 * Set a table's schema. Creates any necessary ColumnModels (for create and update), and figures out necessary ColumnChanges to transform oldSchema into newSchema.
 	 * 
-	 * @param entity
+	 * @param tableId
+	 * @param oldSchema
 	 * @param newSchema
 	 * @param callback
 	 */
-	void getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldColumnModels, List<ColumnModel> newSchema,
+	void getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema,
 			AsyncCallback<TableUpdateTransactionRequest> callback);
 	
 	/**

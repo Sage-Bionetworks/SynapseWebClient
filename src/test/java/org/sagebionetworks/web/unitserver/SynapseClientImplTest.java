@@ -2295,19 +2295,19 @@ public class SynapseClientImplTest {
 		String tableId = "syn93939";
 		
 		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(oldColumnModels);
 		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
-		assertNull(synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels));
+		assertNull(synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, oldColumnModels));
 	}
 	
 	@Test
 	public void testGetTableUpdateTransactionRequestNewColumn()  throws RestServiceException, SynapseException {
 		String tableId = "syn93939";
-		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
-		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
-		when(mockSynapse.createColumnModel(any(ColumnModel.class))).thenReturn(mockNewColumnModelAfterCreate);
+		List<ColumnModel> oldColumnModels = new ArrayList<ColumnModel>();
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(Collections.singletonList(mockNewColumnModelAfterCreate));
 		List<ColumnModel> newColumnModels = Collections.singletonList(mockNewColumnModel);
-		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, newColumnModels);
-		verify(mockSynapse).createColumnModel(mockNewColumnModel);
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, newColumnModels);
+		verify(mockSynapse).createColumnModels(anyList());
 		assertEquals(tableId, request.getEntityId());
 		List<TableUpdateRequest> tableUpdates = request.getChanges();
 		assertEquals(1, tableUpdates.size());
@@ -2323,12 +2323,11 @@ public class SynapseClientImplTest {
 	public void testGetTableUpdateTransactionRequestUpdateColumn()  throws RestServiceException, SynapseException {
 		String tableId = "syn93939";
 		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
-		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
-		when(mockSynapse.createColumnModel(any(ColumnModel.class))).thenReturn(mockNewColumnModelAfterCreate);
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(Collections.singletonList(mockNewColumnModelAfterCreate));
 		when(mockNewColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
 		List<ColumnModel> newColumnModels = Collections.singletonList(mockNewColumnModel);
-		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, newColumnModels);
-		verify(mockSynapse).createColumnModel(mockNewColumnModel);
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, newColumnModels);
+		verify(mockSynapse).createColumnModels(anyList());
 		assertEquals(tableId, request.getEntityId());
 		List<TableUpdateRequest> tableUpdates = request.getChanges();
 		assertEquals(1, tableUpdates.size());

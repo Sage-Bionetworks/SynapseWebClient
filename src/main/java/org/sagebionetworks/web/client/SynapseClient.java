@@ -390,18 +390,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
 	
-	/**
-	 * Set a table's schema. Any ColumnModel that does not have an ID will be
-	 * treated as a column add.
-	 * 
-	 * @param The
-	 *            ID of the table that will be updated.
-	 * @param schema
-	 *            Each string in the list must be a ColumnModel JSON string.
-	 * @return token returned by startTableTransactionJob.
-	 * @throws RestServiceException
-	 */
-	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldColumnModels, List<ColumnModel> newSchema)
+	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**

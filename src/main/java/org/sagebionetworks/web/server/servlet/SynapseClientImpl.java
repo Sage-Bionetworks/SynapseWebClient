@@ -2707,18 +2707,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldColumnModels, List<ColumnModel> models)
+	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> proposedSchema)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// Create any models that do not have an ID, or that have changed
 			Map<String, ColumnModel> oldColumnModelId2Model = new HashMap<String, ColumnModel>();
-			for (ColumnModel columnModel : oldColumnModels) {
+			for (ColumnModel columnModel : oldSchema) {
 				oldColumnModelId2Model.put(columnModel.getId(), columnModel);
 			}
 			
 			List<ColumnModel> newSchema = new ArrayList<ColumnModel>();
-			for (ColumnModel m : models) {
+			for (ColumnModel m : proposedSchema) {
 				// copy column model
 				ColumnModel copy = new ColumnModel();
 				JSONObjectAdapter adapter = adapterFactory.createNew();
@@ -2740,8 +2740,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			// now that all columns have been created, figure out the column changes (create, update, and no-op)
 			// keep track of column ids to figure out what columns were deleted.
 			Set<String> columnIds = new HashSet<String>();
-			for (int i = 0; i < models.size(); i++) {
-				String oldColumnId = models.get(i).getId();
+			for (int i = 0; i < proposedSchema.size(); i++) {
+				String oldColumnId = proposedSchema.get(i).getId();
 				String newColumnId = newSchema.get(i).getId();
 				columnIds.add(oldColumnId);
 				columnIds.add(newColumnId);
@@ -2750,7 +2750,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				}
 			}
 			// delete columns that are not represented in the changes already (create or update)
-			for (ColumnModel oldColumnModel : oldColumnModels) {
+			for (ColumnModel oldColumnModel : oldSchema) {
 				String oldColumnId = oldColumnModel.getId();
 				if (!columnIds.contains(oldColumnId)) {
 					changes.add(createNewColumnChange(oldColumnId, null));
