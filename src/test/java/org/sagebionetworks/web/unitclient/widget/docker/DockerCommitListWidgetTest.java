@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -154,6 +155,7 @@ public class DockerCommitListWidgetTest {
 		verify(mockCommitRow).configure(commit);
 		verify(mockRadioWidget).add(any(Widget.class));
 		verify(mockRadioWidget).setGroupName(id);
+		verify(mockRadioWidget).addClickHandler(any(ClickHandler.class));
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDockerClient).getDockerCommits(eq(entityId),
