@@ -14,9 +14,7 @@
 						<b:FormGroup ui:field="dockerCommitListUI">
 							<b:FormGroup>
 								<b:FormControlStatic addStyleNames="h5">Select the commit below that you would like to submit:</b:FormControlStatic>
-								<g:ScrollPanel width="100%" height="200px">
-									<g:SimplePanel ui:field="dockerCommitListContainer" />
-								</g:ScrollPanel>
+								<g:SimplePanel ui:field="dockerCommitListContainer" />
 							</b:FormGroup>
 						</b:FormGroup>
 						<g:SimplePanel ui:field="dockerCommitListSynAlertPanel"/>

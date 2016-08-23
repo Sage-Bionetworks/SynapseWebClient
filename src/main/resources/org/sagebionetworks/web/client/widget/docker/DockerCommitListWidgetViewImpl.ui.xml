@@ -20,7 +20,9 @@
 				</t:TableHeader>
 			</t:TableRow>
 		</t:Table>
-		<g:SimplePanel ui:field="dockerCommitList" />
+		<g:ScrollPanel width="100%" height="200px">
+			<g:SimplePanel ui:field="dockerCommitList" />
+		</g:ScrollPanel>
 		<g:SimplePanel ui:field="synAlertContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>
