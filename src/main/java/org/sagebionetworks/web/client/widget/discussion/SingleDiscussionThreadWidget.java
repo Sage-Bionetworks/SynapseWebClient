@@ -498,4 +498,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		});
 	}
+
+	public void setReplyListVisible(boolean visible) {
+		view.setReplyListContainerVisible(visible);
+	}
 }
