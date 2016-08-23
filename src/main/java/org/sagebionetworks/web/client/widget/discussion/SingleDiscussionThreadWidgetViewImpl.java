@@ -318,4 +318,9 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	public void setDeletedThreadVisible(boolean visible) {
 		deletedThread.setVisible(visible);
 	}
+
+	@Override
+	public void setReplyListContainerVisible(boolean visible) {
+		replyListContainer.setVisible(visible);
+	}
 }
