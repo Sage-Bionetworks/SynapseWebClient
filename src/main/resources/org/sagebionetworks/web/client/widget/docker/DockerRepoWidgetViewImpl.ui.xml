@@ -27,6 +27,7 @@
 					</b:Panel>
 				</b:Column>
 				<b:Column size="XS_12, MD_6">
+					<bh:Div ui:field="dockerCommitListContainer" addStyleNames="highlight-box" />
 					<bh:Div ui:field="dockerRepoProvenanceContainer" addStyleNames="highlight-box" />
 				</b:Column>
 			</b:Row>

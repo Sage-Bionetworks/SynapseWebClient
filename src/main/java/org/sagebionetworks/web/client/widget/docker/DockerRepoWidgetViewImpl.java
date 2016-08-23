@@ -30,6 +30,8 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	SimplePanel dockerModifiedAndCreatedContainer;
 	@UiField
 	SimplePanel dockerActionMenuContainer;
+	@UiField
+	Div dockerCommitListContainer;
 
 	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {}
 	private Presenter presenter;
@@ -39,6 +41,7 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	public DockerRepoWidgetViewImpl(Binder binder){
 		this.widget = binder.createAndBindUi(this);
 		dockerRepoProvenanceContainer.getElement().setAttribute("highlight-box-title", "Provenance");
+		dockerCommitListContainer.getElement().setAttribute("highlight-box-title", "Tags");
 		dockerPullCommand.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -97,4 +100,8 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 		dockerActionMenuContainer.add(w);
 	}
 
+	@Override
+	public void setDockerCommitListWidget(Widget widget){
+		dockerCommitListContainer.add(widget);
+	}
 }
