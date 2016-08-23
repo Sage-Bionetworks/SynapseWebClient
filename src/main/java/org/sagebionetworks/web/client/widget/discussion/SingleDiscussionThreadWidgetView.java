@@ -83,4 +83,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setReplyContainerVisible(boolean visible);
 
 	void setDeletedThreadVisible(boolean visible);
+
+	void setReplyListContainerVisible(boolean visible);
 }
