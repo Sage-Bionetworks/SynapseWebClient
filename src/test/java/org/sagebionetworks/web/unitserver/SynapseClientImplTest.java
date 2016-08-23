@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
@@ -127,6 +128,7 @@ import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -137,11 +139,9 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
@@ -165,6 +165,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.appengine.repackaged.com.google.common.base.Objects;
 import com.google.common.cache.Cache;
 
 /**
@@ -2319,23 +2320,60 @@ public class SynapseClientImplTest {
 		assertEquals(NEW_COLUMN_MODEL_ID, columnChange.getNewColumnId());
 	}
 	
+	private ColumnModel getColumnModel(String id, ColumnType columnType) {
+		ColumnModel cm = new ColumnModel();
+		cm.setId(id);
+		cm.setColumnType(columnType);
+		return cm;
+	}
+	
+	private ColumnChange getColumnChange(String oldColumnId, List<ColumnChange> changes) {
+		for (ColumnChange columnChange : changes) {
+			if (Objects.equal(oldColumnId, columnChange.getOldColumnId())) {
+				return columnChange;
+			}
+		}
+		throw new NoSuchElementException();
+	}
+	
 	@Test
-	public void testGetTableUpdateTransactionRequestUpdateColumn()  throws RestServiceException, SynapseException {
+	public void testGetTableUpdateTransactionRequestFullTest()  throws RestServiceException, SynapseException {
+		//In this test, we will change a column, delete a column, and add a column (with appropriately mocked responses)
+		// Modify col1, delete col2, no change to col3, and add col4
+		ColumnModel colA, colB, colC, colD, colAModified, colAAfterSave, colDAfterSave;
 		String tableId = "syn93939";
-		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
-		when(mockSynapse.createColumnModels(anyList())).thenReturn(Collections.singletonList(mockNewColumnModelAfterCreate));
-		when(mockNewColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
-		List<ColumnModel> newColumnModels = Collections.singletonList(mockNewColumnModel);
-		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, newColumnModels);
+		colA = getColumnModel("1", ColumnType.STRING);
+		colB = getColumnModel("2", ColumnType.STRING);
+		colC = getColumnModel("3", ColumnType.STRING);
+		colD = getColumnModel(null, ColumnType.STRING);
+		colAModified = getColumnModel("1", ColumnType.INTEGER);
+		colAAfterSave = getColumnModel("4", ColumnType.INTEGER);
+		colDAfterSave = getColumnModel("5", ColumnType.STRING);
+		
+		List<ColumnModel> oldSchema = Arrays.asList(colA, colB, colC);
+		List<ColumnModel> proposedNewSchema = Arrays.asList(colAModified, colC, colD);
+		List<ColumnModel> newSchemaAfterUpdate = Arrays.asList(colAAfterSave, colC, colDAfterSave);
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(newSchemaAfterUpdate);
+		
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldSchema, proposedNewSchema);
 		verify(mockSynapse).createColumnModels(anyList());
 		assertEquals(tableId, request.getEntityId());
 		List<TableUpdateRequest> tableUpdates = request.getChanges();
 		assertEquals(1, tableUpdates.size());
 		TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest)tableUpdates.get(0);
+		
+		//changes should consist of a create, an update, and a delete
 		List<ColumnChange> changes = schemaChange.getChanges();
-		assertEquals(1, changes.size());
-		ColumnChange columnChange = changes.get(0);
-		assertEquals(OLD_COLUMN_MODEL_ID, columnChange.getOldColumnId());
-		assertEquals(NEW_COLUMN_MODEL_ID, columnChange.getNewColumnId());
+		assertEquals(3, changes.size());
+		
+		// colB should be deleted
+		ColumnChange columnChange = getColumnChange("2", changes);
+		assertNull(columnChange.getNewColumnId());
+		// colA should be modified
+		columnChange = getColumnChange("1", changes);
+		assertEquals("4", columnChange.getNewColumnId());
+		// colD should be new
+		columnChange = getColumnChange(null, changes);
+		assertEquals("5", columnChange.getNewColumnId());
 	}
 }
