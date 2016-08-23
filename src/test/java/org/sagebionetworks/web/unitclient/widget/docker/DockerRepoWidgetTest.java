@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
@@ -63,6 +64,8 @@ public class DockerRepoWidgetTest {
 	ActionMenuWidget mockActionMenu;
 	@Mock
 	EntityActionController mockController;
+	@Mock
+	DockerCommitListWidget mockDockerCommitListWidget;
 
 	DockerRepoWidget dockerRepoWidget;
 	String entityId = "syn123";
@@ -80,7 +83,7 @@ public class DockerRepoWidgetTest {
 		dockerRepoWidget = new DockerRepoWidget(mockPreflightController,
 				mockView, mockSynAlert, mockWikiPageWidget, mockProvWidget,
 				mockActionMenu, mockDockerTitleBar, mockMetadata,
-				mockModifiedCreatedBy, mockController);
+				mockModifiedCreatedBy, mockController, mockDockerCommitListWidget);
 		when(mockEntity.getId()).thenReturn(entityId);
 		when(mockEntity.getRepositoryName()).thenReturn(repoName);
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
@@ -104,6 +107,7 @@ public class DockerRepoWidgetTest {
 		verify(mockView).setTitlebar(any(Widget.class));
 		verify(mockView).setActionMenu(any(Widget.class));
 		verify(mockActionMenu).addControllerWidget(any(Widget.class));
+		verify(mockView).setDockerCommitListWidget(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -127,6 +131,7 @@ public class DockerRepoWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
+		verify(mockDockerCommitListWidget).configure(entityId, false);
 	}
 
 	@SuppressWarnings("unchecked")
