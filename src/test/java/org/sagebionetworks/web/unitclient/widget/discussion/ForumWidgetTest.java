@@ -170,6 +170,15 @@ public class ForumWidgetTest {
 		forumWidget.initDefaultThread(DEFAULT_THREAD_ID);
 		verify(mockDiscussionForumClient, atLeastOnce()).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		assertNotNull(ForumWidget.defaultThreadBundle);
+		verify(mockDefaultThreadWidget).configure(defaultThreadBundle, null, false, new HashSet<Long>(), null);
+		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockDefaultThreadWidget, atLeastOnce()).setThreadIdClickedCallback(captor.capture());
+		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyListVisible(false);
+		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyTextBoxVisible(false);
+		verify(mockDefaultThreadWidget, atLeastOnce()).setCommandsVisible(false);
+
+		captor.getValue().invoke("threadId");
+		verify(mockView).showNewThreadTooltip();
 	}
 	
 	@Test
