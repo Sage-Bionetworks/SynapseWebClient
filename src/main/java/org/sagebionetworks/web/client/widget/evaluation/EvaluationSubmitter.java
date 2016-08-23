@@ -494,7 +494,7 @@ public class EvaluationSubmitter implements Presenter {
 	public void onDockerCommitNextButton() {
 		DockerCommit commit = dockerCommitList.getCurrentCommit();
 		if (commit == null) {
-			dockerCommitSynAlert.handleException(new Throwable(NO_COMMITS_SELECTED_MSG));
+			dockerCommitSynAlert.showError(NO_COMMITS_SELECTED_MSG);
 		} else {
 			dockerDigest = commit.getDigest();
 			view.hideDockerCommitModal();

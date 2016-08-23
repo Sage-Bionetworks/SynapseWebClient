@@ -457,9 +457,7 @@ public class EvaluationSubmitterTest {
 	public void testOnDockerCommitNextButtonNoCommitsSelected() {
 		configureSubmitter();
 		submitter.onDockerCommitNextButton();
-		ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
-		verify(mockSynAlert).handleException(captor.capture());
-		assertEquals(captor.getValue().getMessage(), NO_COMMITS_SELECTED_MSG);
+		verify(mockSynAlert).showError(NO_COMMITS_SELECTED_MSG);
 	}
 
 	@Test
@@ -467,7 +465,7 @@ public class EvaluationSubmitterTest {
 		configureSubmitter();
 		when(mockDockerCommitListWidget.getCurrentCommit()).thenReturn(mockCommit);
 		submitter.onDockerCommitNextButton();
-		verify(mockSynAlert, never()).handleException(any(Throwable.class));
+		verify(mockSynAlert, never()).showError(NO_COMMITS_SELECTED_MSG);
 		verify(mockView).hideDockerCommitModal();
 	}
 
