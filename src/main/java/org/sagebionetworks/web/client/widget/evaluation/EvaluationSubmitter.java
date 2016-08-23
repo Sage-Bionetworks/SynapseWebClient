@@ -16,6 +16,8 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -26,6 +28,8 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -39,12 +43,15 @@ import com.google.inject.Inject;
 
 public class EvaluationSubmitter implements Presenter {
 
+	public static final String NO_COMMITS_SELECTED_MSG = "Please select a commit to submit.";
+	public static final String ZERO_COMMITS_ERROR = "This repo does not have any commit. Please add commits to repo before submit to challenge.";
 	private EvaluationSubmitterView view;
 	private SynapseClientAsync synapseClient;
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private GWTWrapper gwt;
+	private DockerCommitListWidget dockerCommitList;
 	private Entity submissionEntity;
 	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
@@ -58,6 +65,9 @@ public class EvaluationSubmitter implements Presenter {
 	private SynapseAlert teamSelectSynAlert;
 	private SynapseAlert contributorSynAlert;
 	boolean isIndividualSubmission;
+	private String dockerDigest;
+	private Set<String> evaluationIds;
+	private SynapseAlert dockerCommitSynAlert;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -66,7 +76,8 @@ public class EvaluationSubmitter implements Presenter {
 			AuthenticationController authenticationController,
 			ChallengeClientAsync challengeClient,
 			GWTWrapper gwt,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			DockerCommitListWidget dockerCommitList) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -74,12 +85,16 @@ public class EvaluationSubmitter implements Presenter {
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
 		this.gwt = gwt;
+		this.dockerCommitList = dockerCommitList;
 		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();
 		this.teamSelectSynAlert = ginInjector.getSynapseAlertWidget();
 		this.contributorSynAlert = ginInjector.getSynapseAlertWidget();
+		this.dockerCommitSynAlert = ginInjector.getSynapseAlertWidget();
 		this.view.setChallengesSynAlertWidget(challengeListSynAlert.asWidget());
 		this.view.setTeamSelectSynAlertWidget(teamSelectSynAlert.asWidget());
 		this.view.setContributorsSynAlertWidget(contributorSynAlert.asWidget());
+		this.view.setDockerCommitSynAlert(dockerCommitSynAlert.asWidget());
+		this.view.setDockerCommitList(dockerCommitList.asWidget());
 	}
 	
 	/**
@@ -98,9 +113,33 @@ public class EvaluationSubmitter implements Presenter {
 		challengeListSynAlert.clear();
 		teamSelectSynAlert.clear();
 		contributorSynAlert.clear();
+		dockerCommitSynAlert.clear();
 		view.resetNextButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
+		this.evaluationIds = evaluationIds;
+		if (submissionEntity instanceof DockerRepository) {
+			configureWithDockerCommit(submissionEntity);
+		} else {
+			configureWithEvaluations();
+		}
+	}
+
+	public void configureWithDockerCommit(Entity submissionEntity) {
+		dockerDigest = null;
+		dockerCommitList.setEmptyListCallback(new Callback(){
+
+			@Override
+			public void invoke() {
+				view.hideDockerCommitModal();
+				view.showErrorMessage(ZERO_COMMITS_ERROR);
+			}
+		});
+		dockerCommitList.configure(submissionEntity.getId(), true);
+		view.showDockerCommitModal();
+	}
+
+	private void configureWithEvaluations() {
 		try {
 			if (evaluationIds == null)
 				challengeClient.getAvailableEvaluations(getEvalCallback());
@@ -110,7 +149,7 @@ public class EvaluationSubmitter implements Presenter {
 			view.showErrorMessage(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public void onIndividualSubmissionOptionClicked() {
 		isIndividualSubmission = true;
@@ -365,6 +404,9 @@ public class EvaluationSubmitter implements Presenter {
 		newSubmission.setEntityId(entityId);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
 		newSubmission.setVersionNumber(versionNumber);
+		if (submissionEntity instanceof DockerRepository) {
+			newSubmission.setDockerDigest(dockerDigest);
+		}
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
 		if (!isIndividualSubmission && !selectedTeamEligibleMembers.isEmpty()) {
@@ -442,5 +484,21 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	public boolean getIsIndividualSubmission() {
 		return isIndividualSubmission;
+	}
+
+	public void setDigest(DockerCommit commit) {
+		dockerDigest = commit.getDigest();
+	}
+
+	@Override
+	public void onDockerCommitNextButton() {
+		DockerCommit commit = dockerCommitList.getCurrentCommit();
+		if (commit == null) {
+			dockerCommitSynAlert.showError(NO_COMMITS_SELECTED_MSG);
+		} else {
+			dockerDigest = commit.getDigest();
+			view.hideDockerCommitModal();
+			configureWithEvaluations();
+		}
 	}
 }

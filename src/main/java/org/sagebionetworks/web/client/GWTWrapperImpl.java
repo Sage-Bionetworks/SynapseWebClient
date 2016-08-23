@@ -19,6 +19,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -149,5 +150,10 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public HasRpcToken asHasRpcToken(Object service) {
 		return (HasRpcToken) service;
+	}
+
+	@Override
+	public String getUniqueElementId() {
+		return HTMLPanel.createUniqueId();
 	}
 }

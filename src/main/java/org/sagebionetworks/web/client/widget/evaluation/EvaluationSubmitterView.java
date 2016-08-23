@@ -43,8 +43,13 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		void onNewTeamClicked();
 		void onIndividualSubmissionOptionClicked();
 		void onTeamSubmissionOptionClicked();
+		void onDockerCommitNextButton();
 	}
 	void setChallengesSynAlertWidget(Widget synAlert);
 	void setTeamSelectSynAlertWidget(Widget synAlert);
 	void setContributorsSynAlertWidget(Widget synAlert);
+	void showDockerCommitModal();
+	void hideDockerCommitModal();
+	void setDockerCommitList(Widget widget);
+	void setDockerCommitSynAlert(Widget widget);
 }
