@@ -40,6 +40,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	private ModifiedCreatedByWidget modifiedCreatedBy;
 	private DockerTitleBar dockerTitleBar;
 	private EntityActionController controller;
+	private DockerCommitListWidget dockerCommitListWidget;
 	private boolean isAnnotationsShown;
 	private boolean canEdit;
 	private DockerRepository entity;
@@ -55,7 +56,8 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 			DockerTitleBar dockerTitleBar,
 			EntityMetadata metadata,
 			ModifiedCreatedByWidget modifiedCreatedBy,
-			EntityActionController controller
+			EntityActionController controller,
+			DockerCommitListWidget dockerCommitListWidget
 			) {
 		this.preflightController = preflightController;
 		this.view = view;
@@ -67,6 +69,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		this.metadata = metadata;
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		this.controller = controller;
+		this.dockerCommitListWidget = dockerCommitListWidget;
 		actionMenu.addControllerWidget(controller.asWidget());
 		view.setPresenter(this);
 		view.setSynapseAlert(synAlert.asWidget());
@@ -76,6 +79,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		view.setEntityMetadata(metadata.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
 		view.setActionMenu(actionMenu.asWidget());
+		view.setDockerCommitListWidget(dockerCommitListWidget.asWidget());
 	}
 
 	public Widget asWidget() {
@@ -94,6 +98,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		configureProvenance(entity.getId());
 		configureActionMenu(bundle);
 		view.setDockerPullCommand(DOCKER_PULL_COMMAND + entity.getRepositoryName());
+		dockerCommitListWidget.configure(entity.getId(), false);
 	}
 
 	private void configureActionMenu(EntityBundle bundle) {
