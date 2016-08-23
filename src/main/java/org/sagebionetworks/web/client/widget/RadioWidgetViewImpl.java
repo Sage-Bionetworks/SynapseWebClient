@@ -32,6 +32,13 @@ public class RadioWidgetViewImpl implements RadioWidget{
 				radio.setValue(true);
 			}
 		});
+
+	}
+
+	@Override
+	public void addClickHandler(ClickHandler handler) {
+		radio.addClickHandler(handler);
+		item.addClickHandler(handler);
 	}
 
 	@Override

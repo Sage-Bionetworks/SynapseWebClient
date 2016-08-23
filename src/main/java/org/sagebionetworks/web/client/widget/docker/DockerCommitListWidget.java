@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import java.util.UUID;
-
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.client.DockerClientAsync;
@@ -14,6 +12,8 @@ import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -97,6 +97,12 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 									RadioWidget radioWidget = ginInjector.createNewRadioWidget();
 									radioWidget.add(dockerCommitRow.asWidget());
 									radioWidget.setGroupName(radioGroupName);
+									radioWidget.addClickHandler(new ClickHandler(){
+										@Override
+										public void onClick(ClickEvent event) {
+											currentCommit = commit;
+										}
+									});
 									commitsContainer.add(radioWidget.asWidget());
 								} else {
 									
