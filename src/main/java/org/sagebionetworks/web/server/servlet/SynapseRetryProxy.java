@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.util.RetryException;
 import org.sagebionetworks.util.TimeUtils;
 
@@ -63,12 +64,9 @@ public class SynapseRetryProxy {
 							return response;
 						} catch(InvocationTargetException ex) {
 							Throwable cause = ex.getCause();
-							if (cause instanceof SynapseServerException) {
-								SynapseServerException synapseServerException = (SynapseServerException)cause;
-								if (synapseServerException.getStatusCode() == SC_TOO_MANY_REQUESTS) {
-									// if 429, we can retry
-									throw new RetryException(ex);
-								}
+							if (cause instanceof SynapseTooManyRequestsException) {
+								// if 429, we can retry
+								throw new RetryException(cause);
 							}
 							throw ex;
 						}
