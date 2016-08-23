@@ -54,4 +54,6 @@ public interface GWTWrapper {
 	
 	ServiceDefTarget asServiceDefTarget(Object service);
 	HasRpcToken asHasRpcToken(Object service);
+
+	String getUniqueElementId();
 }
