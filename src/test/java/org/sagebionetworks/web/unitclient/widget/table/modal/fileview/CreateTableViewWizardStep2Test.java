@@ -5,6 +5,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -131,6 +133,10 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testOnPrimary(){
 		onPrimary().onComplete(null);
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setJobTrackerVisible(true);
+		inOrder.verify(mockView).setJobTrackerVisible(false);
+		
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).onFinished();
@@ -139,6 +145,10 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testOnPrimaryAsyncCancelled(){
 		onPrimary().onCancel();
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setJobTrackerVisible(true);
+		inOrder.verify(mockView).setJobTrackerVisible(false);
+
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep2.SCHEMA_UPDATE_CANCELLED);
@@ -149,6 +159,10 @@ public class CreateTableViewWizardStep2Test {
 		String errorMessage = "error during schema update";
 		Exception ex = new Exception(errorMessage);
 		onPrimary().onFailure(ex);
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setJobTrackerVisible(true);
+		inOrder.verify(mockView).setJobTrackerVisible(false);
+
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).setErrorMessage(errorMessage);
