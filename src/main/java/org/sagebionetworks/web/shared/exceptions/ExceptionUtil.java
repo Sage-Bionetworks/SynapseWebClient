@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.shared.exceptions;
 
-import org.apache.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
@@ -10,8 +9,8 @@ import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
-import org.sagebionetworks.web.server.servlet.SynapseRetryProxy;
 
 public class ExceptionUtil {
 
@@ -35,14 +34,14 @@ public class ExceptionUtil {
 			return new UnauthorizedException(ex.getMessage());
 		} else if(ex instanceof SynapseLockedException) {
 			return new LockedException(ex.getMessage());
+		} else if(ex instanceof SynapseTooManyRequestsException) {
+			return new TooManyRequestsException(ex.getMessage());
 		} else if (ex instanceof SynapseServerException) {
 			SynapseServerException sse = (SynapseServerException)ex;
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
 				return new ConflictException(ex.getMessage());
 			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
 				return new SynapseDownException(ex.getMessage());
-			} else if (sse.getStatusCode()==SynapseRetryProxy.SC_TOO_MANY_REQUESTS) {
-				return new TooManyRequestsException(ex.getMessage());
 			}
 		}
 		return new UnknownErrorException(ex.getMessage());
