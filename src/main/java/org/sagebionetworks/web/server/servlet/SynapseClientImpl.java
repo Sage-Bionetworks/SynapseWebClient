@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -112,12 +114,15 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
+import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -2701,24 +2706,79 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void setTableSchema(Table table, List<ColumnModel> models)
+	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> proposedSchema)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			// Create any models that do not have an ID
-			List<String> newSchema = new LinkedList<String>();
-			for (ColumnModel m : models) {
-				if (m.getId() == null) {
-					ColumnModel clone = synapseClient.createColumnModel(m);
-					m.setId(clone.getId());
-				}
-				newSchema.add(m.getId());
+			// Create any models that do not have an ID, or that have changed
+			Map<String, ColumnModel> oldColumnModelId2Model = new HashMap<String, ColumnModel>();
+			for (ColumnModel columnModel : oldSchema) {
+				oldColumnModelId2Model.put(columnModel.getId(), columnModel);
 			}
-			table.setColumnIds(newSchema);	
-			table = synapseClient.putEntity(table);
+			
+			List<ColumnModel> newSchema = new ArrayList<ColumnModel>();
+			for (ColumnModel m : proposedSchema) {
+				// copy column model
+				ColumnModel copy = new ColumnModel();
+				JSONObjectAdapter adapter = adapterFactory.createNew();
+				m.writeToJSONObject(adapter);
+				copy.initializeFromJSONObject(adapter);
+				
+				if (copy.getId() != null) {
+					// any changes to the existing column model?
+					ColumnModel oldColumnModel = oldColumnModelId2Model.get(copy.getId());
+					if (oldColumnModel != null && !oldColumnModel.equals(copy)) {
+						copy.setId(null);
+					}
+				}
+				newSchema.add(copy);
+			}
+			newSchema = synapseClient.createColumnModels(newSchema);
+			
+			List<ColumnChange> changes = new ArrayList<ColumnChange>();
+			// now that all columns have been created, figure out the column changes (create, update, and no-op)
+			// keep track of column ids to figure out what columns were deleted.
+			Set<String> columnIds = new HashSet<String>();
+			for (int i = 0; i < proposedSchema.size(); i++) {
+				String oldColumnId = proposedSchema.get(i).getId();
+				String newColumnId = newSchema.get(i).getId();
+				columnIds.add(oldColumnId);
+				columnIds.add(newColumnId);
+				if (!Objects.equals(oldColumnId, newColumnId)) {
+					changes.add(createNewColumnChange(oldColumnId, newColumnId));	
+				}
+			}
+			// delete columns that are not represented in the changes already (create or update)
+			for (ColumnModel oldColumnModel : oldSchema) {
+				String oldColumnId = oldColumnModel.getId();
+				if (!columnIds.contains(oldColumnId)) {
+					changes.add(createNewColumnChange(oldColumnId, null));
+				}
+			}
+			
+			TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
+			request.setEntityId(tableId);
+			List<TableUpdateRequest> requestChangeList = new ArrayList<TableUpdateRequest>();
+			if (!changes.isEmpty()) {
+				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
+				newTableSchemaChangeRequest.setEntityId(tableId);
+				newTableSchemaChangeRequest.setChanges(changes);
+				requestChangeList.add(newTableSchemaChangeRequest);
+			} 
+			request.setChanges(requestChangeList);
+			return request;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		} 
+	}
+	
+	private ColumnChange createNewColumnChange(String oldColumnId, String newColumnId) {
+		ColumnChange columnChange = new ColumnChange();
+		columnChange.setOldColumnId(oldColumnId);
+		columnChange.setNewColumnId(newColumnId);
+		return columnChange;
 	}
 	
 	@Override

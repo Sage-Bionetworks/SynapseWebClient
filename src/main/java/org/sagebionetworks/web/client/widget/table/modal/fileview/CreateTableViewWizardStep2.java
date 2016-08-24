@@ -3,16 +3,21 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,6 +31,7 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
+	public static final String SCHEMA_UPDATE_CANCELLED = "Schema update cancelled";
 	public static final String FINISH = "Finish";
 	ColumnModelsEditorWidget editor;
 	String tableId;
@@ -34,6 +40,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	Table entity;
 	TableType tableType;
 	SynapseClientAsync synapseClient;
+	JobTrackingWidget jobTrackingWidget;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -44,9 +51,10 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * @param view
 	 */
 	@Inject
-	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient){
+	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget){
 		this.synapseClient = synapseClient;
 		this.editor = editor;
+		this.jobTrackingWidget = jobTrackingWidget;
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
 			public void invoke() {
@@ -105,16 +113,42 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
+		synapseClient.getTableUpdateTransactionRequest(entity.getId(), new ArrayList<ColumnModel>(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
-			public void onSuccess(Void result) {
-				presenter.setLoading(false);
-				presenter.onFinished();
+			public void onSuccess(TableUpdateTransactionRequest request) {
+				if (request.getChanges().isEmpty()) {
+					finished();
+				} else {
+					startTrackingJob(request);	
+				}
 			}}); 
+	}
+	public void finished() {
+		// Hide the dialog
+		presenter.setLoading(false);
+		presenter.onFinished();
+	}
+	
+	public void startTrackingJob(TableUpdateTransactionRequest request) {
+		presenter.setLoading(true);
+		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
+			@Override
+			public void onFailure(Throwable failure) {
+				presenter.setErrorMessage(failure.getMessage());
+			}
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				finished();
+			}
+			@Override
+			public void onCancel() {
+				presenter.setErrorMessage(SCHEMA_UPDATE_CANCELLED);
+			}
+		});
 	}
 }

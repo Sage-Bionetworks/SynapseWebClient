@@ -53,8 +53,8 @@ import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -324,15 +324,15 @@ public interface SynapseClientAsync {
 	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
 	
 	/**
-	 * Set a table's schema. Any ColumnModel that does not have an ID will be
-	 * treated as a column add.
+	 * Set a table's schema. Creates any necessary ColumnModels (for create and update), and figures out necessary ColumnChanges to transform oldSchema into newSchema.
 	 * 
-	 * @param entity
+	 * @param tableId
+	 * @param oldSchema
 	 * @param newSchema
 	 * @param callback
 	 */
-	void setTableSchema(Table entity, List<ColumnModel> newSchema,
-			AsyncCallback<Void> callback);
+	void getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema,
+			AsyncCallback<TableUpdateTransactionRequest> callback);
 	
 	/**
 	 * Validate a table query.

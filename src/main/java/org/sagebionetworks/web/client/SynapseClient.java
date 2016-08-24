@@ -55,8 +55,8 @@ import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -390,18 +390,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
 	
-	/**
-	 * Set a table's schema. Any ColumnModel that does not have an ID will be
-	 * treated as a column add.
-	 * 
-	 * @param The
-	 *            ID of the table that will be updated.
-	 * @param schema
-	 *            Each string in the list must be a ColumnModel JSON string.
-	 * @return The list of ColumnModel JSON strings.
-	 * @throws RestServiceException
-	 */
-	public void setTableSchema(Table entity, List<ColumnModel> newSchema)
+	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**

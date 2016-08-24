@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -29,7 +29,8 @@ public interface ColumnModelsViewBase extends IsWidget {
 	public void setViewer(ColumnModelsView viewer);
 
 	public void setEditor(IsWidget editor);
-
+	public void setJobTrackingWidget(IsWidget jobTrackingWidget);
+	public void setJobTrackingWidgetVisible(boolean visible);
 	/**
 	 * Show the editor.
 	 */
