@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -20,6 +21,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -27,6 +29,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -34,6 +37,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 
 
@@ -57,15 +61,20 @@ public class CreateTableViewWizardStep2Test {
 	JobTrackingWidget mockJobTrackingWidget;
 	@Mock
 	TableUpdateTransactionRequest mockTableSchemaChangeRequest;
+	@Mock
+	CreateTableViewWizardStep2View mockView;
+	@Mock
+	TableUpdateRequest mockTableUpdateRequest;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 	
-		widget = new CreateTableViewWizardStep2(mockEditor, mockSynapseClient, mockJobTrackingWidget);
+		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
+		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 	}
 	
@@ -78,6 +87,9 @@ public class CreateTableViewWizardStep2Test {
 	
 	@Test
 	public void testConfigureView() {
+		verify(mockView).setJobTracker(any(Widget.class));
+		verify(mockView).setEditor(any(Widget.class));
+		
 		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockSynapseClient).getDefaultColumnsForView(any(ViewType.class), any(AsyncCallback.class));
 		widget.configure(viewEntity, TableType.view);
 		verify(mockEditor).configure(new ArrayList<ColumnModel>());

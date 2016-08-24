@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -85,7 +87,9 @@ public class ColumnModelsWidgetTest {
 	TableUpdateTransactionRequest mockTableSchemaChangeRequest;
 	@Mock
 	JobTrackingWidget mockJobTrackingWidget;
-	
+	@Mock
+	TableUpdateRequest mockTableUpdateRequest;
+
 	TableEntity table;
 	TableBundle tableBundle;
 	
@@ -115,6 +119,7 @@ public class ColumnModelsWidgetTest {
 		});
 		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget);
 		when(mockEditor.validate()).thenReturn(true);
+		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 	}
 	
@@ -205,6 +210,7 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
+		when(mockEditor.getEditedColumnModels()).thenReturn(TableModelTestUtils.createOneOfEachType(false));
 		// Now call save
 		widget.onSave();
 		boolean isDeterminate = false;
