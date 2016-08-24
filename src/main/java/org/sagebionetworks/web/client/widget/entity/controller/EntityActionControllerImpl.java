@@ -493,7 +493,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entity instanceof Table){
 			return false;
 		}
-		return entity instanceof Versionable;
+		return entity instanceof Versionable || entity instanceof DockerRepository;
 	}
 
 

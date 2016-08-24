@@ -42,7 +42,6 @@
 				<b:Column size="XS_12">
 					<g:SimplePanel addStyleNames="margin-top-10" ui:field="defaultThreadContainer" visible="false"/>
 				</b:Column>
-				
 			</b:Row>
 		</bh:Div>
 		<g:SimplePanel ui:field="newThreadModalContainer"/>

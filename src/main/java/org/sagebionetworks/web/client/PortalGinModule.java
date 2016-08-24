@@ -99,6 +99,8 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
+import org.sagebionetworks.web.client.widget.RadioWidget;
+import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -135,6 +137,10 @@ import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadMo
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidgetView;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
@@ -1273,6 +1279,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DockerRepoListWidgetView.class).to(DockerRepoListWidgetViewImpl.class);
 		bind(DockerRepoWidgetView.class).to(DockerRepoWidgetViewImpl.class);
 		bind(AddExternalRepoModalView.class).to(AddExternalRepoModalViewImpl.class);
+		bind(DockerCommitRowWidgetView.class).to(DockerCommitRowWidgetViewImpl.class);
+		bind(DockerCommitListWidgetView.class).to(DockerCommitListWidgetViewImpl.class);
 		
 		bind(SessionStorage.class).to(SessionStorageImpl.class);
 		bind(SynapseForumView.class).to(SynapseForumViewImpl.class);
@@ -1304,6 +1312,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
 		bind(LoadMoreWidgetContainerView.class).to(LoadMoreWidgetContainerViewImpl.class);
+		bind(RadioWidget.class).to(RadioWidgetViewImpl.class);
 		
 		bind(FileClientsHelp.class).to(FileClientsHelpImpl.class);
 		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);

@@ -3,11 +3,30 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  >
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:FlowPanel>
-	  	<b:Modal title="Submit to Challenge"
+  		<b:Modal title="Submit to Challenge"
+				dataBackdrop="STATIC" dataKeyboard="false" ui:field="dockerCommitModal" addStyleNames="modal-fullscreen">
+			<b:ModalBody>
+				<bh:Div>
+					<b:FieldSet>
+						<b:FormGroup ui:field="dockerCommitListUI">
+							<b:FormGroup>
+								<b:FormControlStatic addStyleNames="h5">Select the commit below that you would like to submit:</b:FormControlStatic>
+								<g:SimplePanel ui:field="dockerCommitListContainer" />
+							</b:FormGroup>
+						</b:FormGroup>
+						<g:SimplePanel ui:field="dockerCommitListSynAlertPanel"/>
+					</b:FieldSet>
+				</bh:Div>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="dockerCommitNextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		<b:Modal title="Submit to Challenge"
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
 			<b:ModalBody>
 				<bh:Div>

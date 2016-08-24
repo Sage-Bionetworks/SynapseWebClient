@@ -2,7 +2,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<b:Row>
 		<b:Column size="XS_12">
 			<b:Row>
@@ -27,7 +28,22 @@
 					</b:Panel>
 				</b:Column>
 				<b:Column size="XS_12, MD_6">
-					<bh:Div ui:field="dockerRepoProvenanceContainer" addStyleNames="highlight-box" />
+					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+						<bh:Div addStyleNames="highlight-title">
+							<bh:Text>Tags</bh:Text>
+							<w:HelpWidget helpMarkdown="An image name is made up of slash-separated name components, optionally prefixed by a registry hostname." 
+								href="https://docs.docker.com/engine/reference/commandline/tag/" addStyleNames="margin-left-5" placement="BOTTOM"/>
+						</bh:Div>
+						<bh:Div ui:field="dockerCommitListContainer" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+						<bh:Div addStyleNames="highlight-title">
+							<bh:Text>Provenance</bh:Text>
+			    			<w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results" 
+								href="http://docs.synapse.org/articles/provenance.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+			    		</bh:Div>
+						<bh:Div ui:field="dockerRepoProvenanceContainer" />
+					</g:FlowPanel>
 				</b:Column>
 			</b:Row>
 			<b:Row>
