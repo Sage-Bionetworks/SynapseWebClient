@@ -14,6 +14,8 @@ import org.sagebionetworks.repo.model.table.QueryNextPageToken;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.RowReferenceSetResults;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
@@ -35,7 +37,8 @@ public enum AsynchType implements IsSerializable{
 	TableCSVUploadPreview(UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
 	TableCSVDownload(DownloadFromTableRequest.class, DownloadFromTableResult.class),
 	S3FileCopy(S3FileCopyRequest.class, S3FileCopyResults.class),
-	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class);
+	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
+	TableTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
 	
 	Class<? extends AsynchronousRequestBody> requestClass;
 	Class<? extends AsynchronousResponseBody> responseClass;
