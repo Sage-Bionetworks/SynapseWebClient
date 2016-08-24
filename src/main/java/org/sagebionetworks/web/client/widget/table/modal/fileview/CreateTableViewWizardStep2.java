@@ -41,6 +41,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	TableType tableType;
 	SynapseClientAsync synapseClient;
 	JobTrackingWidget jobTrackingWidget;
+	CreateTableViewWizardStep2View view;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -51,10 +52,16 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * @param view
 	 */
 	@Inject
-	public CreateTableViewWizardStep2(ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget){
+	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view,
+			ColumnModelsEditorWidget editor, 
+			SynapseClientAsync synapseClient, 
+			JobTrackingWidget jobTrackingWidget){
+		this.view = view;
 		this.synapseClient = synapseClient;
 		this.editor = editor;
 		this.jobTrackingWidget = jobTrackingWidget;
+		view.setJobTracker(jobTrackingWidget.asWidget());
+		view.setEditor(editor.asWidget());
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
 			public void invoke() {
@@ -64,6 +71,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 
 	public void configure(Table entity, TableType tableType) {
+		view.setJobTrackerVisible(false);
 		this.changingSelection = false;
 		this.entity = entity;
 		this.tableType = tableType;
@@ -94,7 +102,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 
 	@Override
 	public Widget asWidget() {
-		return editor.asWidget();
+		return view.asWidget();
 	}
 
 	@Override
@@ -135,18 +143,22 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 	
 	public void startTrackingJob(TableUpdateTransactionRequest request) {
+		view.setJobTrackerVisible(true);
 		presenter.setLoading(true);
 		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
+				view.setJobTrackerVisible(false);
 				presenter.setErrorMessage(failure.getMessage());
 			}
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				view.setJobTrackerVisible(false);
 				finished();
 			}
 			@Override
 			public void onCancel() {
+				view.setJobTrackerVisible(false);
 				presenter.setErrorMessage(SCHEMA_UPDATE_CANCELLED);
 			}
 		});

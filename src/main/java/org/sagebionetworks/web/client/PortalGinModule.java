@@ -487,6 +487,8 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQ
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1ViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
@@ -1316,5 +1318,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FileClientsHelp.class).to(FileClientsHelpImpl.class);
 		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);
+		bind(CreateTableViewWizardStep2View.class).to(CreateTableViewWizardStep2ViewImpl.class);
 	}
 }
