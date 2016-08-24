@@ -2298,7 +2298,7 @@ public class SynapseClientImplTest {
 		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
 		when(mockSynapse.createColumnModels(anyList())).thenReturn(oldColumnModels);
 		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
-		assertNull(synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, oldColumnModels));
+		assertEquals(0, synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, oldColumnModels).getChanges().size());
 	}
 	
 	@Test
@@ -2339,7 +2339,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetTableUpdateTransactionRequestFullTest()  throws RestServiceException, SynapseException {
 		//In this test, we will change a column, delete a column, and add a column (with appropriately mocked responses)
-		// Modify col1, delete col2, no change to col3, and add col4
+		// Modify colA, delete colB, no change to colC, and add colD
 		ColumnModel colA, colB, colC, colD, colAModified, colAAfterSave, colDAfterSave;
 		String tableId = "syn93939";
 		colA = getColumnModel("1", ColumnType.STRING);

@@ -131,7 +131,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -2757,16 +2756,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				}
 			}
 			
+			TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
+			request.setEntityId(tableId);
+			List<TableUpdateRequest> requestChangeList = new ArrayList<TableUpdateRequest>();
 			if (!changes.isEmpty()) {
 				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
 				newTableSchemaChangeRequest.setEntityId(tableId);
 				newTableSchemaChangeRequest.setChanges(changes);
-				TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
-				request.setEntityId(tableId);
-				request.setChanges(Collections.singletonList((TableUpdateRequest)newTableSchemaChangeRequest));
-				return request;
+				requestChangeList.add(newTableSchemaChangeRequest);
 			} 
-			return null;
+			request.setChanges(requestChangeList);
+			return request;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

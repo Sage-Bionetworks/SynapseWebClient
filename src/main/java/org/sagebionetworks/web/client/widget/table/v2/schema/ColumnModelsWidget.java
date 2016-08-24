@@ -139,7 +139,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			
 			@Override
 			public void onSuccess(TableUpdateTransactionRequest request) {
-				if (request == null) {
+				if (request.getChanges().isEmpty()) {
 					finished();
 				} else {
 					startTrackingJob(request);	

@@ -121,7 +121,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			
 			@Override
 			public void onSuccess(TableUpdateTransactionRequest request) {
-				if (request == null) {
+				if (request.getChanges().isEmpty()) {
 					finished();
 				} else {
 					startTrackingJob(request);	
