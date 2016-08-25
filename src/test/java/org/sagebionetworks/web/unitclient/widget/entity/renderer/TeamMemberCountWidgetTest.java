@@ -107,14 +107,3 @@ public class TeamMemberCountWidgetTest {
 		verify(mockView).asWidget();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
