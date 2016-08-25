@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -169,9 +170,24 @@ public class EntityMetadataTest {
 	}
 	
 	@Test
+	public void testConfigureStorageLocationExternalSftp() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
+		exS3Destination.setUrl("sftp://testUrl.com/abcdef");
+		exS3Destination.setUploadType(UploadType.SFTP);
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(en);
+		verify(mockView).setUploadDestinationText("sftp://testUrl.com");
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView).setUploadDestinationPanelVisible(true);
+	}
+	
+	@Test
 	public void testConfigureStorageLocationExternal() {
 		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
 		ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
+		exS3Destination.setUploadType(UploadType.HTTPS);
 		exS3Destination.setUrl("testUrl.com");
 		uploadDestinations.add(exS3Destination);
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
