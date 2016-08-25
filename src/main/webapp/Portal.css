@@ -973,8 +973,9 @@ a.shortBtn {
 }
 
 .markdown {
-	word-wrap:break-word;
-	overflow: auto;
+	word-wrap: break-word;
+	overflow-x: auto;
+	overflow-y: hidden;
 	text-align: justify;
 	line-height: 1.6em;
 }
