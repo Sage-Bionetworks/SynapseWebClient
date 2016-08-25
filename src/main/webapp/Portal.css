@@ -2034,7 +2034,7 @@ a.projectTitle:hover {
   	width: 100%;
   }
 }
-@media (min-width: 991px) {
+@media (min-width: 992px) {
 	.entity-tab {
 		width: 140px;
 		font-size: 16px;	
