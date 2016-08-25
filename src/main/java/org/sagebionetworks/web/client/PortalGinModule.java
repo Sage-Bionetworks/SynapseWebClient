@@ -361,6 +361,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWid
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountView;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
@@ -1035,6 +1037,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
 		bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
 		bind(VideoWidgetView.class).to(VideoWidgetViewImpl.class);
+		bind(TeamMemberCountView.class).to(TeamMemberCountViewImpl.class);
 		
 		
 		// ProvenanceWidget
