@@ -76,7 +76,7 @@ public class DockerTabViewImpl implements DockerTabView {
 	}
 	
 	public void updateWidth(Tab tab) {
-		tab.getTabListItem().setWidth("150px");
+		tab.getTabListItem().addStyleName("min-width-200");
 	};
 	
 }

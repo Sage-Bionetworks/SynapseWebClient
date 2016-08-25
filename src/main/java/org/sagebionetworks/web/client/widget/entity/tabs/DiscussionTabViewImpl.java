@@ -33,7 +33,7 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	}
 	
 	public void updateWidth(Tab tab) {
-		tab.getTabListItem().setWidth("200px");
+		tab.getTabListItem().addStyleName("min-width-200");
 	};
 	
 	@Override
