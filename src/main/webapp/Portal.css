@@ -2030,14 +2030,13 @@ a.projectTitle:hover {
 }
 
 @media (max-width: 991px) {
-  .entity-tab {
-  	width: 100%;
-  }
+	.entity-tab {
+		width: 100%;
+	}
 }
 @media (min-width: 992px) {
 	.entity-tab {
 		width: 140px;
-		font-size: 16px;	
 	}
 }
 .entity-tab > a {
