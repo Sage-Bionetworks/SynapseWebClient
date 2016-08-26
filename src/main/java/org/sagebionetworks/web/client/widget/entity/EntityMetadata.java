@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -122,7 +123,15 @@ public class EntityMetadata implements Presenter {
 						view.setUploadDestinationText("Synapse Storage");
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
-						view.setUploadDestinationText(externalUploadDestination.getUrl());
+						String externalUrl = externalUploadDestination.getUrl();
+						UploadType type = externalUploadDestination.getUploadType();
+						if (type == UploadType.SFTP){
+							int indexOfLastSlash = externalUrl.lastIndexOf('/');
+							if (indexOfLastSlash > -1) {
+								externalUrl = externalUrl.substring(0, indexOfLastSlash);	
+							}
+						}
+						view.setUploadDestinationText(externalUrl);
 					} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
 						ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
 						String description = "s3://" + externalUploadDestination.getBucket() + "/";
