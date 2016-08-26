@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -71,7 +72,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		view.updateWidth(tab);
-		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "Not yet implemented", "");
+		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
 		view.setPresenter(this);
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setDockerRepoList(dockerListRepoWidget.asWidget());
