@@ -35,6 +35,12 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 	@Inject
 	public DockerCommitRowWidgetViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
+		digest.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				digest.selectAll();
+			}
+		});
 		row.addClickHandler(new ClickHandler(){
 
 			@Override

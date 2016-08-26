@@ -682,6 +682,10 @@ a.shortBtn {
 .min-width-25 {
 	min-width: 25px;
 }
+.min-width-200 {
+	min-width: 200px;
+}
+
 .profile-image-40px {
 	width: 40px;	
 }
@@ -2023,8 +2027,18 @@ a.projectTitle:hover {
 }
 
 .entity-tab {
-	width: 140px;
 	font-size: 16px;	
+}
+
+@media (max-width: 991px) {
+	.entity-tab {
+		width: 100%;
+	}
+}
+@media (min-width: 992px) {
+	.entity-tab {
+		width: 140px;
+	}
 }
 .entity-tab > a {
 	text-align: center;
