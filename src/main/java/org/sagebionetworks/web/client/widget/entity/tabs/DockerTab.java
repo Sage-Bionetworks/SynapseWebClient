@@ -72,7 +72,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		view.updateWidth(tab);
-		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "[Docker](https://www.docker.com/what-docker) containers are a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
+		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
 		view.setPresenter(this);
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setDockerRepoList(dockerListRepoWidget.asWidget());
