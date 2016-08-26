@@ -160,7 +160,7 @@
 										</a>
 								    </li>
 								    
-								    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
+								    <li class="entity-tab" ui:field="settingsListItem"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
 							    </ul>
 							</div>
 						</div>
