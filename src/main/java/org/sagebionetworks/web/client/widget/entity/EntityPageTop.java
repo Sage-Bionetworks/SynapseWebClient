@@ -222,7 +222,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			default:
 		}
 
-		dockerTab.asTab().setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
