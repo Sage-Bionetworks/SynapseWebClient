@@ -364,6 +364,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_TEAM_MEMBERS:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=123" + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
+		case INSERT_TEAM_MEMBER_COUNT:
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=123" + WidgetConstants.WIDGET_END_MARKDOWN);
+			break;			
 		case SET_PROJECT_BACKGROUND:
 			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
 			break;

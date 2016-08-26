@@ -130,6 +130,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem entityBackgroundLink;
 	@UiField
 	public AnchorListItem teamMembersLink;
+	@UiField
+	public AnchorListItem teamMemberCountLink;
 	
 	@UiField
 	public Button boldButton;
@@ -243,6 +245,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
 		teamMembersLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBERS));
+		teamMemberCountLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBER_COUNT));
 		markdownPreviewButton.addClickHandler(getClickHandler(MarkdownEditorAction.MARKDOWN_PREVIEW));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
