@@ -33,6 +33,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -138,7 +139,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			} else if (teamMembershipStatus.getHasOpenRequest()) {
 				// display a message saying "your membership request is pending review by team administration"
 				view.setRequestMessageVisible(true);
-			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
+			} else if (teamMembershipStatus.getMembershipApprovalRequired() && !teamMembershipStatus.getHasOpenInvitation()) {
 				// show request UI
 				if (isSimpleRequestButton) {
 					view.setSimpleRequestButtonVisible(true);
