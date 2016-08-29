@@ -872,6 +872,10 @@ public class DisplayUtils {
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
 		String[] parts = entityVersion.split(WebConstants.ENTITY_VERSION_STRING);
+		if (parts.length == 1) {
+			// version may be using a dot delimiter:
+			parts = entityVersion.split("\\.");
+		}
 		Reference ref = null;
 		if(parts.length > 0) {
 			ref = new Reference();

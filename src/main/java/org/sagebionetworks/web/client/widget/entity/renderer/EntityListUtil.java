@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -55,7 +56,10 @@ public class EntityListUtil {
 		if(record == null) return;
 		final Reference ref = record.getEntityReference();
 		if(ref == null) return;
-				
+		if (!EntityPresenter.isValidEntityId(ref.getTargetId()))  {
+			createFailureDisplay(new IllegalArgumentException(), ref, handler);
+			return;
+		}
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
