@@ -69,6 +69,7 @@ import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
+	public static final int DELAY_GET_MY_TEAMS = 300;
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
@@ -118,6 +119,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public Callback resubmitVerificationCallback;
 	public LoadMoreWidgetContainer loadMoreProjectsWidgetContainer;
 	public Callback getMoreProjectsCallback;
+	public Callback refreshTeamsCallback;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -180,6 +182,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void invoke() {
 				getMoreProjects();
+			}
+		};
+		refreshTeamsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshTeams();
 			}
 		};
 	}
@@ -272,8 +280,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					showTab(currentArea, pushState);
 				}
 			});
-			// refresh owner teams to update the team notification count
-			refreshTeams();
 		} else {
 			getUserProfile();
 			boolean pushState = false;
@@ -499,6 +505,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		loadMoreProjectsWidgetContainer.setIsMore(false);
 		loadMoreProjectsWidgetContainer.configure(getMoreProjectsCallback);
 		getMoreProjects();
+		if (isOwner) {
+			// refresh owner teams to update the team notification count, and team filter
+			gwt.scheduleExecution(refreshTeamsCallback, DELAY_GET_MY_TEAMS);
+		}
 	}
 	
 	public void refreshChallenges() {
