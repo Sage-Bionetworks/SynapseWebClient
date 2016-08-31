@@ -202,8 +202,11 @@
 			        <compileReport>true</compileReport>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
+<<<<<<< Updated upstream
 
 			        <sourceLevel>auto</sourceLevel>
+=======
+>>>>>>> Stashed changes
 			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
