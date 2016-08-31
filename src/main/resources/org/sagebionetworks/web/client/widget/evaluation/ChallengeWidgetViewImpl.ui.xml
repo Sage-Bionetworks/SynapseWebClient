@@ -34,6 +34,7 @@
 			</b:ModalBody>
 			<b:ModalFooter>
 			    <b:Button type="PRIMARY" text="OK" dataDismiss="MODAL" ui:field="challengeTeamButton"/>
+			    <b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		<bh:Div ui:field="widgetsContainer"/>
