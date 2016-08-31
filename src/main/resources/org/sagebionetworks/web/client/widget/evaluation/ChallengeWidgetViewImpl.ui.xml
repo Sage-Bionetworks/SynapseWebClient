@@ -19,7 +19,7 @@
 					<b:Button ui:field="editTeamButton" type="DEFAULT" text="Edit" icon="EDIT" size="EXTRA_SMALL"/>
 					<bh:Div ui:field="teamWidgetContainer" />
 				</bh:Div>
-				<b:Button ui:field="deleteChallengeButton" type="DANGER" text="Delete Challenge" icon="PLUS" addStyleNames="margin-10"/>
+				<b:Button ui:field="deleteChallengeButton" type="DANGER" text="Delete Challenge" icon="TIMES" addStyleNames="margin-10"/>
 			</bh:Div>
 		</b:Panel>
 		<b:Panel ui:field="newChallengeUI" addStyleNames="padding-10">

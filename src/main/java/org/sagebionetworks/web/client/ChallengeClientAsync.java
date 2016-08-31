@@ -62,7 +62,7 @@ public interface ChallengeClientAsync {
 	void createEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
 	void deleteEvaluation(String evaluationId, AsyncCallback<Void> callback);
 	
-	void getProjectEvaluationIds(String projectId, AsyncCallback<Set<String>> callback) throws RestServiceException;
+	void getProjectEvaluationIds(String projectId, AsyncCallback<Set<String>> callback);
 	void deleteChallenge(String challengeId, AsyncCallback<Void> callback);
 	void updateChallenge(Challenge challenge, AsyncCallback<Challenge> callback);
 	void createChallenge(Challenge challenge, AsyncCallback<Challenge> callback);
