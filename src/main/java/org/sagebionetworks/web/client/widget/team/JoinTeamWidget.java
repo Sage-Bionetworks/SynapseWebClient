@@ -138,7 +138,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			} else if (teamMembershipStatus.getHasOpenRequest()) {
 				// display a message saying "your membership request is pending review by team administration"
 				view.setRequestMessageVisible(true);
-			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
+			} else if (teamMembershipStatus.getMembershipApprovalRequired() && !teamMembershipStatus.getHasOpenInvitation()) {
 				// show request UI
 				if (isSimpleRequestButton) {
 					view.setSimpleRequestButtonVisible(true);
