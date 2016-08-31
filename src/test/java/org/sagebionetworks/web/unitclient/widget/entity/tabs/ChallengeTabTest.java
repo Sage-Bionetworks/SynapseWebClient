@@ -46,6 +46,7 @@ public class ChallengeTabTest {
 	@Test
 	public void testConstruction() {
 		verify(mockView).setEvaluationList(any(Widget.class));
+		verify(mockView).setChallengeWidget(any(Widget.class));
 	}
 	
 	@Test
@@ -62,7 +63,7 @@ public class ChallengeTabTest {
 		ArgumentCaptor<CallbackP> callbackCaptor = ArgumentCaptor.forClass(CallbackP.class);
 		
 		verify(mockAdministerEvaluationsList).configure(eq(entityId), callbackCaptor.capture());
-		
+		verify(mockChallengeWidget).configure(entityId);
 		verify(mockTab, times(2)).setTabListItemVisible(false);
 		verify(mockTab, never()).setTabListItemVisible(true);
 		callbackCaptor.getValue().invoke(true);
