@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -32,13 +33,14 @@ public class ChallengeTabTest {
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
 	AdministerEvaluationsList mockAdministerEvaluationsList;
-	
+	@Mock
+	ChallengeWidget mockChallengeWidget;
 	ChallengeTab tab;
 	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new ChallengeTab(mockView, mockTab, mockAdministerEvaluationsList);
+		tab = new ChallengeTab(mockView, mockTab, mockAdministerEvaluationsList, mockChallengeWidget);
 	}
 
 	@Test
