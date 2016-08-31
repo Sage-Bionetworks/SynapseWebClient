@@ -103,6 +103,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.view = view;
 		this.jsniUtils = jsniUtils;
 		this.markdownEditor = markdownEditor;
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
