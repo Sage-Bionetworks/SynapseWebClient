@@ -247,9 +247,17 @@ public class DisplayUtils {
 	public static void showInfo(String title, String message) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.INFO);
-		Notify.notify(title, message, settings);
+		notify(title, message, settings);
 	}
-
+	
+	public static void notify(String title, String message, NotifySettings settings) {
+		try{
+			Notify.notify(title, message, settings);
+		} catch(Throwable t) {
+			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
+		}
+	}
+	
 	/**
 	 * Shows an warning message to the user in the "Global Alert area".
 	 * @param title
@@ -262,7 +270,7 @@ public class DisplayUtils {
 		if (timeout != null) {
 			settings.setDelay(timeout);	
 		}
-		Notify.notify(title, message, settings);
+		notify(title, message, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
