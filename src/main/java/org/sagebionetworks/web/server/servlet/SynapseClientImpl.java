@@ -178,6 +178,9 @@ import com.google.gwt.core.server.StackTraceDeobfuscator;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
+	private static final Integer MAX_LIMIT = 300;
+	private static final Integer ZERO_OFFSET = 0;
+
 	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
 	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
@@ -370,9 +373,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public SerializableWhitelist junk(SerializableWhitelist l) {
 		return null;
 	}
-
-	private static final Integer MAX_LIMIT = Integer.MAX_VALUE;
-	private static final Integer ZERO_OFFSET = 0;
 
 	/**
 	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.

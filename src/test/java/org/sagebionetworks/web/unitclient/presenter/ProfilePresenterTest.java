@@ -366,6 +366,12 @@ public class ProfilePresenterTest {
 		verify(mockSynAlert).handleException(ex);
 	}
 
+	
+	private void invokeGetMyTeamsCallback() {
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(ProfilePresenter.DELAY_GET_MY_TEAMS));
+		callbackCaptor.getValue().invoke();
+	}
 
 	@Test
 	public void testViewMyProfileNoRedirect() throws JSONObjectAdapterException{
@@ -373,6 +379,9 @@ public class ProfilePresenterTest {
 		setPlaceMyProfile("456");
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		//should attempt to get my teams, but delayed.
+		invokeGetMyTeamsCallback();
 		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
@@ -1006,6 +1015,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testGetTeamFilters() {
 		setPlaceMyProfile("456");
+		invokeGetMyTeamsCallback();
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(true);
@@ -1016,6 +1026,7 @@ public class ProfilePresenterTest {
 	public void testGetTeamFiltersEmpty() {
 		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		setPlaceMyProfile("456");
+		invokeGetMyTeamsCallback();
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(false);
 	}
@@ -1025,6 +1036,7 @@ public class ProfilePresenterTest {
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		setPlaceMyProfile("456");
+		invokeGetMyTeamsCallback();
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(false);
 	}
