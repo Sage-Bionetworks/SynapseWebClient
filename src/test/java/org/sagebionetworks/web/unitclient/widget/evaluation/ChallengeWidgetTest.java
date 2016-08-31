@@ -148,7 +148,7 @@ public class ChallengeWidgetTest {
 		widget.onSelectChallengeTeam();
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
-		
+		verify(mockView).setCreateChallengeVisible(false);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
 		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());

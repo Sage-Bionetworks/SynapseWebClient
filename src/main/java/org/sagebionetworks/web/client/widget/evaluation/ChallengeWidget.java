@@ -115,6 +115,8 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 	public void onSelectChallengeTeam() {
 		GroupSuggestion suggestion = (GroupSuggestion)teamSuggestBox.getSelectedSuggestion();
 		if (suggestion != null) {
+			view.setChallengeVisible(false);
+			view.setCreateChallengeVisible(false);
 			if (isCreatingChallenge) {
 				Challenge c = new Challenge();
 				c.setProjectId(entityId);
