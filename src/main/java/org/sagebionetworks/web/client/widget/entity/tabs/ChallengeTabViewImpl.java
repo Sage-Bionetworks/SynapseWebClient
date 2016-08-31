@@ -10,6 +10,8 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 	
 	@UiField
 	SimplePanel evaluationListContainer;
+	@UiField
+	SimplePanel challengeWidgetContainer;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, ChallengeTabViewImpl> {}
 	
@@ -23,9 +25,14 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 	
 	@Override
 	public void setEvaluationList(Widget w) {
+		evaluationListContainer.clear();
 		evaluationListContainer.add(w);
 	}
-	
+	@Override
+	public void setChallengeWidget(Widget w) {
+		challengeWidgetContainer.clear();
+		challengeWidgetContainer.add(w);
+	}
 	@Override
 	public Widget asWidget() {
 		return widget;

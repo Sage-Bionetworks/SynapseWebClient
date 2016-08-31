@@ -240,6 +240,7 @@ public class DisplayConstants {
 	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google Account Login. Please try again or use your Synapse username and password.";
 	
 	public static final String CONFIRM_DELETE_EVAL_QUEUE = "Are you sure you want to delete evaluation queue: ";
+	public static final String CONFIRM_DELETE_CHALLENGE = "Are you sure you want to delete the challenge associated to this project?";
 	
 	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";

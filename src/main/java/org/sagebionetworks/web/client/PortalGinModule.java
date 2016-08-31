@@ -397,6 +397,8 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TabsView;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabsViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
+import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
@@ -1322,5 +1324,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileClientsHelp.class).to(FileClientsHelpImpl.class);
 		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);
 		bind(CreateTableViewWizardStep2View.class).to(CreateTableViewWizardStep2ViewImpl.class);
+		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
+		
 	}
 }
