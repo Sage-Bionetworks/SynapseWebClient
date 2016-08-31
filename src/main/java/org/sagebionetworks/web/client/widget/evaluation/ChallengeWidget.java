@@ -104,6 +104,12 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 		isCreatingChallenge = true;
 		view.showTeamSelectionModal();
 	}
+
+	@Override
+	public void onEditTeamClicked() {
+		isCreatingChallenge = false;
+		view.showTeamSelectionModal();
+	}
 	
 	@Override
 	public void onSelectChallengeTeam() {
@@ -122,9 +128,11 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 		}
 	}
 	
-	@Override
-	public void onEditTeamClicked() {
-		isCreatingChallenge = false;
-		view.showTeamSelectionModal();
+	/**
+	 * exposed for testing purposes
+	 * @param currentChallenge
+	 */
+	public void setCurrentChallenge(Challenge currentChallenge) {
+		this.currentChallenge = currentChallenge;
 	}
 }
