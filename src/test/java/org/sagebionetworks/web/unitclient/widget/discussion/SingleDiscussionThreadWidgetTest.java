@@ -150,6 +150,8 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
 		verify(mockRepliesContainer).configure(any(Callback.class));
+		verify(mockMarkdownEditorWidget).showExternalImageButton();
+		verify(mockMarkdownEditorWidget).hideUploadRelatedCommands();
 	}
 
 	@Test
