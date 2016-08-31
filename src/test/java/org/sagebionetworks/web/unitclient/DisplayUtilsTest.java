@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -369,6 +370,27 @@ public class DisplayUtilsTest {
 		versioned = DisplayUtils.createEntityVersionString("syn1234", 8888L);
 		assertTrue(versioned.contains("syn1234"));
 		assertTrue(versioned.contains("8888"));
+	}
+	
+	@Test
+	public void testParseEntityVersionString() {
+		String validSynId = "syn123";
+		Long validVersion = 3L;
+		
+		//verify ref without version
+		Reference expectedRef = new Reference();
+		expectedRef.setTargetId(validSynId);
+		Reference testRef;
+		testRef = DisplayUtils.parseEntityVersionString(validSynId);
+		assertEquals(expectedRef, testRef);
+		
+		//verify ref with version defined using dot notation
+		expectedRef.setTargetVersionNumber(validVersion);
+		testRef = DisplayUtils.parseEntityVersionString(validSynId + "." + validVersion);
+		assertEquals(expectedRef, testRef);
+		//verify ref with version defined using "/version/" notation
+		testRef = DisplayUtils.parseEntityVersionString(validSynId + WebConstants.ENTITY_VERSION_STRING + validVersion);
+		assertEquals(expectedRef, testRef);
 	}
 }
 
