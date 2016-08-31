@@ -5,6 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:Row ui:field="adminTabContainer" >
 		<b:Column size="XS_12">
+			<g:SimplePanel ui:field="challengeWidgetContainer"/>
 			<g:SimplePanel ui:field="evaluationListContainer"/>
 		</b:Column>
 	</b:Row>

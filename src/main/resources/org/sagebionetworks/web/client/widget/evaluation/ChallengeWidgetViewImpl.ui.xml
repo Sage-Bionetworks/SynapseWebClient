@@ -1,0 +1,43 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+>
+	<bh:Div>
+		<b:Panel ui:field="challengeUI">
+			<bh:Div addStyleNames="highlight-title margin-left-5">
+				<bh:Text text="Challenge" />
+			</bh:Div>
+			<bh:Div addStyleNames="margin-left-15 padding-bottom-15">
+				<bh:Div>
+					<b:Heading size="H5" text="Challenge ID:" addStyleNames="displayInlineBlock margin-right-10" />
+					<b:Heading size="H5" ui:field="challengeIdHeading" addStyleNames="displayInlineBlock" />
+				</bh:Div>
+				<bh:Div>
+					<b:Heading size="H5" text="Registered participants team" addStyleNames="displayInlineBlock margin-right-10" />
+					<b:Button ui:field="editTeamButton" type="DEFAULT" text="Edit" icon="EDIT" size="EXTRA_SMALL"/>
+					<bh:Div ui:field="teamWidgetContainer" />
+				</bh:Div>
+				<b:Button ui:field="deleteChallengeButton" type="DANGER" text="Delete Challenge" icon="TIMES" addStyleNames="margin-10"/>
+			</bh:Div>
+		</b:Panel>
+		<b:Panel ui:field="newChallengeUI" addStyleNames="padding-10">
+			<b:Button ui:field="newChallengeButton" type="PRIMARY" text="Create Challenge" icon="PLUS"/>
+		</b:Panel>
+		<b:Modal ui:field="teamModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
+			<b:ModalHeader>
+			    <b:Heading size="H4" text="Challenge Participant Team" addStyleNames="displayInline"/>
+			</b:ModalHeader>
+			<b:ModalBody>
+				<bh:Div ui:field="teamSelectBoxContainer"/>
+			</b:ModalBody>
+			<b:ModalFooter>
+			    <b:Button type="PRIMARY" text="OK" dataDismiss="MODAL" ui:field="challengeTeamButton"/>
+			    <b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		<bh:Div ui:field="widgetsContainer"/>
+	</bh:Div>
+	
+</ui:UiBinder>

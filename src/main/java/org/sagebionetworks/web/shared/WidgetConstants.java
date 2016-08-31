@@ -181,6 +181,7 @@ public class WidgetConstants {
 	public static final String BIODALLIANCE_SOURCE_PREFIX = "source";
 	
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
+	public static final String PROJECT_ID_KEY = "projectId";
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
