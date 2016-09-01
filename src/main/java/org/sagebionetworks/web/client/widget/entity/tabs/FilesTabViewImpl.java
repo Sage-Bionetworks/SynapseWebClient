@@ -42,6 +42,11 @@ public class FilesTabViewImpl implements FilesTabView {
 	SimplePanel synapseAlertContainer;
 	@UiField
 	SimplePanel refreshAlertContainer;
+
+	@UiField
+	Div discussionThreadsContainer;
+	@UiField
+	Column discussionContainer;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
 	Widget widget;
@@ -160,4 +165,15 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setRefreshAlert(Widget w) {
 		refreshAlertContainer.setWidget(w);
 	};
+
+	@Override
+	public void setDiscussionThreadListWidget(Widget widget){
+		discussionThreadsContainer.clear();
+		discussionThreadsContainer.add(widget);
+	}
+
+	@Override
+	public void setDiscussionThreadListWidgetVisible(Boolean visible) {
+		discussionContainer.setVisible(visible);
+	}
 }
