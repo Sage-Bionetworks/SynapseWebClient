@@ -6,7 +6,7 @@
 	
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
-	<bh:Div>
+	<bh:Div addStyleNames="margin-left-5 margin-right-5">
 		<bh:Div ui:field="loadingUI" >
 			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 			<bh:Text>&nbsp; Loading...</bh:Text>

@@ -27,6 +27,8 @@ public class SelectTeamModalViewImpl implements SelectTeamModalView {
 	Modal teamModal;
 	@UiField
 	Heading title;
+	@UiField
+	Button cancelButton;
 	
 	@Inject
 	public SelectTeamModalViewImpl(SelectTeamModalViewImplUiBinder binder) {
@@ -34,7 +36,14 @@ public class SelectTeamModalViewImpl implements SelectTeamModalView {
 		selectTeamButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				teamModal.hide();
 				presenter.onSelectTeam();
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				teamModal.hide();
 			}
 		});
 	}
