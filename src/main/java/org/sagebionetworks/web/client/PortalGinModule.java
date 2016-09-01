@@ -617,6 +617,8 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetView;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModalView;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModalViewImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
@@ -1325,6 +1327,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);
 		bind(CreateTableViewWizardStep2View.class).to(CreateTableViewWizardStep2ViewImpl.class);
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
-		
+		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
 	}
 }

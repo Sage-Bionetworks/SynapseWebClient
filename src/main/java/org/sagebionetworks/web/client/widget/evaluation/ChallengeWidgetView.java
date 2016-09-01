@@ -15,12 +15,10 @@ public interface ChallengeWidgetView extends IsWidget {
 	void setChallengeVisible(boolean visible);
 	void setChallengeId(String challengeId);
 	void add(Widget w);
-	void setSuggestWidget(Widget w);
-	void showTeamSelectionModal();
+	void setSelectTeamModal(Widget w);
 	public interface Presenter {
 		void onDeleteChallengeClicked();
 		void onCreateChallengeClicked();
-		void onSelectChallengeTeam();
 		void onEditTeamClicked();
 	}
 }
