@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
@@ -24,6 +25,7 @@ import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -42,13 +44,9 @@ public class ChallengeWidgetTest {
 	@Mock
 	BigTeamBadge mockTeamBadge;
 	@Mock
-	SynapseSuggestBox mockTeamSuggestBox;
-	@Mock
-	GroupSuggestionProvider mockProvider;
-	@Mock
 	Challenge mockChallenge;
 	@Mock
-	GroupSuggestion mockGroupSuggestion;
+	SelectTeamModal mockSelectTeamModal;
 	
 	public static final String PARTICIPANT_TEAM_ID = "1234567890";
 	public static final String CHALLENGE_ID = "45678";
@@ -57,13 +55,11 @@ public class ChallengeWidgetTest {
 	@Before
 	public void setup() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockTeamSuggestBox, mockProvider);
+		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal);
 		
 		AsyncMockStubber.callSuccessWith(mockChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		when(mockChallenge.getId()).thenReturn(CHALLENGE_ID);
 		when(mockChallenge.getParticipantTeamId()).thenReturn(PARTICIPANT_TEAM_ID);
-		when(mockGroupSuggestion.getId()).thenReturn(SELECTED_TEAM_ID);
-		when(mockTeamSuggestBox.getSelectedSuggestion()).thenReturn(mockGroupSuggestion);
 	}
 	
 	@Test
@@ -71,8 +67,7 @@ public class ChallengeWidgetTest {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).add(any(Widget.class));
 		verify(mockView).setChallengeTeamWidget(any(Widget.class));
-		verify(mockView).setSuggestWidget(any(Widget.class));
-		verify(mockTeamSuggestBox).setSuggestionProvider(mockProvider);
+		verify(mockView).setSelectTeamModal(any(Widget.class));
 	}
 	
 	@Test
@@ -142,30 +137,34 @@ public class ChallengeWidgetTest {
 	@Test
 	public void testOnCreateChallengeClicked() {
 		widget.onCreateChallengeClicked();
-		verify(mockView).showTeamSelectionModal();
+		verify(mockSelectTeamModal).show();
 		
-		//no simulate that a team was selected
-		widget.onSelectChallengeTeam();
+		//now simulate that a team was selected
+		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
+		teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
+		
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
 		verify(mockView).setCreateChallengeVisible(false);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
 		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());
-		verify(mockTeamSuggestBox).clear();
 	}
 	
 	@Test
 	public void testOnEditTeamClicked() {
 		widget.setCurrentChallenge(mockChallenge);
 		widget.onEditTeamClicked();
-		verify(mockView).showTeamSelectionModal();
+		verify(mockSelectTeamModal).show();
 		
-		//no simulate that a team was selected
-		widget.onSelectChallengeTeam();
+		//now simulate that a team was selected
+		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
+		teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
+		
 		verify(mockChallengeClient).updateChallenge(eq(mockChallenge), any(AsyncCallback.class));
 		verify(mockChallenge).setParticipantTeamId(SELECTED_TEAM_ID);
-		verify(mockTeamSuggestBox).clear();
 	}
 
 }
