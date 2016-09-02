@@ -24,4 +24,7 @@ public interface FilesTabView extends IsWidget {
 	void clearActionMenuContainer();
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 	void setRefreshAlert(Widget w);
+	void setDiscussionThreadListWidget(Widget widget);
+	void setDiscussionThreadListWidgetVisible(Boolean visible);
+	void setDiscussionText(String entityName);
 }
