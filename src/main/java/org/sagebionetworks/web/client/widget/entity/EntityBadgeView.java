@@ -54,4 +54,6 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	}
 	String getFriendlySize(Long contentSize, boolean b);
 
+	void setDiscussionThreadIconVisible(boolean visible);
+
 }

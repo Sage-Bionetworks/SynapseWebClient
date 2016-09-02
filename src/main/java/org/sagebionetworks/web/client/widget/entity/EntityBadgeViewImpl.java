@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
-	
+
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	SageImageBundle sageImageBundle;
@@ -73,6 +73,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Icon errorIcon;
 	@UiField
 	Span fileDownloadButtonContainer;
+	@UiField
+	Icon discussionIcon;
+	@UiField
+	Tooltip discussion;
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -265,6 +269,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void setFileDownloadButton(Widget w) {
 		fileDownloadButtonContainer.clear();
 		fileDownloadButtonContainer.add(w);
+	}
+
+	@Override
+	public void setDiscussionThreadIconVisible(boolean visible){
+		discussionIcon.setVisible(visible);
 	}
 	/*
 	 * Private Methods
