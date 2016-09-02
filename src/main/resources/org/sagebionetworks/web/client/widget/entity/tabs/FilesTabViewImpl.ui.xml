@@ -44,7 +44,7 @@
 				<b:Column size="MD_12" ui:field="discussionContainer">
 					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
 			    		<bh:Div addStyleNames="highlight-title">
-			    			<bh:Text>Discussion about this entity</bh:Text>
+			    			<bh:Text ui:field="discussionText" />
 			    		</bh:Div>
 			    		<bh:Div ui:field="discussionThreadsContainer" />
 			    	</g:FlowPanel>

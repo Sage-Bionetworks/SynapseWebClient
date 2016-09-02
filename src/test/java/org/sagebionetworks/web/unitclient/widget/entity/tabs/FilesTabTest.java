@@ -310,6 +310,7 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).getProvenanceRenderer();
 
 		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockView).setDiscussionText(fileName);
 		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);

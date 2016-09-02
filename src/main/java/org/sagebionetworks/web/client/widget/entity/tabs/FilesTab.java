@@ -321,6 +321,7 @@ public class FilesTab {
 			fileTitleBar.configure(bundle);
 			previewWidget.configure(bundle);
 			discussionThreadListWidget.configure(currentEntityId, null, null);
+			view.setDiscussionText(currentEntity.getName());
 		}
 		view.setDiscussionThreadListWidgetVisible(isFile);
 		view.setFolderTitlebarVisible(isFolder);
