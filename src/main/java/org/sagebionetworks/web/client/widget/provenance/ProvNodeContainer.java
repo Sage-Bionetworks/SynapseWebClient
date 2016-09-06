@@ -50,6 +50,7 @@ public class ProvNodeContainer extends FlowPanel implements HasMouseOverHandlers
 		tip.setTitle(title);
 		tip.setPlacement(Placement.RIGHT);
 		tip.setTrigger(Trigger.HOVER);
+		tip.setContainer("body");
 		tip.addTooltipInnerClassName("width-200");
 		
 		this.add(tip);
