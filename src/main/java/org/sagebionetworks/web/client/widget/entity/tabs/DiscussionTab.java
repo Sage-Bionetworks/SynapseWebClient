@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.Set;
 
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
