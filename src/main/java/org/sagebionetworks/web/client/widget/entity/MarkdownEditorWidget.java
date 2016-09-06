@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -59,6 +60,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	//Optional wiki page key.  If set, wiki widgets may use.
 	private WikiPageKey wikiKey;
 	private MarkdownWidget markdownPreview;
+	private SelectTeamModal selectTeamModal;
+	MarkdownEditorAction currentAction;
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -69,7 +72,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			WidgetRegistrar widgetRegistrar,
 			MarkdownWidget formattingGuide,
 			UserSelector userSelector,
-			MarkdownWidget markdownPreview
+			MarkdownWidget markdownPreview,
+			SelectTeamModal selectTeamModal
 			) {
 		super();
 		this.view = view;
@@ -81,12 +85,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.formattingGuide = formattingGuide;
 		this.userSelector = userSelector;
 		this.markdownPreview = markdownPreview;
-		
+		this.selectTeamModal = selectTeamModal;
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 		view.setFormattingGuideWidget(formattingGuide.asWidget());
 		view.setMarkdownPreviewWidget(markdownPreview.asWidget());
 		view.setAttachmentCommandsVisible(true);
+		view.setSelectTeamModal(selectTeamModal.asWidget());
 		
 		userSelector.configure(new CallbackP<String>() {
 			@Override
@@ -98,6 +103,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			@Override
 			public void onShown(ModalShownEvent evt) {
 				MarkdownEditorWidget.this.view.setEditorEnabled(true);
+			}
+		});
+		selectTeamModal.configure(new CallbackP<String>() {
+			@Override
+			public void invoke(String selectedTeamId) {
+				onSelectTeam(selectedTeamId);
 			}
 		});
 	}
@@ -221,6 +232,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	@Override
 	public void handleCommand(MarkdownEditorAction action) {
+		this.currentAction = action;
 		//editor knows how to handle all commands (not a subscribe model since we don't need it yet).
 		switch (action) {
 		case EDIT_WIDGET:
@@ -362,11 +374,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			surroundWithTag("######", "", false);
 			break;
 		case INSERT_TEAM_MEMBERS:
-			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=123" + WidgetConstants.WIDGET_END_MARKDOWN);
+		case INSERT_TEAM_MEMBER_COUNT:	
+			selectTeamModal.show();
 			break;
-		case INSERT_TEAM_MEMBER_COUNT:
-			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=123" + WidgetConstants.WIDGET_END_MARKDOWN);
-			break;			
 		case SET_PROJECT_BACKGROUND:
 			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
 			break;
@@ -376,6 +386,20 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		default:
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);
+		}
+	}
+	
+	private void onSelectTeam(String teamId) {
+		switch (currentAction) {
+			case INSERT_TEAM_MEMBERS:
+				insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=" + teamId + WidgetConstants.WIDGET_END_MARKDOWN);
+				break;
+			case INSERT_TEAM_MEMBER_COUNT:
+				insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=" + teamId + WidgetConstants.WIDGET_END_MARKDOWN);
+				break;
+			default:
+				throw new IllegalArgumentException(
+						"Unrecognized markdown editor team select action: " + currentAction);
 		}
 	}
 	
