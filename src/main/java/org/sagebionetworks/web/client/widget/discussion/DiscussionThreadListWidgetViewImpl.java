@@ -32,6 +32,8 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@UiField
 	FocusPanel sortByActivity;
 	@UiField
+	FocusPanel sortByTopic;
+	@UiField
 	Div threadHeader;
 	@UiField
 	Span noThreadsFound;
@@ -58,6 +60,12 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
+			}
+		});
+		sortByTopic.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.THREAD_TITLE);
 			}
 		});
 	}
