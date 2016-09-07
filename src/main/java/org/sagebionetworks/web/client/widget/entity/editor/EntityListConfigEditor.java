@@ -110,6 +110,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		editors.remove(index);
 		editors.add(index-1, editor);
 		entityListWidget.refresh();
+		checkSelectionState();
 	}
 
 	public void onMoveDown() {
@@ -119,6 +120,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		editors.remove(index);
 		editors.add(index+1, editor);
 		entityListWidget.refresh();
+		checkSelectionState();
 	}
 
 	public void deleteSelected() {
@@ -131,6 +133,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 			}
 		}
 		entityListWidget.refresh();
+		checkSelectionState();
 	}
 
 	/**

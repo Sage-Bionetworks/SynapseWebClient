@@ -26,7 +26,9 @@
 				<t:TableData addStyleNames="maxWidth50px overflow-x-hidden " ui:field="linkTableData">
 					<bh:Div addStyleNames="margin-right-5"> 
 						<g:Anchor ui:field="entityLink" styleName="displayInline pull-left link"/>
-						<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right margin-right-10"/>
+						<b:Tooltip title="Download">
+							<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right margin-right-10"/>
+						</b:Tooltip>
 					</bh:Div>
 				</t:TableData>
 				<t:TableData width="60px" addStyleNames="overflow-x-hidden" ui:field="versionTableData">
