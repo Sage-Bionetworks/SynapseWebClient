@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface EntityListRowBadgeView extends IsWidget, SynapseView {
+public interface EntityListRowBadgeView extends IsWidget {
 
 	/**
 	 * Set the presenter.
@@ -16,8 +15,6 @@ public interface EntityListRowBadgeView extends IsWidget, SynapseView {
 	
 	void setEntityLink(String name, String url);
 
-	void showLoadError();
-	
 	void setCreatedOn(String modifiedOnString);
 	
 	void setCreatedByWidget(Widget w);
@@ -25,12 +22,13 @@ public interface EntityListRowBadgeView extends IsWidget, SynapseView {
 	void setFileDownloadButton(Widget w);
 	boolean isInViewport();
 	boolean isAttached();
-	void setError(String error);
-	void showErrorIcon();
 	void setNote(String note);
 	void setDescription(String description);
 	void setDescriptionVisible(boolean visible);
 	void setVersion(String version);
+	void setSynAlert(Widget w);
+	void setRowVisible(boolean visible);
+	void setLoadingVisible(boolean visible);
 	/**
 	 * Presenter interface
 	 */

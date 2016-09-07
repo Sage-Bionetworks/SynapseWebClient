@@ -6,36 +6,41 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<t:Table width="100%" height="36px" addStyleNames="border-top-1">
-		<t:TableRow>
-			<t:TableData width="20px">
-				<b:Icon ui:field="icon" type="FILE"/>
-			</t:TableData>
-			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden ">
-				<bh:Div addStyleNames="margin-right-5"> 
-					<g:Anchor ui:field="entityLink" styleName="displayInline pull-left link"/>
-					<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right moveup-3 margin-right-10"/>
-					<b:Tooltip ui:field="errorField">
-					  <b:Icon ui:field="errorIcon" fixedWidth="true" type="EXCLAMATION_CIRCLE" visible="false" pull="RIGHT" addStyleNames="text-danger"/>
-					</b:Tooltip>
-				</bh:Div>
-			</t:TableData>
-			<t:TableData width="60px" addStyleNames="overflow-x-hidden">
-				<g:Label ui:field="versionField"/>
-			</t:TableData>
-			<t:TableData width="165px" ui:field="descriptionTableData" addStyleNames="overflow-x-hidden" visible="false">
-				<g:Label ui:field="descriptionField"/>
-			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:Label ui:field="createdOnField"/>
-			</t:TableData>
-			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
-				<g:SimplePanel ui:field="createdByField"/>
-			</t:TableData>
-			<t:TableData width="165px" ui:field="noteTableData" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:Label ui:field="noteField"/>
-			</t:TableData>
-			
-		</t:TableRow>
-	</t:Table>    
+  <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+  	<bh:Div addStyleNames="border-top-1">
+  		<g:HTMLPanel ui:field="loadingUI">
+			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+			&nbsp;Loading...
+		</g:HTMLPanel>
+	  	<t:Table ui:field="row" width="100%" height="36px" visible="false">
+			<t:TableRow>
+				<t:TableData width="20px">
+					<b:Icon ui:field="icon" type="FILE"/>
+				</t:TableData>
+				<t:TableData addStyleNames="overflow-x-hidden">
+					<bh:Div addStyleNames="margin-right-5"> 
+						<g:Anchor ui:field="entityLink" styleName="displayInline pull-left link"/>
+						<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right moveup-3 margin-right-10"/>
+					</bh:Div>
+				</t:TableData>
+				<t:TableData width="60px" addStyleNames="overflow-x-hidden">
+					<g:Label ui:field="versionField"/>
+				</t:TableData>
+				<t:TableData width="165px" ui:field="descriptionTableData" addStyleNames="overflow-x-hidden" visible="false">
+					<g:Label ui:field="descriptionField"/>
+				</t:TableData>
+				<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
+					<g:Label ui:field="createdOnField"/>
+				</t:TableData>
+				<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
+					<g:SimplePanel ui:field="createdByField"/>
+				</t:TableData>
+				<t:TableData width="165px" ui:field="noteTableData" addStyleNames="visible-md visible-lg overflow-x-hidden">
+					<g:Label ui:field="noteField"/>
+				</t:TableData>
+			</t:TableRow>
+		</t:Table>  
+  		<bh:Span ui:field="synAlertContainer" />
+  	</bh:Div>
+	  
 </ui:UiBinder>

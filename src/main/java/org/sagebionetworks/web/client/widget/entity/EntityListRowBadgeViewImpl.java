@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,6 +23,8 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	public interface Binder extends UiBinder<Widget, EntityListRowBadgeViewImpl> {	}
 	
 	@UiField
+	Table row;
+	@UiField
 	Icon icon;
 	@UiField
 	Anchor entityLink;
@@ -31,9 +34,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	Label createdOnField;
 	
 	@UiField
-	Tooltip errorField;
-	@UiField
-	Icon errorIcon;
+	Span synAlertContainer;
 	@UiField
 	Span fileDownloadButtonContainer;
 	@UiField
@@ -46,7 +47,8 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	Label noteField;
 	@UiField
 	Label versionField;
-	
+	@UiField
+	HTMLPanel loadingUI;
 	@Inject
 	public EntityListRowBadgeViewImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -69,28 +71,12 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 		icon.setType(iconType);
 	}
 	
-	@Override
-	public void showLoadError() {
-		clear();
-	}
-	
-	@Override
-	public void showInfo(String title, String message) {
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-	}
 
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;		
 	}
-	
-	@Override
-	public void clear() {
-	}
-	
+		
 	@Override
 	public void setCreatedByWidget(Widget w) {
 		createdByField.setWidget(w);
@@ -101,14 +87,11 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 		createdOnField.setText(createdOnString);
 	}
 	
+	
 	@Override
-	public void setError(String error) {
-		errorField.setTitle(error);
-		errorField.reconfigure();
-	}
-	@Override
-	public void showErrorIcon() {
-		errorIcon.setVisible(true);
+	public void setSynAlert(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 	
 	@Override
@@ -132,11 +115,17 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	public void setNote(String note) {
 		noteField.setText(note);
 	}
-	@Override
-	public void showLoading() {
-	}
+	
 	@Override
 	public void setVersion(String version) {
 		versionField.setText(version);
+	}
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
+	}
+	@Override
+	public void setRowVisible(boolean visible) {
+		row.setVisible(visible);
 	}
 }

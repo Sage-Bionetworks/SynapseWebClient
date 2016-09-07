@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -38,6 +39,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	private FileDownloadButton fileDownloadButton;
 	private String entityId;
 	private Long version;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
@@ -45,15 +47,18 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			GWTWrapper gwt,
-			FileDownloadButton fileDownloadButton) {
+			FileDownloadButton fileDownloadButton,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		this.fileDownloadButton = fileDownloadButton;
+		this.synAlert = synAlert;
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
+		view.setSynAlert(synAlert.asWidget());
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
 			public void invoke() {
@@ -101,12 +106,14 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	
 	public void getEntityBundle() {
 		int partsMask = ENTITY | FILE_HANDLES;
-		
+		synAlert.clear();
+		view.setLoadingVisible(true);
+		view.setRowVisible(false);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorIcon();
-				view.setError(caught.getMessage());
+				view.setLoadingVisible(false);
+				synAlert.handleException(caught);
 			}
 			public void onSuccess(EntityBundle eb) {
 				setEntityBundle(eb);
@@ -161,6 +168,8 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		} else {
 			view.setVersion("N/A");
 		}
+		view.setLoadingVisible(false);
+		view.setRowVisible(true);
 	}
 	
 	public String getEntityId() {
