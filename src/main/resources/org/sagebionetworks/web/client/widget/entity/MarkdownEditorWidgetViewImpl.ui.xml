@@ -32,7 +32,9 @@
 				    <b:AnchorListItem ui:field="queryLink" text="Table: Query on Files/Folders"/>
 				    <b:AnchorListItem ui:field="tableOfContentsLink" text="Table of Contents"/>
 				    <b:AnchorListItem ui:field="teamLink" text="Team Badge"/>
-				    <b:AnchorListItem ui:field="userLink" text="User"/>
+				    <b:AnchorListItem ui:field="teamMemberCountLink" text="Team Member Count" />
+					<b:AnchorListItem ui:field="teamMembersLink" text="Team Members List" />
+					<b:AnchorListItem ui:field="userLink" text="User"/>
 				    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT" text="Video"/>
 				    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT" text="Vimeo Video"/>
 				    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT" text="YouTube Video"/>
@@ -52,8 +54,6 @@
 					    <b:AnchorListItem ui:field="entityBackgroundLink" text="Set Project Background Image" />
 					    <b:AnchorListItem ui:field="supertableLink" text="Synapse API SuperTable" />
 					    <b:AnchorListItem ui:field="synapseFormLink" text="Synapse Form" />
-					    <b:AnchorListItem ui:field="teamMemberCountLink" text="Team Member Count" />
-					    <b:AnchorListItem ui:field="teamMembersLink" text="Team Members List" />
 					    <b:AnchorListItem ui:field="tutorialWizardLink" text="Tutorial Wizard" />
 					    <b:AnchorListItem ui:field="wikifilesPreviewLink" text="Wiki Files Preview" />
 					  </b:DropDownMenu>
@@ -125,7 +125,7 @@
 		    	<g:SimplePanel ui:field="previewHtmlContainer" addStyleNames="entity-description-preview-wrapper" />
 		    </bh:Div>
 		</bh:Div>
-	    
+	    <bh:Div ui:field="selectTeamModalContainer"/>
 		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:SimplePanel ui:field="formattingGuideContainer" />

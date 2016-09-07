@@ -25,18 +25,7 @@
 		<b:Panel ui:field="newChallengeUI" addStyleNames="padding-10">
 			<b:Button ui:field="newChallengeButton" type="PRIMARY" text="Create Challenge" icon="PLUS"/>
 		</b:Panel>
-		<b:Modal ui:field="teamModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
-			<b:ModalHeader>
-			    <b:Heading size="H4" text="Challenge Participant Team" addStyleNames="displayInline"/>
-			</b:ModalHeader>
-			<b:ModalBody>
-				<bh:Div ui:field="teamSelectBoxContainer"/>
-			</b:ModalBody>
-			<b:ModalFooter>
-			    <b:Button type="PRIMARY" text="OK" dataDismiss="MODAL" ui:field="challengeTeamButton"/>
-			    <b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
+		<bh:Div ui:field="selectTeamModalContainer" />
 		<bh:Div ui:field="widgetsContainer"/>
 	</bh:Div>
 	

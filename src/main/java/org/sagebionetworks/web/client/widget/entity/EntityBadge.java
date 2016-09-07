@@ -7,15 +7,18 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -55,6 +58,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private boolean isConfigured;
 	private boolean isAttached;
 	private FileDownloadButton fileDownloadButton;
+	private DiscussionForumClientAsync discussionForumClient;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -63,7 +67,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			GWTWrapper gwt,
-			FileDownloadButton fileDownloadButton) {
+			FileDownloadButton fileDownloadButton,
+			DiscussionForumClientAsync discussionForumClient) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -72,6 +77,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		this.fileDownloadButton = fileDownloadButton;
+		this.discussionForumClient = discussionForumClient;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 		invokeCheckForInViewAndLoadData = new Callback() {
@@ -146,6 +152,24 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		}
 		isConfigured = true;
 		startCheckingIfAttachedAndConfigured();
+		discussionForumClient.getEntityThreadCount(Arrays.asList(header.getId()), new AsyncCallback<EntityThreadCounts>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorIcon();
+				view.setError(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(EntityThreadCounts result) {
+				int numberOfResults = result.getList().size();
+				if (numberOfResults > 1) {
+					onFailure(new Throwable("Invalid number of results"));
+				}
+				view.setDiscussionThreadIconVisible(numberOfResults == 1 && result.getList().get(0).getCount() > 0);
+			}
+			
+		});
 	}
 	
 

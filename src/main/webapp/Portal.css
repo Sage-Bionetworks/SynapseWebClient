@@ -1291,6 +1291,14 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.1em;
 }
 
+.markdowntable .userBadgeTable {
+	top: 0px;
+}
+
+.userBadgeTable td {
+	border: 0px;
+}
+
 /* Markdown table styles */
 .markdowntable.text-align-center {
 	text-align: center;

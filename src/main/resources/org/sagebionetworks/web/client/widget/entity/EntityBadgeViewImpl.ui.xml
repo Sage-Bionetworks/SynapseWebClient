@@ -37,6 +37,9 @@
 					<b:Tooltip ui:field="errorField">
 					  <b:Icon ui:field="errorIcon" fixedWidth="true" type="EXCLAMATION_CIRCLE" visible="false" pull="RIGHT" addStyleNames="text-danger"/>
 					</b:Tooltip>
+					<b:Tooltip title="Has been mentioned in discussion" ui:field="discussion">
+						<b:Icon ui:field="discussionIcon" fixedWidth="true" type="COMMENT" visible="false" pull="RIGHT"/>
+					</b:Tooltip>
 				</bh:Div>
 			</t:TableData>
 			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">

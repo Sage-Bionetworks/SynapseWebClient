@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -33,7 +34,9 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
@@ -71,6 +74,7 @@ public class FilesTab {
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	DiscussionThreadListWidget discussionThreadListWidget;
 	
 	Entity currentEntity;
 	String currentEntityId;
@@ -100,8 +104,9 @@ public class FilesTab {
 			StuAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy
+			final GlobalApplicationState globalApplicationState,
+			ModifiedCreatedByWidget modifiedCreatedBy,
+			DiscussionThreadListWidget discussionThreadListWidget
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -117,6 +122,7 @@ public class FilesTab {
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
 		this.modifiedCreatedBy = modifiedCreatedBy;
+		this.discussionThreadListWidget = discussionThreadListWidget;
 		
 		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
@@ -128,7 +134,14 @@ public class FilesTab {
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		
+		view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
+		discussionThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>(){
+
+			@Override
+			public void invoke(DiscussionThreadBundle bundle) {
+				globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId()));
+			}
+		});
 		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
 		
 		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
@@ -307,8 +320,10 @@ public class FilesTab {
 		if (isFile) {
 			fileTitleBar.configure(bundle);
 			previewWidget.configure(bundle);
+			discussionThreadListWidget.configure(currentEntityId, null, null);
+			view.setDiscussionText(currentEntity.getName());
 		}
-		
+		view.setDiscussionThreadListWidgetVisible(isFile);
 		view.setFolderTitlebarVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);

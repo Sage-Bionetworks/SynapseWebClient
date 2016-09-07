@@ -6,6 +6,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCount;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -31,6 +34,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -84,6 +88,8 @@ public class EntityBadgeTest {
 	GWTWrapper mockGWT;
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
+	@Mock
+	DiscussionForumClientAsync mockDiscussionForumClient;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -102,7 +108,9 @@ public class EntityBadgeTest {
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT, mockFileDownloadButton);
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
+				mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT,
+				mockFileDownloadButton, mockDiscussionForumClient);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
@@ -140,6 +148,36 @@ public class EntityBadgeTest {
 		//in this case, "modified by" and "modified on" are not set.
 		verify(mockView).setModifiedByWidgetVisible(false);
 		verify(mockView).setModifiedOn("");
+		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
+		verify(mockDiscussionForumClient).getEntityThreadCount(eq(Arrays.asList(entityId)), captor.capture());
+		AsyncCallback callback = captor.getValue();
+
+		EntityThreadCounts entityThreadCounts = new EntityThreadCounts();
+		entityThreadCounts.setList(new ArrayList<EntityThreadCount>());
+
+		// case empty list
+		callback.onSuccess(entityThreadCounts);
+		verify(mockView).setDiscussionThreadIconVisible(false);
+
+		EntityThreadCount entityThreadCount = new EntityThreadCount();
+		entityThreadCounts.setList(Arrays.asList(entityThreadCount));
+		entityThreadCount.setCount(0L);
+
+		// case zero thread
+		callback.onSuccess(entityThreadCounts);
+		verify(mockView, times(2)).setDiscussionThreadIconVisible(false);
+
+		// case more than one item in the list
+		entityThreadCounts.setList(Arrays.asList(entityThreadCount, entityThreadCount));
+		callback.onSuccess(entityThreadCounts);
+		verify(mockView).showErrorIcon();
+		verify(mockView).setError(anyString());
+
+		String message = "message";
+		Throwable exception = new Throwable(message);
+		callback.onFailure(exception);
+		verify(mockView, times(2)).showErrorIcon();
+		verify(mockView).setError(message);
 	}
 	
 	@Test

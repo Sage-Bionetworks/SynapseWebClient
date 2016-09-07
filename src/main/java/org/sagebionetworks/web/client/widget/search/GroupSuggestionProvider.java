@@ -66,9 +66,6 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 		public String getDisplayString() {
 			StringBuilder result = new StringBuilder();
 			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + "px;\">");
-			result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
-			result.append(jsniUtils.getBaseFileHandleUrl());
-			result.append("?teamId=" + team.getId() + "\" />");
 			result.append("<span class=\"search-item movedown-1 margin-right-5\">");
 			result.append("<span>" + team.getName() + "</span> ");
 			result.append("</span>");

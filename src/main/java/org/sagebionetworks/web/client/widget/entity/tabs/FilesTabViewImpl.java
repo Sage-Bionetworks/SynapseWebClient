@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.shared.GWT;
@@ -13,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FilesTabViewImpl implements FilesTabView {
+	private static final String DISCUSSION_ABOUT = "Discussion about ";
 	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField
@@ -42,6 +44,13 @@ public class FilesTabViewImpl implements FilesTabView {
 	SimplePanel synapseAlertContainer;
 	@UiField
 	SimplePanel refreshAlertContainer;
+
+	@UiField
+	Div discussionThreadsContainer;
+	@UiField
+	Column discussionContainer;
+	@UiField
+	Text discussionText;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
 	Widget widget;
@@ -160,4 +169,20 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setRefreshAlert(Widget w) {
 		refreshAlertContainer.setWidget(w);
 	};
+
+	@Override
+	public void setDiscussionThreadListWidget(Widget widget){
+		discussionThreadsContainer.clear();
+		discussionThreadsContainer.add(widget);
+	}
+
+	@Override
+	public void setDiscussionThreadListWidgetVisible(Boolean visible) {
+		discussionContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDiscussionText(String entityName) {
+		discussionText.setText(DISCUSSION_ABOUT + entityName);
+	}
 }

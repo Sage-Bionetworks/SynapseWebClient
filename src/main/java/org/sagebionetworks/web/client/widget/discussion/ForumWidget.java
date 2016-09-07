@@ -112,19 +112,19 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		subscribeToForumButton.setOnSubscribeCallback(refreshThreadsCallback);
 		subscribeToForumButton.setOnUnsubscribeCallback(refreshThreadsCallback);
 		
-		threadListWidget.setThreadIdClickedCallback(new CallbackP<String>() {
+		threadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>() {
 			@Override
-			public void invoke(String threadId) {
+			public void invoke(DiscussionThreadBundle bundle) {
 				String replyId = null;
-				showThread(threadId, replyId);
+				showThread(bundle.getId(), replyId);
 				urlChangeCallback.invoke();
 			}
 		});
-		deletedThreadListWidget.setThreadIdClickedCallback(new CallbackP<String>() {
+		deletedThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>() {
 			@Override
-			public void invoke(String threadId) {
+			public void invoke(DiscussionThreadBundle bundle) {
 				String replyId = null;
-				showThread(threadId, replyId);
+				showThread(bundle.getId(), replyId);
 				urlChangeCallback.invoke();
 			}
 		});

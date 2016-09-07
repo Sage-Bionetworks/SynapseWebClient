@@ -2,11 +2,10 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,8 +22,7 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 	private BigTeamBadge teamBadge;
 	AsyncCallback<Challenge> callback;
 	private Challenge currentChallenge;
-	
-	private SynapseSuggestBox teamSuggestBox;
+	private SelectTeamModal selectTeamModal;
 	boolean isCreatingChallenge;
 	@Inject
 	public ChallengeWidget(
@@ -32,20 +30,25 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 			ChallengeClientAsync challengeClient,
 			SynapseAlert synAlert,
 			BigTeamBadge teamBadge,
-			SynapseSuggestBox teamSuggestBox,
-			GroupSuggestionProvider provider
+			SelectTeamModal selectTeamModal
 			) {
 		this.challengeClient = challengeClient;
 		this.view = view;
 		this.synAlert = synAlert;
 		this.teamBadge = teamBadge;
-		this.teamSuggestBox = teamSuggestBox;
+		this.selectTeamModal = selectTeamModal;
 		view.setPresenter(this);
 		view.add(synAlert.asWidget());
 		view.setChallengeTeamWidget(teamBadge.asWidget());
 		callback = getConfigureCallback();
-		teamSuggestBox.setSuggestionProvider(provider);
-		view.setSuggestWidget(teamSuggestBox.asWidget());
+		view.setSelectTeamModal(selectTeamModal.asWidget());
+		selectTeamModal.setTitle("Select Participant Team");
+		selectTeamModal.configure(new CallbackP<String>() {
+			@Override
+			public void invoke(String selectedTeamId) {
+				onSelectChallengeTeam(selectedTeamId);
+			}
+		});
 	}
 	
 	private AsyncCallback<Challenge> getConfigureCallback() {
@@ -102,31 +105,26 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 	@Override
 	public void onCreateChallengeClicked() {
 		isCreatingChallenge = true;
-		view.showTeamSelectionModal();
+		selectTeamModal.show();
 	}
 
 	@Override
 	public void onEditTeamClicked() {
 		isCreatingChallenge = false;
-		view.showTeamSelectionModal();
+		selectTeamModal.show();
 	}
 	
-	@Override
-	public void onSelectChallengeTeam() {
-		GroupSuggestion suggestion = (GroupSuggestion)teamSuggestBox.getSelectedSuggestion();
-		if (suggestion != null) {
-			view.setChallengeVisible(false);
-			view.setCreateChallengeVisible(false);
-			if (isCreatingChallenge) {
-				Challenge c = new Challenge();
-				c.setProjectId(entityId);
-				c.setParticipantTeamId(suggestion.getId());
-				challengeClient.createChallenge(c, callback);
-			} else {
-				currentChallenge.setParticipantTeamId(suggestion.getId());
-				challengeClient.updateChallenge(currentChallenge, callback);
-			}
-			teamSuggestBox.clear();
+	public void onSelectChallengeTeam(String id) {
+		view.setChallengeVisible(false);
+		view.setCreateChallengeVisible(false);
+		if (isCreatingChallenge) {
+			Challenge c = new Challenge();
+			c.setProjectId(entityId);
+			c.setParticipantTeamId(id);
+			challengeClient.createChallenge(c, callback);
+		} else {
+			currentChallenge.setParticipantTeamId(id);
+			challengeClient.updateChallenge(currentChallenge, callback);
 		}
 	}
 	

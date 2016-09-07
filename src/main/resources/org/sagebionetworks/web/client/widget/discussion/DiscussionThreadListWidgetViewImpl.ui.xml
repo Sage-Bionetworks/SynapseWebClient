@@ -15,7 +15,9 @@
 					<t:Table width="100%">
 						<t:TableRow>
 							<t:TableHeader>
-								<bh:Span text="Topic"/>
+								<g:FocusPanel ui:field="sortByTopic" addStyleNames="imageButton">
+									<bh:Span text="Topic"/>
+								</g:FocusPanel>
 							</t:TableHeader>
 							<t:TableHeader width="60px" addStyleNames="visible-lg">
 								<bh:Span text="Author"/>

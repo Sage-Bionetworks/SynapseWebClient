@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -36,12 +35,8 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	Panel newChallengeUI;
 	
 	@UiField
-	Button challengeTeamButton;
-	@UiField
-	Div teamSelectBoxContainer;
+	Div selectTeamModalContainer;
 	
-	@UiField
-	Modal teamModal;
 	@UiField
 	Button editTeamButton;
 	
@@ -65,12 +60,6 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 							presenter.onDeleteChallengeClicked();
 						}
 					});
-			}
-		});
-		challengeTeamButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSelectChallengeTeam();
 			}
 		});
 		editTeamButton.addClickHandler(new ClickHandler() {
@@ -112,17 +101,13 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	}
 	
 	@Override
-	public void setSuggestWidget(Widget w) {
-		teamSelectBoxContainer.clear();
-		teamSelectBoxContainer.add(w);
-	}
-	@Override
-	public void add(Widget w) {
-		widgetsContainer.add(w);
+	public void setSelectTeamModal(Widget w) {
+		selectTeamModalContainer.clear();
+		selectTeamModalContainer.add(w);
 	}
 	
 	@Override
-	public void showTeamSelectionModal() {
-		teamModal.show();
+	public void add(Widget w) {
+		widgetsContainer.add(w);
 	}
 }

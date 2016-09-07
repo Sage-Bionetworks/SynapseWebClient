@@ -221,9 +221,10 @@ public class ForumWidgetTest {
 		
 		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(captorP.capture());
-		CallbackP<String> threadIdClickedCallback = captorP.getValue();
+		CallbackP<DiscussionThreadBundle> threadIdClickedCallback = captorP.getValue();
 		String threadId = "9584";
-		threadIdClickedCallback.invoke(threadId);
+		when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
+		threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockView).setDeletedThreadListVisible(false);
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(canModerate);

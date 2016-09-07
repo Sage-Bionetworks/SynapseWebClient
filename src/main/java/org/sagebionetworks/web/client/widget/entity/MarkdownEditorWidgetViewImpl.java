@@ -41,7 +41,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@UiField
 	public SimplePanel formattingGuideContainer;
-	
+	@UiField
+	public Div selectTeamModalContainer;
 	/**
 	 * List of toolbar commands
 	 */
@@ -457,6 +458,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void showEditMode() {
 		previewUI.setVisible(false);
 		writingUI.setVisible(true);	
+	}
+	@Override
+	public void setSelectTeamModal(Widget widget) {
+		selectTeamModalContainer.clear();
+		selectTeamModalContainer.add(widget);
 	}
 
 }
