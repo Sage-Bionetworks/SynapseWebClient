@@ -4,37 +4,27 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
-import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil.RowLoadedHandler;
+import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetRendererPresenter {
+public class EntityListWidget implements WidgetRendererPresenter {
 	
 	private EntityListWidgetView view;
-	private SynapseClientAsync synapseClient;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private Map<String, String> descriptor;
-	AuthenticationController authenticationController;
+	private PortalGinInjector portalGinInjector;
 	
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
-			SynapseClientAsync synapseClient,
-			SynapseJSNIUtils synapseJSNIUtils,
-			AuthenticationController authenticationController) {
+			PortalGinInjector portalGinInjector) {
 		this.view = view;		
-		this.synapseClient = synapseClient;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.authenticationController = authenticationController;
-		view.setPresenter(this);
+		this.portalGinInjector = portalGinInjector;
 	}
 	
 	@Override
@@ -42,40 +32,33 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		final boolean isLoggedIn = authenticationController.isLoggedIn();
 		
 		boolean showDescription = true;
 		if (descriptor.containsKey(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY)) {
 			showDescription = Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY));
 		}
+		view.clearRows();
 		
-		view.configure(showDescription);
-
 		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		if(records != null) {
-			for(int i=0; i<records.size(); i++) {
-				final int rowIndex = i;
-				EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
-					@Override
-					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
-						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
-					}
-				}, authenticationController.getCurrentXsrfToken());
-			}			
-		}		
+		if(records != null && records.size() > 0) {
+			view.setTableVisible(true);
+			view.setEmptyUiVisible(false);
+			view.setDescriptionHeaderVisible(showDescription);
+			for (EntityGroupRecord entityGroupRecord : records) {
+				EntityListRowBadge badge = portalGinInjector.getEntityListRowBadge();
+				badge.configure(entityGroupRecord.getEntityReference());
+				badge.setDescriptionVisible(showDescription);
+				badge.setNote(entityGroupRecord.getNote());
+				view.addRow(badge.asWidget());
+			}
+		} else {
+			view.setTableVisible(false);
+			view.setEmptyUiVisible(true);
+		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void clearState() {
-	}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-	/*
-	 * Private Methods
-	 */
-
 }

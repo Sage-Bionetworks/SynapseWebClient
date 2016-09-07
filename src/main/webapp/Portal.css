@@ -2495,6 +2495,11 @@ td.datePickerMonth {
   border-left: 1px solid #dddddd;
 }
 
+.border-top-1 {
+  border-top: 1px solid #dddddd;
+}
+
+
 /* Provenance graph css */
 .provEntityNode {
 	opacity:0.9; 
