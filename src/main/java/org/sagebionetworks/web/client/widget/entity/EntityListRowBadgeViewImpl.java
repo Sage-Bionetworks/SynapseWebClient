@@ -58,18 +58,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	@UiField
 	TableData iconTableData;
 	@UiField
-	TableData linkTableData;
-	@UiField
-	TableData versionTableData;
-	@UiField
 	TableData descriptionTableData;
-	@UiField
-	TableData createdOnTableData;
-	@UiField
-	TableData createdByTableData;
-	@UiField
-	TableData noteTableData;
-	
 	
 	@Inject
 	public EntityListRowBadgeViewImpl(final Binder uiBinder) {

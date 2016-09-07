@@ -23,7 +23,7 @@
 				<t:TableData width="20px" ui:field="iconTableData">
 					<b:Icon ui:field="icon" type="FILE"/>
 				</t:TableData>
-				<t:TableData addStyleNames="maxWidth50px overflow-x-hidden " ui:field="linkTableData">
+				<t:TableData addStyleNames="maxWidth50px overflow-x-hidden ">
 					<bh:Div addStyleNames="margin-right-5"> 
 						<g:Anchor ui:field="entityLink" styleName="displayInline pull-left link"/>
 						<b:Tooltip title="Download">
@@ -31,16 +31,16 @@
 						</b:Tooltip>
 					</bh:Div>
 				</t:TableData>
-				<t:TableData width="60px" addStyleNames="overflow-x-hidden" ui:field="versionTableData">
+				<t:TableData width="60px" addStyleNames="overflow-x-hidden">
 					<g:Label ui:field="versionField"/>
 				</t:TableData>
 				<t:TableData width="165px" ui:field="descriptionTableData" addStyleNames="overflow-x-hidden" visible="false">
 					<g:Label ui:field="descriptionField"/>
 				</t:TableData>
-				<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden" ui:field="createdOnTableData">
+				<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden" >
 					<g:Label ui:field="createdOnField"/>
 				</t:TableData>
-				<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden" ui:field="createdByTableData">
+				<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden" >
 					<g:SimplePanel ui:field="createdByField"/>
 				</t:TableData>
 				<t:TableData width="165px" ui:field="noteTableData" addStyleNames="visible-md visible-lg overflow-x-hidden">
