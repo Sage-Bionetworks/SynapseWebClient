@@ -9,14 +9,13 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
@@ -29,7 +28,6 @@ import com.google.inject.Inject;
 public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityListRowBadgeView view;
-	private GlobalApplicationState globalAppState;
 	private UserBadge createdByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private SynapseClientAsync synapseClient;
@@ -43,14 +41,12 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
-			GlobalApplicationState globalAppState,
 			UserBadge userBadge,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			GWTWrapper gwt,
 			FileDownloadButton fileDownloadButton) {
 		this.view = view;
-		this.globalAppState = globalAppState;
 		this.createdByUserBadge = userBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
@@ -140,7 +136,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	
 	public void setEntityBundle(EntityBundle eb) {
 		view.setIcon(EntityTypeUtils.getIconTypeForEntity(eb.getEntity()));
-		view.setEntityName(eb.getEntity().getName());
+		view.setEntityLink(eb.getEntity().getName(), DisplayUtils.getSynapseHistoryToken(entityId, version));
 		if (eb.getEntity().getCreatedBy() != null) {
 			createdByUserBadge.configure(eb.getEntity().getCreatedBy());
 		}
@@ -165,11 +161,6 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		} else {
 			view.setVersion("N/A");
 		}
-	}
-	
-	@Override
-	public void onEntityClick() {
-		globalAppState.getPlaceChanger().goTo(new Synapse(entityId));	
 	}
 	
 	public String getEntityId() {

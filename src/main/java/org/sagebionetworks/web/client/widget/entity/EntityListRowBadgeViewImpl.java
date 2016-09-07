@@ -7,8 +7,6 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -52,13 +50,6 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	@Inject
 	public EntityListRowBadgeViewImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
-		entityLink.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEntityClick();
-			}
-		});
 	}
 	
 	@Override
@@ -68,8 +59,9 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	}
 	
 	@Override
-	public void setEntityName(String name) {
+	public void setEntityLink(String name, String url) {
 		entityLink.setText(name);
+		entityLink.setHref(url);
 	}
 	
 	@Override

@@ -14,7 +14,7 @@ public interface EntityListRowBadgeView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	
-	void setEntityName(String name);
+	void setEntityLink(String name, String url);
 
 	void showLoadError();
 	
@@ -35,7 +35,6 @@ public interface EntityListRowBadgeView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void onEntityClick();
 		void viewAttached();
 	}
 }
