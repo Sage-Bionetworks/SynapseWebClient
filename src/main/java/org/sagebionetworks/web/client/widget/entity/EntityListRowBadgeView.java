@@ -23,16 +23,23 @@ public interface EntityListRowBadgeView extends IsWidget {
 	boolean isInViewport();
 	boolean isAttached();
 	void setNote(String note);
+	String getNote();
 	void setDescription(String description);
 	void setDescriptionVisible(boolean visible);
 	void setVersion(String version);
 	void setSynAlert(Widget w);
-	void setRowVisible(boolean visible);
-	void setLoadingVisible(boolean visible);
+	void setIsSelectable(boolean isSelectable);
+	boolean isSelected();
+	void setSelected(boolean selected);
+	void showSynAlert();
+	void showRow();
+	void showLoading();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void viewAttached();
+		void onSelectionChanged();
 	}
 }

@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -23,7 +27,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	public interface Binder extends UiBinder<Widget, EntityListRowBadgeViewImpl> {	}
 	
 	@UiField
-	Table row;
+	TableRow row;
 	@UiField
 	Icon icon;
 	@UiField
@@ -38,20 +42,44 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	@UiField
 	Span fileDownloadButtonContainer;
 	@UiField
-	TableData descriptionTableData;
-	@UiField
 	Label descriptionField;
-	@UiField
-	TableData noteTableData;
 	@UiField
 	Label noteField;
 	@UiField
 	Label versionField;
 	@UiField
 	HTMLPanel loadingUI;
+	@UiField
+	CheckBox select;
+	@UiField
+	TableData selectTableData;
+	@UiField
+	TableData synAlertTableData;
+	@UiField
+	TableData iconTableData;
+	@UiField
+	TableData linkTableData;
+	@UiField
+	TableData versionTableData;
+	@UiField
+	TableData descriptionTableData;
+	@UiField
+	TableData createdOnTableData;
+	@UiField
+	TableData createdByTableData;
+	@UiField
+	TableData noteTableData;
+	
+	
 	@Inject
 	public EntityListRowBadgeViewImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
+		select.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onSelectionChanged();
+			}
+		});
 	}
 	
 	@Override
@@ -121,11 +149,40 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 		versionField.setText(version);
 	}
 	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
+	public void showLoading() {
+		row.setVisible(false);
+		loadingUI.setVisible(true);
 	}
 	@Override
-	public void setRowVisible(boolean visible) {
-		row.setVisible(visible);
+	public void showRow() {
+		loadingUI.setVisible(false);
+		row.setVisible(true);
+		iconTableData.setVisible(true);
+	}
+	@Override
+	public void showSynAlert() {
+		loadingUI.setVisible(false);
+		row.setVisible(true);
+		iconTableData.setVisible(false);
+		synAlertTableData.setVisible(true);
+	}
+	@Override
+	public void setIsSelectable(boolean isSelectable) {
+		selectTableData.setVisible(isSelectable);
+	}
+	
+	@Override
+	public boolean isSelected() {
+		return select.getValue();
+	}
+	
+	@Override
+	public void setSelected(boolean selected) {
+		select.setValue(selected);
+	}
+	
+	@Override
+	public String getNote() {
+		return noteField.getText();
 	}
 }

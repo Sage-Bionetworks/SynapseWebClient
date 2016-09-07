@@ -2180,6 +2180,11 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	width: 95%;
 }
 
+.modal-90-percent [class*="modal-dialog"] {
+	width: 90%;
+}
+
+
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
 }

@@ -5,6 +5,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
@@ -40,6 +41,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	private String entityId;
 	private Long version;
 	private SynapseAlert synAlert;
+	private Callback selectionChangedCallback;
 	
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
@@ -103,16 +105,24 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	public void setDescriptionVisible(boolean visible) {
 		view.setDescriptionVisible(visible);
 	}
+	public void setIsSelectable(boolean isSelectable) {
+		view.setIsSelectable(isSelectable);
+	}
+	public boolean isSelected() {
+		return view.isSelected();
+	}
+	public void setSelected(boolean isSelected) {
+		view.setSelected(isSelected);
+	}
 	
 	public void getEntityBundle() {
 		int partsMask = ENTITY | FILE_HANDLES;
 		synAlert.clear();
-		view.setLoadingVisible(true);
-		view.setRowVisible(false);
+		view.showLoading();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
+				view.showSynAlert();
 				synAlert.handleException(caught);
 			}
 			public void onSuccess(EntityBundle eb) {
@@ -124,7 +134,6 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		} else {
 			synapseClient.getEntityBundleForVersion(entityId, version, partsMask, callback);
 		}
-		
 	}
 	
 	
@@ -168,11 +177,36 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		} else {
 			view.setVersion("N/A");
 		}
-		view.setLoadingVisible(false);
-		view.setRowVisible(true);
+		view.showRow();
+	}
+	
+	public EntityGroupRecord getRecord() {
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);			
+		ref.setTargetVersionNumber(version);
+
+		EntityGroupRecord record = new EntityGroupRecord();
+		record.setEntityReference(ref);
+		record.setNote(view.getNote());
+		return record;
+	}
+	
+	public String getNote() {
+		return view.getNote();
 	}
 	
 	public String getEntityId() {
 		return entityId;
+	}
+	
+	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
+		this.selectionChangedCallback = selectionChangedCallback;
+	}
+	
+	@Override
+	public void onSelectionChanged() {
+		if (selectionChangedCallback != null) {
+			selectionChangedCallback.invoke();
+		}
 	}
 }
