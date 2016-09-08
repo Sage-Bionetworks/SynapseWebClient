@@ -29,6 +29,7 @@ import com.google.inject.Inject;
 
 public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, SynapseWidgetPresenter {
 	
+	public static final String N_A = "N/A";
 	private EntityListRowBadgeView view;
 	private UserBadge createdByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -175,7 +176,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			Versionable versionable = (Versionable) eb.getEntity();
 			view.setVersion(versionable.getVersionNumber().toString());
 		} else {
-			view.setVersion("N/A");
+			view.setVersion(N_A);
 		}
 		view.showRow();
 	}
