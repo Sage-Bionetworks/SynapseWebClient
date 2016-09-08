@@ -132,6 +132,7 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -2375,5 +2376,20 @@ public class SynapseClientImplTest {
 		// colD should be new
 		columnChange = getColumnChange(null, changes);
 		assertEquals("5", columnChange.getNewColumnId());
+	}
+	
+	@Test
+	public void testGetDefaultColumnsForView()  throws RestServiceException, SynapseException{
+		ColumnModel colA, colB;
+		colA = getColumnModel("1", ColumnType.STRING);
+		colB = getColumnModel("2", ColumnType.STRING);
+		
+		List<ColumnModel> defaultColumns = Arrays.asList(colA, colB);
+		when(mockSynapse.getDefaultColumnsForView(any(ViewType.class))).thenReturn(defaultColumns);
+		List<ColumnModel> returnedColumns = synapseClient.getDefaultColumnsForView(ViewType.file);
+		
+		assertEquals(2, returnedColumns.size());
+		assertNull(returnedColumns.get(0).getId());
+		assertNull(returnedColumns.get(1).getId());
 	}
 }
