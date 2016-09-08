@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -26,6 +27,8 @@ import com.google.inject.Inject;
 
 public class EntityListConfigEditor implements EntityListConfigView.Presenter, WidgetEditorPresenter {
 	
+	public static final String PROMPT_ENTER_NOTE = "Enter note";
+	public static final String NOTE = "Note";
 	private EntityListConfigView view;
 	private Map<String, String> descriptor;
 	AuthenticationController authenticationController;
@@ -266,7 +269,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	@Override
 	public void onUpdateNote() {
 		promptForNoteModal.clear();
-		promptForNoteModal.configure("Note", "Enter note", "Save", getSelectedNote());
+		promptForNoteModal.configure(NOTE, PROMPT_ENTER_NOTE, DisplayConstants.SAVE_BUTTON_LABEL, getSelectedNote());
 		promptForNoteModal.show();
 	}
 	
