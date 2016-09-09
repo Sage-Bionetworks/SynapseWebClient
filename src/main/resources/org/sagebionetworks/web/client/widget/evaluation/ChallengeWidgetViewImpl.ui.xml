@@ -27,7 +27,7 @@
 		</b:Panel>
 		<b:Modal ui:field="teamModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
-			    <b:Heading size="H4" text="Challenge Participant Team" addStyleNames="displayInline"/>
+			    <b:Heading size="H4" text="Registered Participants Team" addStyleNames="displayInline"/>
 			</b:ModalHeader>
 			<b:ModalBody>
 				<bh:Div ui:field="teamSelectBoxContainer"/>
