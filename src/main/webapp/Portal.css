@@ -2188,6 +2188,11 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	width: 95%;
 }
 
+.modal-90-percent [class*="modal-dialog"] {
+	width: 90%;
+}
+
+
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
 }
@@ -2502,6 +2507,11 @@ td.datePickerMonth {
 .border-left-1 {
   border-left: 1px solid #dddddd;
 }
+
+.border-top-1 {
+  border-top: 1px solid #dddddd;
+}
+
 
 /* Provenance graph css */
 .provEntityNode {
