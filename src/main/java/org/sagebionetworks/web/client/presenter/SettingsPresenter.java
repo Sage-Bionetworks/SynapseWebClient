@@ -224,7 +224,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
+						notificationSynAlert.handleException(caught);
 					}
 				});
 			}
@@ -250,7 +250,20 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		clear();
 		if (authenticationController.isLoggedIn()) {
 			getUserNotificationEmail();
-			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+			
+			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile result) {
+					authenticationController.updateCachedProfile(result);
+					view.updateNotificationCheckbox(result);	
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					notificationSynAlert.handleException(caught);
+				}
+			};
+			synapseClient.getUserProfile(null, callback);
+			
 			subscriptionListWidget.configure();
 		}
 		this.view.render();
