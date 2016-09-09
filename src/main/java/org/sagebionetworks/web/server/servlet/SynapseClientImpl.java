@@ -2501,7 +2501,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public List<ColumnModel> getDefaultColumnsForView(ViewType type) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getDefaultColumnsForView(type);
+			List<ColumnModel> defaultColumns = synapseClient.getDefaultColumnsForView(type);
+			// SWC-3264: in order for these to look like new columns in the TableUpdateTransactionRequest change set, set column ids to null
+			for (ColumnModel cm : defaultColumns) {
+				cm.setId(null);
+			}
+			return defaultColumns;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
