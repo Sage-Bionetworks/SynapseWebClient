@@ -209,10 +209,11 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testUpdateMyNotificationSettingsFailure() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
+		Exception ex = new Exception("unexpected exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		presenter.updateMyNotificationSettings(true, true);
 		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
@@ -332,6 +333,18 @@ public class SettingsPresenterTest {
 		verify(mockPasswordStrengthWidget).setVisible(false);
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();
+		verify(mockView).updateNotificationCheckbox(profile);
+		verify(mockAuthenticationController).updateCachedProfile(profile);
+	}
+	
+	@Test
+	public void testConfigureFailure() {
+		Exception ex = new Exception("error occurred");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		presenter.configure();
+		verify(mockView).clear();
+		verify(mockSubscriptionListWidget).configure();
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
