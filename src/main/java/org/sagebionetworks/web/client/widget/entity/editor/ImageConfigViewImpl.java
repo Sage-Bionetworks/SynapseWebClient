@@ -127,6 +127,14 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		entityField.setValue("");
 		urlField.setValue("");
 		nameField.setValue("");
+
+		setUploadTabVisible(true);
+		setExistingAttachementTabVisible(true);
+		synapseTabListItem.setActive(false);
+		tab3.setActive(false);
+		externalTabListItem.setActive(false);
+		tab2.setActive(false);
+
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			@Override
 			public void execute() {
