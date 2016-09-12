@@ -124,7 +124,6 @@ public class ImageConfigEditorTest {
 		verify(mockView).setExistingAttachementTabVisible(false);
 		verify(mockView, never()).showExternalTab();
 		verify(mockView).setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
-		verify(mockView).setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
 		verify(mockFileInputWidget, never()).reset();
 	}
 	
