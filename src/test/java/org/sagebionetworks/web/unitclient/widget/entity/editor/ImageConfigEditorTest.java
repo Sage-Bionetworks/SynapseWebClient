@@ -86,7 +86,15 @@ public class ImageConfigEditorTest {
 		verify(mockFileInputWidget).configure(anyString(), any(CallbackP.class));
 		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		verify(mockAttachments).configure(any(WikiPageKey.class));
-		verify(mockView).setAlignment(anyString());
+	}
+
+	@Test
+	public void testConstructionWithAlignment() {
+		String alignment = "alignment";
+		reset(mockView);
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, alignment);
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).setAlignment(alignment);
 	}
 
 
