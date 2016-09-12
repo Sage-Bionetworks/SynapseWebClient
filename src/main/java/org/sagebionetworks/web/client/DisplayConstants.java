@@ -241,6 +241,7 @@ public class DisplayConstants {
 	
 	public static final String CONFIRM_DELETE_EVAL_QUEUE = "Are you sure you want to delete evaluation queue: ";
 	public static final String CONFIRM_DELETE_CHALLENGE = "Are you sure you want to delete the challenge associated with this project?";
+	public static final String CHALLENGE_CREATED = "A challenge has been successfully associated with this project.";
 	
 	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
