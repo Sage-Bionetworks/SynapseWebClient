@@ -48,4 +48,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public void setExistingAttachementTabVisible(boolean visible);
 
 	public void showExternalTab();
+
+	public void showUploadTab();
 }

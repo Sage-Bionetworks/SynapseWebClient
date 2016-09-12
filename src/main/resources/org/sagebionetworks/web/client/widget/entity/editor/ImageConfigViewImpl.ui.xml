@@ -8,13 +8,13 @@
 	<bh:Div>
 		<!-- Tabs -->
 		<b:NavTabs>
-			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
+			<b:TabListItem ui:field="uploadTabListItem" dataTarget="#tab1" text="Upload"/>
 			<b:TabListItem ui:field="externalTabListItem" dataTarget="#tab2" text="From the Web"/>
 			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab3" text="From Synapse File"/>
 			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab4" text="Previously Uploaded"/>
 		</b:NavTabs>
 		<b:TabContent>
-			<b:TabPane active="true" b:id="tab1" addStyleNames="margin-top-15" ui:field="tab1">
+			<b:TabPane b:id="tab1" addStyleNames="margin-top-15" ui:field="tab1">
 				<g:SimplePanel ui:field="fileInputWidgetContainer" />
 				<g:FlowPanel ui:field="uploadSuccessUI">
 					<g:Image resource='{iconsImageBundle.checkGreen16}' addStyleNames="margin-right-5" />

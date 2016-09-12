@@ -70,15 +70,18 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);
 		}
-		//and try to prepopulate with values from the map.  if it fails, ignore
-		try {
-			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
-				if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)){
-					view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
-				} 
-				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
-			}
-		} catch (Exception e) {}
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			configureWithSynapseId();
+		} else {
+			view.showUploadTab();
+		}
+	}
+
+	public void configureWithSynapseId() {
+		view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
+			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		}
 	}
 
 	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
@@ -91,10 +94,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		view.setExistingAttachementTabVisible(false);
 
 		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
-			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
-				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
-			}
+			configureWithSynapseId();
 		} else {
 			view.showExternalTab();
 		}

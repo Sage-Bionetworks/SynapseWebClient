@@ -134,13 +134,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		tab3.setActive(false);
 		externalTabListItem.setActive(false);
 		tab2.setActive(false);
+		uploadTabListItem.setActive(false);
+		tab1.setActive(false);
 
-		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-			@Override
-			public void execute() {
-				uploadTabListItem.showTab();
-			}
-		});
 	}
 	
 	@Override
@@ -295,6 +291,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void showExternalTab() {
 		externalTabListItem.setActive(true);
 		tab2.setActive(true);
+	}
+
+	@Override
+	public void showUploadTab() {
+		uploadTabListItem.setActive(true);
+		tab1.setActive(true);
 	}
 
 	/*
