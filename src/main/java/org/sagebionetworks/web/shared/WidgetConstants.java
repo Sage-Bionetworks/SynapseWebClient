@@ -27,8 +27,6 @@ public class WidgetConstants {
 
 	public static final String IMAGE_LINK_EDITOR_CONTENT_TYPE = "imageLink";
 	public static final String IMAGE_LINK_FRIENDLY_NAME = "Image Link";
-
-	public static final String IMAGE_LINK_ONLY_KEY = "imageLinkOnly";
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";

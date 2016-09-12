@@ -42,33 +42,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
-		if (widgetDescriptor.containsKey(WidgetConstants.IMAGE_LINK_ONLY_KEY) &&
-				widgetDescriptor.get(WidgetConstants.IMAGE_LINK_ONLY_KEY).equals(Boolean.TRUE.toString())) {
-			configureWithoutUpload(wikiKey, widgetDescriptor, dialogCallback);
-		} else {
-			configureWithUpload(wikiKey, widgetDescriptor, dialogCallback);
-		}
-	}
-
-	private void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
-			DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;
-		this.dialogCallback = dialogCallback;
-		view.initView();
-		view.configure(wikiKey, dialogCallback);
-		view.setUploadTabVisible(false);
-		view.setExistingAttachementTabVisible(false);
-		//and try to prepopulate with values from the map.  if it fails, ignore
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
-			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
-		} else {
-			view.showExternalTab();
-		}
-	}
-
-	private void configureWithUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
-			final DialogCallback dialogCallback) {
 		fileHandleIds = new ArrayList<String>();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
@@ -106,6 +79,23 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
 			}
 		} catch (Exception e) {}
+	}
+
+	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
+			DialogCallback dialogCallback) {
+		descriptor = widgetDescriptor;
+		this.dialogCallback = dialogCallback;
+		view.initView();
+		view.configure(wikiKey, dialogCallback);
+		view.setUploadTabVisible(false);
+		view.setExistingAttachementTabVisible(false);
+
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		} else {
+			view.showExternalTab();
+		}
 	}
 
 	public void clearState() {

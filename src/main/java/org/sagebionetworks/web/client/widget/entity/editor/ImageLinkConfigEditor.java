@@ -22,8 +22,7 @@ public class ImageLinkConfigEditor implements WidgetEditorPresenter {
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
-		widgetDescriptor.put(WidgetConstants.IMAGE_LINK_ONLY_KEY, Boolean.TRUE.toString());
-		imageConfigEditor.configure(wikiKey, widgetDescriptor, dialogCallback);
+		imageConfigEditor.configureWithoutUpload(wikiKey, widgetDescriptor, dialogCallback);
 	}
 
 	@Override

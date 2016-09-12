@@ -1,20 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
-import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
 import org.sagebionetworks.web.shared.WikiPageKey;
 public class ImageLinkConfigEditorTest {
 
@@ -38,11 +36,7 @@ public class ImageLinkConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		editor.configure(wikiKey, descriptor, mockCallback);
-		ArgumentCaptor<HashMap> captor = ArgumentCaptor.forClass(HashMap.class);
-		verify(mockImageConfigEditor).configure(eq(wikiKey), captor.capture(), eq(mockCallback));
-		HashMap<String, String> descriptor = captor.getValue();
-		assertTrue(descriptor.containsKey(WidgetConstants.IMAGE_LINK_ONLY_KEY));
-		assertEquals(descriptor.get(WidgetConstants.IMAGE_LINK_ONLY_KEY), Boolean.TRUE.toString());
+		verify(mockImageConfigEditor).configureWithoutUpload(eq(wikiKey), eq(descriptor), eq(mockCallback));
 	}
 
 	@Test
