@@ -58,7 +58,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		view.configure(wikiKey, dialogCallback);
 		view.setUploadTabVisible(false);
 		view.setExistingAttachementTabVisible(false);
-		view.showExternalTab();
+		//and try to prepopulate with values from the map.  if it fails, ignore
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		} else {
+			view.showExternalTab();
+		}
 	}
 
 	private void configureWithUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,

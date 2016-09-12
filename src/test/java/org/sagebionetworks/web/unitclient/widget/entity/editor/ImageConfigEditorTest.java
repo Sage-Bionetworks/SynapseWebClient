@@ -103,6 +103,7 @@ public class ImageConfigEditorTest {
 	public void testConfigureWithImageLinkOnly() {
 		reset(mockView);
 		reset(mockFileInputWidget);
+		descriptor.clear();
 		descriptor.put(WidgetConstants.IMAGE_LINK_ONLY_KEY, Boolean.TRUE.toString());
 		editor.configure(wikiKey, descriptor, mockCallback);
 		verify(mockView).initView();
@@ -111,7 +112,22 @@ public class ImageConfigEditorTest {
 		verify(mockView).setExistingAttachementTabVisible(false);
 		verify(mockView).showExternalTab();
 		verify(mockFileInputWidget, never()).reset();
-		
+	}
+
+	@Test
+	public void testConfigureWithImageLinkToSynapseEntity() {
+		reset(mockView);
+		reset(mockFileInputWidget);
+		descriptor.put(WidgetConstants.IMAGE_LINK_ONLY_KEY, Boolean.TRUE.toString());
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).initView();
+		verify(mockView).configure(wikiKey, mockCallback);
+		verify(mockView).setUploadTabVisible(false);
+		verify(mockView).setExistingAttachementTabVisible(false);
+		verify(mockView, never()).showExternalTab();
+		verify(mockView).setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+		verify(mockView).setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		verify(mockFileInputWidget, never()).reset();
 	}
 	
 	@Test

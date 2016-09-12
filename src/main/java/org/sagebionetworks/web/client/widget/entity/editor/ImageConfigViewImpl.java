@@ -246,7 +246,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void setSynapseId(String synapseId) {
 		entityField.setValue(synapseId);
-		synapseTabListItem.showTab();
+		synapseTabListItem.setActive(true);
+		tab3.setActive(true);
 	}
 	
 	@Override
