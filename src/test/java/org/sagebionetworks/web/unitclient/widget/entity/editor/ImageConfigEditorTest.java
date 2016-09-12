@@ -5,9 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +97,21 @@ public class ImageConfigEditorTest {
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));
+	}
+
+	@Test
+	public void testConfigureWithImageLinkOnly() {
+		reset(mockView);
+		reset(mockFileInputWidget);
+		descriptor.put(WidgetConstants.IMAGE_LINK_ONLY_KEY, Boolean.TRUE.toString());
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).initView();
+		verify(mockView).configure(wikiKey, mockCallback);
+		verify(mockView).setUploadTabVisible(false);
+		verify(mockView).setExistingAttachementTabVisible(false);
+		verify(mockView).showExternalTab();
+		verify(mockFileInputWidget, never()).reset();
+		
 	}
 	
 	@Test

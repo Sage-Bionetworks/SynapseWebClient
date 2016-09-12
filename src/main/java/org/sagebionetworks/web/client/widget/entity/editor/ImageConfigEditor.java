@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -46,6 +42,27 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
+		if (widgetDescriptor.containsKey(WidgetConstants.IMAGE_LINK_ONLY_KEY) &&
+				widgetDescriptor.get(WidgetConstants.IMAGE_LINK_ONLY_KEY).equals(Boolean.TRUE.toString())) {
+			configureWithoutUpload(wikiKey, widgetDescriptor, dialogCallback);
+		} else {
+			configureWithUpload(wikiKey, widgetDescriptor, dialogCallback);
+		}
+	}
+
+	private void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
+			DialogCallback dialogCallback) {
+		descriptor = widgetDescriptor;
+		this.dialogCallback = dialogCallback;
+		view.initView();
+		view.configure(wikiKey, dialogCallback);
+		view.setUploadTabVisible(false);
+		view.setExistingAttachementTabVisible(false);
+		view.showExternalTab();
+	}
+
+	private void configureWithUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
+			final DialogCallback dialogCallback) {
 		fileHandleIds = new ArrayList<String>();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
@@ -71,7 +88,9 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		});
 		fileInputWidget.setValidation(validator);
 		view.configure(wikiKey, dialogCallback);
-		wikiAttachments.configure(wikiKey);
+		if (wikiKey != null) {
+			wikiAttachments.configure(wikiKey);
+		}
 		//and try to prepopulate with values from the map.  if it fails, ignore
 		try {
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
@@ -82,8 +101,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			}
 		} catch (Exception e) {}
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public void clearState() {
 		view.clear();
 	}
@@ -131,13 +149,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			return null;
 		}
 	}
-	/*
-	 * Private Methods
-	 */
 
 	@Override
 	public List<String> getNewFileHandleIds() {
 		return fileHandleIds;
 	}
 
+	/*
+	 * Private Methods
+	 */
 }

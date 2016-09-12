@@ -76,7 +76,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.ExternalImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -264,7 +264,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
-	public ExternalImageConfigEditor getExternalImageConfigEditor();
+	public ImageLinkConfigEditor getImageLinkConfigEditor();
 	public AttachmentConfigEditor getAttachmentConfigEditor();
 	public LinkConfigEditor getLinkConfigEditor();
 	public APITableConfigEditor getSynapseAPICallConfigEditor();

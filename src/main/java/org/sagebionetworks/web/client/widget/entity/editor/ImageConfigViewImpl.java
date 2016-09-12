@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -72,6 +72,14 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	FlowPanel uploadFailureUI;
 	@UiField
 	Text uploadErrorText;
+	@UiField
+	TabPane tab1;
+	@UiField
+	TabPane tab2;
+	@UiField
+	TabPane tab3;
+	@UiField
+	TabPane tab4;
 	
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 	
@@ -261,8 +269,26 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void setExternalVisible(boolean visible) {
 		externalTabListItem.setEnabled(visible);
 	}
+
+	@Override
+	public void setUploadTabVisible(boolean visible) {
+		uploadTabListItem.setVisible(visible);
+		tab1.setVisible(visible);
+	}
+
+	@Override
+	public void setExistingAttachementTabVisible(boolean visible) {
+		existingAttachmentListItem.setVisible(visible);
+		tab4.setVisible(visible);
+	}
+
+	@Override
+	public void showExternalTab() {
+		externalTabListItem.setActive(true);
+		tab2.setActive(true);
+	}
+
 	/*
 	 * Private Methods
 	 */
-
 }

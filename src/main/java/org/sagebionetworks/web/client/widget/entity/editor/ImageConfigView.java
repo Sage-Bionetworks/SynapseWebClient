@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -43,4 +42,10 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 */
 	public interface Presenter {
 	}
+
+	public void setUploadTabVisible(boolean visible);
+
+	public void setExistingAttachementTabVisible(boolean visible);
+
+	public void showExternalTab();
 }

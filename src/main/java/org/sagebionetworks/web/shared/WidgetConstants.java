@@ -25,8 +25,10 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 
-	public static final String EXTERNAL_IMAGE_CONTENT_TYPE = "externalImage";
-	public static final String EXTERNAL_IMAGE_FRIENDLY_NAME = "External Image";
+	public static final String IMAGE_LINK_EDITOR_CONTENT_TYPE = "imageLink";
+	public static final String IMAGE_LINK_FRIENDLY_NAME = "Image Link";
+
+	public static final String IMAGE_LINK_ONLY_KEY = "imageLinkOnly";
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
