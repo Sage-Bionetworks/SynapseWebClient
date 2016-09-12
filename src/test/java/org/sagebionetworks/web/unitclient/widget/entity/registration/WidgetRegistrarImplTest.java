@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.registration;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +34,9 @@ public class WidgetRegistrarImplTest {
 		verify(mockGinInjector).getYouTubeRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null, null);
 		verify(mockGinInjector).getImageRenderer();
+		reset(mockGinInjector);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null, null);
+		verify(mockGinInjector).getImageRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null, null);
 		verify(mockGinInjector).getProvenanceRenderer();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.API_TABLE_CONTENT_TYPE, null, null, null);
@@ -49,8 +50,8 @@ public class WidgetRegistrarImplTest {
 		verify(mockGinInjector).getYouTubeConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE, null, null);
-		verify(mockGinInjector).getExternalImageConfigEditor();
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null);
+		verify(mockGinInjector).getImageLinkConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}

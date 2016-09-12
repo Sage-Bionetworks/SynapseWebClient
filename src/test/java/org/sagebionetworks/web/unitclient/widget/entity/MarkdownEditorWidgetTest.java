@@ -371,8 +371,8 @@ public class MarkdownEditorWidgetTest {
 
 	@Test
 	public void testHandleCommandInsertExternalImage(){
-		String contentType = WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE;
-		presenter.handleCommand(MarkdownEditorAction.INSERT_EXTERNAL_IMAGE);
+		String contentType = WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_IMAGE_LINK);
 		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	

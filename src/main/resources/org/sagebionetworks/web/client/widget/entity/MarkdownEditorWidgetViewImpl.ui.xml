@@ -98,8 +98,8 @@
 		        <b:Tooltip placement="BOTTOM" title="Insert Image">
 		        	<b:Button ui:field="imageButton" icon="CAMERA" size="EXTRA_SMALL" height="22px"/>
 		        </b:Tooltip>
-		        <b:Tooltip placement="BOTTOM" title="Insert External Image">
-		        	<b:Button ui:field="externalImageButton" icon="CAMERA" size="EXTRA_SMALL" height="22px" visible="false"/>
+		        <b:Tooltip placement="BOTTOM" title="Insert Image">
+		        	<b:Button ui:field="imageLinkButton" icon="CAMERA" size="EXTRA_SMALL" height="22px" visible="false"/>
 		        </b:Tooltip>
 		        <b:Tooltip placement="BOTTOM" title="Insert Video">
 		        	<b:Button ui:field="videoButton" icon="VIDEO_CAMERA" size="EXTRA_SMALL" height="22px"/>

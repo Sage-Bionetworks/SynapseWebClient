@@ -170,7 +170,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button imageButton;
 	@UiField
-	public Button externalImageButton;
+	public Button imageLinkButton;
 	@UiField
 	public Button videoButton;
 	@UiField
@@ -240,7 +240,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading6Link.addClickHandler(getClickHandler(MarkdownEditorAction.H6));
 		attachmentButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
-		externalImageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_IMAGE));
+		imageLinkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE_LINK));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
@@ -431,7 +431,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 
 	@Override
 	public void setExternalImageButtonVisible(boolean visible) {
-		externalImageButton.setVisible(visible);
+		imageLinkButton.setVisible(visible);
 	}
 	
 	@Override
