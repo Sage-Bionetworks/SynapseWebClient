@@ -221,7 +221,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onSuccess(Challenge v) {
 				view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				// go to challenge tab
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
