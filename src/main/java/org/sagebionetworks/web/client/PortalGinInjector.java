@@ -125,6 +125,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
@@ -314,7 +315,7 @@ public interface PortalGinInjector extends Ginjector {
 	public SynapseTableFormWidget getSynapseTableFormWidget();
 	public TeamMembersWidget getTeamMembersWidget();
 	public TeamMemberCountWidget getTeamMemberCountWidget();
-	
+	public LazyLoadWikiWidgetWrapper getLazyLoadWikiWidgetWrapper();
 	//////API Table Column Editor
 	public APITableColumnConfigView getAPITableColumnConfigView();
 	

@@ -1232,8 +1232,16 @@ public class DisplayUtils {
 	 * return true if the widget is in the visible part of the page
 	 */
 	public static boolean isInViewport(Widget widget) {
+		return isInViewport(widget, 0);
+	}
+	
+	/**
+	 * return true if the widget is in the visible part of the page
+	 * paddingBottom is the extra space (in px) to enlarge the viewport (in order to preemptively load the widget before scrolling into view).
+	 */
+	public static boolean isInViewport(Widget widget, int paddingBottom) {
 		int docViewTop = Window.getScrollTop();
-		int docViewBottom = docViewTop + Window.getClientHeight();
+		int docViewBottom = docViewTop + Window.getClientHeight() + paddingBottom;
 		int elemTop = widget.getAbsoluteTop();
 		int elemBottom = elemTop + widget.getOffsetHeight();
 		return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
