@@ -40,7 +40,7 @@ public class TableEntityWidget implements IsWidget,
 
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
-	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Schema' to add columns to the this table.";
+	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select 'Schema' to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
