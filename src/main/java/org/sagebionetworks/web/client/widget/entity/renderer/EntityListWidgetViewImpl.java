@@ -10,7 +10,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListWidgetViewImpl  implements EntityListWidgetView {
+public class EntityListWidgetViewImpl implements EntityListWidgetView {
 
 	public interface Binder extends	UiBinder<Widget, EntityListWidgetViewImpl> {}
 

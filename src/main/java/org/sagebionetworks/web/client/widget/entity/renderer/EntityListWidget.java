@@ -7,6 +7,9 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
+import org.sagebionetworks.web.client.widget.SelectableListView;
+import org.sagebionetworks.web.client.widget.SelectionToolbarPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -15,14 +18,13 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListWidget implements WidgetRendererPresenter {
+public class EntityListWidget extends SelectionToolbarPresenter implements WidgetRendererPresenter {
 	
 	private EntityListWidgetView view;
 	private Map<String, String> descriptor;
 	private PortalGinInjector portalGinInjector;
-	private List<EntityListRowBadge> badges;
 	boolean isSelectable, showDescription;
-	Callback selectionChangedCallback;
+	SelectableListView selectionView;
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
 			PortalGinInjector portalGinInjector) {
@@ -42,7 +44,7 @@ public class EntityListWidget implements WidgetRendererPresenter {
 			showDescription = Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY));
 		}
 		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		badges = new ArrayList<EntityListRowBadge>();
+		items = new ArrayList<SelectableListItem>();
 		view.clearRows();
 		if(records != null && records.size() > 0) {
 			view.setTableVisible(true);
@@ -55,6 +57,7 @@ public class EntityListWidget implements WidgetRendererPresenter {
 			view.setTableVisible(false);
 			view.setEmptyUiVisible(true);
 		}
+		checkSelectionState();
 	}
 	
 	public void addRecord(EntityGroupRecord entityGroupRecord) {
@@ -63,30 +66,42 @@ public class EntityListWidget implements WidgetRendererPresenter {
 		badge.setDescriptionVisible(showDescription);
 		badge.setNote(entityGroupRecord.getNote());
 		badge.setIsSelectable(isSelectable);
-		badge.setSelectionChangedCallback(selectionChangedCallback);
+		badge.setSelectionChangedCallback(new Callback() {
+			@Override
+			public void invoke() {
+				checkSelectionState();	
+			}
+		});
 		view.addRow(badge.asWidget());
-		badges.add(badge);
-	}
-	public void setIsSelectable(boolean isSelectable) {
-		this.isSelectable = isSelectable;
+		items.add(badge);
+		view.setEmptyUiVisible(false);
+		view.setTableVisible(true);
 	}
 	
-	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
-		this.selectionChangedCallback = selectionChangedCallback;
+	public void setSelectable(SelectableListView selectionView) {
+		isSelectable = true;
+		this.selectionView = selectionView;
 	}
+	
+	@Override
+	public SelectableListView getView() {
+		return selectionView;
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 	
-	public List<EntityListRowBadge> getRowWidgets() {
-		return badges;
+	public List<SelectableListItem> getRowWidgets() {
+		return items;
 	}
 	
+	@Override
 	public void refresh() {
 		view.clearRows();
-		for (EntityListRowBadge badge : badges) {
-			view.addRow(badge.asWidget());
+		for (SelectableListItem badge : items) {
+			view.addRow(((EntityListRowBadge)badge).asWidget());
 		}
 	}
 }

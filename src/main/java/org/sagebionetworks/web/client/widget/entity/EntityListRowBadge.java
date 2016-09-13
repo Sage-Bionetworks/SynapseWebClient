@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
@@ -27,7 +28,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, SynapseWidgetPresenter {
+public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, SynapseWidgetPresenter, SelectableListItem {
 	
 	public static final String N_A = "N/A";
 	private EntityListRowBadgeView view;

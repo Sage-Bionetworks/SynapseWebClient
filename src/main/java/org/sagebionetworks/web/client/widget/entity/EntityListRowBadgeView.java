@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface EntityListRowBadgeView extends IsWidget {
+public interface EntityListRowBadgeView extends IsWidget, SelectableListItem {
 
 	/**
 	 * Set the presenter.
@@ -29,8 +30,6 @@ public interface EntityListRowBadgeView extends IsWidget {
 	void setVersion(String version);
 	void setSynAlert(Widget w);
 	void setIsSelectable(boolean isSelectable);
-	boolean isSelected();
-	void setSelected(boolean selected);
 	void showSynAlert();
 	void showRow();
 	void showLoading();
@@ -38,8 +37,7 @@ public interface EntityListRowBadgeView extends IsWidget {
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter {
+	public interface Presenter extends SelectableListItem.Presenter {
 		void viewAttached();
-		void onSelectionChanged();
 	}
 }

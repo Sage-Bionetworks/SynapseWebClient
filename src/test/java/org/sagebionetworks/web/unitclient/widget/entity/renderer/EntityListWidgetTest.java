@@ -93,7 +93,7 @@ public class EntityListWidgetTest {
 	@Test
 	public void testConfigureHideDescriptionSetSelectable() {
 		widget.setIsSelectable(true);
-		widget.setSelectionChangedCallback(mockSelectionChangedCallback);
+		widget.setSelectable(mockSelectionChangedCallback);
 		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
 		records.add(record456);
 		String encoded = EntityListUtil.recordsToString(records);
