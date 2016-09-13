@@ -9,10 +9,8 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -21,6 +19,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -34,42 +33,31 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	private UserBadge createdByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private SynapseClientAsync synapseClient;
-	private GWTWrapper gwt;
-	private Callback invokeCheckForInViewAndLoadData;
-	private boolean isConfigured;
-	private boolean isAttached;
 	private FileDownloadButton fileDownloadButton;
 	private String entityId;
 	private Long version;
 	private SynapseAlert synAlert;
 	private Callback selectionChangedCallback;
+	private LazyLoadHelper lazyLoadHelper;
 	
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
 			UserBadge userBadge,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
-			GWTWrapper gwt,
 			FileDownloadButton fileDownloadButton,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
-		this.gwt = gwt;
 		this.fileDownloadButton = fileDownloadButton;
 		this.synAlert = synAlert;
+		this.lazyLoadHelper = lazyLoadHelper;
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
-		invokeCheckForInViewAndLoadData = new Callback() {
-			@Override
-			public void invoke() {
-				checkForInViewAndLoadData();
-			}
-		};
-		isConfigured = false;
-		isAttached = false;
 		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
 		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
 			@Override
@@ -77,29 +65,16 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 				getEntityBundle();
 			}
 		});
+		Callback loadDataCallback = new Callback() {
+			@Override
+			public void invoke() {
+				getEntityBundle();
+			}
+		};
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
 	}
-	public void startCheckingIfAttachedAndConfigured() {
-		if (isAttached && isConfigured) {
-			checkForInViewAndLoadData();
-		}
-	}
-	public void checkForInViewAndLoadData() {
-		if (!view.isAttached()) {
-			//Done, view has been detached and widget was never in the viewport
-			return;
-		} else if (view.isInViewport()) {
-			//try to load data!
-			getEntityBundle();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-		}
-	}
-	@Override
-	public void viewAttached() {
-		isAttached = true;
-		startCheckingIfAttachedAndConfigured();
-	}
+	
 	public void setNote(String note) {
 		view.setNote(note);
 	}
@@ -142,8 +117,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		this.entityId = reference.getTargetId();
 		this.version = reference.getTargetVersionNumber();
 		
-		isConfigured = true;
-		startCheckingIfAttachedAndConfigured();
+		lazyLoadHelper.setIsConfigured();
 	}
 
 	@Override

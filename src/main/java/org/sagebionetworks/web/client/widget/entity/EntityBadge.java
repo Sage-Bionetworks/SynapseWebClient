@@ -19,10 +19,8 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -35,6 +33,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,13 +51,10 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private UserBadge modifiedByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private SynapseClientAsync synapseClient;
-	private GWTWrapper gwt;
 	private CallbackP<String> customEntityClickHandler;
-	private Callback invokeCheckForInViewAndLoadData;
-	private boolean isConfigured;
-	private boolean isAttached;
 	private FileDownloadButton fileDownloadButton;
 	private DiscussionForumClientAsync discussionForumClient;
+	private LazyLoadHelper lazyLoadHelper;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -66,28 +62,28 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			UserBadge modifiedByUserBadge,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
-			GWTWrapper gwt,
 			FileDownloadButton fileDownloadButton,
-			DiscussionForumClientAsync discussionForumClient) {
+			DiscussionForumClientAsync discussionForumClient,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
-		this.gwt = gwt;
 		this.fileDownloadButton = fileDownloadButton;
 		this.discussionForumClient = discussionForumClient;
+		this.lazyLoadHelper = lazyLoadHelper;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
-		invokeCheckForInViewAndLoadData = new Callback() {
+		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
-				checkForInViewAndLoadData();
+				getEntityBundle();
 			}
 		};
-		isConfigured = false;
-		isAttached = false;
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
 		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
 		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
 			@Override
@@ -95,28 +91,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				getEntityBundle();
 			}
 		});
-	}
-	public void startCheckingIfAttachedAndConfigured() {
-		if (isAttached && isConfigured) {
-			checkForInViewAndLoadData();
-		}
-	}
-	public void checkForInViewAndLoadData() {
-		if (!view.isAttached()) {
-			//Done, view has been detached and widget was never in the viewport
-			return;
-		} else if (view.isInViewport()) {
-			//try to load data!
-			getEntityBundle();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-		}
-	}
-	@Override
-	public void viewAttached() {
-		isAttached = true;
-		startCheckingIfAttachedAndConfigured();
 	}
 	
 	public void getEntityBundle() {
@@ -150,8 +124,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		} else {
 			view.setModifiedOn("");
 		}
-		isConfigured = true;
-		startCheckingIfAttachedAndConfigured();
+		lazyLoadHelper.setIsConfigured();
 		discussionForumClient.getEntityThreadCount(Arrays.asList(header.getId()), new AsyncCallback<EntityThreadCounts>(){
 
 			@Override
@@ -172,7 +145,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		});
 	}
 	
-
 	public void clearState() {
 	}
 
