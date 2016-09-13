@@ -1232,7 +1232,7 @@ public class DisplayUtils {
 	 * return true if the widget is in the visible part of the page
 	 */
 	public static boolean isInViewport(Widget widget) {
-		return isInViewport(widget, 0);
+		return isInViewport(widget, 100);
 	}
 	
 	/**
