@@ -82,4 +82,6 @@ public interface DiscussionForumClient extends RemoteService {
 			DiscussionFilter filter) throws RestServiceException;
 
 	EntityThreadCounts getEntityThreadCount(List<String> idList) throws RestServiceException;
+
+	void restoreThread(String threadId) throws RestServiceException;
 }
