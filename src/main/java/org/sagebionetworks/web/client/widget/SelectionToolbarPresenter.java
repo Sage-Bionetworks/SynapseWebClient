@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gwt.core.shared.GWT;
+
 public abstract class SelectionToolbarPresenter implements SelectableListView.Presenter {
 	
 	protected List<SelectableListItem> items = new ArrayList<SelectableListItem>();
@@ -28,6 +30,7 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 		items.remove(index);
 		items.add(index-1, item);
 		refresh();
+		checkSelectionState();
 	}
 
 	public void onMoveDown() {
@@ -36,6 +39,7 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 		items.remove(index);
 		items.add(index+1, item);
 		refresh();
+		checkSelectionState();
 	}
 
 	public void deleteSelected() {
@@ -47,6 +51,7 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 			}
 		}
 		refresh();
+		checkSelectionState();
 	}
 
 	/**
