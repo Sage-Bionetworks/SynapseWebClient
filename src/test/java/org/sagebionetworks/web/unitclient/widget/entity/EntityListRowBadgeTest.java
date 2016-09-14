@@ -8,7 +8,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -19,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -27,8 +25,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -36,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -54,18 +51,18 @@ public class EntityListRowBadgeTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
-	GWTWrapper mockGWT;
+	
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
 	SynapseAlert mockSynAlert;
-	
+	@Mock
+	LazyLoadHelper mockLazyLoadHelper;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT,
-				mockFileDownloadButton, mockSynAlert);
+		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
+				mockFileDownloadButton, mockSynAlert, mockLazyLoadHelper);
 	}
 	@Test
 	public void testConstruction() {
@@ -103,35 +100,14 @@ public class EntityListRowBadgeTest {
 		testProject.setId(entityId);
 		setupEntity(testProject);
 		
-		//simulate the view is not yet attached, or in viewport
-		when(mockView.isAttached()).thenReturn(false);
-		when(mockView.isInViewport()).thenReturn(false);
-		
-		widget.startCheckingIfAttachedAndConfigured();
-		verifyZeroInteractions(mockGWT);
-		verifyZeroInteractions(mockSynapseClient);
-		
 		//configure
 		Reference ref = new Reference();
 		ref.setTargetId(entityId);
 		widget.configure(ref);
 		
-		//has not yet started looking to get entity bundle, because it's been configured but not attached (view tells presenter when it's attached).
-		verifyZeroInteractions(mockGWT);
-		
-		//attach
-		//still not in viewport
-		when(mockView.isAttached()).thenReturn(true);
-		widget.viewAttached();
-		
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
-		Callback callback = captor.getValue();
-		
-		//simulate the view is now attached and in the viewport, and widget is configure, so it should ask for entity bundle
-		when(mockView.isInViewport()).thenReturn(true);
-		callback.invoke();
+		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
+		captor.getValue().invoke();
 		
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
@@ -180,41 +156,6 @@ public class EntityListRowBadgeTest {
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 		verify(mockView).setVersion(version.toString());
-	}
-	
-	/**
-	 * This tests the case when the badge is attached to the dom and remains outside the viewport, and is eventually detached
-	 */
-	@Test
-	public void testNeverInViewport() {
-		//set up entity
-		String entityId = "syn12345";
-		Project testProject = new Project();
-		//note: can't test created on because it format it using the gwt DateUtils (calls GWT.create())
-		testProject.setId(entityId);
-		setupEntity(testProject);
-		
-		//configure
-		Reference ref = new Reference();
-		ref.setTargetId(entityId);
-		widget.configure(ref);
-		
-		when(mockView.isInViewport()).thenReturn(false);
-		//attach
-		when(mockView.isAttached()).thenReturn(true);
-		widget.viewAttached();
-		
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
-		Callback callback = captor.getValue();
-		
-		Mockito.reset(mockGWT);
-		//simulate the view detached before it's ever scrolled into view
-		when(mockView.isAttached()).thenReturn(false);
-		callback.invoke();
-		//verify that this cycle is dead
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
 	}
 	
 	@Test
