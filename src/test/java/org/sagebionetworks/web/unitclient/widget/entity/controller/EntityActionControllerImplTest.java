@@ -1353,6 +1353,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureChallengNotFound() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
@@ -1380,6 +1381,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testGetChallengeError() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		String error = "an error";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));

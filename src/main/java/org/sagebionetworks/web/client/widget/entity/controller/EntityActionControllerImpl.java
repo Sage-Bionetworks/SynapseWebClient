@@ -272,7 +272,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
 		actionMenu.setActionEnabled(Action.CREATE_CHALLENGE, false);
 		boolean canEdit = permissions.getCanEdit();
-		if(entityBundle.getEntity() instanceof Project && canEdit) {
+		if(entityBundle.getEntity() instanceof Project && canEdit && DisplayUtils.isInTestWebsite(cookies)) {
 			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
 			//find out if this project has a challenge
 			challengeClient.getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
