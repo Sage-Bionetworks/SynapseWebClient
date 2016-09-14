@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
@@ -24,6 +25,8 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 	private Challenge currentChallenge;
 	private SelectTeamModal selectTeamModal;
 	boolean isCreatingChallenge;
+	Callback isChallengeCallback;
+	
 	@Inject
 	public ChallengeWidget(
 			ChallengeWidgetView view, 
@@ -59,6 +62,9 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 				teamBadge.configure(challenge.getParticipantTeamId());
 				view.setChallengeVisible(true);
 				view.setChallengeId(currentChallenge.getId());
+				if (isChallengeCallback != null) {
+					isChallengeCallback.invoke();
+				}
 			}
 			
 			@Override
@@ -72,11 +78,12 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 		};
 	}
 
-	public void configure(String entityId) {
+	public void configure(String entityId, Callback isChallengeCallback) {
 		this.entityId = entityId;
 		synAlert.clear();
 		view.setChallengeVisible(false);
 		view.setCreateChallengeVisible(false);
+		this.isChallengeCallback = isChallengeCallback;
 		challengeClient.getChallengeForProject(entityId, callback);
 	}
 
