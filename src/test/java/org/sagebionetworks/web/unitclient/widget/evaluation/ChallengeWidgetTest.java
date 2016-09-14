@@ -3,9 +3,9 @@ package org.sagebionetworks.web.unitclient.widget.evaluation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
@@ -44,6 +45,8 @@ public class ChallengeWidgetTest {
 	Challenge mockChallenge;
 	@Mock
 	SelectTeamModal mockSelectTeamModal;
+	@Mock
+	Callback mockCallback;
 	
 	public static final String PARTICIPANT_TEAM_ID = "1234567890";
 	public static final String CHALLENGE_ID = "45678";
@@ -69,7 +72,7 @@ public class ChallengeWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure("syn100");
+		widget.configure("syn100", mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		verify(mockTeamBadge).configure(PARTICIPANT_TEAM_ID);
@@ -78,13 +81,14 @@ public class ChallengeWidgetTest {
 		inOrder.verify(mockView).setChallengeVisible(false);
 		inOrder.verify(mockView).setChallengeVisible(true);
 		verify(mockView).setChallengeId(CHALLENGE_ID);
+		verify(mockCallback).invoke();
 	}
 	
 	@Test
 	public void testConfigureChallengeNotFound() {
 		Exception ex = new NotFoundException("Challenge not found");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		widget.configure("syn100");
+		widget.configure("syn100", mockCallback);
 		
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
@@ -92,13 +96,14 @@ public class ChallengeWidgetTest {
 		InOrder inOrder = inOrder(mockView);
 		inOrder.verify(mockView).setCreateChallengeVisible(false);
 		inOrder.verify(mockView).setCreateChallengeVisible(true);
+		verify(mockCallback, never()).invoke();
 	}
 	
 	@Test
 	public void testConfigureFailure() {
 		Exception ex = new Exception("unknown error");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		widget.configure("syn100");
+		widget.configure("syn100", mockCallback);
 		
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		
@@ -108,6 +113,7 @@ public class ChallengeWidgetTest {
 		InOrder inOrder = inOrder(mockSynAlert);
 		inOrder.verify(mockSynAlert).clear();
 		inOrder.verify(mockSynAlert).handleException(ex);
+		verify(mockCallback, never()).invoke();
 	}
 	
 	@Test
