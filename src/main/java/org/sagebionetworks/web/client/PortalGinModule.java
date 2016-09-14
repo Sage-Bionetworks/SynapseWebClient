@@ -413,6 +413,8 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperViewImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginModalView;
@@ -1328,5 +1330,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
 		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
 		bind(EntityListRowBadgeView.class).to(EntityListRowBadgeViewImpl.class);
+		
+		bind(LazyLoadWikiWidgetWrapperView.class).to(LazyLoadWikiWidgetWrapperViewImpl.class);
 	}
 }

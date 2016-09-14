@@ -12,9 +12,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
 
@@ -112,7 +114,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
+	public IsWidget getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -182,8 +184,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		
 		//TODO: add other widget descriptors to this mapping as they become available
 		
-		if (presenter != null)
-			presenter.configure(wikiKey, model, widgetRefreshRequired, wikiVersionInView);
+		if (presenter != null) {
+			LazyLoadWikiWidgetWrapper wrapper = ginInjector.getLazyLoadWikiWidgetWrapper();
+			wrapper.configure(presenter, wikiKey, model, widgetRefreshRequired, wikiVersionInView);
+			return wrapper;
+		}	
 		return presenter;
 	}
 	@Override

@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget;
+package org.sagebionetworks.web.unitclient.widget.lazyload;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;

@@ -44,7 +44,6 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 		if (!hasLoaded) {
 			hasLoaded = true;
 			FlowPanel linkContainer = new FlowPanel();
-			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
 			JsArray<Element> headingElements = _localHeaderElements(this.getElement());
 			
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
