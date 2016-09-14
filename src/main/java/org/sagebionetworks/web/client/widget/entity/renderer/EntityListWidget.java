@@ -24,6 +24,7 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 	private Map<String, String> descriptor;
 	private PortalGinInjector portalGinInjector;
 	boolean isSelectable, showDescription;
+	Callback selectionChangedCallback;
 	SelectableListView selectionView;
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
@@ -60,6 +61,10 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 		checkSelectionState();
 	}
 	
+	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
+		this.selectionChangedCallback = selectionChangedCallback;
+	}
+	
 	public void addRecord(EntityGroupRecord entityGroupRecord) {
 		EntityListRowBadge badge = portalGinInjector.getEntityListRowBadge();
 		badge.configure(entityGroupRecord.getEntityReference());
@@ -69,7 +74,10 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 		badge.setSelectionChangedCallback(new Callback() {
 			@Override
 			public void invoke() {
-				checkSelectionState();	
+				checkSelectionState();
+				if (selectionChangedCallback != null) {
+					selectionChangedCallback.invoke();
+				}
 			}
 		});
 		view.addRow(badge.asWidget());

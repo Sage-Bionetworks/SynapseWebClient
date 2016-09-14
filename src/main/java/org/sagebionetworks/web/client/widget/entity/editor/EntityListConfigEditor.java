@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
@@ -58,7 +59,24 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 			}
 		});
 		entityListWidget.setSelectable(view);
+		entityListWidget.setSelectionChangedCallback(new Callback() {
+			@Override
+			public void invoke() {
+				refreshCanEditNoteState();
+			}
+		});
 	}
+	
+	public void refreshCanEditNoteState() {
+		int count = 0;
+		for(SelectableListItem row: entityListWidget.getRowWidgets()) {
+			if(row.isSelected()){
+				count++;
+			}
+		}
+		view.setCanEditNote(count == 1);
+	}
+	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
@@ -73,6 +91,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		entityListWidget.configure(wikiKey, descriptor, null, null);
 		boolean isRow = entityListWidget.getRowWidgets().size() > 0;
 		view.setButtonToolbarVisible(isRow);
+		refreshCanEditNoteState();
 	}
 	
 	@Override
