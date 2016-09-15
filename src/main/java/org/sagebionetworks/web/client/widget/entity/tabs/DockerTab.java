@@ -11,7 +11,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
@@ -31,6 +30,7 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -168,11 +168,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearDockerRepoWidget();
 		if (isRepo) {
-			List<LinkData> links = new ArrayList<LinkData>();
-			Place projectPlace = new Synapse(projectEntityId);
-			Place repoPlace = new Synapse(entity.getId());
-			links.add(new LinkData(projectBundle.getEntity().getName(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
-			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
+			breadcrumb.configure(bundle.getPath(), EntityArea.DOCKER);
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
 			repoWidget.configure(bundle, handler);

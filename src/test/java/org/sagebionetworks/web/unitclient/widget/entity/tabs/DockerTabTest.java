@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -9,11 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -21,7 +18,6 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
-import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -29,7 +25,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -38,7 +33,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -184,14 +178,7 @@ public class DockerTabTest {
 		verify(mockView).setDockerRepoWidgetVisible(true);
 		verify(mockView, atLeastOnce()).clearDockerRepoWidget();
 		verify(mockShowProjectInfoCallback).invoke(false);
-		ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
-		verify(mockBreadcrumb).configure(listCaptor.capture(), eq(dockerRepoName));
-		List<LinkData> list = listCaptor.getValue();
-		assertNotNull(list);
-		assertEquals(1, list.size());
-		assertEquals(list.get(0).getPlace(), new Synapse(projectEntityId));
-		assertEquals(list.get(0).getText(), projectName);
-		assertEquals(list.get(0).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()));
+		verify(mockBreadcrumb).configure(mockPath, EntityArea.DOCKER);
 		verify(mockGinInjector).createNewDockerRepoWidget();
 		verify(mockView).setDockerRepoWidget(any(Widget.class));
 		verify(mockDockerRepoListWidget, never()).configure(mockProjectEntityBundle);
