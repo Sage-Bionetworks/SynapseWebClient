@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -46,7 +47,7 @@ public class EntityListConfigEditorTest {
 	EntityFinder mockEntityFinder;
 	@Mock
 	PromptModalView mockPromptForNoteModal;
-	List<EntityListRowBadge> entityListRowWidgets;
+	List<SelectableListItem> entityListRowWidgets;
 	@Mock
 	EntityListRowBadge mockEntityListRowBadge;
 	@Mock
@@ -60,7 +61,7 @@ public class EntityListConfigEditorTest {
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
-		entityListRowWidgets = new ArrayList<EntityListRowBadge>();
+		entityListRowWidgets = new ArrayList<SelectableListItem>();
 		entityListRowWidgets.add(mockEntityListRowBadge);
 		when(mockEntityListRowBadge.isSelected()).thenReturn(false);
 		when(mockEntityListWidget.getRowWidgets()).thenReturn(entityListRowWidgets);
@@ -117,84 +118,13 @@ public class EntityListConfigEditorTest {
 	}
 	
 	@Test
-	public void testMoveAndDelete() {
-		//set up 3 rows, where the second row reports that it's selected
-		EntityListRowBadge s1 = setupRow(false);
-		EntityListRowBadge s2 = setupRow(true);
-		EntityListRowBadge s3 = setupRow(false);
-		
-		entityListRowWidgets.clear();
-		entityListRowWidgets.add(s1);
-		entityListRowWidgets.add(s2);
-		entityListRowWidgets.add(s3);
-		
-		//check source order with move up, delete, and down
-		assertEquals(Arrays.asList(s1, s2, s3), entityListRowWidgets);
-		
-		//move up clicked.  move s2 to index 0
-		editor.onMoveUp();
-		assertEquals(Arrays.asList(s2, s1, s3), entityListRowWidgets);
-		
-		editor.deleteSelected();
-		assertEquals(Arrays.asList(s1, s3), entityListRowWidgets);
-		
-		when(s1.isSelected()).thenReturn(true);
-		editor.onMoveDown();
-		assertEquals(Arrays.asList(s3, s1), entityListRowWidgets);
-	}
-	
-
-	@Test
-	public void testSelectionToolbarState() {
-		//set up 2 rows, nothing selected
-		EntityListRowBadge s1 = setupRow(false);
-		EntityListRowBadge s2 = setupRow(false);
-		
-		entityListRowWidgets.clear();
-		entityListRowWidgets.add(s1);
-		entityListRowWidgets.add(s2);
-		
-		editor.checkSelectionState();
-		
-		verify(mockView).setCanDelete(false);
-		verify(mockView).setCanMoveUp(false);
-		verify(mockView).setCanMoveDown(false);
-		
-		//row 1 is selected, should now be able to move down or delete
-		reset(mockView);
-		when(s1.isSelected()).thenReturn(true);
-		editor.checkSelectionState();
-		verify(mockView).setCanDelete(true);
-		verify(mockView).setCanMoveUp(false);
-		verify(mockView).setCanMoveDown(true);
-		verify(mockView).setCanEditNote(true);
-		
-		//both rows are selected, should be able to delete only
-		reset(mockView);
-		when(s2.isSelected()).thenReturn(true);
-		editor.checkSelectionState();
-		verify(mockView).setCanDelete(true);
-		verify(mockView).setCanMoveUp(false);
-		verify(mockView).setCanMoveDown(false);
-		verify(mockView).setCanEditNote(false);
-		
-		//row 2 is selected, should be able to delete or move up
-		reset(mockView);
-		when(s1.isSelected()).thenReturn(false);
-		editor.checkSelectionState();
-		verify(mockView).setCanDelete(true);
-		verify(mockView).setCanMoveUp(true);
-		verify(mockView).setCanMoveDown(false);
-		verify(mockView).setCanEditNote(true);
-	}
-	
-	@Test
 	public void testUpdateNote() {
 		String existingNote = "existing note";
 		
 		EntityListRowBadge s1 = setupRow(false);
 		EntityListRowBadge s2 = setupRow(true);
 		when(s2.getNote()).thenReturn(existingNote);
+		when(mockEntityListWidget.findFirstSelected()).thenReturn(1);
 		
 		entityListRowWidgets.clear();
 		entityListRowWidgets.add(s1);

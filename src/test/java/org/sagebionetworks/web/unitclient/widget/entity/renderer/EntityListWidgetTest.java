@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableListView;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -45,6 +46,9 @@ public class EntityListWidgetTest {
 	Reference ref;
 	@Mock
 	Callback mockSelectionChangedCallback;
+	@Mock
+	SelectableListView mockSelectableListView;
+	
 	@Before
 	public void setup() throws Exception{
 		MockitoAnnotations.initMocks(this);
@@ -92,8 +96,8 @@ public class EntityListWidgetTest {
 	
 	@Test
 	public void testConfigureHideDescriptionSetSelectable() {
-		widget.setIsSelectable(true);
-		widget.setSelectable(mockSelectionChangedCallback);
+		widget.setSelectable(mockSelectableListView);
+		widget.setSelectionChangedCallback(mockSelectionChangedCallback);
 		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
 		records.add(record456);
 		String encoded = EntityListUtil.recordsToString(records);
@@ -104,7 +108,7 @@ public class EntityListWidgetTest {
 		verify(mockView).setDescriptionHeaderVisible(false);	
 		verify(mockEntityListRowBadge).setDescriptionVisible(false);
 		verify(mockEntityListRowBadge).setIsSelectable(true);
-		verify(mockEntityListRowBadge).setSelectionChangedCallback(mockSelectionChangedCallback);
+		verify(mockEntityListRowBadge).setSelectionChangedCallback(any(Callback.class));
 	}
 	
 	@Test

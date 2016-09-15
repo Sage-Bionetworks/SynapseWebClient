@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -187,7 +188,10 @@ public class BiodallianceEditorTest {
 		editor.checkParams();
 	}
 
-
+	/**
+	 * The following tests verify SelectionToolbarPresenter 
+	 */
+	
 	private BiodallianceSourceEditor setupTrackEditor(boolean isSelected) {
 		BiodallianceSourceEditor mockSourceEditor= mock(BiodallianceSourceEditor.class);
 		JSONObject jsonObject = mock(JSONObject.class);
@@ -211,7 +215,7 @@ public class BiodallianceEditorTest {
 		editor.addTrackClicked();
 		
 		//check source order with move up, delete, and down
-		List<BiodallianceSourceEditor> sourceEditors = editor.getSourceEditors();
+		List<SelectableListItem> sourceEditors = editor.getSourceEditors();
 		assertEquals(Arrays.asList(s1, s2, s3), sourceEditors);
 		
 		//move up clicked.  move s2 to index 0
