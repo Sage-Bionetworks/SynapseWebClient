@@ -54,8 +54,8 @@
 								</bh:Div>
 								<b:Tooltip title="Restore deleted thread" placement="LEFT">
 									<b:IconStack ui:field="restoreIconStack" addStyleNames="imageButton line-height-1em right moveup-5" visible="false">
-										<b:Icon type="REFRESH" stackTop="true" ui:field="restoreIcon"/>
-										<b:Icon type="TRASH_O" stackBase="true" addStyleNames="halfOpacity"/>
+										<b:Icon type="BAN" stackBase="true" addStyleNames="halfOpacity"/>
+										<b:Icon type="TRASH_O" stackTop="true" ui:field="restoreIcon"/>
 									</b:IconStack>
 								</b:Tooltip>
 							</b:Column>
