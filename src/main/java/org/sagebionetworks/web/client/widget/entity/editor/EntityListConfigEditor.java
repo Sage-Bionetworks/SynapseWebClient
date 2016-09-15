@@ -92,6 +92,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 				entityFinder.hide();
 				EntityGroupRecord record = createRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
 				entityListWidget.addRecord(record);
+				view.setButtonToolbarVisible(true);
 			}
 		});
 		entityFinder.show();	
