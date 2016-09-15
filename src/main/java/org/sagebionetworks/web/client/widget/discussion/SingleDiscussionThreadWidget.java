@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
+import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_RESTORE;
+import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
+
 import java.util.Set;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
@@ -45,14 +50,20 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 5L;
-	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
+
+	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
+	private static final String CONFIRM_RESTORE_DIALOG_TITLE = "Confirm Restoration";
+	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
+	private static final String RESTORE_SUCCESS_TITLE = "Thread restored";
+	private static final String RESTORE_SUCCESS_MESSAGE = "A thread has been restored.";
 	private static final String NEW_REPLY_SUCCESS_TITLE = "Reply created";
 	private static final String NEW_REPLY_SUCCESS_MESSAGE = "A new reply has been created.";
 	public static final String CREATED_ON_PREFIX = "posted ";
 	public static final String DEFAULT_MARKDOWN = "";
+	public static final String RESTORE_CONFIRM_MESSAGE = "Are you sure you want to restore this thread?";
 	SingleDiscussionThreadWidgetView view;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
@@ -76,7 +87,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
 	private String title;
-	private Callback deleteCallback;
+	private Callback deleteOrRestoreCallback;
 	private String projectId;
 	private Callback refreshCallback;
 	private Set<Long> moderatorIds;
@@ -145,12 +156,12 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback) {
+	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteOrRestoreCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
-		this.deleteCallback = deleteCallback;
+		this.deleteOrRestoreCallback = deleteOrRestoreCallback;
 		this.projectId = bundle.getProjectId();
 		this.moderatorIds = moderatorIds;
 		this.isThreadDeleted = bundle.getIsDeleted();
@@ -190,6 +201,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setDeletedThreadVisible(isDeleted);
 		view.setReplyContainerVisible(!isDeleted);
 		view.setCommandsVisible(!isDeleted);
+		view.setRestoreIconVisible(isDeleted);
 		if (!isDeleted) {
 			view.setDeleteIconVisible(isCurrentUserModerator);
 
@@ -232,7 +244,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result, replyId, isCurrentUserModerator, moderatorIds, deleteCallback);
+				configure(result, replyId, isCurrentUserModerator, moderatorIds, deleteOrRestoreCallback);
 			}
 		});
 	}
@@ -391,7 +403,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new AlertCallback(){
+		view.showConfirm(DELETE_CONFIRM_MESSAGE, CONFIRM_DELETE_DIALOG_TITLE, BUTTON_DELETE, DANGER_BUTTON_STYLE, new AlertCallback(){
 
 			@Override
 			public void callback() {
@@ -412,8 +424,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			@Override
 			public void onSuccess(Void result) {
 				view.showSuccess(DELETE_SUCCESS_TITLE, DELETE_SUCCESS_MESSAGE);
-				if (deleteCallback != null) {
-					deleteCallback.invoke();
+				if (deleteOrRestoreCallback != null) {
+					deleteOrRestoreCallback.invoke();
 				}
 			}
 		});
@@ -503,5 +515,34 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void setReplyListVisible(boolean visible) {
 		view.setReplyListContainerVisible(visible);
+	}
+
+	public void onClickRestore() {
+		view.showConfirm(RESTORE_CONFIRM_MESSAGE, CONFIRM_RESTORE_DIALOG_TITLE, BUTTON_RESTORE, PRIMARY_BUTTON_STYLE, new AlertCallback(){
+
+			@Override
+			public void callback() {
+				restoreThread();
+			}
+		});
+	}
+
+	public void restoreThread() {
+		synAlert.clear();
+		discussionForumClientAsync.restoreThread(threadId, new AsyncCallback<Void>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				view.showSuccess(RESTORE_SUCCESS_TITLE, RESTORE_SUCCESS_MESSAGE);
+				if (deleteOrRestoreCallback != null) {
+					deleteOrRestoreCallback.invoke();
+				}
+			}
+		});
 	}
 }
