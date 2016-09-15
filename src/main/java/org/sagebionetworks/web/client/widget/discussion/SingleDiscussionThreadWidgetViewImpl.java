@@ -47,6 +47,8 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Icon deleteIcon;
 	@UiField
+	IconStack restoreIconStack;
+	@UiField
 	Icon restoreIcon;
 	@UiField
 	Icon editIcon;
@@ -330,6 +332,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void setRestoreIconVisible(boolean visible) {
-		restoreIcon.setVisible(visible);
+		restoreIconStack.setVisible(visible);
 	}
 }
