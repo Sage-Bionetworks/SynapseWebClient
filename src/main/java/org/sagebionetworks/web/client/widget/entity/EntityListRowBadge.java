@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -92,7 +94,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ENTITY | FILE_HANDLES;
+		int partsMask = ENTITY | FILE_HANDLES | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
 		synAlert.clear();
 		view.showLoading();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
