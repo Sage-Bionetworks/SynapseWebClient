@@ -168,7 +168,11 @@ public class DockerTab implements DockerTabView.Presenter{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearDockerRepoWidget();
 		if (isRepo) {
-			breadcrumb.configure(bundle.getPath(), EntityArea.DOCKER);
+			List<LinkData> links = new ArrayList<LinkData>();
+			Place projectPlace = new Synapse(projectEntityId);
+			String projectName = bundle.getPath().getPath().get(1).getName();
+			links.add(new LinkData(projectName, EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
+			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());
 			repoWidget.configure(bundle, handler);
