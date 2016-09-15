@@ -66,6 +66,8 @@ public class EntityListWidget implements WidgetRendererPresenter {
 		badge.setSelectionChangedCallback(selectionChangedCallback);
 		view.addRow(badge.asWidget());
 		badges.add(badge);
+		view.setTableVisible(true);
+		view.setEmptyUiVisible(false);
 	}
 	public void setIsSelectable(boolean isSelectable) {
 		this.isSelectable = isSelectable;
