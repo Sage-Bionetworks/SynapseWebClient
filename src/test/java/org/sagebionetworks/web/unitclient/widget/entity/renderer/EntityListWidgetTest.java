@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -77,8 +77,8 @@ public class EntityListWidgetTest {
 		widget.configure(null, descriptor, null, null);
 		//expect to show the description if no param is specified (backwards compatible)
 		verify(mockView).clearRows();
-		verify(mockView).setTableVisible(true);
-		verify(mockView).setEmptyUiVisible(false);
+		verify(mockView, times(2)).setTableVisible(true);
+		verify(mockView, times(2)).setEmptyUiVisible(false);
 		verify(mockView).setDescriptionHeaderVisible(true);
 		verify(mockEntityListRowBadge).configure(ref);
 		verify(mockEntityListRowBadge).setDescriptionVisible(true);
@@ -112,6 +112,12 @@ public class EntityListWidgetTest {
 		widget.configure(null, descriptor, null, null);
 		verify(mockView).setTableVisible(false);	
 		verify(mockView).setEmptyUiVisible(true);
+		
+		reset(mockView);
+		widget.addRecord(new EntityGroupRecord());
+		verify(mockView).addRow(any(Widget.class));
+		verify(mockView).setTableVisible(true);
+		verify(mockView).setEmptyUiVisible(false);
 	}
 	
 }

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.breadcrumb;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
@@ -38,7 +41,6 @@ public class BreadcrumbTest {
 	SynapseClientAsync mockSynapseClient;
 	IconsImageBundle mockIconsImageBundle;
 	
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws UnsupportedEncodingException, JSONObjectAdapterException{		
 		mockView = Mockito.mock(BreadcrumbView.class);
@@ -81,7 +83,12 @@ public class BreadcrumbTest {
 		JSONObjectAdapter pathAdapter = new JSONObjectAdapterImpl();
 		entityPath.writeToJSONObject(pathAdapter);
 		
-		//no service calls in BreadCrumb
+		breadcrumb.configure(entityPath, EntityArea.FILES);
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		verify(mockView).setLinksList(captor.capture() , eq("ds"));
+		List<LinkData> links = captor.getValue();
+		assertNotNull(links);
+		assertEquals(links.size(), 1);
 	}
 	
 
@@ -102,6 +109,5 @@ public class BreadcrumbTest {
 	public void testAsWidget(){
 		assertNull(breadcrumb.asWidget());
 	}
-	
-	
+
 }

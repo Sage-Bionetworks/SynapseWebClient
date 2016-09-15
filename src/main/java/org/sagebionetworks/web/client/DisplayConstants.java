@@ -57,6 +57,7 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String BUTTON_CANCEL = "Cancel";
 	public static final String BUTTON_DELETE = "Delete";
+	public static final String BUTTON_RESTORE = "Restore";
 	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
 	public static final String ERROR_RESTORING_TRASH_PARENT_NOT_FOUND = "Sorry, an error occurred while restoring this item.";
@@ -274,6 +275,7 @@ public class DisplayConstants {
 	public static final String SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT = "Successfully linked the external account to your Synapse profile.";
 
 	// Button styles
+	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
 	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
 	public static final String DANGER_BUTTON_STYLE = "btn-danger";
 	public static final int DELAY_UNTIL_IN_VIEW = 1200;

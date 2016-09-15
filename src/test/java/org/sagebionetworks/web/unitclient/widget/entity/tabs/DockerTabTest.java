@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -16,8 +17,11 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -38,7 +42,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -79,7 +82,7 @@ public class DockerTabTest {
 	@Mock
 	EntityBundle mockDockerRepoEntityBundle;
 	@Mock
-	EntityPath mockPath;
+	EntityPath path;
 
 	DockerTab tab;
 
@@ -102,7 +105,27 @@ public class DockerTabTest {
 		when(mockDockerRepoEntityBundle.getEntity()).thenReturn(mockDockerRepoEntity);
 		when(mockDockerRepoEntity.getRepositoryName()).thenReturn(dockerRepoName);
 		when(mockGinInjector.createNewDockerRepoWidget()).thenReturn(mockDockerRepoWidget);
-		when(mockDockerRepoEntityBundle.getPath()).thenReturn(mockPath);
+
+		List<EntityHeader> pathHeaders = new ArrayList<EntityHeader>();
+		
+		EntityHeader rootHeader = new EntityHeader();
+		rootHeader.setId("1");
+		rootHeader.setName("root");
+		pathHeaders.add(rootHeader);
+		
+		EntityHeader projHeader = new EntityHeader();
+		projHeader.setId("123");
+		projHeader.setName(projectName);
+		pathHeaders.add(projHeader);
+		
+		EntityHeader dsHeader = new EntityHeader();
+		dsHeader.setId("170");
+		dsHeader.setName("syn170");
+		pathHeaders.add(dsHeader);
+		
+		path = new EntityPath();
+		path.setPath(pathHeaders);
+		when(mockDockerRepoEntityBundle.getPath()).thenReturn(path);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -210,7 +233,7 @@ public class DockerTabTest {
 		verify(mockTab).setEntityNameAndPlace(eq(dockerRepoEntityId), any(Synapse.class));
 		verify(mockTab).showTab();
 		verify(mockSynAlert).handleException(any(Throwable.class));
-		verify(mockBreadcrumb, never()).configure(mockPath, EntityArea.DOCKER);
+		verify(mockBreadcrumb, never()).configure(any(List.class), anyString());
 		verify(mockGinInjector, never()).createNewDockerRepoWidget();
 		verify(mockView, never()).setDockerRepoWidget(any(Widget.class));
 		verify(mockDockerRepoListWidget, never()).configure(mockProjectEntityBundle);

@@ -82,8 +82,8 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 		});
 		view.addRow(badge.asWidget());
 		items.add(badge);
-		view.setEmptyUiVisible(false);
 		view.setTableVisible(true);
+		view.setEmptyUiVisible(false);
 	}
 	
 	public void setSelectable(SelectableListView selectionView) {

@@ -22,6 +22,7 @@ import java.util.Set;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
@@ -182,6 +183,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setDeletedThreadVisible(false);
 		verify(mockView).setReplyContainerVisible(true);
 		verify(mockView).setCommandsVisible(true);
+		verify(mockView).setRestoreIconVisible(false);
 	}
 
 	@Test
@@ -212,6 +214,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setDeletedThreadVisible(true);
 		verify(mockView).setReplyContainerVisible(false);
 		verify(mockView).setCommandsVisible(false);
+		verify(mockView).setRestoreIconVisible(true);
 	}
 
 	@Test
@@ -724,7 +727,21 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
-		verify(mockView).showDeleteConfirm(anyString(), any(AlertCallback.class));
+		ArgumentCaptor<AlertCallback> captor = ArgumentCaptor.forClass(AlertCallback.class);
+		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
+		captor.getValue().callback();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testOnClickRestoreThread() {
+		discussionThreadWidget.onClickRestore();
+		ArgumentCaptor<AlertCallback> captor = ArgumentCaptor.forClass(AlertCallback.class);
+		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
+		captor.getValue().callback();
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -763,6 +780,45 @@ public class SingleDiscussionThreadWidgetTest {
 		discussionThreadWidget.deleteThread();
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(eq("1"), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(any(Throwable.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testRestoreThreadSuccess() {
+		boolean isDeleted = true;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		AsyncMockStubber.callSuccessWith((Void) null)
+				.when(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
+		discussionThreadWidget.restoreThread();
+		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockDiscussionForumClientAsync).restoreThread(eq("1"), any(AsyncCallback.class));
+		verify(mockCallback).invoke();
+		verify(mockView).showSuccess(anyString(), anyString());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testRestoreThreadFailure() {
+		boolean isDeleted = true;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		AsyncMockStubber.callFailureWith(new Exception())
+				.when(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
+		discussionThreadWidget.restoreThread();
+		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockDiscussionForumClientAsync).restoreThread(eq("1"), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 

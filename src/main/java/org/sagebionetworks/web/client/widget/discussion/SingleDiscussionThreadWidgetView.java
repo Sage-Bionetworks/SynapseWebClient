@@ -42,7 +42,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setDeleteIconVisible(boolean visible);
 
-	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
+	void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, AlertCallback deleteCallback);
 	
 	void setShowAllRepliesButtonVisible(boolean visible);
 	
@@ -85,4 +85,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setDeletedThreadVisible(boolean visible);
 
 	void setReplyListContainerVisible(boolean visible);
+
+	void setRestoreIconVisible(boolean visible);
 }

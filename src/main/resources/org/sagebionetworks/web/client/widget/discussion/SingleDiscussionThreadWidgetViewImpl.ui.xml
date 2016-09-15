@@ -52,6 +52,9 @@
 										</b:IconStack>
 									</b:Tooltip>
 								</bh:Div>
+								<b:Tooltip title="Restore deleted thread" placement="LEFT">
+									<b:Icon ui:field="restoreIcon" type="UNDO" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+								</b:Tooltip>
 							</b:Column>
 						</b:Row>
 					</b:Container>

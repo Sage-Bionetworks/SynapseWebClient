@@ -79,4 +79,6 @@ public interface DiscussionForumClientAsync{
 			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
 
 	void getEntityThreadCount(List<String> idList, AsyncCallback<EntityThreadCounts> callback);
+
+	void restoreThread(String threadId, AsyncCallback<Void> callback);
 }
