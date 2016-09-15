@@ -5,10 +5,10 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -59,7 +59,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	TableData iconTableData;
 	@UiField
 	TableData descriptionTableData;
-	
+	Callback onAttachCallback;
 	@Inject
 	public EntityListRowBadgeViewImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -72,9 +72,15 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	}
 	
 	@Override
+	public void setOnAttachCallback(Callback onAttachCallback) {
+		this.onAttachCallback = onAttachCallback;
+	}
+	@Override
 	protected void onAttach() {
 		super.onAttach();
-		presenter.viewAttached();
+		if (onAttachCallback != null) {
+			onAttachCallback.invoke();
+		}
 	}
 	
 	@Override

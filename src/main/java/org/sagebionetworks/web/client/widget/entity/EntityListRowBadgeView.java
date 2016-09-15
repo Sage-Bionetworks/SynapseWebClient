@@ -2,11 +2,12 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface EntityListRowBadgeView extends IsWidget, SelectableListItem {
+public interface EntityListRowBadgeView extends IsWidget, SelectableListItem, SupportsLazyLoadInterface {
 
 	/**
 	 * Set the presenter.
@@ -21,8 +22,6 @@ public interface EntityListRowBadgeView extends IsWidget, SelectableListItem {
 	void setCreatedByWidget(Widget w);
 	void setIcon(IconType iconType);
 	void setFileDownloadButton(Widget w);
-	boolean isInViewport();
-	boolean isAttached();
 	void setNote(String note);
 	String getNote();
 	void setDescription(String description);
@@ -38,6 +37,5 @@ public interface EntityListRowBadgeView extends IsWidget, SelectableListItem {
 	 * Presenter interface
 	 */
 	public interface Presenter extends SelectableListItem.Presenter {
-		void viewAttached();
 	}
 }

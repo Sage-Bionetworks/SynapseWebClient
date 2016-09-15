@@ -44,7 +44,7 @@ public class AdministerEvaluationsListTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	CallbackP<Boolean> mockIsChallengeCallback;
+	Callback mockIsChallengeCallback;
 	
 	Evaluation e1, e2;
 	
@@ -71,7 +71,7 @@ public class AdministerEvaluationsListTest {
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView).addRow(e1);
 		verify(mockView).addRow(e2);
-		verify(mockIsChallengeCallback).invoke(true);
+		verify(mockIsChallengeCallback).invoke();
 	}
 	
 	@Test
@@ -80,7 +80,7 @@ public class AdministerEvaluationsListTest {
 		evalList.configure("syn100", mockIsChallengeCallback);
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView, never()).addRow(e1);
-		verify(mockIsChallengeCallback).invoke(false);
+		verify(mockIsChallengeCallback, never()).invoke();;
 	}
 	
 	@Test

@@ -6,12 +6,14 @@ import org.gwtbootstrap3.client.ui.base.HasHref;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -41,6 +43,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	private Presenter presenter;
 	Widget widget;
+	Callback onAttachCallback;
 	
 	@Inject
 	public UserBadgeViewImpl(Binder uiBinder) {
@@ -60,6 +63,35 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.onImageLoadError();
 			}
 		});
+		widget.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					onAttach();
+				}
+			}
+		});
+	}
+	
+	@Override
+	public boolean isAttached() {
+		return widget.isAttached();
+	}
+	
+	@Override
+	public boolean isInViewport() {
+		return DisplayUtils.isInViewport(widget);
+	}
+	
+	@Override
+	public void setOnAttachCallback(Callback onAttachCallback) {
+		this.onAttachCallback = onAttachCallback;
+	}
+	
+	private void onAttach() {
+		if (onAttachCallback != null) {
+			onAttachCallback.invoke();
+		}
 	}
 	
 	@Override

@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -77,7 +78,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Icon discussionIcon;
 	@UiField
 	Tooltip discussion;
-	
+	Callback onAttachCallback;
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
@@ -99,11 +100,18 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			}
 		});
 	}
-	
+
+	@Override
+	public void setOnAttachCallback(Callback onAttachCallback) {
+		this.onAttachCallback = onAttachCallback;
+	}
+
 	@Override
 	protected void onAttach() {
 		super.onAttach();
-		presenter.viewAttached();
+		if (onAttachCallback != null) {
+			onAttachCallback.invoke();
+		}
 	}
 	
 	@Override
