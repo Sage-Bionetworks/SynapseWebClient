@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -92,6 +93,19 @@ public class EntityIdCellRendererImplTest {
 		verify(mockView).showLoadingIcon();
 		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).showErrorIcon(errorMessage);
+		verify(mockView).setLinkText(entityId);
+	}
+	
+	@Test
+	public void testSetValueInvalidResponse(){
+		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		String entityId = "syn987654";
+		renderer.setValue(entityId);
+		
+		simulateInView();
+		verify(mockView).showLoadingIcon();
+		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		verify(mockView).showErrorIcon(DisplayConstants.ERROR_LOADING);
 		verify(mockView).setLinkText(entityId);
 	}
 }

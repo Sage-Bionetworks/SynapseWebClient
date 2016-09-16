@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -138,6 +139,14 @@ public class EntityContainerListWidgetTest {
 		widget.onAddProject(headerId);
 		
 		verify(mockEntityFinder).showError(error);
+	}
+	
+	@Test
+	public void testSetValueInvalidResponse(){
+		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.onAddProject(headerId);
+		
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_LOADING);
 	}
 
 	@Test

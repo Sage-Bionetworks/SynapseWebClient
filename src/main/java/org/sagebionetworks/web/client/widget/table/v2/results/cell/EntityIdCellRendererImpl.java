@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,6 +50,8 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 						entityName = entity.getName();
 						view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
 						view.setLinkText(entityName);
+					} else {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_LOADING));
 					}
 				}
 				
