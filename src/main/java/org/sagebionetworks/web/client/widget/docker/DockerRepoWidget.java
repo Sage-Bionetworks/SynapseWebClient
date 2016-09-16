@@ -118,9 +118,9 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		});
 		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
 		boolean isEditableDockerRepo = entity instanceof DockerRepository && canEdit;
-		this.actionMenu.setActionVisible(Action.ADD_COMMIT, isEditableDockerRepo);
+		this.actionMenu.setActionVisible(Action.ADD_COMMIT, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
 		this.actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, isEditableDockerRepo);
-		this.actionMenu.setActionVisible(Action.EDIT_PROVENANCE, isEditableDockerRepo);
+		this.actionMenu.setActionVisible(Action.EDIT_PROVENANCE, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
 		this.actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		this.actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
 		this.actionMenu.setActionVisible(Action.DELETE_ENTITY, false);

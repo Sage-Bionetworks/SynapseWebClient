@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -130,9 +129,9 @@ public class DockerRepoWidgetTest {
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
 		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
-		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, canEdit);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
@@ -146,6 +145,8 @@ public class DockerRepoWidgetTest {
 		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
 		verify(mockView).setProvenanceWidgetVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
 	}
 
 	@SuppressWarnings("unchecked")

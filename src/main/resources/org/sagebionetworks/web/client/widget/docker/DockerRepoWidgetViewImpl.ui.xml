@@ -36,7 +36,7 @@
 						</bh:Div>
 						<bh:Div ui:field="dockerCommitListContainer" />
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+					<g:FlowPanel ui:field="provenancePanel" addStyleNames="light-border padding-10 margin-bottom-15">
 						<bh:Div addStyleNames="highlight-title">
 							<bh:Text>Provenance</bh:Text>
 			    			<w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results" 
