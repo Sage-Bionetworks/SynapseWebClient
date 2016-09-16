@@ -569,6 +569,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellE
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
@@ -1148,6 +1150,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileCellEditor.class).to(FileCellEditorImpl.class);
 		bind(FileCellRenderer.class).to(FileCellRendererImpl.class);
 		bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
+		bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
 		
 		/*
 		 * Teams Places
