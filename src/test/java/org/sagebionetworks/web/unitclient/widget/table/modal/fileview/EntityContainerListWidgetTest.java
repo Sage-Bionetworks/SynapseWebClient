@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -48,11 +49,6 @@ public class EntityContainerListWidgetTest {
 	String headerId = "963";
 	String headerName = "project area 52";
 	
-	@Mock
-	Entity mockSelectedEntity;
-	String selectedEntityId = "0112358";
-	String selectedEntityName = "Fibonacci folder";
-	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -61,8 +57,6 @@ public class EntityContainerListWidgetTest {
 		when(mockEntityHeader.getName()).thenReturn(headerName);
 		entityHeaders = new ArrayList<EntityHeader>();
 		entityHeaders.add(mockEntityHeader);
-		when(mockSelectedEntity.getId()).thenReturn(selectedEntityId);
-		when(mockSelectedEntity.getName()).thenReturn(selectedEntityName);
 	}
 	@Test
 	public void testConstruction() {
@@ -125,24 +119,34 @@ public class EntityContainerListWidgetTest {
 
 	@Test
 	public void testOnAddProjectId() {
-		AsyncMockStubber.callSuccessWith(mockSelectedEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		widget.onAddProject(selectedEntityId);
+		ArrayList<EntityHeader> returnList = new ArrayList<EntityHeader>();
+		returnList.add(mockEntityHeader);
+		AsyncMockStubber.callSuccessWith(returnList).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.onAddProject(headerId);
 		
 		verify(mockView).setNoContainers(false);
 		verify(mockEntityFinder).hide();
-		verify(mockView).addEntity(selectedEntityId, selectedEntityName, true);
+		verify(mockView).addEntity(headerId, headerName, true);
 		
-		assertTrue(widget.getEntityIds().contains(selectedEntityId));
+		assertTrue(widget.getEntityIds().contains(headerId));
 	}
 	
 	@Test
 	public void testOnAddProjectIdFailure() {
 		String error = "error during lookup!";
 		Exception ex = new Exception(error); 
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		widget.onAddProject(selectedEntityId);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.onAddProject(headerId);
 		
 		verify(mockEntityFinder).showError(error);
+	}
+	
+	@Test
+	public void testSetValueInvalidResponse(){
+		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.onAddProject(headerId);
+		
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_LOADING);
 	}
 
 	@Test
