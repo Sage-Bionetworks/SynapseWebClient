@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import org.sagebionetworks.repo.model.Entity;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -37,12 +40,15 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	public void loadData() {
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
-			synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
+			synapseClient.getEntityHeaderBatch(Collections.singletonList(entityId), new AsyncCallback<ArrayList<EntityHeader>>() {
 				@Override
-				public void onSuccess(Entity entity) {
-					entityName = entity.getName();
-					view.setIcon(EntityTypeUtils.getIconTypeForEntity(entity));
-					view.setLinkText(entityName);
+				public void onSuccess(ArrayList<EntityHeader> results) {
+					if (results.size() == 1) {
+						EntityHeader entity = results.get(0);
+						entityName = entity.getName();
+						view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
+						view.setLinkText(entityName);
+					}
 				}
 				
 				@Override

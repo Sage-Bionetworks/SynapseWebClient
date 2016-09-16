@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -75,18 +76,23 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	 * @param id
 	 */
 	public void onAddProject(String id) {
-		synapseClient.getEntity(id, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity entity) {
-				entityIds.add(entity.getId());
-				view.setNoContainers(false);
-				view.addEntity(entity.getId(), entity.getName(), canEdit);
-				finder.hide();
-			}
-			
+		synapseClient.getEntityHeaderBatch(Collections.singletonList(id), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				finder.showError(caught.getMessage());
+			}
+		
+			@Override
+			public void onSuccess(ArrayList<EntityHeader> entityHeaders) {
+				if (entityHeaders.size() == 1) {
+					EntityHeader entity = entityHeaders.get(0);
+					entityIds.add(entity.getId());
+					view.setNoContainers(false);
+					view.addEntity(entity.getId(), entity.getName(), canEdit);
+					finder.hide();
+				} else {
+					finder.showError("Entity not found.");
+				}
 			}
 		});
 	}

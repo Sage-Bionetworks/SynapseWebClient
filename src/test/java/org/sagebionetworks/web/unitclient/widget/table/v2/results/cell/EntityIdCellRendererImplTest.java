@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
@@ -14,6 +16,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -34,14 +37,16 @@ public class EntityIdCellRendererImplTest {
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
-	Project mockProject;
+	EntityHeader mockProjectHeader;
 	private static final String PROJECT_NAME = "Project Win";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		renderer = new EntityIdCellRendererImpl(mockView, mockSynapseClient, mockLazyLoadHelper);
-		AsyncMockStubber.callSuccessWith(mockProject).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		when(mockProject.getName()).thenReturn(PROJECT_NAME);
+		ArrayList<EntityHeader> returnList = new ArrayList<EntityHeader>();
+		returnList.add(mockProjectHeader);
+		AsyncMockStubber.callSuccessWith(returnList).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
 	}
 	
 	private void simulateInView() {
@@ -66,7 +71,7 @@ public class EntityIdCellRendererImplTest {
 		
 		simulateInView();
 		verify(mockView).showLoadingIcon();
-		verify(mockSynapseClient).getEntity(eq(entityId), any(AsyncCallback.class));
+		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).setIcon(any(IconType.class));
 		verify(mockView).setLinkText(PROJECT_NAME);
 		
@@ -79,13 +84,13 @@ public class EntityIdCellRendererImplTest {
 	@Test
 	public void testSetValueRpcFailure(){
 		String errorMessage = "error";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		String entityId = "syn987654";
 		renderer.setValue(entityId);
 		
 		simulateInView();
 		verify(mockView).showLoadingIcon();
-		verify(mockSynapseClient).getEntity(eq(entityId), any(AsyncCallback.class));
+		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).showErrorIcon(errorMessage);
 		verify(mockView).setLinkText(entityId);
 	}
