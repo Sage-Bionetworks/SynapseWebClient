@@ -19,6 +19,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,9 +48,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Icon deleteIcon;
 	@UiField
-	IconStack restoreIconStack;
-	@UiField
-	Icon restoreIcon;
+	Image restoreIcon;
 	@UiField
 	Icon editIcon;
 	@UiField
@@ -332,6 +331,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void setRestoreIconVisible(boolean visible) {
-		restoreIconStack.setVisible(visible);
+		restoreIcon.setVisible(visible);
 	}
 }
