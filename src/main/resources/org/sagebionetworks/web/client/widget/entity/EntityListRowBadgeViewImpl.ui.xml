@@ -17,8 +17,10 @@
 				<t:TableData width="35px" ui:field="selectTableData">
 					<b:CheckBox ui:field="select" />
 				</t:TableData>
-				<t:TableData ui:field="synAlertTableData">
-					<bh:Span ui:field="synAlertContainer" />
+				<t:TableData width="20px" ui:field="synAlertTableData" >
+					<b:Tooltip title="Loading error">
+					  <b:Icon fixedWidth="true" type="EXCLAMATION_CIRCLE" addStyleNames="text-danger"/>
+					</b:Tooltip>
 				</t:TableData>
 				<t:TableData width="20px" ui:field="iconTableData">
 					<b:Icon ui:field="icon" type="FILE"/>

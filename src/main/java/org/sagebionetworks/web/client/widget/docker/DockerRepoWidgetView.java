@@ -30,4 +30,6 @@ public interface DockerRepoWidgetView {
 	void setActionMenu(Widget widget);
 
 	void setDockerCommitListWidget(Widget widget);
+
+	void setProvenanceWidgetVisible(boolean visible);
 }

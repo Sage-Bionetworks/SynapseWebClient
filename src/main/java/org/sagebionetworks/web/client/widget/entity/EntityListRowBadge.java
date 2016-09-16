@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -39,7 +38,6 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	private FileDownloadButton fileDownloadButton;
 	private String entityId;
 	private Long version;
-	private SynapseAlert synAlert;
 	private Callback selectionChangedCallback;
 	private LazyLoadHelper lazyLoadHelper;
 	
@@ -49,18 +47,15 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			FileDownloadButton fileDownloadButton,
-			SynapseAlert synAlert,
 			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
 		this.fileDownloadButton = fileDownloadButton;
-		this.synAlert = synAlert;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
-		view.setSynAlert(synAlert.asWidget());
 		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
 		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
 			@Override
@@ -96,13 +91,12 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	
 	public void getEntityBundle() {
 		int partsMask = ENTITY | FILE_HANDLES | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
-		synAlert.clear();
 		view.showLoading();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showSynAlert();
-				synAlert.handleException(caught);
+				view.setEntityLink(entityId, DisplayUtils.getSynapseHistoryToken(entityId, version));
+				view.showErrorIcon();
 			}
 			public void onSuccess(EntityBundle eb) {
 				setEntityBundle(eb);
