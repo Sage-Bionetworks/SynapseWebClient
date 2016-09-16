@@ -90,8 +90,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 					view.setNoContainers(false);
 					view.addEntity(entity.getId(), entity.getName(), canEdit);
 					finder.hide();
-				} else {
-					finder.showError("Entity not found.");
 				}
 			}
 		});
