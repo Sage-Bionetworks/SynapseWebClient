@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableItemList;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
@@ -21,20 +22,27 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	private BiodallianceEditorView view;
 	private PortalGinInjector ginInjector;
 	private Map<String, String> descriptor;
-	private List<BiodallianceSourceEditor> sourceEditors;
-	private boolean changingSelection = false;
 	private Callback selectionChangedCallback;
+	SelectableItemList selectableItemList;
 	
 	@Inject
 	public BiodallianceEditor(BiodallianceEditorView view, PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.ginInjector = ginInjector;
-		sourceEditors = new ArrayList<BiodallianceSourceEditor>();
+		selectableItemList = new SelectableItemList();
+		Callback refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		};
+		selectableItemList.configure(refreshCallback, view);
+		view.setSelectionToolbarHandler(selectableItemList);
 		selectionChangedCallback = new Callback() {
 			@Override
 			public void invoke() {
-				checkSelectionState();
+				selectableItemList.checkSelectionState();
 			}
 		};
 		view.initView();
@@ -42,7 +50,6 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
-		changingSelection = false;
 		descriptor = widgetDescriptor;
 		
 		Species species = BiodallianceWidget.DEFAULT_SPECIES;
@@ -65,10 +72,10 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			viewEnd = Integer.parseInt(descriptor.get(WidgetConstants.BIODALLIANCE_VIEW_END_KEY));
 		}
 		
-		sourceEditors = new ArrayList<BiodallianceSourceEditor>();
+		selectableItemList.clear();
 		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0)){
 			//discover all sources
-			sourceEditors.addAll(getSourceEditors(descriptor));
+			selectableItemList.addAll(getSourceEditors(descriptor));
 		}
 		
 		view.setChr(chr);
@@ -80,7 +87,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			view.setMouse();
 		}
 		
-		refreshTracks();
+		refresh();
 	}
 	
 	public List<BiodallianceSourceEditor> getSourceEditors(Map<String, String> descriptor) {
@@ -102,12 +109,12 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	public void addTrackClicked() {
 		BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
 		editor.setSelectionChangedCallback(selectionChangedCallback);
-		sourceEditors.add(editor);
-		refreshTracks();
+		selectableItemList.add(editor);
+		refresh();
 	}
 	
 	public void clearState() {
-		sourceEditors.clear();
+		selectableItemList.clear();
 		view.clear();
 	}
 
@@ -120,8 +127,8 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		checkParams();
-		for (BiodallianceSourceEditor biodallianceSourceEditor : sourceEditors) {
-			biodallianceSourceEditor.checkParams();
+		for (SelectableListItem biodallianceSourceEditor : selectableItemList) {
+			((BiodallianceSourceEditor)biodallianceSourceEditor).checkParams();
 		}
 		descriptor.clear();
 		descriptor.put(WidgetConstants.BIODALLIANCE_CHR_KEY, view.getChr());
@@ -134,8 +141,9 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		descriptor.put(WidgetConstants.BIODALLIANCE_VIEW_END_KEY, view.getViewEnd());
 		
 		//and add the sources to the map
-		for (int j = 0; j < sourceEditors.size(); j++) {
-			descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+j, sourceEditors.get(j).toJsonObject().toString());
+		for (int j = 0; j < selectableItemList.size(); j++) {
+			BiodallianceSourceEditor sourceEditor = (BiodallianceSourceEditor)selectableItemList.get(j);
+			descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+j, sourceEditor.toJsonObject().toString());
 		}
 	}
 	
@@ -181,114 +189,19 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		return null;
 	}
 	
-	private void refreshTracks() {
+	public void refresh() {
 		view.clearTracks();
-		for (BiodallianceSourceEditor sourceEditor : sourceEditors) {
-			view.addTrack(sourceEditor.asWidget());
+		for (SelectableListItem sourceEditor : selectableItemList) {
+			view.addTrack(((BiodallianceSourceEditor)sourceEditor).asWidget());
 		}
-		boolean sourceTracksVisible = sourceEditors.size() > 0;
+		boolean sourceTracksVisible = selectableItemList.size() > 0;
 		view.setButtonToolbarVisible(sourceTracksVisible);
 		view.setTrackHeaderColumnsVisible(sourceTracksVisible);
-		checkSelectionState();
+		selectableItemList.checkSelectionState();
 	}
 	
-	public void selectAll() {
-		changeAllSelection(true);
-	}
-
-	public void selectNone() {
-		changeAllSelection(false);
-	}
-
-	public void onMoveUp() {
-		int index = findFirstSelected();
-		BiodallianceSourceEditor sourceEditor = sourceEditors.get(index);
-		sourceEditors.remove(index);
-		sourceEditors.add(index-1, sourceEditor);
-		refreshTracks();
-	}
-
-	public void onMoveDown() {
-		int index = findFirstSelected();
-		BiodallianceSourceEditor sourceEditor = sourceEditors.get(index);
-		sourceEditors.remove(index);
-		sourceEditors.add(index+1, sourceEditor);
-		refreshTracks();
-	}
-
-	public void deleteSelected() {
-		Iterator<BiodallianceSourceEditor> it = sourceEditors.iterator();
-		while(it.hasNext()){
-			BiodallianceSourceEditor row = it.next();
-			if(row.isSelected()){
-				it.remove();
-			}
-		}
-		refreshTracks();
-	}
-
-	/**
-	 * Find the first selected row.
-	 * @return
-	 */
-	private int findFirstSelected(){
-		int index = 0;
-		for(BiodallianceSourceEditor row: sourceEditors){
-			if(row.isSelected()){
-				return index;
-			}
-			index++;
-		}
-		throw new IllegalStateException("Nothing selected");
-	}
-	
-	public void selectionChanged(boolean isSelected) {
-		checkSelectionState();
-	}
-	
-	/**
-	 * Change the selection state of all rows to the passed value.
-	 * 
-	 * @param select
-	 */
-	private void changeAllSelection(boolean select){
-		try{
-			changingSelection = true;
-			// Select all 
-			for(BiodallianceSourceEditor row: sourceEditors){
-				row.setSelected(select);
-			}
-		}finally{
-			changingSelection = false;
-		}
-		checkSelectionState();
-	}
-	
-	/**
-	 * The current selection state determines which buttons are enabled.
-	 */
-	public void checkSelectionState(){
-		if(!changingSelection){
-			int index = 0;
-			int count = 0;
-			int lastIndex = 0;
-			for(BiodallianceSourceEditor row: sourceEditors) {
-				if(row.isSelected()){
-					count++;
-					lastIndex = index;
-				}
-				index++;
-			}
-			view.setCanDelete(count > 0);
-			view.setCanMoveUp(count == 1 && lastIndex > 0);
-			view.setCanMoveDown(count == 1 && lastIndex < sourceEditors.size()-1);
-		}
-	}
-		
 	//for tests
-	public List<BiodallianceSourceEditor> getSourceEditors() {
-		return sourceEditors;
+	public SelectableItemList getSourceEditors() {
+		return selectableItemList;
 	}
-	
-	
 }

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.SelectableListView;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -16,6 +17,7 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 	public interface Binder extends UiBinder<Widget, EntityListConfigViewImpl> {}
 	Widget widget;
 	private Presenter presenter;
+	private SelectableListView.Presenter selectionHandler;
 	@UiField
 	Button addEntityButton;
 	@UiField
@@ -39,32 +41,32 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.deleteSelected();
+				selectionHandler.deleteSelected();
 			}
 		});
 		selectionToolbar.setMovedownClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onMoveDown();
+				selectionHandler.onMoveDown();
 			}
 		});
 		
 		selectionToolbar.setMoveupClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onMoveUp();
+				selectionHandler.onMoveUp();
 			}
 		});
 		selectionToolbar.setSelectAllClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.selectAll();
+				selectionHandler.selectAll();
 			}
 		});
 		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.selectNone();
+				selectionHandler.selectNone();
 			}
 		});
 		editNoteButton.addClickHandler(new ClickHandler() {
@@ -74,6 +76,11 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 				presenter.onUpdateNote();
 			}
 		});
+	}
+	@Override
+	public void setSelectionToolbarHandler(
+			org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectableItemList) {
+		selectionHandler = selectableItemList;
 	}
 	
 	@Override

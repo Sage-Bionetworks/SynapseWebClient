@@ -1,18 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.biodalliance13.editor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableItemList;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -187,7 +191,10 @@ public class BiodallianceEditorTest {
 		editor.checkParams();
 	}
 
-
+	/**
+	 * The following tests verify SelectionToolbarPresenter 
+	 */
+	
 	private BiodallianceSourceEditor setupTrackEditor(boolean isSelected) {
 		BiodallianceSourceEditor mockSourceEditor= mock(BiodallianceSourceEditor.class);
 		JSONObject jsonObject = mock(JSONObject.class);
@@ -211,18 +218,18 @@ public class BiodallianceEditorTest {
 		editor.addTrackClicked();
 		
 		//check source order with move up, delete, and down
-		List<BiodallianceSourceEditor> sourceEditors = editor.getSourceEditors();
+		SelectableItemList sourceEditors = editor.getSourceEditors();
 		assertEquals(Arrays.asList(s1, s2, s3), sourceEditors);
 		
 		//move up clicked.  move s2 to index 0
-		editor.onMoveUp();
+		sourceEditors.onMoveUp();
 		assertEquals(Arrays.asList(s2, s1, s3), sourceEditors);
 		
-		editor.deleteSelected();
+		sourceEditors.deleteSelected();
 		assertEquals(Arrays.asList(s1, s3), sourceEditors);
 		
 		when(s1.isSelected()).thenReturn(true);
-		editor.onMoveDown();
+		sourceEditors.onMoveDown();
 		assertEquals(Arrays.asList(s3, s1), sourceEditors);
 	}
 	
@@ -238,7 +245,8 @@ public class BiodallianceEditorTest {
 		editor.addTrackClicked();
 		
 		reset(mockView);
-		editor.checkSelectionState();
+		SelectableItemList sourceEditors = editor.getSourceEditors();
+		sourceEditors.checkSelectionState();
 		
 		verify(mockView).setCanDelete(false);
 		verify(mockView).setCanMoveUp(false);
@@ -247,7 +255,7 @@ public class BiodallianceEditorTest {
 		//track 1 is selected, should now be able to move down or delete
 		reset(mockView);
 		when(s1.isSelected()).thenReturn(true);
-		editor.checkSelectionState();
+		sourceEditors.checkSelectionState();
 		verify(mockView).setCanDelete(true);
 		verify(mockView).setCanMoveUp(false);
 		verify(mockView).setCanMoveDown(true);
@@ -255,7 +263,7 @@ public class BiodallianceEditorTest {
 		//both tracks are selected, should be able to delete only
 		reset(mockView);
 		when(s2.isSelected()).thenReturn(true);
-		editor.checkSelectionState();
+		sourceEditors.checkSelectionState();
 		verify(mockView).setCanDelete(true);
 		verify(mockView).setCanMoveUp(false);
 		verify(mockView).setCanMoveDown(false);
@@ -263,7 +271,7 @@ public class BiodallianceEditorTest {
 		//track 2 is selected, should be able to delete or move up
 		reset(mockView);
 		when(s1.isSelected()).thenReturn(false);
-		editor.checkSelectionState();
+		sourceEditors.checkSelectionState();
 		verify(mockView).setCanDelete(true);
 		verify(mockView).setCanMoveUp(true);
 		verify(mockView).setCanMoveDown(false);
