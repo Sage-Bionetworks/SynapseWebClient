@@ -5,6 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<bh:Div addStyleNames="overflow-x-hidden">
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
 		<bh:Div addStyleNames="overflow-x-hidden">
@@ -53,7 +54,7 @@
 									</b:Tooltip>
 								</bh:Div>
 								<b:Tooltip title="Restore deleted thread" placement="LEFT">
-									<b:Icon ui:field="restoreIcon" type="UNDO" size="LARGE" pull="RIGHT" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+									<g:Image resource='{icons.restore24}' ui:field="restoreIcon" addStyleNames="imageButton line-height-1em right moveup-5" visible="false"/>
 								</b:Tooltip>
 							</b:Column>
 						</b:Row>
