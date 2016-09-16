@@ -102,4 +102,9 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	public void setDockerCommitListWidget(Widget widget){
 		dockerCommitListContainer.add(widget);
 	}
+
+	@Override
+	public void setProvenanceWidgetVisible(boolean visible) {
+		dockerRepoProvenanceContainer.setVisible(visible);
+	}
 }
