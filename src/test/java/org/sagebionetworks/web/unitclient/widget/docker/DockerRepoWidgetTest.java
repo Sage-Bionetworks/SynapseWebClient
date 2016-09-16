@@ -14,6 +14,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
@@ -25,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -66,6 +67,8 @@ public class DockerRepoWidgetTest {
 	EntityActionController mockController;
 	@Mock
 	DockerCommitListWidget mockDockerCommitListWidget;
+	@Mock
+	CookieProvider mockCookieProvider;
 
 	DockerRepoWidget dockerRepoWidget;
 	String entityId = "syn123";
@@ -83,7 +86,8 @@ public class DockerRepoWidgetTest {
 		dockerRepoWidget = new DockerRepoWidget(mockPreflightController,
 				mockView, mockSynAlert, mockWikiPageWidget, mockProvWidget,
 				mockActionMenu, mockDockerTitleBar, mockMetadata,
-				mockModifiedCreatedBy, mockController, mockDockerCommitListWidget);
+				mockModifiedCreatedBy, mockController, mockDockerCommitListWidget,
+				mockCookieProvider);
 		when(mockEntity.getId()).thenReturn(entityId);
 		when(mockEntity.getRepositoryName()).thenReturn(repoName);
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
@@ -94,6 +98,7 @@ public class DockerRepoWidgetTest {
 		when(mockEntity.getModifiedBy()).thenReturn(modifiedBy);
 		when(mockEntity.getModifiedOn()).thenReturn(modifiedOn);
 		when(mockEntityBundle.getRootWikiId()).thenReturn(rootWikiId);
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 	}
 
 	@Test
@@ -124,14 +129,24 @@ public class DockerRepoWidgetTest {
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
 		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
-		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, canEdit);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 		verify(mockDockerCommitListWidget).configure(entityId, false);
+		verify(mockView).setProvenanceWidgetVisible(false);
+	}
+
+	@Test
+	public void testConfigureAlphaMode() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
+		verify(mockView).setProvenanceWidgetVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
 	}
 
 	@SuppressWarnings("unchecked")

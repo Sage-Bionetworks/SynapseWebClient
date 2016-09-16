@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -41,6 +42,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	private DockerTitleBar dockerTitleBar;
 	private EntityActionController controller;
 	private DockerCommitListWidget dockerCommitListWidget;
+	private CookieProvider cookies;
 	private boolean isAnnotationsShown;
 	private boolean canEdit;
 	private DockerRepository entity;
@@ -57,7 +59,8 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 			EntityMetadata metadata,
 			ModifiedCreatedByWidget modifiedCreatedBy,
 			EntityActionController controller,
-			DockerCommitListWidget dockerCommitListWidget
+			DockerCommitListWidget dockerCommitListWidget,
+			CookieProvider cookies
 			) {
 		this.preflightController = preflightController;
 		this.view = view;
@@ -70,6 +73,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		this.controller = controller;
 		this.dockerCommitListWidget = dockerCommitListWidget;
+		this.cookies = cookies;
 		actionMenu.addControllerWidget(controller.asWidget());
 		view.setPresenter(this);
 		view.setSynapseAlert(synAlert.asWidget());
@@ -99,6 +103,7 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		configureActionMenu(bundle);
 		view.setDockerPullCommand(DOCKER_PULL_COMMAND + entity.getRepositoryName());
 		dockerCommitListWidget.configure(entity.getId(), false);
+		view.setProvenanceWidgetVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
 	private void configureActionMenu(EntityBundle bundle) {
@@ -113,9 +118,9 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		});
 		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
 		boolean isEditableDockerRepo = entity instanceof DockerRepository && canEdit;
-		this.actionMenu.setActionVisible(Action.ADD_COMMIT, isEditableDockerRepo);
+		this.actionMenu.setActionVisible(Action.ADD_COMMIT, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
 		this.actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, isEditableDockerRepo);
-		this.actionMenu.setActionVisible(Action.EDIT_PROVENANCE, isEditableDockerRepo);
+		this.actionMenu.setActionVisible(Action.EDIT_PROVENANCE, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
 		this.actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		this.actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
 		this.actionMenu.setActionVisible(Action.DELETE_ENTITY, false);

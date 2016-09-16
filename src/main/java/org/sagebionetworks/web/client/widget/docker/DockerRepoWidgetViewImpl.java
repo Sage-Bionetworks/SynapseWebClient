@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -18,6 +19,8 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	PanelBody dockerRepoWikiPageContainer;
 	@UiField
 	Div dockerRepoProvenanceContainer;
+	@UiField
+	FlowPanel provenancePanel;
 	@UiField
 	TextBox dockerPullCommand;
 	@UiField
@@ -101,5 +104,10 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@Override
 	public void setDockerCommitListWidget(Widget widget){
 		dockerCommitListContainer.add(widget);
+	}
+
+	@Override
+	public void setProvenanceWidgetVisible(boolean visible) {
+		provenancePanel.setVisible(visible);
 	}
 }
