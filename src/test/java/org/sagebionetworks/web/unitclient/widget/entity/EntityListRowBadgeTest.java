@@ -55,20 +55,17 @@ public class EntityListRowBadgeTest {
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
-				mockFileDownloadButton, mockSynAlert, mockLazyLoadHelper);
+				mockFileDownloadButton, mockLazyLoadHelper);
 	}
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setCreatedByWidget(any(Widget.class));
-		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockFileDownloadButton).setSize(ButtonSize.EXTRA_SMALL);
 	}
 	
@@ -110,7 +107,6 @@ public class EntityListRowBadgeTest {
 		captor.getValue().invoke();
 		
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		verify(mockSynAlert).clear();
 		verify(mockView).showLoading();
 		verify(mockView).setIcon(IconType.LIST_ALT); //project icon
 		verify(mockView).setEntityLink(entityName, "#!Synapse:"+entityId);
@@ -146,7 +142,6 @@ public class EntityListRowBadgeTest {
 		widget.getEntityBundle();
 		
 		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
-		verify(mockSynAlert).clear();
 		verify(mockView).showLoading();
 		verify(mockView).setIcon(IconType.FILE_O); //file icon
 		verify(mockView).setEntityLink(entityName, "#!Synapse:"+entityId+"."+version);
@@ -169,7 +164,7 @@ public class EntityListRowBadgeTest {
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
-		verify(mockView).showSynAlert();
-		verify(mockSynAlert).handleException(ex);;
+		verify(mockView).showErrorIcon();
+		verify(mockView).setEntityLink(entityId, "#!Synapse:"+entityId);
 	}
 }

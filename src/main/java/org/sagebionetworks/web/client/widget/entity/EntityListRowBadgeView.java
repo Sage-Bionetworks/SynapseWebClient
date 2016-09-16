@@ -26,11 +26,10 @@ public interface EntityListRowBadgeView extends IsWidget, SupportsLazyLoadInterf
 	void setDescription(String description);
 	void setDescriptionVisible(boolean visible);
 	void setVersion(String version);
-	void setSynAlert(Widget w);
 	void setIsSelectable(boolean isSelectable);
 	boolean isSelected();
 	void setSelected(boolean selected);
-	void showSynAlert();
+	void showErrorIcon();
 	void showRow();
 	void showLoading();
 	

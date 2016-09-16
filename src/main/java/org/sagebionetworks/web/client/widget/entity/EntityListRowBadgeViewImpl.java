@@ -38,8 +38,6 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	Label createdOnField;
 	
 	@UiField
-	Span synAlertContainer;
-	@UiField
 	Span fileDownloadButtonContainer;
 	@UiField
 	Label descriptionField;
@@ -110,13 +108,6 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 		createdOnField.setText(createdOnString);
 	}
 	
-	
-	@Override
-	public void setSynAlert(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
-	
 	@Override
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
@@ -151,11 +142,12 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	@Override
 	public void showRow() {
 		loadingUI.setVisible(false);
+		synAlertTableData.setVisible(false);
 		row.setVisible(true);
 		iconTableData.setVisible(true);
 	}
 	@Override
-	public void showSynAlert() {
+	public void showErrorIcon() {
 		loadingUI.setVisible(false);
 		row.setVisible(true);
 		iconTableData.setVisible(false);
