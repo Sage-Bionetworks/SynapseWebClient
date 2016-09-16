@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.gwt.core.shared.GWT;
+import org.sagebionetworks.web.client.utils.Callback;
 
-public abstract class SelectionToolbarPresenter implements SelectableListView.Presenter {
-	
-	protected List<SelectableListItem> items = new ArrayList<SelectableListItem>();
+public class SelectableItemList extends ArrayList<SelectableListItem> implements SelectableListView.Presenter {
+	private static final long serialVersionUID = 1L;
 	private boolean changingSelection = false;
+	Callback refreshCallback;
+	SelectableListView view;
 	/**
-	 * Fill in way to refresh row data.
+	 * 
+	 * @param refreshCallback  called back when UI should be refreshed (after underlying items have been modified).
+	 * @param view view that supports list item selection (and basic operations). Typically has a SelectionToolbar ui component.
 	 */
-	public abstract void refresh();
-	public abstract SelectableListView getView();
+	public void configure(Callback refreshCallback, SelectableListView view) {
+		this.refreshCallback = refreshCallback;
+		this.view = view;
+	}
 	
 	public void selectAll() {
 		changeAllSelection(true);
@@ -26,31 +31,31 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 
 	public void onMoveUp() {
 		int index = findFirstSelected();
-		SelectableListItem item = items.get(index);
-		items.remove(index);
-		items.add(index-1, item);
-		refresh();
+		SelectableListItem item = get(index);
+		remove(index);
+		add(index-1, item);
+		refreshCallback.invoke();
 		checkSelectionState();
 	}
 
 	public void onMoveDown() {
 		int index = findFirstSelected();
-		SelectableListItem item = items.get(index);
-		items.remove(index);
-		items.add(index+1, item);
-		refresh();
+		SelectableListItem item = get(index);
+		remove(index);
+		add(index+1, item);
+		refreshCallback.invoke();
 		checkSelectionState();
 	}
 
 	public void deleteSelected() {
-		Iterator<SelectableListItem> it = items.iterator();
+		Iterator<SelectableListItem> it = iterator();
 		while(it.hasNext()){
 			SelectableListItem row = it.next();
 			if(row.isSelected()){
 				it.remove();
 			}
 		}
-		refresh();
+		refreshCallback.invoke();
 		checkSelectionState();
 	}
 
@@ -60,7 +65,7 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 	 */
 	public int findFirstSelected(){
 		int index = 0;
-		for(SelectableListItem row: items){
+		for(SelectableListItem row: this){
 			if(row.isSelected()){
 				return index;
 			}
@@ -82,7 +87,7 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 		try{
 			changingSelection = true;
 			// Select all 
-			for(SelectableListItem row: items){
+			for(SelectableListItem row: this){
 				row.setSelected(select);
 			}
 		}finally{
@@ -95,20 +100,20 @@ public abstract class SelectionToolbarPresenter implements SelectableListView.Pr
 	 * The current selection state determines which buttons are enabled.
 	 */
 	public void checkSelectionState(){
-		if(!changingSelection && getView() != null){
+		if(!changingSelection && view != null){
 			int index = 0;
 			int count = 0;
 			int lastIndex = 0;
-			for(SelectableListItem row: items) {
+			for(SelectableListItem row: this) {
 				if(row.isSelected()){
 					count++;
 					lastIndex = index;
 				}
 				index++;
 			}
-			getView().setCanDelete(count > 0);
-			getView().setCanMoveUp(count == 1 && lastIndex > 0);
-			getView().setCanMoveDown(count == 1 && lastIndex < items.size()-1);
+			view.setCanDelete(count > 0);
+			view.setCanMoveUp(count == 1 && lastIndex > 0);
+			view.setCanMoveDown(count == 1 && lastIndex < size()-1);
 		}
 	}
 }

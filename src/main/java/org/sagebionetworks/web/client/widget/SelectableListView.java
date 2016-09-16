@@ -6,7 +6,7 @@ public interface SelectableListView {
 	void setCanMoveUp(boolean canMoveUp);
 	void setCanMoveDown(boolean canMoveDown);
 	void setButtonToolbarVisible(boolean visible);
-	
+	void setSelectionToolbarHandler(Presenter selectableItemList);
 	/**
 	 * Presenter interface
 	 */

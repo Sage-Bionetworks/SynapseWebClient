@@ -19,7 +19,7 @@ public interface BiodallianceEditorView extends IsWidget, WidgetEditorView, Sele
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter extends SelectableListView.Presenter {
+	public interface Presenter {
 		void addTrackClicked();
 	}
 	

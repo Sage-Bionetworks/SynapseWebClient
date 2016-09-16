@@ -47,7 +47,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		this.entityFinder = entityFinder;
 		this.entityListWidget = entityListWidget;
 		this.promptForNoteModal = promptForNoteModal;
-		view.setSelectionHandler(entityListWidget);
+		view.setSelectionToolbarHandler(entityListWidget.getRowWidgets());
 		view.setEntityListWidget(entityListWidget.asWidget());
 		view.setPresenter(this);
 		view.addWidget(promptForNoteModal.asWidget());
@@ -158,14 +158,14 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	}
 	
 	public String getSelectedNote() {
-		int index = entityListWidget.findFirstSelected();
+		int index = entityListWidget.getRowWidgets().findFirstSelected();
 		List<SelectableListItem> editors = entityListWidget.getRowWidgets();
 		EntityListRowBadge editor = (EntityListRowBadge)editors.get(index);
 		return editor.getNote();
 	}
 	
 	public void setSelectedNote(String newNote) {
-		int index = entityListWidget.findFirstSelected();
+		int index = entityListWidget.getRowWidgets().findFirstSelected();
 		List<SelectableListItem> editors = entityListWidget.getRowWidgets();
 		EntityListRowBadge editor = (EntityListRowBadge)editors.get(index);
 		editor.setNote(newNote);

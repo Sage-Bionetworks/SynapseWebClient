@@ -37,7 +37,7 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	@UiField
 	Table trackColumnHeaders;
 	Widget widget;
-	
+	org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionToolbarHandler;
 	@Inject
 	public BiodallianceEditorViewImpl(BiodallianceEditorViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -50,36 +50,40 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.deleteSelected();
+				selectionToolbarHandler.deleteSelected();
 			}
 		});
 		selectionToolbar.setMovedownClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onMoveDown();
+				selectionToolbarHandler.onMoveDown();
 			}
 		});
 		
 		selectionToolbar.setMoveupClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onMoveUp();
+				selectionToolbarHandler.onMoveUp();
 			}
 		});
 		selectionToolbar.setSelectAllClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.selectAll();
+				selectionToolbarHandler.selectAll();
 			}
 		});
 		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.selectNone();
+				selectionToolbarHandler.selectNone();
 			}
 		});
 	}
-	
+	@Override
+	public void setSelectionToolbarHandler(
+			org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionToolbarHandler) {
+		this.selectionToolbarHandler = selectionToolbarHandler;
+	}
 	@Override
 	public void initView() {
 	}

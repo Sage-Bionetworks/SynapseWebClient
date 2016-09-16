@@ -13,7 +13,6 @@ public interface EntityListConfigView extends IsWidget, WidgetEditorView, Select
 	void setCanEditNote(boolean canEditNote);
 	void setButtonToolbarVisible(boolean visible);
 	void addWidget(Widget w);
-	void setSelectionHandler(SelectableListView.Presenter selectionHandler);
 	public interface Presenter {
 		void onAddRecord();
 		void onUpdateNote();

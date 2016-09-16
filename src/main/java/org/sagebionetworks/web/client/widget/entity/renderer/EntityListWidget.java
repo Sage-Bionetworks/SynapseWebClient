@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableItemList;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.SelectableListView;
-import org.sagebionetworks.web.client.widget.SelectionToolbarPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -18,7 +17,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListWidget extends SelectionToolbarPresenter implements WidgetRendererPresenter {
+public class EntityListWidget implements WidgetRendererPresenter {
 	
 	private EntityListWidgetView view;
 	private Map<String, String> descriptor;
@@ -26,12 +25,21 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 	boolean isSelectable, showDescription;
 	Callback selectionChangedCallback;
 	SelectableListView selectionView;
+	SelectableItemList selectableItemList;
+	Callback refreshCallback;
 	@Inject
 	public EntityListWidget(EntityListWidgetView view,
 			PortalGinInjector portalGinInjector) {
 		this.view = view;		
 		this.portalGinInjector = portalGinInjector;
 		isSelectable = false;
+		selectableItemList = new SelectableItemList();
+		refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		};
 	}
 	
 	@Override
@@ -45,7 +53,7 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 			showDescription = Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY));
 		}
 		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		items = new ArrayList<SelectableListItem>();
+		selectableItemList.clear();
 		view.clearRows();
 		if(records != null && records.size() > 0) {
 			view.setTableVisible(true);
@@ -58,7 +66,7 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 			view.setTableVisible(false);
 			view.setEmptyUiVisible(true);
 		}
-		checkSelectionState();
+		selectableItemList.checkSelectionState();
 	}
 	
 	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
@@ -74,14 +82,14 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 		badge.setSelectionChangedCallback(new Callback() {
 			@Override
 			public void invoke() {
-				checkSelectionState();
+				selectableItemList.checkSelectionState();
 				if (selectionChangedCallback != null) {
 					selectionChangedCallback.invoke();
 				}
 			}
 		});
 		view.addRow(badge.asWidget());
-		items.add(badge);
+		selectableItemList.add(badge);
 		view.setTableVisible(true);
 		view.setEmptyUiVisible(false);
 	}
@@ -89,11 +97,8 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 	public void setSelectable(SelectableListView selectionView) {
 		isSelectable = true;
 		this.selectionView = selectionView;
-	}
-	
-	@Override
-	public SelectableListView getView() {
-		return selectionView;
+		selectableItemList.configure(refreshCallback, selectionView);
+		selectionView.setSelectionToolbarHandler(selectableItemList);
 	}
 	
 	@Override
@@ -101,14 +106,13 @@ public class EntityListWidget extends SelectionToolbarPresenter implements Widge
 		return view.asWidget();
 	}
 	
-	public List<SelectableListItem> getRowWidgets() {
-		return items;
+	public SelectableItemList getRowWidgets() {
+		return selectableItemList;
 	}
 	
-	@Override
 	public void refresh() {
 		view.clearRows();
-		for (SelectableListItem badge : items) {
+		for (SelectableListItem badge : selectableItemList) {
 			view.addRow(((EntityListRowBadge)badge).asWidget());
 		}
 	}

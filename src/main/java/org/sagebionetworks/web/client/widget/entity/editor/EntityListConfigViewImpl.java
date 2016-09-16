@@ -77,11 +77,10 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 			}
 		});
 	}
-	
 	@Override
-	public void setSelectionHandler(
-			org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionHandler) {
-		this.selectionHandler = selectionHandler;
+	public void setSelectionToolbarHandler(
+			org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectableItemList) {
+		selectionHandler = selectableItemList;
 	}
 	
 	@Override
