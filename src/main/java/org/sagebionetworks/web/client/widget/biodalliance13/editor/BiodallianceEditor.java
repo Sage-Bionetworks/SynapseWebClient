@@ -201,7 +201,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	}
 	
 	//for tests
-	public List<SelectableListItem> getSourceEditors() {
+	public SelectableItemList getSourceEditors() {
 		return selectableItemList;
 	}
 }

@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.SelectableItemList;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
@@ -47,7 +48,7 @@ public class EntityListConfigEditorTest {
 	EntityFinder mockEntityFinder;
 	@Mock
 	PromptModalView mockPromptForNoteModal;
-	List<SelectableListItem> entityListRowWidgets;
+	SelectableItemList entityListRowWidgets;
 	@Mock
 	EntityListRowBadge mockEntityListRowBadge;
 	@Mock
@@ -61,7 +62,7 @@ public class EntityListConfigEditorTest {
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
-		entityListRowWidgets = new ArrayList<SelectableListItem>();
+		entityListRowWidgets = new SelectableItemList();
 		entityListRowWidgets.add(mockEntityListRowBadge);
 		when(mockEntityListRowBadge.isSelected()).thenReturn(false);
 		when(mockEntityListWidget.getRowWidgets()).thenReturn(entityListRowWidgets);
@@ -124,7 +125,6 @@ public class EntityListConfigEditorTest {
 		EntityListRowBadge s1 = setupRow(false);
 		EntityListRowBadge s2 = setupRow(true);
 		when(s2.getNote()).thenReturn(existingNote);
-		when(mockEntityListWidget.findFirstSelected()).thenReturn(1);
 		
 		entityListRowWidgets.clear();
 		entityListRowWidgets.add(s1);
