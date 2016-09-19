@@ -6,22 +6,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
-	private Map<Reference, AsyncCallback<EntityHeader>> reference2Callback = new HashMap<Reference, AsyncCallback<EntityHeader>>();
-	private List<Reference> referenceArrayList = new ArrayList<Reference>();
+	private Map<String, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
 	SynapseClientAsync synapseClient;
+	// This singleton checks for new work every <DELAY> milliseconds.
+	public static final int DELAY = 300;
+	
 	@Inject
 	public EntityHeaderAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
@@ -31,49 +30,60 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, 300);
+		gwt.scheduleFixedDelay(callback, DELAY);
 	}
 	
 	@Override
-	public void getEntityHeader(Reference entityReference, AsyncCallback<EntityHeader> callback) {
-		referenceArrayList.add(entityReference);
-		reference2Callback.put(entityReference, callback);
+	public void getEntityHeader(String entityId, AsyncCallback<EntityHeader> callback) {
+		List<AsyncCallback<EntityHeader>> list = reference2Callback.get(entityId);
+		if (list == null) {
+			list = new ArrayList<AsyncCallback<EntityHeader>>();
+			reference2Callback.put(entityId, list);
+		}
+		list.add(callback);
 	}
 	
 	public void executeRequests() {
-		if (!referenceArrayList.isEmpty()) {
-			ReferenceList referenceList = new ReferenceList();
-			final List<Reference> referenceListCopy = new ArrayList<Reference>();
-			referenceListCopy.addAll(referenceArrayList);
-			referenceList.setReferences(referenceListCopy);
-			referenceArrayList.clear();
-			synapseClient.getEntityHeaderBatch(referenceList,new AsyncCallback<PaginatedResults<EntityHeader>>() {
+		if (!reference2Callback.isEmpty()) {
+			final Map<String, List<AsyncCallback<EntityHeader>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
+			reference2CallbackCopy.putAll(reference2Callback);
+			reference2Callback.clear();
+			List<String> entityIdsList = new ArrayList<String>();
+			entityIdsList.addAll(reference2CallbackCopy.keySet());
+			synapseClient.getEntityHeaderBatch(entityIdsList,new AsyncCallback<ArrayList<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
-					for (Reference reference : referenceListCopy) {
-						AsyncCallback<EntityHeader> callback = reference2Callback.remove(reference);
-						if (callback != null) {
-							callback.onFailure(caught);
+					for (String entityId: reference2CallbackCopy.keySet()) {
+						callOnFailure(entityId, caught);
+					}
+				}
+				
+				private void callOnFailure(String entityId, Throwable ex) {
+					List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.get(entityId);
+					if (callbacks != null) {
+						for (AsyncCallback<EntityHeader> callback : callbacks) {
+							callback.onFailure(ex);	
 						}
 					}
-					reference2Callback.clear();
 				}
-				public void onSuccess(PaginatedResults<EntityHeader> result) {
+				
+				public void onSuccess(ArrayList<EntityHeader> results) {
 					// go through all results, and inform the proper callback of the success
-					List<EntityHeader> results = result.getResults();
-					// sanity check
-					if (results.size() != referenceListCopy.size()) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_LOADING));
-					} else {
-						for (int i = 0; i < results.size(); i++) {
-							AsyncCallback<EntityHeader> callback = reference2Callback.remove(referenceListCopy.get(i));
-							if (callback != null) {
-								callback.onSuccess(results.get(i));
+					for (EntityHeader entityHeader : results) {
+						List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.remove(entityHeader.getId());
+						if (callbacks != null) {
+							for (AsyncCallback<EntityHeader> callback : callbacks) {
+								callback.onSuccess(entityHeader);	
 							}
 						}
 					}
-					reference2Callback.clear();
+					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					for (String entityId : reference2CallbackCopy.keySet()) {
+						// not returned
+						callOnFailure(entityId, notReturnedException);
+						
+					}
 				};
 			});
 		}

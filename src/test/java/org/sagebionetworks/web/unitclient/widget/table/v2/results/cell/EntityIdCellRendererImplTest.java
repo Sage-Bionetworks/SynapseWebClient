@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -41,7 +41,7 @@ public class EntityIdCellRendererImplTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		renderer = new EntityIdCellRendererImpl(mockView, mockLazyLoadHelper, mockEntityHeaderAsyncHandler);
-		AsyncMockStubber.callSuccessWith(mockProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(any(Reference.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
 	}
 	
@@ -67,7 +67,7 @@ public class EntityIdCellRendererImplTest {
 		
 		simulateInView();
 		verify(mockView).showLoadingIcon();
-		verify(mockEntityHeaderAsyncHandler).getEntityHeader(any(Reference.class), any(AsyncCallback.class));
+		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).setIcon(any(IconType.class));
 		verify(mockView).setLinkText(PROJECT_NAME);
 		
@@ -80,13 +80,13 @@ public class EntityIdCellRendererImplTest {
 	@Test
 	public void testSetValueRpcFailure(){
 		String errorMessage = "error";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(any(Reference.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		String entityId = "syn987654";
 		renderer.setValue(entityId);
 		
 		simulateInView();
 		verify(mockView).showLoadingIcon();
-		verify(mockEntityHeaderAsyncHandler).getEntityHeader(any(Reference.class), any(AsyncCallback.class));
+		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorIcon(errorMessage);
 		verify(mockView).setLinkText(entityId);
 	}

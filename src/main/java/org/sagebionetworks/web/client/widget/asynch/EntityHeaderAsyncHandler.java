@@ -6,5 +6,5 @@ import org.sagebionetworks.repo.model.Reference;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface EntityHeaderAsyncHandler {
-	void getEntityHeader(Reference entityReference, AsyncCallback<EntityHeader> callback);
+	void getEntityHeader(String entityId, AsyncCallback<EntityHeader> callback);
 }

@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,9 +37,7 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	public void loadData() {
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
-			Reference r = new Reference();
-			r.setTargetId(entityId);
-			entityHeaderAsyncHandler.getEntityHeader(r, new AsyncCallback<EntityHeader>() {
+			entityHeaderAsyncHandler.getEntityHeader(entityId, new AsyncCallback<EntityHeader>() {
 				@Override
 				public void onSuccess(EntityHeader entity) {
 					entityName = entity.getName();
@@ -63,6 +61,7 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	
 	@Override
 	public void setValue(String value) {
+		view.hideAllIcons();
 		this.entityId = value;
 		entityName = null;
 		lazyLoadHelper.setIsConfigured();
