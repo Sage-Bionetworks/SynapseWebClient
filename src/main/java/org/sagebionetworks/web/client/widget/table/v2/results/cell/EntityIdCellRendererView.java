@@ -11,4 +11,5 @@ public interface EntityIdCellRendererView extends IsWidget, SupportsLazyLoadInte
 	void setIcon(IconType iconType);
 	void showLoadingIcon();
 	void showErrorIcon(String error);
+	void hideAllIcons();
 }
