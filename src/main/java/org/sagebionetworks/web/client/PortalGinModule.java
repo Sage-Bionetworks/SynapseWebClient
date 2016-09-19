@@ -108,6 +108,8 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
@@ -1335,5 +1337,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityListRowBadgeView.class).to(EntityListRowBadgeViewImpl.class);
 		
 		bind(LazyLoadWikiWidgetWrapperView.class).to(LazyLoadWikiWidgetWrapperViewImpl.class);
+		
+		bind(EntityHeaderAsyncHandlerImpl.class).in(Singleton.class);
+		bind(EntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class);
 	}
 }

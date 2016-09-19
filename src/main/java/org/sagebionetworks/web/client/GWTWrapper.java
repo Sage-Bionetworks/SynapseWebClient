@@ -32,6 +32,8 @@ public interface GWTWrapper {
 	
 	DateTimeFormat getDateTimeFormat(PredefinedFormat format);
 	
+	void scheduleFixedDelay(final Callback callback, int delayMs);
+	
 	void scheduleExecution(Callback callback, int delay);
 	
 	void scheduleDeferred(Callback callback);
