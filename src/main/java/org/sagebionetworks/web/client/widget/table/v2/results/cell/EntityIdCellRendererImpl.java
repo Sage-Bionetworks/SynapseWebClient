@@ -1,17 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,16 +16,15 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 
 	EntityIdCellRendererView view;
 	LazyLoadHelper lazyLoadHelper;
-	SynapseClientAsync synapseClient;
-	
+	EntityHeaderAsyncHandler entityHeaderAsyncHandler;
 	String entityId, entityName;
 	@Inject
 	public EntityIdCellRendererImpl(EntityIdCellRendererView view, 
-			SynapseClientAsync synapseClient, 
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			EntityHeaderAsyncHandler entityHeaderAsyncHandler) {
 		this.view = view;
 		this.lazyLoadHelper = lazyLoadHelper;
-		this.synapseClient = synapseClient;
+		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -42,17 +37,12 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	public void loadData() {
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
-			synapseClient.getEntityHeaderBatch(Collections.singletonList(entityId), new AsyncCallback<ArrayList<EntityHeader>>() {
+			entityHeaderAsyncHandler.getEntityHeader(entityId, new AsyncCallback<EntityHeader>() {
 				@Override
-				public void onSuccess(ArrayList<EntityHeader> results) {
-					if (results.size() == 1) {
-						EntityHeader entity = results.get(0);
-						entityName = entity.getName();
-						view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
-						view.setLinkText(entityName);
-					} else {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_LOADING));
-					}
+				public void onSuccess(EntityHeader entity) {
+					entityName = entity.getName();
+					view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
+					view.setLinkText(entityName);
 				}
 				
 				@Override
@@ -71,6 +61,7 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	
 	@Override
 	public void setValue(String value) {
+		view.hideAllIcons();
 		this.entityId = value;
 		entityName = null;
 		lazyLoadHelper.setIsConfigured();

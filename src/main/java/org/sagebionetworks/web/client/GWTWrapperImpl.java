@@ -100,7 +100,20 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
+	public void scheduleFixedDelay(final Callback callback, int delayMs) {
+		Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
+			@Override
+			public boolean execute() {
+				callback.invoke();
+				return true;
+			}
+		}, delayMs);
+		
+	}
+	
+	@Override
 	public void scheduleDeferred(final Callback callback) {
+		
 		Scheduler.get().scheduleDeferred(new Command() {
 			@Override
 			public void execute() {
