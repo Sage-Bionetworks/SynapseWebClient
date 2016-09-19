@@ -112,4 +112,15 @@ public class LoadMoreWidgetContainerTest {
 		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
 		verify(mockLoadMoreCallback).invoke();
 	}
+
+	@Test
+	public void testCheckForInViewAndLoadDataAttachedInViewAndVisibleAndIsProcessing() {
+		when(mockView.isLoadMoreAttached()).thenReturn(true);
+		when(mockView.isLoadMoreInViewport()).thenReturn(true);
+		when(mockView.getLoadMoreVisibility()).thenReturn(true);
+		widget.setIsProcessing(true);
+		widget.checkForInViewAndLoadData();
+		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockLoadMoreCallback, never()).invoke();
+	}
 }

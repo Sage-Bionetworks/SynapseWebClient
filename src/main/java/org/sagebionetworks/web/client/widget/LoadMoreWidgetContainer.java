@@ -22,12 +22,13 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	LoadMoreWidgetContainerView view;
 	Callback callback, invokeCheckForInViewAndLoadData;
 	GWTWrapper gwt;
+	boolean isProcessing;
 	
 	@Inject
 	public LoadMoreWidgetContainer(LoadMoreWidgetContainerView view, GWTWrapper gwt) {
 		this.view = view;
 		this.gwt = gwt;
-		
+		this.isProcessing = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
 			public void invoke() {
@@ -44,8 +45,9 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 		if (!view.isLoadMoreAttached()) {
 			//Done, view has been detached and widget was never in the viewport
 			return;
-		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility()) {
+		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility() && !isProcessing) {
 			//try to load data!
+			isProcessing = true;
 			callback.invoke();
 		} else {
 			//wait for a few seconds and see if we should load data
@@ -54,6 +56,7 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	}
 	
 	public void setIsMore(boolean isMore) {
+		isProcessing = false;
 		view.setLoadMoreVisibility(isMore);
 		if (isMore) {
 			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
@@ -83,5 +86,12 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	@Override
 	public boolean remove(Widget w) {
 		return view.remove(w);
+	}
+
+	/*
+	 * for test only
+	 */
+	public void setIsProcessing(boolean isProcessing) {
+		this.isProcessing = isProcessing;
 	}
 }
