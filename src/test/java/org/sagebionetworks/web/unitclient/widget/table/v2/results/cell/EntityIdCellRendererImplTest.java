@@ -59,10 +59,9 @@ public class EntityIdCellRendererImplTest {
 	
 	@Test
 	public void testSetValue(){
-		String entityId = "syn987654";
+		String entityId = "987654";
 		renderer.setValue(entityId);
 		verify(mockLazyLoadHelper).setIsConfigured();
-		verify(mockView).setLinkHref("#!Synapse:syn987654");
 		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
 		
 		simulateInView();
@@ -70,6 +69,7 @@ public class EntityIdCellRendererImplTest {
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).setIcon(any(IconType.class));
 		verify(mockView).setLinkText(PROJECT_NAME);
+		verify(mockView).setLinkHref("#!Synapse:syn987654");
 		
 		//verify that attempting to load data again is a no-op
 		reset(mockEntityHeaderAsyncHandler);
