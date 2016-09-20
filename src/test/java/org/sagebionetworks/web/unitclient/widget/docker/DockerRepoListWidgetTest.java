@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
@@ -56,6 +57,8 @@ public class DockerRepoListWidgetTest {
 	private EntityQueryResults mockEntityQueryResults;
 	@Mock
 	private SynapseAlert mockSynAlert;
+	@Mock
+	private UserEntityPermissions mockUserEntityPermissions;
 
 	DockerRepoListWidget dockerRepoListWidget;
 	String projectId;
@@ -69,6 +72,8 @@ public class DockerRepoListWidgetTest {
 		projectId = "syn123";
 		when(mockProjectBundle.getEntity()).thenReturn(mockProject);
 		when(mockProject.getId()).thenReturn(projectId);
+		when(mockProjectBundle.getPermissions()).thenReturn(mockUserEntityPermissions);
+		when(mockUserEntityPermissions.getCanAddChild()).thenReturn(true);
 	}
 
 	@Test
@@ -148,6 +153,7 @@ public class DockerRepoListWidgetTest {
 		verify(mockView, atLeastOnce()).addRepo(bundle2);
 		verify(mockSynapseClient).getEntityBundle(eq(id1), anyInt(), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityBundle(eq(id2), anyInt(), any(AsyncCallback.class));
+		verify(mockView).setAddExternalRepoButtonVisible(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -246,5 +252,12 @@ public class DockerRepoListWidgetTest {
 		verify(mockSynapseClient).getEntityBundle(eq(id1), anyInt(), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityBundle(eq(id2), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(error);
+	}
+
+	@Test
+	public void testConfigurationWithoutUploadPermission() {
+		when(mockUserEntityPermissions.getCanAddChild()).thenReturn(false);
+		dockerRepoListWidget.configure(mockProjectBundle);
+		verify(mockView).setAddExternalRepoButtonVisible(false);
 	}
 }

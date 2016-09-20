@@ -105,6 +105,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 			}
 		});
 		queryForOnePage(OFFSET_ZERO);
+		view.setAddExternalRepoButtonVisible(projectBundle.getPermissions().getCanAddChild());
 	}
 
 	/**
