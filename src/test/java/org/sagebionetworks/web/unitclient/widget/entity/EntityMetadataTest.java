@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +21,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
@@ -96,6 +98,32 @@ public class EntityMetadataTest {
 		widget.setEntityBundle(bundle, null);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setRestrictionPanelVisible(false);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
+				Mockito.anyBoolean(), any(Callback.class));
+	}
+
+	@Test
+	public void testSetEntityBundleDockerRepo() {
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = true;
+		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		DockerRepository dockerRepo = new DockerRepository();
+		dockerRepo.setName(entityName);
+		dockerRepo.setId(entityId);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(dockerRepo);
+		bundle.setPermissions(permissions);
+		bundle.setDoi(mockDoi);
+		Long versionNumber = null;
+		widget.setEntityBundle(bundle, versionNumber);
+		verify(mockView).setDetailedMetadataVisible(true);
+		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber);
+		verify(mockFileHistoryWidget, never()).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
