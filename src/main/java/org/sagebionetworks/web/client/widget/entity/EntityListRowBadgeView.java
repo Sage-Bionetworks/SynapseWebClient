@@ -28,7 +28,7 @@ public interface EntityListRowBadgeView extends IsWidget, SelectableListItem, Su
 	void setDescriptionVisible(boolean visible);
 	void setVersion(String version);
 	void setIsSelectable(boolean isSelectable);
-	void showErrorIcon();
+	void showErrorIcon(String reason);
 	void showRow();
 	void showLoading();
 	
