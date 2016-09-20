@@ -96,7 +96,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setEntityLink(entityId, DisplayUtils.getSynapseHistoryToken(entityId, version));
-				view.showErrorIcon();
+				view.showErrorIcon(caught.getMessage());
 			}
 			public void onSuccess(EntityBundle eb) {
 				setEntityBundle(eb);

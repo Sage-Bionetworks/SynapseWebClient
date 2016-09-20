@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -57,6 +58,9 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	TableData iconTableData;
 	@UiField
 	TableData descriptionTableData;
+	@UiField
+	Tooltip errorTooltip;
+	
 	Callback onAttachCallback;
 	@Inject
 	public EntityListRowBadgeViewImpl(final Binder uiBinder) {
@@ -147,11 +151,13 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 		iconTableData.setVisible(true);
 	}
 	@Override
-	public void showErrorIcon() {
+	public void showErrorIcon(String reason) {
 		loadingUI.setVisible(false);
 		row.setVisible(true);
 		iconTableData.setVisible(false);
 		synAlertTableData.setVisible(true);
+		errorTooltip.setTitle(reason);
+		errorTooltip.reconfigure();
 	}
 	@Override
 	public void setIsSelectable(boolean isSelectable) {
