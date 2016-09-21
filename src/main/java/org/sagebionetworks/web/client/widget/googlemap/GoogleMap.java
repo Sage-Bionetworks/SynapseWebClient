@@ -79,7 +79,7 @@ public class GoogleMap implements IsWidget {
 	
 	private void loadScript() {
 		if (!isLoaded) {
-			ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js").setCallback(
+			ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=APIKEYHERE").setCallback(
 				     new Callback<Void, Exception>() {
 						@Override
 						public void onSuccess(Void result) {
