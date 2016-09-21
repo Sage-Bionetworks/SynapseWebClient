@@ -77,7 +77,7 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		}
 	}
 	
-	public void getFileContents(String url, final CallbackP<String> c) {
+	public void getFileContents(final String url, final CallbackP<String> c) {
 		requestBuilder.configure(RequestBuilder.GET, url);
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
@@ -89,7 +89,7 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 					if (statusCode == Response.SC_OK) {
 						c.invoke(response.getText());
 					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve map data for " + jsonURL + ". Reason: " + response.getStatusText()));
+						onError(null, new IllegalArgumentException("Unable to retrieve map data for " + url + ". Reason: " + response.getStatusText()));
 					}
 				}
 
