@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -70,7 +71,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem inviteMemberItem;
 	@UiField
 	TextBox synapseEmailField;
-	
+	@UiField
+	Div mapPanel;
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
@@ -251,4 +253,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void setTeamEmailAddress(String teamEmail) {
 		synapseEmailField.setValue(teamEmail);
 	}
+	@Override
+	public void setMap(Widget w) {
+		mapPanel.clear();
+		mapPanel.add(w);
+	}
+	
 }

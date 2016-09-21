@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -30,13 +31,26 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	GoogleMapView view;
 	SynapseAlert synAlert;
 	PortalGinInjector ginInjector;
+	LazyLoadHelper lazyLoadHelper;
 	@Inject
-	public GoogleMap(GoogleMapView view, SynapseJSNIUtils utils, RequestBuilderWrapper requestBuilder, SynapseAlert synAlert, PortalGinInjector ginInjector) {
+	public GoogleMap(GoogleMapView view, 
+			SynapseJSNIUtils utils, 
+			RequestBuilderWrapper requestBuilder, 
+			SynapseAlert synAlert, 
+			PortalGinInjector ginInjector, 
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.utils = utils;
 		this.requestBuilder = requestBuilder;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
+		this.lazyLoadHelper = lazyLoadHelper;
+		lazyLoadHelper.configure(new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+				initMap();
+			}
+		}, view);
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 		loadScript();
@@ -44,16 +58,15 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	
 	public void configure(String teamId) {
 		this.jsonURL = S3_PREFIX + teamId + ".json";
-		initMap();
+		lazyLoadHelper.setIsConfigured();
 	}
 	
 	public void configure() {
 		this.jsonURL = S3_PREFIX + "allPoints.json";
-		initMap();
+		lazyLoadHelper.setIsConfigured();
 	}
 	
 	private void initMap() {
-		view.setLoading(true);
 		if (isLoaded && jsonURL != null) {
 			getFileContents(jsonURL, new CallbackP<String>() {
 				@Override
@@ -74,7 +87,6 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						view.setLoading(false);
 						c.invoke(response.getText());
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve map data for " + jsonURL + ". Reason: " + response.getStatusText()));
@@ -83,12 +95,10 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 
 				@Override
 				public void onError(Request request, Throwable exception) {
-					view.setLoading(false);
 					synAlert.handleException(exception);
 				}
 			});
 		} catch (final Exception e) {
-			view.setLoading(false);
 			synAlert.handleException(e);
 		}
 	}
@@ -132,5 +142,9 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 			userBadges.add(userBadge.asWidget());
 		}
 		view.showUsers(location, userBadges);
+	}
+	
+	public void setHeight(String height) {
+		view.setHeight(height);
 	}
 }

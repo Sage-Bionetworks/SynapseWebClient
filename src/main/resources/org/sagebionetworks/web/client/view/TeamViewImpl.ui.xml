@@ -44,7 +44,8 @@
 		    	    <br/>
 		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
 		    	    <g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
-		    		<g:SimplePanel ui:field="joinTeamPanel"/>
+		    	    <bh:Div ui:field="mapPanel"/>
+		    	    <g:SimplePanel ui:field="joinTeamPanel"/>
 		    		<g:SimplePanel ui:field="openMembershipRequestsPanel"/>
 		    		<g:SimplePanel ui:field="openUserInvitationsPanel"/>
 		    		<g:SimplePanel ui:field="memberListPanel"/>
@@ -55,6 +56,6 @@
 		    <div class="clear"></div>
         </div>
 		<g:SimplePanel ui:field="footer" />
-
+		
 	</g:HTMLPanel>
 </ui:UiBinder> 

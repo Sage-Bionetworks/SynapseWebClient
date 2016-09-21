@@ -7,10 +7,6 @@
   >
   <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<bh:Div>
-  		<g:HTMLPanel ui:field="loadingUI">
-			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-			&nbsp;Loading...
-		</g:HTMLPanel>
 		<bh:Div ui:field="synAlertContainer"/>
 		<bh:Div visible="false">
 			<bh:Div ui:field="markerPopupContent">
@@ -18,7 +14,9 @@
 				<bh:Div ui:field="userBadges"/>
 			</bh:Div>
 		</bh:Div>
-		<bh:Div ui:field="googleMapContainer"/>
+		<bh:Div ui:field="googleMapContainer" height="300px">
+			<bh:Div ui:field="googleMapCanvas" height="100%" width="100%" addStyleNames="mapping"/>
+		</bh:Div>
   	</bh:Div>
 	  
 </ui:UiBinder>

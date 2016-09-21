@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,24 +25,58 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	}
 	Presenter presenter;
 	@UiField
-	HTMLPanel loadingUI;
-	@UiField
 	Div synAlertContainer;
 	@UiField
-	Div googleMapContainer;
+	Div googleMapCanvas;
 	@UiField
 	Div userBadges;
 	@UiField
 	Div markerPopupContent;
 	@UiField
+	Div googleMapContainer;
+	@UiField
 	Heading locationTitle;
 	Widget widget;
-	
+	Callback onAttachCallback;
 	@Inject
 	public GoogleMapViewImpl(GoogleMapViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
+		widget.addAttachHandler(new AttachEvent.Handler() {
+			
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					onAttach();
+				}
+			}
+		});
 	}
-
+	
+	@Override
+	public void setHeight(String height) {
+		googleMapContainer.setHeight(height);	
+	}
+	@Override
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
+	}
+	@Override
+	public boolean isAttached() {
+		return widget.isAttached();
+	}
+	@Override
+	public boolean isInViewport() {
+		return DisplayUtils.isInViewport(widget);
+	}
+	@Override
+	public void setOnAttachCallback(Callback onAttachCallback) {
+		this.onAttachCallback = onAttachCallback;
+	}
+	private void onAttach() {
+		if (onAttachCallback != null) {
+			onAttachCallback.invoke();
+		}
+	}
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -55,16 +89,10 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	}
 
 	@Override
-	public void setLoading(boolean visible) {
-		loadingUI.setVisible(visible);
-	}
-
-	@Override
 	public void showMap(String data) {
 		JSONArray jsonArray = (JSONArray) JSONParser.parseStrict(data);
-		googleMapContainer.setHeight("600px");
 		Element markerPopupContentEl = markerPopupContent.getElement();
-		Element el = googleMapContainer.getElement();
+		Element el = googleMapCanvas.getElement();
 		JavaScriptObject map = _createMap(el);
 		userBadges.clear();
 		for (int i = 0; i < jsonArray.size(); i++) {
@@ -82,12 +110,14 @@ public class GoogleMapViewImpl implements GoogleMapView {
 			JSONString title = markerJson.get("location").isString();
 			_addMarker(this, map, title.stringValue(), lat, lng, userIdsList, markerPopupContentEl);
 		}
+		setVisible(jsonArray.size() > 0);
 	}
 
 	private static native JavaScriptObject _createMap(Element el) /*-{
 		return new google.maps.Map(el, {
 			center : new google.maps.LatLng(42, -34),
-			zoom : 3
+			zoom : 3,
+			scrollwheel: false
 		});
 	}-*/;
 	
