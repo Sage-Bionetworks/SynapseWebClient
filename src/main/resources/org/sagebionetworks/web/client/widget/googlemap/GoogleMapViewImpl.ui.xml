@@ -12,8 +12,11 @@
 			&nbsp;Loading...
 		</g:HTMLPanel>
 		<bh:Div ui:field="synAlertContainer"/>
+		<b:Panel visible="false" ui:field="locationPanel">
+			<b:Heading size="H3" ui:field="locationTitle"/>
+			<bh:Div ui:field="userBadges"/>
+		</b:Panel>
 		<bh:Div ui:field="googleMapContainer"/>
-		<bh:Div ui:field="userBadges" visible="false"></bh:Div>
   	</bh:Div>
 	  
 </ui:UiBinder>

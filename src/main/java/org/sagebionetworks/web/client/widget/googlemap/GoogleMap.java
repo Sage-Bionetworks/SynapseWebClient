@@ -1,12 +1,18 @@
 package org.sagebionetworks.web.client.widget.googlemap;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.ScriptInjector;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -15,7 +21,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class GoogleMap implements IsWidget {
+public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	public static boolean isLoaded = false;
 	SynapseJSNIUtils utils;
 	RequestBuilderWrapper requestBuilder;
@@ -23,14 +29,16 @@ public class GoogleMap implements IsWidget {
 	public static final String S3_PREFIX = "https://s3.amazonaws.com/geoloc.sagebase.org/";
 	GoogleMapView view;
 	SynapseAlert synAlert;
-	
+	PortalGinInjector ginInjector;
 	@Inject
-	public GoogleMap(GoogleMapView view, SynapseJSNIUtils utils, RequestBuilderWrapper requestBuilder, SynapseAlert synAlert) {
+	public GoogleMap(GoogleMapView view, SynapseJSNIUtils utils, RequestBuilderWrapper requestBuilder, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.utils = utils;
 		this.requestBuilder = requestBuilder;
 		this.synAlert = synAlert;
+		this.ginInjector = ginInjector;
 		view.setSynAlert(synAlert.asWidget());
+		view.setPresenter(this);
 		loadScript();
 	}
 	
@@ -79,7 +87,7 @@ public class GoogleMap implements IsWidget {
 	
 	private void loadScript() {
 		if (!isLoaded) {
-			ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=APIKEYHERE").setCallback(
+			ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=").setCallback(
 				     new Callback<Void, Exception>() {
 						@Override
 						public void onSuccess(Void result) {
@@ -99,5 +107,17 @@ public class GoogleMap implements IsWidget {
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	@Override
+	public void markerClicked(String location, List<String> userIds) {
+		//create user badges
+		List<Widget> userBadges = new ArrayList<Widget>();
+		for (String userId : userIds) {
+			UserBadge userBadge = ginInjector.getUserBadgeWidget();
+			userBadge.configure(userId);
+			userBadges.add(userBadge.asWidget());
+		}
+		view.showUsers(location, userBadges);
 	}
 }
