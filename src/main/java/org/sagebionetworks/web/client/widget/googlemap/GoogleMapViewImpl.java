@@ -33,7 +33,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	@UiField
 	Div userBadges;
 	@UiField
-	Panel locationPanel;
+	Div markerPopupContent;
 	@UiField
 	Heading locationTitle;
 	Widget widget;
@@ -63,6 +63,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	public void showMap(String data) {
 		JSONArray jsonArray = (JSONArray) JSONParser.parseStrict(data);
 		googleMapContainer.setHeight("600px");
+		Element markerPopupContentEl = markerPopupContent.getElement();
 		Element el = googleMapContainer.getElement();
 		JavaScriptObject map = _createMap(el);
 		userBadges.clear();
@@ -79,7 +80,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 			}
 			
 			JSONString title = markerJson.get("location").isString();
-			_addMarker(this, map, title.stringValue(), lat, lng, userIdsList);
+			_addMarker(this, map, title.stringValue(), lat, lng, userIdsList, markerPopupContentEl);
 		}
 	}
 
@@ -94,22 +95,29 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		presenter.markerClicked(location, userIdsList);
 	}
 	
-	private static native void _addMarker(GoogleMapViewImpl x, JavaScriptObject mapJsObject, String locationString, double lat, double lng, List<String> userIdsList) /*-{
+	private static native void _addMarker(GoogleMapViewImpl x, JavaScriptObject mapJsObject, String locationString, double lat, double lng, List<String> userIdsList, Element markerPopupContent) /*-{
 		var marker = new google.maps.Marker({
 			position : new google.maps.LatLng(lat, lng),
 			map : mapJsObject,
-			title : locationString,
 			icon: 'images/synapse-map-marker.png'
 		});
+		var infowindow = new google.maps.InfoWindow({
+		    content: markerPopupContent
+		  });
 		marker.addListener('click', function() {
 			x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::markerClicked(Ljava/lang/String;Ljava/util/List;)(locationString, userIdsList);
+			if( $wnd.currentInfowindow ) {
+	           $wnd.currentInfowindow.close();
+	        }
+	
+	        $wnd.currentInfowindow = infowindow;
+			infowindow.open(mapJsObject, marker);
 		  });
 		marker.setClickable(true);
 	}-*/;
 
 	@Override
 	public void showUsers(String location, List<Widget> badges) {
-		locationPanel.setVisible(true);
 		locationTitle.setText(location);
 		userBadges.clear();
 		for (Widget widget : badges) {
