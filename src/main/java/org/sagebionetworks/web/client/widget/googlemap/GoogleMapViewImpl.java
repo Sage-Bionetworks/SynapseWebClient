@@ -96,10 +96,17 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	}
 	
 	private static native void _addMarker(GoogleMapViewImpl x, JavaScriptObject mapJsObject, String locationString, double lat, double lng, List<String> userIdsList, Element markerPopupContent) /*-{
+		
+		var image = {
+		    url: 'images/synapse-map-marker.png',
+		    size: new google.maps.Size(20, 32),
+		    origin: new google.maps.Point(0, 0),
+		    anchor: new google.maps.Point(0, 32)
+		  };
 		var marker = new google.maps.Marker({
 			position : new google.maps.LatLng(lat, lng),
 			map : mapJsObject,
-			icon: 'images/synapse-map-marker.png'
+			icon: image
 		});
 		var infowindow = new google.maps.InfoWindow({
 		    content: markerPopupContent

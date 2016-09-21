@@ -6,13 +6,13 @@ import java.util.List;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -55,52 +55,65 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	private void initMap() {
 		view.setLoading(true);
 		if (isLoaded && jsonURL != null) {
-			requestBuilder.configure(RequestBuilder.GET, jsonURL);
-			requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-			try {
-				requestBuilder.sendRequest(null, new RequestCallback() {
-					@Override
-					public void onResponseReceived(Request request,
-							Response response) {
-						int statusCode = response.getStatusCode();
-						if (statusCode == Response.SC_OK) {
-							view.setLoading(false);
-							String data = response.getText();
-							view.showMap(data);
-						} else {
-							onError(null, new IllegalArgumentException("Unable to retrieve map data for " + jsonURL + ". Reason: " + response.getStatusText()));
-						}
-					}
-
-					@Override
-					public void onError(Request request, Throwable exception) {
+			getFileContents(jsonURL, new CallbackP<String>() {
+				@Override
+				public void invoke(String data) {
+					view.showMap(data);
+				}
+			});
+		}
+	}
+	
+	public void getFileContents(String url, final CallbackP<String> c) {
+		requestBuilder.configure(RequestBuilder.GET, url);
+		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+		try {
+			requestBuilder.sendRequest(null, new RequestCallback() {
+				@Override
+				public void onResponseReceived(Request request,
+						Response response) {
+					int statusCode = response.getStatusCode();
+					if (statusCode == Response.SC_OK) {
 						view.setLoading(false);
-						synAlert.handleException(exception);
+						c.invoke(response.getText());
+					} else {
+						onError(null, new IllegalArgumentException("Unable to retrieve map data for " + jsonURL + ". Reason: " + response.getStatusText()));
 					}
-				});
-			} catch (final Exception e) {
-				view.setLoading(false);
-				synAlert.handleException(e);
-			}
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					view.setLoading(false);
+					synAlert.handleException(exception);
+				}
+			});
+		} catch (final Exception e) {
+			view.setLoading(false);
+			synAlert.handleException(e);
 		}
 	}
 	
 	private void loadScript() {
 		if (!isLoaded) {
-			ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=").setCallback(
-				     new Callback<Void, Exception>() {
-						@Override
-						public void onSuccess(Void result) {
-							isLoaded = true;
-							utils.consoleLog("Loaded Google Maps API");
-							initMap();
-						}
-						
-						@Override
-						public void onFailure(Exception reason) {
-							synAlert.handleException(reason);
-						}
-					}).inject();
+			getFileContents(S3_PREFIX + "googlemap.txt", new CallbackP<String>() {
+				@Override
+				public void invoke(String key) {
+					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key).setCallback(
+						     new Callback<Void, Exception>() {
+								@Override
+								public void onSuccess(Void result) {
+									isLoaded = true;
+									utils.consoleLog("Loaded Google Maps API");
+									initMap();
+								}
+								
+								@Override
+								public void onFailure(Exception reason) {
+									synAlert.handleException(reason);
+								}
+							}).inject();
+				}
+			});
 		}
 	}
 
