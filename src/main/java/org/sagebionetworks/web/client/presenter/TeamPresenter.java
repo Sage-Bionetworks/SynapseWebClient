@@ -2,8 +2,10 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
@@ -43,6 +45,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
 	private OpenUserInvitationsWidget openUserInvitationsWidget;
 	private GoogleMap map;
+	private CookieProvider cookies;
+	
 	@Inject
 	public TeamPresenter(TeamView view,
 			AuthenticationController authenticationController,
@@ -55,7 +59,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			MemberListWidget memberListWidget, 
 			OpenMembershipRequestsWidget openMembershipRequestsWidget,
 			OpenUserInvitationsWidget openUserInvitationsWidget,
-			GoogleMap map) {
+			GoogleMap map,
+			CookieProvider cookies) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -70,6 +75,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		this.map = map;
+		this.cookies = cookies;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
@@ -81,6 +87,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
 		view.setMap(map.asWidget());
+		map.asWidget().setVisible(false);
 		Callback refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -154,7 +161,10 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
 				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
 				view.setTeamEmailAddress(getTeamEmail(team.getName()));
-				map.configure(teamId);
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					map.asWidget().setVisible(true);
+					map.configure(teamId);
+				}
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
