@@ -265,8 +265,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 				} else {
 					// continuous variable, in this case time in seconds
 					String valueAsString = facet.getValue().replaceAll("\\.\\.", "");
-					long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
-					String formattedDateString = valueInMiliseconds == 0 ? "any time": DisplayUtils.converDateaToSimpleString(new Date(valueInMiliseconds));
+					
+					String formattedDateString;
+					try{
+						long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
+						formattedDateString = valueInMiliseconds == 0 ? "any time": DisplayUtils.converDateaToSimpleString(new Date(valueInMiliseconds));
+					}catch (NumberFormatException e){
+						formattedDateString = valueAsString;
+					}
+					
 					text = formatFacetName(facet.getKey()) + " >= " + formattedDateString;
 				}
 			}
