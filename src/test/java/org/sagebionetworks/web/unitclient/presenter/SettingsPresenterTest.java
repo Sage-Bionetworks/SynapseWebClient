@@ -296,7 +296,7 @@ public class SettingsPresenterTest {
 	public void testAddEmailNewEmailWithSpaces(){
 		String email3 = " testuser3@test.com ";
 		presenter.addEmail(email3);
-		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).additionalEmailValidation(anyString(), Mockito.eq("testuser3@test.com"), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
