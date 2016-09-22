@@ -121,6 +121,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 			_addMarker(this, map, title.stringValue(), lat, lng, userIdsList, markerPopupContentEl, bounds);
 		}
 		setVisible(jsonArray.size() > 0);
+		DisplayUtils.scrollToTop();
 	}
 	
 	private static native JavaScriptObject _getBounds() /*-{
