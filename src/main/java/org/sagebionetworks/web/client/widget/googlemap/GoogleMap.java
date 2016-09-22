@@ -28,6 +28,8 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	RequestBuilderWrapper requestBuilder;
 	private String jsonURL;
 	public static final String S3_PREFIX = "https://s3.amazonaws.com/geoloc.sagebase.org/";
+	public static final String ALL_POINTS_URL = S3_PREFIX + "allPoints.json";
+	public static final String GOOGLE_MAP_URL = S3_PREFIX + "googlemap.txt";
 	GoogleMapView view;
 	SynapseAlert synAlert;
 	PortalGinInjector ginInjector;
@@ -48,12 +50,11 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		lazyLoadHelper.configure(new org.sagebionetworks.web.client.utils.Callback() {
 			@Override
 			public void invoke() {
-				initMap();
+				loadData();
 			}
 		}, view);
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
-		loadScript();
 	}
 	
 	public void configure(String teamId) {
@@ -62,11 +63,11 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	}
 	
 	public void configure() {
-		this.jsonURL = S3_PREFIX + "allPoints.json";
+		this.jsonURL = ALL_POINTS_URL;
 		lazyLoadHelper.setIsConfigured();
 	}
 	
-	private void initMap() {
+	public void initMap() {
 		if (isLoaded && jsonURL != null) {
 			getFileContents(jsonURL, new CallbackP<String>() {
 				@Override
@@ -103,9 +104,9 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		}
 	}
 	
-	private void loadScript() {
+	private void loadData() {
 		if (!isLoaded) {
-			getFileContents(S3_PREFIX + "googlemap.txt", new CallbackP<String>() {
+			getFileContents(GOOGLE_MAP_URL, new CallbackP<String>() {
 				@Override
 				public void invoke(String key) {
 					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key).setCallback(
@@ -124,6 +125,8 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 							}).inject();
 				}
 			});
+		} else {
+			initMap();
 		}
 	}
 
@@ -146,5 +149,8 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	
 	public void setHeight(String height) {
 		view.setHeight(height);
+	}
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
 	}
 }

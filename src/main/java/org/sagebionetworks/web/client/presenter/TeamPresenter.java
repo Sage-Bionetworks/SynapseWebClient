@@ -87,7 +87,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
 		view.setMap(map.asWidget());
-		map.asWidget().setVisible(false);
+		map.setVisible(false);
 		Callback refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -162,7 +162,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
 				view.setTeamEmailAddress(getTeamEmail(team.getName()));
 				if (DisplayUtils.isInTestWebsite(cookies)) {
-					map.asWidget().setVisible(true);
+					map.setVisible(true);
 					map.configure(teamId);
 				}
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				

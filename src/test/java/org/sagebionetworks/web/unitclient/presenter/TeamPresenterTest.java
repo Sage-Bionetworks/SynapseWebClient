@@ -12,15 +12,21 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
@@ -67,8 +73,14 @@ public class TeamPresenterTest {
 	boolean newPublicJoin = false;
 	String newIcon = "newIcon";
 	String xsrfToken = "98208";
+	@Mock
+	GoogleMap mockGoogleMap;
+	@Mock
+	CookieProvider mockCookies;
+	
 	@Before
 	public void setup() {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(TeamView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
@@ -85,7 +97,7 @@ public class TeamPresenterTest {
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
-				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget);
+				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies);
 		mockTeam = mock(Team.class);
 		when(mockTeam.getName()).thenReturn(teamName);
 		mockTeamBundle = mock(TeamBundle.class);
@@ -104,6 +116,7 @@ public class TeamPresenterTest {
 		when(mockTeam.getIcon()).thenReturn(teamIcon);
 		
 		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
 	
 	@Test
@@ -122,6 +135,8 @@ public class TeamPresenterTest {
 		verify(mockEditModal).setRefreshCallback(any(Callback.class));
 		verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
 		verify(mockInviteModal).setRefreshCallback(any(Callback.class));
+		verify(mockView).setMap(any(Widget.class));
+		verify(mockGoogleMap).setVisible(false);
 	}
 	
 	@Test
@@ -152,6 +167,8 @@ public class TeamPresenterTest {
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockGoogleMap).configure(teamId);
+		verify(mockGoogleMap).setVisible(true);
 	}
 	
 	@Test
@@ -176,6 +193,8 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockView, never()).showAdminMenuItems();
+		verify(mockGoogleMap).configure(teamId);
+		verify(mockGoogleMap).setVisible(true);
 	}
 	
 	@Test
@@ -198,6 +217,8 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockView, never()).showAdminMenuItems();
+		verify(mockGoogleMap).configure(teamId);
+		verify(mockGoogleMap).setVisible(true);
 	}
 
 	@Test
