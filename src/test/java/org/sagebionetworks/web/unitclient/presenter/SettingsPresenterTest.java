@@ -293,6 +293,13 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
+	public void testAddEmailNewEmailWithSpaces(){
+		String email3 = " testuser3@test.com ";
+		presenter.addEmail(email3);
+		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testAddEmailExistingEmail(){
 		presenter.addEmail(email);
 		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
