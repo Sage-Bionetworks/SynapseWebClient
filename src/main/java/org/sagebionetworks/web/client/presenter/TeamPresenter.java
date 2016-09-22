@@ -46,6 +46,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private OpenUserInvitationsWidget openUserInvitationsWidget;
 	private GoogleMap map;
 	private CookieProvider cookies;
+	private String currentTeamId;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -87,7 +88,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
 		view.setMap(map.asWidget());
-		map.setVisible(false);
 		Callback refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -141,6 +141,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void refresh(final String teamId) {
+		this.currentTeamId = teamId;
 		clear();
 		synAlert.clear();
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
@@ -161,10 +162,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
 				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
 				view.setTeamEmailAddress(getTeamEmail(team.getName()));
-				if (DisplayUtils.isInTestWebsite(cookies)) {
-					map.setVisible(true);
-					map.configure(teamId);
-				}
+				view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
@@ -185,6 +183,13 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void onShowMap() {
+		map.setHeight((view.getClientHeight() - 200) + "px");
+		map.configure(currentTeamId);
+		view.showMapModal();
 	}
 	
 	public String getTeamEmail(String teamName) {

@@ -136,7 +136,6 @@ public class TeamPresenterTest {
 		verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
 		verify(mockInviteModal).setRefreshCallback(any(Callback.class));
 		verify(mockView).setMap(any(Widget.class));
-		verify(mockGoogleMap).setVisible(false);
 	}
 	
 	@Test
@@ -167,8 +166,6 @@ public class TeamPresenterTest {
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-		verify(mockGoogleMap).configure(teamId);
-		verify(mockGoogleMap).setVisible(true);
 	}
 	
 	@Test
@@ -193,8 +190,6 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockView, never()).showAdminMenuItems();
-		verify(mockGoogleMap).configure(teamId);
-		verify(mockGoogleMap).setVisible(true);
 	}
 	
 	@Test
@@ -217,8 +212,15 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockView, never()).showAdminMenuItems();
+		
+		verify(mockGoogleMap, never()).configure(teamId);
+		verify(mockView).setShowMapVisible(true);
+		
+		//simulate clicking Show Map
+		presenter.onShowMap();
+		verify(mockGoogleMap).setHeight(anyString());
 		verify(mockGoogleMap).configure(teamId);
-		verify(mockGoogleMap).setVisible(true);
+		verify(mockView).showMapModal();
 	}
 
 	@Test
