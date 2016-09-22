@@ -302,6 +302,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Override
 	public void addEmail(String emailAddress) {
 		addressSynAlert.clear();
+		emailAddress = emailAddress.trim();
 		// Is this email already in the profile email list?
 		// If so, just update it as the new notification email. Otherwise, kick
 		// off the verification process.
