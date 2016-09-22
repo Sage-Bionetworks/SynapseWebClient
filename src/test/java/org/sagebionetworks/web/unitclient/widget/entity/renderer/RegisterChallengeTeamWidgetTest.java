@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,6 +102,12 @@ public class RegisterChallengeTeamWidgetTest {
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockView).setPresenter(widget);
+		verify(mockView).setButtonType(ButtonType.PRIMARY);
 	}
 }
 
