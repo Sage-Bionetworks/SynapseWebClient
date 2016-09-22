@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,6 +19,12 @@ public interface SingleButtonView extends IsWidget {
 	 * @param string
 	 */
 	void setButtonText(String string);
+	
+	/**
+	 * Set the type of the button
+	 * @param type
+	 */
+	void setButtonType(ButtonType type);
 	
 	/**
 	 * Show/hide the button.

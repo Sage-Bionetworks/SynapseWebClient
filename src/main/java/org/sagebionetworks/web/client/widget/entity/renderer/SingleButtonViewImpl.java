@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.Callback;
@@ -61,6 +62,12 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	public void setButtonText(String string) {
 		button.setText(string);
 	}
+
+	@Override
+	public void setButtonType(ButtonType type) {
+		button.setType(type);
+	}
+	
 	@Override
 	public void setButtonVisible(boolean visible) {
 		button.setVisible(visible);
