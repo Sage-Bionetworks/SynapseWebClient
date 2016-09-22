@@ -411,6 +411,8 @@ import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMapView;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
@@ -1340,5 +1342,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(EntityHeaderAsyncHandlerImpl.class).in(Singleton.class);
 		bind(EntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class);
+		
+		bind(GoogleMapView.class).to(GoogleMapViewImpl.class);
 	}
 }
