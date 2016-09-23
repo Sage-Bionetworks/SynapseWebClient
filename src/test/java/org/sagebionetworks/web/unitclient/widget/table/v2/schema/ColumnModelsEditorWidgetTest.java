@@ -21,7 +21,9 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
@@ -47,6 +49,8 @@ public class ColumnModelsEditorWidgetTest {
 	PortalGinInjector mockGinInjector;
 	@Mock
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
+	@Mock
+	CookieProvider mockCookies;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
 	@Before
@@ -69,6 +73,8 @@ public class ColumnModelsEditorWidgetTest {
 			}
 		});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
+		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		widget = new ColumnModelsEditorWidget(mockGinInjector);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
