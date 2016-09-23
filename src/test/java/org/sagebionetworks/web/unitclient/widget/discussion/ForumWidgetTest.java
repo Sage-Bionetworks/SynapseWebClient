@@ -471,7 +471,7 @@ public class ForumWidgetTest {
 		AsyncMockStubber.callFailureWith(exception).when(mockDiscussionForumClient)
 				.getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 
-		forumWidget.loadModerators(forumId, mockCallback);
+		forumWidget.loadModerators(forumId, 0L, mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
 		verifyNoMoreInteractions(mockDiscussionForumClient);
@@ -481,7 +481,7 @@ public class ForumWidgetTest {
 
 	@Test
 	public void testLoadModeratorsOnePage() {
-		forumWidget.loadModerators(forumId, mockCallback);
+		forumWidget.loadModerators(forumId, 0L, mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
 		verifyNoMoreInteractions(mockDiscussionForumClient);
@@ -496,7 +496,7 @@ public class ForumWidgetTest {
 		AsyncMockStubber.callSuccessWith(moderators).when(mockDiscussionForumClient)
 				.getModerators(eq(forumId), eq(MODERATOR_LIMIT), anyLong(), any(AsyncCallback.class));
 
-		forumWidget.loadModerators(forumId, mockCallback);
+		forumWidget.loadModerators(forumId, 0L, mockCallback);
 		verify(mockSynAlert, times(2)).clear();
 		verify(mockDiscussionForumClient, times(2)).getModerators(eq(forumId), eq(MODERATOR_LIMIT), anyLong(), any(AsyncCallback.class));
 		verifyNoMoreInteractions(mockDiscussionForumClient);

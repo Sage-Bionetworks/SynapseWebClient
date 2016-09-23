@@ -54,7 +54,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	SubscribeButtonWidget subscribeToForumButton;
 	Set<String> moderatorIds = new HashSet<String>();
 	ParameterizedToken params;
-	Long offset = 0L;
 	
 	// From portal.properties, what thread should we show if no threads are available?
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
@@ -230,6 +229,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
 		this.params = params;
+		moderatorIds.clear();;
 		// get Forum and its moderators
 		loadForum(entityId, new Callback(){
 
@@ -257,12 +257,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			@Override
 			public void onSuccess(final Forum forum) {
 				forumId = forum.getId();
-				loadModerators(forumId, callback);
+				loadModerators(forumId, 0L, callback);
 			}
 		});
 	}
 
-	public void loadModerators(final String forumId, final Callback callback) {
+	public void loadModerators(final String forumId, final Long offset, final Callback callback) {
 		synAlert.clear();
 		discussionForumClient.getModerators(forumId, MODERATOR_LIMIT, offset, new AsyncCallback<PaginatedIds>(){
 
@@ -273,10 +273,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(PaginatedIds result) {
-				offset += MODERATOR_LIMIT;
 				moderatorIds.addAll(result.getResults());
-				if (result.getTotalNumberOfResults() > offset) {
-					loadModerators(forumId, callback);
+				if (result.getTotalNumberOfResults() > offset+MODERATOR_LIMIT) {
+					loadModerators(forumId, offset + MODERATOR_LIMIT, callback);
 				} else {
 					if (callback != null) {
 						callback.invoke();
