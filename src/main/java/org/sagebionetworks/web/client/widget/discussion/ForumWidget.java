@@ -229,6 +229,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
 		this.params = params;
+		initView();
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -238,23 +239,26 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		}
 	}
 
+	public void initView() {
+		view.setMainContainerVisible(false);
+		view.setSingleThreadUIVisible(false);
+		view.setThreadListUIVisible(false);
+		view.setNewThreadButtonVisible(false);
+		view.setShowAllThreadsButtonVisible(false);
+		view.setDefaultThreadWidgetVisible(false);
+		view.setDeletedThreadListVisible(false);
+		view.setDeletedThreadButtonVisible(false);
+	}
+
 	public void showThread(final String threadId, final String replyId) {
 		isSingleThread = true;
 		synAlert.clear();
 		subscribeToForumButton.clear();
 		updatePlaceToSingleThread(threadId);
-		view.setSingleThreadUIVisible(true);
-		view.setThreadListUIVisible(false);
-		view.setNewThreadButtonVisible(false);
-		view.setShowAllThreadsButtonVisible(true);
-		view.setDefaultThreadWidgetVisible(false);
-		view.setDeletedThreadListVisible(false);
-		view.setDeletedThreadButtonVisible(false);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setSingleThreadUIVisible(false);
 				synAlert.handleException(caught);
 			}
 
@@ -267,6 +271,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 						urlChangeCallback.invoke();
 					}
 				});
+				view.setSingleThreadUIVisible(true);
+				view.setShowAllThreadsButtonVisible(true);
+				view.setMainContainerVisible(true);
 			}
 		});
 	}
@@ -277,12 +284,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		subscribeToForumButton.clear();
 		threadListWidget.clear();
 		updatePlaceToForum();
-		view.setSingleThreadUIVisible(false);
-		view.setThreadListUIVisible(false);
-		view.setNewThreadButtonVisible(true);
-		view.setShowAllThreadsButtonVisible(false);
-		view.setDefaultThreadWidgetVisible(false);
-		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -300,9 +301,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 								moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 					}
 				});
-				view.setThreadListUIVisible(true);
 				threadListWidget.configure(forumId, isCurrentUserModerator,
 						moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+				view.setThreadListUIVisible(true);
+				view.setNewThreadButtonVisible(true);
+				view.setDeletedThreadButtonVisible(isCurrentUserModerator);
+				view.setMainContainerVisible(true);
 			}
 		});
 	}

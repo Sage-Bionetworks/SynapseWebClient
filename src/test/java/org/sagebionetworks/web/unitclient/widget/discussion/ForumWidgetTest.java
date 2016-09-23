@@ -209,11 +209,16 @@ public class ForumWidgetTest {
 		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
 		verify(mockStuAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
+
 		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setMainContainerVisible(false);
 		inOrder.verify(mockView).setThreadListUIVisible(false);
+		inOrder.verify(mockView).setNewThreadButtonVisible(false);
 		inOrder.verify(mockView).setThreadListUIVisible(true);
+		inOrder.verify(mockView).setNewThreadButtonVisible(true);
+		inOrder.verify(mockView).setMainContainerVisible(true);
+
 		verify(mockView).setDefaultThreadWidgetVisible(false);
-		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
@@ -250,8 +255,11 @@ public class ForumWidgetTest {
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView, never()).setThreadListUIVisible(true);
-		verify(mockView).setNewThreadButtonVisible(true);
+		verify(mockView).setNewThreadButtonVisible(false);
+		verify(mockView, never()).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
+		verify(mockView).setMainContainerVisible(false);
+		verify(mockView, never()).setMainContainerVisible(true);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
 		verify(mockStuAlert).handleException(any(Exception.class));
@@ -303,10 +311,17 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
 		verify(mockStuAlert).clear();
-		verify(mockView).setSingleThreadUIVisible(true);
+
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setMainContainerVisible(false);
+		inOrder.verify(mockView).setSingleThreadUIVisible(false);
+		inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
+		inOrder.verify(mockView).setSingleThreadUIVisible(true);
+		inOrder.verify(mockView).setShowAllThreadsButtonVisible(true);
+		inOrder.verify(mockView).setMainContainerVisible(true);
+
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
-		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
 		ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
@@ -342,10 +357,17 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
 		verify(mockStuAlert).clear();
-		verify(mockView).setSingleThreadUIVisible(true);
+
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setMainContainerVisible(false);
+		inOrder.verify(mockView).setSingleThreadUIVisible(false);
+		inOrder.verify(mockView).setShowAllThreadsButtonVisible(false);
+		inOrder.verify(mockView).setSingleThreadUIVisible(true);
+		inOrder.verify(mockView).setShowAllThreadsButtonVisible(true);
+		inOrder.verify(mockView).setMainContainerVisible(true);
+
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
-		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(replyId),
@@ -382,10 +404,12 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
 		verify(mockStuAlert).clear();
-		verify(mockView).setSingleThreadUIVisible(true);
+		verify(mockView).setSingleThreadUIVisible(false);
+		verify(mockView, never()).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
-		verify(mockView).setShowAllThreadsButtonVisible(true);
+		verify(mockView).setShowAllThreadsButtonVisible(false);
+		verify(mockView, never()).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockStuAlert).handleException(ex);
 	}
