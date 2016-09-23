@@ -60,8 +60,6 @@
 										# Obtain a pointer and download the data<br/>
 										<span ui:field="id5"/> &#60;- synGet(id='<span ui:field="id6"/>')<br/>
 										<br/>
-										# Load the data<br/>
-										<span ui:field="id7"/> &#60;- synGet(id='<span ui:field="id8"/>', load=T)<br/>
 									</code>
 								</pre>
 							</g:HTMLPanel>
