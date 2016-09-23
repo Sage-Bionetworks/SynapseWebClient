@@ -208,7 +208,10 @@ public class ColumnModelsEditorWidgetTest {
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
 	}
-	
+
+	/**
+	 * 	THIS TEST TO BE DELETED ONCE WE EXPOSE EDITING EXISTING TABLE COLUMNS AGAIN
+	 */
 	@Test
 	public void testNoneditableColumns() {
 		reset(mockKeyboardNavigationHandler, mockEditor);
@@ -217,9 +220,7 @@ public class ColumnModelsEditorWidgetTest {
 		widget = new ColumnModelsEditorWidget(mockGinInjector);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
-		// All rows should be added to the editor
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
 		verify(mockGinInjector, times(schema.size())).createNewColumnModelTableRowViewer();
-		
 	}
 }
