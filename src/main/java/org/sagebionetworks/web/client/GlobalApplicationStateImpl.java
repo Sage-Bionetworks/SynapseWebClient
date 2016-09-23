@@ -91,7 +91,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 	}
 	
-	public Throwable unwrap(Throwable e) {
+	public static Throwable unwrap(Throwable e) {
 		if (e instanceof UmbrellaException) {
 			UmbrellaException ue = (UmbrellaException) e;
 			if (ue.getCauses().size() == 1) {
