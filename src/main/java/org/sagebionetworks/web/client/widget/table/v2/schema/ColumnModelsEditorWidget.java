@@ -8,7 +8,9 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
@@ -29,6 +31,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	Callback onAddDefaultViewColumnsCallback;
 	Set<String> columnModelIds;
+	CookieProvider cookies;
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
@@ -41,6 +44,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
+		cookies = ginInjector.getCookieProvider();
 	}
 	
 	public void configure(List<ColumnModel> startingModels) {
@@ -89,6 +93,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		return rowEditor;
 	}
 	
+	private ColumnModelTableRowViewer createColumnModelViewerWidget(ColumnModel cm) {
+		ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
+		ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
+		rowViewer.setSelectable(true);
+		rowViewer.setSelectionPresenter(this);
+		editor.addColumn(rowViewer);
+		this.editorRows.add(rowViewer);
+		checkSelectionState();
+		return rowViewer;
+	}
+	
 	/**
 	 * Reset the editor.
 	 */
@@ -105,7 +120,11 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		for(ColumnModel cm: models){
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
-				createColumnModelEditorWidget(cm);
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					createColumnModelEditorWidget(cm);	
+				} else {
+					createColumnModelViewerWidget(cm);
+				}
 				columnModelIds.add(columnModelId);
 			}
 		}
