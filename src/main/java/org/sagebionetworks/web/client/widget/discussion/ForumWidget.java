@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,7 +35,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	NewDiscussionThreadModal newThreadModal;
 	DiscussionThreadListWidget threadListWidget;
-	SynapseAlert synAlert;
+	StuAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
@@ -61,7 +61,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Inject
 	public ForumWidget(
 			final ForumWidgetView view,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
 			DiscussionThreadListWidget deletedThreadListWidget,
@@ -278,7 +278,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		threadListWidget.clear();
 		updatePlaceToForum();
 		view.setSingleThreadUIVisible(false);
-		view.setThreadListUIVisible(true);
+		view.setThreadListUIVisible(false);
 		view.setNewThreadButtonVisible(true);
 		view.setShowAllThreadsButtonVisible(false);
 		view.setDefaultThreadWidgetVisible(false);
@@ -300,6 +300,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 								moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 					}
 				});
+				view.setThreadListUIVisible(true);
 				threadListWidget.configure(forumId, isCurrentUserModerator,
 						moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			}

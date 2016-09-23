@@ -16,6 +16,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -34,6 +35,7 @@ import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -55,7 +57,7 @@ public class ForumWidgetTest {
 	@Mock
 	NewDiscussionThreadModal mockNewDiscussionThreadModal;
 	@Mock
-	SynapseAlert mockSynAlert;
+	StuAlert mockStuAlert;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -96,7 +98,7 @@ public class ForumWidgetTest {
 			.getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		when(mockDefaultDiscussionThreadBundle.getId()).thenReturn(DEFAULT_THREAD_ID);
 		when(mockDefaultDiscussionThreadBundle.getMessageKey()).thenReturn(DEFAULT_THREAD_MESSAGE_KEY);
-		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
+		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget,mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
 				mockSubscribeButtonWidget, mockDefaultThreadWidget);
@@ -184,7 +186,7 @@ public class ForumWidgetTest {
 	@Test
 	public void testDefaultThreadBundleCached() {
 		reset(mockDiscussionForumClient);
-		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
+		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
 				mockSubscribeButtonWidget, mockDefaultThreadWidget);
@@ -205,9 +207,11 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 		verify(mockSubscribeButtonWidget).clear();
 		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
-		verify(mockView).setThreadListUIVisible(true);
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setThreadListUIVisible(false);
+		inOrder.verify(mockView).setThreadListUIVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
 		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
@@ -242,14 +246,15 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
-		verify(mockView).setThreadListUIVisible(true);
+		verify(mockView).setThreadListUIVisible(false);
+		verify(mockView, never()).setThreadListUIVisible(true);
 		verify(mockView).setNewThreadButtonVisible(true);
 		verify(mockView).setShowAllThreadsButtonVisible(false);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
-		verify(mockSynAlert).handleException(any(Exception.class));
+		verify(mockStuAlert).handleException(any(Exception.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -297,7 +302,7 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -336,7 +341,7 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -376,13 +381,13 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setSingleThreadUIVisible(false);
-		verify(mockSynAlert).handleException(ex);
+		verify(mockStuAlert).handleException(ex);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -398,8 +403,9 @@ public class ForumWidgetTest {
 		//attempts to show full thread list
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
-		verify(mockView).setThreadListUIVisible(true);
-		verify(mockSynAlert, times(2)).clear();
+		verify(mockView, atLeastOnce()).setThreadListUIVisible(false);
+		verify(mockView, never()).setThreadListUIVisible(true);
+		verify(mockStuAlert, times(2)).clear();
 		
 		verify(mockURLChangeCallback).invoke();
 	}
