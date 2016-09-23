@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,7 +36,9 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	public void loadData() {
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
-			entityHeaderAsyncHandler.getEntityHeader(entityId, new AsyncCallback<EntityHeader>() {
+			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn"+entityId;
+			view.setLinkHref(Synapse.getHrefForDotVersion(requestEntityId));
+			entityHeaderAsyncHandler.getEntityHeader(requestEntityId, new AsyncCallback<EntityHeader>() {
 				@Override
 				public void onSuccess(EntityHeader entity) {
 					entityName = entity.getName();
@@ -65,7 +66,6 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 		this.entityId = value;
 		entityName = null;
 		lazyLoadHelper.setIsConfigured();
-		view.setLinkHref(Synapse.getHrefForDotVersion(entityId));
 	}
 
 	@Override

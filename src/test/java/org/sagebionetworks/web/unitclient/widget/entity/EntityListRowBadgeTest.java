@@ -164,7 +164,7 @@ public class EntityListRowBadgeTest {
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
-		verify(mockView).showErrorIcon();
+		verify(mockView).showErrorIcon(errorMessage);
 		verify(mockView).setEntityLink(entityId, "#!Synapse:"+entityId);
 	}
 }

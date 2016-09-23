@@ -20,11 +20,14 @@ import static org.mockito.Mockito.when;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -65,6 +68,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
+import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
@@ -608,6 +612,18 @@ public class UploaderTest {
 	public void testGetSelectedFilesTextMultipleFiles() {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"file1", "file2"});
 		assertEquals("2 files", uploader.getSelectedFilesText());
+	}
+	
+	@Test
+	public void testUwrapException() {
+		String message = "meow there's an error.";
+		Exception ex = new Exception("exception to log");
+		Set<Throwable> wrapper1 = new HashSet<Throwable>();
+		wrapper1.add(ex);
+		Exception wrappedException = new UmbrellaException(wrapper1);
+		uploader.uploadError(message, wrappedException);
+		//verify unwrapped exception is sent to the server logs
+		verify(mockLogger).errorToRepositoryServices(anyString(), eq(ex));
 	}
 
 }

@@ -473,15 +473,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private FlowPanel createDateFacet(final Facet facet) {
 		if(facet == null) return null;
-		if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
+		//TODO: remove the comment
+		//if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
 		
 		FlowPanel lc = new FlowPanel();
 		lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
 		FlexTable table = new FlexTable();
 		
 		// convert to miliseconds
-		long min = facet.getMin() * 1000;
-		long max = facet.getMax() * 1000;
+		//long min = facet.getMin() * 1000;
+		//long max = facet.getMax() * 1000;
 		
 		// determine time diffs
 		long curTimeInSec = System.currentTimeMillis() / 1000;
@@ -494,15 +495,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		int row = -1;
 		table.setWidget(++row, 0, createTimeFacet(facet, beginingOfTime, "Any Time"));
-		if(anHourAgo <= max)
+		//if(anHourAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, anHourAgo, "Past Hour"));
-		if(aDayAgo <= max)
+		//if(aDayAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aDayAgo, "Past 24 Hours"));
-		if(aWeekAgo <= max)
+		//if(aWeekAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aWeekAgo, "Past Week"));
-		if(aMonthAgo <= max)
+		//if(aMonthAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aMonthAgo, "Past Month"));
-		if(aYearAgo <= max)
+		//if(aYearAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aYearAgo, "Past Year"));
 		
 		if(row == -1) {
