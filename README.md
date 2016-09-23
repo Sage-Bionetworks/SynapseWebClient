@@ -4,3 +4,5 @@ The Synapse Web Client is a [Google Web Toolkit](http://www.gwtproject.org/)-bas
 The current SWC release build can be accessed by visiting https://www.synapse.org/
 
 For more information about Synapse, please see the [Synapse Docs](http://docs.synapse.org/).
+
+Interested in spinning up a local web client? Go to the [SWC Developer Bootstrap](https://sagebionetworks.jira.com/wiki/display/SWC/Developer+Bootstrap) to find out how.
