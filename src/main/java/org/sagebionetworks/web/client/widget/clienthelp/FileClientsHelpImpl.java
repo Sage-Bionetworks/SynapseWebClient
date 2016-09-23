@@ -19,10 +19,6 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 	SpanElement id5;
 	@UiField
 	SpanElement id6;
-	@UiField
-	SpanElement id7;
-	@UiField
-	SpanElement id8;
 	Widget widget;
 	String entityId = null;
 	public interface Binder extends UiBinder<Widget, FileClientsHelpImpl> {}
@@ -46,7 +42,5 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 		id4.setInnerHTML(entityId);
 		id5.setInnerHTML(entityId);
 		id6.setInnerHTML(entityId);
-		id7.setInnerHTML(entityId);
-		id8.setInnerHTML(entityId);
 	}
 }
