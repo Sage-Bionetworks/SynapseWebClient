@@ -85,6 +85,7 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockEditor).configure(ViewType.EDITOR, true);
 		// All rows should be added to the editor
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockGinInjector, times(schema.size())).createColumnModelEditorWidget();
 		// are the rows registered?
 		verify(mockKeyboardNavigationHandler).removeAllRows();
 		// Extract the columns from the editor
@@ -208,4 +209,17 @@ public class ColumnModelsEditorWidgetTest {
 		assertTrue(three.isSelected());
 	}
 	
+	@Test
+	public void testNoneditableColumns() {
+		reset(mockKeyboardNavigationHandler, mockEditor);
+		// when not in test website, existing columns will be viewers (not editors)
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		widget = new ColumnModelsEditorWidget(mockGinInjector);
+		schema = TableModelTestUtils.createOneOfEachType(true);
+		widget.configure(schema);
+		// All rows should be added to the editor
+		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockGinInjector, times(schema.size())).createNewColumnModelTableRowViewer();
+		
+	}
 }
