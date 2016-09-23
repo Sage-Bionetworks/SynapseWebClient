@@ -104,7 +104,6 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		JavaScriptObject map = _createMap(el);
 		JavaScriptObject bounds  = _getBounds();
 		
-		userBadges.clear();
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JSONObject markerJson = (JSONObject) jsonArray.get(i);
 			JSONArray latLngArray = (JSONArray) markerJson.get("latLng");
@@ -130,7 +129,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	
 	private static native JavaScriptObject _createMap(Element el) /*-{
 		return new google.maps.Map(el, {
-			scrollwheel : false,
+			scrollwheel : true,
 			mapTypeControlOptions : {
 				mapTypeIds : []
 			},
