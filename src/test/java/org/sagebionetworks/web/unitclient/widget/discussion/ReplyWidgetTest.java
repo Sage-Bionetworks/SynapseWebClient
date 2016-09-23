@@ -65,7 +65,7 @@ public class ReplyWidgetTest {
 	GWTWrapper mockGwt;
 	@Mock
 	CopyTextModal mockCopyTextModal;
-	Set<Long> moderatorIds;
+	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
 	
 	private static final String CREATED_BY = "123";
@@ -79,7 +79,7 @@ public class ReplyWidgetTest {
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
 				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
-		moderatorIds = new HashSet<Long>();
+		moderatorIds = new HashSet<String>();
 	}
 
 	@Test
@@ -141,7 +141,7 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		moderatorIds.add(Long.parseLong(CREATED_BY));
+		moderatorIds.add(CREATED_BY);
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");

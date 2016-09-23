@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import java.util.Set;
-
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -41,7 +39,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, Set<Long> moderatorIds) {
+	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
@@ -57,7 +55,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, moderatorIds, updateParamsCallback, updateURLCallback);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, updateParamsCallback, updateURLCallback);
 	}
 
 	/**

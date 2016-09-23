@@ -35,7 +35,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private Boolean isCurrentUserModerator;
 	private CallbackP<Boolean> emptyListCallback;
 	private CallbackP<DiscussionThreadBundle> threadIdClickedCallback;
-	Set<Long> moderatorIds;
+	Set<String> moderatorIds;
 	private DiscussionFilter filter;
 	private LoadMoreWidgetContainer threadsContainer;
 	private String entityId;
@@ -62,7 +62,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	}
 
 	public void configure(String forumId, Boolean isCurrentUserModerator,
-			Set<Long> moderatorIds, CallbackP<Boolean> emptyListCallback,
+			Set<String> moderatorIds, CallbackP<Boolean> emptyListCallback,
 			DiscussionFilter filter) {
 		clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;

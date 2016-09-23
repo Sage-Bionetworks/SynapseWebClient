@@ -116,7 +116,7 @@ public class SingleDiscussionThreadWidgetTest {
 	DiscussionReplyBundle mockDiscussionReplyBundle;
 	@Mock
 	LoadMoreWidgetContainer mockRepliesContainer;
-	Set<Long> moderatorIds;
+	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
 	private static final String CREATED_BY = "123";
@@ -138,7 +138,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
-		moderatorIds = new HashSet<Long>();
+		moderatorIds = new HashSet<String>();
 	}
 
 	@Test
@@ -272,7 +272,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isPinned = false;
-		moderatorIds.add(Long.parseLong(CREATED_BY));
+		moderatorIds.add(CREATED_BY);
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);

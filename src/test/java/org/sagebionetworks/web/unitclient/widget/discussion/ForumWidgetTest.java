@@ -6,6 +6,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.discussion.ForumWidget.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
@@ -79,11 +81,12 @@ public class ForumWidgetTest {
 	@Mock
 	CallbackP<ParameterizedToken> mockParamChangeCallback;
 	@Mock
-	Callback mockURLChangeCallback;
+	Callback mockCallback;
 	
 	ForumWidget forumWidget;
 	private boolean canModerate = false;
-	Set<Long> moderatorIds;
+	Set<String> moderatorIds;
+	String forumId;
 	
 	public static final String DEFAULT_THREAD_ID = "424242";
 	public static final String DEFAULT_THREAD_MESSAGE_KEY = "1234567";
@@ -102,7 +105,19 @@ public class ForumWidgetTest {
 				mockSubscribeButtonWidget, mockDefaultThreadWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		moderatorIds = new HashSet<Long>();
+		moderatorIds = new HashSet<String>();
+
+		forumId = "123";
+		when(mockForum.getId()).thenReturn(forumId);
+		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
+				.getForumByProjectId(anyString(), any(AsyncCallback.class));
+		PaginatedIds moderators = new PaginatedIds();
+		moderators.setResults(new ArrayList<String>());
+		moderators.setTotalNumberOfResults(MODERATOR_LIMIT);
+		AsyncMockStubber.callSuccessWith(moderators).when(mockDiscussionForumClient)
+				.getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
+
+
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -128,7 +143,7 @@ public class ForumWidgetTest {
 		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), captorP.capture(), any(DiscussionFilter.class));
 		
-		Set<Long> moderatorIds = new HashSet<Long>();
+		Set<String> moderatorIds = new HashSet<String>();
 		Callback deleteCallback = null;
 		boolean isCurrentUserModerator = false;
 		String replyId = null;
@@ -170,7 +185,7 @@ public class ForumWidgetTest {
 		forumWidget.initDefaultThread(DEFAULT_THREAD_ID);
 		verify(mockDiscussionForumClient, atLeastOnce()).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		assertNotNull(ForumWidget.defaultThreadBundle);
-		verify(mockDefaultThreadWidget).configure(defaultThreadBundle, null, false, new HashSet<Long>(), null);
+		verify(mockDefaultThreadWidget).configure(defaultThreadBundle, null, false, new HashSet<String>(), null);
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockDefaultThreadWidget, atLeastOnce()).setThreadIdClickedCallback(captor.capture());
 		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyListVisible(false);
@@ -193,19 +208,14 @@ public class ForumWidgetTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testConfigureForumSuccess() {
-		String forumId = "123";
-		when(mockForum.getId()).thenReturn(forumId);
-		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumByProjectId(anyString(), any(AsyncCallback.class));
-
+	public void testConfigureForum() {
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 		verify(mockSubscribeButtonWidget).clear();
 		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
-		verify(mockSynAlert).clear();
+		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
@@ -217,7 +227,7 @@ public class ForumWidgetTest {
 		ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(ParameterizedToken.class);
 		verify(mockParamChangeCallback).invoke(captorToken.capture());
 		assertEquals(ParameterizedToken.DEFAULT_TOKEN, captorToken.getValue().toString());
-		verify(mockURLChangeCallback, never()).invoke();
+		verify(mockCallback, never()).invoke();
 		
 		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(captorP.capture());
@@ -228,42 +238,43 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockView).setDeletedThreadListVisible(false);
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(canModerate);
+		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockDiscussionForumClient).getModerators(eq(mockForum.getId()), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testLoadForumSuccess() {
+		forumWidget.loadForum("1", mockCallback);
+
+		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		verify(mockSynAlert, never()).handleException(any(Exception.class));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testConfigureForumFailure() {
-		when(mockForum.getId()).thenReturn("123");
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockDiscussionForumClient)
+	public void testLoadForumFailure() {
+		Exception exception = new Exception();
+		AsyncMockStubber.callFailureWith(exception).when(mockDiscussionForumClient)
 				.getForumByProjectId(anyString(), any(AsyncCallback.class));
 
-		String entityId = "syn1"; 
-		String areaToken = "foo=bar";
-		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.loadForum("1", mockCallback);
 
 		verify(mockSynAlert).clear();
-		verify(mockView).setSingleThreadUIVisible(false);
-		verify(mockView).setThreadListUIVisible(true);
-		verify(mockView).setNewThreadButtonVisible(true);
-		verify(mockView).setShowAllThreadsButtonVisible(false);
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
-		verify(mockNewDiscussionThreadModal, never()).configure(anyString(), any(Callback.class));
-		verify(mockSynAlert).handleException(any(Exception.class));
+		verify(mockDiscussionForumClient, never()).getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(exception);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureForumSuccessWithModerator() {
-		when(mockForum.getId()).thenReturn("123");
-		AsyncMockStubber.callSuccessWith(mockForum).when(mockDiscussionForumClient)
-				.getForumByProjectId(anyString(), any(AsyncCallback.class));
-
 		String entityId = "syn1";
 		String areaToken = "";
 		canModerate = true;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), any(DiscussionFilter.class));
 		verify(mockView).setDeletedThreadButtonVisible(true);
@@ -295,15 +306,16 @@ public class ForumWidgetTest {
 		String replyId = null;
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
 		ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(replyId),
 				eq(canModerate), eq(moderatorIds), onShowAllThreadsCallback.capture());
@@ -317,7 +329,7 @@ public class ForumWidgetTest {
 		//invoke callback to show all threads
 		onShowAllThreadsCallback.getValue().invoke();
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
-		verify(mockURLChangeCallback).invoke();
+		verify(mockCallback).invoke();
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(false);
 		verify(mockView).setDeletedThreadListVisible(false);
 	}
@@ -334,14 +346,15 @@ public class ForumWidgetTest {
 		String replyId = "008";
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId + "&" + ForumWidget.REPLY_ID_KEY + "=" + replyId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
+		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(eq(mockDiscussionThreadBundle), eq(replyId),
 				eq(canModerate), eq(moderatorIds), any(Callback.class));
@@ -374,9 +387,9 @@ public class ForumWidgetTest {
 		String threadId = "007";
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -392,16 +405,16 @@ public class ForumWidgetTest {
 		String threadId = "007";
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 		forumWidget.onClickShowAllThreads();
 
 		//attempts to show full thread list
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
-		verify(mockSynAlert, times(2)).clear();
+		verify(mockSynAlert, atLeastOnce()).clear();
 		
-		verify(mockURLChangeCallback).invoke();
+		verify(mockCallback).invoke();
 	}
 
 	@Test
@@ -423,7 +436,7 @@ public class ForumWidgetTest {
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		when(mockView.isDeletedThreadListVisible()).thenReturn(false);
-		forumWidget.configure(entityId, param, canModerate, moderatorIds, mockParamChangeCallback, mockURLChangeCallback);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 		forumWidget.onClickDeletedThreadButton();
 		verify(mockView).setDeletedThreadListVisible(true);
 		verify(mockDeletedThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), eq((CallbackP)null), eq(DiscussionFilter.DELETED_ONLY));
@@ -450,5 +463,43 @@ public class ForumWidgetTest {
 		assertNotNull(defaultThread.getIsPinned());
 		assertNotNull(defaultThread.getNumberOfReplies());
 		assertNotNull(defaultThread.getNumberOfViews());
+	}
+
+	@Test
+	public void testLoadModeratorsFail() {
+		Exception exception = new Exception();
+		AsyncMockStubber.callFailureWith(exception).when(mockDiscussionForumClient)
+				.getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+
+		forumWidget.loadModerators(forumId, mockCallback);
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
+		verifyNoMoreInteractions(mockDiscussionForumClient);
+		verify(mockSynAlert).handleException(exception);
+		verify(mockCallback, never()).invoke();
+	}
+
+	@Test
+	public void testLoadModeratorsOnePage() {
+		forumWidget.loadModerators(forumId, mockCallback);
+		verify(mockSynAlert).clear();
+		verify(mockDiscussionForumClient).getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
+		verifyNoMoreInteractions(mockDiscussionForumClient);
+		verify(mockCallback).invoke();
+	}
+
+	@Test
+	public void testLoadModeratorsTwoPage() {
+		PaginatedIds moderators = new PaginatedIds();
+		moderators.setResults(new ArrayList<String>());
+		moderators.setTotalNumberOfResults(MODERATOR_LIMIT+1);
+		AsyncMockStubber.callSuccessWith(moderators).when(mockDiscussionForumClient)
+				.getModerators(eq(forumId), eq(MODERATOR_LIMIT), anyLong(), any(AsyncCallback.class));
+
+		forumWidget.loadModerators(forumId, mockCallback);
+		verify(mockSynAlert, times(2)).clear();
+		verify(mockDiscussionForumClient, times(2)).getModerators(eq(forumId), eq(MODERATOR_LIMIT), anyLong(), any(AsyncCallback.class));
+		verifyNoMoreInteractions(mockDiscussionForumClient);
+		verify(mockCallback).invoke();
 	}
 }

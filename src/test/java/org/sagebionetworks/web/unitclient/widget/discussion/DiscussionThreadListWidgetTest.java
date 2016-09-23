@@ -63,7 +63,7 @@ public class DiscussionThreadListWidgetTest {
 	LoadMoreWidgetContainer mockThreadsContainer;
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
-	Set<Long> moderatorIds;
+	Set<String> moderatorIds;
 
 	@Before
 	public void before() {
@@ -72,7 +72,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockGinInjector.getDiscussionThreadCountAlert()).thenReturn(mockDiscussionThreadCountAlert);
 		discussionThreadListWidget = new DiscussionThreadListWidget(mockView,
 				mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockThreadsContainer);
-		moderatorIds = new HashSet<Long>();
+		moderatorIds = new HashSet<String>();
 	}
 
 	@Test
