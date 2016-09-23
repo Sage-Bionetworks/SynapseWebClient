@@ -47,7 +47,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
 	private Callback deleteReplyCallback;
-	private Set<Long> moderatorIds;
+	private Set<String> moderatorIds;
 	private String message;
 	private boolean isThreadDeleted;
 	
@@ -86,7 +86,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		copyTextModal.setTitle(REPLY_URL);
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteReplyCallback, boolean isThreadDeleted) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<String> moderatorIds, Callback deleteReplyCallback, boolean isThreadDeleted) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
@@ -101,7 +101,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
 		view.setEditedVisible(bundle.getIsEdited());
-		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
+		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
 		view.setIsAuthorModerator(isAuthorModerator);
 		view.setCommandsContainerVisible(!isThreadDeleted);
 		if (!isThreadDeleted) {
