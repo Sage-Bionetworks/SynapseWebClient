@@ -229,7 +229,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
 		this.params = params;
-		initView();
 		//are we just showing a single thread, or the full list?
 		if (params.containsKey(THREAD_ID_KEY)) {
 			String threadId = params.get(THREAD_ID_KEY);
@@ -239,7 +238,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		}
 	}
 
-	public void initView() {
+	public void resetView() {
 		view.setMainContainerVisible(false);
 		view.setSingleThreadUIVisible(false);
 		view.setThreadListUIVisible(false);
@@ -251,6 +250,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	public void showThread(final String threadId, final String replyId) {
+		resetView();
 		isSingleThread = true;
 		synAlert.clear();
 		subscribeToForumButton.clear();
@@ -279,6 +279,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	public void showForum() {
+		resetView();
 		isSingleThread = false;
 		synAlert.clear();
 		subscribeToForumButton.clear();
