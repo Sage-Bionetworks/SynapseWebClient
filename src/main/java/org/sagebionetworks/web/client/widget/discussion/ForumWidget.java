@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,7 +35,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	NewDiscussionThreadModal newThreadModal;
 	DiscussionThreadListWidget threadListWidget;
-	SynapseAlert synAlert;
+	StuAlert synAlert;
 	DiscussionForumClientAsync discussionForumClient;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
@@ -61,7 +61,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	@Inject
 	public ForumWidget(
 			final ForumWidgetView view,
-			SynapseAlert synAlert,
+			StuAlert synAlert,
 			DiscussionForumClientAsync discussionForumClient,
 			DiscussionThreadListWidget threadListWidget,
 			DiscussionThreadListWidget deletedThreadListWidget,
@@ -238,23 +238,27 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		}
 	}
 
+	public void resetView() {
+		view.setMainContainerVisible(false);
+		view.setSingleThreadUIVisible(false);
+		view.setThreadListUIVisible(false);
+		view.setNewThreadButtonVisible(false);
+		view.setShowAllThreadsButtonVisible(false);
+		view.setDefaultThreadWidgetVisible(false);
+		view.setDeletedThreadListVisible(false);
+		view.setDeletedThreadButtonVisible(false);
+	}
+
 	public void showThread(final String threadId, final String replyId) {
+		resetView();
 		isSingleThread = true;
 		synAlert.clear();
 		subscribeToForumButton.clear();
 		updatePlaceToSingleThread(threadId);
-		view.setSingleThreadUIVisible(true);
-		view.setThreadListUIVisible(false);
-		view.setNewThreadButtonVisible(false);
-		view.setShowAllThreadsButtonVisible(true);
-		view.setDefaultThreadWidgetVisible(false);
-		view.setDeletedThreadListVisible(false);
-		view.setDeletedThreadButtonVisible(false);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setSingleThreadUIVisible(false);
 				synAlert.handleException(caught);
 			}
 
@@ -267,22 +271,20 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 						urlChangeCallback.invoke();
 					}
 				});
+				view.setSingleThreadUIVisible(true);
+				view.setShowAllThreadsButtonVisible(true);
+				view.setMainContainerVisible(true);
 			}
 		});
 	}
 
 	public void showForum() {
+		resetView();
 		isSingleThread = false;
 		synAlert.clear();
 		subscribeToForumButton.clear();
 		threadListWidget.clear();
 		updatePlaceToForum();
-		view.setSingleThreadUIVisible(false);
-		view.setThreadListUIVisible(true);
-		view.setNewThreadButtonVisible(true);
-		view.setShowAllThreadsButtonVisible(false);
-		view.setDefaultThreadWidgetVisible(false);
-		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -302,6 +304,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				});
 				threadListWidget.configure(forumId, isCurrentUserModerator,
 						moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+				view.setThreadListUIVisible(true);
+				view.setNewThreadButtonVisible(true);
+				view.setDeletedThreadButtonVisible(isCurrentUserModerator);
+				view.setMainContainerVisible(true);
 			}
 		});
 	}
