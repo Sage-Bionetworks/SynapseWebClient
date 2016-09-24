@@ -36,7 +36,6 @@ import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -235,7 +234,7 @@ public class ForumWidgetTest {
 		when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
 		threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
-		verify(mockView).setDeletedThreadListVisible(false);
+		verify(mockView, atLeastOnce()).setDeletedThreadListVisible(false);
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(canModerate);
 	}
 
@@ -339,7 +338,7 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockURLChangeCallback).invoke();
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(false);
-		verify(mockView).setDeletedThreadListVisible(false);
+		verify(mockView, atLeastOnce()).setDeletedThreadListVisible(false);
 	}
 	
 
@@ -426,7 +425,7 @@ public class ForumWidgetTest {
 
 		//attempts to show full thread list
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
-		verify(mockView).setSingleThreadUIVisible(false);
+		verify(mockView, atLeastOnce()).setSingleThreadUIVisible(false);
 		verify(mockView, atLeastOnce()).setThreadListUIVisible(false);
 		verify(mockView, never()).setThreadListUIVisible(true);
 		verify(mockStuAlert, times(2)).clear();
