@@ -46,7 +46,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	AdapterFactory adapterFactory;
 	private Place cachedPlace;
 	private String cachedUserId;
-	Long userUpdatableOffset;
+	Long userUpdatableOffset = ZERO_OFFSET;
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
 	}
@@ -92,6 +92,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public void refresh() {
 		//do not reload if the session is unchanged, and the context (project) is unchanged.
 		if (!isSameContext()) {
+			//reset user updatable entities
 			view.getEntityTreeBrowser().clear();
 			view.setIsMoreUpdatableEntities(true);
 			userUpdatableOffset = ZERO_OFFSET;
@@ -244,6 +245,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		return getEntityTreeBrowser().getEntityFilter();
 	}
 
+	public Long getUserUpdatableOffset() {
+		return userUpdatableOffset;
+	}
 	
 	/*
 	 * Private Methods
