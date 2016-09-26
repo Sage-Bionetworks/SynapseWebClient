@@ -123,7 +123,6 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		this.actionMenu.setActionVisible(Action.EDIT_PROVENANCE, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
 		this.actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		this.actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
-		this.actionMenu.setActionVisible(Action.DELETE_ENTITY, false);
 		this.actionMenu.setActionListener(Action.ADD_COMMIT, new ActionListener() {
 			@Override
 			public void onAction(Action action) {

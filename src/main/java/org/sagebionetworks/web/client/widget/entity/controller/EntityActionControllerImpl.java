@@ -1066,6 +1066,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Place gotoPlace = null;
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
 			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
+			else if(entityBundle.getEntity() instanceof DockerRepository) gotoPlace = new Synapse(parentId, null, EntityArea.DOCKER, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

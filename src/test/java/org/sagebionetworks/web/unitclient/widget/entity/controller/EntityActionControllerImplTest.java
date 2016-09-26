@@ -774,6 +774,20 @@ public class EntityActionControllerImplTest {
 		Place expected = new Synapse(parentId);
 		assertEquals(expected, result);
 	}
+
+	@Test
+	public void testCreateDeletePlaceDocker(){
+		Entity docker = new DockerRepository();
+		docker.setId(entityId);
+		docker.setParentId(parentId);
+		entityBundle.setEntity(docker);
+		entityBundle.setPermissions(entityBundle.getPermissions());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		// call under test
+		Place result = controller.createDeletePlace();
+		Place expected = new Synapse(parentId, null, EntityArea.DOCKER, null);
+		assertEquals(expected, result);
+	}
 	
 	@Test
 	public void testOnShareNoChange(){
