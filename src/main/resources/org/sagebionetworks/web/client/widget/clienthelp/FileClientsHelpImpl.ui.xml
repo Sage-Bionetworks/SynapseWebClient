@@ -24,7 +24,7 @@
 								<pre>
 									<code class="nohighlight">
 										# Login<br/>
-										synapse -u synapse_username -p synapse_password<br/>
+										synapse login<br/>
 										<br/>
 										# Download file<br/>
 										synapse get <span ui:field="id1"/><br/>
@@ -35,17 +35,7 @@
 						<b:TabPane b:id="pythonTab">
 							<g:HTMLPanel>
 								<pre>
-									<code class="nohighlight">
-										import synapseclient<br/>
-										<br/>
-										syn = synapseclient.Synapse()<br/>
-										syn.login('synapse_username','password')<br/>
-										<br/>
-										# Obtain a pointer and download the data<br/>
-										<span ui:field="id2"/> = syn.get('<span ui:field="id3"/>')<br/>
-										<br/>
-										# Get the path to the local copy of the data file<br/>
-										filepath = <span ui:field="id4"/>.path<br/>
+									<code class="nohighlight">import synapseclient<br/><br/>syn = synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/><br/># Obtain a pointer and download the data<br/><span ui:field="id2"/> = syn.get('<span ui:field="id3"/>')<br/><br/># Get the path to the local copy of the data file<br/>filepath = <span ui:field="id4"/>.path<br/>
 									</code>
 								</pre>
 						    </g:HTMLPanel>

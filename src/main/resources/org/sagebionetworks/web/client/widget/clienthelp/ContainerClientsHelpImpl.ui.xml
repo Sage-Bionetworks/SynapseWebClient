@@ -23,7 +23,7 @@
 								<pre>
 									<code class="nohighlight">
 										# Login<br/>
-										synapse -u synapse_username -p synapse_password<br/>
+										synapse login<br/>
 										<br/>
 										# Download<br/>
 										synapse get -r <span ui:field="id1"/><br/>
@@ -34,13 +34,7 @@
 						<b:TabPane b:id="containerPythonTab">
 							<g:HTMLPanel>
 								<pre>
-									<code class="nohighlight">
-										import synapseclient<br/>
-										import synapseutils<br/>
-										<br/>
-										syn = synapseclient.Synapse()<br/>
-										syn.login('synapse_username','password')<br/>
-										files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/>
+									<code class="nohighlight">import synapseclient<br/>import synapseutils<br/><br/>syn = synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/>files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/>
 									</code>
 								</pre>
 						    </g:HTMLPanel>
