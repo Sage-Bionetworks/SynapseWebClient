@@ -200,6 +200,7 @@ public class FilesTab {
 		breadcrumb.clear();
 		view.setProvenanceVisible(false);
 		modifiedCreatedBy.setVisible(false);
+		view.setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
