@@ -36,7 +36,7 @@ import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -57,7 +57,7 @@ public class ForumWidgetTest {
 	@Mock
 	NewDiscussionThreadModal mockNewDiscussionThreadModal;
 	@Mock
-	SynapseAlert mockSynAlert;
+	StuAlert mockStuAlert;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -99,7 +99,7 @@ public class ForumWidgetTest {
 			.getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 		when(mockDefaultDiscussionThreadBundle.getId()).thenReturn(DEFAULT_THREAD_ID);
 		when(mockDefaultDiscussionThreadBundle.getMessageKey()).thenReturn(DEFAULT_THREAD_MESSAGE_KEY);
-		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
+		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget,mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
 				mockSubscribeButtonWidget, mockDefaultThreadWidget);
@@ -199,7 +199,7 @@ public class ForumWidgetTest {
 	@Test
 	public void testDefaultThreadBundleCached() {
 		reset(mockDiscussionForumClient);
-		forumWidget = new ForumWidget(mockView, mockSynAlert, mockDiscussionForumClient,
+		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
 				mockSubscribeButtonWidget, mockDefaultThreadWidget);
@@ -215,7 +215,7 @@ public class ForumWidgetTest {
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 		verify(mockSubscribeButtonWidget).clear();
 		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
 		verify(mockView).setDefaultThreadWidgetVisible(false);
@@ -238,7 +238,7 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockView).setDeletedThreadListVisible(false);
 		verify(mockView, atLeastOnce()).setDeletedThreadButtonVisible(canModerate);
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(mockForum.getId()), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
 	}
 
@@ -246,10 +246,10 @@ public class ForumWidgetTest {
 	public void testLoadForumSuccess() {
 		forumWidget.loadForum("1", mockCallback);
 
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionForumClient).getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
-		verify(mockSynAlert, never()).handleException(any(Exception.class));
+		verify(mockStuAlert, never()).handleException(any(Exception.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -261,10 +261,10 @@ public class ForumWidgetTest {
 
 		forumWidget.loadForum("1", mockCallback);
 
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionForumClient, never()).getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(exception);
+		verify(mockStuAlert).handleException(exception);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -308,7 +308,7 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -348,7 +348,7 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
@@ -389,13 +389,13 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
 
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockView).setSingleThreadUIVisible(true);
 		verify(mockView).setThreadListUIVisible(false);
 		verify(mockView).setNewThreadButtonVisible(false);
 		verify(mockView).setShowAllThreadsButtonVisible(true);
 		verify(mockView).setSingleThreadUIVisible(false);
-		verify(mockSynAlert).handleException(ex);
+		verify(mockStuAlert).handleException(ex);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -412,7 +412,7 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockView).setSingleThreadUIVisible(false);
 		verify(mockView).setThreadListUIVisible(true);
-		verify(mockSynAlert, atLeastOnce()).clear();
+		verify(mockStuAlert, atLeastOnce()).clear();
 		
 		verify(mockCallback).invoke();
 	}
@@ -472,17 +472,17 @@ public class ForumWidgetTest {
 				.getModerators(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 
 		forumWidget.loadModerators(forumId, 0L, mockCallback);
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
 		verifyNoMoreInteractions(mockDiscussionForumClient);
-		verify(mockSynAlert).handleException(exception);
+		verify(mockStuAlert).handleException(exception);
 		verify(mockCallback, never()).invoke();
 	}
 
 	@Test
 	public void testLoadModeratorsOnePage() {
 		forumWidget.loadModerators(forumId, 0L, mockCallback);
-		verify(mockSynAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(forumId), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
 		verifyNoMoreInteractions(mockDiscussionForumClient);
 		verify(mockCallback).invoke();
@@ -497,7 +497,7 @@ public class ForumWidgetTest {
 				.getModerators(eq(forumId), eq(MODERATOR_LIMIT), anyLong(), any(AsyncCallback.class));
 
 		forumWidget.loadModerators(forumId, 0L, mockCallback);
-		verify(mockSynAlert, times(2)).clear();
+		verify(mockStuAlert, times(2)).clear();
 		verify(mockDiscussionForumClient, times(2)).getModerators(eq(forumId), eq(MODERATOR_LIMIT), anyLong(), any(AsyncCallback.class));
 		verifyNoMoreInteractions(mockDiscussionForumClient);
 		verify(mockCallback).invoke();
