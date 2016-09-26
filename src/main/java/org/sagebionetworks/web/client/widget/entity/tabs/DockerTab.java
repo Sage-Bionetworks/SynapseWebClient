@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
