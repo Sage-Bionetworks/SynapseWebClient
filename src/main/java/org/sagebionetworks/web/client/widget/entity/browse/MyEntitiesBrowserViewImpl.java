@@ -8,6 +8,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -55,19 +57,28 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	Div myFavoritesTabContents;
 	@UiField
 	Div currentContextTabContents;
-	
+	LoadMoreWidgetContainer myProjectsContainerWrapper;
 	private Widget widget;
 	@Inject
 	public MyEntitiesBrowserViewImpl(MyEntitiesBrowserViewImplUiBinder binder, 
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			LoadMoreWidgetContainer myProjectsContainerWrapper) {
 		widget = binder.createAndBindUi(this);
 		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();
 		this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
 		this.currentContextTreeBrowser = ginInjector.getEntityTreeBrowser();
-		myProjectsContainer.setWidget(myTreeBrowser.asWidget());
+		this.myProjectsContainerWrapper = myProjectsContainerWrapper;
+		myProjectsContainerWrapper.add(myTreeBrowser.asWidget());
+		myTreeBrowser.setLoadingVisible(false);
+		myProjectsContainer.setWidget(myProjectsContainerWrapper.asWidget());
 		myFavoritesContainer.setWidget(favoritesTreeBrowser.asWidget());
 		currentContextContainer.setWidget(currentContextTreeBrowser.asWidget());
-		
+		myProjectsContainerWrapper.configure(new Callback() {
+			@Override
+			public void invoke() {
+				presenter.loadMoreUserUpdateable();
+			}
+		});
 		myProjectsLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -91,10 +102,14 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 		
 		setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
 	}
+	@Override
+	public void setIsMoreUpdatableEntities(boolean isMore) {
+		myProjectsContainerWrapper.setIsMore(isMore);	
+	}
 	
 	@Override
-	public void setUpdatableEntities(List<EntityHeader> rootEntities) {
-		myTreeBrowser.configure(rootEntities);		
+	public void addUpdatableEntities(List<EntityHeader> rootEntities) {
+		myTreeBrowser.addHeaders(rootEntities);
 	}
 	
 	@Override

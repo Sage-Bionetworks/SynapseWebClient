@@ -83,7 +83,7 @@ public class MyEntitiesBrowserTest {
 
 	@Test
 	public void testLoadUserUpdateable() {
-		widget.loadUserUpdateable();
+		widget.loadMoreUserUpdateable();
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
 				any(AsyncCallback.class));
@@ -93,7 +93,7 @@ public class MyEntitiesBrowserTest {
 	@Test
 	public void testLoadUserUpdateableAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.loadUserUpdateable();
+		widget.loadMoreUserUpdateable();
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockView, never()).setUpdatableEntities(anyList());
 	}
@@ -104,7 +104,7 @@ public class MyEntitiesBrowserTest {
 		AsyncMockStubber
 		.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
 			any(AsyncCallback.class));
-		widget.loadUserUpdateable();
+		widget.loadMoreUserUpdateable();
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockView, never()).setUpdatableEntities(anyList());
 		verify(mockView).showErrorMessage(errorMessage);
