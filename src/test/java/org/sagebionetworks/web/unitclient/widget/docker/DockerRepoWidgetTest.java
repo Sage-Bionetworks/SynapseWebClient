@@ -134,7 +134,7 @@ public class DockerRepoWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
+		verify(mockActionMenu, never()).setActionVisible(eq(Action.DELETE_ENTITY), anyBoolean());
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 		verify(mockDockerCommitListWidget).configure(entityId, false);
 		verify(mockView).setProvenanceWidgetVisible(false);
@@ -170,7 +170,7 @@ public class DockerRepoWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
+		verify(mockActionMenu, never()).setActionVisible(eq(Action.DELETE_ENTITY), anyBoolean());
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 	}
 }
