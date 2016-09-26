@@ -25,7 +25,6 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -118,7 +117,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
 			final Callback callback, final boolean showSubpages) {
 		clear();
-		GWT.debugger();
 		view.setMainPanelVisible(true);
 		view.setLoadingVisible(true);
 		// migrate fields to passed parameters?
@@ -391,7 +389,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	/* private methods */
 
 	private void handleGetV2WikiPageAsV1Failure(Throwable caught) {
-		GWT.debugger();
 		view.setLoadingVisible(false);
 		view.setModifiedCreatedByHistoryPanelVisible(false);
 		// if it is because of a missing root (and we have edit permission),
