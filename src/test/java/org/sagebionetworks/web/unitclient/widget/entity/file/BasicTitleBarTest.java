@@ -12,7 +12,9 @@ import junit.framework.Assert;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -23,6 +25,7 @@ import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
@@ -42,15 +45,19 @@ public class BasicTitleBarTest {
 	FavoriteWidget mockFavoriteWidget;
 	Entity entity;
 	String testEntityName = "Entity Name";
+	String entityId = "syn123";
+	@Mock
+	ContainerClientsHelp mockContainerClientsHelp;
 	@Before
-	public void setup(){	
+	public void setup(){
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(BasicTitleBarView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockFavoriteWidget = mock(FavoriteWidget.class);
-		titleBar = new BasicTitleBar(mockView, mockAuthController, mockFavoriteWidget);
+		titleBar = new BasicTitleBar(mockView, mockAuthController, mockFavoriteWidget, mockContainerClientsHelp);
 		mockBundle = mock(EntityBundle.class);
 		entity = new Folder();
-		entity.setId("syn123");
+		entity.setId(entityId);
 		entity.setName(testEntityName);
 		when(mockBundle.getEntity()).thenReturn(entity);
 		verify(mockView).setPresenter(titleBar);
@@ -70,16 +77,19 @@ public class BasicTitleBarTest {
 		verify(mockView).setFavoritesWidgetVisible(true);
 		verify(mockView).setTitle(testEntityName);
 		verify(mockView).setIconType(IconType.FOLDER);
+		verify(mockContainerClientsHelp).configure(entityId);
 	}
 	
 	@Test
 	public void testConfigureAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		entity = new TableEntity();
+		entity.setId(entityId);
 		when(mockBundle.getEntity()).thenReturn(entity);
 		titleBar.configure(mockBundle);
 		verify(mockView).setFavoritesWidgetVisible(false);
 		verify(mockView).setIconType(IconType.TABLE);
+		verify(mockContainerClientsHelp).configure(entityId);
 	}
 
 
