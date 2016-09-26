@@ -229,7 +229,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
 		this.params = params;
-		moderatorIds.clear();;
+		moderatorIds.clear();
+		resetView();
 		// get Forum and its moderators
 		loadForum(entityId, new Callback(){
 
@@ -285,23 +286,27 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		});
 	}
 
+	public void resetView() {
+		view.setMainContainerVisible(false);
+		view.setSingleThreadUIVisible(false);
+		view.setThreadListUIVisible(false);
+		view.setNewThreadButtonVisible(false);
+		view.setShowAllThreadsButtonVisible(false);
+		view.setDefaultThreadWidgetVisible(false);
+		view.setDeletedThreadListVisible(false);
+		view.setDeletedThreadButtonVisible(false);
+	}
+
 	public void showThread(final String threadId, final String replyId) {
+		resetView();
 		isSingleThread = true;
 		stuAlert.clear();
 		subscribeToForumButton.clear();
 		updatePlaceToSingleThread(threadId);
-		view.setSingleThreadUIVisible(true);
-		view.setThreadListUIVisible(false);
-		view.setNewThreadButtonVisible(false);
-		view.setShowAllThreadsButtonVisible(true);
-		view.setDefaultThreadWidgetVisible(false);
-		view.setDeletedThreadListVisible(false);
-		view.setDeletedThreadButtonVisible(false);
 		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setSingleThreadUIVisible(false);
 				stuAlert.handleException(caught);
 			}
 
@@ -314,22 +319,21 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 						urlChangeCallback.invoke();
 					}
 				});
+
+				view.setSingleThreadUIVisible(true);
+				view.setShowAllThreadsButtonVisible(true);
+				view.setMainContainerVisible(true);
 			}
 		});
 	}
 
 	public void showForum() {
+		resetView();
 		isSingleThread = false;
 		stuAlert.clear();
 		subscribeToForumButton.clear();
 		threadListWidget.clear();
 		updatePlaceToForum();
-		view.setSingleThreadUIVisible(false);
-		view.setThreadListUIVisible(true);
-		view.setNewThreadButtonVisible(true);
-		view.setShowAllThreadsButtonVisible(false);
-		view.setDefaultThreadWidgetVisible(false);
-		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		subscribeToForumButton.configure(SubscriptionObjectType.FORUM, forumId);
 		newThreadModal.configure(forumId, new Callback(){
 			@Override
@@ -340,6 +344,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		});
 		threadListWidget.configure(forumId, isCurrentUserModerator,
 				moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+		view.setThreadListUIVisible(true);
+		view.setNewThreadButtonVisible(true);
+		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
+		view.setMainContainerVisible(true);
 	}
 
 	@Override

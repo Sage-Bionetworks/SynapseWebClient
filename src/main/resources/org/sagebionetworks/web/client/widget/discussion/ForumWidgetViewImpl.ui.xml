@@ -26,7 +26,7 @@
 				</b:Column>
 			</b:Row>
 		</bh:Div>
-		<bh:Div addStyleNames="highlight-box padding-top-0-imp margin-bottom-20 ">
+		<bh:Div ui:field="mainContainer" addStyleNames="highlight-box padding-top-0-imp margin-bottom-20 ">
 			<b:Row>
 				<b:Column size="XS_12">
 					<b:Button ui:field="showAllThreadsButton" type="DEFAULT" size="SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10" visible="false">Show all threads</b:Button>
