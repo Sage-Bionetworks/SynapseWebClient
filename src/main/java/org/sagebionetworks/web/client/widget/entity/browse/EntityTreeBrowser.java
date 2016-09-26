@@ -95,20 +95,25 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.setLoadingVisible(true);
 		getChildren(searchId, null, 0);
 	}
-
+	
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
 		view.setLoadingVisible(true);
+		addHeaders(headers);
+		view.setLoadingVisible(false);
+	}
+	
+	public void addHeaders(List<EntityHeader> headers) {
 		headers = filter.filterForBrowsing(headers);
 		EntityQueryResults results = getEntityQueryResultsFromHeaders(headers);
 		for (EntityQueryResult wrappedHeader : results.getEntities()) {
 			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(wrappedHeader, true,
 					isExpandable(wrappedHeader)));
 		}
-		view.setLoadingVisible(false);
 	}
-	
-
+	public void setLoadingVisible(boolean visible) {
+		view.setLoadingVisible(visible);
+	}
 	public EntityQueryResults getEntityQueryResultsFromHeaders(
 			List<EntityHeader> headers) {
 		EntityQueryResults results = new EntityQueryResults();
