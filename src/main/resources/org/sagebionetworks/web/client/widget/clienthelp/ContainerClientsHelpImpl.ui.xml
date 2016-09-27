@@ -27,10 +27,6 @@
 						  	<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">
-										# Login<br/>
-										synapse login<br/>
-										<br/>
-										# Download ALL files in the folder (and subfolders)<br/>
 										synapse get -r <span ui:field="id1"/><br/>
 									</code>
 								</pre>

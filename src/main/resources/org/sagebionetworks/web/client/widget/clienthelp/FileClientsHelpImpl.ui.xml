@@ -23,10 +23,6 @@
 						  	<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">
-										# Login<br/>
-										synapse login<br/>
-										<br/>
-										# Download file<br/>
 										synapse get <span ui:field="id1"/><br/>
 									</code>
 								</pre>
