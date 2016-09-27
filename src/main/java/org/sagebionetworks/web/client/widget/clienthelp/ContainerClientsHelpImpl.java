@@ -1,6 +1,13 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPane;
+
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -11,6 +18,19 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	SpanElement id1;
 	@UiField
 	SpanElement id2;
+	@UiField
+	Anchor link;
+	@UiField
+	Modal modal;
+	@UiField
+	TabListItem cliTabListItem;
+	@UiField
+	TabListItem pythonTabListItem;
+	@UiField
+	TabPane cliTabPane;
+	@UiField
+	TabPane pythonTabPane;
+	
 	Widget widget;
 	String entityId = null;
 	public interface Binder extends UiBinder<Widget, ContainerClientsHelpImpl> {}
@@ -18,8 +38,15 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	@Inject
 	public ContainerClientsHelpImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
+		link.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				modal.show();
+			}
+		});
+		FileClientsHelpImpl.setId(cliTabListItem, cliTabPane);
+		FileClientsHelpImpl.setId(pythonTabListItem, pythonTabPane);
 	}
-
 	@Override
 	public Widget asWidget() {
 		return widget;
