@@ -95,7 +95,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	public static boolean isValidShinySite(String siteUrl, SynapseJSNIUtils jsniUtils) {
 		if(siteUrl != null) {
 			String hostName = jsniUtils.getHostname(siteUrl.toLowerCase());
-			if (hostName != null && hostName.endsWith("synapse.org")) {
+			if (hostName != null && hostName.endsWith(".synapse.org")) {
 				return true;
 			}
 			for(String base : VALID_URL_BASES) {
