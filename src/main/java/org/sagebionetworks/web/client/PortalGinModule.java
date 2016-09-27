@@ -123,6 +123,8 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelpImpl;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
@@ -1332,6 +1334,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RadioWidget.class).to(RadioWidgetViewImpl.class);
 		
 		bind(FileClientsHelp.class).to(FileClientsHelpImpl.class);
+		bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
 		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);
 		bind(CreateTableViewWizardStep2View.class).to(CreateTableViewWizardStep2ViewImpl.class);
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);

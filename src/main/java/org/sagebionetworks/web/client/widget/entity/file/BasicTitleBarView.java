@@ -18,6 +18,7 @@ public interface BasicTitleBarView extends IsWidget, SynapseView {
 	void setFavoritesWidgetVisible(boolean visible);
 	void setTitle(String name);
 	void setIconType(IconType iconType);
+	void setContainerHelpWidget(Widget w);
 	/**
 	 * Presenter interface
 	 */
