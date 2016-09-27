@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,7 +14,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
@@ -24,21 +27,23 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 public class ShinySiteWidgetTest {
 		
 	ShinySiteWidget widget;
+	@Mock
 	ShinySiteWidgetView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
 	String validSiteUrl2 = "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
 
 	String invalidSiteUrl = "http://glimmer.rstudio.com.hackers.com/problem.html";
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
 	@Before
 	public void setup(){
-		mockView = mock(ShinySiteWidgetView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
+		MockitoAnnotations.initMocks(this);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget = new ShinySiteWidget(mockView, mockAuthenticationController);
+		widget = new ShinySiteWidget(mockView, mockAuthenticationController, mockSynapseJSNIUtils);
 	}
 	
 	@Test
@@ -78,11 +83,17 @@ public class ShinySiteWidgetTest {
 	
 	@Test 
 	public void testIsValidShinySite() {
-		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl));
-		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl.toUpperCase()));
-		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl));
-		assertTrue(ShinySiteWidget.isValidShinySite("https://docs.google.com/a/sagebase.org/forms/d/1JmVWhcCAx26Jd94nFY8HhtVBgJSReaBbphZid16T6V4/viewform"));
-		assertFalse(ShinySiteWidget.isValidShinySite(null));
+		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl, mockSynapseJSNIUtils));
+		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl.toUpperCase(), mockSynapseJSNIUtils));
+		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
+		assertTrue(ShinySiteWidget.isValidShinySite("https://docs.google.com/a/sagebase.org/forms/d/1JmVWhcCAx26Jd94nFY8HhtVBgJSReaBbphZid16T6V4/viewform", mockSynapseJSNIUtils));
+		assertFalse(ShinySiteWidget.isValidShinySite(null, mockSynapseJSNIUtils));
+		
+		//hostname test
+		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("www.jayhodgson.com");
+		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
+		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("anything.synapse.org");
+		assertTrue(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
 	}
 	
 	@Test

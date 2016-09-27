@@ -14,22 +14,21 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -38,16 +37,13 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -62,11 +58,8 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
-import com.google.gwt.core.client.Callback;
 import com.google.gwt.dev.util.collect.HashSet;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvenanceWidgetTest {
 		
@@ -76,7 +69,6 @@ public class ProvenanceWidgetTest {
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
 	ClientCache mockClientCache;
-	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	GlobalApplicationState mockGlobalAppState;
 	
 	FileEntity outputEntity;
@@ -90,18 +82,21 @@ public class ProvenanceWidgetTest {
 	Map<String, String> descriptor;
 	Activity act;
 	UserProfile modifiedByUserProfile;
-	
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@SuppressWarnings("unchecked")
 	@Before
-	public void setup() throws Exception {		
+	public void setup() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
+		when(mockSynapseJSNIUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
 		mockClientCache = mock(ClientCache.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, mockSynapseJSNIUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new FileEntity();
@@ -321,222 +316,6 @@ public class ProvenanceWidgetTest {
 		verify(mockView).setGraph(argument.capture());
 		ProvGraph graph = argument.getValue();
 		return graph;
-	}
-
-	private SynapseJSNIUtils implJSNIUtils() {
-		return new SynapseJSNIUtils() {
-			Random rand = new Random();
-			
-			@Override
-			public void recordPageVisit(String token) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public int randomNextInt() {
-				return rand.nextInt();
-			}
-			
-			@Override
-			public void highlightCodeBlocks() {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public String getRelativeTime(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getCalendarTime(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getLongFriendlyDate(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public void hideBootstrapTooltip(String id) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public String getCurrentHistoryToken() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String getBaseProfileAttachmentUrl() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String convertDateToSmallString(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public void bindBootstrapTooltip(String id) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void bindBootstrapPopover(String id) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public String getLocationPath() {
-				return "/Portal.html";
-			}
-
-			@Override
-			public String getLocationQueryString() {
-				return "?foo=bar";
-			}
-			
-			@Override
-			public String getBaseFileHandleUrl() {
-				return "";
-			}
-
-			@Override
-			public LayoutResult nChartlayout(NChartLayersArray layers,
-					NChartCharacters characters) {
-				return jsoProvider.newLayoutResult();
-			}
-			@Override
-			public void setPageDescription(String newDescription) {
-				
-			}
-			
-			@Override
-			public void setPageTitle(String newTitle) {};
-			
-			@Override
-			public void loadTableSorters() {}
-
-			@Override
-			public void uploadUrlToGenomeSpace(String url) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void uploadUrlToGenomeSpace(String url, String filename) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void processWithMathJax(Element element) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void loadCss(String url, Callback<Void, Exception> callback) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public String getFileUrl(String fileFieldId) {
-				return null;
-			}
-			@Override
-			public void consoleError(String message) {
-			}
-			
-			@Override
-			public void consoleLog(String message) {
-			}
-
-			@Override
-			public void uploadFileChunk(String contentType, int index,
-					String fileFieldId, Long startByte, Long endByte,
-					String url, XMLHttpRequest xhr, ProgressCallback callback) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public String getContentType(String fileFieldId, int index) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void getFilePartMd5(String fileFieldId, int currentChunk,
-					Long chunkSize, int fileIndex, MD5Callback md5Callback) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public void getFileMd5(String fileFieldId, int index,
-					MD5Callback callback) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public boolean isElementExists(String elementId) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public double getFileSize(String fileFieldId, int index) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public String[] getMultipleUploadFileNames(String fileFieldId) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public boolean isFileAPISupported() {
-				return true;
-			}
-
-			@Override
-			public void initOnPopStateHandler() {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void showTwitterFeed(String dataWidgetId, String elementId,
-					String linkColor, String borderColor, int height) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public String getCurrentURL() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String getCurrentHostName() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
 	}
 
 }
