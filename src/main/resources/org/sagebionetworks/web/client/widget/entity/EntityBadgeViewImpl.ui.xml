@@ -48,8 +48,8 @@
 			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden">
-				<g:Label ui:field="sizeField"/>
+			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden text-align-right">
+				<g:Label ui:field="sizeField" addStyleNames="margin-right-30"/>
 			</t:TableData>
 			<t:TableData width="65px" addStyleNames="visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="md5Field" width="64px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
