@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import java.util.Arrays;
+
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -98,29 +101,34 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	public void onFileSelected() {
 		FileMetadata[] fileMetaArr = getSelectedFileMetadata();
 		if (fileMetaArr != null) {
-			FileMetadata fileMeta = fileMetaArr[0];
-			boolean isValidUpload = validator == null || validator.isValid(fileMeta);
-			if (isValidUpload) {
-				if (startedUploadingCallback != null) {
-					startedUploadingCallback.invoke();
-				}
-				view.updateProgress(1, "1%");
-				view.showProgress(true);
-				view.setInputEnabled(false);
-				view.hideError();
-				doMultipartUpload(fileMeta);		
-			} else {
-				Callback invalidFileCallback = validator.getInvalidFileCallback();
-				if (invalidFileCallback == null) {
-					String invalidMessage = validator.getInvalidMessage();
-					if (invalidMessage == null)
-						view.showError("Please select a valid filetype.");
-					else
-						view.showError(invalidMessage);	
+			int size = fileMetaArr.length;
+			for (int i = 0; i < size; i++) {
+				
+			
+				FileMetadata fileMeta = fileMetaArr[i];
+				boolean isValidUpload = validator == null || validator.isValid(fileMeta);
+				if (isValidUpload) {
+					if (startedUploadingCallback != null) {
+						startedUploadingCallback.invoke();
+					}
+					view.updateProgress(1, "1%");
+					view.showProgress(true);
+					view.setInputEnabled(false);
+					view.hideError();
+					doMultipartUpload(fileMeta);		
 				} else {
-					invalidFileCallback.invoke();
+					Callback invalidFileCallback = validator.getInvalidFileCallback();
+					if (invalidFileCallback == null) {
+						String invalidMessage = validator.getInvalidMessage();
+						if (invalidMessage == null)
+							view.showError("Please select a valid filetype.");
+						else
+							view.showError(invalidMessage);	
+					} else {
+						invalidFileCallback.invoke();
+					}
 				}
-			}
+			}		
 		}
 	}
 	
@@ -134,6 +142,43 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	
 	private void doMultipartUpload(final FileMetadata fileMeta) {
 		// The uploader does the real work
+		
+		
+		String fileInputId = view.getInputId();
+		String name = fileMeta.getFileName();
+		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
+		int index = Arrays.asList(names).indexOf(name);
+		GWT.debugger();
+		multipartUploader.uploadFile(name, fileInputId, index,
+			new ProgressingFileUploadHandler() {
+				@Override
+				public void uploadSuccess(String fileHandleId) {
+					FileUpload uploadedFile = new FileUpload(fileMeta, fileHandleId);
+					// Set the view at 100%
+					view.updateProgress(100, "100%");
+					view.showProgress(false);
+					view.setInputEnabled(true);
+					GWT.debugger();
+					finishedUploadingCallback.invoke(uploadedFile);
+				}
+
+				@Override
+				public void uploadFailed(String error) {
+					view.showProgress(false);
+					view.setInputEnabled(true);
+					view.showError(error);
+				}
+
+				@Override
+				public void updateProgress(double currentProgress,
+						String progressText, String uploadSpeed) {
+					view.updateProgress(currentProgress*100, progressText);
+				}
+		}, null);
+		
+		
+		/*
+		GWT.debugger();
 		multipartUploader.uploadSelectedFile(view.getInputId(),
 				new ProgressingFileUploadHandler() {
 					@Override
@@ -159,6 +204,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 						view.updateProgress(currentProgress*100, progressText);
 					}
 		}, null);
+		*/
 	}
 
 

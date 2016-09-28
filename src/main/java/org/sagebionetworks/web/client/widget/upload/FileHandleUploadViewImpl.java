@@ -54,6 +54,7 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 		widget = binder.createAndBindUi(this);
 		// Create a unique for each new instance.
 		this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET+ID_SEQUENCE++);
+		this.fileInput.getElement().setAttribute("multiple", null);
 	}
 
 	@Override

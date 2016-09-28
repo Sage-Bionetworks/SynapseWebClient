@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,6 +47,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		fileUploadedCallback = new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
+				GWT.debugger();
 				addFileLink(fileUpload);
 			}
 		};

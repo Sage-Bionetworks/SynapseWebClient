@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -99,6 +100,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	@Override
 	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, final Long storageLocationId) {
 		//initialize attempt count. 
+		GWT.debugger();
 		this.request = null;
 		this.totalPartCount = 0;
 		this.fileInputId = fileInputId;
@@ -125,6 +127,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				request.setFileSizeBytes(fileSize);
 				request.setPartSizeBytes(partSizeBytes);
 				request.setStorageLocationId(storageLocationId);
+				GWT.debugger();
 				startMultipartUpload();
 			}
 		});
@@ -310,6 +313,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			
 			@Override
 			public void onSuccess(MultipartUploadStatus status) {
+				GWT.debugger();
 				handler.uploadSuccess(status.getResultFileHandleId());
 			}
 		});
