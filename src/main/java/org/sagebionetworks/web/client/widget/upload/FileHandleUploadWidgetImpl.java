@@ -139,7 +139,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		doMultipartUpload(fileMetaArr[count]);
 	}
 	
-	
 	private void uploadNext() {
 		count++;
 		if (count != fileMetaArr.length) {
@@ -159,7 +158,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	
 	private void doMultipartUpload(final FileMetadata fileMeta) {
 		// The uploader does the real work
-		
 		
 		String fileInputId = view.getInputId();
 		String name = fileMeta.getFileName();
@@ -183,7 +181,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 				@Override
 				public void updateProgress(double currentProgress,
 						String progressText, String uploadSpeed) {
-					view.updateProgress(currentProgress*100, progressText);
+					int totalProgress = count * 100 / fileMetaArr.length + (int)(currentProgress * 100 / fileMetaArr.length);
+					view.updateProgress(totalProgress, totalProgress + "%");
 				}
 		}, null);
 	}
