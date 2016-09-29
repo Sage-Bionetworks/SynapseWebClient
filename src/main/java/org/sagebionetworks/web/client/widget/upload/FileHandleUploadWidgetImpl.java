@@ -145,7 +145,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			int progress = count * 100 / fileMetaArr.length;
 			view.updateProgress(progress, progress + "%");
 			view.showProgress(true);
-			view.setInputEnabled(true);
+			view.setInputEnabled(false);
 			doMultipartUpload(fileMetaArr[count]);
 		} else {
 			// Set the view at 100%
