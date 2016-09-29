@@ -29,6 +29,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		this.multipartUploader = multipartUploader;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.view.setPresenter(this);
+		this.view.allowMultipleFileUpload(true);
 	}
 
 	@Override
