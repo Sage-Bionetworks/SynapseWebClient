@@ -54,10 +54,10 @@
 								dataDismiss="MODAL">Ok</b:Button>
 						</b:ModalFooter>
 					</b:Modal>
-		    	    <g:SimplePanel ui:field="joinTeamPanel"/>
-		    		<g:SimplePanel ui:field="openMembershipRequestsPanel"/>
-		    		<g:SimplePanel ui:field="openUserInvitationsPanel"/>
-		    		<g:SimplePanel ui:field="memberListPanel"/>
+		    	    <g:SimplePanel ui:field="joinTeamPanel" addStyleNames="margin-bottom-5"/>
+		    		<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5"/>
+		    		<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5"/>
+		    		<g:SimplePanel ui:field="memberListPanel" addStyleNames="margin-bottom-5"/>
 		    	</g:HTMLPanel>
 		   	</div>
 		   	<div>
