@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -92,15 +93,53 @@ public class FileHandleUploadWidgetImplTest {
 		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
 		handleCaptor.getValue().uploadSuccess(successFileHandle);
 
-		// The progress should be updated 
+		// The progress should be updated
 		verify(mockView).updateProgress(10, "10%");
 		verify(mockView).updateProgress(90, "90%");
-		// Success should trigger the following:
+		verify(mockView).showProgress(true);
+		verify(mockView).setInputEnabled(false);
 		verify(mockCallback).invoke(any(FileUpload.class));
+		// Success should trigger the following:
+		verify(mockView).updateProgress(100, "100%");
+		verify(mockView).setInputEnabled(true);
+		verify(mockView).showProgress(false);
+	}
+	
+	@Test
+	public void testMultiFileSelected() {
+		final String successFileHandle = "123";
+		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName", "testName2"});
+		
+		// Configure before the test
+		widget.configure("button text", mockCallback);
+		reset(mockView);
+		// method under test.
+		widget.onFileSelected();
+		verify(mockView).updateProgress(1, "1%");
+		verify(mockView).showProgress(true);
+		verify(mockView).setInputEnabled(false);
+		verify(mockView).hideError();
+		
+		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
+		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
+		handleCaptor.getValue().updateProgress(0.2, "20%", "10 MB/s");
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
+
+		// The progress should be updated with scaled values based on the presence of two files to upload
+		verify(mockView).updateProgress(5, "5%");
+		verify(mockView).updateProgress(45, "45%");
+		verify(mockView).updateProgress(50, "50%");
+		verify(mockView).updateProgress(60,  "60%");
+		// Success should trigger the following:
 		verify(mockView).updateProgress(100, "100%");
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
 		
+		verify(mockView, VerificationModeFactory.times(2)).showProgress(true);
+		verify(mockView, VerificationModeFactory.times(2)).setInputEnabled(false);
+		verify(mockCallback, VerificationModeFactory.times(2)).invoke(any(FileUpload.class));
 	}
 	
 	@Test
