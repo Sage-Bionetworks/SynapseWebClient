@@ -40,6 +40,7 @@ import com.google.inject.Inject;
 public class APITableWidget implements APITableWidgetView.Presenter, WidgetRendererPresenter {
 	
 	public static final String CURRENT_USER_SQL_VARIABLE = "@CURRENT_USER";
+	public static final String ENCODED_CURRENT_USER_SQL_VARIABLE = "%40CURRENT_USER";
 	private APITableWidgetView view;
 	private Map<String, String> descriptor;
 	private SynapseClientAsync synapseClient;
@@ -124,8 +125,11 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 		
 		
-		if (authenticationController.isLoggedIn())
-			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, authenticationController.getCurrentUserPrincipalId());
+		if (authenticationController.isLoggedIn()) {
+			String userId = authenticationController.getCurrentUserPrincipalId();
+			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, userId).replace(ENCODED_CURRENT_USER_SQL_VARIABLE, userId);
+		}
+			
 		synapseClient.getJSONEntity(fullUri, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
