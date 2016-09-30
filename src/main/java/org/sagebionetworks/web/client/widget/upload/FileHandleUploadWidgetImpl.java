@@ -124,7 +124,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 					invalidFileCallback.invoke();
 				}
 			}
-		}	
+		}
 	}
 	
 	@Override
