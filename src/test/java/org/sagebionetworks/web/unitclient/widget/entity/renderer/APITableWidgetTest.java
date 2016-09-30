@@ -249,6 +249,23 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
+	public void testCurrentUserVariableEncoded() throws JSONObjectAdapterException {
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project+where+userId==" + APITableWidget.ENCODED_CURRENT_USER_SQL_VARIABLE;
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		String testUserId = "12345test";
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		
+		assertTrue(arg.getValue().endsWith(testUserId));
+	}
+	
+	@Test
 	public void testLoggedInOnly() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN, "true");
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
