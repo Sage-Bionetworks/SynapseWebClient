@@ -6,8 +6,10 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -66,11 +68,22 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 	}
 	
 	@Override
-	public void showBiodallianceBrowser(String urlPrefix, String containerId,
-			String initChr, int initViewStart, int initViewEnd,
-			BiodallianceConfigInterface currentConfig,
-			List<BiodallianceSource> sources) {
-		new Biodalliance013dev().show(urlPrefix, containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
+	public void showBiodallianceBrowser(final String urlPrefix, final String containerId,
+			final String initChr, final int initViewStart, final int initViewEnd,
+			final BiodallianceConfigInterface currentConfig,
+			final List<BiodallianceSource> sources) {
+		GWT.runAsync(new RunAsyncCallback() {
+			@Override
+			public void onSuccess() {
+				new Biodalliance013dev().show(urlPrefix, containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
+			}
+			
+			@Override
+			public void onFailure(Throwable reason) {
+				SynapseJSNIUtilsImpl._consoleError(reason.getMessage());
+			}
+		});
+		
 	}
 	
 	@Override
