@@ -46,8 +46,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
-import com.google.gwt.thirdparty.javascript.rhino.jstype.StaticSourceFile;
-
 /**
  * Business logic unit tests for the TablePageWidget.
  * 
