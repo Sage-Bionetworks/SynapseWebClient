@@ -120,25 +120,24 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).setInputEnabled(false);
 		verify(mockView).hideError();
 		
-		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
-		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
-		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
-		handleCaptor.getValue().uploadSuccess(successFileHandle);
-		handleCaptor.getValue().updateProgress(0.2, "20%", "10 MB/s");
-		handleCaptor.getValue().uploadSuccess(successFileHandle);
-
 		// The progress should be updated with scaled values based on the presence of two files to upload
+		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		verify(mockView).showProgress(true);
+		verify(mockView).setInputEnabled(false);
+		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
 		verify(mockView).updateProgress(5, "5%");
+		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
 		verify(mockView).updateProgress(45, "45%");
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
 		verify(mockView).updateProgress(50, "50%");
+		handleCaptor.getValue().updateProgress(0.2, "20%", "10 MB/s");
 		verify(mockView).updateProgress(60,  "60%");
-		// Success should trigger the following:
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
 		verify(mockView).updateProgress(100, "100%");
+
+		// Success should trigger the following:
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		
-		verify(mockView, VerificationModeFactory.times(2)).showProgress(true);
-		verify(mockView, VerificationModeFactory.times(2)).setInputEnabled(false);
 		verify(mockCallback, VerificationModeFactory.times(2)).invoke(any(FileUpload.class));
 	}
 	

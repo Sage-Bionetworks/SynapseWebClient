@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -29,7 +28,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		this.multipartUploader = multipartUploader;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.view.setPresenter(this);
-		this.view.allowMultipleFileUpload(true);
+		this.view.allowMultipleFileUpload(false);
 	}
 
 	@Override
@@ -58,6 +57,11 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	@Override
 	public void setValidation(FileValidator validator) {
 		this.validator = validator;
+	}
+	
+	@Override
+	public void allowMultipleFileUpload(boolean value) {
+		this.view.allowMultipleFileUpload(value);
 	}
 	
 	@Override
@@ -145,8 +149,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		if (count != fileMetaArr.length) {
 			int progress = count * 100 / fileMetaArr.length;
 			view.updateProgress(progress, progress + "%");
-			view.showProgress(true);
-			view.setInputEnabled(false);
 			doMultipartUpload(fileMetaArr[count]);
 		} else {
 			// Set the view at 100%
