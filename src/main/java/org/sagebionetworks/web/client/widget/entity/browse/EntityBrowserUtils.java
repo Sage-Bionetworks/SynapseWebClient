@@ -13,7 +13,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityBrowserUtils {
 	public static void loadFavorites(SynapseClientAsync synapseClient,
-			final AdapterFactory adapterFactory,
 			final GlobalApplicationState globalApplicationState,
 			final AsyncCallback<List<EntityHeader>> callback) {
 		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
@@ -21,7 +20,6 @@ public class EntityBrowserUtils {
 			public void onSuccess(List<EntityHeader> favorites) {
 				//show whatever projects that we found (maybe zero)
 				globalApplicationState.setFavorites(favorites);
-				
 				callback.onSuccess(favorites);
 			}
 			@Override
