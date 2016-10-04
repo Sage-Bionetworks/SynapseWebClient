@@ -4,7 +4,14 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	
 	<b:Row>
+		<g:FlowPanel ui:field="loading">
+			<g:Image resource='{sageImageBundle.loading31}' />
+			<bh:Text> Loading...</bh:Text>
+		</g:FlowPanel>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">

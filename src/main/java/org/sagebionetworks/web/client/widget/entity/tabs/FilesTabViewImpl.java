@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,6 +16,8 @@ import com.google.inject.Inject;
 
 public class FilesTabViewImpl implements FilesTabView {
 	private static final String DISCUSSION_ABOUT = "Discussion about ";
+	@UiField
+	FlowPanel loading;
 	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField
@@ -185,4 +188,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setDiscussionText(String entityName) {
 		discussionText.setText(DISCUSSION_ABOUT + entityName);
 	}
+	
+	@Override
+	public void showLoading(boolean value) {
+		loading.setVisible(value);
+	}
+	
 }

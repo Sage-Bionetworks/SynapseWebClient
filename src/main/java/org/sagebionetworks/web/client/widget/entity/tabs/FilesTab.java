@@ -219,6 +219,8 @@ public class FilesTab {
 		
 		//reset view
 		resetView();
+		//need to add loading bar here - page is already blank before executing next line
+		view.showLoading(true);
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
@@ -310,6 +312,8 @@ public class FilesTab {
 		boolean isProject = currentEntity instanceof Project;
 		
 		showProjectInfoCallack.invoke(isProject);
+		
+		view.showLoading(false);
 		
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);

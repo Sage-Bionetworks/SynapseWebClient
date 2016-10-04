@@ -27,4 +27,5 @@ public interface FilesTabView extends IsWidget {
 	void setDiscussionThreadListWidget(Widget widget);
 	void setDiscussionThreadListWidgetVisible(Boolean visible);
 	void setDiscussionText(String entityName);
+	void showLoading(boolean value);
 }
