@@ -129,7 +129,13 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 		this.uploadbutton.setText(buttonText);
 	}
 	
-
-
+	@Override
+	public void allowMultipleFileUpload(boolean enabled) {
+		if (enabled) {
+			this.fileInput.getElement().setAttribute("multiple", null);			
+		} else {
+			this.fileInput.getElement().removeAttribute("multiple");
+		}
+	}
 
 }

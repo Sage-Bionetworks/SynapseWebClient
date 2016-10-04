@@ -64,6 +64,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		uploadWidget.reset();
 		uploadWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, fileUploadedCallback);
+		uploadWidget.allowMultipleFileUpload(true);
 		return this;
 	};
 	
