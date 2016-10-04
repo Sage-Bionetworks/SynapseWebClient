@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface APITableWidgetView extends IsWidget, SynapseView {
 
@@ -29,7 +31,8 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	public void showError(String message);
 	
 	void showTableUnavailable();
-	
+	List<ElementWrapper> findCancelRequestDivs();
+	void addWidget(Widget widget, String divID);
 	/**
 	 * Presenter interface
 	 */
