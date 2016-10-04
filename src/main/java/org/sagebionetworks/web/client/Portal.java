@@ -121,7 +121,7 @@ public class Portal implements EntryPoint {
 		    		.inject();
 		    }
 		};
-		timer.schedule(12000);
+		timer.schedule(10000);
 	}
 	
 	public void reloadApp(int delay) {
