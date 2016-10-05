@@ -20,7 +20,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -29,11 +31,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
@@ -48,6 +52,7 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class APITableWidgetTest {
 		
@@ -69,8 +74,12 @@ public class APITableWidgetTest {
 	String col1Name ="column 1";
 	String col2Name ="column 2";
 	public static final int COLUMN_ROW_COUNT = 10;
+	@Mock
+	SynapseAlert mockSynAlert;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(APITableWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
@@ -97,7 +106,7 @@ public class APITableWidgetTest {
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(synapseIDColumnRenderer);
 		
 		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController);
+		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
@@ -169,16 +178,19 @@ public class APITableWidgetTest {
 	public void testMissingServiceURI() throws JSONObjectAdapterException {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).showError(anyString());
+		verify(mockSynAlert).showError(DisplayConstants.API_TABLE_MISSING_URI);
+		verify(mockView).showError(any(Widget.class));
 	}
 	
 	//test uri call failure causes view to render error
 	@Test
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).showError(eq(errorMessage));
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showError(any(Widget.class));
 	}
 	
 	@Test

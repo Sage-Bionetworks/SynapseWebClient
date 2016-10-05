@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -32,7 +33,6 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -50,6 +50,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private APITableConfig tableConfig;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	SynapseAlert synAlert;
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
 	public static Set<String> dateColumnNames = new HashSet<String>();
@@ -69,12 +70,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	@Inject
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.ginInjector = ginInjector;
+		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;		
 	}
@@ -94,8 +97,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		if (tableConfig.getUri() != null) {
 			refreshData();
 		}
-		else
-			view.showError(DisplayConstants.API_TABLE_MISSING_URI);
+		else {
+			synAlert.showError(DisplayConstants.API_TABLE_MISSING_URI);
+			view.showError(synAlert.asWidget());
+		}
 	}
 	
 	@Override
@@ -205,8 +210,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			public void onFailure(Throwable caught) {
 				if(caught instanceof TableUnavilableException)
 					view.showTableUnavailable();
-				else
-					view.showError(caught.getMessage());
+				else {
+					synAlert.handleException(caught);
+					view.showError(synAlert.asWidget());
+				}
 			}
 		});
 	}
@@ -379,7 +386,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			@Override
 			public void onFailure(Throwable caught) {
 				//there was a problem initializing a particular renderer
-				view.showError(caught.getMessage());
+				synAlert.handleException(caught);
+				view.showError(synAlert.asWidget());
 			}
 			private void processNext() {
 				//after all renderers have initialized, then configure the view
