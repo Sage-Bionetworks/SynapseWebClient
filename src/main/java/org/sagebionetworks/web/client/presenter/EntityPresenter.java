@@ -103,7 +103,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// Install the view
 		panel.setWidget(view);
 		view.setLoadingVisible(true);
-		//add in loading here after top and bottom are installed
 	}
 
 	@Override

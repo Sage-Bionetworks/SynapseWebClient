@@ -219,7 +219,6 @@ public class FilesTab {
 		
 		//reset view
 		resetView();
-		//need to add loading bar here - page is already blank before executing next line
 		view.showLoading(true);
 		
 		boolean isFile = targetEntity instanceof FileEntity;
