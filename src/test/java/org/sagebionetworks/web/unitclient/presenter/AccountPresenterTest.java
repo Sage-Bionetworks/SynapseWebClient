@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,7 +52,7 @@ public class AccountPresenterTest {
 		//notify user of success
 		verify(mockView).showInfo(anyString(), anyString());
 		//and go to the settings page
-		verify(mockPlaceChanger).goTo(any(Place.class));
+		verify(mockPlaceChanger).goTo(isA(Place.class));
 	}	
 	
 	@Test

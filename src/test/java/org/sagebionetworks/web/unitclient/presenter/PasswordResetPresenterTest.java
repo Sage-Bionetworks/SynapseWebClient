@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -139,7 +140,7 @@ public class PasswordResetPresenterTest {
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to Home
-		verify(mockPlaceChanger).goTo(any(Home.class));
+		verify(mockPlaceChanger).goTo(isA(Home.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -154,7 +155,7 @@ public class PasswordResetPresenterTest {
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to login place
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -169,7 +170,7 @@ public class PasswordResetPresenterTest {
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to login page
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -182,7 +183,7 @@ public class PasswordResetPresenterTest {
 		currentUserSessionData.setProfile(null);
 		presenter.resetPassword("myPassword");
 		//verify that place is changed to Login
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -195,7 +196,7 @@ public class PasswordResetPresenterTest {
 		currentUserSessionData.getProfile().setUserName(null);
 		presenter.resetPassword("myPassword");
 		//verify that place is changed to Login
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -208,7 +209,7 @@ public class PasswordResetPresenterTest {
 		currentUserSessionData.getProfile().setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "123");
 		presenter.resetPassword("myPassword");
 		//verify that place is changed to Login
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	

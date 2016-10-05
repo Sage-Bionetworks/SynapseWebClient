@@ -149,7 +149,7 @@ public class UserBadgeTest {
 	public void testBadgeClicked() {
 		userBadge.configure(profile);
 		userBadge.badgeClicked(null);
-		verify(mockPlaceChanger).goTo(any(Profile.class));
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 	
 	@Test

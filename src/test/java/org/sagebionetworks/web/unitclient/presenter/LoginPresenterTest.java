@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -149,7 +150,7 @@ public class LoginPresenterTest {
 		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
 		usd.setProfile(profile);
 		loginPresenter.checkForTempUsername();
-		verify(mockPlaceChanger).goTo(any(ChangeUsername.class));
+		verify(mockPlaceChanger).goTo(isA(ChangeUsername.class));
 	}
 	
 	@Test 
@@ -168,7 +169,7 @@ public class LoginPresenterTest {
 	public void testSetPlaceChangeUsername()throws JSONObjectAdapterException {
 		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
 		loginPresenter.setPlace(place);
-		verify(mockPlaceChanger).goTo(any(ChangeUsername.class));
+		verify(mockPlaceChanger).goTo(isA(ChangeUsername.class));
 	}
 
 	@Test

@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -277,7 +278,7 @@ public class EntityBadgeTest {
 		EntityQueryResult header = new EntityQueryResult();
 		header.setId("syn93847");
 		widget.entityClicked(header);
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 	
 	@Test

@@ -133,7 +133,7 @@ public class SubscribeButtonWidgetTest {
 		//simulate click
 		widget.onSubscribe();
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test

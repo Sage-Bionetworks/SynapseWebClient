@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -162,7 +163,7 @@ public class SettingsPresenterTest {
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));		
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));		
 	}
 	
 	//if notification settings are null, should still successfully update with user specified notification setting
@@ -237,7 +238,7 @@ public class SettingsPresenterTest {
 		presenter.setUserNotificationEmail(email);
 		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
 		//reload profile
-		verify(mockPlaceChanger).goTo(any(Profile.class));
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 	
 	@Test
@@ -330,7 +331,7 @@ public class SettingsPresenterTest {
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockUserProfileModalWidget).showEditProfile(anyString(), captor.capture());
 		captor.getValue().invoke();
-		verify(mockPlaceChanger).goTo(any(Profile.class));
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 	
 	@Test

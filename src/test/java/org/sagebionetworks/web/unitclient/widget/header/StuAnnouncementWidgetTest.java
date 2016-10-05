@@ -6,6 +6,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -172,7 +173,7 @@ public class StuAnnouncementWidgetTest {
 		String capturedKey = stringCaptor.getValue();
 		assertTrue(capturedKey.startsWith(StuAnnouncementWidget.STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY));
 		verify(mockView).hide();
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 	
 	@Test

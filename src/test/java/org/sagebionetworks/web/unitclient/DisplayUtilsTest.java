@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -318,13 +318,13 @@ public class DisplayUtilsTest {
 	@Test
 	public void testHandleServiceExceptionReadOnly() {
 		assertTrue(DisplayUtils.handleServiceException(new ReadOnlyModeException(), mockGlobalApplicationState, true, mockView));
-		verify(mockPlaceChanger).goTo(any(Down.class));
+		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
 	public void testHandleServiceExceptionDown() {
 		assertTrue(DisplayUtils.handleServiceException(new SynapseDownException(), mockGlobalApplicationState, true, mockView));
-		verify(mockPlaceChanger).goTo(any(Down.class));
+		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
@@ -339,7 +339,7 @@ public class DisplayUtilsTest {
 	public void testHandleServiceExceptionForbiddenNotLoggedIn() {
 		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, false, mockView));
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test
@@ -352,7 +352,7 @@ public class DisplayUtilsTest {
 	public void testHandleServiceExceptionNotFound() {
 		assertTrue(DisplayUtils.handleServiceException(new NotFoundException(), mockGlobalApplicationState, true, mockView));
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_NOT_FOUND));
-		verify(mockPlaceChanger).goTo(any(Home.class));
+		verify(mockPlaceChanger).goTo(isA(Home.class));
 	}
 	
 	@Test
