@@ -99,7 +99,7 @@ public class PasswordResetPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUserSessionData);
-		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(currentUserSessionData).when(mockAuthenticationController).loginUser(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -132,15 +132,16 @@ public class PasswordResetPresenterTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testResetPassword() {
-		//without the registration token set, mock a successful user service call
+		//mock a successful user service call
 		resetAll();
+		currentUserSessionData.getProfile().setUserName("007");
 		presenter.setPlace(place);
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
-		//verify that place is changed to Home
-		verify(mockPlaceChanger).goTo(isA(Home.class));
+		//verify that place is changed to last place
+		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 	
 	@SuppressWarnings("unchecked")
