@@ -196,7 +196,6 @@ public class FilesTab {
 		view.setMetadataVisible(false);
 		view.setWikiPageWidgetVisible(false);
 		view.setFileBrowserVisible(false);
-		view.setDiscussionThreadListWidgetVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
 		view.setProvenanceVisible(false);
