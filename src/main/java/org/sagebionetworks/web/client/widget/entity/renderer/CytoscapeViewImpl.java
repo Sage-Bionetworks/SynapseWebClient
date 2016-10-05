@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph25;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -59,9 +61,19 @@ public class CytoscapeViewImpl implements CytoscapeView {
 	private void showIfAttachedAndConfigured() {
 		if (isAttached && isConfigured) {
 			visualizationContainer.clear();
-			String id = Document.get().createUniqueId();
+			final String id = Document.get().createUniqueId();
 			visualizationContainer.getElement().setId(id);
-			new CytoscapeGraph25().show(id,  cyJS, styleJson);
+			GWT.runAsync(new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					new CytoscapeGraph25().show(id, cyJS, styleJson);
+				}
+				
+				@Override
+				public void onFailure(Throwable reason) {
+					SynapseJSNIUtilsImpl._consoleError(reason.getMessage());
+				}
+			});
 		}
 	}
 	

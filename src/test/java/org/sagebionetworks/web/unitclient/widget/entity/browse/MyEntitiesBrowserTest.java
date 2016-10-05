@@ -47,7 +47,6 @@ public class MyEntitiesBrowserTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter jsonObjectAdapter;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	@Mock
 	EntityTreeBrowser mockEntityTreeBrowser;
 	@Mock
@@ -65,7 +64,7 @@ public class MyEntitiesBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		widget = new MyEntitiesBrowser(mockView, mockAuthenticationController,
 				mockGlobalApplicationState, mockSynapseClient,
-				jsonObjectAdapter, adapterFactory);
+				jsonObjectAdapter);
 		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
 		when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
 		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockFavoritesTreeBrowser);
