@@ -48,21 +48,8 @@ public class SearchUtil {
 			//no potential redirect, go directly to search!
 			globalApplicationState.getPlaceChanger().goTo(searchPlace);	
 		} else {
-			//looks like a redirect.  let's validate before going there.
-			synapseClient.getEntity(queryTerm, new AsyncCallback<Entity>() {
-				
-				@Override
-				public void onSuccess(Entity result) {
-					//any success then go to entity page
-					globalApplicationState.getPlaceChanger().goTo(synapsePlace);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					//any failure then go to search
-					globalApplicationState.getPlaceChanger().goTo(searchPlace);
-				}
-			});
+			globalApplicationState.getPlaceChanger().goTo(synapsePlace);
+			
 		}
 	}
 
