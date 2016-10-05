@@ -66,12 +66,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private static final int FACET_NAME_LENGTH_CHAR = 21;
 	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	private static final int MAX_RESULTS_PER_PAGE = 10;
-	private static final int MINUTE_MS = 1000*60;
-	private static final int HOUR_MS = MINUTE_MS * 60;
-	private static final int DAY_MS = HOUR_MS * 24;
-	private static final int WEEK_MS = DAY_MS * 7;
-	private static final int MONTH_MS = DAY_MS * 30;
-	private static final int YEAR_MS = DAY_MS * 365;
+	private static final int MINUTE_IN_SEC = 60;
+	private static final int HOUR_IN_SEC = MINUTE_IN_SEC * 60;
+	private static final int DAY_IN_SEC = HOUR_IN_SEC * 24;
+	private static final int WEEK_IN_SEC = DAY_IN_SEC * 7;
+	private static final int MONTH_IN_SEC = DAY_IN_SEC * 30;
+	private static final int YEAR_IN_SEC = DAY_IN_SEC * 365;
 	private static Map<String,String> facetToDisplay;
 	
 	static {
@@ -263,8 +263,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 				if (text != null) {
 					text = formatFacetName(facet.getKey()) + ": " + text;
 				} else {
-					// continuous variable
-					text = formatFacetName(facet.getKey()) + " >= " + facet.getValue().replaceAll("\\.\\.", "");
+					// continuous variable, in this case time in seconds
+					String valueAsString = facet.getValue().replaceAll("\\.\\.", "");
+					
+					String formattedDateString;
+					try{
+						long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
+						formattedDateString = valueInMiliseconds == 0 ? "any time": DisplayUtils.converDateaToSimpleString(new Date(valueInMiliseconds));
+					}catch (NumberFormatException e){
+						formattedDateString = valueAsString;
+					}
+					
+					text = formatFacetName(facet.getKey()) + " >= " + formattedDateString;
 				}
 			}
 			facetNames.append(text);
@@ -463,36 +473,37 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private FlowPanel createDateFacet(final Facet facet) {
 		if(facet == null) return null;
-		if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
+		//TODO: remove the comment
+		//if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
 		
 		FlowPanel lc = new FlowPanel();
 		lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
 		FlexTable table = new FlexTable();
 		
 		// convert to miliseconds
-		long min = facet.getMin() * 1000;
-		long max = facet.getMax() * 1000;
+		//long min = facet.getMin() * 1000;
+		//long max = facet.getMax() * 1000;
 		
 		// determine time diffs
-		Date now = presenter.getSearchStartTime();		
+		long curTimeInSec = System.currentTimeMillis() / 1000;
 		long beginingOfTime = 0;
-		long anHourAgo = now.getTime()-HOUR_MS;
-		long aDayAgo = now.getTime()-DAY_MS;
-		long aWeekAgo = now.getTime()-WEEK_MS;
-		long aMonthAgo = now.getTime()-MONTH_MS;
-		long aYearAgo = now.getTime()-YEAR_MS;
+		long anHourAgo = curTimeInSec - HOUR_IN_SEC;
+		long aDayAgo = curTimeInSec - DAY_IN_SEC;
+		long aWeekAgo = curTimeInSec - WEEK_IN_SEC;
+		long aMonthAgo = curTimeInSec - MONTH_IN_SEC;
+		long aYearAgo = curTimeInSec - YEAR_IN_SEC;
 		
 		int row = -1;
 		table.setWidget(++row, 0, createTimeFacet(facet, beginingOfTime, "Any Time"));
-		if(anHourAgo <= max)
+		//if(anHourAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, anHourAgo, "Past Hour"));
-		if(aDayAgo <= max)
+		//if(aDayAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aDayAgo, "Past 24 Hours"));
-		if(aWeekAgo <= max)
+		//if(aWeekAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aWeekAgo, "Past Week"));
-		if(aMonthAgo <= max)
+		//if(aMonthAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aMonthAgo, "Past Month"));
-		if(aYearAgo <= max)
+		//if(aYearAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, aYearAgo, "Past Year"));
 		
 		if(row == -1) {

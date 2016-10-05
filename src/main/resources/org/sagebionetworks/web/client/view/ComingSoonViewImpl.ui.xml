@@ -2,7 +2,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
-	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<ui:style>
 		.important {
@@ -21,16 +22,10 @@
 			<w:HelpWidget text="Optional help link text" helpMarkdown="This contains basic help." href="http://link/to/more/help" placement="BOTTOM" />
 			<w:HelpWidget helpMarkdown="This contains **very basic** markdown, perhaps with a [link](http://www.jayhodgson.com)."/>
 		</g:FlowPanel>
-		<g:SimplePanel ui:field="fileHandleListContainer" />
 		
+		<bh:Div ui:field="widgetContainer" />
 		<h2>Coming Soon</h2>
-		<div style="margin: 15px;">
-			<g:SimplePanel ui:field="biodallianceView" addStyleNames="cytoscape-container" />
-		</div>
-		<div style="margin: 15px;">
-			<g:SimplePanel ui:field="cytoscapeView" addStyleNames="cytoscape-container" />
-		</div>
-		<g:FlexTable ui:field="flextTable1"></g:FlexTable>
+		
 		This page is coming soon.
 		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />	    

@@ -18,7 +18,7 @@
 					<b:CheckBox ui:field="select" />
 				</t:TableData>
 				<t:TableData width="20px" ui:field="synAlertTableData" >
-					<b:Tooltip title="Loading error">
+					<b:Tooltip ui:field="errorTooltip" title="Loading error">
 					  <b:Icon fixedWidth="true" type="EXCLAMATION_CIRCLE" addStyleNames="text-danger"/>
 					</b:Tooltip>
 				</t:TableData>

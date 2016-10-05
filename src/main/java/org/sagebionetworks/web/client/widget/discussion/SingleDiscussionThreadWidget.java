@@ -90,7 +90,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private Callback deleteOrRestoreCallback;
 	private String projectId;
 	private Callback refreshCallback;
-	private Set<Long> moderatorIds;
+	private Set<String> moderatorIds;
 	private boolean isThreadDeleted;
 	
 	@Inject
@@ -156,7 +156,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteOrRestoreCallback) {
+	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<String> moderatorIds, Callback deleteOrRestoreCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
@@ -166,7 +166,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.moderatorIds = moderatorIds;
 		this.isThreadDeleted = bundle.getIsDeleted();
 		configureView(bundle);
-		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
+		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
 		view.setIsAuthorModerator(isAuthorModerator);
 
 		authorWidget.configure(bundle.getCreatedBy());

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.ListBox;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl.SetAccessCallback;
@@ -17,12 +17,13 @@ import com.google.inject.Inject;
 public class SharingPermissionsGrid implements SharingPermissionsGridView.Presenter, SynapseWidgetPresenter {
 
 	private SharingPermissionsGridView view;
-	
+	private AuthenticationController authController;
 	private List<AclEntry> aclEntries;
 	
 	@Inject
-	public SharingPermissionsGrid(SharingPermissionsGridView view) {
+	public SharingPermissionsGrid(SharingPermissionsGridView view, AuthenticationController authController) {
 		this.view = view;
+		this.authController = authController;
 		aclEntries = new ArrayList<AclEntry>();
 	}
 	
@@ -50,7 +51,8 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 	
 	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
 		aclEntries.add(aclEntry);
-		view.add(aclEntry, permissionLevels, permissionDisplay);
+		boolean deleteButtonVisible = !aclEntry.getOwnerId().equals(authController.getCurrentUserPrincipalId());
+		view.add(aclEntry, permissionLevels, permissionDisplay, deleteButtonVisible);
 	}
 	
 	public int getCount() {

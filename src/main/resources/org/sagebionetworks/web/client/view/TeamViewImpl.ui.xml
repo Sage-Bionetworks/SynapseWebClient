@@ -44,10 +44,20 @@
 		    	    <br/>
 		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
 		    	    <g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
-		    		<g:SimplePanel ui:field="joinTeamPanel"/>
-		    		<g:SimplePanel ui:field="openMembershipRequestsPanel"/>
-		    		<g:SimplePanel ui:field="openUserInvitationsPanel"/>
-		    		<g:SimplePanel ui:field="memberListPanel"/>
+		    	    <b:Anchor ui:field="showMapLink" text="Show map" icon="MAP_MARKER" visible="false"/>
+		    	    <b:Modal ui:field="mapModal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen" >
+						<b:ModalBody>
+							<bh:Div ui:field="mapPanel"/>
+						</b:ModalBody>
+						<b:ModalFooter>
+							<b:Button type="DEFAULT"
+								dataDismiss="MODAL">Ok</b:Button>
+						</b:ModalFooter>
+					</b:Modal>
+		    	    <g:SimplePanel ui:field="joinTeamPanel" addStyleNames="margin-bottom-5"/>
+		    		<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5"/>
+		    		<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5"/>
+		    		<g:SimplePanel ui:field="memberListPanel" addStyleNames="margin-bottom-5"/>
 		    	</g:HTMLPanel>
 		   	</div>
 		   	<div>
@@ -55,6 +65,6 @@
 		    <div class="clear"></div>
         </div>
 		<g:SimplePanel ui:field="footer" />
-
+		
 	</g:HTMLPanel>
 </ui:UiBinder> 

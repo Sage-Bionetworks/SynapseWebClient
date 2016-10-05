@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -74,7 +75,7 @@ public class EntityMetadata implements Presenter {
 			view.setRestrictionPanelVisible(true);
 		} else {
 			view.setRestrictionPanelVisible(en instanceof TableEntity
-					|| en instanceof Folder);
+					|| en instanceof Folder || en instanceof DockerRepository);
 		}
 		configureStorageLocation(en);
 		restrictionWidget.configure(bundle, true, false, true, new Callback() {

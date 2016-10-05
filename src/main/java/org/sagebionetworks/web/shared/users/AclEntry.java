@@ -8,17 +8,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AclEntry implements IsSerializable {
 	private Set<ACCESS_TYPE> accessTypes;
-	private boolean isOwner, isIndividual;
+	private boolean isIndividual;
 	private String ownerId, title, subtitle;
 	
 	public AclEntry() {}
 
 	
-	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, String title, String subtitle, boolean isIndividual) {
+	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, String title, String subtitle, boolean isIndividual) {
 		super();
 		this.ownerId = ownerId;
 		this.accessTypes = accessTypes;
-		this.isOwner = isOwner;
 		this.title = title;
 		this.isIndividual = isIndividual;
 		this.subtitle = subtitle;
@@ -34,14 +33,6 @@ public class AclEntry implements IsSerializable {
 
 	public void setAccessTypes(Set<ACCESS_TYPE> accessTypes) {
 		this.accessTypes = accessTypes;
-	}
-
-	public boolean isOwner() {
-		return isOwner;
-	}
-
-	public void setOwner(boolean isOwner) {
-		this.isOwner = isOwner;
 	}
 	
 	public String getOwnerId() {
@@ -76,7 +67,6 @@ public class AclEntry implements IsSerializable {
 		result = prime * result
 				+ ((accessTypes == null) ? 0 : accessTypes.hashCode());
 		result = prime * result + (isIndividual ? 1231 : 1237);
-		result = prime * result + (isOwner ? 1231 : 1237);
 		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
 		result = prime * result
 				+ ((subtitle == null) ? 0 : subtitle.hashCode());
@@ -101,8 +91,6 @@ public class AclEntry implements IsSerializable {
 			return false;
 		if (isIndividual != other.isIndividual)
 			return false;
-		if (isOwner != other.isOwner)
-			return false;
 		if (ownerId == null) {
 			if (other.ownerId != null)
 				return false;
@@ -124,7 +112,7 @@ public class AclEntry implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "AclEntry [accessTypes=" + accessTypes + ", isOwner=" + isOwner
+		return "AclEntry [accessTypes=" + accessTypes
 				+ ", isIndividual=" + isIndividual + ", ownerId=" + ownerId
 				+ ", title=" + title + ", subtitle=" + subtitle + "]";
 	}

@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -55,7 +55,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private boolean showSubpages;
 	
 	// widgets
-	private SynapseAlert synapseAlert;
+	private StuAlert stuAlert;
 	private WikiHistoryWidget historyWidget;
 	private MarkdownWidget markdownWidget;
 	private Breadcrumb breadcrumb;
@@ -70,22 +70,22 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	@Inject
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
-			SynapseAlert synAlert, WikiHistoryWidget historyWidget,
+			StuAlert stuAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
 			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
 			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.synapseAlert = synAlert;
+		this.stuAlert = stuAlert;
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
 		this.breadcrumb = breadcrumb;
 		this.modifiedCreatedBy = modifiedCreatedBy;
-		this.synapseAlert = synAlert;
+		this.stuAlert = stuAlert;
 		view.setPresenter(this);
-		view.setSynapseAlertWidget(synAlert.asWidget());
+		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
@@ -125,7 +125,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.showSubpages = showSubpages;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
-		this.synapseAlert.clear();
+		this.stuAlert.clear();
 		// set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -259,7 +259,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					synapseAlert.handleException(caught);
+					view.setMainPanelVisible(false);
+					stuAlert.handleException(caught);
 				}
 			});
 		} else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString()) 
@@ -290,7 +291,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 								callback.noWikiFound();
 						}
 						else {
-							synapseAlert.handleException(caught);
+							stuAlert.handleException(caught);
 						}
 					}
 
@@ -338,7 +339,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synapseAlert.handleException(caught);
+				stuAlert.handleException(caught);
 			}
 		});
 	}
@@ -355,7 +356,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	@Override
 	public void reloadWikiPage() {
-		synapseAlert.clear();
+		stuAlert.clear();
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(final WikiPage result) {
@@ -406,7 +407,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				view.setNoWikiCannotEditMessageVisible(true);
 			}
 		} else {
-			synapseAlert.handleException(caught);
+			view.setMainPanelVisible(false);
+			stuAlert.handleException(caught);
 		}
 	}
 

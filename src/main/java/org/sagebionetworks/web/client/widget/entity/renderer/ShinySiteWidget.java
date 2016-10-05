@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -13,25 +14,28 @@ import com.google.inject.Inject;
 
 public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRendererPresenter {
 	
+	//Note: *.synapse.org is also in the whitelist
 	private static final String[] VALID_URL_BASES = { 
 		"http://glimmer.rstudio.com/", 
-		"http://shiny.synapse.org/", 
-		"https://shiny.synapse.org/", 
 		"http://spark.rstudio.com/",
 		"https://s3.amazonaws.com/static.synapse.org/",
 		"https://belltown.fhcrc.org:9898/",
 		"http://pipeline.rice.edu/dream9/",
 		"https://fredcommo.shinyapps.io/",
-		"https://docs.google.com/a/sagebase.org/forms/"
+		"https://docs.google.com/a/sagebase.org/forms/",
+		"https://calendar.google.com/calendar/"
 		};
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	private AuthenticationController authenticationController;
-	
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
-	public ShinySiteWidget(ShinySiteWidgetView view, AuthenticationController authenticationController) {
+	public ShinySiteWidget(ShinySiteWidgetView view, 
+			AuthenticationController authenticationController,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
+		this.jsniUtils = jsniUtils;
 		view.setPresenter(this);
 	}
 	
@@ -41,7 +45,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		descriptor = widgetDescriptor;
 		int height = getHeightFromDescriptor(descriptor);
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
-		if(isValidShinySite(siteUrl)) {
+		if(isValidShinySite(siteUrl, jsniUtils)) {
 			boolean includePrincipleId = isIncludePrincipalId(descriptor);
 			//if we should include the current user's principal id, then append ?principal=<principal> to the siteUrl
 			if (includePrincipleId && authenticationController.isLoggedIn()) {
@@ -89,8 +93,12 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	}
 
 
-	public static boolean isValidShinySite(String siteUrl) {
+	public static boolean isValidShinySite(String siteUrl, SynapseJSNIUtils jsniUtils) {
 		if(siteUrl != null) {
+			String hostName = jsniUtils.getHostname(siteUrl.toLowerCase());
+			if (hostName != null && hostName.endsWith(".synapse.org")) {
+				return true;
+			}
 			for(String base : VALID_URL_BASES) {
 				// starts with one of the valid url bases?				
 				if(siteUrl.toLowerCase().startsWith(base)) return true;

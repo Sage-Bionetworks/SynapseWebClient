@@ -11,10 +11,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -42,7 +38,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -376,12 +371,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (discussionTab.asTab().isContentStale()) {
 			String projectId = projectHeader.getId();
 			boolean canModerate = false;
-			Set<Long> moderatorIds = new HashSet<Long>();
 			if (projectBundle != null) {
 				canModerate = projectBundle.getPermissions().getCanModerate();
-				moderatorIds = AclUtils.getPrincipalIds(projectBundle.getAccessControlList(), ACCESS_TYPE.MODERATE);
 			}
-			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, moderatorIds);
+			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
 			discussionTab.asTab().setContentStale(false);
 		}
 	}

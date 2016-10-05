@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -81,4 +82,6 @@ public interface DiscussionForumClientAsync{
 	void getEntityThreadCount(List<String> idList, AsyncCallback<EntityThreadCounts> callback);
 
 	void restoreThread(String threadId, AsyncCallback<Void> callback);
+
+	void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback);
 }

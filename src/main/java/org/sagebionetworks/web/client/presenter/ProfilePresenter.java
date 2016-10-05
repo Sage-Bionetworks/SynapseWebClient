@@ -96,7 +96,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
-	private AdapterFactory adapterFactory;
 	private int inviteCount;
 	private int openRequestCount;
 	private String currentUserId;
@@ -126,7 +125,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory,
 			ChallengeClientAsync challengeClient,
 			CookieProvider cookies,
 			UserProfileModalWidget userProfileModalWidget,
@@ -143,7 +141,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
 		this.challengeClient = challengeClient;
 		this.cookies = cookies;
 		this.userProfileModalWidget = userProfileModalWidget;
@@ -744,7 +741,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getFavorites() {
 		projectSynAlert.clear();
-		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(synapseClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				if (filterType == ProjectFilterEnum.FAVORITES) {
@@ -783,7 +780,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			return;
 		}
 		
-		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
+		CreateEntityUtil.createProject(name, synapseClient, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
