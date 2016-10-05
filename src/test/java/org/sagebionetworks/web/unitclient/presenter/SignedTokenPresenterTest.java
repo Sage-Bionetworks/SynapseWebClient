@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -115,7 +114,7 @@ public class SignedTokenPresenterTest {
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
-		verify(mockPlaceChanger).goTo(any(Team.class));
+		verify(mockPlaceChanger).goTo(isA(Team.class));
 	}
 	
 	@Test

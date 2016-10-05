@@ -5,6 +5,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -831,7 +832,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickThreadNoCallback() {
 		discussionThreadWidget.onClickThread();
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 	
 	@Test
