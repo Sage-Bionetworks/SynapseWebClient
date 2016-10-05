@@ -10,8 +10,8 @@
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="headerPanel"/>
 		<g:SimplePanel ui:field="synAlertContainer"/>
-		<g:HTMLPanel ui:field="loadingUI" addStyleNames="min-height-500">
-			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+		<g:HTMLPanel ui:field="loadingUI" addStyleNames="center-block center min-height-500">
+			<g:Image resource='{sageImageBundle.loading31}' />
 			&nbsp;Loading...
 		</g:HTMLPanel>
 		
