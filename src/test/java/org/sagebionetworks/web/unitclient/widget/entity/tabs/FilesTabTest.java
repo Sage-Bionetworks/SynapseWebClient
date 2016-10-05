@@ -257,7 +257,7 @@ public class FilesTabTest {
 		
 		verify(mockRefreshAlert, never()).configure(anyString(), any(ObjectType.class));
 
-		verify(mockView).setDiscussionThreadListWidgetVisible(false);
+		verify(mockView, times(2)).setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	@Test
@@ -385,7 +385,7 @@ public class FilesTabTest {
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
 
-		verify(mockView).setDiscussionThreadListWidgetVisible(false);
+		verify(mockView, times(2)).setDiscussionThreadListWidgetVisible(false);
 	}
 
 	@Test
