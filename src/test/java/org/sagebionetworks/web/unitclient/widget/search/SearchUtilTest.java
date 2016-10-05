@@ -30,7 +30,6 @@ public class SearchUtilTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -47,10 +46,10 @@ public class SearchUtilTest {
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
 	}
 	
-	@Test
+	@Test //fix
 	public void testSearchForInvalidSynId() {
 		//mocking failed verification of the syn id, should change to Search place
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		//AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		SearchUtil.searchForTerm("syn123", mockGlobalAppState, mockSynapseClient);
 		verify(mockPlaceChanger).goTo(any(Search.class));
 	}
