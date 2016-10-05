@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface APITableWidgetView extends IsWidget, SynapseView {
 
@@ -26,7 +27,7 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	 */
 	public void configurePager(int start, int end, int total);
 	
-	public void showError(String message);
+	public void showError(Widget synAlert);
 	
 	void showTableUnavailable();
 	
