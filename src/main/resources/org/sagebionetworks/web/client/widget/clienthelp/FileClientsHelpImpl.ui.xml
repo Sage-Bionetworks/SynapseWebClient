@@ -4,8 +4,8 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Span>
-		<b:Anchor dataToggle="MODAL" dataTarget="#clientHelpModal" text="other&#160;download&#160;options" addStyleNames="font-italic"/>
-		<b:Modal closable="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="clientHelpModal">
+		<b:Anchor ui:field="link" text="other&#160;download&#160;options" addStyleNames="font-italic"/>
+		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
 			    <b:Heading size="H4" text="Download Options" addStyleNames="displayInline"/>
 			    <w:HelpWidget helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](http://docs.synapse.org/articles/api_documentation.html) is available online." 
@@ -14,43 +14,29 @@
 			<b:ModalBody>
 				<b:TabPanel>
 					<b:NavTabs>
-						<b:TabListItem active="true" dataTarget="#commandLineTab" text="Command Line" />
-						<b:TabListItem dataTarget="#pythonTab" text="Python" />
-						<b:TabListItem dataTarget="#rTab" text="R" />
+						<b:TabListItem ui:field="cliTabListItem" active="true" text="Command Line" />
+						<b:TabListItem ui:field="pythonTabListItem" text="Python" />
+						<b:TabListItem ui:field="rTabListItem" text="R" />
 					</b:NavTabs>
 					<b:TabContent>
-						<b:TabPane active="true" b:id="commandLineTab">
+						<b:TabPane active="true" ui:field="cliTabPane">
 						  	<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">
-										# Login<br/>
-										synapse -u synapse_username -p synapse_password<br/>
-										<br/>
-										# Download file<br/>
 										synapse get <span ui:field="id1"/><br/>
 									</code>
 								</pre>
 							</g:HTMLPanel>
 						</b:TabPane>
-						<b:TabPane b:id="pythonTab">
+						<b:TabPane ui:field="pythonTabPane">
 							<g:HTMLPanel>
 								<pre>
-									<code class="nohighlight">
-										import synapseclient<br/>
-										<br/>
-										syn = synapseclient.Synapse()<br/>
-										syn.login('synapse_username','password')<br/>
-										<br/>
-										# Obtain a pointer and download the data<br/>
-										<span ui:field="id2"/> = syn.get('<span ui:field="id3"/>')<br/>
-										<br/>
-										# Get the path to the local copy of the data file<br/>
-										filepath = <span ui:field="id4"/>.path<br/>
+									<code class="nohighlight">import synapseclient<br/><br/>syn = synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/><br/># Obtain a pointer and download the data<br/><span ui:field="id2"/> = syn.get('<span ui:field="id3"/>')<br/><br/># Get the path to the local copy of the data file<br/>filepath = <span ui:field="id4"/>.path<br/>
 									</code>
 								</pre>
 						    </g:HTMLPanel>
 						</b:TabPane>
-						<b:TabPane b:id="rTab">
+						<b:TabPane ui:field="rTabPane">
 							<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">

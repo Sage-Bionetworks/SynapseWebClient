@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -84,4 +85,6 @@ public interface DiscussionForumClient extends RemoteService {
 	EntityThreadCounts getEntityThreadCount(List<String> idList) throws RestServiceException;
 
 	void restoreThread(String threadId) throws RestServiceException;
+
+	PaginatedIds getModerators(String forumId, Long limit, Long offset) throws RestServiceException;
 }

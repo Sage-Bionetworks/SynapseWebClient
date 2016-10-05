@@ -196,11 +196,11 @@ public class FilesTab {
 		view.setMetadataVisible(false);
 		view.setWikiPageWidgetVisible(false);
 		view.setFileBrowserVisible(false);
-		view.setDiscussionThreadListWidgetVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
 		view.setProvenanceVisible(false);
 		modifiedCreatedBy.setVisible(false);
+		view.setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {

@@ -2,12 +2,15 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
@@ -41,6 +44,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private MemberListWidget memberListWidget;
 	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
 	private OpenUserInvitationsWidget openUserInvitationsWidget;
+	private GoogleMap map;
+	private CookieProvider cookies;
+	private String currentTeamId;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -53,7 +59,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			JoinTeamWidget joinTeamWidget,  
 			MemberListWidget memberListWidget, 
 			OpenMembershipRequestsWidget openMembershipRequestsWidget,
-			OpenUserInvitationsWidget openUserInvitationsWidget) {
+			OpenUserInvitationsWidget openUserInvitationsWidget,
+			GoogleMap map,
+			CookieProvider cookies) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -67,6 +75,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.memberListWidget = memberListWidget;
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
+		this.map = map;
+		this.cookies = cookies;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
@@ -74,9 +84,11 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setEditTeamWidget(editTeamWidget.asWidget());
 		view.setInviteMemberWidget(inviteWidget.asWidget());
 		view.setJoinTeamWidget(joinTeamWidget.asWidget());
-		view.setOpenMembershipRequestWidget(memberListWidget.asWidget());
+		view.setOpenMembershipRequestWidget(openUserInvitationsWidget.asWidget());
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
-		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
+		view.setMemberListWidget(memberListWidget.asWidget());
+		view.setMap(map.asWidget());
+		view.setShowMapVisible(true);
 		Callback refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -130,6 +142,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void refresh(final String teamId) {
+		this.currentTeamId = teamId;
 		clear();
 		synAlert.clear();
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
@@ -170,6 +183,13 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void onShowMap() {
+		map.setHeight((view.getClientHeight() - 200) + "px");
+		map.configure(currentTeamId);
+		view.showMapModal();
 	}
 	
 	public String getTeamEmail(String teamName) {

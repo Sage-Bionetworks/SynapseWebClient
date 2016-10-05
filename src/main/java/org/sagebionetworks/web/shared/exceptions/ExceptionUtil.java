@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
-import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -22,9 +22,12 @@ public class ExceptionUtil {
 	 * @param ex
 	 * @return
 	 */
-	public static RestServiceException convertSynapseException(SynapseException ex) {
+	public static RestServiceException convertSynapseException(Throwable ex) {
 		log.error(ex);
-		if(ex instanceof SynapseForbiddenException) {			
+		if (ex instanceof SynapseClientException && ex.getCause() != null) {
+			ex = ex.getCause();
+		}
+		if(ex instanceof SynapseForbiddenException) {
 			return new ForbiddenException(ex.getMessage());
 		} else if(ex instanceof SynapseBadRequestException) {
 			return new BadRequestException(ex.getMessage());

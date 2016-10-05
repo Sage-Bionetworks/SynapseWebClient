@@ -187,10 +187,9 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	}
 	
 	@Override
-	public void showError(String message) {
+	public void showError(Widget synAlert) {
 		clear();
-		String errorMessage = DisplayUtils.getIconHtml(iconsImageBundle.error16()) + message;
-		add(new HTMLPanel(DisplayUtils.getMarkdownAPITableWarningHtml(errorMessage)));	
+		add(synAlert);	
 	}
 	
 	@Override

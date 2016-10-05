@@ -4,6 +4,8 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -14,17 +16,21 @@ public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidget
 	private BasicTitleBarView view;
 	private AuthenticationController authenticationController;
 	private FavoriteWidget favWidget;
+	private ContainerClientsHelp containerDownloadHelp;
 	@Inject
-	public BasicTitleBar(BasicTitleBarView view, AuthenticationController authenticationController, FavoriteWidget favWidget) {
+	public BasicTitleBar(BasicTitleBarView view, AuthenticationController authenticationController, FavoriteWidget favWidget, ContainerClientsHelp containerDownloadHelp) {
 		this.view = view;
 		this.authenticationController = authenticationController;
+		this.containerDownloadHelp = containerDownloadHelp;
 		this.favWidget = favWidget;
 		
 		view.setPresenter(this);
 		view.setFavoritesWidget(favWidget.asWidget());
+		view.setContainerHelpWidget(containerDownloadHelp.asWidget());
 	}	
 	
 	public void configure(EntityBundle bundle) {
+		containerDownloadHelp.configure(bundle.getEntity().getId());
 		favWidget.configure(bundle.getEntity().getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(bundle.getEntity().getName());

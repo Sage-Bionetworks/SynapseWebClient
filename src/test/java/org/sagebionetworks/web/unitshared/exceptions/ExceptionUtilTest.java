@@ -61,7 +61,14 @@ public class ExceptionUtilTest {
 	public void testConvertSynapseForbiddenException() {
 		RestServiceException ex = ExceptionUtil.convertSynapseException(synapseException);
 		assertNotNull(ex);
-		assertEquals(restServiceException, ex.getClass());		
+		assertEquals(restServiceException, ex.getClass());
 	}
-		
+
+	@Test
+	public void testConvertSynapseClientException() {
+		SynapseClientException synapseClientEx = new SynapseClientException(synapseException);
+		RestServiceException ex = ExceptionUtil.convertSynapseException(synapseClientEx);
+		assertNotNull(ex);
+		assertEquals(restServiceException, ex.getClass());
+	}
 }

@@ -95,4 +95,14 @@ public interface SynapseJSNIUtils {
 	
 	public String getCurrentURL();
 	public String getCurrentHostName();
+
+	String getProtocol(String url);
+
+	String getHost(String url);
+
+	String getHostname(String url);
+
+	String getPort(String url);
+
+	String getPathname(String url);
 }
