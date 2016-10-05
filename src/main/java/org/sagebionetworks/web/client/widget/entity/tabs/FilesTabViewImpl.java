@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 public class FilesTabViewImpl implements FilesTabView {
 	private static final String DISCUSSION_ABOUT = "Discussion about ";
 	@UiField
-	FlowPanel loading;
+	Span loading;
 	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField

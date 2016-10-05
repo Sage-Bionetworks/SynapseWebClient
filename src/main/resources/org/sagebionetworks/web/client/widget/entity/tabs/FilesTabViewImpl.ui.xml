@@ -8,10 +8,10 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<b:Row>
-		<g:FlowPanel ui:field="loading">
+		<bh:Span ui:field="loading" addStyleNames="center-block center min-height-400">
 			<g:Image resource='{sageImageBundle.loading31}' />
 			<bh:Text> Loading...</bh:Text>
-		</g:FlowPanel>
+		</bh:Span>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
