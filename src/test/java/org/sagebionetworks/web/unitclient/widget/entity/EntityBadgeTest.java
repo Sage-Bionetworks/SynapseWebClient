@@ -2,10 +2,21 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -14,15 +25,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCount;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -30,8 +43,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -45,12 +57,15 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class EntityBadgeTest {
 
@@ -78,7 +93,11 @@ public class EntityBadgeTest {
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
-	GWTWrapper mockGWT;
+	FileDownloadButton mockFileDownloadButton;
+	@Mock
+	DiscussionForumClientAsync mockDiscussionForumClient;
+	@Mock
+	LazyLoadHelper mockLazyLoadHelper;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -97,7 +116,9 @@ public class EntityBadgeTest {
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient, mockGWT);
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
+				mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
+				mockFileDownloadButton, mockDiscussionForumClient, mockLazyLoadHelper);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
@@ -135,6 +156,36 @@ public class EntityBadgeTest {
 		//in this case, "modified by" and "modified on" are not set.
 		verify(mockView).setModifiedByWidgetVisible(false);
 		verify(mockView).setModifiedOn("");
+		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
+		verify(mockDiscussionForumClient).getEntityThreadCount(eq(Arrays.asList(entityId)), captor.capture());
+		AsyncCallback callback = captor.getValue();
+
+		EntityThreadCounts entityThreadCounts = new EntityThreadCounts();
+		entityThreadCounts.setList(new ArrayList<EntityThreadCount>());
+
+		// case empty list
+		callback.onSuccess(entityThreadCounts);
+		verify(mockView).setDiscussionThreadIconVisible(false);
+
+		EntityThreadCount entityThreadCount = new EntityThreadCount();
+		entityThreadCounts.setList(Arrays.asList(entityThreadCount));
+		entityThreadCount.setCount(0L);
+
+		// case zero thread
+		callback.onSuccess(entityThreadCounts);
+		verify(mockView, times(2)).setDiscussionThreadIconVisible(false);
+
+		// case more than one item in the list
+		entityThreadCounts.setList(Arrays.asList(entityThreadCount, entityThreadCount));
+		callback.onSuccess(entityThreadCounts);
+		verify(mockView).showErrorIcon();
+		verify(mockView).setError(anyString());
+
+		String message = "message";
+		Throwable exception = new Throwable(message);
+		callback.onFailure(exception);
+		verify(mockView, times(2)).showErrorIcon();
+		verify(mockView).setError(message);
 	}
 	
 	@Test
@@ -170,33 +221,12 @@ public class EntityBadgeTest {
 		testProject.setId(entityId);
 		setupEntity(testProject);
 		
-		//simulate the view is not yet attached, or in viewport
-		when(mockView.isAttached()).thenReturn(false);
-		when(mockView.isInViewport()).thenReturn(false);
-		
-		widget.startCheckingIfAttachedAndConfigured();
-		verifyZeroInteractions(mockGWT);
-		verifyZeroInteractions(mockSynapseClient);
-		
 		//configure
 		configure();
 		
-		//has not yet started looking to get entity bundle, because it's been configured but not attached (view tells presenter when it's attached).
-		verifyZeroInteractions(mockGWT);
-		
-		//attach
-		//still not in viewport
-		when(mockView.isAttached()).thenReturn(true);
-		widget.viewAttached();
-		
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
-		Callback callback = captor.getValue();
-		
-		//simulate the view is now attached and in the viewport, and widget is configure, so it should ask for entity bundle
-		when(mockView.isInViewport()).thenReturn(true);
-		callback.invoke();
+		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
+		captor.getValue().invoke();
 		
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
@@ -204,39 +234,29 @@ public class EntityBadgeTest {
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
+		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
+		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
 	}
 	
-	/**
-	 * This tests the case when the badge is attached to the dom and remains outside the viewport, and is eventually detached
-	 */
 	@Test
-	public void testNeverInViewport() {
-		//set up entity
+	public void testGetFileEntityBundle() {
+		//verify download button is configured and shown
 		String entityId = "syn12345";
-		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
-		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-		testProject.setId(entityId);
-		setupEntity(testProject);
-		
-		//configure
+		FileEntity testFile = new FileEntity();
+		testFile.setModifiedBy("4444");
+		testFile.setId(entityId);
+		setupEntity(testFile);
 		configure();
-		when(mockView.isInViewport()).thenReturn(false);
-		//attach
-		when(mockView.isAttached()).thenReturn(true);
-		widget.viewAttached();
+		widget.getEntityBundle();
 		
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
-		Callback callback = captor.getValue();
-		
-		Mockito.reset(mockGWT);
-		//simulate the view detached before it's ever scrolled into view
-		when(mockView.isAttached()).thenReturn(false);
-		callback.invoke();
-		//verify that this cycle is dead
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).showPublicIcon();
+		verify(mockView).showAnnotationsIcon();
+		verify(mockView).setAnnotations(anyString());
+		verify(mockView).setAnnotations(anyString());
+		verify(mockView).showHasWikiIcon();
+		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
+		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}
 	
 	@Test
@@ -258,7 +278,7 @@ public class EntityBadgeTest {
 		EntityQueryResult header = new EntityQueryResult();
 		header.setId("syn93847");
 		widget.entityClicked(header);
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 	
 	@Test

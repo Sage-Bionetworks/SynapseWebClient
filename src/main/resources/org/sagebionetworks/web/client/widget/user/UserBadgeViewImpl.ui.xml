@@ -7,7 +7,7 @@
 	
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  	
-	<t:Table addStyleNames="displayInlineBlock">
+	<t:Table addStyleNames="displayInlineBlock userBadgeTable">
 		<t:TableRow>
 			<t:TableData paddingRight="2" ui:field="loadingUI">
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />

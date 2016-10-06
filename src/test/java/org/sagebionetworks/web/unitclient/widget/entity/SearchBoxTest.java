@@ -73,7 +73,6 @@ public class SearchBoxTest {
 	public void testSearchRegular() {
 		presenter.setSearchAll(false);
 		presenter.search("syn123");
-		Mockito.verify(mockSynapseClient).getEntity(Mockito.eq("syn123"), Mockito.any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -82,7 +81,6 @@ public class SearchBoxTest {
 		presenter.setSearchAll(true);
 		presenter.search("syn123");
 		Mockito.verify(mockJSONObjectAdapter, Mockito.atLeastOnce()).createNew();
-		Mockito.verify(mockSynapseClient).getEntity(Mockito.eq("syn456"), Mockito.any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -90,7 +88,6 @@ public class SearchBoxTest {
 		presenter.search("");
 		Mockito.verify(mockJSONObjectAdapter, Mockito.never()).createNew();
 		Mockito.verify(mockGlobalApplicationState, Mockito.never()).getPlaceChanger();
-		Mockito.verify(mockSynapseClient, Mockito.never()).getEntity(Mockito.anyString(), Mockito.any(AsyncCallback.class));
 	}
 	
 }

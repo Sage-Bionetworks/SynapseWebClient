@@ -30,22 +30,16 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void setProfile(UserProfile profile, boolean isOwner);
 	void refreshHeader();
-	void setProjectsError(String string);
-	void addProjectWidget(Widget widget);
+	void setProjectContainer(Widget widget);
 	void addChallengeWidget(Widget widget);
-	void setChallengesError(String error);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
-	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
-	void clearProjects();
 	void setSortText(String text);
-	void setIsMoreProjectsVisible(boolean isVisible);
 	void clearTeamNotificationCount();
 	void setTabSelected(ProfileArea areaTab);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
-	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
 	void hideLoading();
 	void setTeamsFilterVisible(boolean isVisible);
@@ -66,7 +60,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addSortOption(SortOptionEnum sort);
 	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
-	void setEmptyProjectUIVisible(boolean b);
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
 	void setUnbindOrcIdVisible(boolean isVisible);
@@ -78,6 +71,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setVerificationRejectedButtonVisible(boolean isVisible);
 	void setVerificationSubmittedButtonVisible(boolean isVisible);
 	void setVerificationDetailsButtonVisible(boolean isVisible);
+	void setSettingsWidget(Widget w);
 	public interface Presenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -91,7 +85,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void tabClicked(ProfileArea areaTab);
 		void unbindOrcId();
 		void certificationBadgeClicked();
-		void getMoreProjects();
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
@@ -119,6 +112,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setProjectSynAlertWidget(Widget profileSynAlert);
 
 	void setTeamSynAlertWidget(Widget profileSynAlert);
+	void setChallengeSynAlertWidget(Widget challengeSynAlert);
 
 	void addCertifiedBadge();
 	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);

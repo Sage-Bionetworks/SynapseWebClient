@@ -14,8 +14,11 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
@@ -24,7 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
+import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -53,7 +56,7 @@ public class DockerRepoWidgetTest {
 	@Mock
 	private UserEntityPermissions mockPermissions;
 	@Mock
-	BasicTitleBar mockDockerTitleBar;
+	DockerTitleBar mockDockerTitleBar;
 	@Mock
 	EntityMetadata mockMetadata;
 	@Mock
@@ -62,10 +65,14 @@ public class DockerRepoWidgetTest {
 	ActionMenuWidget mockActionMenu;
 	@Mock
 	EntityActionController mockController;
+	@Mock
+	DockerCommitListWidget mockDockerCommitListWidget;
+	@Mock
+	CookieProvider mockCookieProvider;
 
 	DockerRepoWidget dockerRepoWidget;
 	String entityId = "syn123";
-	String entityName = "dockerRepoName";
+	String repoName = "dockerRepoName";
 	Boolean canEdit = true;
 	private Date createdOn = new Date();
 	private String createdBy = "999";
@@ -79,9 +86,10 @@ public class DockerRepoWidgetTest {
 		dockerRepoWidget = new DockerRepoWidget(mockPreflightController,
 				mockView, mockSynAlert, mockWikiPageWidget, mockProvWidget,
 				mockActionMenu, mockDockerTitleBar, mockMetadata,
-				mockModifiedCreatedBy, mockController);
+				mockModifiedCreatedBy, mockController, mockDockerCommitListWidget,
+				mockCookieProvider);
 		when(mockEntity.getId()).thenReturn(entityId);
-		when(mockEntity.getName()).thenReturn(entityName);
+		when(mockEntity.getRepositoryName()).thenReturn(repoName);
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
@@ -90,6 +98,7 @@ public class DockerRepoWidgetTest {
 		when(mockEntity.getModifiedBy()).thenReturn(modifiedBy);
 		when(mockEntity.getModifiedOn()).thenReturn(modifiedOn);
 		when(mockEntityBundle.getRootWikiId()).thenReturn(rootWikiId);
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 	}
 
 	@Test
@@ -103,6 +112,7 @@ public class DockerRepoWidgetTest {
 		verify(mockView).setTitlebar(any(Widget.class));
 		verify(mockView).setActionMenu(any(Widget.class));
 		verify(mockActionMenu).addControllerWidget(any(Widget.class));
+		verify(mockView).setDockerCommitListWidget(any(Widget.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -112,20 +122,31 @@ public class DockerRepoWidgetTest {
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
-		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + entityName);
+		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
 		verify(mockMetadata).setEntityUpdatedHandler(mockHandler);
 		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
-		verify(mockDockerTitleBar).configure(mockEntityBundle);
+		verify(mockDockerTitleBar).configure(mockEntity);
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
 		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
-		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, canEdit);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
+		verify(mockActionMenu, never()).setActionVisible(eq(Action.DELETE_ENTITY), anyBoolean());
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
+		verify(mockDockerCommitListWidget).configure(entityId, false);
+		verify(mockView).setProvenanceWidgetVisible(false);
+	}
+
+	@Test
+	public void testConfigureAlphaMode() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
+		verify(mockView).setProvenanceWidgetVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -137,10 +158,10 @@ public class DockerRepoWidgetTest {
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
-		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + entityName);
+		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
 		verify(mockMetadata).setEntityUpdatedHandler(mockHandler);
 		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
-		verify(mockDockerTitleBar).configure(mockEntityBundle);
+		verify(mockDockerTitleBar).configure(mockEntity);
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
 		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
@@ -149,7 +170,7 @@ public class DockerRepoWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, false);
+		verify(mockActionMenu, never()).setActionVisible(eq(Action.DELETE_ENTITY), anyBoolean());
 		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 	}
 }

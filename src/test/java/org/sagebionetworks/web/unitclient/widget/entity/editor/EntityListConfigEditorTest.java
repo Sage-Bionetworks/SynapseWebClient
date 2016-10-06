@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -10,72 +9,69 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
+import org.sagebionetworks.web.client.widget.SelectableItemList;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
+import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
-import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityListConfigEditorTest {
 		
 	EntityListConfigEditor editor;
 	EntityListConfigView mockView;
-	SynapseClientAsync mockSynapseClient;
-	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AuthenticationController mockAuthenticationController;
 
 	Map<String, String> descriptor;
-	Folder syn456;
-	EntityGroupRecord record456; 
+	
+	@Mock
+	EntityListWidget mockEntityListWidget;
+	@Mock
+	EntityFinder mockEntityFinder;
+	@Mock
+	PromptModalView mockPromptForNoteModal;
+	SelectableItemList entityListRowWidgets;
+	@Mock
+	EntityListRowBadge mockEntityListRowBadge;
+	@Mock
+	EntityGroupRecord mockEntityGroupRecord;
 	
 	@Before
 	public void setup() throws Exception{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(EntityListConfigView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockAuthenticationController = mock(AuthenticationController.class);		
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
-		// create gettable entity
-		syn456 = new Folder();
-		syn456.setId("syn456");
-		syn456.setName(syn456.getId());
-		EntityBundle bundle = new EntityBundle();
-		bundle.setEntity(syn456);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
-
-		// create an entity group record for syn456
-		record456 = new EntityGroupRecord();
-		Reference ref = new Reference();
-		ref.setTargetId(syn456.getId());
-		ref.setTargetVersionNumber(1L);
-		record456.setEntityReference(ref);
+		entityListRowWidgets = new SelectableItemList();
+		entityListRowWidgets.add(mockEntityListRowBadge);
+		when(mockEntityListRowBadge.isSelected()).thenReturn(false);
+		when(mockEntityListWidget.getRowWidgets()).thenReturn(entityListRowWidgets);
+		when(mockEntityListRowBadge.getRecord()).thenReturn(mockEntityGroupRecord);
 		
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 		
-		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
-				mockSynapseJSNIUtils, mockAuthenticationController);
-		
-		editor.configure(null, descriptor, null);
+		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockEntityListWidget, mockEntityFinder, mockPromptForNoteModal);
 	}
 	
 	@Test
@@ -85,47 +81,65 @@ public class EntityListConfigEditorTest {
 	}
 	
 	@Test
-	public void testConfigure() throws Exception {
-		reset(mockView); // as configure is called in the before
-		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
-		records.add(record456);			
-		String encoded = EntityListUtil.recordsToString(records);
-		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
-				
+	public void testConfigure() {
 		editor.configure(null, descriptor, null);
-		
-		verify(mockView).configure();	
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
+		//by editing a widget, it always attempts to hide the description.  but you have to touch the entity list to get the update.
+		assertFalse(Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY)));
+		verify(mockEntityListWidget).configure(null, descriptor, null, null);
+		verify(mockView).setButtonToolbarVisible(true);
 	}
 	
 	@Test
-	public void testAddRecord() throws Exception {		
-		editor.addRecord(syn456.getId(), 1L, null);
-			
-		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
-		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		assertEquals(record456, records.get(0));
+	public void testAddRecord() throws Exception {
+		editor.onAddRecord();
+		boolean showVersions = true;
+		ArgumentCaptor<SelectedHandler> captor = ArgumentCaptor.forClass(SelectedHandler.class);
+		verify(mockEntityFinder).configure(eq(showVersions), captor.capture());
+		verify(mockEntityFinder).show();
+		Reference selectedRef = new Reference();
+		String targetId = "syn987";
+		Long targetVersion = 9L;
+		selectedRef.setTargetId(targetId);
+		selectedRef.setTargetVersionNumber(targetVersion);
+		captor.getValue().onSelected(selectedRef);
+		
+		verify(mockEntityFinder).hide();
+		ArgumentCaptor<EntityGroupRecord> recordCaptor = ArgumentCaptor.forClass(EntityGroupRecord.class);
+		verify(mockEntityListWidget).addRecord(recordCaptor.capture());
+		EntityGroupRecord capturedRecord = recordCaptor.getValue();
+		assertEquals(targetId, capturedRecord.getEntityReference().getTargetId());
+		assertEquals(targetVersion, capturedRecord.getEntityReference().getTargetVersionNumber());
 	}
 	
-	@Test
-	public void testRemoveRecord() {			
-		editor.addRecord(syn456.getId(), 1L, null);
-		
-		editor.removeRecord(0);
-		
-		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		assertEquals(0, records.size());
+
+	private EntityListRowBadge setupRow(boolean isSelected) {
+		EntityListRowBadge mockSourceEditor= mock(EntityListRowBadge.class);
+		when(mockSourceEditor.isSelected()).thenReturn(isSelected);
+		return mockSourceEditor;
 	}
 	
 	@Test
 	public void testUpdateNote() {
-		String newNote = "some note";
-		editor.addRecord(syn456.getId(), 1L, null);
+		String existingNote = "existing note";
 		
-		editor.updateNote(0, newNote);
-
-		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		assertEquals(newNote, records.get(0).getNote());
+		EntityListRowBadge s1 = setupRow(false);
+		EntityListRowBadge s2 = setupRow(true);
+		when(s2.getNote()).thenReturn(existingNote);
+		
+		entityListRowWidgets.clear();
+		entityListRowWidgets.add(s1);
+		entityListRowWidgets.add(s2);
+		
+		editor.onUpdateNote();
+		
+		verify(mockPromptForNoteModal).clear();
+		verify(mockPromptForNoteModal).configure(EntityListConfigEditor.NOTE, EntityListConfigEditor.PROMPT_ENTER_NOTE, DisplayConstants.SAVE_BUTTON_LABEL, existingNote);
+		verify(mockPromptForNoteModal).show();
+		
+		String newNote = "new note";
+		when(mockPromptForNoteModal.getValue()).thenReturn(newNote);
+		editor.onUpdateNoteFromModal();
+		verify(s2).setNote(newNote);
 	}
 }
 

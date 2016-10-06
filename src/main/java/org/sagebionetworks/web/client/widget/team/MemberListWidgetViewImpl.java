@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -10,8 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
@@ -23,10 +24,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -37,44 +38,48 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	public static final String MEMBER_ACCESS = "Member";
 	public static final String ADMIN_ACCESS = "Team Manager";
 	
-	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private PortalGinInjector portalGinInjector;
 	private TextBox searchField;
 	private SimplePanel memberSearchContainer;
-	private FlowPanel mainContainer;
+	private SimplePanel synAlertContainer;
+	private SimplePanel loadMoreWidgetContainer;
+	private LoadMoreWidgetContainer loadMoreWidget;
+	private Div membersPanel;
 	@Inject
 	public MemberListWidgetViewImpl(SageImageBundle sageImageBundle,
 			PortalGinInjector portalGinInjector) {
-		this.sageImageBundle = sageImageBundle;
 		this.portalGinInjector = portalGinInjector;
 		memberSearchContainer = new SimplePanel();
-		mainContainer = new FlowPanel();
-		mainContainer.addStyleName("highlight-box margin-bottom-10");
-		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.MEMBERS);
+		synAlertContainer = new SimplePanel();
+		membersPanel = new Div();
+		membersPanel.addStyleName("light-border padding-10");
+		Div membersTitle = new Div();
+		membersTitle.addStyleName("highlight-title");
+		membersTitle.add(new Text(DisplayConstants.MEMBERS));
+		membersPanel.add(membersTitle);
+		loadMoreWidgetContainer = new SimplePanel();
+		membersPanel.add(loadMoreWidgetContainer);
+		configureSearchBox();
+		add(memberSearchContainer);
+		add(membersPanel);
+		add(synAlertContainer);
+	}
+	@Override
+	public void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget) {
+		this.loadMoreWidget = loadMoreWidget;
+		loadMoreWidgetContainer.clear();
+		loadMoreWidgetContainer.add(loadMoreWidget);
 	}
 	
 	@Override
-	public void showLoading() {
-		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
+	public void setSynAlert(IsWidget widget) {
+		synAlertContainer.clear();
+		synAlertContainer.add(widget);
 	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		configureSearchBox();
 	}
 
 	private void configureSearchBox() {
@@ -113,14 +118,8 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	
 	@Override
-	public void configure(List<TeamMemberBundle> members, String searchTerm, boolean isAdmin) {
-		clear();
-		mainContainer.clear();
-		if (searchTerm == null)
-			searchTerm = "";
-		searchField.setValue(searchTerm);
+	public void addMembers(List<TeamMemberBundle> members, boolean isAdmin) {
 		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
-		add(memberSearchContainer);
 		
 		for (TeamMemberBundle teamMember : members) {
 			FlowPanel mediaContainer = new FlowPanel();
@@ -171,30 +170,12 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			singleRow.add(mediaContainer);
 		}
 		
-		mainContainer.add(singleRow);
-		add(mainContainer);
-		createPagination();
+		loadMoreWidget.add(singleRow);
 	}
 	
-
-	private void createPagination() {
-		FlowPanel lc = new FlowPanel();
-		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.setStyleName("pagination pagination-lg");
-
-		List<PaginationEntry> entries = presenter.getPaginationEntries(MemberListWidget.MEMBER_LIMIT, MAX_PAGES_IN_PAGINATION);
-		if(entries != null && entries.size() > 1) {
-			for(PaginationEntry pe : entries) {
-				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "active");
-				else
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
-			}
-		}
-		
-		lc.add(ul);
-		if (entries.size() > 1)
-			mainContainer.add(lc);
+	@Override
+	public void clearMembers() {
+		loadMoreWidget.clear();
 	}
 	
 	private ListBox getAccessCombo(final String ownerId, boolean isAdmin) {
@@ -215,17 +196,8 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		return accessCombo;
 	}
 	
-	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
-		Anchor a = new Anchor();
-		a.setHTML(anchorName);
-		a.addClickHandler(new ClickHandler() {				
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.jumpToOffset(newStart);
-			}
-		});
-		
-		return a;
-	}	
-
+	@Override
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message, "");
+	}
 }

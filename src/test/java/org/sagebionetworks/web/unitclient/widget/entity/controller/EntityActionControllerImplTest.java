@@ -3,12 +3,14 @@ package org.sagebionetworks.web.unitclient.widget.entity.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,9 +31,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.MockCreationValidator;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
@@ -48,11 +55,14 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -63,7 +73,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -77,7 +86,10 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -121,9 +133,19 @@ public class EntityActionControllerImplTest {
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 	V2WikiPage mockWikiPageToDelete;
-
+	@Mock
+	EvaluationEditorModal mockEvalEditor;
+	@Mock
+	CookieProvider mockCookies;
+	
+	@Mock
+	ChallengeClientAsync mockChallengeClient;
+	@Mock
+	SelectTeamModal mockSelectTeamModal;
+	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(EntityActionControllerView.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -156,7 +178,8 @@ public class EntityActionControllerImplTest {
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
+				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
+				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -411,6 +434,32 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
 	}
 
+
+	@Test
+	public void testConfigureAddEvaluationNotInAlpha(){
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+	}
+	
+	@Test
+	public void testConfigureAddEvaluationInAlpha(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
+	}
+	
+	@Test
+	public void testConfigureAddEvaluationInAlphaNotProject(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+	}
 	
 	@Test
 	public void testConfigureMoveTable(){
@@ -725,6 +774,20 @@ public class EntityActionControllerImplTest {
 		Place expected = new Synapse(parentId);
 		assertEquals(expected, result);
 	}
+
+	@Test
+	public void testCreateDeletePlaceDocker(){
+		Entity docker = new DockerRepository();
+		docker.setId(entityId);
+		docker.setParentId(parentId);
+		entityBundle.setEntity(docker);
+		entityBundle.setPermissions(entityBundle.getPermissions());
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		// call under test
+		Place result = controller.createDeletePlace();
+		Place expected = new Synapse(parentId, null, EntityArea.DOCKER, null);
+		assertEquals(expected, result);
+	}
 	
 	@Test
 	public void testOnShareNoChange(){
@@ -929,6 +992,7 @@ public class EntityActionControllerImplTest {
 		assertFalse(controller.isSubmittableType(new Project()));
 		assertFalse(controller.isSubmittableType(new TableEntity()));
 		assertTrue(controller.isSubmittableType(new FileEntity()));
+		assertTrue(controller.isSubmittableType(new DockerRepository()));
 		assertFalse(controller.isSubmittableType(new Folder()));
 		assertFalse(controller.isSubmittableType(new Link()));
 	}
@@ -1265,5 +1329,82 @@ public class EntityActionControllerImplTest {
 
 	}
 
+
+	@Test
+	public void testOnSelectChallengeTeam() {
+		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_CHALLENGE);
+		verify(mockSelectTeamModal).show();
+		
+		//now simulate that a team was selected
+		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
+		teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
+		
+		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
+		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.ADMIN, null) );
+		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+		Challenge c = captor.getValue();
+		assertNull(c.getId());
+		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());
+	}
+	@Test
+	public void testCreateChallengeFailure(){
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		String error = "an error";
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
+		//now simulate that a challenge team was selected
+		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
+		teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
+		
+		verify(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(error);
+	}
+	
+
+	@Test
+	public void testConfigureChallengNotFound() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		//initially hide, then show
+		InOrder inOrder = inOrder(mockActionMenu);
+		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
+		inOrder.verify(mockActionMenu).setActionEnabled(Action.CREATE_CHALLENGE, false);
+		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, true);
+		inOrder.verify(mockActionMenu).setActionEnabled(Action.CREATE_CHALLENGE, true);
+	}
+	
+	
+	@Test
+	public void testConfigureChallengeFoundNonEditable() throws Exception {
+		entityBundle.setEntity(new Project());
+		permissions.setCanEdit(false);
+		AsyncMockStubber.callSuccessWith(new Challenge()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_CHALLENGE, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_CHALLENGE, false);
+		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_CHALLENGE, true);
+	}
+	
+	@Test
+	public void testGetChallengeError() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		String error = "an error";
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_CHALLENGE, false);
+		verify(mockView).showErrorMessage(error);
+	}
+	
+	
 	
 }

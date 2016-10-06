@@ -17,11 +17,7 @@ public interface AddExternalRepoModalView extends IsWidget{
 
 	void hideDialog();
 
-	String getRegistryHost();
-
-	String getPort();
-
-	String getRepoPath();
+	String getRepoName();
 
 	void clear();
 

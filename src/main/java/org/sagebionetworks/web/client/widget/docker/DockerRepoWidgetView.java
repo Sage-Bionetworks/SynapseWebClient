@@ -28,4 +28,8 @@ public interface DockerRepoWidgetView {
 	void setModifiedCreatedBy(IsWidget widget);
 
 	void setActionMenu(Widget widget);
+
+	void setDockerCommitListWidget(Widget widget);
+
+	void setProvenanceWidgetVisible(boolean visible);
 }

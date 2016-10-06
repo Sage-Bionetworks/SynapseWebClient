@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -167,10 +166,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createProjectUI;
 	@UiField
 	FlowPanel projectsTabContent;
-	@UiField
-	SimplePanel emptyProjectUI;
-	@UiField
-	Button moreProjectsButton;
 	
 	//Headings
 	@UiField
@@ -223,8 +218,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement teamsHighlightBox;
 
 	@UiField 
-	DivElement projectsLoadingUI;
-	@UiField 
 	DivElement challengesLoadingUI;
 	@UiField 
 	Row profilePictureLoadingUI;
@@ -246,6 +239,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel teamSynAlertPanel;
 	@UiField
 	FocusPanel alertFocusPanel;
+	@UiField
+	FlowPanel challengeSynAlertPanel;
 	
 	@UiField
 	Alert verifyAlert;
@@ -286,21 +281,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private SettingsPresenter settingsPresenter;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, 
 			Footer footerWidget, 
 			SageImageBundle sageImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, 
-			SettingsPresenter settingsPresenter) {		
+			SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.settingsPresenter = settingsPresenter;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -388,14 +380,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		initCertificationBadge();
-
-		moreProjectsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.getMoreProjects();
-			}
-		});
-		showProjectsLoading(false);
 		
 		moreChallengesButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -526,6 +510,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setChallengeSynAlertWidget(Widget synAlert) {
+		challengeSynAlertPanel.clear();
+		challengeSynAlertPanel.add(synAlert);
+	}
+	
+	@Override
 	public void setTeamSynAlertWidget(Widget teamSynAlert) {
 		teamSynAlertPanel.setWidget(teamSynAlert);
 	}
@@ -597,18 +587,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setSettingsWidget(Widget w){
+		settingsTabContent.clear();
+		settingsTabContent.add(w);
+	}
+	
+	@Override
 	public void showTabs(boolean isOwner) {
 		DisplayUtils.hide(settingsListItem);
 		openInvitesContainer.setVisible(isOwner);
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			settingsTabContent.add(settingsPresenter.asWidget());
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
-		} else {
-			settingsPresenter.resetView();
 		}
 		//Teams
 		DisplayUtils.show(navtabContainer);
@@ -670,41 +663,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeamsError(String error) {
-		DisplayUtils.showErrorMessage(error);
-	}
-
-	@Override
-	public void setProjectsError(String error) {
-		DisplayUtils.showErrorMessage(error);
-	}
-	
-	@Override
-	public void setEmptyProjectUIVisible(boolean b) {
-		emptyProjectUI.setVisible(b);
-	}
-	
-	@Override
-	public void clearProjects() {
-		projectsTabContent.clear();
-		setIsMoreProjectsVisible(false);
-		setEmptyProjectUIVisible(false);
-		favoritesHelpPanel.setVisible(false);
-	}
-	@Override
 	public void clearChallenges() {
 		challengesTabContent.clear();
 		setIsMoreChallengesVisible(false);
 	}
 	
 	@Override
-	public void setIsMoreProjectsVisible(boolean isVisible) {
-		moreProjectsButton.setVisible(isVisible);
-	}
-	
-	@Override
-	public void addProjectWidget(Widget toAdd) {
-		toAdd.addStyleName("margin-bottom-10 col-xs-12");
+	public void setProjectContainer(Widget toAdd) {
+		projectsTabContent.clear();
 		projectsTabContent.add(toAdd);
 	}
 	
@@ -723,10 +689,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setIsMoreChallengesVisible(boolean isVisible) {
 		moreChallengesButton.setVisible(isVisible);
-	}
-	@Override
-	public void setChallengesError(String error) {
-		DisplayUtils.showErrorMessage(error);
 	}
 	
 	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {
@@ -817,11 +779,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
-	@Override
-	public void showProjectsLoading(boolean isLoading) {
-		UIObject.setVisible(projectsLoadingUI, isLoading);
-	}
 	
 	@Override
 	public void clear() {
@@ -836,7 +793,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
-		clearProjects();
 		//init with loading widget
 		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		

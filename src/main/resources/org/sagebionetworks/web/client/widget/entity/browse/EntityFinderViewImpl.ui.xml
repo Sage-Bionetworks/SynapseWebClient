@@ -4,8 +4,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<b:Modal fade="true"
-		dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+	<b:Modal dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 		<b:ModalHeader closable="false">
 			<b:Heading size="H4" text="Find in Synapse" addStyleNames="displayInline" />
 			<w:HelpWidget helpMarkdown="Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own." 
@@ -81,8 +80,8 @@
 			</t:Table>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 			<b:Button ui:field="okButton" type="PRIMARY">Select</b:Button>
+			<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 

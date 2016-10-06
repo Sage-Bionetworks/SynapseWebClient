@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import java.util.Set;
-
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -33,7 +30,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.forumWidget = forumWidget;
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		view.updateWidth(tab);
-		tab.configure("Discussion&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
+		tab.configure("Discussion", view.asWidget(), "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
 		view.setPresenter(this);
 		view.setForum(forumWidget.asWidget());
 	}
@@ -42,7 +39,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, Set<Long> moderatorIds) {
+	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
@@ -58,7 +55,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, moderatorIds, updateParamsCallback, updateURLCallback);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, updateParamsCallback, updateURLCallback);
 	}
 
 	/**

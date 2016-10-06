@@ -26,8 +26,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setPresenter(SingleDiscussionThreadWidget presenter);
 
-	void addReply(Widget w);
-
 	void clear();
 
 	void setTitle(String title);
@@ -42,13 +40,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setAlert(Widget w);
 
-	void setLoadMoreVisibility(boolean visible);
-
-	void clearReplies();
-
 	void setDeleteIconVisible(boolean visible);
 
-	void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback);
+	void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, AlertCallback deleteCallback);
 	
 	void setShowAllRepliesButtonVisible(boolean visible);
 	
@@ -62,10 +56,10 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setEditThreadModal(Widget w);
 
-	void setEditedVisible(Boolean visible);
+	void setEditedLabelVisible(Boolean visible);
 
 	void setLoadingMessageVisible(boolean visible);
-
+	void setRepliesContainer(IsWidget container);
 	void showSuccess(String successTitle, String successMessage);
 
 	void setThreadLink(String link);
@@ -78,12 +72,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setUnpinIconVisible(boolean visible);
 	void setIsAuthorModerator(boolean isModerator);
 
-	boolean isLoadMoreInViewport();
-
-	boolean getLoadMoreVisibility();
-
-	boolean isLoadMoreAttached();
-
 	void resetButton();
 
 	void setNewReplyContainerVisible(boolean visible);
@@ -91,4 +79,12 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setMarkdownEditorWidget(Widget widget);
 
 	void showSaving();
+
+	void setReplyContainerVisible(boolean visible);
+
+	void setDeletedThreadVisible(boolean visible);
+
+	void setReplyListContainerVisible(boolean visible);
+
+	void setRestoreIconVisible(boolean visible);
 }

@@ -3,12 +3,13 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface EntityBadgeView extends IsWidget, SynapseView {
+public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoadInterface {
 
 	/**
 	 * Set the presenter.
@@ -31,7 +32,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void setModifiedByWidget(Widget w);
 	void setModifiedByWidgetVisible(boolean visible);
 	void setIcon(IconType iconType);
-	
+	void setFileDownloadButton(Widget w);
 	void setAnnotations(String html);
 	void setSize(String s);
 	void setMd5(String s);
@@ -40,8 +41,6 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void showSharingSetIcon();
 	void showHasWikiIcon();
 	void showAnnotationsIcon();
-	boolean isInViewport();
-	boolean isAttached();
 	void setError(String error);
 	void showErrorIcon();
 	
@@ -50,8 +49,9 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		void entityClicked(EntityQueryResult entityHeader);
-		void viewAttached();
 	}
 	String getFriendlySize(Long contentSize, boolean b);
+
+	void setDiscussionThreadIconVisible(boolean visible);
 
 }

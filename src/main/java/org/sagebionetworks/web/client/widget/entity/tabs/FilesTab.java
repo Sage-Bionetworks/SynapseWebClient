@@ -12,7 +12,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -24,6 +23,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -34,7 +34,9 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
@@ -57,7 +59,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class FilesTab implements FilesTabView.Presenter{
+public class FilesTab {
 	Tab tab;
 	FilesTabView view;
 	FileTitleBar fileTitleBar;
@@ -72,6 +74,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	DiscussionThreadListWidget discussionThreadListWidget;
 	
 	Entity currentEntity;
 	String currentEntityId;
@@ -101,8 +104,9 @@ public class FilesTab implements FilesTabView.Presenter{
 			StuAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy
+			final GlobalApplicationState globalApplicationState,
+			ModifiedCreatedByWidget modifiedCreatedBy,
+			DiscussionThreadListWidget discussionThreadListWidget
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -118,7 +122,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
 		this.modifiedCreatedBy = modifiedCreatedBy;
-		view.setPresenter(this);
+		this.discussionThreadListWidget = discussionThreadListWidget;
 		
 		previewWidget.addStyleName("min-height-200");
 		view.setFileTitlebar(fileTitleBar.asWidget());
@@ -130,7 +134,14 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		
+		view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
+		discussionThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>(){
+
+			@Override
+			public void invoke(DiscussionThreadBundle bundle) {
+				globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId()));
+			}
+		});
 		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
 		
 		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
@@ -187,9 +198,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
 		modifiedCreatedBy.setVisible(false);
+		view.setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
@@ -199,6 +210,8 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	
 	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+		this.currentEntity = targetEntity;
+		this.currentEntityId = targetEntity.getId();
 		this.handler = handler;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
@@ -206,6 +219,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		//reset view
 		resetView();
+		view.showLoading(true);
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
@@ -298,6 +312,8 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		showProjectInfoCallack.invoke(isProject);
 		
+		view.showLoading(false);
+		
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
@@ -308,8 +324,10 @@ public class FilesTab implements FilesTabView.Presenter{
 		if (isFile) {
 			fileTitleBar.configure(bundle);
 			previewWidget.configure(bundle);
+			discussionThreadListWidget.configure(currentEntityId, null, null);
+			view.setDiscussionText(currentEntity.getName());
 		}
-		
+		view.setDiscussionThreadListWidgetVisible(isFile);
 		view.setFolderTitlebarVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);
@@ -334,12 +352,6 @@ public class FilesTab implements FilesTabView.Presenter{
 			filesBrowser.configure(currentEntityId, bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser());	
 		}
 		
-		//Programmatic Clients
-		view.setProgrammaticClientsVisible(isFile);
-		if (isFile) {
-			view.configureProgrammaticClients(currentEntityId, shownVersionNumber);	
-		}
-
 		//Provenance
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));

@@ -16,10 +16,9 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	PortalGinInjector ginInjector;
 	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
-	private CallbackP<String> threadIdClickedCallback; 
+	private CallbackP<DiscussionThreadBundle> threadIdClickedCallback; 
 	
-	private String threadId;
-	private String projectId;
+	private DiscussionThreadBundle bundle;
 	@Inject
 	public DiscussionThreadListItemWidget(
 			DiscussionThreadListItemWidgetView view,
@@ -42,8 +41,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	}
 
 	public void configure(DiscussionThreadBundle bundle) {
-		this.threadId = bundle.getId();
-		this.projectId = bundle.getProjectId();
+		this.bundle = bundle;
 		view.setTitle(bundle.getTitle());
 		authorWidget.configure(bundle.getCreatedBy());
 		authorWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
@@ -68,15 +66,11 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	@Override
 	public void onClickThread() {
 		if (threadIdClickedCallback != null) {
-			threadIdClickedCallback.invoke(threadId);
+			threadIdClickedCallback.invoke(bundle);
 		}
 	}
 	
-	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
+	public void setThreadIdClickedCallback(CallbackP<DiscussionThreadBundle> threadIdClickedCallback) {
 		this.threadIdClickedCallback = threadIdClickedCallback;
-	}
-
-	public void disableClick() {
-		view.disableClick();
 	}
 }

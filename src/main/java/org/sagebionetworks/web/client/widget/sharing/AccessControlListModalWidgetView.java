@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import org.gwtbootstrap3.client.ui.ModalSize;
-
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction between the a AccessControlListModalWidget and its view.
@@ -62,5 +60,6 @@ public interface AccessControlListModalWidgetView extends IsWidget {
 	 * @param b
 	 */
 	void setLoading(boolean loading);
+	void setTitle(String title);
 
 }

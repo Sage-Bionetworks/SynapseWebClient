@@ -38,7 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -60,7 +60,7 @@ public class WikiPageWidgetTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
-	SynapseAlert mockSynapseAlert;
+	StuAlert mockStuAlert;
 	@Mock
 	WikiHistoryWidget mockHistoryWidget;
 	@Mock
@@ -84,7 +84,7 @@ public class WikiPageWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget,
+		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockStuAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockBreadcrumb, mockSubpages, mockInjector, mockModifiedCreatedBy);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
@@ -126,6 +126,7 @@ public class WikiPageWidgetTest {
 		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
 		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		// once to clear, once after loading shown
 		verify(mockView, times(2)).setLoadingVisible(false);
@@ -140,7 +141,7 @@ public class WikiPageWidgetTest {
 		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		
-		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
+		verify(mockStuAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockView).setNoWikiCannotEditMessageVisible(true);
@@ -155,7 +156,7 @@ public class WikiPageWidgetTest {
 		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		
-		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
+		verify(mockStuAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockView).setNoWikiCanEditMessageVisible(true);
@@ -169,7 +170,8 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
-		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockStuAlert).handleException(any(Exception.class));
+		verify(mockView).setMainPanelVisible(false);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 
@@ -183,7 +185,7 @@ public class WikiPageWidgetTest {
 		headers.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		presenter.setOwnerObjectName(mockCallbackP);
-		verify(mockSynapseAlert).handleException(any(NotFoundException.class));
+		verify(mockStuAlert).handleException(any(NotFoundException.class));
 	}
 	
 	@Test
@@ -193,7 +195,8 @@ public class WikiPageWidgetTest {
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
-		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockStuAlert).handleException(any(Exception.class));
+		verify(mockView).setMainPanelVisible(false);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 	
@@ -225,7 +228,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.setWikiReloadHandler(mockCallbackP);
 		presenter.reloadWikiPage();
-		verify(mockSynapseAlert).clear();
+		verify(mockStuAlert).clear();
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).setDiffVersionAlertVisible(false);
 		verify(mockView).scrollWikiHeadingIntoView();
@@ -244,7 +247,8 @@ public class WikiPageWidgetTest {
 		// fail to reload wiki page
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.reloadWikiPage();
-		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockStuAlert).handleException(any(Exception.class));
+		verify(mockView).setMainPanelVisible(false);
 		verify(mockView, never()).scrollWikiHeadingIntoView();
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}

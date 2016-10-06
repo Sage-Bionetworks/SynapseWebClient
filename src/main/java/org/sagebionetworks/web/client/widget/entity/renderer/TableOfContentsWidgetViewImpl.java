@@ -13,6 +13,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
@@ -43,7 +44,6 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 		if (!hasLoaded) {
 			hasLoaded = true;
 			FlowPanel linkContainer = new FlowPanel();
-			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
 			JsArray<Element> headingElements = _localHeaderElements(this.getElement());
 			
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
@@ -62,7 +62,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 					final Element scrollToElement = heading;
 					SimplePanel wrapper = new SimplePanel();
 					Anchor a = new Anchor();
-					a.setHTML(text);
+					a.setHTML(SimpleHtmlSanitizer.sanitizeHtml(text));
 					a.addStyleName("link");
 					a.addStyleName(tocStyle);
 					

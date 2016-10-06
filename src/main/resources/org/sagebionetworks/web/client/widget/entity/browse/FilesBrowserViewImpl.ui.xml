@@ -22,7 +22,7 @@
 		<g:SimplePanel ui:field="files" styleName="highlight-box padding-top-0-imp" />
 
 		<b:Modal ui:field="newFolderDialog" title="New Folder"
-			closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false"
+			closable="true" dataBackdrop="STATIC" dataKeyboard="false"
 			size="LARGE">
 			<b:ModalBody>
 				<b:FormGroup>
@@ -32,8 +32,8 @@
 				<g:SimplePanel ui:field="sharingAndDataUseContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelNewFolderButton" type="DEFAULT">Cancel</b:Button>
 				<b:Button ui:field="okNewFolderButton" type="PRIMARY">OK</b:Button>
+				<b:Button ui:field="cancelNewFolderButton" type="DEFAULT">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

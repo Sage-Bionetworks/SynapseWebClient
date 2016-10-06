@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
@@ -30,7 +31,7 @@ public class BookmarkWidgetViewImpl extends FlowPanel implements BookmarkWidgetV
 		this.bookmarkLinkText = bookmarkLinkText;
 		
 		Anchor a = new Anchor();
-		a.setHTML(bookmarkLinkText);
+		a.setHTML(SimpleHtmlSanitizer.sanitizeHtml(bookmarkLinkText));
 		a.addStyleName("link");
 		a.addClickHandler(new ClickHandler() {
 			@Override

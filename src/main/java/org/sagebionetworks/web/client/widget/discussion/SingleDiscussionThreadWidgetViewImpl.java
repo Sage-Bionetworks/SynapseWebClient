@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
-import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
 import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -21,6 +19,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,8 +28,6 @@ import com.google.inject.Inject;
 public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThreadWidgetView {
 
 	public interface Binder extends UiBinder<Widget, SingleDiscussionThreadWidgetViewImpl> {}
-
-	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
 	@UiField
 	Div replyListContainer;
@@ -42,8 +40,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Span createdOn;
 	@UiField
-	HTMLPanel loadMore;
-	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div refreshAlertContainer;
@@ -51,6 +47,8 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	HTMLPanel loadingMessage;
 	@UiField
 	Icon deleteIcon;
+	@UiField
+	Image restoreIcon;
 	@UiField
 	Icon editIcon;
 	@UiField
@@ -81,6 +79,10 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Button saveButton;
 	@UiField
 	Button showAllRepliesButton;
+	@UiField
+	Div replyContainer;
+	@UiField
+	Div deletedThread;
 	
 	String threadLinkHref;
 	private Widget widget;
@@ -141,6 +143,12 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 				presenter.onClickShowAllReplies();
 			}
 		});
+		restoreIcon.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickRestore();
+			}
+		});
 	}
 
 	@Override
@@ -159,15 +167,15 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void addReply(Widget w) {
-		replyListContainer.add(w);
+	public void setRepliesContainer(IsWidget container) {
+		replyListContainer.clear();
+		replyListContainer.add(container);
 	}
 
 	@Override
 	public void clear() {
 		threadTitle.clear();
 		createdOn.clear();
-		replyListContainer.clear();
 	}
 
 	@Override
@@ -196,16 +204,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setLoadMoreVisibility(boolean visible) {
-		loadMore.setVisible(visible);
-	}
-
-	@Override
-	public void clearReplies() {
-		replyListContainer.clear();
-	}
-
-	@Override
 	public void setLoadingMessageVisible(boolean visible) {
 		loadingMessage.setVisible(visible);
 	}
@@ -216,13 +214,13 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void showDeleteConfirm(String deleteConfirmMessage, final AlertCallback deleteCallback) {
+	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final AlertCallback deleteCallback) {
 		Bootbox.Dialog.create()
 				.setMessage(deleteConfirmMessage)
 				.setCloseButton(false)
-				.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
+				.setTitle(dialogTitle)
 				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
-				.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
+				.addButton(buttonName, buttonStyle, deleteCallback)
 				.show();
 	}
 
@@ -242,7 +240,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setEditedVisible(Boolean visible) {
+	public void setEditedLabelVisible(Boolean visible) {
 		edited.setVisible(visible);
 	}
 
@@ -292,21 +290,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public boolean isLoadMoreAttached() {
-		return loadMore.isAttached();
-	}
-
-	@Override
-	public boolean isLoadMoreInViewport() {
-		return DisplayUtils.isInViewport(loadMore.asWidget());
-	}
-
-	@Override
-	public boolean getLoadMoreVisibility() {
-		return loadMore.isVisible();
-	}
-
-	@Override
 	public void setReplyTextBoxVisible(boolean visible) {
 		replyTextBox.setVisible(visible);
 	}
@@ -329,5 +312,25 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void showSaving() {
 		saveButton.state().loading();
+	}
+
+	@Override
+	public void setReplyContainerVisible(boolean visible) {
+		replyContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setDeletedThreadVisible(boolean visible) {
+		deletedThread.setVisible(visible);
+	}
+
+	@Override
+	public void setReplyListContainerVisible(boolean visible) {
+		replyListContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setRestoreIconVisible(boolean visible) {
+		restoreIcon.setVisible(visible);
 	}
 }

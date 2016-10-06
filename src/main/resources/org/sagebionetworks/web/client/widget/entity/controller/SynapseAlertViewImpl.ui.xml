@@ -19,7 +19,7 @@
   		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp">
   			<bh:Strong ui:field="alertText"></bh:Strong>
   		</b:Alert>
-  		<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+  		<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
 				<b:FieldSet>
 					<b:FormGroup>
@@ -29,8 +29,8 @@
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelButton" type="DEFAULT" text="Don't Send" />
 			    <b:Button ui:field="okButton" type="PRIMARY" text="Send Error Report" />
+			    <b:Button ui:field="cancelButton" type="DEFAULT" text="Don't Send" />
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

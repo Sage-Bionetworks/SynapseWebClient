@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -71,19 +67,39 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		});
 		fileInputWidget.setValidation(validator);
 		view.configure(wikiKey, dialogCallback);
-		wikiAttachments.configure(wikiKey);
-		//and try to prepopulate with values from the map.  if it fails, ignore
-		try {
-			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
-				if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)){
-					view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
-				} 
-				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
-			}
-		} catch (Exception e) {}
+		if (wikiKey != null) {
+			wikiAttachments.configure(wikiKey);
+		}
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			configureWithSynapseId();
+		} else {
+			view.showUploadTab();
+		}
 	}
-	
-	@SuppressWarnings("unchecked")
+
+	public void configureWithSynapseId() {
+		view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
+			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		}
+	}
+
+	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
+			DialogCallback dialogCallback) {
+		descriptor = widgetDescriptor;
+		this.dialogCallback = dialogCallback;
+		view.initView();
+		view.configure(wikiKey, dialogCallback);
+		view.setUploadTabVisible(false);
+		view.setExistingAttachementTabVisible(false);
+
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			configureWithSynapseId();
+		} else {
+			view.showExternalTab();
+		}
+	}
+
 	public void clearState() {
 		view.clear();
 	}
@@ -131,13 +147,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			return null;
 		}
 	}
-	/*
-	 * Private Methods
-	 */
 
 	@Override
 	public List<String> getNewFileHandleIds() {
 		return fileHandleIds;
 	}
 
+	/*
+	 * Private Methods
+	 */
 }

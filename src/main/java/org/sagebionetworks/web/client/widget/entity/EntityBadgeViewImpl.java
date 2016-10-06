@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,7 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
-	
+
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	SageImageBundle sageImageBundle;
@@ -70,7 +72,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Tooltip errorField;
 	@UiField
 	Icon errorIcon;
-	
+	@UiField
+	Span fileDownloadButtonContainer;
+	@UiField
+	Icon discussionIcon;
+	@UiField
+	Tooltip discussion;
+	Callback onAttachCallback;
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
@@ -92,11 +100,18 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			}
 		});
 	}
-	
+
+	@Override
+	public void setOnAttachCallback(Callback onAttachCallback) {
+		this.onAttachCallback = onAttachCallback;
+	}
+
 	@Override
 	protected void onAttach() {
 		super.onAttach();
-		presenter.viewAttached();
+		if (onAttachCallback != null) {
+			onAttachCallback.invoke();
+		}
 	}
 	
 	@Override
@@ -258,7 +273,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
 	}
+	@Override
+	public void setFileDownloadButton(Widget w) {
+		fileDownloadButtonContainer.clear();
+		fileDownloadButtonContainer.add(w);
+	}
 
+	@Override
+	public void setDiscussionThreadIconVisible(boolean visible){
+		discussionIcon.setVisible(visible);
+	}
 	/*
 	 * Private Methods
 	 */

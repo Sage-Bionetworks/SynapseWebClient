@@ -14,14 +14,13 @@ public interface EvaluationAccessControlListModalWidget extends IsWidget {
 	
 	/**
 	 * Show the sharing dialog.
-	 * @param changeCallback
 	 */
-	public void showSharing(Callback changeCallback);
+	public void show();
 	
 	/**
 	 * The widget must be configured before showing the dialog.
 	 * @param evaluation
 	 */
-	public void configure(Evaluation evaluation);
+	public void configure(Evaluation evaluation, Callback changeCallback);
 
 }

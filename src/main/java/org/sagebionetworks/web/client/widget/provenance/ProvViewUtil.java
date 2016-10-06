@@ -3,18 +3,20 @@ package org.sagebionetworks.web.client.widget.provenance;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
-import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
@@ -62,12 +64,16 @@ public class ProvViewUtil {
 		FlowPanel label = new FlowPanel();
 		label.addStyleName(PROV_ACTIVITY_LABEL_STYLE);
 
-		
 		if(node.getType() == ActivityType.UNDEFINED) {		
-			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);						
-			label.add(new HTML(DisplayConstants.UNDEFINED));
-			label.addStyleName(ACT_MARGIN_NAME);
-			container.add(label);
+			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);
+			Div undefinedContainer = new Div();
+			undefinedContainer.add(new Text(DisplayConstants.UNDEFINED));
+			HelpWidget help = new HelpWidget();
+			help.setHelpMarkdown(DisplayConstants.PROVENANCE_BASIC_HELP);
+			help.setHref(WebConstants.PROVENANCE_API_URL);
+			undefinedContainer.add(help);
+			undefinedContainer.addStyleName(ACT_MARGIN_NAME);
+			container.add(undefinedContainer);
 		} else {
 			// display user profile and name if defined
 			if(node.getActivityName() != null) {				
@@ -235,19 +241,4 @@ public class ProvViewUtil {
 		}
 		return sb.toSafeHtml();
 	}
-
-	/**
-	 * Create a closable popover
-	 * @param title
-	 * @param text
-	 * @param widget
-	 */
-	public static void createMessageConfig(String title, String text, Widget widget) {
-		Tooltip tip = new Tooltip(widget);
-		tip.setIsHtml(true);
-		tip.setTitle(text);
-		tip.setPlacement(Placement.BOTTOM);
-		tip.setShowDelayMs(200);
-	}
-
 }

@@ -9,7 +9,7 @@
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  	
  	<!-- TODO: modal to replace GovernanceDialogHelper.showAccessRequirement -->
-	<b:Modal size="LARGE" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+	<b:Modal size="LARGE" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 	  <b:ModalBody>
 	    <bh:Div ui:field="controlledUseUI" styleName="margin-bottom-20">
 	       	<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.shieldRed16}' />
@@ -44,13 +44,13 @@
 		</bh:Div>
 		<bh:Div ui:field="imposeRestrictionsAllowedNote">
 		    <bh:Text>You are responsible to ensure your data is shared in compliance with the </bh:Text>
-		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5 margin-right-5" href="#!Help:Governance" target="_blank" />
+		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5 margin-right-5" href="http://docs.synapse.org/articles/governance.html" target="_blank" />
 		    <bh:Text> and all applicable laws.  To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below. </bh:Text>
 		    <g:InlineLabel styleName="boldText" text="NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT." />
 		</bh:Div>
 		<bh:Div ui:field="imposeRestrictionsNotAllowedNote">
 		    <bh:Text>For more information on use conditions, please read the </bh:Text>
-		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="#!Help:Governance" target="_blank" />
+		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="http://docs.synapse.org/articles/governance.html" target="_blank" />
 		    <bh:Text>.</bh:Text>
 		</bh:Div>
 		<bh:Div ui:field="anonymousFlagNote">

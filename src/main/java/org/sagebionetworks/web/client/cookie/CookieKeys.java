@@ -9,11 +9,6 @@ package org.sagebionetworks.web.client.cookie;
 public class CookieKeys {
 
 	/**
-	 * Key for the selected columns shown in the datasets table.
-	 */
-	public static String SELECTED_DATASETS_COLUMNS = "org.sagebionetworks.datasets.selected.columns";
-
-	/**
 	 * Key for the selected filters applied on the datasets table.
 	 */
 	public static String APPLIED_DATASETS_FILTERS = "org.sagebionetworks.datasets.applied.filters";
@@ -24,11 +19,6 @@ public class CookieKeys {
 	 * Login token
 	 */
 	public static String USER_LOGIN_TOKEN = "org.sagebionetworks.security.user.login.token";
-
-	/**
-	 * Login token
-	 */
-	public static String SHOW_DEMO = "org.sagebionetworks.synapse.show.demo";
 
 	/**
 	 * Last Place in the app
@@ -44,12 +34,4 @@ public class CookieKeys {
 	 * LinkedIn requestToken key
 	 */
 	public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
-
-	/**
-	 * Get Satisfaction fastpass key
-	 */
-	public static String FASTPASS = "fastpass";
-	
-	public static String IGNORE_CERTIFICATION_REMINDER = "org.sagebionetworks.synapse.ignore.certification.reminder";
-	
 }

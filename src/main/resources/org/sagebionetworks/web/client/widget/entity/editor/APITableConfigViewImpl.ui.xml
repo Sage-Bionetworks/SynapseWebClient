@@ -40,11 +40,7 @@
 				</b:FormGroup>
 			</b:FieldSet>
 		</bh:Div>
-		<b:Panel>
-			<b:PanelBody>
-				<g:SimplePanel ui:field="columnManagerContainer"/>
-			</b:PanelBody>
-		</b:Panel>
+		<g:SimplePanel ui:field="columnManagerContainer"/>
 	</bh:Div>
 	
 </ui:UiBinder>

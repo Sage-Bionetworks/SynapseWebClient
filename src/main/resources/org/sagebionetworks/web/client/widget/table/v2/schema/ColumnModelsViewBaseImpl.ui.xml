@@ -7,11 +7,12 @@
 		<g:SimplePanel ui:field="viewerPanel" />
 		<!-- This modal dialog will contain the editor view -->
 		<b:Modal ui:field="editModal" title="Edit Columns" closable="true"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="editColumnsModal"
+			dataBackdrop="STATIC" dataKeyboard="false" b:id="editColumnsModal"
 			size="LARGE">
 			<b:ModalBody>
 				<g:SimplePanel ui:field="columnEditorModalPanel"/>
 				<b:Alert type="DANGER" ui:field="alert" visible="false" title="Error"/>
+				<g:SimplePanel ui:field="jobTrackerWidgetContainer"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="saveButton" type="PRIMARY"

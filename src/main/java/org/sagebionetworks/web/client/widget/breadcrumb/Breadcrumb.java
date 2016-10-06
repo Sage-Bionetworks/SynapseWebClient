@@ -41,12 +41,13 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 	public void configure(EntityPath entityPath, EntityArea optionalArea) {
 		view.setPresenter(this);
 		List<LinkData> links = new ArrayList<LinkData>();
+		String currentPageName = null;
 		if (entityPath != null) {
 			List<EntityHeader> path = entityPath.getPath();
 			if (path != null) {
 				// create link data for each path element except for the first
 				// (root) and last (current)
-				for (int i = 1; i < path.size(); i++) {
+				for (int i = 1; i < path.size() - 1; i++) {
 					EntityHeader element = path.get(i);
 					String name = element.getName();
 					Synapse place = new Synapse(element.getId());
@@ -62,9 +63,14 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 					}
 					links.add(new LinkData(name, icon, place));
 				}
+				currentPageName = path.get(path.size()-1).getName();
 			}
 		}
-		view.setLinksList(links);
+		if (currentPageName != null) {
+			view.setLinksList(links, currentPageName);
+		} else {
+			view.setLinksList(links);
+		}
 	}
 	
 	/**

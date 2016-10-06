@@ -25,14 +25,14 @@
 							<bh:Span ui:field="createdOn"></bh:Span>
 							<b:Label text="Edited" ui:field="edited" visible="false" addStyleNames="margin-left-10 moveup-1"/>
 						</bh:Div>
-						<bh:Div>
+						<bh:Div ui:field="commandsContainer">
 							<b:Tooltip title="Delete reply" placement="LEFT">
 								<b:Icon ui:field="deleteIcon" type="TRASH_O" size="LARGE"  pull="RIGHT" addStyleNames="imageButton line-height-1em" visible="false"/>
 							</b:Tooltip>
 							<b:Tooltip title="Edit reply" placement="LEFT">
 								<b:Icon ui:field="editIcon" type="PENCIL" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em" visible="false"/>
 							</b:Tooltip>
-							<b:Tooltip title="Link to this reply" placement="LEFT">
+							<b:Tooltip title="Link directly to this reply" placement="LEFT">
 								<b:Icon ui:field="linkIcon" type="LINK" size="LARGE"  pull="RIGHT" addStyleNames="imageButton margin-right-5 line-height-1em " />
 							</b:Tooltip>
 						</bh:Div>
@@ -41,6 +41,7 @@
 			</b:Container>
 		</bh:Div>
 		<g:SimplePanel ui:field="editReplyModalContainer"/>
+		<bh:Div ui:field="copyTextModalContainer" />
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
 	</bh:Div>
 </ui:UiBinder>

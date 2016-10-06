@@ -82,17 +82,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
 			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
-		} else if (aclEntry.isOwner()) {
-			//owner should be the first (after groups, if present)
-			int insertIndex = 0;
-			for (; insertIndex < permissionsGrid.getCount(); insertIndex++) {
-				if (permissionsGrid.getAt(insertIndex).isIndividual())
-					break;
-			}
-			permissionsGrid.insert(aclEntry, insertIndex, permList, permissionDisplay, false); // insert owner
-		}
-		else
+		} else {
 			permissionsGrid.add(aclEntry, permList, permissionDisplay);
+		}
 	}
 	
 	@Override

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,7 +62,7 @@ public class QuizInfoDialogTest {
 		Dialog.Callback dialogCallback = callbackCaptor.getValue();
 		//Verify that it sends the user to the quiz place on primary click
 		dialogCallback.onPrimary();
-		verify(mockPlaceChanger).goTo(any(Quiz.class));
+		verify(mockPlaceChanger).goTo(isA(Quiz.class));
 	}
 	
 	

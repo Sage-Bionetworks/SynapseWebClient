@@ -2,9 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -47,7 +46,6 @@ public class WikiMarkdownEditorTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils; 
 	PlaceChanger mockPlaceChanger;
 	WikiMarkdownEditor presenter;
-	MarkdownWidget mockMarkdownWidget;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
@@ -66,9 +64,8 @@ public class WikiMarkdownEditorTest {
 		mockView = mock(WikiMarkdownEditorView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		mockMarkdownWidget = mock(MarkdownWidget.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockMarkdownWidget);
+		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
@@ -100,27 +97,12 @@ public class WikiMarkdownEditorTest {
 	public void testConfigure() {
 		//configured in before, verify that view is reset
 		verify(mockView).setPresenter(presenter);
-		verify(mockView).setMarkdownPreviewWidget(any(Widget.class));
 		verify(mockView).setMarkdownEditorWidget(any(Widget.class));
 		verify(mockView).clear();
 		verify(mockMarkdownEditorWidget).configure(anyString());
 		verify(mockView).setTitleEditorVisible(false);
 		verify(mockGlobalApplicationState).setIsEditing(true);
 		verify(mockView).showEditorModal();
-	}
-	
-	@Test
-	public void testPreview() throws Exception {
-		presenter.previewClicked();
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
-		verify(mockView).showPreviewModal();
-	}
-	
-	@Test
-	public void testPreviewFailure() throws Exception {
-		presenter.previewClicked();
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
-		verify(mockView).showPreviewModal();
 	}
 	
 	@Test
@@ -134,7 +116,7 @@ public class WikiMarkdownEditorTest {
 		captor.getValue().callback(isConfirmed);
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).hideEditorModal();
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 	
 	@Test

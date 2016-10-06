@@ -5,25 +5,29 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<bh:Div addStyleNames="overflow-x-hidden">
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
-		<bh:Div ui:field="threadDetails" addStyleNames="overflow-x-hidden">
-			<bh:Div addStyleNames="margin-top-10" width="100%" pull="RIGHT" >
+		<bh:Div addStyleNames="overflow-x-hidden">
+			<bh:Div ui:field="deletedThread" visible="false">
+				<bh:Span addStyleNames="highlight-title">Deleted Thread</bh:Span>
+			</bh:Div>
+			<bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%" pull="RIGHT" >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
 					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
 				</bh:Div>
 				<bh:Div width="100%">
-					<g:HTMLPanel ui:field="loadingMessage" visible="false">
-						<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-						&nbsp;Loading...
-					</g:HTMLPanel>
 					<b:Container fluid="true">
 						<b:Row>
 							<b:Column size="XS_12">
 								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10 margin-left-10"/>
 							</b:Column>
 							<b:Column size="XS_12">
+								<g:HTMLPanel ui:field="loadingMessage" visible="false">
+									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+									&nbsp;Loading...
+								</g:HTMLPanel>
 								<bh:Div ui:field="threadMessage"></bh:Div>
 							</b:Column>
 							<b:Column size="XS_12">
@@ -49,17 +53,20 @@
 										</b:IconStack>
 									</b:Tooltip>
 								</bh:Div>
+								<b:Tooltip title="Restore deleted thread" placement="LEFT">
+									<g:Image resource='{icons.restore24}' ui:field="restoreIcon" addStyleNames="imageButton line-height-1em right moveup-5" visible="false"/>
+								</b:Tooltip>
 							</b:Column>
 						</b:Row>
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
+			<bh:Div ui:field="replyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT">
 					<b:TextBox ui:field="replyTextBox" placeholder="Write a reply..."/>
 					<bh:Div ui:field="newReplyContainer" visible="false">
-						<bh:Div ui:field="markdownEditorContainer"></bh:Div>
-						<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
-						<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving...">Save</b:Button>
+						<bh:Div ui:field="markdownEditorContainer" />
+						<b:Button ui:field="cancelButton" type="DEFAULT" text="Cancel" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
+						<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Posting..." text="Post" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
 					</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="replyDetails">
@@ -67,12 +74,6 @@
 					<b:Button ui:field="showAllRepliesButton" type="DEFAULT" size="EXTRA_SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10" visible="false">Show all replies</b:Button>
 				</bh:Div>
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
-			</bh:Div>
-			<bh:Div width="98%" pull="RIGHT" addStyleNames="margin-bottom-5">
-				<g:HTMLPanel ui:field="loadMore" visible="false">
-					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-					&nbsp;Loading...
-				</g:HTMLPanel>
 			</bh:Div>
 		</bh:Div>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>

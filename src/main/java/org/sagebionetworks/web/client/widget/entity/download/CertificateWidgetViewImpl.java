@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -30,7 +31,7 @@ public class CertificateWidgetViewImpl extends Composite implements CertificateW
 	
 	@Override
 	public void setProfile(UserProfile profile) {
-		userNameCertificate.setInnerHTML(DisplayUtils.getDisplayName(profile));
+		userNameCertificate.setInnerHTML(SafeHtmlUtils.htmlEscape(DisplayUtils.getDisplayName(profile)));
 	}
 	
 	@Override

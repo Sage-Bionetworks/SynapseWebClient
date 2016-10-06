@@ -21,10 +21,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	private Presenter presenter;
 	private WikiSubpagesOrderEditorModalWidget orderEditorModal;
-	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
-	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
-	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
-	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
+	private static final String WELL="well";
+	private static final String COL_MD_3="col-md-3";
+	private static final String COL_MD_9="col-md-9";
+	private static final String COL_XS_12="col-xs-12";
 	
 	private Button showHideButton;
 	private Button editOrderButton;
@@ -48,6 +48,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (wikiSubpagesContainer != null) {
 			wikiSubpagesContainer.setStyleName("");
 		}
+		if (wikiPageContainer != null) {
+			wikiPageContainer.setStyleName("");
+		}
+			
 	}
 	
 	@Override
@@ -120,7 +124,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		isShowingSubpages = false;
 		// This call to layout is necessary to force the scroll bar to appear on page-load
 		if (wikiSubpagesContainer != null){
-			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);
+			wikiSubpagesContainer.setStyleName(COL_XS_12);
 		}
 		
 		if (editOrderButton != null) {
@@ -137,8 +141,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			DisplayUtils.hide(navTreeContainer);
 		
 		if (wikiPageContainer != null) {
-			wikiPageContainer.removeStyleName(SHOW_SUBPAGES_MD_STYLE);
-			wikiPageContainer.addStyleName(HIDE_SUBPAGES_MD_STYLE);
+			wikiPageContainer.setStyleName("");
+			wikiPageContainer.addStyleName(COL_XS_12);
 			wikiPageContainer.setVisible(true);
 		}
 	}
@@ -147,8 +151,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public void showSubpages() {
 		isShowingSubpages = true;
 		if (wikiSubpagesContainer != null) {
-			wikiSubpagesContainer.removeStyleName(HIDE_SUBPAGES_STYLE);
-			wikiSubpagesContainer.addStyleName(SHOW_SUBPAGES_STYLE);
+			wikiSubpagesContainer.setStyleName("");
+			wikiSubpagesContainer.addStyleName(COL_XS_12);
+			wikiSubpagesContainer.addStyleName(WELL);
+			wikiSubpagesContainer.addStyleName(COL_MD_3);
 		}
 		
 		if (editOrderButton != null) {
@@ -156,8 +162,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 			
 		if (wikiPageContainer != null) {
-			wikiPageContainer.removeStyleName(HIDE_SUBPAGES_MD_STYLE);
-			wikiPageContainer.addStyleName(SHOW_SUBPAGES_MD_STYLE);
+			wikiPageContainer.setStyleName("");
+			wikiPageContainer.addStyleName(COL_XS_12);
+			wikiPageContainer.addStyleName(COL_MD_9);
 		}
 				
 		if (showHideButton != null) {

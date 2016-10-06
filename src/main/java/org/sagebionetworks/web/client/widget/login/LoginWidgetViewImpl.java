@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
@@ -131,7 +132,7 @@ public class LoginWidgetViewImpl extends Composite implements
 
 	@Override
 	public void showError(String message) {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+message+"</h4>");
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+SafeHtmlUtils.htmlEscapeAllowEntities(message)+"</h4>");
 		clear();
 	}
 

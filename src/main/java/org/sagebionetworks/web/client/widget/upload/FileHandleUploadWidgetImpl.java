@@ -17,6 +17,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	private CallbackP<FileUpload> finishedUploadingCallback;
 	private Callback startedUploadingCallback;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private int count;
+	private FileMetadata[] fileMetaArr;
 	
 	@Inject
 	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader,
@@ -26,6 +28,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		this.multipartUploader = multipartUploader;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.view.setPresenter(this);
+		this.view.allowMultipleFileUpload(false);
 	}
 
 	@Override
@@ -54,6 +57,11 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	@Override
 	public void setValidation(FileValidator validator) {
 		this.validator = validator;
+	}
+	
+	@Override
+	public void allowMultipleFileUpload(boolean value) {
+		this.view.allowMultipleFileUpload(value);
 	}
 	
 	@Override
@@ -92,11 +100,10 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		}
 		return contentType;
 	}
-	
 
 	@Override
 	public void onFileSelected() {
-		FileMetadata[] fileMetaArr = getSelectedFileMetadata();
+		fileMetaArr = getSelectedFileMetadata();
 		if (fileMetaArr != null) {
 			FileMetadata fileMeta = fileMetaArr[0];
 			boolean isValidUpload = validator == null || validator.isValid(fileMeta);
@@ -108,7 +115,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 				view.showProgress(true);
 				view.setInputEnabled(false);
 				view.hideError();
-				doMultipartUpload(fileMeta);		
+				beginMultiFileUpload();	
 			} else {
 				Callback invalidFileCallback = validator.getInvalidFileCallback();
 				if (invalidFileCallback == null) {
@@ -132,34 +139,55 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		view.resetForm();
 	}
 	
+	private void beginMultiFileUpload() {
+		count = 0;
+		doMultipartUpload(fileMetaArr[count]);
+	}
+	
+	private void uploadNext() {
+		count++;
+		if (count != fileMetaArr.length) {
+			int progress = count * 100 / fileMetaArr.length;
+			view.updateProgress(progress, progress + "%");
+			doMultipartUpload(fileMetaArr[count]);
+		} else {
+			// Set the view at 100%
+			view.updateProgress(100, "100%");
+			view.showProgress(false);
+			view.setInputEnabled(true);
+		}
+	}
+	
+	
 	private void doMultipartUpload(final FileMetadata fileMeta) {
 		// The uploader does the real work
-		multipartUploader.uploadSelectedFile(view.getInputId(),
-				new ProgressingFileUploadHandler() {
-					@Override
-					public void uploadSuccess(String fileHandleId) {
-						FileUpload uploadedFile = new FileUpload(fileMeta, fileHandleId);
-						// Set the view at 100%
-						view.updateProgress(100, "100%");
-						view.showProgress(false);
-						view.setInputEnabled(true);
-						finishedUploadingCallback.invoke(uploadedFile);
-					}
+		
+		String fileInputId = view.getInputId();
+		String name = fileMeta.getFileName();
 
-					@Override
-					public void uploadFailed(String error) {
-						view.showProgress(false);
-						view.setInputEnabled(true);
-						view.showError(error);
-					}
+		multipartUploader.uploadFile(name, fileInputId, count,
+			new ProgressingFileUploadHandler() {
+				@Override
+				public void uploadSuccess(String fileHandleId) {
+					FileUpload uploadedFile = new FileUpload(fileMetaArr[count], fileHandleId);
+					finishedUploadingCallback.invoke(uploadedFile);
+					uploadNext();
+				}
 
-					@Override
-					public void updateProgress(double currentProgress,
-							String progressText) {
-						view.updateProgress(currentProgress*100, progressText);
-					}
+				@Override
+				public void uploadFailed(String error) {
+					view.showProgress(false);
+					view.setInputEnabled(true);
+					view.showError(error);
+				}
+
+				@Override
+				public void updateProgress(double currentProgress,
+						String progressText, String uploadSpeed) {
+					int totalProgress = count * 100 / fileMetaArr.length + (int)(currentProgress * 100 / fileMetaArr.length);
+					view.updateProgress(totalProgress, totalProgress + "%");
+				}
 		}, null);
 	}
-
 
 }

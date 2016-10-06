@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
@@ -442,7 +443,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				clearState();
 			} else {
 				//finish upload
-				view.updateProgress(.99d, "99%");
+				view.updateProgress(.99d, "99%", "");
 				uploadSuccess();
 			}
 		} else {
@@ -657,9 +658,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		});
 	}
-	private void uploadError(String message, Throwable t) {
+	public void uploadError(String message, Throwable t) {
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, message);
-		logger.errorToRepositoryServices(message, t);
+		logger.errorToRepositoryServices(message, GlobalApplicationStateImpl.unwrap(t));
 		fireCancelEvent();
 	}
 	
@@ -695,11 +696,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	@Override
-	public void updateProgress(double currentProgress, String progressText) {
+	public void updateProgress(double currentProgress, String progressText, String uploadSpeed) {
 		view.showProgressBar();
 		double percentOfAllFiles = calculatePercentOverAllFiles(this.fileNames.length, this.currIndex, currentProgress);
-		String textOfAllFiles = percentFormat.format(percentOfAllFiles*100.0) + "%";
-		view.updateProgress(percentOfAllFiles, textOfAllFiles);
+		String textOfAllFiles = percentFormat.format(percentOfAllFiles*100.0) + "% ";
+		view.updateProgress(percentOfAllFiles, textOfAllFiles, uploadSpeed);
 	}
 
 	@Override

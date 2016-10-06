@@ -186,6 +186,33 @@ public class GlobalApplicationStateImplTest {
 		captor = ArgumentCaptor.forClass(VersionState.class);
 		verify(callback).onSuccess(captor.capture());
 		assertEquals("v1", captor.getValue().getVersion());
+		
+		AsyncMockStubber.callSuccessWith("v3").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		globalApplicationState.checkVersionCompatibility(callback);
+		//showVersionOutOfDateGlobalMessage() has still only been called once, despite detecting another version change
+		verify(mockView).showVersionOutOfDateGlobalMessage();
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCheckVersionCompatibilityCheckedRecently() {
+		when(mockLocalStorage.get(GlobalApplicationStateImpl.RECENTLY_CHECKED_SYNAPSE_VERSION)).thenReturn(Boolean.TRUE.toString());
+		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
+		globalApplicationState.initSynapseProperties(new Callback() {
+			@Override
+			public void invoke() {}
+		});
+		
+		reset(mockSynapseClient);
+		globalApplicationState.checkVersionCompatibility(callback);
+		
+		verify(mockSynapseClient, never()).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
+		//verify callback was given the correct version
+		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
+		verify(callback).onSuccess(captor.capture());
+		assertEquals("v1", captor.getValue().getVersion());
 	}
 	
 	@Test
@@ -196,6 +223,7 @@ public class GlobalApplicationStateImplTest {
 		Callback mockCallback = mock(Callback.class);
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
+		verify(mockView).initGlobalViewProperties();
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
 		verify(mockLocalStorage).put(eq(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY), eq(Boolean.TRUE.toString()), anyLong());

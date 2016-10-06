@@ -24,4 +24,6 @@ public interface FileHandleUploadWidget extends IsWidget{
 	void setValidation(FileValidator validator);
 
 	void setUploadedFileText(String text);
+	
+	void allowMultipleFileUpload(boolean value);
 }

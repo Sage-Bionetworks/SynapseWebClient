@@ -27,6 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
+	public static final String RECENTLY_CHECKED_SYNAPSE_VERSION = "org.sagebionetworks.web.client.recently-checked-synapse-version";
 	public static final String PROPERTIES_LOADED_KEY = "org.sagebionetworks.web.client.properties-loaded";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
@@ -46,6 +47,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private String synapseVersion;
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
+	private boolean isShowingVersionAlert;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -66,6 +68,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.gwt = gwt;
 		this.view = view;
 		isEditing = false;
+		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
 	}
 	
@@ -88,7 +91,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 	}
 	
-	public Throwable unwrap(Throwable e) {
+	public static Throwable unwrap(Throwable e) {
 		if (e instanceof UmbrellaException) {
 			UmbrellaException ue = (UmbrellaException) e;
 			if (ue.getCauses().size() == 1) {
@@ -212,13 +215,27 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public void checkVersionCompatibility(final AsyncCallback<VersionState> callback) {
+		//have we checked recently?
+		String cachedVersion = localStorage.get(RECENTLY_CHECKED_SYNAPSE_VERSION);
+		if (cachedVersion != null) {
+			if (callback != null) {
+				callback.onSuccess(new VersionState(synapseVersion, false));
+			}
+			return;
+		}
+		// don't check for the next minute
+		localStorage.put(RECENTLY_CHECKED_SYNAPSE_VERSION, Boolean.TRUE.toString(), new Date(System.currentTimeMillis() + 1000*60).getTime());
+		
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
 				boolean isVersionChange = false;
 				//synapse version is set on app load
 				if(!synapseVersion.equals(versions)) {
-					view.showVersionOutOfDateGlobalMessage();
+					if (!isShowingVersionAlert) {
+						view.showVersionOutOfDateGlobalMessage();
+						isShowingVersionAlert = true;
+					}
 					isVersionChange = true;
 				}
 				if (callback != null) {
@@ -258,11 +275,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					});
 				}
 			});
-			initWikiEntitiesAndVersions(c);
-			
 		} else {
 			initSynapsePropertiesFromServer(c);
 		}
+		initWikiEntitiesAndVersions(c);
+		view.initGlobalViewProperties();
 	}
 	
 	public void initSynapsePropertiesFromServer(final Callback c) {
@@ -273,7 +290,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
 				}
 				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
-				initWikiEntitiesAndVersions(c);
 			}
 			
 			@Override

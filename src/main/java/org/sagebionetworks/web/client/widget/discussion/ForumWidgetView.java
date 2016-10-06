@@ -33,4 +33,5 @@ public interface ForumWidgetView extends IsWidget{
 	void setDeletedThreadList(Widget widget);
 	void setDeletedThreadButtonVisible(boolean visible);
 	void setDeletedThreadButtonIcon(IconType icon);
+	void setMainContainerVisible(boolean visible);
 }

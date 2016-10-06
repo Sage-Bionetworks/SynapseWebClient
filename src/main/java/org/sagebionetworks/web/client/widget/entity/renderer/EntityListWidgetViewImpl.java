@@ -1,52 +1,57 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListWidgetViewImpl extends FlowPanel implements EntityListWidgetView {
+public class EntityListWidgetViewImpl implements EntityListWidgetView {
 
-	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private EntityListRenderer renderer;
-	private PortalGinInjector ginInjector;
+	public interface Binder extends	UiBinder<Widget, EntityListWidgetViewImpl> {}
+
+	Widget widget;
+	@UiField
+	Panel table;
+	@UiField
+	Div rows;
+	@UiField
+	Span emptyUI;
+	@UiField
+	TableHeader descriptionHeader;
 	
 	@Inject
-	public EntityListWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
-		this.iconsImageBundle = iconsImageBundle;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.ginInjector = ginInjector;
+	public EntityListWidgetViewImpl(Binder binder) {
+		widget = binder.createAndBindUi(this);
 	}
 	
-	@Override
-	public void configure() {
-		this.clear();		
-		renderer = new EntityListRenderer(iconsImageBundle, synapseJSNIUtils, ginInjector, false);
-		this.add(renderer);
-	}	
-	
-	@Override
-	public void setEntityGroupRecordDisplay(final int rowIndex,
-			final EntityGroupRecordDisplay entityGroupRecordDisplay, boolean isLoggedIn) {
-		renderer.setRow(rowIndex, entityGroupRecordDisplay, isLoggedIn);		
-	}
 	
 	@Override
 	public Widget asWidget() {
-		return this;
-	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
+		return widget;
 	}
-		
-	
-
+	@Override
+	public void addRow(Widget w) {
+		rows.add(w);
+	}
+	@Override
+	public void clearRows() {
+		rows.clear();
+	}
+	@Override
+	public void setEmptyUiVisible(boolean visible) {
+		emptyUI.setVisible(visible);
+	}
+	@Override
+	public void setTableVisible(boolean visible) {
+		table.setVisible(visible);
+	}
+	@Override
+	public void setDescriptionHeaderVisible(boolean visible) {
+		descriptionHeader.setVisible(visible);
+	}
 }

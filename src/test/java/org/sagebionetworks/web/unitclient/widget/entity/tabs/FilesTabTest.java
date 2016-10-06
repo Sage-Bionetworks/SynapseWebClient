@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -37,7 +38,9 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
@@ -45,7 +48,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -124,6 +126,10 @@ public class FilesTabTest {
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Mock
 	RefreshAlert mockRefreshAlert;
+	@Mock
+	DiscussionThreadListWidget mockDiscussionThreadListWidget;
+	@Mock
+	DiscussionThreadBundle mockBundle;
 	FilesTab tab;
 	String projectEntityId = "syn9";
 	String projectName = "proyecto";
@@ -134,6 +140,7 @@ public class FilesTabTest {
 	String entityId = "syn7777777";
 	String linkEntityId = "syn333";
 	Long linkEntityVersion=3L;
+	String threadId = "987";
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -146,7 +153,9 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
 		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
 				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
-				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy);
+				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync,
+				mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy,
+				mockDiscussionThreadListWidget);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -169,6 +178,9 @@ public class FilesTabTest {
 		when(mockLinkEntity.getLinksTo()).thenReturn(mockReference);
 		when(mockReference.getTargetId()).thenReturn(linkEntityId);
 		when(mockReference.getTargetVersionNumber()).thenReturn(linkEntityVersion);
+
+		when(mockBundle.getProjectId()).thenReturn(projectEntityId);
+		when(mockBundle.getId()).thenReturn(threadId);
 	}
 
 	@Test
@@ -182,6 +194,14 @@ public class FilesTabTest {
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockFilesBrowser).setEntityClickedHandler(any(CallbackP.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
+		verify(mockView).setDiscussionThreadListWidget(any(Widget.class));
+		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockDiscussionThreadListWidget).setThreadIdClickedCallback(captor.capture());
+		captor.getValue().invoke(mockBundle);
+		verify(mockGlobalApplicationState).getPlaceChanger();
+		ArgumentCaptor<Place> placeCaptor = ArgumentCaptor.forClass(Place.class);
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		assertEquals(placeCaptor.getValue(), TopicUtils.getThreadPlace(projectEntityId, threadId));
 	}
 	
 	@Test
@@ -217,9 +237,7 @@ public class FilesTabTest {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
-		
 		verify(mockView, times(2)).clearActionMenuContainer();
-		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
@@ -234,6 +252,8 @@ public class FilesTabTest {
 		assertNull(place.getAreaToken());
 		
 		verify(mockRefreshAlert, never()).configure(anyString(), any(ObjectType.class));
+
+		verify(mockView, atLeastOnce()).setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	@Test
@@ -276,8 +296,6 @@ public class FilesTabTest {
 		verify(mockProjectInfoCallback).invoke(false);
 		
 		verify(mockView, times(2)).clearActionMenuContainer();
-		verify(mockView).setProgrammaticClientsVisible(true);
-		verify(mockView).configureProgrammaticClients(fileEntityId, version);
 		verify(mockView).setProvenanceVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -288,6 +306,7 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).getProvenanceRenderer();
 
 		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockView).setDiscussionText(fileName);
 		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
@@ -297,6 +316,9 @@ public class FilesTabTest {
 		assertEquals(version, place.getVersionNumber());
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
+
+		verify(mockDiscussionThreadListWidget).configure(fileEntityId, null, null);
+		verify(mockView).setDiscussionThreadListWidgetVisible(true);
 	}
 	
 
@@ -342,7 +364,6 @@ public class FilesTabTest {
 		verify(mockProjectInfoCallback).invoke(false);
 		
 		verify(mockView, times(2)).clearActionMenuContainer();
-		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -359,6 +380,8 @@ public class FilesTabTest {
 		assertNull(place.getVersionNumber());
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
+
+		verify(mockView, atLeastOnce()).setDiscussionThreadListWidgetVisible(false);
 	}
 
 	@Test
@@ -391,9 +414,9 @@ public class FilesTabTest {
 		verify(mockView).setFileBrowserVisible(false);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockBreadcrumb).clear();
-		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).setVisible(false);
+		verify(mockView).setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	@Test

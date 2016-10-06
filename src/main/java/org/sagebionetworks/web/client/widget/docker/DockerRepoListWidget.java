@@ -1,5 +1,13 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.DOI;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+
 import java.util.Arrays;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -8,6 +16,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
 import org.sagebionetworks.repo.model.entity.query.Operator;
@@ -39,7 +48,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 	private SynapseAlert synAlert;
 	private EntityBundle projectBundle;
 	private EntityQuery query;
-	private CallbackP<String> onRepoClickCallback;
+	private CallbackP<EntityBundle> onRepoClickCallback;
 
 	@Inject
 	public DockerRepoListWidget(
@@ -76,7 +85,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		});
 	}
 
-	public void setRepoClickedCallback(CallbackP<String> onRepoClickCallback) {
+	public void setRepoClickedCallback(CallbackP<EntityBundle> onRepoClickCallback) {
 		this.onRepoClickCallback = onRepoClickCallback;
 	}
 
@@ -96,6 +105,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 			}
 		});
 		queryForOnePage(OFFSET_ZERO);
+		view.setAddExternalRepoButtonVisible(projectBundle.getPermissions().getCanAddChild());
 	}
 
 	/**
@@ -124,7 +134,20 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 
 	private void setResults(EntityQueryResults results) {
 		view.clear();
-		view.addRepos(results.getEntities());
+		synAlert.clear();
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | DOI;
+		for (EntityQueryResult header: results.getEntities()) {
+			synapseClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
+				@Override
+				public void onSuccess(EntityBundle bundle) {
+					view.addRepo(bundle);
+				}
+				@Override
+				public void onFailure(Throwable error) {
+					synAlert.handleException(error);
+				}
+			});
+		}
 	}
 
 	/**
@@ -153,9 +176,9 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 	}
 
 	@Override
-	public void onRepoClicked(String id) {
+	public void onRepoClicked(EntityBundle bundle) {
 		if (onRepoClickCallback != null) {
-			onRepoClickCallback.invoke(id);
+			onRepoClickCallback.invoke(bundle);
 		}
 	}
 }

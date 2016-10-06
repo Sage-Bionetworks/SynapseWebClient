@@ -30,9 +30,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -147,6 +147,46 @@ public class SubmitToEvaluationWidgetTest {
 		verify(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testGetEvaluationIdsFromProject() throws Exception {
+		//test resolving evaluation ids from project id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.PROJECT_ID_KEY, "1");
+		Set<String> evaluationIds = Collections.singleton("5");
+		AsyncMockStubber.callSuccessWith(evaluationIds).when(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockCallback).invoke(evaluationIds);
+	}
+	
+	@Test
+	public void testGetEvaluationIdsEmptyFromProject() throws Exception {
+		//test resolving evaluation ids from project id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.PROJECT_ID_KEY, "1");
+		Set<String> evaluationIds = Collections.emptySet();
+		AsyncMockStubber.callSuccessWith(evaluationIds).when(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockCallback, never()).invoke(anySet());
+		verify(mockView).showUnavailable(anyString());
+	}
+	
+	@Test
+	public void testGetEvaluationIdsErrorFromProject() throws Exception {
+		//test resolving evaluation ids from challenge id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.PROJECT_ID_KEY, "1");
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
 
 	@Test
 	public void testConfigureServiceFailure() throws Exception {

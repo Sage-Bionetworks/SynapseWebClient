@@ -15,11 +15,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -32,18 +34,20 @@ public class ChallengeTabTest {
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
 	AdministerEvaluationsList mockAdministerEvaluationsList;
-	
+	@Mock
+	ChallengeWidget mockChallengeWidget;
 	ChallengeTab tab;
 	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new ChallengeTab(mockView, mockTab, mockAdministerEvaluationsList);
+		tab = new ChallengeTab(mockView, mockTab, mockAdministerEvaluationsList, mockChallengeWidget);
 	}
 
 	@Test
 	public void testConstruction() {
 		verify(mockView).setEvaluationList(any(Widget.class));
+		verify(mockView).setChallengeWidget(any(Widget.class));
 	}
 	
 	@Test
@@ -57,13 +61,13 @@ public class ChallengeTabTest {
 		String entityId = "syn1"; 
 		String entityName = "challenge project test";
 		tab.configure(entityId, entityName);
-		ArgumentCaptor<CallbackP> callbackCaptor = ArgumentCaptor.forClass(CallbackP.class);
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		
 		verify(mockAdministerEvaluationsList).configure(eq(entityId), callbackCaptor.capture());
-		
+		verify(mockChallengeWidget).configure(eq(entityId), any(Callback.class));
 		verify(mockTab, times(2)).setTabListItemVisible(false);
 		verify(mockTab, never()).setTabListItemVisible(true);
-		callbackCaptor.getValue().invoke(true);
+		callbackCaptor.getValue().invoke();
 		verify(mockTab).setTabListItemVisible(true);
 		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);

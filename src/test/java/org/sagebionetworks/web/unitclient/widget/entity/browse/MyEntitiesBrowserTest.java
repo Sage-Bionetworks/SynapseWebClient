@@ -47,7 +47,6 @@ public class MyEntitiesBrowserTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter jsonObjectAdapter;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	@Mock
 	EntityTreeBrowser mockEntityTreeBrowser;
 	@Mock
@@ -65,7 +64,7 @@ public class MyEntitiesBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		widget = new MyEntitiesBrowser(mockView, mockAuthenticationController,
 				mockGlobalApplicationState, mockSynapseClient,
-				jsonObjectAdapter, adapterFactory);
+				jsonObjectAdapter);
 		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
 		when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
 		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockFavoritesTreeBrowser);
@@ -75,6 +74,7 @@ public class MyEntitiesBrowserTest {
 		searchResults = new EntityQueryResults();
 		List<EntityQueryResult> entities = new ArrayList<EntityQueryResult>();
 		searchResults.setEntities(entities);
+		searchResults.setTotalEntityCount(new Long(entities.size()));
 
 		AsyncMockStubber
 			.callSuccessWith(searchResults).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
@@ -83,19 +83,28 @@ public class MyEntitiesBrowserTest {
 
 	@Test
 	public void testLoadUserUpdateable() {
-		widget.loadUserUpdateable();
-		verify(mockEntityTreeBrowser).clear();
+		widget.loadMoreUserUpdateable();
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
 				any(AsyncCallback.class));
-		verify(mockView).setUpdatableEntities(anyList());
+		verify(mockView).addUpdatableEntities(anyList());
+		verify(mockView).setIsMoreUpdatableEntities(false);
+	}
+	
+	@Test
+	public void testLoadUserUpdateableWithMore() {
+		searchResults.setTotalEntityCount(MyEntitiesBrowser.PROJECT_LIMIT*2);
+		widget.loadMoreUserUpdateable();
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
+				any(AsyncCallback.class));
+		verify(mockView).addUpdatableEntities(anyList());
+		verify(mockView).setIsMoreUpdatableEntities(true);
 	}
 	
 	@Test
 	public void testLoadUserUpdateableAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.loadUserUpdateable();
-		verify(mockEntityTreeBrowser).clear();
-		verify(mockView, never()).setUpdatableEntities(anyList());
+		widget.loadMoreUserUpdateable();
+		verify(mockView, never()).addUpdatableEntities(anyList());
 	}
 	
 	@Test
@@ -104,15 +113,15 @@ public class MyEntitiesBrowserTest {
 		AsyncMockStubber
 		.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
 			any(AsyncCallback.class));
-		widget.loadUserUpdateable();
-		verify(mockEntityTreeBrowser).clear();
-		verify(mockView, never()).setUpdatableEntities(anyList());
+		widget.loadMoreUserUpdateable();
+		verify(mockView, never()).addUpdatableEntities(anyList());
 		verify(mockView).showErrorMessage(errorMessage);
 	}
 
 	@Test
 	public void testCreateGetMyProjectQuery() {
-		EntityQuery query = widget.createMyProjectQuery();
+		Long offset = 40L;
+		EntityQuery query = widget.createMyProjectQuery(offset);
 
 		// verify sort
 		assertEquals(EntityFieldName.name.name(), query.getSort()
@@ -122,7 +131,7 @@ public class MyEntitiesBrowserTest {
 		assertEquals(1, conditions.size());
 		assertEquals(EntityType.project, query.getFilterByType());
 		assertEquals(MyEntitiesBrowser.PROJECT_LIMIT, query.getLimit());
-		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, query.getOffset());
+		assertEquals(offset, query.getOffset());
 	}
 	
 	@Test
@@ -162,7 +171,11 @@ public class MyEntitiesBrowserTest {
 		//now test refresh after a context change
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("different place"));
 		widget.refresh();
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
+		
+		verify(mockEntityTreeBrowser).clear();
+		verify(mockView).setIsMoreUpdatableEntities(true);
+		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, widget.getUserUpdatableOffset());
+		verify(mockSynapseClient, never()).executeEntityQuery(any(EntityQuery.class),
 				any(AsyncCallback.class));
 		
 		//test clearState() when context has changed

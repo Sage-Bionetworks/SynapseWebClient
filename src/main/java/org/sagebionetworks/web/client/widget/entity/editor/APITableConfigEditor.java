@@ -70,6 +70,15 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	}
 
 	public static void updateDescriptorWithColumnConfigs(Map<String, String> descriptor, List<APITableColumnConfig> configs) {
+		// clean up old column config definitions
+		int index = 0;
+		boolean foundConfig = descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + index);
+		while(foundConfig){
+			descriptor.remove(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + index);
+			index++;
+			foundConfig = descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + index);
+		}
+		
 		if (configs != null) {
 			for (int i = 0; i < configs.size(); i++) {
 				APITableColumnConfig config = configs.get(i);

@@ -25,7 +25,6 @@ public interface ChallengeClientAsync {
 	void getAvailableEvaluations(AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
 	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
 	void getSharableEvaluations(String entityId, AsyncCallback<List<Evaluation>> asyncCallback);
-	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object
 	 * @param submissionJson
@@ -59,4 +58,12 @@ public interface ChallengeClientAsync {
 	
 	void getChallengeEvaluationIds(String challengeId, AsyncCallback<Set<String>> callback);
 	void getTeamSubmissionEligibility(String evaluationId, String teamId, AsyncCallback<TeamSubmissionEligibility> callback);
+	void updateEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
+	void createEvaluation(Evaluation evaluation, AsyncCallback<Void> callback);
+	void deleteEvaluation(String evaluationId, AsyncCallback<Void> callback);
+	
+	void getProjectEvaluationIds(String projectId, AsyncCallback<Set<String>> callback);
+	void deleteChallenge(String challengeId, AsyncCallback<Void> callback);
+	void updateChallenge(Challenge challenge, AsyncCallback<Challenge> callback);
+	void createChallenge(Challenge challenge, AsyncCallback<Challenge> callback);
 }

@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -71,7 +73,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem inviteMemberItem;
 	@UiField
 	TextBox synapseEmailField;
-	
+	@UiField
+	Div mapPanel;
+	@UiField
+	Modal mapModal;
+	@UiField
+	Anchor showMapLink;
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
@@ -94,6 +101,17 @@ public class TeamViewImpl extends Composite implements TeamView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		showMapLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onShowMap();
+			}
+		});
+	}
+	
+	@Override
+	public void showMapModal() {
+		mapModal.show();
 	}
 	
 	private void setDropdownHandlers() {
@@ -184,13 +202,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	@Override
-	public void setMediaObjectPanel(Team team) {
+	public void setMediaObjectPanel(Team team, String xsrfToken) {
 		String pictureUrl = null;
 		if (team.getIcon() != null) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()) + "&imageId=" + team.getIcon();
+			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken) + "&imageId=" + team.getIcon();
 		}
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
+		mapModal.setTitle(team.getName());
 	}	
 
 	@Override
@@ -252,4 +271,19 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void setTeamEmailAddress(String teamEmail) {
 		synapseEmailField.setValue(teamEmail);
 	}
+	@Override
+	public void setMap(Widget w) {
+		mapPanel.clear();
+		mapPanel.add(w);
+	}
+	
+	@Override
+	public void setShowMapVisible(boolean visible) {
+		showMapLink.setVisible(visible);
+	}
+	
+	@Override
+	public int getClientHeight() {
+		return Window.getClientHeight();
+	};
 }

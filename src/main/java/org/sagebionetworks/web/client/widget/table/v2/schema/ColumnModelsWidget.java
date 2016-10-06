@@ -3,17 +3,22 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,16 +40,18 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	String tableId;
 	EntityBundle bundle;
 	EntityUpdatedHandler updateHandler;
-	
+	JobTrackingWidget jobTrackingWidget;
+	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	/**
 	 * New presenter with its view.
 	 * @param view
 	 */
 	@Inject
-	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, ColumnModelsEditorWidget editor){
+	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, ColumnModelsEditorWidget editor, JobTrackingWidget jobTrackingWidget){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
+		this.jobTrackingWidget = jobTrackingWidget;
 		this.baseView.setPresenter(this);
 		// We need two copies of the view, one as an editor, and the other as a viewer.
 		this.viewer = ginInjector.createNewColumnModelsView();
@@ -53,6 +60,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// Add all of the parts
 		this.baseView.setViewer(this.viewer);
 		this.baseView.setEditor(this.editor);
+		this.baseView.setJobTrackingWidget(jobTrackingWidget);
+		this.baseView.setJobTrackingWidgetVisible(false);
 		this.synapseClient = synapseClient;
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
@@ -121,7 +130,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		// Get the models from the view and save them
 		baseView.setLoading();
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
-		synapseClient.setTableSchema((Table)bundle.getEntity(), newSchema, new AsyncCallback<Void>(){
+		synapseClient.getTableUpdateTransactionRequest(bundle.getEntity().getId(), bundle.getTableBundle().getColumnModels(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -129,10 +138,39 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 			
 			@Override
-			public void onSuccess(Void result) {
-				// Hide the dialog
-				baseView.hideEditor();
-				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			public void onSuccess(TableUpdateTransactionRequest request) {
+				if (request.getChanges().isEmpty()) {
+					finished();
+				} else {
+					startTrackingJob(request);	
+				}
 			}}); 
+	}
+	
+	public void finished() {
+		baseView.setJobTrackingWidgetVisible(false);
+		// Hide the dialog
+		baseView.hideEditor();
+		updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	}
+	
+	public void startTrackingJob(TableUpdateTransactionRequest request) {
+		this.baseView.setJobTrackingWidgetVisible(true);
+		this.jobTrackingWidget.startAndTrackJob(UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
+			@Override
+			public void onFailure(Throwable failure) {
+				baseView.setJobTrackingWidgetVisible(false);
+				baseView.showError(failure.getMessage());
+			}
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				finished();
+			}
+			@Override
+			public void onCancel() {
+				baseView.setJobTrackingWidgetVisible(false);
+				baseView.showEditor();
+			}
+		});
 	}
 }

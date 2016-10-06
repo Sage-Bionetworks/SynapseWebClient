@@ -5,8 +5,7 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
-    <b:Modal ui:field="modal" title="Add Provenance URL" closable="true" fade="true"
-		dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+    <b:Modal ui:field="modal" title="Add Provenance URL" closable="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		<b:ModalBody>
 		    <b:FormGroup>
 		     	<b:FormLabel>URL</b:FormLabel>
@@ -17,8 +16,8 @@
 			<g:SimplePanel ui:field="synAlertPanel"/>
 		</b:ModalBody>
 		<b:ModalFooter>
-		    <b:Button text="Cancel" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
 			<b:Button ui:field="saveButton" text="Add" type="PRIMARY"/>
+		    <b:Button text="Cancel" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
 		</b:ModalFooter>
 	</b:Modal>
 

@@ -6,7 +6,7 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
 
 	<b:Modal ui:field="modal" title="Edit Profile" closable="true"
-		fade="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+		dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		<b:ModalBody>
 			<g:SimplePanel ui:field="bodyPanel" />
 			<g:SimplePanel ui:field="loadingPanel">

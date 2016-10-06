@@ -25,8 +25,8 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 
-	public static final String EXTERNAL_IMAGE_CONTENT_TYPE = "externalImage";
-	public static final String EXTERNAL_IMAGE_FRIENDLY_NAME = "External Image";
+	public static final String IMAGE_LINK_EDITOR_CONTENT_TYPE = "imageLink";
+	public static final String IMAGE_LINK_FRIENDLY_NAME = "Image Link";
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
@@ -55,6 +55,10 @@ public class WidgetConstants {
 	
 	public static final String QUERY_TABLE_CONTENT_TYPE = "querytable";
 	public static final String QUERY_TABLE_FRIENDLY_NAME = "Query Table";
+	
+	public static final String LEADERBOARD_CONTENT_TYPE = "leaderboard";
+	public static final String LEADERBOARD_FRIENDLY_NAME = "Leaderboard";
+	
 	
 	public static final String API_TABLE_CONTENT_TYPE = "supertable";
 	public static final String API_TABLE_FRIENDLY_NAME = "Super Table (Synapse API Based)";
@@ -87,6 +91,7 @@ public class WidgetConstants {
 	public static final String TEAM_MEMBERS_CONTENT_TYPE = "members";
 	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
 	
+	public static final String TEAM_MEMBER_COUNT_CONTENT_TYPE = "teammembercount";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
@@ -161,6 +166,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
+	public static final String ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY = "desc";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
 	public static final String USER_TEAM_BADGE_WIDGET_ID_KEY = "id";
 	public static final String USER_TEAM_BADGE_WIDGET_USERNAME_KEY = "username";
@@ -175,6 +181,7 @@ public class WidgetConstants {
 	public static final String BIODALLIANCE_SOURCE_PREFIX = "source";
 	
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
+	public static final String PROJECT_ID_KEY = "projectId";
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	

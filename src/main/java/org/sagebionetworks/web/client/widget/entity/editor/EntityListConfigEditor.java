@@ -1,19 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
+import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
-import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil.RowLoadedHandler;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -23,90 +27,87 @@ import com.google.inject.Inject;
 
 public class EntityListConfigEditor implements EntityListConfigView.Presenter, WidgetEditorPresenter {
 	
+	public static final String PROMPT_ENTER_NOTE = "Enter note";
+	public static final String NOTE = "Note";
 	private EntityListConfigView view;
-	private SynapseClientAsync synapseClient;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private Map<String, String> descriptor;
-	List<EntityGroupRecord> records;
 	AuthenticationController authenticationController;
-
+	EntityFinder entityFinder;
+	EntityListWidget entityListWidget;
+	WikiPageKey wikiKey;
+	PromptModalView promptForNoteModal;
 	@Inject
 	public EntityListConfigEditor(EntityListConfigView view,
-			SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			EntityListWidget entityListWidget,
+			EntityFinder entityFinder,
+			PromptModalView promptForNoteModal) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.authenticationController = authenticationController;
+		this.entityFinder = entityFinder;
+		this.entityListWidget = entityListWidget;
+		this.promptForNoteModal = promptForNoteModal;
+		view.setSelectionToolbarHandler(entityListWidget.getRowWidgets());
+		view.setEntityListWidget(entityListWidget.asWidget());
 		view.setPresenter(this);
+		view.addWidget(promptForNoteModal.asWidget());
 		view.initView();
+		promptForNoteModal.setPresenter(new PromptModalView.Presenter() {
+			@Override
+			public void onPrimary() {
+				onUpdateNoteFromModal();
+			}
+		});
+		entityListWidget.setSelectable(view);
+		entityListWidget.setSelectionChangedCallback(new Callback() {
+			@Override
+			public void invoke() {
+				refreshCanEditNoteState();
+			}
+		});
 	}
+	
+	public void refreshCanEditNoteState() {
+		int count = 0;
+		for(SelectableListItem row: entityListWidget.getRowWidgets()) {
+			if(row.isSelected()){
+				count++;
+			}
+		}
+		view.setCanEditNote(count == 1);
+	}
+	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
+		this.wikiKey = wikiKey;
 		descriptor = widgetDescriptor;
-		final boolean isLoggedIn = authenticationController.isLoggedIn();
-		
-		view.configure();
-
-		records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
-		if(records != null && !records.equals("")) {
-			for(int i=0; i<records.size(); i++) {
-				final int rowIndex = i;
-				EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
-					@Override
-					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
-						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
-					}
-				});
-			}			
-		}
-
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY, Boolean.FALSE.toString());
+		refresh();
+	}
+	
+	public void refresh() {
+		entityListWidget.configure(wikiKey, descriptor, null, null);
+		boolean isRow = entityListWidget.getRowWidgets().size() > 0;
+		view.setButtonToolbarVisible(isRow);
+		refreshCanEditNoteState();
 	}
 	
 	@Override
-	public void addRecord(final String entityId, Long versionNumber, String note) {
-		final boolean isLoggedIn = authenticationController.isLoggedIn();
-
-		// add record to list of records
-		final int addedIndex = records.size();
-		EntityGroupRecord record = createRecord(entityId, versionNumber, note);
-		records.add(record);
-		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
-		try {
-			EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, isLoggedIn, records, addedIndex, new RowLoadedHandler() {					
-				@Override
-				public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
-					view.setEntityGroupRecordDisplay(addedIndex, entityGroupRecordDisplay, isLoggedIn);
-				}
-			});	
-		} catch (IllegalArgumentException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
-		}
-	}
-
-	
-	@Override
-	public void removeRecord(int row) {
-		if(records != null && records.size() > row) {
-			records.remove(row);
-			descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
-		} else {
-			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
-		}
-	}
-	@Override
-	public void updateNote(int row, String note) {
-		if(records != null && records.size() > row) {
-			records.get(row).setNote(note);
-			descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
-		} else {
-			view.showErrorMessage(DisplayConstants.ERROR_SAVE_MESSAGE);
-		}
+	public void onAddRecord() {
+		entityFinder.configure(true, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				entityFinder.hide();
+				EntityGroupRecord record = createRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
+				entityListWidget.addRecord(record);
+				view.setButtonToolbarVisible(true);
+			}
+		});
+		entityFinder.show();	
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
@@ -119,14 +120,15 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	@Override
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
-		view.checkParams();		
+		view.checkParams();
+		//update descriptor based on current badges
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		for (SelectableListItem row : entityListWidget.getRowWidgets()) {
+			records.add(((EntityListRowBadge)row).getRecord());
+		}
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
 	}
-	
-	@Override
-	public String getTextToInsert() {
-		return null;
-	}
-	
+
 	/*
 	 * Private Methods
 	 */
@@ -140,7 +142,12 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		record.setNote(note);
 		return record;
 	}
-
+	
+	@Override
+	public String getTextToInsert() {
+		return null;
+	}
+	
 	@Override
 	public List<String> getNewFileHandleIds() {
 		return null;
@@ -148,5 +155,32 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	@Override
 	public List<String> getDeletedFileHandleIds() {
 		return null;
+	}
+	
+	public String getSelectedNote() {
+		int index = entityListWidget.getRowWidgets().findFirstSelected();
+		List<SelectableListItem> editors = entityListWidget.getRowWidgets();
+		EntityListRowBadge editor = (EntityListRowBadge)editors.get(index);
+		return editor.getNote();
+	}
+	
+	public void setSelectedNote(String newNote) {
+		int index = entityListWidget.getRowWidgets().findFirstSelected();
+		List<SelectableListItem> editors = entityListWidget.getRowWidgets();
+		EntityListRowBadge editor = (EntityListRowBadge)editors.get(index);
+		editor.setNote(newNote);
+	}
+
+
+	@Override
+	public void onUpdateNote() {
+		promptForNoteModal.clear();
+		promptForNoteModal.configure(NOTE, PROMPT_ENTER_NOTE, DisplayConstants.SAVE_BUTTON_LABEL, getSelectedNote());
+		promptForNoteModal.show();
+	}
+	
+	public void onUpdateNoteFromModal() {
+		promptForNoteModal.hide();
+		setSelectedNote(promptForNoteModal.getValue());
 	}
 }

@@ -8,13 +8,13 @@
 	<bh:Div>
 		<!-- Tabs -->
 		<b:NavTabs>
-			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
+			<b:TabListItem ui:field="uploadTabListItem" dataTarget="#tab1" text="Upload"/>
 			<b:TabListItem ui:field="externalTabListItem" dataTarget="#tab2" text="From the Web"/>
 			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab3" text="From Synapse File"/>
 			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab4" text="Previously Uploaded"/>
 		</b:NavTabs>
 		<b:TabContent>
-			<b:TabPane active="true" b:id="tab1" addStyleNames="margin-top-15">
+			<b:TabPane b:id="tab1" addStyleNames="margin-top-15" ui:field="tab1">
 				<g:SimplePanel ui:field="fileInputWidgetContainer" />
 				<g:FlowPanel ui:field="uploadSuccessUI">
 					<g:Image resource='{iconsImageBundle.checkGreen16}' addStyleNames="margin-right-5" />
@@ -26,7 +26,7 @@
 				</g:FlowPanel>
 				<g:SimplePanel ui:field="uploadParamsPanelContainer" />
 			</b:TabPane>
-			<b:TabPane b:id="tab2" addStyleNames="margin-top-15">
+			<b:TabPane b:id="tab2" addStyleNames="margin-top-15" ui:field="tab2">
 				<bh:Div addStyleNames="form-horizontal">
 					<b:FieldSet>
 						<b:FormGroup>
@@ -44,7 +44,7 @@
 					</b:FieldSet>
 				</bh:Div>
 			</b:TabPane>
-			<b:TabPane b:id="tab3" addStyleNames="margin-top-15">
+			<b:TabPane b:id="tab3" addStyleNames="margin-top-15" ui:field="tab3">
 				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup>
@@ -60,7 +60,7 @@
 				</bh:Div>
 				<g:SimplePanel ui:field="synapseParamsPanelContainer" />
 			</b:TabPane>
-			<b:TabPane b:id="tab4" addStyleNames="margin-top-15">
+			<b:TabPane b:id="tab4" addStyleNames="margin-top-15" ui:field="tab4">
 				<g:SimplePanel ui:field="wikiAttachmentsContainer" />
 			</b:TabPane>
 			

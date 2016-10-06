@@ -21,7 +21,9 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
@@ -47,6 +49,8 @@ public class ColumnModelsEditorWidgetTest {
 	PortalGinInjector mockGinInjector;
 	@Mock
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
+	@Mock
+	CookieProvider mockCookies;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
 	@Before
@@ -69,6 +73,8 @@ public class ColumnModelsEditorWidgetTest {
 			}
 		});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
+		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		widget = new ColumnModelsEditorWidget(mockGinInjector);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
@@ -79,6 +85,7 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockEditor).configure(ViewType.EDITOR, true);
 		// All rows should be added to the editor
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockGinInjector, times(schema.size())).createColumnModelEditorWidget();
 		// are the rows registered?
 		verify(mockKeyboardNavigationHandler).removeAllRows();
 		// Extract the columns from the editor
@@ -101,7 +108,7 @@ public class ColumnModelsEditorWidgetTest {
 		// This should add a new string column
 		widget.addNewColumn();
 		// the new row should be added to the keyboard navigator
-		verify(mockKeyboardNavigationHandler).bindRow(any(RowOfWidgets.class));
+		verify(mockKeyboardNavigationHandler, times(schema.size() + 1)).bindRow(any(RowOfWidgets.class));
 		// A string should be added...
 		ColumnModel newModel = new ColumnModel();
 		newModel.setColumnType(ColumnModelsEditorWidget.DEFAULT_NEW_COLUMN_TYPE);
@@ -126,9 +133,10 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testSelectAll(){
-		verify(mockEditor).setCanDelete(false);
-		verify(mockEditor).setCanMoveUp(false);
-		verify(mockEditor).setCanMoveDown(false);
+		// checks selection state each time a column editor is added, and once when columns are initialized.
+		verify(mockEditor, times(schema.size() + 1)).setCanDelete(false);
+		verify(mockEditor, times(schema.size() + 1)).setCanMoveUp(false);
+		verify(mockEditor, times(schema.size() + 1)).setCanMoveDown(false);
 		
 		// Add three columns
 		reset(mockEditor);
@@ -200,5 +208,19 @@ public class ColumnModelsEditorWidgetTest {
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
 	}
-	
+
+	/**
+	 * 	THIS TEST TO BE DELETED ONCE WE EXPOSE EDITING EXISTING TABLE COLUMNS AGAIN
+	 */
+	@Test
+	public void testNoneditableColumns() {
+		reset(mockKeyboardNavigationHandler, mockEditor);
+		// when not in test website, existing columns will be viewers (not editors)
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		widget = new ColumnModelsEditorWidget(mockGinInjector);
+		schema = TableModelTestUtils.createOneOfEachType(true);
+		widget.configure(schema);
+		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockGinInjector, times(schema.size())).createNewColumnModelTableRowViewer();
+	}
 }

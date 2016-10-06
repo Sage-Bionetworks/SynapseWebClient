@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
+import org.sagebionetworks.web.server.servlet.DockerClientImpl;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
@@ -24,7 +25,6 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
-import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
@@ -46,6 +46,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.WithTokenizers;
+import com.google.gwt.user.server.rpc.XsrfTokenServiceServlet;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
@@ -80,6 +81,10 @@ public class PortalServletModule extends ServletModule {
 		bind(SynapseClientImpl.class).in(Singleton.class);
 		serve("/Portal/synapseclient").with(SynapseClientImpl.class);
 		
+		// Cross-Site Request Forgery protection
+		bind(XsrfTokenServiceServlet.class).in(Singleton.class);
+		serve("/Portal/xsrf").with(XsrfTokenServiceServlet.class);
+
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
@@ -110,10 +115,6 @@ public class PortalServletModule extends ServletModule {
 		// Setup the User Account service mapping
 		bind(StackConfigServiceImpl.class).in(Singleton.class);
 		serve("/Portal/stackConfig").with(StackConfigServiceImpl.class);
-	
-		// setup the NCBO servlet
-		bind(NcboSearchService.class).in(Singleton.class);
-		serve("/Portal/ncbo/search").with(NcboSearchService.class);
 		
 		// setup the Simple Search servlet
 		bind(SimpleSearchService.class).in(Singleton.class);
@@ -156,6 +157,10 @@ public class PortalServletModule extends ServletModule {
 		// Discussion message download
 		bind(DiscussionMessageServlet.class).in(Singleton.class);
 		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
+
+		// Setup the Docker service mapping
+		bind(DockerClientImpl.class).in(Singleton.class);
+		serve("/Portal/dockerclient").with(DockerClientImpl.class);
 
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);

@@ -224,7 +224,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
+						notificationSynAlert.handleException(caught);
 					}
 				});
 			}
@@ -236,20 +236,37 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		};
 		synapseClient.getUserProfile(null, callback);
 	}
-
-	// configuration
-	public void resetView() {
+	
+	public void clear() {
 		view.clear();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		passwordSynAlert.clear();
 		passwordStrengthWidget.setVisible(false);
+	}
+	
+	public void configure() {
+		clear();
 		if (authenticationController.isLoggedIn()) {
 			getUserNotificationEmail();
-			view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
-			subscriptionListWidget.configure();	
+			
+			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile result) {
+					authenticationController.updateCachedProfile(result);
+					view.updateNotificationCheckbox(result);	
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					notificationSynAlert.handleException(caught);
+				}
+			};
+			synapseClient.getUserProfile(null, callback);
+			
+			subscriptionListWidget.configure();
 		}
+		this.view.render();
 	}
 
 	@Override
@@ -285,6 +302,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Override
 	public void addEmail(String emailAddress) {
 		addressSynAlert.clear();
+		emailAddress = emailAddress.trim();
 		// Is this email already in the profile email list?
 		// If so, just update it as the new notification email. Otherwise, kick
 		// off the verification process.
@@ -325,11 +343,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 					}
 				});
 	}
-
-	// The entry point of this class, called from the ProfilePresenter
+	
 	public Widget asWidget() {
-		resetView();
-		this.view.render();
 		return view.asWidget();
 	}
 	

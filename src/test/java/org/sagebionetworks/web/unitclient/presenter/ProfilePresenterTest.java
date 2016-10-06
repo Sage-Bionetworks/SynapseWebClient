@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -66,12 +67,14 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
+import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -108,7 +111,6 @@ public class ProfilePresenterTest {
 	
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;	
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
 	CookieProvider mockCookies;
 	UserProfileModalWidget mockUserProfileModalWidget;
@@ -142,7 +144,10 @@ public class ProfilePresenterTest {
 	VerificationSubmissionWidget mockVerificationSubmissionModal;
 	@Mock
 	VerificationSubmission mockVerificationSubmission;
-	
+	@Mock
+	SettingsPresenter mockSettingsPresenter;
+	@Mock
+	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -165,8 +170,8 @@ public class ProfilePresenterTest {
 		mockSynAlert = mock(SynapseAlert.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal);	
+				mockSynapseClient, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockSettingsPresenter);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -254,6 +259,8 @@ public class ProfilePresenterTest {
 		when(mockVerificationSubmission.getStateHistory()).thenReturn(verificationStateList);
 		when(mockVerificationSubmissionModal.setResubmitCallback(any(Callback.class))).thenReturn(mockVerificationSubmissionModal);
 		when(mockVerificationSubmissionModal.configure(any(VerificationSubmission.class), anyBoolean(), anyBoolean())).thenReturn(mockVerificationSubmissionModal);
+		
+		when(mockInjector.getLoadMoreProjectsWidgetContainer()).thenReturn(mockLoadMoreContainer);
 	}
 	
 	public void setupTestChallengePagedResults() {
@@ -286,9 +293,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testStart() {
-		verify(mockInjector, times(3)).getSynapseAlertWidget();
+		verify(mockInjector, times(4)).getSynapseAlertWidget();
 		profilePresenter.setPlace(place);
-		verify(mockInjector, times(3)).getSynapseAlertWidget();
+		verify(mockInjector, times(4)).getSynapseAlertWidget();
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
 		
@@ -323,10 +330,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
-		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
-		
-		assertEquals(targetUserId, captor.getValue());
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verifyProfileShown(false);
 		
 		//not logged in, should not ask for this user favs
@@ -362,23 +366,26 @@ public class ProfilePresenterTest {
 		verify(mockSynAlert).handleException(ex);
 	}
 
+	
+	private void invokeGetMyTeamsCallback() {
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(ProfilePresenter.DELAY_GET_MY_TEAMS));
+		callbackCaptor.getValue().invoke();
+	}
 
 	@Test
 	public void testViewMyProfileNoRedirect() throws JSONObjectAdapterException{
 		//view another user profile
-		String myPrincipalId = "456";
-		userProfile.setOwnerId(myPrincipalId);
-		
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(myPrincipalId);
-		when(place.getUserId()).thenReturn(myPrincipalId);
-		profilePresenter.setPlace(place);
+		setPlaceMyProfile("456");
 		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		//should attempt to get my teams, but delayed.
+		invokeGetMyTeamsCallback();
 		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
-		assertEquals(myPrincipalId, captor.getValue());
+		assertEquals("456", captor.getValue());
 		
 		verify(mockView).setOrcIdVisible(false);
 		verify(mockView).setUnbindOrcIdVisible(false);
@@ -506,7 +513,10 @@ public class ProfilePresenterTest {
 		//on refresh, current project offset should be reset to 0
 		profilePresenter.refreshProjects();
 		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
-		verify(mockView, times(2)).clearProjects();
+		verify(mockInjector).getLoadMoreProjectsWidgetContainer();
+		verify(mockView).setProjectContainer(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).setIsMore(false);
+		verify(mockLoadMoreContainer).configure(any(Callback.class));
 	}
 	
 	@Test
@@ -515,17 +525,12 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		//when setting the filter to all, it should ask for all of my projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).setAllProjectsFilterSelected();
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
-		//should have refreshed teams too, since this is the owner
-		verify(mockView).clearTeamNotificationCount();
-		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class), any(Long.class));
-		verify(mockView).setTeamNotificationCount(String.valueOf(1));	
 	}
 	
 	@Test
@@ -534,11 +539,9 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
-		//should not have refreshed team invites, since this is not the owner
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 	}
 	
 	@Test
@@ -547,10 +550,21 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(null, null);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
+	}
+	
+	@Test
+	public void testGetProjectsDefaultFilterFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
+		profilePresenter.setPlace(place);
+		profilePresenter.setIsOwner(false);
+		//when setting the filter to all, it should ask for all of their projects
+		profilePresenter.setProjectFilterAndRefresh(null, null);
+		verify(mockView).setProjectContainer(any(Widget.class));
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
 
@@ -562,12 +576,11 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("125");
 		//when setting the filter to my projects, it should query for projects created by me
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setMyProjectsFilterSelected();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -578,12 +591,11 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
 	
@@ -593,12 +605,11 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setSharedDirectlyWithMeFilterSelected();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -609,11 +620,11 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("125");
 		myFavorites.clear();
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockView).setFavoritesHelpPanelVisible(true);
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView, never()).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, never()).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
 
@@ -626,12 +637,11 @@ public class ProfilePresenterTest {
 		
 		//when setting the filter to all, it should ask for all of my projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, teamId);
-		verify(mockView, times(2)).clearProjects();
-		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setTeamsFilterSelected();
 		verify(mockSynapseClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
+		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -641,7 +651,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, "123");
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -651,7 +661,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("111");
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -705,69 +715,48 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectSortVisible(false);
 	}
 	
-	
-	@Test
-	public void testGetMoreOfTheirProjects() {
-		profilePresenter.setIsOwner(false);
-		//when asking for more projects, it should get their if I am not the owner
-		profilePresenter.getMoreProjects();
-		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-	}
-	
-	
 	@Test
 	public void testGetMyProjectsError() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		profilePresenter.getMyProjects(ProjectListType.MY_PROJECTS, ProjectFilterEnum.ALL, 0);
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectsError(anyString());
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
-	@Test
-	public void testGetUserProjects() {
-		profilePresenter.getUserProjects(1);
-		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
-	}
-	
-	@Test
-	public void testGetUserProjectsError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
-		profilePresenter.getUserProjects(1);
-		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectsError(anyString());
-	}
-
 	@Test
 	public void testProjectPageAdded() {
 		//add a page (where the full project list fits in a single page
+		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
 		profilePresenter.setCurrentOffset(0);
 		profilePresenter.projectPageAdded(ProfilePresenter.PROJECT_PAGE_SIZE - 10);
 		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
-		verify(mockView).setIsMoreProjectsVisible(eq(false));
+		verify(mockLoadMoreContainer).setIsMore(false);
 	}
 	
 	@Test
 	public void testProjectPageAddedZeroResults() {
+		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
 		profilePresenter.setCurrentOffset(0);
 		profilePresenter.projectPageAdded(0);
-		verify(mockView).setIsMoreProjectsVisible(eq(false));
+		verify(mockLoadMoreContainer).setIsMore(false);
 	}
 	
 	@Test
 	public void testProjectPageAddedWithMoreResults() {
+		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
 		profilePresenter.setCurrentOffset(0);
 		profilePresenter.projectPageAdded(ProfilePresenter.PROJECT_PAGE_SIZE + 10);
 		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
-		verify(mockView).setIsMoreProjectsVisible(eq(true));
+		verify(mockLoadMoreContainer).setIsMore(true);
 	}
 	
 	@Test
 	public void testProjectPageTwoAddedWithMoreResults() {
+		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
 		profilePresenter.setCurrentOffset(ProfilePresenter.PROJECT_PAGE_SIZE);
 		profilePresenter.projectPageAdded(2*ProfilePresenter.PROJECT_PAGE_SIZE + 10);
 		assertEquals(2*ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
-		verify(mockView).setIsMoreProjectsVisible(eq(true));
+		verify(mockLoadMoreContainer).setIsMore(true);
 	}
 
 	
@@ -777,19 +766,19 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		//inform user of success, and go to new project page
 		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 
 	@Test
 	public void testCreateProjectEmptyName() {
 		profilePresenter.createProject("");
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		Mockito.reset(mockView);
+		verify(mockSynAlert).showError(anyString());
+		Mockito.reset(mockSynAlert);
 		
 		profilePresenter.createProject(null);
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 
 	@Test
@@ -804,7 +793,7 @@ public class ProfilePresenterTest {
 	public void testCreateProjectNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.createProject("valid name");
-		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+		verify(mockSynAlert).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
 	}
 	
 	// Project Sorting tests
@@ -858,18 +847,18 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
 		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockPlaceChanger).goTo(any(org.sagebionetworks.web.client.place.Team.class));
+		verify(mockPlaceChanger).goTo(isA(org.sagebionetworks.web.client.place.Team.class));
 	}
 
 	@Test
 	public void testCreateTeamEmptyName() {
 		profilePresenter.createTeam("");
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		Mockito.reset(mockView);	
+		verify(mockSynAlert).showError(anyString());
+		Mockito.reset(mockSynAlert);	
 		profilePresenter.createTeam(null);
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 
 	@Test
@@ -884,11 +873,20 @@ public class ProfilePresenterTest {
 	public void testCreateTeamNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		profilePresenter.createTeam("valid name");
-		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_TEAM_NAME_EXISTS));
+		verify(mockSynAlert).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 	}
 	
 	
 	//Challenge tests
+	
+	@Test
+	public void testChallengePlace() {
+		when(place.getArea()).thenReturn(ProfileArea.CHALLENGES);
+		profilePresenter.setPlace(place);
+		profilePresenter.getMoreChallenges();
+		verify(mockView).setTabSelected(ProfileArea.CHALLENGES);
+	}
+
 	@Test
 	public void testRefreshChallenges() {
 		profilePresenter.setPlace(place);
@@ -937,7 +935,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.getTeamBundles("12345",true);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setTeamsError(ex.getMessage());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
@@ -968,7 +966,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).
 				getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.getTeamBundles("12345", true);
-		verify(mockView).setTeamsError(ex.getMessage());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	
@@ -998,15 +996,26 @@ public class ProfilePresenterTest {
 	public void testGetTeamsError() {
 		profilePresenter.setPlace(place);
 		String errorMessage = "error loading teams";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setTeamsError(errorMessage);
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	private void setPlaceMyProfile(String myPrincipalId) {
+		userProfile.setOwnerId(myPrincipalId);
+		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(myPrincipalId);
+		when(place.getUserId()).thenReturn(myPrincipalId);
+		profilePresenter.setPlace(place);
 	}
 	
 	@Test
 	public void testGetTeamFilters() {
-		profilePresenter.setPlace(place);
+		setPlaceMyProfile("456");
+		invokeGetMyTeamsCallback();
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(true);
@@ -1015,19 +1024,19 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamFiltersEmpty() {
-		profilePresenter.setPlace(place);
 		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		setPlaceMyProfile("456");
+		invokeGetMyTeamsCallback();
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(false);
 	}
 	
 	@Test
 	public void testGetTeamFiltersError() {
-		profilePresenter.setPlace(place);
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		setPlaceMyProfile("456");
+		invokeGetMyTeamsCallback();
 		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(false);
 	}
@@ -1054,7 +1063,7 @@ public class ProfilePresenterTest {
 		profilePresenter.editMyProfile();
 		
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test
@@ -1078,7 +1087,7 @@ public class ProfilePresenterTest {
 		profilePresenter.viewMyProfile();
 		
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 
 	@Test
@@ -1250,6 +1259,15 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testTabClickedSettings(){
+		profilePresenter.setPlace(place);
+		profilePresenter.tabClicked(ProfileArea.SETTINGS);
+		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
+		verify(mockSettingsPresenter).configure();
+		verify(mockView).setSettingsWidget(any(Widget.class));
+	}
+	
+	@Test
 	public void testTabClickedWhileEditing(){
 		profilePresenter.setPlace(place);
 		when(mockGlobalApplicationState.isEditing()).thenReturn(true);
@@ -1268,7 +1286,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testCertificationBadgeClicked() {
 		profilePresenter.certificationBadgeClicked();
-		verify(mockPlaceChanger).goTo(any(Certificate.class));
+		verify(mockPlaceChanger).goTo(isA(Certificate.class));
 	}
 	
 	@Test
@@ -1295,7 +1313,7 @@ public class ProfilePresenterTest {
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
 		boolean pushState = true;
 		profilePresenter.updateArea(ProfileArea.PROJECTS, false);
-		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
+		verify(mockPlaceChanger, never()).goTo(isA(Profile.class));
 	}
 	
 	private void verifyProfileHidden(boolean isCookieExpected) {
@@ -1644,7 +1662,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		when(place.toToken()).thenReturn(token);
 		profilePresenter.setPlace(place);
-		verify(mockPlaceChanger).goTo(any(Home.class));
+		verify(mockPlaceChanger).goTo(isA(Home.class));
 	}
 	
 	@Test

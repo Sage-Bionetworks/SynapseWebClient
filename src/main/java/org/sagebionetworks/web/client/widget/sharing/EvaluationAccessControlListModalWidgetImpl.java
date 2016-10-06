@@ -27,16 +27,17 @@ public class EvaluationAccessControlListModalWidgetImpl implements EvaluationAcc
 	}
 
 	@Override
-	public void showSharing(Callback changeCallback) {
-		this.changeCallback = changeCallback;
+	public void show() {
 		this.editor.refresh();
 		view.setLoading(false);
 		view.showDialog();
 	}
 
 	@Override
-	public void configure(Evaluation entity) {
-		editor.configure(entity, this);
+	public void configure(Evaluation evaluation, Callback changeCallback) {
+		this.changeCallback = changeCallback;
+		editor.configure(evaluation, this);
+		view.setTitle("Sharing Settings - " + evaluation.getName() + " ("+evaluation.getId() + ")");
 		view.setPrimaryButtonVisible(true);
 		view.setDefaultButtonText(CANCEL);
 	}
@@ -53,7 +54,9 @@ public class EvaluationAccessControlListModalWidgetImpl implements EvaluationAcc
 			@Override
 			public void invoke() {
 				view.hideDialog();
-				changeCallback.invoke();
+				if (changeCallback != null) {
+					changeCallback.invoke();	
+				}
 			}
 		});
 

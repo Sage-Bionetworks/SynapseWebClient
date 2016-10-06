@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>143.0</synapse.version>
+		<synapse.version>2016-09-22-2339-53d5056</synapse.version>
 		<gwtVersion>2.8.0-beta1</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -203,7 +203,7 @@
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
 			        <sourceLevel>auto</sourceLevel>
-			        <extraJvmArgs>-Xmx1536m -Xms1024m -XX:PermSize=128m -XX:MaxPermSize=256m</extraJvmArgs>
+			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>

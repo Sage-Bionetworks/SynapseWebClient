@@ -1,13 +1,15 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +17,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -52,38 +54,6 @@ public class DisplayUtilsTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
-
-	@Test
-	public void testGetMimeType(){
-		Map<String, String> expected = new HashMap<String, String>();
-		expected.put("test.tar.gz", "gz");
-		expected.put("test.txt", "txt");
-		expected.put("test", null);
-		expected.put("test.", null);
-		for(String fileName: expected.keySet()){
-			String expectedMime = expected.get(fileName);
-			String mime = DisplayUtils.getMimeType(fileName);
-			assertEquals(expectedMime, mime);
-		}
-	}
-	
-	@Test
-	public void testFixWikiLinks(){
-		String testHref = "Hello <a href=\"/wiki/HelloWorld.html\">World</a>";
-		String expectedHref = "Hello <a href=\"https://sagebionetworks.jira.com/wiki/HelloWorld.html\">World</a>";
-		String actualHref = DisplayUtils.fixWikiLinks(testHref);
-		Assert.assertEquals(actualHref, expectedHref);
-	}
-	
-	@Test
-	public void testFixEmbeddedYouTube(){
-		String testYouTube = "Hello video:<p> www.youtube.com/embed/xSfd5mkkmGM </p>";
-		String expectedYouTube = "Hello video:<p> <iframe width=\"300\" height=\"169\" src=\"https://www.youtube.com/embed/xSfd5mkkmGM \" frameborder=\"0\" allowfullscreen=\"true\"></iframe></p>";
-		String actualYouTube = DisplayUtils.fixEmbeddedYouTube(testYouTube);
-		Assert.assertEquals(actualYouTube, expectedYouTube);
-	}
-
-	
 	
 	@Test
 	public void testGetFileNameFromLocationPath() {
@@ -348,13 +318,13 @@ public class DisplayUtilsTest {
 	@Test
 	public void testHandleServiceExceptionReadOnly() {
 		assertTrue(DisplayUtils.handleServiceException(new ReadOnlyModeException(), mockGlobalApplicationState, true, mockView));
-		verify(mockPlaceChanger).goTo(any(Down.class));
+		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
 	public void testHandleServiceExceptionDown() {
 		assertTrue(DisplayUtils.handleServiceException(new SynapseDownException(), mockGlobalApplicationState, true, mockView));
-		verify(mockPlaceChanger).goTo(any(Down.class));
+		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
@@ -369,7 +339,7 @@ public class DisplayUtilsTest {
 	public void testHandleServiceExceptionForbiddenNotLoggedIn() {
 		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, false, mockView));
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test
@@ -382,7 +352,7 @@ public class DisplayUtilsTest {
 	public void testHandleServiceExceptionNotFound() {
 		assertTrue(DisplayUtils.handleServiceException(new NotFoundException(), mockGlobalApplicationState, true, mockView));
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_NOT_FOUND));
-		verify(mockPlaceChanger).goTo(any(Home.class));
+		verify(mockPlaceChanger).goTo(isA(Home.class));
 	}
 	
 	@Test
@@ -400,6 +370,27 @@ public class DisplayUtilsTest {
 		versioned = DisplayUtils.createEntityVersionString("syn1234", 8888L);
 		assertTrue(versioned.contains("syn1234"));
 		assertTrue(versioned.contains("8888"));
+	}
+	
+	@Test
+	public void testParseEntityVersionString() {
+		String validSynId = "syn123";
+		Long validVersion = 3L;
+		
+		//verify ref without version
+		Reference expectedRef = new Reference();
+		expectedRef.setTargetId(validSynId);
+		Reference testRef;
+		testRef = DisplayUtils.parseEntityVersionString(validSynId);
+		assertEquals(expectedRef, testRef);
+		
+		//verify ref with version defined using dot notation
+		expectedRef.setTargetVersionNumber(validVersion);
+		testRef = DisplayUtils.parseEntityVersionString(validSynId + "." + validVersion);
+		assertEquals(expectedRef, testRef);
+		//verify ref with version defined using "/version/" notation
+		testRef = DisplayUtils.parseEntityVersionString(validSynId + WebConstants.ENTITY_VERSION_STRING + validVersion);
+		assertEquals(expectedRef, testRef);
 	}
 }
 

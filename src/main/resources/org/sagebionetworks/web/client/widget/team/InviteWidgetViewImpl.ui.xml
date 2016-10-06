@@ -5,11 +5,11 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
-    <b:Modal ui:field="inviteUIModal" title="Invite Members" closable="true" fade="true"
+    <b:Modal ui:field="inviteUIModal" title="Invite User" closable="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 		    <b:FormGroup>
-			    <b:FormLabel>Member Search</b:FormLabel>
+			    <b:FormLabel>User Search</b:FormLabel>
 			    <g:SimplePanel ui:field="suggestBoxPanel"/>
 			</b:FormGroup>
 			<b:FormGroup>

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
@@ -17,11 +18,13 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -32,7 +35,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -41,7 +43,10 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -100,6 +105,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
+	EvaluationEditorModal evalEditor;
+	CookieProvider cookies;
+	ChallengeClientAsync challengeClient;
+	SelectTeamModal selectTeamModal;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -116,11 +125,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			UploadDialogWidget uploader,
 			WikiMarkdownEditor wikiEditor,
 			ProvenanceEditorWidget provenanceEditor,
-			StorageLocationWidget storageLocationEditor) {
+			StorageLocationWidget storageLocationEditor,
+			EvaluationEditorModal evalEditor,
+			CookieProvider cookies,
+			ChallengeClientAsync challengeClient,
+			SelectTeamModal selectTeamModal) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
-		this.view.addAccessControlListModalWidget(accessControlListModalWidget);
 		this.preflightController = preflightController;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
@@ -134,9 +146,23 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.wikiEditor = wikiEditor;
 		this.provenanceEditor = provenanceEditor;
 		this.storageLocationEditor = storageLocationEditor;
-		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
-		this.view.addProvenanceEditorModalWidget(provenanceEditor.asWidget());
-		this.view.addStorageLocationModalWidget(storageLocationEditor.asWidget());
+		this.evalEditor = evalEditor;
+		this.cookies = cookies;
+		this.challengeClient = challengeClient;
+		this.view.addWidget(wikiEditor.asWidget());
+		this.view.addWidget(provenanceEditor.asWidget());
+		this.view.addWidget(storageLocationEditor.asWidget());
+		this.view.addWidget(accessControlListModalWidget);
+		this.view.addWidget(evalEditor.asWidget());
+		this.view.addWidget(selectTeamModal.asWidget());
+		selectTeamModal.setTitle("Select Participant Team");
+		selectTeamModal.configure(new CallbackP<String>() {
+			@Override
+			public void invoke(String selectedTeamId) {
+				onSelectChallengeTeam(selectedTeamId);
+			}
+		});
+		this.selectTeamModal = selectTeamModal;
 	}
 
 	@Override
@@ -182,7 +208,28 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureCreateDOI();
 			configureEditProjectMetadataAction();
 			configureEditFileMetadataAction();
+			configureAddEvaluationAction();
+			configureCreateChallenge();
 		}
+	}
+	
+	public void onSelectChallengeTeam(String id) {
+		Challenge c = new Challenge();
+		c.setProjectId(entity.getId());
+		c.setParticipantTeamId(id);
+		challengeClient.createChallenge(c, new AsyncCallback<Challenge>() {
+			@Override
+			public void onSuccess(Challenge v) {
+				view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+				// go to challenge tab
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	private void configureProvenance() {
@@ -221,6 +268,32 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
+	private void configureCreateChallenge() {
+		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
+		actionMenu.setActionEnabled(Action.CREATE_CHALLENGE, false);
+		boolean canEdit = permissions.getCanEdit();
+		if(entityBundle.getEntity() instanceof Project && canEdit && DisplayUtils.isInTestWebsite(cookies)) {
+			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
+			//find out if this project has a challenge
+			challengeClient.getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
+				@Override
+				public void onSuccess(Challenge result) {
+					// challenge found, do nothing
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if (caught instanceof NotFoundException) {
+						actionMenu.setActionVisible(Action.CREATE_CHALLENGE, true);
+						actionMenu.setActionEnabled(Action.CREATE_CHALLENGE, true);
+					} else {
+						//unexpected error
+						view.showErrorMessage(caught.getMessage());
+					}
+				}
+			});
+		}
+	}
+	
 	private Long getVersion(){
 		Long version = null;
 		Entity entity = entityBundle.getEntity();
@@ -244,6 +317,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
+	
+	private void onCreateChallenge() {
+		selectTeamModal.show();
+	}
 	
 	private void configureFileUpload() {
 		if(entityBundle.getEntity() instanceof FileEntity ){
@@ -374,6 +451,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
+	private void configureAddEvaluationAction(){
+		if(entityBundle.getEntity() instanceof Project && DisplayUtils.isInTestWebsite(cookies)){
+			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
+			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
+		}else{
+			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
+			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
+		}
+	}
+
+	
 	private void configureEditFileMetadataAction(){
 		if(entityBundle.getEntity() instanceof FileEntity){
 			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
@@ -471,7 +560,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entity instanceof Table){
 			return false;
 		}
-		return entity instanceof Versionable;
+		return entity instanceof Versionable || entity instanceof DockerRepository;
 	}
 
 
@@ -543,6 +632,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case ADD_COMMIT:
 			onAddCommit();
 			break;
+		case ADD_EVALUATION_QUEUE:
+			onAddEvaluationQueue();
+			break;
+		case CREATE_CHALLENGE:
+			onCreateChallenge();
+			break;
 		default:
 			break;
 		}
@@ -551,6 +646,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void onAddCommit() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void onAddEvaluationQueue() {
+		evalEditor.configure(entity.getId(), new Callback() {
+			@Override
+			public void invoke() {
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			}
+		});
+		evalEditor.show();
 	}
 
 	private void onChangeStorageLocation() {
@@ -960,6 +1066,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Place gotoPlace = null;
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
 			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
+			else if(entityBundle.getEntity() instanceof DockerRepository) gotoPlace = new Synapse(parentId, null, EntityArea.DOCKER, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

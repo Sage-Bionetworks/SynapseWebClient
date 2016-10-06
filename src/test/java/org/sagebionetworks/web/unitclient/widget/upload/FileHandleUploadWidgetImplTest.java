@@ -12,6 +12,10 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockitoAnnotations;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -22,7 +26,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 
@@ -37,11 +40,16 @@ public class FileHandleUploadWidgetImplTest {
 	FileMetadata mockMetadata;
 	Callback mockFailedValidationCallback;
 	
+	@Captor 
+	ArgumentCaptor<ProgressingFileUploadHandler> handleCaptor;
+	
+	
 	String fileHandleId = "222";
 	String testFileName = "testing.txt";
 	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		jsniUtils = mock(SynapseJSNIUtils.class);
 		mockView = mock(FileHandleUploadView.class);
 		mockMultipartUploader = mock(MultipartUploader.class);
@@ -69,17 +77,7 @@ public class FileHandleUploadWidgetImplTest {
 	public void testFileSelected(){
 		final String successFileHandle = "123";
 		final FileUpload uploadedFile = new FileUpload(null, successFileHandle);
-		// Stub a some progress then success.
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
-				handler.updateProgress(0.1, "10%");
-				handler.updateProgress(0.9, "90%");
-				handler.uploadSuccess(successFileHandle);
-				return null;
-			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
+
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		reset(mockView);
@@ -89,14 +87,58 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).showProgress(true);
 		verify(mockView).setInputEnabled(false);
 		verify(mockView).hideError();
-		// The progress should be updated 
+		
+		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
+		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
+
+		// The progress should be updated
 		verify(mockView).updateProgress(10, "10%");
 		verify(mockView).updateProgress(90, "90%");
+		verify(mockView).showProgress(true);
+		verify(mockView).setInputEnabled(false);
+		verify(mockCallback).invoke(any(FileUpload.class));
 		// Success should trigger the following:
 		verify(mockView).updateProgress(100, "100%");
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		verify(mockCallback).invoke(any(FileUpload.class));
+	}
+	
+	@Test
+	public void testMultiFileSelected() {
+		final String successFileHandle = "123";
+		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName", "testName2"});
+		
+		// Configure before the test
+		widget.configure("button text", mockCallback);
+		reset(mockView);
+		// method under test.
+		widget.onFileSelected();
+		verify(mockView).updateProgress(1, "1%");
+		verify(mockView).showProgress(true);
+		verify(mockView).setInputEnabled(false);
+		verify(mockView).hideError();
+		
+		// The progress should be updated with scaled values based on the presence of two files to upload
+		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		verify(mockView).showProgress(true);
+		verify(mockView).setInputEnabled(false);
+		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
+		verify(mockView).updateProgress(5, "5%");
+		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
+		verify(mockView).updateProgress(45, "45%");
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
+		verify(mockView).updateProgress(50, "50%");
+		handleCaptor.getValue().updateProgress(0.2, "20%", "10 MB/s");
+		verify(mockView).updateProgress(60,  "60%");
+		handleCaptor.getValue().uploadSuccess(successFileHandle);
+		verify(mockView).updateProgress(100, "100%");
+
+		// Success should trigger the following:
+		verify(mockView).setInputEnabled(true);
+		verify(mockView).showProgress(false);
+		verify(mockCallback, VerificationModeFactory.times(2)).invoke(any(FileUpload.class));
 	}
 	
 	@Test
@@ -107,8 +149,8 @@ public class FileHandleUploadWidgetImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
-				handler.updateProgress(0.1, "10%");
-				handler.updateProgress(0.9, "90%");
+				handler.updateProgress(0.1, "10%", "100 KB/s");
+				handler.updateProgress(0.9, "90%", "10 MB/s");
 				handler.uploadFailed(error);
 				return null;
 			}
@@ -153,8 +195,8 @@ public class FileHandleUploadWidgetImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
-				handler.updateProgress(0.1, "10%");
-				handler.updateProgress(0.9, "90%");
+				handler.updateProgress(0.1, "10%", "100 KB/s");
+				handler.updateProgress(0.9, "90%", "10 MB/s");
 				handler.uploadFailed(error);
 				return null;
 			}

@@ -9,7 +9,7 @@
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  	
- 	<b:Modal size="LARGE" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+ 	<b:Modal closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-90-percent">
 	  <b:ModalBody>
 	    <bh:Div styleName="margin-bottom-20">
 	    	<g:SimplePanel ui:field="paramsPanel"></g:SimplePanel>
@@ -17,8 +17,8 @@
 		</bh:Div>
 	  </b:ModalBody>
 	  <b:ModalFooter>
+	      <b:Button ui:field="okButton" type="PRIMARY" >Save</b:Button>
 	      <b:Button type="DEFAULT" dataDismiss="MODAL" >Cancel</b:Button>
-	      <b:Button ui:field="okButton" type="PRIMARY" >Insert</b:Button>
 	  </b:ModalFooter>
 	</b:Modal>
 	
