@@ -113,7 +113,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public void setOpenNewWindow(boolean value) {
-		this.view.setOpenNewWindow(value);
 		this.openNewWindow = value;
 	}
 	
@@ -257,8 +256,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void badgeClicked(ClickEvent event) {
 		if (customClickHandler == null) 
 			if (openNewWindow) {
-				//open a new window
-				DisplayUtils.newWindow("#!Profile:" + profile.getOwnerId(), "", "");
+				view.openNewWindow(profile.getOwnerId());
 			} else {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));				
 			}
