@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,7 +47,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 			association.setFileHandleId(fileHandleId);
 			if (address.isView()) {
 				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-				association.setAssociateObjectId(address.getRowId().toString());
+				association.setAssociateObjectId("syn" + address.getRowId().toString());
 			} else {
 				association.setAssociateObjectType(FileHandleAssociateType.TableEntity);
 				association.setAssociateObjectId(address.getTableId());

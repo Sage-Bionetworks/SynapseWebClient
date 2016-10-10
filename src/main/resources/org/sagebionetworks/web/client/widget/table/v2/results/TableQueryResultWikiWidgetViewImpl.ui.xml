@@ -5,6 +5,6 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<bh:Div ui:field="tableWidgetContainer"/>
-		<bh:Div uiLfield="synAlertContainer" />
+		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>
 </ui:UiBinder>

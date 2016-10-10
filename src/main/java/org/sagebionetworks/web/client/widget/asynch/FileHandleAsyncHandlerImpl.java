@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -20,7 +19,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
-	private Map<FileHandleAssociation, List<AsyncCallback<FileResult>>> reference2Callback = new HashMap<FileHandleAssociation, List<AsyncCallback<FileResult>>>();
+	private Map<String, List<AsyncCallback<FileResult>>> reference2Callback = new HashMap<String, List<AsyncCallback<FileResult>>>();
+	private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<FileHandleAssociation>();
 	SynapseClientAsync synapseClient;
 	// This singleton checks for new work every <DELAY> milliseconds.
 	public static final int DELAY = 300;
@@ -42,32 +42,35 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 		List<AsyncCallback<FileResult>> list = reference2Callback.get(fileHandleAssociation);
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<FileResult>>();
-			reference2Callback.put(fileHandleAssociation, list);
+			reference2Callback.put(fileHandleAssociation.getFileHandleId(), list);
+			fileHandleAssociations.add(fileHandleAssociation);
 		}
 		list.add(callback);
 	}
 	
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
-			final Map<FileHandleAssociation, List<AsyncCallback<FileResult>>> reference2CallbackCopy = new HashMap<FileHandleAssociation, List<AsyncCallback<FileResult>>>();
+			final Map<String, List<AsyncCallback<FileResult>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<FileResult>>>();
 			reference2CallbackCopy.putAll(reference2Callback);
+			List<FileHandleAssociation> fileHandleAssociationsCopy = new ArrayList<FileHandleAssociation>();
+			fileHandleAssociationsCopy.addAll(fileHandleAssociations);
 			reference2Callback.clear();
-			List<FileHandleAssociation> fileHandleAssociationsList = new ArrayList<FileHandleAssociation>();
-			fileHandleAssociationsList.addAll(reference2CallbackCopy.keySet());
+			fileHandleAssociations.clear();
 			BatchFileRequest request = new BatchFileRequest();
-			request.setRequestedFiles(fileHandleAssociationsList);
+			request.setRequestedFiles(fileHandleAssociationsCopy);
 			request.setIncludeFileHandles(true);
+			request.setIncludePreSignedURLs(false);
 			synapseClient.getFileHandleAndUrlBatch(request,new AsyncCallback<BatchFileResult>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
-					for (FileHandleAssociation fileHandleAssociation: reference2CallbackCopy.keySet()) {
-						callOnFailure(fileHandleAssociation, caught);
+					for (String fileHandleId: reference2CallbackCopy.keySet()) {
+						callOnFailure(fileHandleId, caught);
 					}
 				}
 				
-				private void callOnFailure(FileHandleAssociation fileHandleAssociation, Throwable ex) {
-					List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.get(fileHandleAssociation);
+				private void callOnFailure(String fileHandleId, Throwable ex) {
+					List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.get(fileHandleId);
 					if (callbacks != null) {
 						for (AsyncCallback<FileResult> callback : callbacks) {
 							callback.onFailure(ex);	
@@ -77,18 +80,18 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 				
 				public void onSuccess(BatchFileResult results) {
 					// go through all results, and inform the proper callback of the success
-					for (FileResult entityHeader : results.getRequestedFiles()) {
-						List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.remove(entityHeader);
+					for (FileResult fileResult : results.getRequestedFiles()) {
+						List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.remove(fileResult.getFileHandleId());
 						if (callbacks != null) {
 							for (AsyncCallback<FileResult> callback : callbacks) {
-								callback.onSuccess(entityHeader);	
+								callback.onSuccess(fileResult);	
 							}
 						}
 					}
 					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
-					for (FileHandleAssociation fileHandleAssociation : reference2CallbackCopy.keySet()) {
+					for (String fileHandleId : reference2CallbackCopy.keySet()) {
 						// not returned
-						callOnFailure(fileHandleAssociation, notReturnedException);
+						callOnFailure(fileHandleId, notReturnedException);
 						
 					}
 				};
