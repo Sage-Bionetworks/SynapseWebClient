@@ -99,7 +99,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 		
 		if (customClickHandler == null) {
-			view.setHref("#!Profile:" + profile.getOwnerId());//
+			view.setHref("#!Profile:" + profile.getOwnerId());
 		}
 		useCachedImage = true;
 		configurePicture();
