@@ -36,6 +36,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	private Integer maxNameLength;
 	UserProfile profile;
 	ClickHandler customClickHandler;
+	boolean openNewWindow;
 	GlobalApplicationState globalApplicationState;
 	SynapseJSNIUtils synapseJSNIUtils;
 	boolean isShowCompany;
@@ -62,6 +63,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.adapterFactory = adapterFactory;
 		this.clientCache = clientCache;
 		this.lazyLoadHelper = lazyLoadHelper;
+		this.openNewWindow = false;
 		view.setPresenter(this);
 		view.setSize(BadgeSize.SMALL);
 		clearState();
@@ -110,8 +112,9 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		configure(profile);
 	}
 	
-	public void setTarget(String target) {
-		view.setTarget(target);
+	public void setOpenNewWindow(boolean value) {
+		this.view.setOpenNewWindow(value);
+		this.openNewWindow = value;
 	}
 	
 	public void setSize(BadgeSize size) {
@@ -253,7 +256,12 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	@Override
 	public void badgeClicked(ClickEvent event) {
 		if (customClickHandler == null) 
-			globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
+			if (openNewWindow) {
+				//open a new window
+				DisplayUtils.newWindow("#!Profile:" + profile.getOwnerId(), "", "");
+			} else {
+				globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));				
+			}
 		else
 			customClickHandler.onClick(event);
 	}
