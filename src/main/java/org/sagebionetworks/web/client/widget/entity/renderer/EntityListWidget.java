@@ -52,13 +52,13 @@ public class EntityListWidget implements WidgetRendererPresenter {
 		if (descriptor.containsKey(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY)) {
 			showDescription = Boolean.parseBoolean(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY));
 		}
+		view.setDescriptionHeaderVisible(showDescription);
 		List<EntityGroupRecord> records = EntityListUtil.parseRecords(descriptor.get(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY));
 		selectableItemList.clear();
 		view.clearRows();
 		if(records != null && records.size() > 0) {
 			view.setTableVisible(true);
 			view.setEmptyUiVisible(false);
-			view.setDescriptionHeaderVisible(showDescription);
 			for (EntityGroupRecord entityGroupRecord : records) {
 				addRecord(entityGroupRecord);
 			}
