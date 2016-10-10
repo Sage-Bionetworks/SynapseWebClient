@@ -114,7 +114,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void setOpenNewWindow(boolean value) {
 		this.openNewWindow = value;
-		this.view.setOpenNewWindow(value);
+		this.view.setOpenNewWindow(value ? "_blank" : "");
 	}
 	
 	public void setSize(BadgeSize size) {
