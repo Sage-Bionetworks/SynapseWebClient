@@ -179,6 +179,20 @@ public class UserBadgeTest {
 	}
 	
 	@Test
+	public void testTargetWhenSetOpenWindowTrue() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(true);
+		verify(mockView).setOpenNewWindow("_blank");
+	}
+	
+	@Test
+	public void testTargetWhenSetOpenWindowFalse() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(false);
+		verify(mockView).setOpenNewWindow("");
+	}
+	
+	@Test
 	public void testConfigureAsyncFailFromCache() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		userBadge.setMaxNameLength(max);
