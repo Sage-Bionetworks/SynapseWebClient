@@ -256,7 +256,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void badgeClicked(ClickEvent event) {
 		if (customClickHandler == null) 
 			if (openNewWindow) {
-				view.openNewWindow(profile.getOwnerId());
+				view.openNewWindow("#!Profile:" + profile.getOwnerId());
 			} else {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));				
 			}

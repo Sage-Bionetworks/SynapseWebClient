@@ -189,9 +189,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	}
 	
 	@Override
-	public void openNewWindow(String ownerId) {
+	public void openNewWindow(String url) {
 		usernameLink.setTarget("_blank");
-		DisplayUtils.newWindow("#!Profile:" + ownerId, "", "");
+		DisplayUtils.newWindow(url, "", "");
 	}
 	
 	/*
