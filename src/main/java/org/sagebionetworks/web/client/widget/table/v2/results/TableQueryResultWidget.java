@@ -39,6 +39,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
+	boolean isView;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
@@ -64,10 +65,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * Configure this widget with a query string.
 	 * @param queryString
 	 * @param isEditable Is the user allowed to edit the query results?
+	 * @param is table a file view?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, QueryResultsListener listener){
+	public void configure(Query query, boolean isEditable, boolean isView, QueryResultsListener listener){
 		this.isEditable = isEditable;
+		this.isView = isView;
 		this.startingQuery = query;
 		this.queryListener = listener;
 		if (!synapseAlert.isUserLoggedIn()) {

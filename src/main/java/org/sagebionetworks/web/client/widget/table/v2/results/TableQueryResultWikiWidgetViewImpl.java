@@ -13,6 +13,8 @@ public class TableQueryResultWikiWidgetViewImpl implements TableQueryResultWikiW
 	Widget widget;
 	@UiField
 	Div tableWidgetContainer;
+	@UiField
+	Div synAlertContainer;
 	
 	@Inject
 	public TableQueryResultWikiWidgetViewImpl(Binder binder) {
@@ -23,6 +25,12 @@ public class TableQueryResultWikiWidgetViewImpl implements TableQueryResultWikiW
 	public void setTableQueryResultWidget(Widget tableQueryResultWidget) {
 		tableWidgetContainer.clear();
 		tableWidgetContainer.add(tableQueryResultWidget);
+	}
+	
+	@Override
+	public void setSynAlert(Widget synAlert) {
+		synAlertContainer.clear();
+		synAlertContainer.add(synAlert);
 	}
 	
 	@Override

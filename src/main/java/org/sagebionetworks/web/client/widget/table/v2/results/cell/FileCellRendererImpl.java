@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
+import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
@@ -20,12 +21,14 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	CellAddress address;
 	AsynchTableFileHandleProvider fileHandleProvider;
 	AuthenticationController authController;
+	FileHandleAsyncHandler fileHandleAsynHandler;
 	
 	@Inject
-	public FileCellRendererImpl(FileCellRendererView view, AsynchTableFileHandleProvider provider, AuthenticationController authController) {
+	public FileCellRendererImpl(FileCellRendererView view, AsynchTableFileHandleProvider provider, AuthenticationController authController, FileHandleAsyncHandler fileHandleAsynHandler) {
 		this.view = view;
 		this.fileHandleProvider = provider;
 		this.authController = authController;
+		this.fileHandleAsynHandler = fileHandleAsynHandler;
 	}
 
 	@Override
