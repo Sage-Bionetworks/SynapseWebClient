@@ -110,7 +110,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		configure(profile);
 	}
 	
-	public void configureTarget(String target) {
+	public void setTarget(String target) {
 		view.setTarget(target);
 	}
 	
