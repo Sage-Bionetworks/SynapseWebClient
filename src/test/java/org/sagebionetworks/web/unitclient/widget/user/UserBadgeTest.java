@@ -153,6 +153,22 @@ public class UserBadgeTest {
 	}
 	
 	@Test
+	public void testBadgeClickedNewWindowTrue() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(true);
+		userBadge.badgeClicked(null);
+		verify(mockView).openNewWindow(anyString());
+	}
+	
+	@Test
+	public void testBadgeClickedNewWindowFalse() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(false);
+		userBadge.badgeClicked(null);
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
+	}
+	
+	@Test
 	public void testBadgeClickedCustomClickHandler() {
 		userBadge.configure(profile);
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
