@@ -20,7 +20,7 @@
 						<t:TableHeader width="60px">
 							<bh:Span text="Version"/>
 						</t:TableHeader>
-						<t:TableHeader ui:field="descriptionHeader" width="165px" visible="false">
+						<t:TableHeader ui:field="descriptionHeader" width="165px">
 							<bh:Span text="Description" />
 						</t:TableHeader>
 						<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
