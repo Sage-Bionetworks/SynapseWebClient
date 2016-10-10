@@ -190,8 +190,13 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void openNewWindow(String url) {
-		usernameLink.setTarget("_blank");
-		DisplayUtils.newWindow(url, "", "");
+		DisplayUtils.newWindow(url, "_blank", "");
+		
+	}
+	
+	@Override
+	public void setOpenNewWindow(boolean value) {
+		usernameLink.setTarget(value ? "_blank" : "");
 	}
 	
 	/*
