@@ -141,7 +141,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			sort = sortItems.get(0);
 		}
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, null, this);
+		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, isView, null, this);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
