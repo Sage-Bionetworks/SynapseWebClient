@@ -184,6 +184,11 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	}
 	
 	@Override
+	public void setTarget(String target) {
+		usernameLink.setTarget(target);
+	}
+	
+	@Override
 	public void clearHref() {
 		usernameLink.setHref(HasHref.EMPTY_HREF);
 	}

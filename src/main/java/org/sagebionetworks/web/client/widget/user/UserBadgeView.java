@@ -22,6 +22,7 @@ public interface UserBadgeView extends IsWidget, SynapseView, SupportsLazyLoadIn
 	void setDefaultPictureColor(String colorCss);
 	void setDefaultPictureLetter(String letter);
 	void setHref(String href);
+	void setTarget(String target);
 	void clearHref();
 	/**
 	 * Presenter interface

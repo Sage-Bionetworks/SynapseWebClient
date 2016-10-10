@@ -99,7 +99,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 		
 		if (customClickHandler == null) {
-			view.setHref("#!Profile:" + profile.getOwnerId());
+			view.setHref("#!Profile:" + profile.getOwnerId());//
 		}
 		useCachedImage = true;
 		configurePicture();
@@ -108,6 +108,10 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void configure(UserProfile profile, String description) {
 		this.description = description;
 		configure(profile);
+	}
+	
+	public void configureTarget(String target) {
+		view.setTarget(target);
 	}
 	
 	public void setSize(BadgeSize size) {
