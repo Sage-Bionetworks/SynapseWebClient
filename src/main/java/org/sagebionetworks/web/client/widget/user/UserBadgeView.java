@@ -23,6 +23,8 @@ public interface UserBadgeView extends IsWidget, SynapseView, SupportsLazyLoadIn
 	void setDefaultPictureLetter(String letter);
 	void setHref(String href);
 	void clearHref();
+	void openNewWindow(String url);
+	void setOpenNewWindow(String target);
 	/**
 	 * Presenter interface
 	 */
