@@ -208,10 +208,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 					synapseAlert.handleException(e);
 				}
 			}
-		} else if (VideoConfigEditor.isRecognizedMP4FileName(originalFileHandle.getFileName())) {
-			//VideoWidget vw = new VideoWidget(new VideoWidgetViewImpl(synapseJSNIUtils), authController);
-
-			view.setVideoPreview(originalFileHandle.getFileName());
 		}
 	}
 	

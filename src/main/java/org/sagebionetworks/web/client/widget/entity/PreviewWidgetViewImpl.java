@@ -93,18 +93,6 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setVideoPreview(String filename) {
-		clear();
-		StringBuilder sb = new StringBuilder();
-		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
-		sb.append(filename);
-		sb.append("</code></pre>");
-		setPreview(sb.toString());
-		synapseJSNIUtils.highlightCodeBlocks();
-		isCode = true;
-	}
-	
-	@Override
 	public void setCodePreview(String code) {
 		clear();
 		StringBuilder sb = new StringBuilder();
