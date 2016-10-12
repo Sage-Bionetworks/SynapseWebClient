@@ -187,6 +187,18 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void clearHref() {
 		usernameLink.setHref(HasHref.EMPTY_HREF);
 	}
+	
+	@Override
+	public void openNewWindow(String url) {
+		DisplayUtils.newWindow(url, "_blank", "");
+		
+	}
+	
+	@Override
+	public void setOpenNewWindow(String target) {
+		usernameLink.setTarget(target);
+	}
+	
 	/*
 	 * Private Methods
 	 */
