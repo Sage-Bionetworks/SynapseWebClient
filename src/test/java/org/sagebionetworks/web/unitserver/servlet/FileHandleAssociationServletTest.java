@@ -43,6 +43,9 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.util.tools.shared.Md5Utils;
+import com.google.gwt.util.tools.shared.StringUtils;
+
 public class FileHandleAssociationServletTest {
 
 	HttpServletRequest mockRequest;
@@ -104,7 +107,8 @@ public class FileHandleAssociationServletTest {
 		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
-		
+		String xsrfToken = StringUtils.toHexString(Md5Utils.getMd5Digest(sessionToken.getBytes()));
+		when(mockRequest.getParameter(WebConstants.XSRF_TOKEN_KEY)).thenReturn(xsrfToken);
 		
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
