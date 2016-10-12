@@ -113,6 +113,7 @@ public class ProvenanceEditorWidgetTest {
 		provList.add(mockUrlProvEntry);
 		when(mockProvenanceList.getEntries())
 				.thenReturn(provList);
+		when(mockEntity.getId()).thenReturn(entityId);
 	}
 	
 	@Test
@@ -132,7 +133,7 @@ public class ProvenanceEditorWidgetTest {
 	public void testConfigureSuccessProvenanceCreated() {
 		when(mockActivity.getUsed()).thenReturn(null);
 		AsyncMockStubber.callSuccessWith(mockActivity)
-				.when(mockSynClient).getOrCreateActivityForEntityVersion
+				.when(mockSynClient).getCopyOfActivityForEntityVersion
 				(anyString(), anyLong(), any(AsyncCallback.class));
 		when(mockProvenanceList.getEntries()).thenReturn(new LinkedList<ProvenanceEntry>());
 		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
@@ -155,13 +156,13 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockActivity).setUsed(captor.capture());
 		Set newProvSet = captor.getValue();
 		assertTrue(newProvSet.isEmpty());
-		verify(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
+		verify(mockSynClient).saveNewActivity(eq(mockActivity), eq(entityId), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testConfigureSuccess() {
 		AsyncMockStubber.callSuccessWith(mockActivity)
-				.when(mockSynClient).getOrCreateActivityForEntityVersion
+				.when(mockSynClient).getCopyOfActivityForEntityVersion
 				(anyString(), anyLong(), any(AsyncCallback.class));
 		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
 		verify(mockView).setName(mockActivity.getName());
@@ -179,7 +180,7 @@ public class ProvenanceEditorWidgetTest {
 	@Test
 	public void testConfigureFailure() {
 		AsyncMockStubber.callFailureWith(caught)
-				.when(mockSynClient).getOrCreateActivityForEntityVersion
+				.when(mockSynClient).getCopyOfActivityForEntityVersion
 				(anyString(), anyLong(), any(AsyncCallback.class));
 		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
 		verify(mockSynAlert).handleException(caught);
@@ -188,7 +189,7 @@ public class ProvenanceEditorWidgetTest {
 	@Test
 	public void onSaveSuccess() {
 		AsyncMockStubber.callSuccessWith(null)
-				.when(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
+				.when(mockSynClient).saveNewActivity(eq(mockActivity), anyString(), any(AsyncCallback.class));
 		presenter.setActivty(mockActivity);
 		presenter.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		presenter.onSave();
@@ -200,7 +201,7 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockActivity).setUsed(captor.capture());
 		Set usedSet = captor.getValue();
 		assertTrue(usedSet.size() == 4);
-		verify(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
+		verify(mockSynClient).saveNewActivity(eq(mockActivity), anyString(), any(AsyncCallback.class));
 		verify(mockView).hide();
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -208,10 +209,10 @@ public class ProvenanceEditorWidgetTest {
 	@Test
 	public void onSaveFailure() {
 		AsyncMockStubber.callFailureWith(caught)
-				.when(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
+				.when(mockSynClient).saveNewActivity(eq(mockActivity), anyString(), any(AsyncCallback.class));
 		presenter.setActivty(mockActivity);
 		presenter.onSave();
-		verify(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
+		verify(mockSynClient).saveNewActivity(eq(mockActivity), anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}
 	

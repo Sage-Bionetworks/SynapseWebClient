@@ -506,9 +506,9 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
-	void putActivity(Activity update) throws RestServiceException;
+	void saveNewActivity(Activity activity, String entityId) throws RestServiceException;
 
-	Activity getOrCreateActivityForEntityVersion(String entityId,
+	Activity getCopyOfActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException;
 
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException;

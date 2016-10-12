@@ -1137,32 +1137,36 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public Activity getOrCreateActivityForEntityVersion(String entityId,
+	public Activity getCopyOfActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		Activity originalActivity;
 		try {
-			return synapseClient.getActivityForEntityVersion(
+			originalActivity = synapseClient.getActivityForEntityVersion(
 					entityId, versionNumber);
 		} catch (SynapseNotFoundException ex) {
 			// not found, so create
-				Activity newActivity;
-				try {
-					newActivity = synapseClient.createActivity(new Activity());
-					synapseClient.putEntity(synapseClient.getEntityById(entityId), newActivity.getId());
-				} catch (SynapseException e) {
-					throw ExceptionUtil.convertSynapseException(e);
-				}
-				return newActivity;
+			originalActivity = new Activity();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		try {
+			originalActivity.setId(null);
+			return synapseClient.createActivity(originalActivity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
 	@Override
-	public void putActivity(Activity update) throws RestServiceException {
+	public void saveNewActivity(Activity activity, String entityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.putActivity(update);
+			//update the activity modifications
+			synapseClient.putActivity(activity);
+			
+			//and associate with the entity
+			synapseClient.putEntity(synapseClient.getEntityById(entityId), activity.getId());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

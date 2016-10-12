@@ -422,10 +422,10 @@ public interface SynapseClientAsync {
 	
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
-	void getOrCreateActivityForEntityVersion(String entityId,
+	void getCopyOfActivityForEntityVersion(String entityId,
 			Long versionNumber, AsyncCallback<Activity> callback);
 
-	void putActivity(Activity update, AsyncCallback<Void> callback);
+	void saveNewActivity(Activity activity, String entityId, AsyncCallback<Void> callback);
 
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 

@@ -35,7 +35,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	EntityFinder entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
 	EntityUpdatedHandler entityUpdatedHandler;
-
+	String entityId;
 	
 	@Inject
 	public ProvenanceEditorWidget(ProvenanceEditorWidgetView view,
@@ -66,8 +66,8 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	public void configure(EntityBundle entityBundle, EntityUpdatedHandler entityUpdatedHandler) {
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
-		Entity entity = entityBundle.getEntity();
-		synapseClient.getOrCreateActivityForEntityVersion(entity.getId(), null, new AsyncCallback<Activity>() {
+		entityId = entityBundle.getEntity().getId();
+		synapseClient.getCopyOfActivityForEntityVersion(entityId, null, new AsyncCallback<Activity>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -153,7 +153,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		usedSet.addAll(provEntryListToUsedSet(usedEntries, false));
 		usedSet.addAll(provEntryListToUsedSet(executedEntries, true));
 		activity.setUsed(usedSet);
-		synapseClient.putActivity(activity, new AsyncCallback<Void>() {
+		synapseClient.saveNewActivity(activity, entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
