@@ -23,7 +23,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 	private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<FileHandleAssociation>();
 	SynapseClientAsync synapseClient;
 	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 300;
+	public static final int DELAY = 325;
 	
 	@Inject
 	public FileHandleAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
