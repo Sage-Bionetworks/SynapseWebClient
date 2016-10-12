@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -15,11 +15,15 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -30,6 +34,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -73,18 +78,45 @@ public class TableQueryResultWikiWidgetTest {
 	}
 	
 	@Test
-	public void testConfigure() {
+	public void testConfigureIsTable() {
+		when(mockEntityHeader.getType()).thenReturn(TableEntity.class.getName());
+		boolean isView = false;
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String sql = "my query string";
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockSynAlert).clear();
 		ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
-		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), (QueryResultsListener)isNull());
+		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), eq(isView), (QueryResultsListener)isNull());
 		
 		Query capturedQuery = captor.getValue();
 		assertEquals(sql, capturedQuery.getSql());
 		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, capturedQuery.getLimit());
 		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, capturedQuery.getOffset());
+	}
+	
+	@Test
+	public void testConfigureIsView() {
+		when(mockEntityHeader.getType()).thenReturn(EntityView.class.getName());
+		boolean isView = true;
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String sql = "my query string";
+		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockSynAlert).clear();
+		verify(mockTableQueryResultWidget).configure(any(Query.class), eq(false), eq(isView), (QueryResultsListener)isNull());
+	}
+	
+	@Test
+	public void testConfigureNotFound() {
+		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String sql = "my query string";
+		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+		widget.configure(wikiKey, descriptor, null, null);
+		InOrder inOrder = Mockito.inOrder(mockSynAlert);
+		inOrder.verify(mockSynAlert).clear();
+		inOrder.verify(mockSynAlert).handleException(isA(NotFoundException.class));
 	}
 	
 	@Test
@@ -99,7 +131,7 @@ public class TableQueryResultWikiWidgetTest {
 		descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
 		widget.configure(wikiKey, descriptor, null, null);
 		ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
-		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), (QueryResultsListener)isNull());
+		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), eq(false), (QueryResultsListener)isNull());
 		
 		Query capturedQuery = captor.getValue();
 		assertEquals(sql, capturedQuery.getSql());
@@ -119,7 +151,7 @@ public class TableQueryResultWikiWidgetTest {
 		descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
 		widget.configure(wikiKey, descriptor, null, null);
 		ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
-		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), (QueryResultsListener)isNull());
+		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), eq(false), (QueryResultsListener)isNull());
 		
 		Query capturedQuery = captor.getValue();
 		assertEquals(sql, capturedQuery.getSql());
