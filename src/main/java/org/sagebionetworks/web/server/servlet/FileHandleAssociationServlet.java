@@ -105,6 +105,8 @@ public class FileHandleAssociationServlet extends HttpServlet {
 		String objectId = request.getParameter(WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY);
 		String objectType = request.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY);
 		String fileHandleId = request.getParameter(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
+		String xsrfToken = request.getParameter(WebConstants.XSRF_TOKEN_KEY);
+		FileHandleServlet.validateXsrfToken(xsrfToken, token);
 		
 		try {
 			FileHandleAssociation fha = new FileHandleAssociation();
