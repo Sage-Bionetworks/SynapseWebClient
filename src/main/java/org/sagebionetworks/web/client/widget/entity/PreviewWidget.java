@@ -20,6 +20,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetViewImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -205,6 +208,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 					synapseAlert.handleException(e);
 				}
 			}
+		} else if (VideoConfigEditor.isRecognizedMP4FileName(originalFileHandle.getFileName())) {
+			//VideoWidget vw = new VideoWidget(new VideoWidgetViewImpl(synapseJSNIUtils), authController);
+
+			view.setVideoPreview(originalFileHandle.getFileName());
 		}
 	}
 	
