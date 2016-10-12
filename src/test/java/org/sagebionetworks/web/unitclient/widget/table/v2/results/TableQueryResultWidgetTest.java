@@ -52,6 +52,7 @@ public class TableQueryResultWidgetTest {
 	QueryResult results;
 	SelectColumn select;
 	SynapseAlert mockSynapseAlert;
+	boolean isView;
 	
 	@Before
 	public void before(){
@@ -93,6 +94,7 @@ public class TableQueryResultWidgetTest {
 		delta.setTableId("syn123");
 		
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
+		isView = false;
 	}
 	
 	@Test
@@ -101,12 +103,12 @@ public class TableQueryResultWidgetTest {
 		// setup a success
 		jobTrackingStub.setResponse(bundle);
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
+		widget.configure(query, isEditable, isView, mockListner);
 		verify(mockView, times(2)).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -119,7 +121,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigureNotLoggedIn() {
 		boolean isEditable = false;
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
-		widget.configure(query, isEditable, mockListner);
+		widget.configure(query, isEditable, isView, mockListner);
 		verify(mockView).setTableVisible(false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
@@ -130,15 +132,16 @@ public class TableQueryResultWidgetTest {
 	@Test
 	public void testConfigureSuccessNotEditable(){
 		boolean isEditable = false;
+		isView = true;
 		// setup a success
 		jobTrackingStub.setResponse(bundle);
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
+		widget.configure(query, isEditable, isView, mockListner);
 		verify(mockView, times(2)).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -154,12 +157,12 @@ public class TableQueryResultWidgetTest {
 		// Results are only editable if all of the select columns have IDs.
 		select.setId(null);
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
+		widget.configure(query, isEditable, isView, mockListner);
 		verify(mockView, times(2)).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -173,7 +176,7 @@ public class TableQueryResultWidgetTest {
 		// Setup a cancel
 		jobTrackingStub.setOnCancel(true);
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
+		widget.configure(query, isEditable, isView, mockListner);
 		verify(mockView).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
@@ -194,7 +197,7 @@ public class TableQueryResultWidgetTest {
 		Throwable error = new Throwable("Failed!!");
 		jobTrackingStub.setError(error);
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
+		widget.configure(query, isEditable, isView, mockListner);
 		verify(mockView).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.

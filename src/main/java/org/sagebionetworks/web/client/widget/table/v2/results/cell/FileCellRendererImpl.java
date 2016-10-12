@@ -47,7 +47,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 			association.setFileHandleId(fileHandleId);
 			if (address.isView()) {
 				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-				association.setAssociateObjectId("syn" + address.getRowId().toString());
+				association.setAssociateObjectId(address.getRowId().toString());
 			} else {
 				association.setAssociateObjectType(FileHandleAssociateType.TableEntity);
 				association.setAssociateObjectId(address.getTableId());

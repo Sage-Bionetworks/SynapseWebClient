@@ -78,7 +78,7 @@ public class FileCellRendererImplTest {
 	@Test
 	public void testCreateAnchorHref(){
 		renderer.setValue(fileHandleId);
-		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId=999&xsrfToken=98208";
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	
@@ -88,8 +88,7 @@ public class FileCellRendererImplTest {
 		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
 		renderer.setCellAddresss(address);
 		renderer.setValue(fileHandleId);
-		String objectId = "syn" + rowId;
-		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+objectId+"&associatedObjectType=FileEntity&fileHandleId=999&xsrfToken=98208";
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	
