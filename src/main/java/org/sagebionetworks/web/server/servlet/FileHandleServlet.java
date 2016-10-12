@@ -118,7 +118,7 @@ public class FileHandleServlet extends HttpServlet {
 		super.service(arg0, arg1);
 	}
 
-	public void validateXsrfToken(String xsrfToken, String sessionToken) {
+	public static void validateXsrfToken(String xsrfToken, String sessionToken) {
 		if (sessionToken != null) {
 			//validate token for xsrf
 			String expectedToken = StringUtils.toHexString(
@@ -129,6 +129,7 @@ public class FileHandleServlet extends HttpServlet {
 		    }
 		}
 	}
+	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

@@ -36,6 +36,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
+	boolean isView;
 	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
@@ -58,7 +59,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, Query query, SortItem sort, boolean isEditable, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
+	public void configure(QueryResultBundle bundle, Query query, SortItem sort, boolean isEditable, boolean isView, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
+		this.isView = isView;
 		this.rowSelectionListener = rowSelectionListener;
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null){
@@ -128,7 +130,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(rowSelectionListener != null){
 			listner = this;
 		}
-		rowWidget.configure(tableId, types, isEditor, row, listner);
+		rowWidget.configure(tableId, types, isEditor, isView, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
 		if(keyboardNavigationHandler != null){
