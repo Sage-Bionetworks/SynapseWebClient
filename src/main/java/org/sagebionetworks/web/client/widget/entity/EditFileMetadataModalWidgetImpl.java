@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,6 +25,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	FileEntity fileEntity;
 	String startingName;
 	Callback handler;
+	AsyncCallback<Entity> entityUpdatedCallback;
 	
 	@Inject
 	public EditFileMetadataModalWidgetImpl(EditFileMetadataModalView view,
@@ -34,9 +34,24 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.view.setPresenter(this);
+		this.entityUpdatedCallback = getEntityUpdatedCallback();
 	}
 	
-	
+	private AsyncCallback<Entity> getEntityUpdatedCallback() {
+		return new AsyncCallback<Entity>() {
+			@Override
+			public void onSuccess(Entity result) {
+				view.hide();
+				handler.invoke();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				fileEntity.setName(startingName);
+				view.showError(caught.getMessage());
+				view.setLoading(false);
+			}
+		};
+	}
 	/**
 	 * Update entity with a new name.
 	 * @param name
@@ -52,60 +67,26 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
 		fha.setFileHandleId(fileHandle.getId());
 		copyRequest.setOriginalFile(fha);
-		synapseClient.updateFileEntity(fileEntity, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				view.hide();
-				handler.invoke();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				// put the name back.
-				fileEntity.setName(startingName);
-				fileEntity.setFileNameOverride(revertOverrideFilename);
-				view.showError(caught.getMessage());
-				view.setLoading(false);
-			}
-		});
+		synapseClient.updateFileEntity(fileEntity, copyRequest, entityUpdatedCallback);
 	}
 	
 	/**
 	 * Update entity with a new name.
 	 * @param name
 	 */
-	private void updateFileEntity(final String name) {
+	private void updateFileEntity() {
 		view.setLoading(true);
-		fileEntity.setName(name);
-		
-		//only set the fileEntity file name override if it differs from the starting filename
-		if (!startingFileName.equals(newFileName)) {
-			fileEntity.setFileNameOverride(newFileName);
-		}
-		FileHandleCopyRequest copyRequest = new FileHandleCopyRequest();
-		synapseClient.updateFileEntity(fileEntity, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				view.hide();
-				handler.invoke();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				// put the name back.
-				fileEntity.setName(startingName);
-				fileEntity.setFileNameOverride(revertOverrideFilename);
-				view.showError(caught.getMessage());
-				view.setLoading(false);
-			}
-		});
+		fileEntity.setName(getEntityNameFromView());
+		synapseClient.updateEntity(fileEntity, entityUpdatedCallback);
 	}
 
 	@Override
 	public void onPrimary() {
-		if(getEntityNameFromView() == null){
+		if (getEntityNameFromView() == null) {
 			view.showError(RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		} else if(getFileNameFromView() == null){
+		} else if (getFileNameFromView() == null) {
 			view.showError(FILE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		} else if(getFileContentTypeFromView() == null){
+		} else if (getFileContentTypeFromView() == null) {
 			view.showError(CONTENT_TYPE_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		} else if (isFileHandleChange()) {
 			updateFileEntityFileHandle();
@@ -129,7 +110,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	}
 	
 	private boolean isEntityChange() {
-		return this.startingName.equals(getEntityNameFromView());
+		return !this.startingName.equals(getEntityNameFromView());
 	}
 	
 	private boolean isFileHandleChange() {
@@ -146,8 +127,9 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 		this.handler = handler;
 		this.fileEntity = fileEntity;
 		this.fileHandle = fileHandle;
+		this.startingName = fileEntity.getName();
 		view.clear();
-		view.configure(startingName, fileHandle.getFileName(), fileHandle.getConcreteType());
+		view.configure(startingName, fileHandle.getFileName(), fileHandle.getContentType());
 		view.show();
 	}
 
