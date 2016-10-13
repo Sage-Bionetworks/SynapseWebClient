@@ -38,6 +38,8 @@ import com.google.inject.Inject;
 public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendererPresenter {
 	public static final String APPLICATION_ZIP = "application/zip";	
 	public static final int MAX_LENGTH = 100000;
+	public static final int VIDEO_WIDTH = 320;
+	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
 	}
@@ -212,7 +214,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			}
 		} 
 		else if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
-			videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName());
+			videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
 			view.setVideoPreview(videoWidget);
 		}
 	}

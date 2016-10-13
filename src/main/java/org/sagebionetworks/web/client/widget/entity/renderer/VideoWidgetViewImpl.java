@@ -28,14 +28,14 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("<video width=\"");
-//		if (width != null)
-//			builder.append(SafeHtmlUtils.htmlEscape(width));
-//		else builder.append("640");
-//		
-//		builder.append("\" height=\"");
-//		if (height != null)
-//			builder.append(SafeHtmlUtils.htmlEscape(height));
-//		else builder.append("480");
+		if (width != null)
+			builder.append(SafeHtmlUtils.htmlEscape(width));
+		else builder.append("640");
+		
+		builder.append("\" height=\"");
+		if (height != null)
+			builder.append(SafeHtmlUtils.htmlEscape(height));
+		else builder.append("480");
 		
 		builder.append("\" controls>");
 		if (mp4SynapseId != null) {

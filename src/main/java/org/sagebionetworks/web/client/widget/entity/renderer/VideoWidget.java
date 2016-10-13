@@ -39,11 +39,11 @@ public class VideoWidget implements VideoWidgetView.Presenter, WidgetRendererPre
 		descriptor = widgetDescriptor;
 	}
 	
-	public void configure(String synapseId, String filename) {
+	public void configure(String synapseId, String filename, int width, int height) {
 		String mp4SynapseId = VideoConfigEditor.isRecognizedMP4FileName(filename) ? synapseId : null;
 		String oggSynapseId = VideoConfigEditor.isRecognizedOggFileName(filename) ? synapseId : null;
 		String webmSynapseId = VideoConfigEditor.isRecognizedWebMFileName(filename) ? synapseId : null;
-		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, null, null, authenticationController.getCurrentXsrfToken());
+		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, Integer.toString(width), Integer.toString(height), authenticationController.getCurrentXsrfToken());
 		
 	}
 	
