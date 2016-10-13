@@ -5,6 +5,7 @@ import java.util.Map;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -33,10 +34,17 @@ public class VideoWidget implements VideoWidgetView.Presenter, WidgetRendererPre
 		String webmSynapseId = descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY);
 		String width = descriptor.get(WidgetConstants.VIDEO_WIDGET_WIDTH_KEY);
 		String height = descriptor.get(WidgetConstants.HEIGHT_KEY);
-		view.configure(wikiKey,	mp4SynapseId, oggSynapseId, webmSynapseId, width, height, authenticationController.isLoggedIn(), wikiVersionInView,
-				authenticationController.getCurrentXsrfToken());
+		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height, authenticationController.getCurrentXsrfToken());
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
+	}
+	
+	public void configure(String synapseId, String filename) {
+		String mp4SynapseId = VideoConfigEditor.isRecognizedMP4FileName(filename) ? synapseId : null;
+		String oggSynapseId = VideoConfigEditor.isRecognizedOggFileName(filename) ? synapseId : null;
+		String webmSynapseId = VideoConfigEditor.isRecognizedWebMFileName(filename) ? synapseId : null;
+		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, null, null, authenticationController.getCurrentXsrfToken());
+		
 	}
 	
 	@SuppressWarnings("unchecked")
