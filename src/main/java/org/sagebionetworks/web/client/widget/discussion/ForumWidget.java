@@ -196,7 +196,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			}
 		});
 		defaultThreadWidget.setReplyListVisible(false);
-		defaultThreadWidget.setReplyTextBoxVisible(false);
+		defaultThreadWidget.setNewReplyContainerVisible(false);
 		defaultThreadWidget.setCommandsVisible(false);
 	}
 	
