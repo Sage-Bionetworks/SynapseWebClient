@@ -159,7 +159,7 @@ public class ForumWidgetTest {
 		assertEquals(DEFAULT_THREAD_ID, defaultThreadBundle.getId());
 		assertEquals(DEFAULT_THREAD_MESSAGE_KEY, defaultThreadBundle.getMessageKey());
 		
-		verify(mockDefaultThreadWidget).setReplyTextBoxVisible(false);
+		verify(mockDefaultThreadWidget).setNewReplyContainerVisible(false);
 		verify(mockDefaultThreadWidget).setCommandsVisible(false);
 
 		//test "New Thread" button tooltip shown if user attempts to follow default thread
@@ -190,7 +190,7 @@ public class ForumWidgetTest {
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockDefaultThreadWidget, atLeastOnce()).setThreadIdClickedCallback(captor.capture());
 		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyListVisible(false);
-		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyTextBoxVisible(false);
+		verify(mockDefaultThreadWidget, atLeastOnce()).setNewReplyContainerVisible(false);
 		verify(mockDefaultThreadWidget, atLeastOnce()).setCommandsVisible(false);
 
 		captor.getValue().invoke("threadId");
