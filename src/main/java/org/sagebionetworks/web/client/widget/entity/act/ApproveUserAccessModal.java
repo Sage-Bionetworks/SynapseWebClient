@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import java.util.List;
+
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -24,6 +26,10 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	public void configure(boolean isCreate) {
 		this.isCreate = isCreate;
+	}
+	
+	public void setDropdown(List<String> requirements) {
+		view.setStates(requirements);
 	}
 	
 	public void show() {

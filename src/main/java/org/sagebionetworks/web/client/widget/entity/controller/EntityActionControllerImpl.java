@@ -1,7 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -12,6 +17,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -33,6 +39,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.UserProfileClient;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -83,6 +90,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETE_PREFIX = "Delete ";
 	
 	public static final String RENAME_PREFIX = "Rename ";
+	
+	public static final int IS_ACT_MEMBER = 0x20;
 
 	EntityActionControllerView view;
 	PreflightController preflightController;
@@ -114,6 +123,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
+	UserProfileClientAsync userProfileClient;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -135,7 +145,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			CookieProvider cookies,
 			ChallengeClientAsync challengeClient,
 			SelectTeamModal selectTeamModal,
-			ApproveUserAccessModal approveUserAccessModal) {
+			ApproveUserAccessModal approveUserAccessModal,
+			UserProfileClientAsync userProfileClient) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -171,6 +182,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 		this.selectTeamModal = selectTeamModal;
 		this.approveUserAccessModal = approveUserAccessModal;
+		this.userProfileClient = userProfileClient;
 	}
 
 	@Override
@@ -223,15 +235,34 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureApproveUserAccess() {
-		//UserProfileClient.getMyOwnUserBundle(0);
-		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository){
-			//actionMenu.addControllerWidget(approveUserAccessModal);
-			actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
-			actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
-			actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
-		} else {
-			actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
-			actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
+		if (authenticationController.isLoggedIn()) {
+			
+			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER, new AsyncCallback<UserBundle>() {
+				@Override
+				public void onSuccess(UserBundle userBundle) {
+					//populate list
+					userBundle.setIsACTMember(true);
+					List<AccessRequirement> list = entityBundle.getAccessRequirements();
+					List<String> titles = new ArrayList<String>();
+					for (AccessRequirement ar : list) {
+						titles.add("" + ar.getId());
+					}
+					if (userBundle.getIsACTMember()) {
+						approveUserAccessModal.setDropdown(titles);
+						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
+						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
+					} else {
+						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
+						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					// not sure
+				}
+			});	
 		}
 	}
 
