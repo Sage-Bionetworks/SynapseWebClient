@@ -204,6 +204,19 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testPreviewVideoContentType(){
+		mainFileHandle.setFileName("preview.mp4");
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("video/mp4");
+		fh.setFileName("preview.mp4");
+		testFileHandleList.add(fh);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setVideoPreview(any(Widget.class));
+	}
+	
+	@Test
 	public void testWikiConfigure() {		
 		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
 		previewWidget.configure(null, descriptor, null, null);

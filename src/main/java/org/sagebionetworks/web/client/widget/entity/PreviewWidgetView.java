@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
-
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,7 +14,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setImagePreview(String fullFileUrl, String previewUrl);
 	public void setCodePreview(String text);
 	public void setTextPreview(String text);
-	public void setVideoPreview(VideoWidget vw);
+	public void setVideoPreview(Widget w);
 	void addStyleName(String style);
 	
 	/**
