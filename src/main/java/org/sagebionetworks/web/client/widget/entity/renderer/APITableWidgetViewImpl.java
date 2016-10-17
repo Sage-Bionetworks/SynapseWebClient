@@ -149,10 +149,10 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 
 		}
 	}
-	@Override
-	public List<ElementWrapper> findCancelRequestDivs() {
+	
+	public List<ElementWrapper> findDivs(String prefix) {
 		List<ElementWrapper> wrappedElements = new ArrayList<ElementWrapper>();
-		JsArray<JavaScriptObject> elements = _findDivs(APITableColumnRendererCancelControl.CANCEL_REQUEST_WIDGET_DIV_PREFIX);
+		JsArray<JavaScriptObject> elements = _findDivs(prefix);
 		if (elements != null) {
 			for (int i = 0; i < elements.length(); i++) {
 				DivElement div = (DivElement) elements.get(i);
@@ -160,6 +160,17 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 			}
 		}
 		return wrappedElements;
+	}
+	
+	
+	@Override
+	public List<ElementWrapper> findUserBadgeDivs() {
+		return findDivs(APITableColumnRendererUserId.USER_WIDGET_DIV_PREFIX);
+	}
+	
+	@Override
+	public List<ElementWrapper> findCancelRequestDivs() {
+		return findDivs(APITableColumnRendererCancelControl.CANCEL_REQUEST_WIDGET_DIV_PREFIX);
 	}
 	
 	@Override

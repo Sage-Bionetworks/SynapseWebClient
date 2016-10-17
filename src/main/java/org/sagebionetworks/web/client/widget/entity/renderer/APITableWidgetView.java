@@ -32,6 +32,7 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	
 	void showTableUnavailable();
 	List<ElementWrapper> findCancelRequestDivs();
+	List<ElementWrapper> findUserBadgeDivs();
 	void addWidget(Widget widget, String divID);
 	/**
 	 * Presenter interface

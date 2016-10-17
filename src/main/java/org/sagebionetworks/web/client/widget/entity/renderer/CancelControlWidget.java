@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget {
-	
 	private SingleButtonView view;
 	private ChallengeClientAsync challengeClient;
 	AuthenticationController authController;
