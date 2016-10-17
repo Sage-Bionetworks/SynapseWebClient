@@ -43,7 +43,13 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 				String uniqueId = gwt.getUniqueElementId();
 				String colValue = column.get(i);
 				// create div with an id that can be found later.
-				String output = "<div id=\"" + USER_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + colValue + "\" />";
+				String output;
+				if (colValue != null) {
+					 output = "<div id=\"" + USER_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + colValue + "\" />";	
+				} else {
+					output = "";
+				}
+				
 				outputValues.add(output);
 			}
 		}

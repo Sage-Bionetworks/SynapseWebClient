@@ -70,8 +70,8 @@ public class APITableColumnRendererUserIDTest {
 		assertTrue(initializedRenderer.getColumnData().containsKey(inputColumnName));
 		//rendered value should contain the first and last name (obtained from the synapse client service for the input user id)
 		String userHtml = initializedRenderer.getColumnData().get(inputColumnName).get(0);
-		assertTrue(userHtml.contains(firstName));
-		assertTrue(userHtml.contains(lastName));
+		assertTrue(userHtml.contains(APITableColumnRendererUserId.USER_WIDGET_DIV_PREFIX));
+		assertTrue(userHtml.contains(inputValue));
 	}
 	
 	@Test

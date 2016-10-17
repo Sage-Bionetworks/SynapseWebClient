@@ -50,7 +50,12 @@ public class APITableColumnRendererCancelControl implements APITableColumnRender
 				String uniqueId = gwt.getUniqueElementId();
 				String cancelRequestedColValue = cancelRequestedColumn.get(i);
 				// create div with an id that can be found later.
-				String output = "<div id=\"" + CANCEL_REQUEST_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + cancelRequestedColValue + "\" />";
+				String output;
+				if (cancelRequestedColValue != null) {
+					output = "<div id=\"" + CANCEL_REQUEST_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + cancelRequestedColValue + "\" />";	
+				} else {
+					output = "";
+				}
 				outputValues.add(output);
 			}
 		}
