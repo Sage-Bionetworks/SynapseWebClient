@@ -18,12 +18,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Modal modal;
 	@UiField
 	TextBox nameField;
-	@UiField
-	TextBox submissionInstructionsField;
-	@UiField
-	TextBox submissionReceiptField;
-	@UiField
-	Div synAlertContainer;
 	
 	@UiField
 	Button saveButton;
@@ -66,22 +60,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		nameField.setText(name);
 	}
 	@Override
-	public String getSubmissionInstructionsMessage() {
-		return submissionInstructionsField.getText();
-	}
-	@Override
-	public void setSubmissionInstructionsMessage(String message) {
-		submissionInstructionsField.setText(message);
-	}
-	@Override
-	public String getSubmissionReceiptMessage() {
-		return submissionReceiptField.getText();
-	}
-	@Override
-	public void setSubmissionReceiptMessage(String message) {
-		submissionReceiptField.setText(message);
-	}
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}
@@ -92,10 +70,5 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void hide() {
 		modal.hide();
-	}
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
 	}
 }

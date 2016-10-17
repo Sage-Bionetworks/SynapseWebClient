@@ -14,16 +14,7 @@
 					<b:FormLabel text="Name" />
 					<b:TextBox ui:field="nameField" />
 				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel text="Submission Instructions" />
-					<b:TextBox ui:field="submissionInstructionsField" />
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel text="Submission Receipt Message" />
-					<b:TextBox ui:field="submissionReceiptField" />
-				</b:FormGroup>
 			</bh:Div>
-			<bh:Div ui:field="synAlertContainer"/>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." text="Save" />

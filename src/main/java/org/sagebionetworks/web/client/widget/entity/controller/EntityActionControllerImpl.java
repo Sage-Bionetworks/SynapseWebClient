@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -110,6 +111,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
+	ApproveUserAccessModal approveUserAccessModal;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -130,7 +132,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EvaluationEditorModal evalEditor,
 			CookieProvider cookies,
 			ChallengeClientAsync challengeClient,
-			SelectTeamModal selectTeamModal) {
+			SelectTeamModal selectTeamModal,
+			ApproveUserAccessModal approveUserAccessModal) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -156,6 +159,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.view.addWidget(accessControlListModalWidget);
 		this.view.addWidget(evalEditor.asWidget());
 		this.view.addWidget(selectTeamModal.asWidget());
+		this.view.addWidget(approveUserAccessModal.asWidget());
 		selectTeamModal.setTitle("Select Participant Team");
 		selectTeamModal.configure(new CallbackP<String>() {
 			@Override
@@ -164,6 +168,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}
 		});
 		this.selectTeamModal = selectTeamModal;
+		this.approveUserAccessModal = approveUserAccessModal;
 	}
 
 	@Override
@@ -211,9 +216,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureEditFileMetadataAction();
 			configureAddEvaluationAction();
 			configureCreateChallenge();
+			configureApproveUserAccess();
 		}
 	}
 	
+	private void configureApproveUserAccess() {
+		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository){
+			//actionMenu.addControllerWidget(approveUserAccessModal);
+			actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
+			actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+		} else {
+			actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
+			actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		}
+	}
+
 	public void onSelectChallengeTeam(String id) {
 		Challenge c = new Challenge();
 		c.setProjectId(entity.getId());
@@ -639,9 +656,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_CHALLENGE:
 			onCreateChallenge();
 			break;
+		case APPROVE_USER_ACCESS:
+			onApproveUserAccess();
+			break;
 		default:
 			break;
 		}
+	}
+
+	private void onApproveUserAccess() {
+		approveUserAccessModal.configure(true);
+		approveUserAccessModal.show();
+		view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+		
 	}
 
 	private void onAddCommit() {
