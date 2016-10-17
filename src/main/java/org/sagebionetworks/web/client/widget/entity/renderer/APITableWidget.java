@@ -52,6 +52,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	SynapseAlert synAlert;
+	Callback refreshRequiredCallback;
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
 	public static Set<String> dateColumnNames = new HashSet<String>();
@@ -80,7 +81,13 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;		
+		this.authenticationController = authenticationController;
+		refreshRequiredCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshData();
+			}
+		};
 	}
 	
 	@Override
@@ -416,7 +423,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			div.removeAllChildren();
 			String json = div.getAttribute("value");
 			CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
-			cancelRequestWidget.configure(json);
+			cancelRequestWidget.configure(json, refreshRequiredCallback);
 			view.addWidget(cancelRequestWidget.asWidget(), div.getAttribute("id"));
 		}
 	}
