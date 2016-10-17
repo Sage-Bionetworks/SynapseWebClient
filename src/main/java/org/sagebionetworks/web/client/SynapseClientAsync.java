@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -37,7 +38,10 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.file.BatchFileRequest;
+import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
@@ -417,6 +421,7 @@ public interface SynapseClientAsync {
 			AsyncCallback<TableFileHandleResults> callback);
 
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
+	void updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest, AsyncCallback<Entity> callback);
 	
 	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
 	
@@ -449,4 +454,6 @@ public interface SynapseClientAsync {
 	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
 
 	void getDefaultColumnsForView(ViewType type, AsyncCallback<List<ColumnModel>> callback);
+
+	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 }

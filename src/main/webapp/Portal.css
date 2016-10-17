@@ -2366,6 +2366,11 @@ div.input-group > input.search-textbox {
   font-size: 1em;
 }
 
+.nav>li>a>div {
+	padding: 2em;
+	margin: -2em;
+}
+
 /*===========*/
 
 .largeIconButton {

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.shared.WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_REQUESTED;
+import static org.sagebionetworks.web.shared.WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class APITableColumnRendererCancelRequested implements APITableColumnRenderer {
+public class APITableColumnRendererCancelControl implements APITableColumnRenderer {
 	private String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
 	AuthenticationController authController;
@@ -23,7 +23,7 @@ public class APITableColumnRendererCancelRequested implements APITableColumnRend
 	GWTWrapper gwt;
 	//  This class simply adds elements that can be found later (to inject the CancelSubmissionWidget) after adding the table to the DOM.
 	@Inject
-	public APITableColumnRendererCancelRequested(AuthenticationController authController, GWTWrapper gwt) {
+	public APITableColumnRendererCancelControl(AuthenticationController authController, GWTWrapper gwt) {
 		this.authController = authController;
 		this.gwt = gwt;
 	}
@@ -37,13 +37,13 @@ public class APITableColumnRendererCancelRequested implements APITableColumnRend
 		}
 		outputColumnName = APITableWidget.getSingleOutputColumnName(config);
 		outputColumnData = new HashMap<String, List<String>>();
-		List<String> cancelRequestedColumn = APITableWidget.getColumnValues(API_TABLE_COLUMN_RENDERER_CANCEL_REQUESTED, columnData);
+		List<String> cancelRequestedColumn = APITableWidget.getColumnValues(API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL, columnData);
 		
 		List<String> outputValues = new ArrayList<String>();
 		if (cancelRequestedColumn == null) {
 			//column unavailable
 			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + 
-					API_TABLE_COLUMN_RENDERER_CANCEL_REQUESTED));
+					API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL));
 			return;
 		} else {
 			for (int i = 0; i < cancelRequestedColumn.size(); i++) {

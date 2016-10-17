@@ -102,6 +102,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		clear();
 		// Install the view
 		panel.setWidget(view);
+		view.setLoadingVisible(true);
 	}
 
 	@Override

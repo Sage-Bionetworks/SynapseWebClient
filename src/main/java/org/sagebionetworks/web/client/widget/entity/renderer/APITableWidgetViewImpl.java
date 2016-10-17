@@ -152,7 +152,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	@Override
 	public List<ElementWrapper> findCancelRequestDivs() {
 		List<ElementWrapper> wrappedElements = new ArrayList<ElementWrapper>();
-		JsArray<JavaScriptObject> elements = _findDivs(APITableColumnRendererCancelRequested.CANCEL_REQUEST_WIDGET_DIV_PREFIX);
+		JsArray<JavaScriptObject> elements = _findDivs(APITableColumnRendererCancelControl.CANCEL_REQUEST_WIDGET_DIV_PREFIX);
 		if (elements != null) {
 			for (int i = 0; i < elements.length(); i++) {
 				DivElement div = (DivElement) elements.get(i);
@@ -218,10 +218,9 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	}
 	
 	@Override
-	public void showError(String message) {
+	public void showError(Widget synAlert) {
 		clear();
-		String errorMessage = DisplayUtils.getIconHtml(iconsImageBundle.error16()) + message;
-		add(new HTMLPanel(DisplayUtils.getMarkdownAPITableWarningHtml(errorMessage)));	
+		add(synAlert);	
 	}
 	
 	@Override

@@ -88,8 +88,14 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
+import org.sagebionetworks.repo.model.file.BatchFileRequest;
+import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
@@ -169,6 +175,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.cache.Cache;
@@ -3099,5 +3106,45 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
+	public Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			BatchFileHandleCopyRequest batchRequest =  new BatchFileHandleCopyRequest();
+			batchRequest.setCopyRequests(Collections.singletonList(copyRequest));
+			BatchFileHandleCopyResult batchCopyResults = synapseClient.copyFileHandles(batchRequest);
+			List<FileHandleCopyResult> copyResults = batchCopyResults.getCopyResults();
+			// sanity check
+			if (copyResults.size() != 1) {
+				throw new UnknownErrorException("Copy file handle resulted in unexpected response list size.");
+			}
+			FileHandleCopyResult copyResult = copyResults.get(0);
+			if (copyResult.getFailureCode() != null) {
+				switch(copyResult.getFailureCode()) {
+					case NOT_FOUND:
+						throw new NotFoundException();
+					case UNAUTHORIZED:
+						throw new UnauthorizedException();
+					default:
+						throw new UnknownErrorException();
+				}
+			} else {
+				FileHandle newFileHandle = copyResult.getNewFileHandle();
+				toUpdate.setDataFileHandleId(newFileHandle.getId());
+				return synapseClient.putEntity(toUpdate);
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
+	@Override
+	public BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.getFileHandleAndUrlBatch(request);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 }

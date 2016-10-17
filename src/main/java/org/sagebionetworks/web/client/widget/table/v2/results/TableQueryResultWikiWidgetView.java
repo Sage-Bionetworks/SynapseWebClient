@@ -5,4 +5,5 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface TableQueryResultWikiWidgetView extends IsWidget {
 	void setTableQueryResultWidget(Widget tableQueryResultWidget);
+	void setSynAlert(Widget synAlert);
 }

@@ -19,7 +19,6 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -43,7 +42,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private SelectedHandler selectedHandler;
-	AdapterFactory adapterFactory;
 	private Place cachedPlace;
 	private String cachedUserId;
 	Long userUpdatableOffset = ZERO_OFFSET;
@@ -56,13 +54,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			AuthenticationController authenticationController,
 			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter, 
-			AdapterFactory adapterFactory) {
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
 		
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			
@@ -220,7 +216,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadFavorites() {
 		view.getFavoritesTreeBrowser().clear();
-		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(synapseClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setFavoriteEntities(result);

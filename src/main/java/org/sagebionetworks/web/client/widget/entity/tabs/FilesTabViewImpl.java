@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -15,6 +16,8 @@ import com.google.inject.Inject;
 
 public class FilesTabViewImpl implements FilesTabView {
 	private static final String DISCUSSION_ABOUT = "Discussion about ";
+	@UiField
+	Span loading;
 	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField
@@ -185,4 +188,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setDiscussionText(String entityName) {
 		discussionText.setText(DISCUSSION_ABOUT + entityName);
 	}
+	
+	@Override
+	public void showLoading(boolean value) {
+		loading.setVisible(value);
+	}
+	
 }

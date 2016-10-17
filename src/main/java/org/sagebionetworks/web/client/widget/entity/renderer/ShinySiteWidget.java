@@ -22,7 +22,8 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		"https://belltown.fhcrc.org:9898/",
 		"http://pipeline.rice.edu/dream9/",
 		"https://fredcommo.shinyapps.io/",
-		"https://docs.google.com/a/sagebase.org/forms/"
+		"https://docs.google.com/a/sagebase.org/forms/",
+		"https://calendar.google.com/calendar/"
 		};
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;

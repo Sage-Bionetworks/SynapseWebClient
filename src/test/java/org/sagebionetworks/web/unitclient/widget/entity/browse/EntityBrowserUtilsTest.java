@@ -27,7 +27,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class EntityBrowserUtilsTest {
 
 	SynapseClientAsync mockSynapseClient;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	@Before
@@ -49,7 +48,7 @@ public class EntityBrowserUtilsTest {
 		
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		AsyncCallback<List<EntityHeader>> callback = mock(AsyncCallback.class);
-		EntityBrowserUtils.loadFavorites(mockSynapseClient, adapterFactory, mockGlobalApplicationState, callback);
+		EntityBrowserUtils.loadFavorites(mockSynapseClient, mockGlobalApplicationState, callback);
 		ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
 		verify(callback).onSuccess(argument.capture());
 		List<EntityHeader> returned = argument.getValue();

@@ -28,7 +28,7 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	 */
 	public void configurePager(int start, int end, int total);
 	
-	public void showError(String message);
+	public void showError(Widget synAlert);
 	
 	void showTableUnavailable();
 	List<ElementWrapper> findCancelRequestDivs();

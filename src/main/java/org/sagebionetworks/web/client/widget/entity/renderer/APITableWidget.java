@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -50,6 +51,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private APITableConfig tableConfig;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	SynapseAlert synAlert;
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
 	public static Set<String> dateColumnNames = new HashSet<String>();
@@ -69,12 +71,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	@Inject
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.ginInjector = ginInjector;
+		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;		
 	}
@@ -94,8 +98,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		if (tableConfig.getUri() != null) {
 			refreshData();
 		}
-		else
-			view.showError(DisplayConstants.API_TABLE_MISSING_URI);
+		else {
+			synAlert.showError(DisplayConstants.API_TABLE_MISSING_URI);
+			view.showError(synAlert.asWidget());
+		}
 	}
 	
 	@Override
@@ -205,8 +211,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			public void onFailure(Throwable caught) {
 				if(caught instanceof TableUnavilableException)
 					view.showTableUnavailable();
-				else
-					view.showError(caught.getMessage());
+				else {
+					synAlert.handleException(caught);
+					view.showError(synAlert.asWidget());
+				}
 			}
 		});
 	}
@@ -379,7 +387,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			@Override
 			public void onFailure(Throwable caught) {
 				//there was a problem initializing a particular renderer
-				view.showError(caught.getMessage());
+				synAlert.handleException(caught);
+				view.showError(synAlert.asWidget());
 			}
 			private void processNext() {
 				//after all renderers have initialized, then configure the view
@@ -406,7 +415,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		for (ElementWrapper div : divs) {
 			div.removeAllChildren();
 			String json = div.getAttribute("value");
-			CancelRequestWidget cancelRequestWidget = ginInjector.getCancelRequestWidget();
+			CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
 			cancelRequestWidget.configure(json);
 			view.addWidget(cancelRequestWidget.asWidget(), div.getAttribute("id"));
 		}
@@ -469,8 +478,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			} else if (synapseIdColumnNames.contains(lowerCaseColumnName) || 
 					(isNodeQueryService(tableConfig.getUri()) && WebConstants.DEFAULT_COL_NAME_ID.equals(lowerCaseColumnName))) {
 				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
-			} else if (lowerCaseColumnName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_REQUESTED)) {
-				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_REQUESTED;
+			} else if (lowerCaseColumnName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL;
 			}
 		}
 		return defaultRendererName;
@@ -493,8 +502,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			renderer = ginInjector.getAPITableColumnRendererSynapseID();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS))
 			renderer = ginInjector.getAPITableColumnRendererEntityAnnotations();
-		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_REQUESTED))
-			renderer = ginInjector.getAPITableColumnRendererCancelRequested();
+		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL))
+			renderer = ginInjector.getAPITableColumnRendererCancelControl();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE))
 			renderer = ginInjector.getAPITableColumnRendererNone();
 		else

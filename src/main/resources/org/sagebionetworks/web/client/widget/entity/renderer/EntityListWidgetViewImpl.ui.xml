@@ -26,7 +26,7 @@
 						<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
 							<bh:Span text="Date" />
 						</t:TableHeader>
-						<t:TableHeader width="310px" addStyleNames="visible-xl">
+						<t:TableHeader width="310px" addStyleNames="visible-md visible-lg">
 							<bh:Span text="Created By"/>
 						</t:TableHeader>
 						<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">

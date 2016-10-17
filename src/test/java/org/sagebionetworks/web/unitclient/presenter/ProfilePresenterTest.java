@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -110,7 +111,6 @@ public class ProfilePresenterTest {
 	
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;	
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
 	CookieProvider mockCookies;
 	UserProfileModalWidget mockUserProfileModalWidget;
@@ -170,7 +170,7 @@ public class ProfilePresenterTest {
 		mockSynAlert = mock(SynapseAlert.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
+				mockSynapseClient, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
 				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockSettingsPresenter);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -766,7 +766,7 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		//inform user of success, and go to new project page
 		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 
 	@Test
@@ -847,7 +847,7 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
 		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockPlaceChanger).goTo(any(org.sagebionetworks.web.client.place.Team.class));
+		verify(mockPlaceChanger).goTo(isA(org.sagebionetworks.web.client.place.Team.class));
 	}
 
 	@Test
@@ -1063,7 +1063,7 @@ public class ProfilePresenterTest {
 		profilePresenter.editMyProfile();
 		
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test
@@ -1087,7 +1087,7 @@ public class ProfilePresenterTest {
 		profilePresenter.viewMyProfile();
 		
 		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 
 	@Test
@@ -1286,7 +1286,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testCertificationBadgeClicked() {
 		profilePresenter.certificationBadgeClicked();
-		verify(mockPlaceChanger).goTo(any(Certificate.class));
+		verify(mockPlaceChanger).goTo(isA(Certificate.class));
 	}
 	
 	@Test
@@ -1313,7 +1313,7 @@ public class ProfilePresenterTest {
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
 		boolean pushState = true;
 		profilePresenter.updateArea(ProfileArea.PROJECTS, false);
-		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
+		verify(mockPlaceChanger, never()).goTo(isA(Profile.class));
 	}
 	
 	private void verifyProfileHidden(boolean isCookieExpected) {
@@ -1662,7 +1662,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		when(place.toToken()).thenReturn(token);
 		profilePresenter.setPlace(place);
-		verify(mockPlaceChanger).goTo(any(Home.class));
+		verify(mockPlaceChanger).goTo(isA(Home.class));
 	}
 	
 	@Test

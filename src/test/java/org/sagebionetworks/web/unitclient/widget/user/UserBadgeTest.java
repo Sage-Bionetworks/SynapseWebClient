@@ -149,7 +149,23 @@ public class UserBadgeTest {
 	public void testBadgeClicked() {
 		userBadge.configure(profile);
 		userBadge.badgeClicked(null);
-		verify(mockPlaceChanger).goTo(any(Profile.class));
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
+	}
+	
+	@Test
+	public void testBadgeClickedNewWindowTrue() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(true);
+		userBadge.badgeClicked(null);
+		verify(mockView).openNewWindow(anyString());
+	}
+	
+	@Test
+	public void testBadgeClickedNewWindowFalse() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(false);
+		userBadge.badgeClicked(null);
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 	
 	@Test
@@ -160,6 +176,20 @@ public class UserBadgeTest {
 		verify(mockView).clearHref();
 		userBadge.badgeClicked(null);
 		verify(mockClickHandler).onClick(any(ClickEvent.class));
+	}
+	
+	@Test
+	public void testTargetWhenSetOpenWindowTrue() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(true);
+		verify(mockView).setOpenNewWindow("_blank");
+	}
+	
+	@Test
+	public void testTargetWhenSetOpenWindowFalse() {
+		userBadge.configure(profile);
+		userBadge.setOpenNewWindow(false);
+		verify(mockView).setOpenNewWindow("");
 	}
 	
 	@Test
