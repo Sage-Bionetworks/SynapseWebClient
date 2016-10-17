@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -18,7 +22,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Modal modal;
 	@UiField
 	TextBox nameField;
-	
+	@UiField
+	DropDownMenu arDropdownMenu;
 	@UiField
 	Button saveButton;
 	@UiField
@@ -49,6 +54,21 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+	
+	@Override
+	public void setStates(List<String> states) {
+		arDropdownMenu.clear();
+		for (final String state : states) {
+			AnchorListItem item = new AnchorListItem(state);
+			item.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					//presenter.onStateSelected(state);
+				}
+			});
+			arDropdownMenu.add(item);
+		}
 	}
 	
 	@Override

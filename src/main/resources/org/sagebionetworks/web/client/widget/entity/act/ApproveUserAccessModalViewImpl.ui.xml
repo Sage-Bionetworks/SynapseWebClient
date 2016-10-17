@@ -7,18 +7,28 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<!-- Dialog for creating a new table -->
-	<b:Modal ui:field="modal" title="Edit Evaluation Queue" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
+	<b:Modal ui:field="modal" title="Approve User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 			<bh:Div>
+				<b:DropDownMenu addStyleNames="dropdown-menu-right">
+				</b:DropDownMenu>
+				<b:ButtonGroup>
+					<b:Button dataToggle="DROPDOWN" text="Choose an access requirement..."/>
+					<b:DropDownMenu ui:field="arDropdownMenu" />
+				</b:ButtonGroup>
 				<b:FormGroup>
-					<b:FormLabel text="Name" />
+					<b:FormLabel text="User" />
+					<b:TextBox ui:field="arText" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="User" />
 					<b:TextBox ui:field="nameField" />
 				</b:FormGroup>
 			</bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." text="Save" />
 			<b:Button ui:field="cancelButton" type="DEFAULT" text="Cancel" />
+			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." text="Approve" />
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>

@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.UserProfileClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -53,6 +54,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -159,7 +161,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.view.addWidget(accessControlListModalWidget);
 		this.view.addWidget(evalEditor.asWidget());
 		this.view.addWidget(selectTeamModal.asWidget());
-		this.view.addWidget(approveUserAccessModal.asWidget());
+		//this.view.addWidget(approveUserAccessModal.asWidget());
 		selectTeamModal.setTitle("Select Participant Team");
 		selectTeamModal.configure(new CallbackP<String>() {
 			@Override
@@ -221,10 +223,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureApproveUserAccess() {
+		//UserProfileClient.getMyOwnUserBundle(0);
 		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository){
 			//actionMenu.addControllerWidget(approveUserAccessModal);
 			actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
 			actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+			actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
 		} else {
 			actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
 			actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);
@@ -667,8 +671,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void onApproveUserAccess() {
 		approveUserAccessModal.configure(true);
 		approveUserAccessModal.show();
-		view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
-		
 	}
 
 	private void onAddCommit() {
