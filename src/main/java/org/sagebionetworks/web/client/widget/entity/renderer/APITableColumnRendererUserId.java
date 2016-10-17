@@ -45,7 +45,7 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 				// create div with an id that can be found later.
 				String output;
 				if (colValue != null) {
-					 output = "<div id=\"" + USER_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + colValue + "\" />";	
+					 output = "<div class=\"min-width-200 text-align-left\" id=\"" + USER_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + colValue + "\" />";	
 				} else {
 					output = "";
 				}
