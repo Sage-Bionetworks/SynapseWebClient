@@ -39,20 +39,10 @@ public class APITableColumnRendererUserIDTest {
 	AsyncCallback<APITableInitializedColumnRenderer> mockCallback;
 	String inputColumnName = "name";
 	String inputValue = "8888888";
-	String firstName = "Philip";
-	String lastName = "Fry";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
-		
-		List<UserProfile> listProfiles = new ArrayList<UserProfile>();
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId(inputValue);
-		profile.setFirstName(firstName);
-		profile.setLastName(lastName);
-		listProfiles.add(profile);
-		
 		renderer = new APITableColumnRendererUserId(mockGWT);
 		columnData = new HashMap<String, List<String>>();
 		config = new APITableColumnConfig();
@@ -68,7 +58,6 @@ public class APITableColumnRendererUserIDTest {
 		renderer.init(columnData, config, mockCallback);
 		APITableInitializedColumnRenderer initializedRenderer = APITableTestUtils.getInitializedRenderer(mockCallback);
 		assertTrue(initializedRenderer.getColumnData().containsKey(inputColumnName));
-		//rendered value should contain the first and last name (obtained from the synapse client service for the input user id)
 		String userHtml = initializedRenderer.getColumnData().get(inputColumnName).get(0);
 		assertTrue(userHtml.contains(APITableColumnRendererUserId.USER_WIDGET_DIV_PREFIX));
 		assertTrue(userHtml.contains(inputValue));
@@ -81,16 +70,5 @@ public class APITableColumnRendererUserIDTest {
 		APITableInitializedColumnRenderer initializedRenderer = APITableTestUtils.getInitializedRenderer(mockCallback);
 		//null value should be rendered as an empty string
 		assertEquals("", initializedRenderer.getColumnData().get(inputColumnName).get(0));
-	}
-	
-	@Test
-	public void testInitNotFoundUserId() {
-		String unavailableUserProfileId = "11111";
-		APITableTestUtils.setInputValue(unavailableUserProfileId, inputColumnName, columnData);
-		renderer.init(columnData, config, mockCallback);
-		APITableInitializedColumnRenderer initializedRenderer = APITableTestUtils.getInitializedRenderer(mockCallback);
-		String userHtml = initializedRenderer.getColumnData().get(inputColumnName).get(0);
-		//no first or last name, but it should give us back the ID we used as input
-		assertTrue(userHtml.contains(unavailableUserProfileId));
 	}
 }
