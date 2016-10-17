@@ -15,8 +15,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
@@ -27,9 +30,9 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class APITableColumnRendererUserIDTest {
-		
-	SynapseClientAsync mockSynapseClient;
-	SynapseJSNIUtils mockJsniUtils;
+
+	@Mock
+	GWTWrapper mockGWT;
 	APITableColumnRendererUserId renderer;
 	Map<String, List<String>> columnData;
 	APITableColumnConfig config;
@@ -41,8 +44,7 @@ public class APITableColumnRendererUserIDTest {
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockJsniUtils = mock(SynapseJSNIUtils.class);
+		MockitoAnnotations.initMocks(this);
 		
 		List<UserProfile> listProfiles = new ArrayList<UserProfile>();
 		UserProfile profile = new UserProfile();
@@ -51,9 +53,7 @@ public class APITableColumnRendererUserIDTest {
 		profile.setLastName(lastName);
 		listProfiles.add(profile);
 		
-		AsyncMockStubber.callSuccessWith(listProfiles).when(mockSynapseClient).listUserProfiles(any(ArrayList.class), any(AsyncCallback.class));
-		
-		renderer = new APITableColumnRendererUserId(mockSynapseClient, mockJsniUtils);
+		renderer = new APITableColumnRendererUserId(mockGWT);
 		columnData = new HashMap<String, List<String>>();
 		config = new APITableColumnConfig();
 		HashSet<String> inputColumnNames = new HashSet<String>();
@@ -93,13 +93,4 @@ public class APITableColumnRendererUserIDTest {
 		//no first or last name, but it should give us back the ID we used as input
 		assertTrue(userHtml.contains(unavailableUserProfileId));
 	}
-	
-	@Test
-	public void testGetUserGroupHeadersFailure() {
-		Exception thrownException = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(thrownException).when(mockSynapseClient).listUserProfiles(any(ArrayList.class), any(AsyncCallback.class));
-		renderer.init(columnData, config, mockCallback);
-		verify(mockCallback).onFailure(eq(thrownException));
-	}
-	//Callback.onFailure is never called.  An empty column is shown if the data are unavailable for the specified column.
 }
