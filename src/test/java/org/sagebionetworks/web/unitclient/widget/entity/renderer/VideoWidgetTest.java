@@ -56,6 +56,39 @@ public class VideoWidgetTest {
 		descriptor.put(WidgetConstants.HEIGHT_KEY, height);
 		
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), anyBoolean(), anyLong(), eq(xsrfToken));
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+	}
+	
+	@Test
+	public void testShortConfigureMP4() {
+		String mp4VideoId = "syn123";
+		String oggVideoId = null;
+		String webMVideoId = null;
+		String width = "400";
+		String height="600";
+		widget.configure(mp4VideoId, "filename.mp4", 400, 600);
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+	}
+	
+	@Test
+	public void testShortConfigureWebMV() {
+		String mp4VideoId = null;
+		String oggVideoId = null;
+		String webMVideoId = "syn456";
+		String width = "400";
+		String height="600";
+		widget.configure(webMVideoId, "filename.webm", 400, 600);
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+	}
+	
+	@Test
+	public void testShortConfigureOgg() {
+		String mp4VideoId = null;
+		String oggVideoId = "syn789";
+		String webMVideoId = null;
+		String width = "400";
+		String height="600";
+		widget.configure(oggVideoId, "filename.ogg", 400, 600);
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
 	}
 }
