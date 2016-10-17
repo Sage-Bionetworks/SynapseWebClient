@@ -213,7 +213,7 @@ public class PreviewWidgetTest {
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
-		verify(mockView).setVideoPreview(any(Widget.class));
+		verify(mockView).setPreviewWidget(any(Widget.class));
 	}
 	
 	@Test

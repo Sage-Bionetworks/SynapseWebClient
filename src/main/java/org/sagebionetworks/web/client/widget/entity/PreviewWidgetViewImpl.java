@@ -94,7 +94,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setVideoPreview(Widget w) {
+	public void setPreviewWidget(Widget w) {
 		clear();
 		add(w.asWidget());
 	}

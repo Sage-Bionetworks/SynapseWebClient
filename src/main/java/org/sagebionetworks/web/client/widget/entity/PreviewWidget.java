@@ -215,7 +215,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		} 
 		else if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
 			videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
-			view.setVideoPreview(videoWidget.asWidget());
+			view.setPreviewWidget(videoWidget.asWidget());
 		}
 	}
 	
