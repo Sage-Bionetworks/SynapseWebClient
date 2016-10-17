@@ -56,6 +56,6 @@ public class VideoWidgetTest {
 		descriptor.put(WidgetConstants.HEIGHT_KEY, height);
 		
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), anyBoolean(), anyLong(), eq(xsrfToken));
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
 	}
 }
