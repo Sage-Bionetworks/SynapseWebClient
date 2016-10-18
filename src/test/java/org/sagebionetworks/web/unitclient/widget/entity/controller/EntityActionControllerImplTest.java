@@ -142,8 +142,6 @@ public class EntityActionControllerImplTest {
 	ChallengeClientAsync mockChallengeClient;
 	@Mock
 	SelectTeamModal mockSelectTeamModal;
-	@Mock
-	ApproveUserAccessModal mockApproveUserAccessModal;
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -181,7 +179,7 @@ public class EntityActionControllerImplTest {
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
 				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
-				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal);
+				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal);
 		
 		parentId = "syn456";
 		entityId = "syn123";

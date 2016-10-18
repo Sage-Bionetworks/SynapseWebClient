@@ -122,8 +122,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
-	ApproveUserAccessModal approveUserAccessModal;
-	UserProfileClientAsync userProfileClient;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -144,9 +142,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EvaluationEditorModal evalEditor,
 			CookieProvider cookies,
 			ChallengeClientAsync challengeClient,
-			SelectTeamModal selectTeamModal,
-			ApproveUserAccessModal approveUserAccessModal,
-			UserProfileClientAsync userProfileClient) {
+			SelectTeamModal selectTeamModal) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -181,8 +177,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}
 		});
 		this.selectTeamModal = selectTeamModal;
-		this.approveUserAccessModal = approveUserAccessModal;
-		this.userProfileClient = userProfileClient;
 	}
 
 	@Override
@@ -230,10 +224,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureEditFileMetadataAction();
 			configureAddEvaluationAction();
 			configureCreateChallenge();
-			configureApproveUserAccess();
+			//configureApproveUserAccess();
 		}
 	}
 	
+	/*
 	private void configureApproveUserAccess() {
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
 		if (authenticationController.isLoggedIn()) {
@@ -265,6 +260,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			});	
 		}
 	}
+	*/
 
 	public void onSelectChallengeTeam(String id) {
 		Challenge c = new Challenge();
@@ -692,17 +688,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			onCreateChallenge();
 			break;
 		case APPROVE_USER_ACCESS:
-			onApproveUserAccess();
+			//onApproveUserAccess();
 			break;
 		default:
 			break;
 		}
 	}
 
+	/*
 	private void onApproveUserAccess() {
 		approveUserAccessModal.configure(true);
 		approveUserAccessModal.show();
 	}
+	*/
 
 	private void onAddCommit() {
 		// TODO Auto-generated method stub
