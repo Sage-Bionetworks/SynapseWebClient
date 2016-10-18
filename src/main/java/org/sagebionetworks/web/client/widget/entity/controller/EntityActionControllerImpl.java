@@ -694,7 +694,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onApproveUserAccess() {
-		approveUserAccessModal.configure(true);
+		approveUserAccessModal.configure(entityBundle.getAccessRequirements());
 		approveUserAccessModal.show();
 	}
 	
