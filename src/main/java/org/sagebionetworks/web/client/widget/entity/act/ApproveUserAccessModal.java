@@ -18,16 +18,11 @@ import com.google.inject.Inject;
 public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presenter, IsWidget {
 	
 	private ApproveUserAccessModalView view;
-	private boolean isCreate;
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view) {
 		this.view = view;
 
 		view.setPresenter(this);
-	}
-	
-	public void configure(boolean isCreate) {
-		this.isCreate = isCreate;
 	}
 	
 	public void show() {
