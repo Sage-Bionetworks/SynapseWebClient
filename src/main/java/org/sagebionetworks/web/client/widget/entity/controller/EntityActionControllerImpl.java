@@ -685,19 +685,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			onCreateChallenge();
 			break;
 		case APPROVE_USER_ACCESS:
-			//onApproveUserAccess();
+			onApproveUserAccess();
 			break;
 		default:
 			break;
 		}
 	}
 
-	/*
+	
 	private void onApproveUserAccess() {
 		approveUserAccessModal.configure(true);
 		approveUserAccessModal.show();
 	}
-	*/
+	
 
 	private void onAddCommit() {
 		// TODO Auto-generated method stub
