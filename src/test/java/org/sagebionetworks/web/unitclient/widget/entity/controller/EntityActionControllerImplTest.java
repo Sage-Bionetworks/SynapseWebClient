@@ -61,6 +61,7 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -144,6 +145,8 @@ public class EntityActionControllerImplTest {
 	SelectTeamModal mockSelectTeamModal;
 	@Mock
 	ApproveUserAccessModal mockApproveUserAccessModal;
+	@Mock
+	UserProfileClientAsync mockUserProfileClient;
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -181,7 +184,7 @@ public class EntityActionControllerImplTest {
 				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
 				mockEntityFinder, mockSubmitter, mockUploader,
 				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
-				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal);
+				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal, mockUserProfileClient);
 		
 		parentId = "syn456";
 		entityId = "syn123";

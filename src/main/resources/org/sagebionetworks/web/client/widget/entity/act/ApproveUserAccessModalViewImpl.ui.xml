@@ -9,17 +9,22 @@
 	<!-- Dialog for creating a new table -->
 	<b:Modal ui:field="modal" title="Approve User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
-			<bh:Div>
-				<b:DropDownMenu addStyleNames="dropdown-menu-right">
-				</b:DropDownMenu>
+			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
+				
+				
 				<b:ButtonGroup>
 					<b:Button dataToggle="DROPDOWN" text="Choose an access requirement..."/>
 					<b:DropDownMenu ui:field="arDropdownMenu" />
 				</b:ButtonGroup>
-				<b:FormGroup>
-					<b:FormLabel text="User" />
-					<b:TextBox ui:field="arText" />
-				</b:FormGroup>
+			</bh:Div>
+			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
+				<b:TextBox width="100%" addStyleNames="noBackground margin-right-15" readOnly="true">
+					Access Requirement Text
+				</b:TextBox>
+				
+			</bh:Div>
+			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
+				
 				<b:FormGroup>
 					<b:FormLabel text="User" />
 					<b:TextBox ui:field="nameField" />

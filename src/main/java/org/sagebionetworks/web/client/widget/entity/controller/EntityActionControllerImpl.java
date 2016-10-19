@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -234,6 +230,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
+	
 	private void configureApproveUserAccess() {
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
 		if (authenticationController.isLoggedIn()) {
@@ -243,13 +240,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				public void onSuccess(UserBundle userBundle) {
 					//populate list
 					userBundle.setIsACTMember(true);
-					List<AccessRequirement> list = entityBundle.getAccessRequirements();
-					List<String> titles = new ArrayList<String>();
-					for (AccessRequirement ar : list) {
-						titles.add("" + ar.getId());
-					}
-					if (userBundle.getIsACTMember()) {
-						approveUserAccessModal.setDropdown(titles);
+					if (userBundle.getIsACTMember() && entityBundle.getAccessRequirements().size() > 0) {
+						//approveUserAccessModal.setDropdown(titles);
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
 						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
 					} else {
@@ -265,6 +257,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			});	
 		}
 	}
+	
 
 	public void onSelectChallengeTeam(String id) {
 		Challenge c = new Challenge();
@@ -699,10 +692,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
+	
 	private void onApproveUserAccess() {
-		approveUserAccessModal.configure(true);
+		approveUserAccessModal.configure(entityBundle.getAccessRequirements());
 		approveUserAccessModal.show();
 	}
+	
 
 	private void onAddCommit() {
 		// TODO Auto-generated method stub
