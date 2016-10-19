@@ -8,6 +8,8 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,7 +27,11 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Modal modal;
 	@UiField
+	Button accessReqNum;
+	@UiField
 	DropDownMenu arDropdownMenu;
+	@UiField
+	TextBox accessReqText;
 	@UiField
 	Button submitButton;
 	@UiField
@@ -67,7 +73,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			item.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					//presenter.onStateSelected(state);
+					presenter.onStateSelected(state);
 				}
 			});
 			arDropdownMenu.add(item);
@@ -99,5 +105,11 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void hide() {
 		modal.hide();
+	}
+
+	@Override
+	public void setAccessRequirement(String state, AccessRequirement ar) {
+		accessReqNum.setText(state);
+		accessReqText.setText(GovernanceServiceHelper.getAccessRequirementText(ar));
 	}
 }

@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessRequirement;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -12,6 +14,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	String getEvaluationName();
 	void setStates(List<String> states);
 	void setUserPickerWidget(Widget w);
+	void setAccessRequirement(String state, AccessRequirement accessRequirement);
 	void show();
 	void hide();
 	/**
@@ -19,6 +22,9 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	 */
 	public interface Presenter {
 		void onSubmit();
+
+		void onStateSelected(String state);
 	}
+
 
 }

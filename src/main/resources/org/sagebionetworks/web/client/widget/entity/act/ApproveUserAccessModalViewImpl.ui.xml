@@ -12,13 +12,13 @@
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 				<b:Heading size="H5" text="Access Requirement" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 				<b:ButtonGroup>
-					<b:Button dataToggle="DROPDOWN" text="Choose an access requirement..."/>
+					<b:Button ui:field="accessReqNum" dataToggle="DROPDOWN" text="Choose an access requirement..."/>
 					<b:DropDownMenu ui:field="arDropdownMenu" />
 				</b:ButtonGroup>
 			</bh:Div>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 				<b:Heading size="H5" text="Access Requirement Text" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
-				<b:TextBox width="100%" addStyleNames="min-height-200 noBackground margin-right-15" readOnly="true">
+				<b:TextBox ui:field="accessReqText" width="100%" addStyleNames="min-height-200 noBackground margin-right-15" readOnly="true">
 				</b:TextBox>
 				
 			</bh:Div>

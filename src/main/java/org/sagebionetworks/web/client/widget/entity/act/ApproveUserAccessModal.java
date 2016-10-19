@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
@@ -24,6 +26,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	private ApproveUserAccessModalView view;
 	private SynapseSuggestBox peopleSuggestWidget;
+	private List<AccessRequirement> accessRequirements;
+	private Map<String, AccessRequirement> arMap;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -52,11 +56,19 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	public void configure(List<AccessRequirement> accessRequirements) {
+		this.accessRequirements = accessRequirements;
+		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
 		for (AccessRequirement ar : accessRequirements) {
+			arMap.put(Long.toString(ar.getId()), ar);
 			list.add(Long.toString(ar.getId()));
 		}
 		view.setStates(list);
+	}
+
+	@Override
+	public void onStateSelected(String state) {
+		view.setAccessRequirement(state, arMap.get(state));
 	}
 		
 }
