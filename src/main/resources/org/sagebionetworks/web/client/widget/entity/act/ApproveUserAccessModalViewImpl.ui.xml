@@ -20,9 +20,7 @@
 				<b:Heading size="H5" text="Access Requirement Text" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 				<b:TextBox ui:field="accessReqText" width="100%" addStyleNames="min-height-200 noBackground margin-right-15" readOnly="true">
 				</b:TextBox>
-				
 			</bh:Div>
-			<bh:Div ui:field="tester" addStyleNames="margin-top-10 margin-bottom-10"></bh:Div>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 				<b:Heading size="H5" text="User" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 				<bh:Div ui:field="userSelectContainer" />

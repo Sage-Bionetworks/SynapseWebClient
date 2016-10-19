@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+import org.sagebionetworks.repo.model.ACTAccessApproval;
+import org.sagebionetworks.repo.model.ACTApprovalStatus;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -66,10 +67,10 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 	@Override
 	public void onSubmit() {
-//		ACTAccessApproval aa  = new ACTAccessApproval();
-//		aa.setAccessorId(userId);  //user id
-//		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
-//		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
+		ACTAccessApproval aa  = new ACTAccessApproval();
+		aa.setAccessorId(userId);  //user id
+		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
+		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
 		//synapseClient.createAccessApproval(aa);
 		view.hide();
 	}

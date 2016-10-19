@@ -35,8 +35,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Button cancelButton;
 	@UiField
 	Div userSelectContainer;
-	@UiField
-	Div tester;
 	
 	private Presenter presenter;
 	
