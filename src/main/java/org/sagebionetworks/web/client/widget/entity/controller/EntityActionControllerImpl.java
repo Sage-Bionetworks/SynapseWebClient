@@ -238,10 +238,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER, new AsyncCallback<UserBundle>() {
 				@Override
 				public void onSuccess(UserBundle userBundle) {
-					//populate list
 					userBundle.setIsACTMember(true);
 					if (userBundle.getIsACTMember() && entityBundle.getAccessRequirements().size() > 0) {
-						//approveUserAccessModal.setDropdown(titles);
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
 						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
 					} else {

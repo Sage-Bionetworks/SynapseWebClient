@@ -10,25 +10,21 @@
 	<b:Modal ui:field="modal" title="Approve User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-				
-				
+				<b:Heading size="H5" text="Access Requirement" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 				<b:ButtonGroup>
 					<b:Button dataToggle="DROPDOWN" text="Choose an access requirement..."/>
 					<b:DropDownMenu ui:field="arDropdownMenu" />
 				</b:ButtonGroup>
 			</bh:Div>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-				<b:TextBox width="100%" addStyleNames="noBackground margin-right-15" readOnly="true">
-					Access Requirement Text
+				<b:Heading size="H5" text="Access Requirement Text" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+				<b:TextBox width="100%" addStyleNames="min-height-200 noBackground margin-right-15" readOnly="true">
 				</b:TextBox>
 				
 			</bh:Div>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-				
-				<b:FormGroup>
-					<b:FormLabel text="User" />
-					<b:TextBox ui:field="nameField" />
-				</b:FormGroup>
+				<b:Heading size="H5" text="User" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+				<bh:Div ui:field="userSelectContainer" />
 			</bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>

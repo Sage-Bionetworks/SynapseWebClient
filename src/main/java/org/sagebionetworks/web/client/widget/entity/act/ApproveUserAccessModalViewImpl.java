@@ -18,22 +18,25 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
+	
+	public interface Binder extends UiBinder<Widget, ApproveUserAccessModalViewImpl> {}
+	private static Binder uiBinder = GWT.create(Binder.class);
+	
 	@UiField
 	Modal modal;
-	@UiField
-	TextBox nameField;
 	@UiField
 	DropDownMenu arDropdownMenu;
 	@UiField
 	Button saveButton;
 	@UiField
 	Button cancelButton;
-	Widget widget;
+	@UiField
+	Div userSelectContainer;
 	
 	private Presenter presenter;
 	
-	public interface Binder extends UiBinder<Widget, ApproveUserAccessModalViewImpl> {}
-	private static Binder uiBinder = GWT.create(Binder.class);
+	Widget widget;
+
 	
 	public ApproveUserAccessModalViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
@@ -72,12 +75,18 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
+	public void setUserPickerWidget(Widget w) {
+		userSelectContainer.clear();
+		userSelectContainer.add(w);
+	}
+	
+	@Override
 	public String getEvaluationName() {
-		return nameField.getText();
+		return userSelectContainer.getTitle();
 	}
 	@Override
 	public void setEvaluationName(String name) {
-		nameField.setText(name);
+		userSelectContainer.setTitle(name);
 	}
 	@Override
 	public Widget asWidget() {
