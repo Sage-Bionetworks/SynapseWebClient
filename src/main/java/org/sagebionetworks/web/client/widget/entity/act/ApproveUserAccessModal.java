@@ -9,6 +9,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -46,6 +47,19 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 	
+	public void configure(List<AccessRequirement> accessRequirements) {
+		this.arMap = new HashMap<String, AccessRequirement>();
+		List<String> list = new ArrayList<String>();
+		for (AccessRequirement ar : accessRequirements) {
+			arMap.put(Long.toString(ar.getId()), ar);
+			list.add(Long.toString(ar.getId()));
+		}
+		view.setStates(list);
+		if (list.size() > 0) {
+			view.setAccessRequirement(list.get(0), GovernanceServiceHelper.getAccessRequirementText(arMap.get(list.get(0))));			
+		}
+	}
+	
 	public void show() {
 		view.show();
 	}
@@ -70,23 +84,10 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		return view.asWidget();
 	}
 
-	public void configure(List<AccessRequirement> accessRequirements) {
-		this.arMap = new HashMap<String, AccessRequirement>();
-		List<String> list = new ArrayList<String>();
-		for (AccessRequirement ar : accessRequirements) {
-			arMap.put(Long.toString(ar.getId()), ar);
-			list.add(Long.toString(ar.getId()));
-		}
-		view.setStates(list);
-		if (list.size() > 0) {
-			view.setAccessRequirement(list.get(0), arMap.get(list.get(0)));			
-		}
-	}
-
 	@Override
 	public void onStateSelected(String state) {
 		accessRequirement = state;
-		view.setAccessRequirement(state, arMap.get(state));
+		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
 	}
 		
 }

@@ -8,8 +8,6 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -44,7 +42,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	
 	Widget widget;
 
-	
 	public ApproveUserAccessModalViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
 		submitButton.addClickHandler(new ClickHandler() {
@@ -64,6 +61,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		//any additional setup should go here
 	}
 	
 	@Override
@@ -93,29 +91,23 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public String getEvaluationName() {
-		return userSelectContainer.getTitle();
-	}
-	@Override
-	public void setEvaluationName(String name) {
-		userSelectContainer.setTitle(name);
-	}
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}
+	
 	@Override
 	public void show() {
 		modal.show();
 	}
+	
 	@Override
 	public void hide() {
 		modal.hide();
 	}
 
 	@Override
-	public void setAccessRequirement(String state, AccessRequirement ar) {
-		accessReqNum.setText(state);
-		accessReqText.setText(GovernanceServiceHelper.getAccessRequirementText(ar));
+	public void setAccessRequirement(String num, String text) {
+		accessReqNum.setText(num);
+		accessReqText.setText(text);
 	}
 }
