@@ -18,7 +18,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void onSave();
+		void onSubmit();
 	}
 
 }

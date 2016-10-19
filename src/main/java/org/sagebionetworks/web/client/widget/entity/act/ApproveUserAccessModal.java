@@ -39,9 +39,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public void show() {
 		view.show();
 	}
-	
+
 	@Override
-	public void onSave() {
+	public void onSubmit() {
+		//submit 
+		view.hide();
 	}
 	
 	public Widget asWidget() {

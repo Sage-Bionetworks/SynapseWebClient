@@ -27,7 +27,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	DropDownMenu arDropdownMenu;
 	@UiField
-	Button saveButton;
+	Button submitButton;
 	@UiField
 	Button cancelButton;
 	@UiField
@@ -40,10 +40,10 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	
 	public ApproveUserAccessModalViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
-		saveButton.addClickHandler(new ClickHandler() {
+		submitButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onSave();
+				presenter.onSubmit();
 			}
 		});
 		cancelButton.addClickHandler(new ClickHandler() {
