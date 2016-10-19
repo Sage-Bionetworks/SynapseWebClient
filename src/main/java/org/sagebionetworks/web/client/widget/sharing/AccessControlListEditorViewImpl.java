@@ -47,6 +47,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private PermissionLevel[] permList;	// To enforce order.
 	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
+	private HelpWidget deleteAclHelpWidget = new HelpWidget();
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
@@ -55,6 +56,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
 		
+		// 'Delete ACL' HelpWidget
+		deleteAclHelpWidget.setHelpMarkdown(DELETE_ACL_HELP_TEXT);
+		deleteAclHelpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
+		deleteAclHelpWidget.setAddStyleNames("margin-left-5");
 		// 'Delete ACL' button
 		deleteAclButton.setType(ButtonType.DANGER);
 		deleteAclButton.setSize(ButtonSize.SMALL);
@@ -191,11 +196,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(addPeoplePanel.asWidget());
 				deleteAclButton.setEnabled(canEnableInheritance);
 				add(deleteAclButton);
-				HelpWidget helpWidget = new HelpWidget();
-				helpWidget.setHelpMarkdown(DELETE_ACL_HELP_TEXT);
-				helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
-				helpWidget.setAddStyleNames("margin-left-5");
-				add(helpWidget.asWidget());
+				add(deleteAclHelpWidget.asWidget());
 			}
 		}
 	}
@@ -212,6 +213,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void setDeleteLocalACLButtonVisible(boolean isVisible) {
 		deleteAclButton.setVisible(isVisible);
+		deleteAclHelpWidget.setVisible(isVisible);
 	}
 	@Override
 	public void setIsNotifyPeople(Boolean value) {
