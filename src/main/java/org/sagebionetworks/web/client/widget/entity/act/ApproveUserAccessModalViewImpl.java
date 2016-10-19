@@ -16,7 +16,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
@@ -38,6 +37,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Button cancelButton;
 	@UiField
 	Div userSelectContainer;
+	@UiField
+	Div tester;
 	
 	private Presenter presenter;
 	
@@ -84,6 +85,11 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void setUserPickerWidget(Widget w) {
 		userSelectContainer.clear();
 		userSelectContainer.add(w);
+	}
+	
+	@Override
+	public void enableApprove(boolean enabled) {
+		submitButton.setEnabled(enabled);
 	}
 	
 	@Override
