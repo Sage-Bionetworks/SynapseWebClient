@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
@@ -28,7 +29,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	DropDownMenu arDropdownMenu;
 	@UiField
-	TextBox accessReqText;
+	Div accessReqText;
 	@UiField
 	Button submitButton;
 	@UiField
@@ -101,6 +102,9 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void setAccessRequirement(String num, String text) {
 		accessReqNum.setText(num);
-		accessReqText.setText(text);
+		HTML display = new HTML();
+		display.setHTML(text);
+		accessReqText.clear();
+		accessReqText.add(display.asWidget());
 	}
 }
