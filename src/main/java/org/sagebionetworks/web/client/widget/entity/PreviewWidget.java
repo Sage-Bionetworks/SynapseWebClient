@@ -20,6 +20,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -36,6 +38,8 @@ import com.google.inject.Inject;
 public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendererPresenter {
 	public static final String APPLICATION_ZIP = "application/zip";	
 	public static final int MAX_LENGTH = 100000;
+	public static final int VIDEO_WIDTH = 320;
+	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
 	}
@@ -47,6 +51,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	SynapseAlert synapseAlert;
 	SynapseClientAsync synapseClient;
 	AuthenticationController authController;
+	VideoWidget videoWidget;
 	
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
@@ -54,13 +59,15 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseAlert synapseAlert,
 			SynapseClientAsync synapseClient,
-			AuthenticationController authController) {
+			AuthenticationController authController,
+			VideoWidget videoWidget) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
 		this.synapseClient = synapseClient;
 		this.authController = authController;
+		this.videoWidget = videoWidget;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -205,6 +212,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 					synapseAlert.handleException(e);
 				}
 			}
+		} 
+		else if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
+			videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
+			view.setPreviewWidget(videoWidget.asWidget());
 		}
 	}
 	

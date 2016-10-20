@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -77,6 +78,8 @@ public class PreviewWidgetTest {
 	SynapseAlert mockSynapseAlert;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	VideoWidget mockVideoWidget;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
@@ -84,7 +87,7 @@ public class PreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockVideoWidget);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -198,6 +201,19 @@ public class PreviewWidgetTest {
 		verify(mockView).setTextPreview(captor.capture());
 		String textSentToView = captor.getValue();
 		Assert.assertEquals(PreviewWidget.MAX_LENGTH + "...".length(), textSentToView.length());
+	}
+	
+	@Test
+	public void testPreviewVideoContentType(){
+		mainFileHandle.setFileName("preview.mp4");
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("video/mp4");
+		fh.setFileName("preview.mp4");
+		testFileHandleList.add(fh);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setPreviewWidget(any(Widget.class));
 	}
 	
 	@Test

@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -923,7 +924,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * Called if the preflight check for edit file metadata passes.
 	 */
 	private void postCheckEditFileMetadata() {
-		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), entityBundle.getFileName(), new Callback() {
+		FileHandle originalFileHandle = DisplayUtils.getFileHandle(entityBundle);
+		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), originalFileHandle, new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
