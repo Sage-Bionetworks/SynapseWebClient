@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface ApproveUserAccessModalView extends IsWidget {
 
 	void setPresenter(Presenter presenter);
+	void setSynAlert(Widget asWidget);
 	void setStates(List<String> states);
 	void setUserPickerWidget(Widget w);
 	void setAccessRequirement(String num, String text);

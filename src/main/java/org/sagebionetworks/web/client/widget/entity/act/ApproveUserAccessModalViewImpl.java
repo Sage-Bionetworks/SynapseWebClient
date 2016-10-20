@@ -31,6 +31,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Div accessReqText;
 	@UiField
+	Div synAlertContainer;
+	@UiField
 	Button submitButton;
 	@UiField
 	Button cancelButton;
@@ -106,5 +108,11 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		display.setHTML(text);
 		accessReqText.clear();
 		accessReqText.add(display.asWidget());
+	}
+
+	@Override
+	public void setSynAlert(Widget widget) {
+		synAlertContainer.clear();
+		synAlertContainer.add(widget.asWidget());		
 	}
 }

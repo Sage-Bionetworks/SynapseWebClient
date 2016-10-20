@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -26,20 +27,23 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private String userId;
 	
 	private ApproveUserAccessModalView view;
+	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
 	private Map<String, AccessRequirement> arMap;
 	//private SynapseClient synapseClient;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
+			SynapseAlert synAlert,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider) {
 		this.view = view;
+		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		//this.synapseClient = synapseClient;
 		peopleSuggestWidget.setSuggestionProvider(provider);
-		view.setPresenter(this);
-		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		this.view.setPresenter(this);
+		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
@@ -55,6 +59,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			arMap.put(Long.toString(ar.getId()), ar);
 			list.add(Long.toString(ar.getId()));
 		}
+		view.setSynAlert(synAlert.asWidget());
 		view.setStates(list);
 		if (list.size() > 0) {
 			view.setAccessRequirement(list.get(0), GovernanceServiceHelper.getAccessRequirementText(arMap.get(list.get(0))));			
@@ -62,11 +67,16 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	public void show() {
+		synAlert.clear();
 		view.show();
 	}
 
 	@Override
 	public void onSubmit() {
+		if (userId == null) {
+			synAlert.showError("You must select a user to approve");
+			return;
+		}
 //		ACTAccessApproval aa  = new ACTAccessApproval();
 //		aa.setAccessorId(userId);  //user id
 //		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
