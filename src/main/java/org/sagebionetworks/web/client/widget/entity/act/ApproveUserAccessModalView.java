@@ -12,7 +12,6 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setPresenter(Presenter presenter);
 	void setStates(List<String> states);
 	void setUserPickerWidget(Widget w);
-	void enableApprove(boolean enabled);
 	void setAccessRequirement(String num, String text);
 	void show();
 	void hide();

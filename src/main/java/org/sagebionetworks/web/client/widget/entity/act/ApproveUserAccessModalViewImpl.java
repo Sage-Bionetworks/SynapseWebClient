@@ -84,11 +84,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void enableApprove(boolean enabled) {
-		submitButton.setEnabled(enabled);
-	}
-	
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}

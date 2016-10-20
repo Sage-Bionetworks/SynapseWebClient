@@ -67,17 +67,16 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 	@Override
 	public void onSubmit() {
-		ACTAccessApproval aa  = new ACTAccessApproval();
-		aa.setAccessorId(userId);  //user id
-		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
-		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
+//		ACTAccessApproval aa  = new ACTAccessApproval();
+//		aa.setAccessorId(userId);  //user id
+//		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
+//		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
 		//synapseClient.createAccessApproval(aa);
 		view.hide();
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
 		this.userId = suggestion.getId();
-		view.enableApprove(true);
 	}
 	
 	public Widget asWidget() {
