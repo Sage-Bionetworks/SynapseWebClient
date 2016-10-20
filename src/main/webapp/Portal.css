@@ -200,6 +200,10 @@ End Synapse color scheme
 	width: 0px;
 }
 
+.text-align-left {
+	text-align: left;
+}
+
 .mainPageHeader {
 	border: 1px solid black;
 	padding: 10px;
