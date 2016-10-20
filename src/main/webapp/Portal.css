@@ -2522,6 +2522,12 @@ td.datePickerMonth {
   border-top: 1px solid #dddddd;
 }
 
+.read-only-box {
+	padding: 5px;
+    border: 1px solid #dddddd;
+    border-radius: .2em;
+    box-shadow: inset 0 -1px 0 #ddd;
+}
 
 /* Provenance graph css */
 .provEntityNode {
