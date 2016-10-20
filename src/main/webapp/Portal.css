@@ -200,9 +200,8 @@ End Synapse color scheme
 	width: 0px;
 }
 
-.descriptionField {
+.text-align-left {
 	text-align: left;
-	padding-right: 5px;
 }
 
 .mainPageHeader {
