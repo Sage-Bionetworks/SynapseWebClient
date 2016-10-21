@@ -104,7 +104,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	
 	@Override
 	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, null);
+		DisplayUtils.showInfo(message, "");
 	}
 
 	@Override
