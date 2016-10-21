@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -100,7 +101,26 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void hide() {
 		modal.hide();
 	}
+	
+	@Override
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message, null);
+	}
 
+	@Override
+	public String getAccessRequirement() {
+		return accessReqNum.getText();
+	}
+
+	@Override
+	public void setProcessing(boolean processing) {
+		if(processing){
+			submitButton.state().loading();
+		}else{
+			submitButton.state().reset();
+		}
+	}
+	
 	@Override
 	public void setAccessRequirement(String num, String text) {
 		accessReqNum.setText(num);

@@ -13,7 +13,10 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setSynAlert(Widget asWidget);
 	void setStates(List<String> states);
 	void setUserPickerWidget(Widget w);
+	String getAccessRequirement();
 	void setAccessRequirement(String num, String text);
+	void setProcessing(boolean processing);
+	void showInfo(String string);
 	void show();
 	void hide();
 	/**

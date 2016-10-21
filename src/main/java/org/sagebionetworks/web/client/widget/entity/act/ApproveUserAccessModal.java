@@ -7,8 +7,10 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -17,6 +19,7 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,17 +33,18 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
 	private Map<String, AccessRequirement> arMap;
-	//private SynapseClient synapseClient;
+	private SynapseClientAsync synapseClient;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
 			SynapseAlert synAlert,
 			SynapseSuggestBox peopleSuggestBox,
-			UserGroupSuggestionProvider provider) {
+			UserGroupSuggestionProvider provider, 
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
-		//this.synapseClient = synapseClient;
+		this.synapseClient = synapseClient;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
@@ -77,12 +81,31 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError("You must select a user to approve");
 			return;
 		}
-//		ACTAccessApproval aa  = new ACTAccessApproval();
-//		aa.setAccessorId(userId);  //user id
-//		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
-//		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
-		//synapseClient.createAccessApproval(aa);
-		view.hide();
+		if (accessRequirement == null) {
+			accessRequirement = view.getAccessRequirement();
+		}
+		view.setProcessing(true);
+		ACTAccessApproval aa  = new ACTAccessApproval();
+		aa.setAccessorId(userId);  //user id
+		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
+		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
+		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				view.setProcessing(false);
+			}
+
+			@Override
+			public void onSuccess(AccessApproval result) {
+				view.setProcessing(false);
+				view.hide();
+				view.showInfo("Approved user."); //-> from DisplayUtils
+				
+			}
+			
+		});
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
