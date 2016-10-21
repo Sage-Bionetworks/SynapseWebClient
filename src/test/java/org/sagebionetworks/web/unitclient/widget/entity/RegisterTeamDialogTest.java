@@ -144,6 +144,6 @@ public class RegisterTeamDialogTest {
 	@Test
 	public void testOnNewTeamClicked() {
 		widget.onNewTeamClicked();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
+		verify(mockView).openNewWindow(anyString());
 	}
 }
