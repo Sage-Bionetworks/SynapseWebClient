@@ -129,7 +129,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	@Override
 	public void onNewTeamClicked() {
 		//go to user profile page, team tab
-		globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS));
+		view.openNewWindow("#!Profile:"+authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS);
 	}
 	
 	@Override

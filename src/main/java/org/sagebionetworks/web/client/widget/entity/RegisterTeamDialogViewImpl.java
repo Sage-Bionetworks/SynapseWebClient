@@ -143,6 +143,11 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
+	
+	@Override
+	public void openNewWindow(String url) {
+		DisplayUtils.newWindow(url, "_blank", "");
+	}
 	/*
 	 * Private Methods
 	 */

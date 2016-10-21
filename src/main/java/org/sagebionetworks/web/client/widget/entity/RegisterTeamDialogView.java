@@ -22,6 +22,7 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void setNoTeamsFoundVisible(boolean isVisible);
 	void showConfirmDialog(String message, ConfirmCallback okCallback);
 	void showInfo(String title, String message);
+	void openNewWindow(String url);
 	
 	/**
 	 * Presenter interface
