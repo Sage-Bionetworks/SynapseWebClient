@@ -37,6 +37,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -45,6 +47,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -76,6 +80,16 @@ public class APITableWidgetTest {
 	public static final int COLUMN_ROW_COUNT = 10;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	CancelControlWidget mockCancelControlWidget;
+	@Mock
+	UserBadge mockUserBadge;
+	@Mock
+	ElementWrapper cancelControlDiv;
+	@Mock
+	ElementWrapper userBadgeDiv1;
+	@Mock
+	ElementWrapper userBadgeDiv2;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -88,6 +102,8 @@ public class APITableWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		noneColumnRenderer = new APITableColumnRendererNone();
 		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
+		when(mockGinInjector.getCancelControlWidget()).thenReturn(mockCancelControlWidget);
+		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
@@ -555,5 +571,28 @@ public class APITableWidgetTest {
 		assertNotNull(absentColumn);
 		assertEquals(COLUMN_ROW_COUNT, absentColumn.size());
 		assertNull(absentColumn.get(0));
+	}
+	
+	@Test
+	public void testInjectWidgets() {
+		List<ElementWrapper> cancelRequestDivs = new ArrayList<ElementWrapper>();
+		cancelRequestDivs.add(cancelControlDiv);
+		when(mockView.findCancelRequestDivs()).thenReturn(cancelRequestDivs);
+		
+		List<ElementWrapper> userBadgeDivs = new ArrayList<ElementWrapper>();
+		userBadgeDivs.add(userBadgeDiv1);
+		userBadgeDivs.add(userBadgeDiv2);
+		when(mockView.findUserBadgeDivs()).thenReturn(userBadgeDivs);
+		
+		widget.injectWidgets();
+		verify(mockGinInjector, times(cancelRequestDivs.size())).getCancelControlWidget();
+		verify(mockGinInjector, times(userBadgeDivs.size())).getUserBadgeWidget();
+		
+		verify(cancelControlDiv).removeAllChildren();
+		verify(userBadgeDiv1).removeAllChildren();
+		verify(userBadgeDiv2).removeAllChildren();
+		
+		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString(), any(Callback.class));
+		verify(mockUserBadge, times(userBadgeDivs.size())).configure(anyString());
 	}
 }
