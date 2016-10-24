@@ -72,12 +72,6 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 				modal.hide();
 			}
 		});
-//		createNewTeamLink.addClickHandler(new ClickHandler() {
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.onNewTeamClicked();
-//			}
-//		});
 		teamComboBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
