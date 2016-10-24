@@ -38,6 +38,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button cancelButton;
 	@UiField
+	Button emailButton;
+	@UiField
 	Div userSelectContainer;
 	
 	private Presenter presenter;
