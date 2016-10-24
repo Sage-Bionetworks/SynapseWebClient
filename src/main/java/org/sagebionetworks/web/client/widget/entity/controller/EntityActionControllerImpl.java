@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -108,6 +112,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	String enityTypeDisplay;
 	boolean isUserAuthenticated;
 	boolean isCurrentVersion;
+	List<ACTAccessRequirement> actRequirements;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
@@ -179,6 +184,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.selectTeamModal = selectTeamModal;
 		this.approveUserAccessModal = approveUserAccessModal;
 		this.userProfileClient = userProfileClient;
+		this.actRequirements = new ArrayList<ACTAccessRequirement>();
 	}
 
 	@Override
@@ -233,13 +239,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureApproveUserAccess() {
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
+		List<AccessRequirement> requirements = entityBundle.getAccessRequirements();
+		for (AccessRequirement ar : requirements) {
+			if (ar instanceof ACTAccessRequirement) {
+				actRequirements.add((ACTAccessRequirement) ar);
+			}
+		}
 		if (authenticationController.isLoggedIn()) {
 			
 			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER, new AsyncCallback<UserBundle>() {
 				@Override
 				public void onSuccess(UserBundle userBundle) {
 					userBundle.setIsACTMember(true);
-					if (userBundle.getIsACTMember() && entityBundle.getAccessRequirements().size() > 0) {
+					if (userBundle.getIsACTMember() && actRequirements.size() > 0) {
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
 						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
 					} else {
@@ -692,7 +704,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onApproveUserAccess() {
-		approveUserAccessModal.configure(entityBundle.getAccessRequirements());
+		approveUserAccessModal.configure(actRequirements);
 		approveUserAccessModal.show();
 	}
 	

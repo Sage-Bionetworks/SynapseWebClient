@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ACTAccessApproval;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -56,10 +57,10 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 	
-	public void configure(List<AccessRequirement> accessRequirements) {
+	public void configure(List<ACTAccessRequirement> accessRequirements) {
 		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
-		for (AccessRequirement ar : accessRequirements) {
+		for (ACTAccessRequirement ar : accessRequirements) {
 			arMap.put(Long.toString(ar.getId()), ar);
 			list.add(Long.toString(ar.getId()));
 		}
