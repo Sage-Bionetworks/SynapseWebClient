@@ -73,6 +73,7 @@ public class RegisterTeamDialogTest {
 		widget.configure(CHALLENGE_ID, mockCallback);
 		
 		verify(mockView).setRecruitmentMessage("");
+		verify(mockView).setNewTeamLink(any(String.class));
 		verify(mockView).setNoTeamsFoundVisible(false);
 		verify(mockView).setTeams(registratableTeams);
 		assertEquals(firstTeam.getId(), widget.getSelectedTeamId());
@@ -95,6 +96,7 @@ public class RegisterTeamDialogTest {
 		widget.configure(CHALLENGE_ID, mockCallback);
 		
 		verify(mockView).setRecruitmentMessage("");
+		verify(mockView).setNewTeamLink(any(String.class));
 		verify(mockView).setNoTeamsFoundVisible(true);
 		verify(mockView).showModal();
 	}
@@ -141,9 +143,8 @@ public class RegisterTeamDialogTest {
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
-//	@Test
-//	public void testOnNewTeamClicked() {
-//		widget.onNewTeamClicked();
-//		verify(mockView).openNewWindow(anyString());
-//	}
+	@Test
+	public void testOnNewTeamClicked() {
+		//mockView.
+	}
 }

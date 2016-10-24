@@ -30,7 +30,6 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	public interface Presenter {
 		void teamSelected(int selectedIndex);
 		void onOk();
-		//void onNewTeamClicked();
 	}
 
 }

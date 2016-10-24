@@ -127,12 +127,6 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		}
 	}
 	
-//	@Override
-//	public void onNewTeamClicked() {
-//		//go to user profile page, team tab
-//		view.openNewWindow("#!Profile:"+authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS);
-//	}
-//	
 	@Override
 	public void teamSelected(int selectedIndex) {
 		selectedTeamId = null;
