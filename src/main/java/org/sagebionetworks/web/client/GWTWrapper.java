@@ -34,7 +34,7 @@ public interface GWTWrapper {
 	
 	void scheduleFixedDelay(final Callback callback, int delayMs);
 	
-	void scheduleExecution(Callback callback, int delay);
+	void scheduleExecution(Callback callback, int delayMs);
 	
 	void scheduleDeferred(Callback callback);
 	

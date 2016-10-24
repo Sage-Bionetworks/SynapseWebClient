@@ -527,5 +527,13 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}		
 	}
-
+	@Override
+	public void requestToCancelSubmission(String submissionId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.requestToCancelSubmission(submissionId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}		
+	}
 }
