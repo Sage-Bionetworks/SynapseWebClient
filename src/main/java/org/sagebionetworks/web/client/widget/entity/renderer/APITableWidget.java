@@ -18,6 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -54,6 +56,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	AuthenticationController authenticationController;
 	SynapseAlert synAlert;
 	Callback refreshRequiredCallback;
+	private GWTWrapper gwt;
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
 	public static Set<String> dateColumnNames = new HashSet<String>();
@@ -74,7 +77,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert, GWTWrapper gwt) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -83,6 +86,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.gwt = gwt;
 		refreshRequiredCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -422,7 +426,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		List<ElementWrapper> divs = view.findCancelRequestDivs();
 		for (ElementWrapper div : divs) {
 			div.removeAllChildren();
-			String json = div.getAttribute("value");
+			String json = gwt.decodeQueryString(div.getAttribute("value"));
 			CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
 			cancelRequestWidget.configure(json, refreshRequiredCallback);
 			view.addWidget(cancelRequestWidget.asWidget(), div.getAttribute("id"));

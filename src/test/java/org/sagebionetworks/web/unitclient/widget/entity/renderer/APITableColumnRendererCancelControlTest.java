@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +48,7 @@ public class APITableColumnRendererCancelControlTest {
 		inputColumnNames.add(inputColumnName);
 		config.setInputColumnNames(inputColumnNames);
 		mockCallback = mock(AsyncCallback.class);
+		when(mockGWT.encodeQueryString(anyString())).thenReturn(inputValue);
 		APITableTestUtils.setInputValue(inputValue, inputColumnName, columnData);
 	}
 	

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 
@@ -49,6 +50,8 @@ public interface SingleButtonView extends IsWidget {
 	 * @param b
 	 */
 	void setLoading(boolean loading);
+	
+	void setButtonSize(ButtonSize size);
 	
 	void showConfirmDialog(String message, ConfirmCallback okCallback);
 	void addWidget(Widget widget);

@@ -37,7 +37,8 @@ public class APITableColumnRendererCancelControl implements APITableColumnRender
 		}
 		outputColumnName = APITableWidget.getSingleOutputColumnName(config);
 		outputColumnData = new HashMap<String, List<String>>();
-		List<String> cancelRequestedColumn = APITableWidget.getColumnValues(API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL, columnData);
+		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
+		List<String> cancelRequestedColumn = APITableWidget.getColumnValues(inputColumnName, columnData);
 		
 		List<String> outputValues = new ArrayList<String>();
 		if (cancelRequestedColumn == null) {
@@ -52,7 +53,7 @@ public class APITableColumnRendererCancelControl implements APITableColumnRender
 				// create div with an id that can be found later.
 				String output;
 				if (cancelRequestedColValue != null) {
-					output = "<div id=\"" + CANCEL_REQUEST_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + cancelRequestedColValue + "\" />";	
+					output = "<div id=\"" + CANCEL_REQUEST_WIDGET_DIV_PREFIX + uniqueId + "\" value=\"" + gwt.encodeQueryString(cancelRequestedColValue) + "\" />";	
 				} else {
 					output = "";
 				}

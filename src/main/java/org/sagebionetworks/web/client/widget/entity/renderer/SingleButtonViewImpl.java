@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -90,6 +91,12 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	@Override
 	public void addWidget(Widget widget) {
 		extraWidgetsContainer.add(widget);
+	}
+	
+
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		button.setSize(size);
 	}
 	
 	@Override
