@@ -141,9 +141,9 @@ public class RegisterTeamDialogTest {
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
-	@Test
-	public void testOnNewTeamClicked() {
-		widget.onNewTeamClicked();
-		verify(mockView).openNewWindow(anyString());
-	}
+//	@Test
+//	public void testOnNewTeamClicked() {
+//		widget.onNewTeamClicked();
+//		verify(mockView).openNewWindow(anyString());
+//	}
 }

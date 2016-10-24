@@ -60,6 +60,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		this.callback = callback;
 		this.challengeId = challengeId;
 		view.setRecruitmentMessage("");
+		view.setNewTeamLink("#!Profile:"+authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS);
 		getRegistratableTeams();
 	}
 	
@@ -126,12 +127,12 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		}
 	}
 	
-	@Override
-	public void onNewTeamClicked() {
-		//go to user profile page, team tab
-		view.openNewWindow("#!Profile:"+authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS);
-	}
-	
+//	@Override
+//	public void onNewTeamClicked() {
+//		//go to user profile page, team tab
+//		view.openNewWindow("#!Profile:"+authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS);
+//	}
+//	
 	@Override
 	public void teamSelected(int selectedIndex) {
 		selectedTeamId = null;

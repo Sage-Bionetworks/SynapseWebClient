@@ -22,7 +22,7 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void setNoTeamsFoundVisible(boolean isVisible);
 	void showConfirmDialog(String message, ConfirmCallback okCallback);
 	void showInfo(String title, String message);
-	void openNewWindow(String url);
+	void setNewTeamLink(String url);
 	
 	/**
 	 * Presenter interface
@@ -30,6 +30,7 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	public interface Presenter {
 		void teamSelected(int selectedIndex);
 		void onOk();
-		void onNewTeamClicked();
+		//void onNewTeamClicked();
 	}
+
 }

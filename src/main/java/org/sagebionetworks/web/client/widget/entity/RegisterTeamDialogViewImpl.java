@@ -72,12 +72,12 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 				modal.hide();
 			}
 		});
-		createNewTeamLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onNewTeamClicked();
-			}
-		});
+//		createNewTeamLink.addClickHandler(new ClickHandler() {
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				presenter.onNewTeamClicked();
+//			}
+//		});
 		teamComboBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -143,11 +143,12 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-	
+
 	@Override
-	public void openNewWindow(String url) {
-		DisplayUtils.newWindow(url, "_blank", "");
+	public void setNewTeamLink(String url) {
+		createNewTeamLink.setHref(url);
 	}
+
 	/*
 	 * Private Methods
 	 */
