@@ -214,7 +214,7 @@ public class TeamPresenterTest {
 		verify(mockView, never()).showAdminMenuItems();
 		
 		verify(mockGoogleMap, never()).configure(teamId);
-		verify(mockView).setShowMapVisible(true);
+		verify(mockView).setShowMapVisible(false);
 		
 		//simulate clicking Show Map
 		presenter.onShowMap();
