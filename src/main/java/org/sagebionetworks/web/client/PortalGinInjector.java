@@ -93,6 +93,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.VimeoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
@@ -103,6 +104,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
@@ -325,6 +327,7 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererLink getAPITableColumnRendererLink();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
+	public APITableColumnRendererCancelControl getAPITableColumnRendererCancelControl();
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
@@ -421,4 +424,5 @@ public interface PortalGinInjector extends Ginjector {
 	public LoadMoreWidgetContainer getLoadMoreProjectsWidgetContainer();
 	public RadioWidget createNewRadioWidget();
 	public EntityListRowBadge getEntityListRowBadge();
+	public CancelControlWidget getCancelControlWidget();
 }
