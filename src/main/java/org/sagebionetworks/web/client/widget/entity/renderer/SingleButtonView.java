@@ -45,6 +45,7 @@ public interface SingleButtonView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 
+	void setDataLoadingText(String loadingText);
 	/**
 	 * Set the loading state
 	 * @param b

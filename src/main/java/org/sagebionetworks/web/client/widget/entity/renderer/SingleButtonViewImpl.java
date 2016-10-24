@@ -84,6 +84,11 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	}
 	
 	@Override
+	public void setDataLoadingText(String loadingText) {
+		button.setDataLoadingText(loadingText);
+	}
+	
+	@Override
 	public void showConfirmDialog(String message, ConfirmCallback callback) {
 		Bootbox.confirm(message, callback);
 	}
