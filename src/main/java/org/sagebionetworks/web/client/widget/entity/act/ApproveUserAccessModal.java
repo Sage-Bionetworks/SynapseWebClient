@@ -10,10 +10,14 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
@@ -33,6 +37,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
+	private EntityFinder entityFinderWidget;
 	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
 	
@@ -40,15 +45,24 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
 			SynapseAlert synAlert,
 			SynapseSuggestBox peopleSuggestBox,
+			EntityFinder entityFinder,
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
+		this.entityFinderWidget = entityFinder;
 		this.synapseClient = synapseClient;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		this.view.setEntityPickerWidget(entityFinderWidget.asWidget());
+		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				onEntitySelected(selected);
+			}
+		});
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
@@ -57,6 +71,15 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 	
+	protected void onEntitySelected(Reference selected) {
+		view.hide();
+	}
+	
+	public void email() {
+		this.entityFinderWidget.show();
+	}
+	
+
 	public void configure(List<ACTAccessRequirement> accessRequirements) {
 		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();

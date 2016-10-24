@@ -41,6 +41,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Button emailButton;
 	@UiField
 	Div userSelectContainer;
+	@UiField
+	Div entitySelectContainer;
 	
 	private Presenter presenter;
 	
@@ -58,6 +60,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
+			}
+		});
+		emailButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.email();
 			}
 		});
 	}
@@ -87,6 +95,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void setUserPickerWidget(Widget w) {
 		userSelectContainer.clear();
 		userSelectContainer.add(w);
+	}
+	
+	@Override
+	public void setEntityPickerWidget(Widget w) {
+		entitySelectContainer.clear();
+		entitySelectContainer.add(w);
 	}
 	
 	@Override

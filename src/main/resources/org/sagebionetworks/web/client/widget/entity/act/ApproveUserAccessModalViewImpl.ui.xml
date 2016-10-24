@@ -24,6 +24,7 @@
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 				<b:Heading size="H5" text="User" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 				<bh:Div ui:field="userSelectContainer" />
+				<bh:Div ui:field="entitySelectContainer" />
 			</bh:Div>
 			<bh:Div ui:field="synAlertContainer" addStyleNames="margin-top-10" />
 		</b:ModalBody>
