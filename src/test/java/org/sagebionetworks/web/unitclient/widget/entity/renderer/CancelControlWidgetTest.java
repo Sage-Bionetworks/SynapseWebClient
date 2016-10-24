@@ -55,6 +55,7 @@ public class CancelControlWidgetTest {
 	public static final String SUBMITTER_ID = "1131050";
 	public static final String CAN_CANCEL_JSON = "{\"canCancel\":true,\"cancelRequested\":false,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
 	public static final String CANNOT_CANCEL_JSON = "{\"canCancel\":false,\"cancelRequested\":false,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
+	public static final String CAN_CANCEL_CANCEL_REQUESTED_JSON = "{\"canCancel\":false,\"cancelRequested\":true,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
 	
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
@@ -116,7 +117,14 @@ public class CancelControlWidgetTest {
 		verify(mockView).setButtonVisible(false);
 		verify(mockView, never()).setButtonVisible(true);
 	}
-
+	
+	@Test
+	public void testConfigureSubmitterCancelRequested() {
+		widget.configure(CAN_CANCEL_CANCEL_REQUESTED_JSON, mockRefreshCallback);
+		verify(mockSynAlert).clear();
+		verify(mockView).setButtonVisible(false);
+		verify(mockView, never()).setButtonVisible(true);
+	}
 	
 	@Test
 	public void testOnClick() {

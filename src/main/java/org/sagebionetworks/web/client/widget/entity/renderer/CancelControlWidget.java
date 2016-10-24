@@ -61,7 +61,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 			cancelControl.initializeFromJSONObject(adapterFactory.createNew(json));
 			String submissionUserId = cancelControl.getUserId();
 			if (authController.isLoggedIn() && authController.getCurrentUserPrincipalId().equals(submissionUserId)) {
-				if (cancelControl.getCanCancel()) {
+				if (!cancelControl.getCancelRequested() && cancelControl.getCanCancel()) {
 					view.setButtonVisible(true);
 				}
 			}
