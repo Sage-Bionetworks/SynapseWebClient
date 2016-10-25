@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -29,6 +30,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	DiscussionThreadListWidgetView view;
 	PortalGinInjector ginInjector;
 	DiscussionForumClientAsync discussionForumClientAsync;
+	SynapseJSNIUtils jsniUtils;
 	SynapseAlert synAlert;
 	private Long offset;
 	private DiscussionThreadOrder order;
@@ -42,20 +44,22 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private LoadMoreWidgetContainer threadsContainer;
 	private String entityId;
 	private LoadMoreWidgetContainer loadMoreWidgetContainer;
-	private Map<String, Widget> threadId2Widget = new HashMap<String, Widget>();
+	private Map<String, DiscussionThreadListItemWidget> threadId2Widget = new HashMap<String, DiscussionThreadListItemWidget>();
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,
 			PortalGinInjector ginInjector,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			SynapseAlert synAlert,
-			LoadMoreWidgetContainer loadMoreWidgetContainer
+			LoadMoreWidgetContainer loadMoreWidgetContainer,
+			SynapseJSNIUtils jsniUtils
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
 		this.synAlert = synAlert;
 		this.threadsContainer = loadMoreWidgetContainer;
+		this.jsniUtils = jsniUtils;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		order = DEFAULT_ORDER;
@@ -133,7 +137,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 							if (threadIdClickedCallback != null) {
 								thread.setThreadIdClickedCallback(threadIdClickedCallback);
 							}
-							threadId2Widget.put(bundle.getId(), thread.asWidget());
+							threadId2Widget.put(bundle.getId(), thread);
 							threadsContainer.add(thread.asWidget());
 						}
 						
@@ -181,7 +185,20 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	
 	public void scrollToThread(String threadId) {
 		if (threadId2Widget.containsKey(threadId)) {
-			view.scrollIntoView(threadId2Widget.get(threadId));
+			//update thread data and scroll into view
+			final DiscussionThreadListItemWidget threadListItemWidget = threadId2Widget.get(threadId);
+			discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					// unable to update thread data
+					jsniUtils.consoleError(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(DiscussionThreadBundle bundle) {
+					threadListItemWidget.configure(bundle);
+				}
+			});
+			view.scrollIntoView(threadListItemWidget.asWidget());
 		}
 	}
 }
