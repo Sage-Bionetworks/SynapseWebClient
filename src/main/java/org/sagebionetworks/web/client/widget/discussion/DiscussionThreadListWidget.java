@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -40,6 +42,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private LoadMoreWidgetContainer threadsContainer;
 	private String entityId;
 	private LoadMoreWidgetContainer loadMoreWidgetContainer;
+	private Map<String, Widget> threadId2Widget = new HashMap<String, Widget>();
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,
@@ -65,6 +68,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			Set<String> moderatorIds, CallbackP<Boolean> emptyListCallback,
 			DiscussionFilter filter) {
 		clear();
+		threadId2Widget.clear();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		this.moderatorIds = moderatorIds;
@@ -129,6 +133,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 							if (threadIdClickedCallback != null) {
 								thread.setThreadIdClickedCallback(threadIdClickedCallback);
 							}
+							threadId2Widget.put(bundle.getId(), thread.asWidget());
 							threadsContainer.add(thread.asWidget());
 						}
 						
@@ -172,5 +177,12 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			ascending = DEFAULT_ASCENDING;
 		}
 		configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, filter);
+	}
+	
+	public void scrollToThread(String threadId) {
+		Widget w = threadId2Widget.get(threadId);
+		if (w != null) {
+			view.scrollIntoView(w);
+		}
 	}
 }
