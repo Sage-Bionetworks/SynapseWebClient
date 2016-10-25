@@ -80,7 +80,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(widget);
+		return DisplayUtils.isInViewport(widget, 600);
 	}
 	
 	@Override

@@ -2390,6 +2390,10 @@ div.input-group > input.search-textbox {
 .text-align-right {
 	text-align: right;
 }
+.text-align-left {
+	text-align: left;
+}
+
 
 .inlineField {
 	overflow: hidden; 
