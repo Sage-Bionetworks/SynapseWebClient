@@ -13,10 +13,10 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setSynAlert(Widget asWidget);
 	void setStates(List<String> states);
 	void setUserPickerWidget(Widget w);
-	void setEntityPickerWidget(Widget w);
 	String getAccessRequirement();
 	void setAccessRequirement(String num, String text);
 	void setProcessing(boolean processing);
+	void setEmailButtonText(String string);
 	void showInfo(String string);
 	void show();
 	void hide();
@@ -28,7 +28,9 @@ public interface ApproveUserAccessModalView extends IsWidget {
 
 		void onStateSelected(String state);
 
-		void email();
+		void selectEmail();
+
+		void sendEmail();
 	}
 
 

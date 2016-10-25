@@ -56,7 +56,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
-		this.view.setEntityPickerWidget(entityFinderWidget.asWidget());
 		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
@@ -72,11 +71,16 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	protected void onEntitySelected(Reference selected) {
-		view.hide();
+		entityFinderWidget.hide();
+		view.setEmailButtonText(entityFinderWidget.getSelectedEntity().getTargetId());
 	}
 	
-	public void email() {
+	public void selectEmail() {
 		this.entityFinderWidget.show();
+	}
+	
+	public void sendEmail() {
+		
 	}
 	
 

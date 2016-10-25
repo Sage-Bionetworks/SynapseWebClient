@@ -40,9 +40,9 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button emailButton;
 	@UiField
-	Div userSelectContainer;
+	Button sendEmail;
 	@UiField
-	Div entitySelectContainer;
+	Div userSelectContainer;
 	
 	private Presenter presenter;
 	
@@ -65,7 +65,13 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		emailButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.email();
+				presenter.selectEmail();
+			}
+		});
+		sendEmail.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sendEmail();
 			}
 		});
 	}
@@ -98,9 +104,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setEntityPickerWidget(Widget w) {
-		entitySelectContainer.clear();
-		entitySelectContainer.add(w);
+	public void setEmailButtonText(String text) {
+		emailButton.setText(text);
 	}
 	
 	@Override
