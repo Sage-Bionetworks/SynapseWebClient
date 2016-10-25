@@ -318,6 +318,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				singleThreadWidget.configure(result, replyId, isCurrentUserModerator, moderatorIds, new Callback(){
 					@Override
 					public void invoke() {
+						isForumConfigured = false;
+						ForumWidget.this.threadId = null;
 						onClickShowAllThreads();
 					}
 				});

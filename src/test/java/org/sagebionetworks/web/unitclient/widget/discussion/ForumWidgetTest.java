@@ -258,6 +258,36 @@ public class ForumWidgetTest {
 		verify(mockAvailableThreadListWidget, never()).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
 		verify(mockAvailableThreadListWidget).scrollToThread(threadId);
 	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testConfigureForumSingleForum() {
+		String entityId = "syn1"; 
+		String areaToken = "a=b&c=d";
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
+		
+		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(captorP.capture());
+		CallbackP<DiscussionThreadBundle> threadIdClickedCallback = captorP.getValue();
+		String threadId = "9584";
+		when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
+			.getThread(anyString(), any(AsyncCallback.class));
+		threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
+		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
+		
+		//going back to the forum should cause the thread list to reconfigure if thread was deleted
+		reset(mockAvailableThreadListWidget);
+		
+		ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class), anyString(),
+				anyBoolean(), anySet(), onShowAllThreadsCallback.capture());
+		onShowAllThreadsCallback.getValue().invoke();
+		verify(mockAvailableThreadListWidget).clear();
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockAvailableThreadListWidget, never()).scrollToThread(threadId);
+	}
 
 	@Test
 	public void testLoadForumSuccess() {
