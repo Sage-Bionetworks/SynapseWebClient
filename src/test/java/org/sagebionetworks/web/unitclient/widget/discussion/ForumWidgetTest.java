@@ -209,7 +209,8 @@ public class ForumWidgetTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testConfigureForum() {
+	public void testGoBackToForum() {
+		// configure the widget to show the full forum, click on a thread, and then go back to all threads.
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
@@ -251,7 +252,7 @@ public class ForumWidgetTest {
 		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(mockForum.getId()), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
 		
-		//going back to the forum should not cause the thread list to reconfigure
+		//going back to the forum should not cause the thread list to reconfigure, but should scroll to thread
 		reset(mockAvailableThreadListWidget);
 		forumWidget.onClickShowAllThreads();
 		verify(mockAvailableThreadListWidget, never()).clear();
@@ -261,7 +262,7 @@ public class ForumWidgetTest {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testConfigureForumSingleForum() {
+	public void testGoBackToForumOnDelete() {
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
