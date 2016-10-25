@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -175,6 +174,8 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE;
 			} else if (APITableWidget.synapseIdColumnNames.contains(lowerCaseColumnName)) {
 				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
+			} else if (lowerCaseColumnName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL;		
 			}
 		}
 		return defaultRendererName;
