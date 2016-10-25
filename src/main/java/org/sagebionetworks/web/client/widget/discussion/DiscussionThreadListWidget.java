@@ -180,9 +180,8 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	}
 	
 	public void scrollToThread(String threadId) {
-		Widget w = threadId2Widget.get(threadId);
-		if (w != null) {
-			view.scrollIntoView(w);
+		if (threadId2Widget.containsKey(threadId)) {
+			view.scrollIntoView(threadId2Widget.get(threadId));
 		}
 	}
 }

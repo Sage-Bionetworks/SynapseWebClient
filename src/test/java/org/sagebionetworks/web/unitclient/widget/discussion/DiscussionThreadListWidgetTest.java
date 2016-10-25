@@ -127,7 +127,10 @@ public class DiscussionThreadListWidgetTest {
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 						any(DiscussionFilter.class), any(AsyncCallback.class));
 		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
-		discussionThreadBundleList.add(new DiscussionThreadBundle());
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		String threadId = "987654";
+		threadBundle.setId(threadId);
+		discussionThreadBundleList.add(threadBundle);
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
@@ -138,6 +141,12 @@ public class DiscussionThreadListWidgetTest {
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockDiscussionThreadWidget).setThreadIdClickedCallback(mockThreadIdClickedCallback);
+		
+		// test scroll to thread
+		discussionThreadListWidget.scrollToThread("invalidid");
+		verify(mockView, never()).scrollIntoView(any(Widget.class));
+		discussionThreadListWidget.scrollToThread(threadId);
+		verify(mockView).scrollIntoView(any(Widget.class));
 	}
 
 	@Test

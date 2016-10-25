@@ -234,6 +234,7 @@ public class ForumWidgetTest {
 		
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
+		verify(mockAvailableThreadListWidget).clear();
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
 		ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(ParameterizedToken.class);
 		verify(mockParamChangeCallback).invoke(captorToken.capture());
@@ -249,6 +250,13 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(mockForum.getId()), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
+		
+		//going back to the forum should not cause the thread list to reconfigure
+		reset(mockAvailableThreadListWidget);
+		forumWidget.onClickShowAllThreads();
+		verify(mockAvailableThreadListWidget, never()).clear();
+		verify(mockAvailableThreadListWidget, never()).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockAvailableThreadListWidget).scrollToThread(threadId);
 	}
 
 	@Test
