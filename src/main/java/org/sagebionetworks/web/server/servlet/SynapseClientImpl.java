@@ -2547,6 +2547,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public void sendMessage(MessageToUser message) throws SynapseException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		synapseClient.sendMessage(message);
+	}
 
 	@Override
 	public String sendMessageToEntityOwner(

@@ -8,12 +8,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.client.SynapseClientImpl;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
@@ -38,6 +42,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	private String accessRequirement;
 	private String userId;
+	private Reference selectedEntity;
+	private String entityId;
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
@@ -76,8 +82,26 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	protected void onEntitySelected(Reference selected) {
+		selectedEntity = selected;
 		entityFinderWidget.hide();
 		view.setEmailButtonText(entityFinderWidget.getSelectedEntity().getTargetId());
+		synapseClient.getEntity(entityFinderWidget.getSelectedEntity().getTargetId().replace("syn", ""), new AsyncCallback<Entity>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.showError(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(Entity result) {
+				if (result instanceof FileEntity) {
+					entityId = ((FileEntity)result).getDataFileHandleId();					
+				} else {
+					synAlert.showError("Error loading file??");
+				}
+			}
+			
+		});
 	}
 	
 	public void selectEmail() {
@@ -85,12 +109,42 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	public void sendEmail() {
+		if (userId == null) {
+			synAlert.showError("You must select a user to approve");
+			return;
+		}
+		if (entityId == null) {
+			synAlert.showError("You must select an email synId");
+			return;
+		}
+		if (accessRequirement == null) {
+			accessRequirement = view.getAccessRequirement();
+		}
 		view.setSendEmailProcessing(true);
 		Set<String> recipients = new HashSet<String>();
-		recipients.add("3345921");
-		//recipients.add("345424");
+		recipients.add(userId);
 		
-		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, "message", "hostPageBaseURL", new AsyncCallback<String>() {
+		MessageToUser m = new MessageToUser();
+		m.setRecipients(recipients);
+		m.setFileHandleId(entityId);
+		synapseClient.sendMessage(m, new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setSendEmailProcessing(false);
+				synAlert.showError(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				view.setSendEmailProcessing(false);
+				view.hide();
+				view.showInfo("Email sent.");
+			}
+			
+		});
+		/*
+		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, body, "hostPageBaseURL", new AsyncCallback<String>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -104,8 +158,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				view.hide();
 				view.showInfo("Email sent.");
 			}
-			
 		});
+		*/
 	}
 	
 

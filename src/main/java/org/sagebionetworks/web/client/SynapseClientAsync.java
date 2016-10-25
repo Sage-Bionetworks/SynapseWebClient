@@ -46,6 +46,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -456,4 +457,6 @@ public interface SynapseClientAsync {
 	void getDefaultColumnsForView(ViewType type, AsyncCallback<List<ColumnModel>> callback);
 
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
+	
+	void sendMessage(MessageToUser message, AsyncCallback<Void> callback);
 }
