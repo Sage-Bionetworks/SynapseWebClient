@@ -134,11 +134,20 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 
 	@Override
-	public void setProcessing(boolean processing) {
+	public void setApproveProcessing(boolean processing) {
 		if(processing){
 			submitButton.state().loading();
 		}else{
 			submitButton.state().reset();
+		}
+	}
+	
+	@Override
+	public void setSendEmailProcessing(boolean processing) {
+		if(processing){
+			sendEmail.state().loading();
+		}else{
+			sendEmail.state().reset();
 		}
 	}
 	

@@ -2,9 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
@@ -30,6 +33,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presenter, IsWidget {
+	
+	public static final String EMAIL_SUBJECT = "Data access approval";
 	
 	private String accessRequirement;
 	private String userId;
@@ -80,7 +85,27 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	public void sendEmail() {
+		view.setSendEmailProcessing(true);
+		Set<String> recipients = new HashSet<String>();
+		recipients.add("3345921");
+		//recipients.add("345424");
 		
+		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, "message", "hostPageBaseURL", new AsyncCallback<String>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setSendEmailProcessing(false);
+				synAlert.showError(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				view.setSendEmailProcessing(false);
+				view.hide();
+				view.showInfo("Email sent.");
+			}
+			
+		});
 	}
 	
 
@@ -112,7 +137,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		if (accessRequirement == null) {
 			accessRequirement = view.getAccessRequirement();
 		}
-		view.setProcessing(true);
+		view.setApproveProcessing(true);
 		ACTAccessApproval aa  = new ACTAccessApproval();
 		aa.setAccessorId(userId);  //user id
 		aa.setApprovalStatus(ACTApprovalStatus.APPROVED);
@@ -122,15 +147,14 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-				view.setProcessing(false);
+				view.setApproveProcessing(false);
 			}
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				view.setProcessing(false);
+				view.setApproveProcessing(false);
 				view.hide();
-				view.showInfo("Approved user."); //-> from DisplayUtils
-				
+				view.showInfo("Approved user.");
 			}
 			
 		});
