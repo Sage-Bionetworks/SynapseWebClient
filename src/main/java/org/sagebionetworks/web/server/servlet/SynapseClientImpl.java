@@ -2549,10 +2549,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void sendMessage(MessageToUser message) throws SynapseException {
+	public void sendMessage(MessageToUser message) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		synapseClient.sendMessage(message);
+		try {
+			synapseClient.sendMessage(message);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
 	}
+	
 
 	@Override
 	public String sendMessageToEntityOwner(

@@ -26,8 +26,11 @@
 				<bh:Div ui:field="userSelectContainer" />
 			</bh:Div>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-				<b:Heading size="H5" text="Email SynId" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
-				<b:Button ui:field="emailButton" type="WARNING" text="Choose..." />
+				<b:Heading size="H5" text="Email Template" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+				<bh:Div addStyleNames="margin-top-10 margin-bottom-10" height="30px">
+					<bh:Div ui:field="emailTemplate" addStyleNames="read-only-box floatleft" width="80%" height="30px"/>
+					<b:Button ui:field="emailButton" addStyleNames="floatright" type="DEFAULT" text="Browse..."/>
+				</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="synAlertContainer" addStyleNames="margin-top-10" />
 		</b:ModalBody>

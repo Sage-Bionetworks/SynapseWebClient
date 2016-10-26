@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACTAccessApproval;
@@ -15,11 +17,16 @@ import org.sagebionetworks.repo.model.ACTApprovalStatus;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
@@ -30,6 +37,9 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.server.servlet.NotificationTokenType;
+import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -43,7 +53,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private String accessRequirement;
 	private String userId;
 	private Reference selectedEntity;
-	private String entityId;
+	private String fileHandleId;
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
@@ -84,8 +94,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	protected void onEntitySelected(Reference selected) {
 		selectedEntity = selected;
 		entityFinderWidget.hide();
-		view.setEmailButtonText(entityFinderWidget.getSelectedEntity().getTargetId());
-		synapseClient.getEntity(entityFinderWidget.getSelectedEntity().getTargetId().replace("syn", ""), new AsyncCallback<Entity>() {
+		int mask = EntityBundle.ENTITY | EntityBundle.FILE_HANDLES;
+		synapseClient.getEntityBundle(entityFinderWidget.getSelectedEntity().getTargetId(), mask, new AsyncCallback<EntityBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -93,9 +103,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			}
 
 			@Override
-			public void onSuccess(Entity result) {
-				if (result instanceof FileEntity) {
-					entityId = ((FileEntity)result).getDataFileHandleId();					
+			public void onSuccess(EntityBundle result) {
+				FileHandle f = DisplayUtils.getFileHandle(result);
+				if (f != null) {
+					view.setEmailButtonText(f.getFileName());
+					fileHandleId = f.getId();				
 				} else {
 					synAlert.showError("Error loading file??");
 				}
@@ -113,7 +125,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError("You must select a user to approve");
 			return;
 		}
-		if (entityId == null) {
+		if (fileHandleId == null) {
 			synAlert.showError("You must select an email synId");
 			return;
 		}
@@ -125,8 +137,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		recipients.add(userId);
 		
 		MessageToUser m = new MessageToUser();
+		m.setSubject(EMAIL_SUBJECT);
 		m.setRecipients(recipients);
-		m.setFileHandleId(entityId);
+		m.setFileHandleId(fileHandleId);
 		synapseClient.sendMessage(m, new AsyncCallback<Void>() {
 
 			@Override

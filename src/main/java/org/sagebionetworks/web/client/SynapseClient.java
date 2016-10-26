@@ -69,6 +69,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
@@ -547,5 +548,5 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 
-	void sendMessage(MessageToUser message) throws SynapseException;
+	void sendMessage(MessageToUser message) throws RestServiceException;
 }

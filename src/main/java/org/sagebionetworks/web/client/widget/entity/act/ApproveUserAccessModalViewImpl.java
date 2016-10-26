@@ -5,7 +5,9 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -39,6 +41,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Button cancelButton;
 	@UiField
 	Button emailButton;
+	@UiField
+	Div emailTemplate;
 	@UiField
 	Button sendEmail;
 	@UiField
@@ -105,7 +109,10 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	
 	@Override
 	public void setEmailButtonText(String text) {
-		emailButton.setText(text);
+		HTML display = new HTML();
+		display.setHTML(text);
+		emailTemplate.clear();
+		emailTemplate.add(display.asWidget());
 	}
 	
 	@Override
