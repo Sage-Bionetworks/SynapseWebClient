@@ -2,6 +2,7 @@
 package org.sagebionetworks.web.client;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -548,5 +550,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 
-	void sendMessage(MessageToUser message) throws RestServiceException;
+//	void sendMessage(MessageToUser message) throws RestServiceException;
+//
+//	String getFileURL(FileHandleAssociation fileHandleAssociation) throws SynapseException;
 }

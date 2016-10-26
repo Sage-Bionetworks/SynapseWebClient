@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
-import org.sagebionetworks.client.SynapseClientImpl;
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
@@ -21,12 +17,15 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
@@ -38,9 +37,14 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.server.servlet.NotificationTokenType;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,8 +56,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	private String accessRequirement;
 	private String userId;
-	private Reference selectedEntity;
 	private String fileHandleId;
+	private String entityId;
+	private String message;
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
@@ -61,6 +66,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private EntityFinder entityFinderWidget;
 	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
+	RequestBuilderWrapper requestBuilder;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -68,12 +74,14 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			SynapseSuggestBox peopleSuggestBox,
 			EntityFinder entityFinder,
 			UserGroupSuggestionProvider provider, 
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			RequestBuilderWrapper requestBuilder) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.entityFinderWidget = entityFinder;
 		this.synapseClient = synapseClient;
+		this.requestBuilder = requestBuilder;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
@@ -92,29 +100,75 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	protected void onEntitySelected(Reference selected) {
-		selectedEntity = selected;
 		entityFinderWidget.hide();
 		int mask = EntityBundle.ENTITY | EntityBundle.FILE_HANDLES;
-		synapseClient.getEntityBundle(entityFinderWidget.getSelectedEntity().getTargetId(), mask, new AsyncCallback<EntityBundle>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.showError(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(EntityBundle result) {
-				FileHandle f = DisplayUtils.getFileHandle(result);
-				if (f != null) {
-					view.setEmailButtonText(f.getFileName());
-					fileHandleId = f.getId();				
-				} else {
-					synAlert.showError("Error loading file??");
-				}
-			}
-			
-		});
+		entityId = entityFinderWidget.getSelectedEntity().getTargetId();
+//		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				synAlert.handleException(caught);
+//			}
+//
+//			@Override
+//			public void onSuccess(EntityBundle result) {
+//				FileHandle f = DisplayUtils.getFileHandle(result);
+//				if (f != null && entityId != null) {
+//					view.setEmailButtonText(f.getFileName());
+//					fileHandleId = f.getId();
+//					getFileURL();
+//				} else {
+//					synAlert.showError("Error loading file??");
+//				}
+//			}
+//			
+//		});
 	}
+//	
+//	private void getFileURL() {
+//		FileHandleAssociation fha = new FileHandleAssociation();
+//        fha.setAssociateObjectId(entityId);
+//        fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+//        fha.setFileHandleId(fileHandleId);
+//        synapseClient.getFileURL(fha, new AsyncCallback<String>() {
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				synAlert.handleException(caught);
+//				//failing here
+//			}
+//
+//			@Override
+//			public void onSuccess(String url) {
+//				requestBuilder.configure(RequestBuilder.GET, url);
+//				//requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+//				try {
+//					requestBuilder.sendRequest(null, new RequestCallback() {
+//
+//						@Override
+//						public void onResponseReceived(Request request,
+//								Response response) {
+//							int statusCode = response.getStatusCode();
+//							if (statusCode == Response.SC_OK) {
+//								message = response.getText();
+//							} else {
+//								synAlert.showError("Could not read text from chosen file");
+//							}
+//						}
+//
+//						@Override
+//						public void onError(Request request, Throwable exception) {
+//							synAlert.handleException(exception);
+//						}
+//					});
+//				} catch (final Exception e) {
+//					synAlert.handleException(e);
+//				}
+//			}
+//			
+//        	
+//        });
+//	}
 	
 	public void selectEmail() {
 		this.entityFinderWidget.show();
@@ -132,47 +186,29 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		if (accessRequirement == null) {
 			accessRequirement = view.getAccessRequirement();
 		}
-		view.setSendEmailProcessing(true);
-		Set<String> recipients = new HashSet<String>();
-		recipients.add(userId);
-		
-		MessageToUser m = new MessageToUser();
-		m.setSubject(EMAIL_SUBJECT);
-		m.setRecipients(recipients);
-		m.setFileHandleId(fileHandleId);
-		synapseClient.sendMessage(m, new AsyncCallback<Void>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setSendEmailProcessing(false);
-				synAlert.showError(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				view.setSendEmailProcessing(false);
-				view.hide();
-				view.showInfo("Email sent.");
-			}
-			
-		});
-		/*
-		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, body, "hostPageBaseURL", new AsyncCallback<String>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setSendEmailProcessing(false);
-				synAlert.showError(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				view.setSendEmailProcessing(false);
-				view.hide();
-				view.showInfo("Email sent.");
-			}
-		});
-		*/
+//		if (message == null) {
+//			synAlert.showError("Missing message body");
+//			return;
+//		}
+//		view.setSendEmailProcessing(true);
+//		Set<String> recipients = new HashSet<String>();
+//		recipients.add(userId);
+//
+//		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				view.setSendEmailProcessing(false);
+//				synAlert.handleException(caught);;
+//			}
+//
+//			@Override
+//			public void onSuccess(String result) {
+//				view.setSendEmailProcessing(false);
+//				view.hide();
+//				view.showInfo("Email sent.");
+//			}
+//		});
 	}
 	
 

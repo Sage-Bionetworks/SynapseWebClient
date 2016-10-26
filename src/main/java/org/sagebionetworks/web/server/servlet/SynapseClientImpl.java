@@ -94,6 +94,7 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -2548,16 +2549,25 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public void sendMessage(MessageToUser message) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.sendMessage(message);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
-	}
-	
+//	@Override
+//	public void sendMessage(MessageToUser message) throws RestServiceException {
+//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//		try {
+//			synapseClient.sendMessage(message);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		} 
+//	}
+//	
+//	@Override
+//	public String getFileURL(FileHandleAssociation fileHandleAssociation) throws SynapseException{
+//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//		try {
+//			return synapseClient.getFileURL(fileHandleAssociation).toString();
+//		} catch (SynapseException e) {
+//			throw e;
+//		}
+//	}
 
 	@Override
 	public String sendMessageToEntityOwner(
