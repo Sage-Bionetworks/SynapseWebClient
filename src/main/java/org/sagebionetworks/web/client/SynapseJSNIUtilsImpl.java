@@ -134,11 +134,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId, String xsrfToken) {
 		return GWT.getModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
 				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
-				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId + "&" +
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
 
 	@Override
