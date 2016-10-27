@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
@@ -195,6 +196,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/html", MESSAGE_CHARSET);
+	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
+			.create("text/plain", MESSAGE_CHARSET);
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
@@ -2533,10 +2536,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			message.setSubject(subject);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
-			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.none(), new OutputSettings().prettyPrint(false));
 			String fileHandleId = synapseClient.uploadToFileHandle(
 					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
+					PLAIN_MESSAGE_CONTENT_TYPE);
 			message.setFileHandleId(fileHandleId);
 			MessageToUser sentMessage = synapseClient.sendMessage(message);
 			JSONObjectAdapter sentMessageJson = sentMessage
@@ -2548,26 +2551,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-//	@Override
-//	public void sendMessage(MessageToUser message) throws RestServiceException {
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			synapseClient.sendMessage(message);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		} 
-//	}
-//	
-//	@Override
-//	public String getFileURL(FileHandleAssociation fileHandleAssociation) throws SynapseException{
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			return synapseClient.getFileURL(fileHandleAssociation).toString();
-//		} catch (SynapseException e) {
-//			throw e;
-//		}
-//	}
 
 	@Override
 	public String sendMessageToEntityOwner(

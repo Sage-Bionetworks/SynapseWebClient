@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.AccessRequirement;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -19,6 +17,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setSendEmailProcessing(boolean processing);
 	void setEmailButtonText(String string);
 	void showInfo(String string);
+	void showLoading(boolean visible);
 	void show();
 	void hide();
 	/**
@@ -28,8 +27,6 @@ public interface ApproveUserAccessModalView extends IsWidget {
 		void onSubmit();
 
 		void onStateSelected(String state);
-
-		void selectEmail();
 
 		void sendEmail();
 	}

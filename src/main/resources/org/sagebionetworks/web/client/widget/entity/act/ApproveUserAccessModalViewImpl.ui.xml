@@ -5,6 +5,7 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 
 	<!-- Dialog for creating a new table -->
 	<b:Modal ui:field="modal" title="Approve User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
@@ -27,9 +28,12 @@
 			</bh:Div>
 			<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 				<b:Heading size="H5" text="Email Template" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+				<g:HTMLPanel ui:field="loadingUI">
+					<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+					&nbsp;Loading...
+				</g:HTMLPanel>
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10" height="30px">
-					<bh:Div ui:field="emailTemplate" addStyleNames="read-only-box floatleft" width="80%" height="30px"/>
-					<b:Button ui:field="emailButton" addStyleNames="floatright" type="DEFAULT" text="Browse..."/>
+					<bh:Div ui:field="emailTemplate" addStyleNames="read-only-box floatleft" width="100%" height="30px"/>
 				</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="synAlertContainer" addStyleNames="margin-top-10" />

@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
-import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 
 import com.google.gwt.core.client.Scheduler;
@@ -31,7 +31,7 @@ public class CellEditorViewImpl implements CellEditorView {
 	@UiField
 	FormGroup formGroup;
 	@UiField
-	TextBox textBox;
+	TextArea textBox;
 	@UiField
 	HelpBlock helpBlock;
 

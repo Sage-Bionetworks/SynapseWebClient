@@ -550,7 +550,4 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 
-//	void sendMessage(MessageToUser message) throws RestServiceException;
-//
-//	String getFileURL(FileHandleAssociation fileHandleAssociation) throws SynapseException;
 }

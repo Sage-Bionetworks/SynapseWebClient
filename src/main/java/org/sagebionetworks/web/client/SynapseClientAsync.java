@@ -460,6 +460,4 @@ public interface SynapseClientAsync {
 
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 	
-//	void sendMessage(MessageToUser message, AsyncCallback<Void> callback);
-//	void getFileURL(FileHandleAssociation fileHandleAssociation, AsyncCallback<String> callback);
 }

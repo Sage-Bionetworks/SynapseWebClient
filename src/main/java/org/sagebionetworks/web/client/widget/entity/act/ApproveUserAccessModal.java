@@ -12,39 +12,24 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ACTApprovalStatus;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.repo.model.message.MessageToUser;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
-import org.sagebionetworks.web.server.servlet.NotificationTokenType;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,44 +38,41 @@ import com.google.inject.Inject;
 public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presenter, IsWidget {
 	
 	public static final String EMAIL_SUBJECT = "Data access approval";
+	public static final String SELECT_FROM = "SELECT \"Email Body\" FROM ";
+	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
+	// Mask to get all parts of a query.
+	private static final Long ALL_PARTS_MASK = new Long(255);
 	
 	private String accessRequirement;
 	private String userId;
-	private String fileHandleId;
-	private String entityId;
+	private String datasetId;
 	private String message;
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
-	private EntityFinder entityFinderWidget;
 	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
-	RequestBuilderWrapper requestBuilder;
+	private GlobalApplicationState globalApplicationState;
+	private JobTrackingWidget progressWidget;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
 			SynapseAlert synAlert,
 			SynapseSuggestBox peopleSuggestBox,
-			EntityFinder entityFinder,
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
-			RequestBuilderWrapper requestBuilder) {
+			GlobalApplicationState globalApplicationState,
+			JobTrackingWidget progressWidget) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
-		this.entityFinderWidget = entityFinder;
 		this.synapseClient = synapseClient;
-		this.requestBuilder = requestBuilder;
+		this.globalApplicationState = globalApplicationState;
+		this.progressWidget = progressWidget;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
-		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
-			@Override
-			public void onSelected(Reference selected) {
-				onEntitySelected(selected);
-			}
-		});
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
@@ -98,121 +80,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			}
 		});
 	}
-	
-	protected void onEntitySelected(Reference selected) {
-		entityFinderWidget.hide();
-		int mask = EntityBundle.ENTITY | EntityBundle.FILE_HANDLES;
-		entityId = entityFinderWidget.getSelectedEntity().getTargetId();
-//		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				synAlert.handleException(caught);
-//			}
-//
-//			@Override
-//			public void onSuccess(EntityBundle result) {
-//				FileHandle f = DisplayUtils.getFileHandle(result);
-//				if (f != null && entityId != null) {
-//					view.setEmailButtonText(f.getFileName());
-//					fileHandleId = f.getId();
-//					getFileURL();
-//				} else {
-//					synAlert.showError("Error loading file??");
-//				}
-//			}
-//			
-//		});
-	}
-//	
-//	private void getFileURL() {
-//		FileHandleAssociation fha = new FileHandleAssociation();
-//        fha.setAssociateObjectId(entityId);
-//        fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-//        fha.setFileHandleId(fileHandleId);
-//        synapseClient.getFileURL(fha, new AsyncCallback<String>() {
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				synAlert.handleException(caught);
-//				//failing here
-//			}
-//
-//			@Override
-//			public void onSuccess(String url) {
-//				requestBuilder.configure(RequestBuilder.GET, url);
-//				//requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-//				try {
-//					requestBuilder.sendRequest(null, new RequestCallback() {
-//
-//						@Override
-//						public void onResponseReceived(Request request,
-//								Response response) {
-//							int statusCode = response.getStatusCode();
-//							if (statusCode == Response.SC_OK) {
-//								message = response.getText();
-//							} else {
-//								synAlert.showError("Could not read text from chosen file");
-//							}
-//						}
-//
-//						@Override
-//						public void onError(Request request, Throwable exception) {
-//							synAlert.handleException(exception);
-//						}
-//					});
-//				} catch (final Exception e) {
-//					synAlert.handleException(e);
-//				}
-//			}
-//			
-//        	
-//        });
-//	}
-	
-	public void selectEmail() {
-		this.entityFinderWidget.show();
-	}
-	
-	public void sendEmail() {
-		if (userId == null) {
-			synAlert.showError("You must select a user to approve");
-			return;
-		}
-		if (fileHandleId == null) {
-			synAlert.showError("You must select an email synId");
-			return;
-		}
-		if (accessRequirement == null) {
-			accessRequirement = view.getAccessRequirement();
-		}
-//		if (message == null) {
-//			synAlert.showError("Missing message body");
-//			return;
-//		}
-//		view.setSendEmailProcessing(true);
-//		Set<String> recipients = new HashSet<String>();
-//		recipients.add(userId);
-//
-//		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				view.setSendEmailProcessing(false);
-//				synAlert.handleException(caught);;
-//			}
-//
-//			@Override
-//			public void onSuccess(String result) {
-//				view.setSendEmailProcessing(false);
-//				view.hide();
-//				view.showInfo("Email sent.");
-//			}
-//		});
-	}
-	
 
-	public void configure(List<ACTAccessRequirement> accessRequirements) {
+	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
+		view.showLoading(true);
 		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
 		for (ACTAccessRequirement ar : accessRequirements) {
@@ -224,10 +94,54 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		if (list.size() > 0) {
 			view.setAccessRequirement(list.get(0), GovernanceServiceHelper.getAccessRequirementText(arMap.get(list.get(0))));			
 		}
+		datasetId = bundle.getEntity().getId(); //get synId of dataset we are currently on
+		view.setEmailButtonText(bundle.getEntity().getName());
+		Query query = getDefaultQuery();
+		
+		
+		QueryBundleRequest qbr = new QueryBundleRequest();
+		qbr.setPartMask(ALL_PARTS_MASK);
+		qbr.setQuery(query);
+		qbr.setEntityId(QueryBundleUtils.getTableId(query));
+		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+			
+			@Override
+			public void onFailure(Throwable failure) {
+				view.showLoading(false);
+				synAlert.handleException(failure);
+			}
+			
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				view.showLoading(false);
+				QueryResultBundle result = (QueryResultBundle) response;
+				message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
+			}
+			
+			@Override
+			public void onCancel() {
+				view.showLoading(false);
+				synAlert.showError("Query cancelled");
+			}
+		});
+
+	}
+	
+	private Query getDefaultQuery() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(SELECT_FROM);
+		builder.append(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
+		builder.append(WHERE);
+		builder.append(datasetId + "\"");
+		
+		Query query = new Query();
+		query.setSql(builder.toString());
+		query.setIsConsistent(true);
+		return query;
 	}
 	
 	public void show() {
-		synAlert.clear();
+		//synAlert.clear();
 		view.show();
 	}
 
@@ -276,6 +190,36 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public void onStateSelected(String state) {
 		accessRequirement = state;
 		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
+	}
+	
+	public void sendEmail() {
+		if (userId == null) {
+			synAlert.showError("You must select a user to approve");
+			return;
+		}
+		if (accessRequirement == null) {
+			accessRequirement = view.getAccessRequirement();
+		}
+		
+		view.setSendEmailProcessing(true);
+		Set<String> recipients = new HashSet<String>();
+		recipients.add(userId);
+
+		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setSendEmailProcessing(false);
+				synAlert.handleException(caught);;
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				view.setSendEmailProcessing(false);
+				view.hide();
+				view.showInfo("Email sent.");
+			}
+		});
 	}
 		
 }

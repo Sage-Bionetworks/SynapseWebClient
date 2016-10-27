@@ -5,10 +5,8 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -34,13 +32,13 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Div accessReqText;
 	@UiField
+	HTMLPanel loadingUI;
+	@UiField
 	Div synAlertContainer;
 	@UiField
 	Button submitButton;
 	@UiField
 	Button cancelButton;
-	@UiField
-	Button emailButton;
 	@UiField
 	Div emailTemplate;
 	@UiField
@@ -64,12 +62,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
-			}
-		});
-		emailButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectEmail();
 			}
 		});
 		sendEmail.addClickHandler(new ClickHandler() {
@@ -128,6 +120,11 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void hide() {
 		modal.hide();
+	}
+	
+	@Override
+	public void showLoading(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
 	
 	@Override
