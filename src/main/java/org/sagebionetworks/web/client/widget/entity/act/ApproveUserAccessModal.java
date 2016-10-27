@@ -47,6 +47,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private String userId;
 	private String datasetId;
 	private String message;
+	private EntityBundle entityBundle;
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
@@ -82,7 +83,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
+		view.setEmailTemplateTitleVisible(false);
 		view.showLoading(true);
+		this.entityBundle = bundle;
 		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
 		for (ACTAccessRequirement ar : accessRequirements) {
@@ -94,12 +97,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		if (list.size() > 0) {
 			view.setAccessRequirement(list.get(0), GovernanceServiceHelper.getAccessRequirementText(arMap.get(list.get(0))));			
 		}
-		datasetId = bundle.getEntity().getId(); //get synId of dataset we are currently on
-		view.setEmailButtonText(bundle.getEntity().getName());
-		Query query = getDefaultQuery();
-		
-		
-		QueryBundleRequest qbr = new QueryBundleRequest();
+		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
+		view.setEmailTemplateTitle(entityBundle.getEntity().getName());
+		Query query = getDefaultQuery();QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
@@ -116,6 +116,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				view.showLoading(false);
 				QueryResultBundle result = (QueryResultBundle) response;
 				message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
+				view.setEmailTemplateTitleVisible(true);
 			}
 			
 			@Override
@@ -124,7 +125,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				synAlert.showError("Query cancelled");
 			}
 		});
-
 	}
 	
 	private Query getDefaultQuery() {
@@ -141,7 +141,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 	
 	public void show() {
-		//synAlert.clear();
+		synAlert.clear();
 		view.show();
 	}
 

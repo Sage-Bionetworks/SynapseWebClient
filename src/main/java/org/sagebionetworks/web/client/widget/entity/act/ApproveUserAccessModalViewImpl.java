@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -16,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
@@ -100,11 +100,16 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setEmailButtonText(String text) {
+	public void setEmailTemplateTitle(String text) {
 		HTML display = new HTML();
 		display.setHTML(text);
 		emailTemplate.clear();
 		emailTemplate.add(display.asWidget());
+	}
+	
+	@Override
+	public void setEmailTemplateTitleVisible(boolean visible) {
+		emailTemplate.setVisible(visible);
 	}
 	
 	@Override

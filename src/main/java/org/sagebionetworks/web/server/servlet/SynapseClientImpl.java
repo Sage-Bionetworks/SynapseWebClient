@@ -2536,10 +2536,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			message.setSubject(subject);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
-			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.none(), new OutputSettings().prettyPrint(false));
+			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
 			String fileHandleId = synapseClient.uploadToFileHandle(
 					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					PLAIN_MESSAGE_CONTENT_TYPE);
+					HTML_MESSAGE_CONTENT_TYPE);
 			message.setFileHandleId(fileHandleId);
 			MessageToUser sentMessage = synapseClient.sendMessage(message);
 			JSONObjectAdapter sentMessageJson = sentMessage
