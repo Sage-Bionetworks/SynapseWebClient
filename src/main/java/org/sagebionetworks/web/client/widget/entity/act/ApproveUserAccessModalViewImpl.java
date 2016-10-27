@@ -32,8 +32,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Div accessReqText;
 	@UiField
-	HTMLPanel loadingUI;
-	@UiField
 	Div synAlertContainer;
 	@UiField
 	Button submitButton;
@@ -45,6 +43,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Button sendEmail;
 	@UiField
 	Div userSelectContainer;
+	@UiField
+	Div loadingEmail;
 	
 	private Presenter presenter;
 	
@@ -108,8 +108,18 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setEmailTemplateTitleVisible(boolean visible) {
-		emailTemplate.setVisible(visible);
+	public void startLoadingEmail(Widget w) {
+		emailTemplate.setVisible(false);
+		loadingEmail.clear();
+		loadingEmail.setVisible(true);
+		loadingEmail.add(w.asWidget());
+	}
+	
+	@Override
+	public void finishLoadingEmail() {
+		loadingEmail.clear();
+		loadingEmail.setVisible(false);
+		emailTemplate.setVisible(true);
 	}
 	
 	@Override
@@ -125,11 +135,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void hide() {
 		modal.hide();
-	}
-	
-	@Override
-	public void showLoading(boolean visible) {
-		loadingUI.setVisible(visible);
 	}
 	
 	@Override

@@ -83,8 +83,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
-		view.setEmailTemplateTitleVisible(false);
-		view.showLoading(true);
+		view.startLoadingEmail(progressWidget.asWidget());
 		this.entityBundle = bundle;
 		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
@@ -107,21 +106,18 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			
 			@Override
 			public void onFailure(Throwable failure) {
-				view.showLoading(false);
 				synAlert.handleException(failure);
 			}
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				view.showLoading(false);
 				QueryResultBundle result = (QueryResultBundle) response;
 				message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-				view.setEmailTemplateTitleVisible(true);
+				view.finishLoadingEmail();
 			}
 			
 			@Override
 			public void onCancel() {
-				view.showLoading(false);
 				synAlert.showError("Query cancelled");
 			}
 		});
@@ -195,6 +191,10 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public void sendEmail() {
 		if (userId == null) {
 			synAlert.showError("You must select a user to approve");
+			return;
+		}
+		if (message == null) {
+			synAlert.showError("An error was encountered while loading the email message body");
 			return;
 		}
 		if (accessRequirement == null) {

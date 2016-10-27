@@ -16,9 +16,9 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setApproveProcessing(boolean processing);
 	void setSendEmailProcessing(boolean processing);
 	void setEmailTemplateTitle(String string);
+	void startLoadingEmail(Widget asWidget);
+	void finishLoadingEmail();
 	void showInfo(String string);
-	void setEmailTemplateTitleVisible(boolean visible);
-	void showLoading(boolean visible);
 	void show();
 	void hide();
 	/**
