@@ -118,6 +118,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void startLoadingEmail(Widget w) {
 		emailTemplate.setVisible(false);
+		previewButton.setVisible(false);
 		loadingEmail.clear();
 		loadingEmail.setVisible(true);
 		loadingEmail.add(w.asWidget());
@@ -128,6 +129,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		loadingEmail.clear();
 		loadingEmail.setVisible(false);
 		emailTemplate.setVisible(true);
+		previewButton.setVisible(true);
 	}
 	
 	@Override
