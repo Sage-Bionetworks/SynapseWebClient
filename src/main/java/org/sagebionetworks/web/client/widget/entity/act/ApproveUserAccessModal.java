@@ -100,7 +100,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			view.setAccessRequirement(list.get(0), GovernanceServiceHelper.getAccessRequirementText(arMap.get(list.get(0))));			
 		}
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
-		view.setEmailTemplateTitle(entityBundle.getEntity().getName());
+		view.setDatasetTitle(entityBundle.getEntity().getName());
 		loadEmailMessage();
 	}
 	
@@ -150,8 +150,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		view.show();
 	}
 	
-	
-
 	@Override
 	public void onSubmit() {
 		if (userId == null) {
@@ -198,7 +196,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 					}
 				});
 			}
-			
 		});
 	}
 	
@@ -217,41 +214,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
 	}
 	
-	//will be removed eventually - retaining for testing purposes
-	public void sendEmail() {
-		if (userId == null) {
-			synAlert.showError("You must select a user to approve");
-			return;
-		}
-		if (message == null) {
-			synAlert.showError("An error was encountered while loading the email message body");
-			return;
-		}
-		if (accessRequirement == null) {
-			accessRequirement = view.getAccessRequirement();
-		}
-		
-		view.setSendEmailProcessing(true);
-		Set<String> recipients = new HashSet<String>();
-		recipients.add(userId);
-
-		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setSendEmailProcessing(false);
-				synAlert.handleException(caught);;
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				view.setSendEmailProcessing(false);
-				view.hide();
-				view.showInfo("Email sent.");
-			}
-		});
-	}
-
 	@Override
 	public void showPreview() {
 		messagePreview.show();

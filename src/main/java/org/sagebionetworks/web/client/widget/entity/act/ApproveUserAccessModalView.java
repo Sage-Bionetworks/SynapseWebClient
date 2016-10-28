@@ -14,8 +14,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	String getAccessRequirement();
 	void setAccessRequirement(String num, String text);
 	void setApproveProcessing(boolean processing);
-	void setSendEmailProcessing(boolean processing);
-	void setEmailTemplateTitle(String string);
+	void setDatasetTitle(String string);
 	void startLoadingEmail(Widget asWidget);
 	void finishLoadingEmail();
 	void showInfo(String string);
@@ -26,11 +25,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	 */
 	public interface Presenter {
 		void onSubmit();
-
 		void onStateSelected(String state);
-
-		void sendEmail();
-
 		void showPreview();
 	}
 

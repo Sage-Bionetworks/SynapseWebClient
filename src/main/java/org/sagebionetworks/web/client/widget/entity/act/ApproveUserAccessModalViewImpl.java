@@ -15,7 +15,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
@@ -42,8 +41,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Div emailTemplate;
 	@UiField
-	Button sendEmail;
-	@UiField
 	Div userSelectContainer;
 	@UiField
 	Div loadingEmail;
@@ -64,12 +61,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
-			}
-		});
-		sendEmail.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.sendEmail();
 			}
 		});
 		previewButton.addClickHandler(new ClickHandler() {
@@ -108,7 +99,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setEmailTemplateTitle(String text) {
+	public void setDatasetTitle(String text) {
 		HTML display = new HTML();
 		display.setHTML(text);
 		emailTemplate.clear();
@@ -163,15 +154,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			submitButton.state().loading();
 		}else{
 			submitButton.state().reset();
-		}
-	}
-	
-	@Override
-	public void setSendEmailProcessing(boolean processing) {
-		if(processing){
-			sendEmail.state().loading();
-		}else{
-			sendEmail.state().reset();
 		}
 	}
 	
