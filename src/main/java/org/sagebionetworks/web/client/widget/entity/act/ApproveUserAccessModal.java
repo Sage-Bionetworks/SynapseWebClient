@@ -56,6 +56,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
+	private EmailMessagePreviewModal messagePreview;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -64,13 +65,15 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			JobTrackingWidget progressWidget) {
+			JobTrackingWidget progressWidget,
+			EmailMessagePreviewModal messagePreview) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
+		this.messagePreview = messagePreview;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
@@ -98,7 +101,12 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
 		view.setEmailTemplateTitle(entityBundle.getEntity().getName());
-		Query query = getDefaultQuery();QueryBundleRequest qbr = new QueryBundleRequest();
+		loadEmailMessage();
+	}
+	
+	private void loadEmailMessage() {
+		Query query = getDefaultQuery();
+		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
@@ -113,6 +121,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			public void onComplete(AsynchronousResponseBody response) {
 				QueryResultBundle result = (QueryResultBundle) response;
 				message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
+				messagePreview.configure(message);
 				view.finishLoadingEmail();
 			}
 			
@@ -140,11 +149,17 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		synAlert.clear();
 		view.show();
 	}
+	
+	
 
 	@Override
 	public void onSubmit() {
 		if (userId == null) {
 			synAlert.showError("You must select a user to approve");
+			return;
+		}
+		if (message == null) {
+			synAlert.showError("An error was encountered while loading the email message body");
 			return;
 		}
 		if (accessRequirement == null) {
@@ -165,9 +180,23 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				view.setApproveProcessing(false);
-				view.hide();
-				view.showInfo("Approved user.");
+				Set<String> recipients = new HashSet<String>();
+				recipients.add(userId);
+				synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setApproveProcessing(false);
+						synAlert.showError("User has been approved; however, an error was encountered while emailing them");
+					}
+
+					@Override
+					public void onSuccess(String result) {
+						view.setApproveProcessing(false);
+						view.hide();
+						view.showInfo("Successfully approved user; an email has been sent to notify them");
+					}
+				});
 			}
 			
 		});
@@ -188,6 +217,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
 	}
 	
+	//will be removed eventually - retaining for testing purposes
 	public void sendEmail() {
 		if (userId == null) {
 			synAlert.showError("You must select a user to approve");
@@ -220,6 +250,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				view.showInfo("Email sent.");
 			}
 		});
+	}
+
+	@Override
+	public void showPreview() {
+		messagePreview.show();
 	}
 		
 }

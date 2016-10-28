@@ -30,6 +30,8 @@ public interface ApproveUserAccessModalView extends IsWidget {
 		void onStateSelected(String state);
 
 		void sendEmail();
+
+		void showPreview();
 	}
 
 

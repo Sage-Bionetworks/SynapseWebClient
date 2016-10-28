@@ -38,6 +38,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button cancelButton;
 	@UiField
+	Button previewButton;
+	@UiField
 	Div emailTemplate;
 	@UiField
 	Button sendEmail;
@@ -68,6 +70,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.sendEmail();
+			}
+		});
+		previewButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showPreview();
 			}
 		});
 	}
