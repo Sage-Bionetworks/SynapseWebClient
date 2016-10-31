@@ -132,7 +132,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 	
-	private Query getDefaultQuery() {
+	public Query getDefaultQuery() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
 		builder.append(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
