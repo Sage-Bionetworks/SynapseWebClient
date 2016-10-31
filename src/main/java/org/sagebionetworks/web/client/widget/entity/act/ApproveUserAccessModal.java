@@ -16,7 +16,10 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -120,16 +123,55 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				QueryResultBundle result = (QueryResultBundle) response;
-				message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-				messagePreview.configure(message);
-				view.finishLoadingEmail();
+				if (hasResult1(result)) {
+					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
+					messagePreview.configure(message);
+					view.finishLoadingEmail();
+				} else {
+					synAlert.showError("An error was encountered while loading the email body");
+				}
 			}
-			
+
 			@Override
 			public void onCancel() {
 				synAlert.showError("Query cancelled");
 			}
 		});
+	}
+	
+	private boolean hasResult1(QueryResultBundle result) {
+		if (result.getQueryResult() != null) {
+			if (result.getQueryResult().getQueryResults() != null) {
+				if (result.getQueryResult().getQueryResults().getRows() != null && result.getQueryResult().getQueryResults().getRows().size() > 0) {
+					if (result.getQueryResult().getQueryResults().getRows().get(0) != null) {
+						if (result.getQueryResult().getQueryResults().getRows().get(0).getValues() != null && result.getQueryResult().getQueryResults().getRows().get(0).getValues().size() > 0) {
+							return result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0) != null;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean hasResult2(QueryResultBundle result) {
+		QueryResult qr = result.getQueryResult();
+		if (qr != null) {
+			RowSet rs = qr.getQueryResults();
+			if (rs != null) {
+				List<Row> rowList = rs.getRows();
+				if (rowList != null && rowList.size() > 0) {
+					Row r = rowList.get(0);
+					if (r != null) {
+						List<String> strList = r.getValues();
+						if (strList != null && strList.size() > 0) {
+							return strList.get(0) != null;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	public Query getDefaultQuery() {
