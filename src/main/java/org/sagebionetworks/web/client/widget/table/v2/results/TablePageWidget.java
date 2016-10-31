@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
@@ -63,7 +65,14 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, Query query, SortItem sort, boolean isEditable, boolean isView, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
+	public void configure(QueryResultBundle bundle, 
+			Query query, 
+			SortItem sort, 
+			boolean isEditable, 
+			boolean isView, 
+			RowSelectionListener rowSelectionListener, 
+			final PagingAndSortingListener pageChangeListener,
+			CallbackP<FacetColumnRequest> facetChangedHandler){
 		this.isView = isView;
 		this.rowSelectionListener = rowSelectionListener;
 		// The pagination widget is only visible if a listener was provider
@@ -112,8 +121,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			keyboardNavigationHandler = null;
 		}
 		
-		view.setFacetsWidgetVisible(!isEditable);
-		facetsWidget.configure(bundle.getFacets());
+		view.setFacetsWidgetVisible(!isEditable && facetChangedHandler != null);
+		facetsWidget.configure(bundle.getFacets(), facetChangedHandler);
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table

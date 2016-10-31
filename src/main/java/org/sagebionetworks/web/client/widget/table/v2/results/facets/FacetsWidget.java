@@ -17,20 +17,13 @@ import com.google.inject.Inject;
 public class FacetsWidget implements IsWidget {
 	DivView view;
 	PortalGinInjector ginInjector;
-	CallbackP<FacetColumnRequest> facetChangedHandler;
 	@Inject
 	public FacetsWidget(DivView view, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.ginInjector = ginInjector;
-		facetChangedHandler = new CallbackP<FacetColumnRequest>() {
-			@Override
-			public void invoke(FacetColumnRequest param) {
-				
-			}
-		};
 	}
 	
-	public void configure(List<FacetColumnResult> facets) {
+	public void configure(List<FacetColumnResult> facets, CallbackP<FacetColumnRequest> facetChangedHandler) {
 		view.clear();
 		for (FacetColumnResult facet : facets) {
 			switch(facet.getFacetType()) {
