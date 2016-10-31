@@ -186,5 +186,15 @@ public class VideoConfigEditorTest {
 		assertTrue(VideoConfigEditor.isRecognizedWebMFileName("video.1.webm"));
 		assertFalse(VideoConfigEditor.isRecognizedWebMFileName("video.1.mp4"));
 		assertFalse(VideoConfigEditor.isRecognizedWebMFileName("video.1.ogg"));
+		
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.mp4"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.1.m4a"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.m4R"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.2.M4V"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.m4R"));
+		assertFalse(VideoConfigEditor.isRecognizedVideoFileName("video.m44"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.1.ogg"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.OGV"));
+		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.1.webm"));
 	}
 }

@@ -53,7 +53,7 @@ public interface SynapseJSNIUtils {
 	
 	public String getBaseProfileAttachmentUrl();
 	
-	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId);
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId, String xsrfToken);
 
 	public int randomNextInt();
 	

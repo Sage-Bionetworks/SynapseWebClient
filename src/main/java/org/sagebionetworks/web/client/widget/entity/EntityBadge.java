@@ -1,11 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +48,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private SynapseClientAsync synapseClient;
 	private CallbackP<String> customEntityClickHandler;
 	private FileDownloadButton fileDownloadButton;
-	private DiscussionForumClientAsync discussionForumClient;
 	private LazyLoadHelper lazyLoadHelper;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -63,7 +57,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			FileDownloadButton fileDownloadButton,
-			DiscussionForumClientAsync discussionForumClient,
 			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.globalAppState = globalAppState;
@@ -72,7 +65,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
 		this.fileDownloadButton = fileDownloadButton;
-		this.discussionForumClient = discussionForumClient;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
@@ -94,7 +86,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
+		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
 		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -125,24 +117,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			view.setModifiedOn("");
 		}
 		lazyLoadHelper.setIsConfigured();
-		discussionForumClient.getEntityThreadCount(Arrays.asList(header.getId()), new AsyncCallback<EntityThreadCounts>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorIcon();
-				view.setError(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(EntityThreadCounts result) {
-				int numberOfResults = result.getList().size();
-				if (numberOfResults > 1) {
-					onFailure(new Throwable("Invalid number of results"));
-				}
-				view.setDiscussionThreadIconVisible(numberOfResults == 1 && result.getList().get(0).getCount() > 0);
-			}
-			
-		});
 	}
 	
 	public void clearState() {
@@ -184,6 +158,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			fileDownloadButton.setClientsHelpVisible(false);
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
+		
+		view.setDiscussionThreadIconVisible(eb.getThreadCount() > 0);
 	}
 	
 	public String getContentSize(List<FileHandle> handles) {

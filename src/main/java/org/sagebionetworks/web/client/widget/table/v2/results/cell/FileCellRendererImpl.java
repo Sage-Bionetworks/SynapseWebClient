@@ -1,14 +1,16 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
-import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
+import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
-import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -18,14 +20,15 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	FileCellRendererView view;
 	String fileHandleId;
 	CellAddress address;
-	AsynchTableFileHandleProvider fileHandleProvider;
 	AuthenticationController authController;
+	FileHandleAsyncHandler fileHandleAsynHandler;
+	FileHandleAssociation association;
 	
 	@Inject
-	public FileCellRendererImpl(FileCellRendererView view, AsynchTableFileHandleProvider provider, AuthenticationController authController) {
+	public FileCellRendererImpl(FileCellRendererView view, AuthenticationController authController, FileHandleAsyncHandler fileHandleAsynHandler) {
 		this.view = view;
-		this.fileHandleProvider = provider;
 		this.authController = authController;
+		this.fileHandleAsynHandler = fileHandleAsynHandler;
 	}
 
 	@Override
@@ -40,25 +43,33 @@ public class FileCellRendererImpl implements FileCellRenderer {
 			view.setLoadingVisible(false);
 		}else{
 			view.setLoadingVisible(true);
-			// Get the table fileHanle.
-			fileHandleProvider.requestFileHandle(new TableFileHandleRequest(value, address, new Callback<FileHandle, Throwable>() {
+			association = new FileHandleAssociation();
+			association.setFileHandleId(fileHandleId);
+			if (address.isView()) {
+				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+				association.setAssociateObjectId(address.getRowId().toString());
+			} else {
+				association.setAssociateObjectType(FileHandleAssociateType.TableEntity);
+				association.setAssociateObjectId(address.getTableId());
+			}
+			fileHandleAsynHandler.getFileHandle(association, new AsyncCallback<FileResult>() {
 				
 				@Override
-				public void onSuccess(FileHandle result) {
+				public void onSuccess(FileResult result) {
 					if(view.isAttached()){
 						view.setLoadingVisible(false);
-						view.setAnchor(result.getFileName(), createAnchorHref());
+						view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());
 					}
 				}
 				
 				@Override
-				public void onFailure(Throwable reason) {
+				public void onFailure(Throwable caught) {
 					if(view.isAttached()){
 						view.setLoadingVisible(false);
-						view.setErrorText(UNABLE_TO_LOAD_FILE_DATA);
+						view.setErrorText(UNABLE_TO_LOAD_FILE_DATA + ": " + caught.getMessage());
 					}
 				}
-			}));
+			});
 		}
 	}
 	
@@ -69,23 +80,19 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	public String createAnchorHref(){
 		StringBuilder builder = new StringBuilder();
 		builder.append("/Portal/");
-		builder.append(WebConstants.FILE_HANDLE_UPLOAD_SERVLET);
+		builder.append(WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET);
 		builder.append("?");
-		builder.append(WebConstants.ENTITY_PARAM_KEY);
+		builder.append(WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY);
 		builder.append("=");
-		builder.append(address.getTableId());
+		builder.append(association.getAssociateObjectId());
 		builder.append("&");
-		builder.append(WebConstants.TABLE_COLUMN_ID);
+		builder.append(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY);
 		builder.append("=");
-		builder.append(address.getColumn().getId());
+		builder.append(association.getAssociateObjectType());
 		builder.append("&");
-		builder.append(WebConstants.TABLE_ROW_ID);
+		builder.append(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
 		builder.append("=");
-		builder.append(address.getRowId());
-		builder.append("&");
-		builder.append(WebConstants.TABLE_ROW_VERSION_NUMBER);
-		builder.append("=");
-		builder.append(address.getRowVersion());
+		builder.append(association.getFileHandleId());
 		builder.append("&");
 		builder.append(WebConstants.XSRF_TOKEN_KEY);
 		builder.append("=");

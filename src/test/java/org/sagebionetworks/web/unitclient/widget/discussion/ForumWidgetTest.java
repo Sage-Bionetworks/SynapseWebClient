@@ -159,7 +159,7 @@ public class ForumWidgetTest {
 		assertEquals(DEFAULT_THREAD_ID, defaultThreadBundle.getId());
 		assertEquals(DEFAULT_THREAD_MESSAGE_KEY, defaultThreadBundle.getMessageKey());
 		
-		verify(mockDefaultThreadWidget).setReplyTextBoxVisible(false);
+		verify(mockDefaultThreadWidget).setNewReplyContainerVisible(false);
 		verify(mockDefaultThreadWidget).setCommandsVisible(false);
 
 		//test "New Thread" button tooltip shown if user attempts to follow default thread
@@ -190,7 +190,7 @@ public class ForumWidgetTest {
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockDefaultThreadWidget, atLeastOnce()).setThreadIdClickedCallback(captor.capture());
 		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyListVisible(false);
-		verify(mockDefaultThreadWidget, atLeastOnce()).setReplyTextBoxVisible(false);
+		verify(mockDefaultThreadWidget, atLeastOnce()).setNewReplyContainerVisible(false);
 		verify(mockDefaultThreadWidget, atLeastOnce()).setCommandsVisible(false);
 
 		captor.getValue().invoke("threadId");
@@ -209,7 +209,8 @@ public class ForumWidgetTest {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testConfigureForum() {
+	public void testGoBackToForum() {
+		// configure the widget to show the full forum, click on a thread, and then go back to all threads.
 		String entityId = "syn1"; 
 		String areaToken = "a=b&c=d";
 		ParameterizedToken param = new ParameterizedToken(areaToken);
@@ -234,6 +235,7 @@ public class ForumWidgetTest {
 		
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
+		verify(mockAvailableThreadListWidget).clear();
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
 		ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(ParameterizedToken.class);
 		verify(mockParamChangeCallback).invoke(captorToken.capture());
@@ -249,6 +251,43 @@ public class ForumWidgetTest {
 		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
 		verify(mockStuAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClient).getModerators(eq(mockForum.getId()), eq(MODERATOR_LIMIT), eq(0L), any(AsyncCallback.class));
+		
+		//going back to the forum should not cause the thread list to reconfigure, but should scroll to thread
+		reset(mockAvailableThreadListWidget);
+		forumWidget.onClickShowAllThreads();
+		verify(mockAvailableThreadListWidget, never()).clear();
+		verify(mockAvailableThreadListWidget, never()).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockAvailableThreadListWidget).scrollToThread(threadId);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testGoBackToForumOnDelete() {
+		String entityId = "syn1"; 
+		String areaToken = "a=b&c=d";
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		forumWidget.configure(entityId, param, canModerate, mockParamChangeCallback, mockCallback);
+		
+		ArgumentCaptor<CallbackP> captorP = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(captorP.capture());
+		CallbackP<DiscussionThreadBundle> threadIdClickedCallback = captorP.getValue();
+		String threadId = "9584";
+		when(mockDiscussionThreadBundle.getId()).thenReturn(threadId);
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient)
+			.getThread(anyString(), any(AsyncCallback.class));
+		threadIdClickedCallback.invoke(mockDiscussionThreadBundle);
+		verify(mockDiscussionForumClient).getThread(eq(threadId), any(AsyncCallback.class));
+		
+		//going back to the forum should cause the thread list to reconfigure if thread was deleted
+		reset(mockAvailableThreadListWidget);
+		
+		ArgumentCaptor<Callback> onShowAllThreadsCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class), anyString(),
+				anyBoolean(), anySet(), onShowAllThreadsCallback.capture());
+		onShowAllThreadsCallback.getValue().invoke();
+		verify(mockAvailableThreadListWidget).clear();
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockAvailableThreadListWidget, never()).scrollToThread(threadId);
 	}
 
 	@Test

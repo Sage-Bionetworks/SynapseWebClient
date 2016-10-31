@@ -1,30 +1,9 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,50 +41,20 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.reflection.model.PaginatedResults;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityIdList;
-import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.ExampleEntity;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.JoinTeamSignedToken;
-import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
-import org.sagebionetworks.repo.model.MembershipRequest;
-import org.sagebionetworks.repo.model.MembershipRqstSubmission;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
-import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.repo.model.SignedTokenInterface;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserGroup;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.*;
+
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
@@ -163,6 +112,8 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -234,6 +185,18 @@ public class SynapseClientImplTest {
 	ColumnModel mockNewColumnModel;
 	@Mock
 	ColumnModel mockNewColumnModelAfterCreate;
+	
+	@Mock
+	BatchFileHandleCopyResult mockBatchCopyResults;
+	@Mock
+	FileHandleCopyResult mockFileHandleCopyResult;
+	@Mock
+	FileEntity mockFileEntity;
+	@Mock
+	FileHandleCopyRequest mockFileHandleCopyRequest;
+	List<FileHandleCopyResult> batchCopyResultsList;
+	
+	
 	public static final String OLD_COLUMN_MODEL_ID = "4444";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
 	private static final String testUserId = "myUserId";
@@ -503,7 +466,11 @@ public class SynapseClientImplTest {
 		notificationSettingsToken.setHmac("987654");
 		notificationSettingsToken.setSettings(new Settings());
 		notificationSettingsToken.setUserId("4");
-		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);		
+		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);
+		
+		when(mockSynapse.copyFileHandles(any(BatchFileHandleCopyRequest.class))).thenReturn(mockBatchCopyResults);
+		batchCopyResultsList = new ArrayList<FileHandleCopyResult>();
+		when(mockBatchCopyResults.getCopyResults()).thenReturn(batchCopyResultsList);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -2391,5 +2358,45 @@ public class SynapseClientImplTest {
 		assertEquals(2, returnedColumns.size());
 		assertNull(returnedColumns.get(0).getId());
 		assertNull(returnedColumns.get(1).getId());
+	}
+	
+
+	@Test(expected = UnknownErrorException.class)
+	public void testUpdateFileEntityWrongResponseSize() throws RestServiceException, SynapseException {
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+	}
+	
+	@Test(expected = UnknownErrorException.class)
+	public void testUpdateFileEntityWrongResponseSizeTooMany() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+	}
+	
+	@Test
+	public void testUpdateFileEntity() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		when(mockFileHandleCopyResult.getFailureCode()).thenReturn(null);
+		when(mockFileHandleCopyResult.getNewFileHandle()).thenReturn(handle);
+		
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+		
+		verify(mockSynapse).copyFileHandles(isA(BatchFileHandleCopyRequest.class));
+		verify(mockFileEntity).setDataFileHandleId(handle.getId());
+		verify(mockSynapse).putEntity(mockFileEntity);
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void testUpdateFileEntityNotFound() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		when(mockFileHandleCopyResult.getFailureCode()).thenReturn(FileResultFailureCode.NOT_FOUND);
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+	}
+	
+	@Test(expected = UnauthorizedException.class)
+	public void testUpdateFileEntityUnauthorized() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		when(mockFileHandleCopyResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
 	}
 }

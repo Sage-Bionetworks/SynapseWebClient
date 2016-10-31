@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONArrayGwt;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
@@ -101,8 +100,6 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
-import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
@@ -110,11 +107,15 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressViewImpl
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetView;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditorView;
@@ -133,6 +134,8 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
@@ -858,10 +861,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AsynchronousProgressView.class).to(AsynchronousProgressViewImpl.class);
 		bind(AsynchronousJobTracker.class).to(AsynchronousJobTrackerImpl.class);
 		
-		// This is a singleton
-		bind(AsynchTableFileHandleProviderSingleton.class).in(Singleton.class);
-		bind(AsynchTableFileHandleProvider.class).to(AsynchTableFileHandleProviderSingleton.class);
-		
 		/*
 		 * Widgets
 		 */
@@ -1293,6 +1292,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SingleDiscussionThreadWidgetView.class).to(SingleDiscussionThreadWidgetViewImpl.class);
 		bind(ReplyWidgetView.class).to(ReplyWidgetViewImpl.class);
 		bind(ForumWidgetView.class).to(ForumWidgetViewImpl.class);
+		bind(NewReplyWidgetView.class).to(NewReplyWidgetViewImpl.class);
 
 		// docker
 		bind(DockerRepoListWidgetView.class).to(DockerRepoListWidgetViewImpl.class);
@@ -1347,5 +1347,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class);
 		
 		bind(GoogleMapView.class).to(GoogleMapViewImpl.class);
+		
+		bind(FileHandleAsyncHandlerImpl.class).in(Singleton.class);
+		bind(FileHandleAsyncHandler.class).to(FileHandleAsyncHandlerImpl.class);
+		
+		bind(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
+		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class);
 	}
 }

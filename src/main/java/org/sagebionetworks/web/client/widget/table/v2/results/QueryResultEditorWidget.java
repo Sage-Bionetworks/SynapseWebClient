@@ -64,7 +64,7 @@ public class QueryResultEditorWidget implements
 		this.startingBundle = bundle;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, null, true, this, null);
+		pageWidget.configure(bundle, null, null, true, false, this, null);
 		setJobRunning(false);
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);

@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -60,6 +61,10 @@ public class DiscussionThreadListWidgetTest {
 	@Mock
 	DiscussionThreadCountAlert mockDiscussionThreadCountAlert;
 	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
+	DiscussionThreadBundle mockDiscussionThreadBundle;
+	@Mock
 	LoadMoreWidgetContainer mockThreadsContainer;
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
@@ -71,7 +76,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockGinInjector.createThreadListItemWidget()).thenReturn(mockDiscussionThreadWidget);
 		when(mockGinInjector.getDiscussionThreadCountAlert()).thenReturn(mockDiscussionThreadCountAlert);
 		discussionThreadListWidget = new DiscussionThreadListWidget(mockView,
-				mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockThreadsContainer);
+				mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockThreadsContainer,mockSynapseJSNIUtils);
 		moderatorIds = new HashSet<String>();
 	}
 
@@ -127,7 +132,10 @@ public class DiscussionThreadListWidgetTest {
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 						any(DiscussionFilter.class), any(AsyncCallback.class));
 		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
-		discussionThreadBundleList.add(new DiscussionThreadBundle());
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		String threadId = "987654";
+		threadBundle.setId(threadId);
+		discussionThreadBundleList.add(threadBundle);
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
@@ -138,6 +146,16 @@ public class DiscussionThreadListWidgetTest {
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
 		verify(mockDiscussionThreadWidget).setThreadIdClickedCallback(mockThreadIdClickedCallback);
+		
+		// test scroll to thread
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
+			.when(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+		discussionThreadListWidget.scrollToThread("invalidid");
+		verify(mockView, never()).scrollIntoView(any(Widget.class));
+		discussionThreadListWidget.scrollToThread(threadId);
+		verify(mockView).scrollIntoView(any(Widget.class));
+		verify(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionThreadWidget).configure(mockDiscussionThreadBundle);
 	}
 
 	@Test
@@ -156,7 +174,10 @@ public class DiscussionThreadListWidgetTest {
 						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
-		discussionThreadBundleList.add(new DiscussionThreadBundle());
+		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+		String threadId = "987654";
+		threadBundle.setId(threadId);
+		discussionThreadBundleList.add(threadBundle);
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		verify(mockThreadsContainer).clear();
@@ -170,6 +191,16 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockEmptyListCallback).invoke(anyBoolean());
 		verify(mockView).setThreadHeaderVisible(true);
 		verify(mockView).setNoThreadsFoundVisible(false);
+		
+		// test scroll to thread, rpc failure
+		String error = "unable to refresh thread data";
+		AsyncMockStubber.callFailureWith(new Exception(error))
+			.when(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+		discussionThreadListWidget.scrollToThread(threadId);
+		verify(mockView).scrollIntoView(any(Widget.class));
+		verify(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockDiscussionThreadWidget, never()).configure(mockDiscussionThreadBundle);
+		verify(mockSynapseJSNIUtils).consoleError(error);
 	}
 
 	@SuppressWarnings("unchecked")

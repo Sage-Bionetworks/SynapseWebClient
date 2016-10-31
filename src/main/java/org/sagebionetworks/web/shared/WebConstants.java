@@ -133,6 +133,8 @@ public class WebConstants {
 
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 
+	public static final String SUBMISSION_ID = "submissionId";
+	
 	public static final String USER_PROFILE_USER_ID = "userId";
 	
 	public static final String USER_PROFILE_IMAGE_ID = "imageId";
@@ -247,6 +249,7 @@ public class WebConstants {
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
 	public static final String USERNAME_SUFFIX = "_USERNAME_2_ID";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
+	public static final String WIKIPAGE_SUFFIX = "_WIKI_PAGE";
 
 	public static final String TABLE_COLUMN_ID = "columnId";
 	public static final String TABLE_ROW_ID = "rowId";

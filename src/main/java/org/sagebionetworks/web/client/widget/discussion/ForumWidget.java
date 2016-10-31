@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,7 +45,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	SingleDiscussionThreadWidget singleThreadWidget;
 	DiscussionThreadListWidget deletedThreadListWidget;
 
-	String forumId;
+	String forumId, threadId;
 	String entityId;
 	Boolean isCurrentUserModerator;
 	CallbackP<ParameterizedToken> paramChangeCallback;
@@ -59,7 +60,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
 	public static DiscussionThreadBundle defaultThreadBundle;
 	public SingleDiscussionThreadWidget defaultThreadWidget;
-
+	boolean isForumConfigured;
 	@Inject
 	public ForumWidget(
 			final ForumWidgetView view,
@@ -196,7 +197,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			}
 		});
 		defaultThreadWidget.setReplyListVisible(false);
-		defaultThreadWidget.setReplyTextBoxVisible(false);
+		defaultThreadWidget.setNewReplyContainerVisible(false);
 		defaultThreadWidget.setCommandsVisible(false);
 	}
 	
@@ -224,11 +225,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void configure(String entityId, final ParameterizedToken params,
 			Boolean isCurrentUserModerator,
 			CallbackP<ParameterizedToken> paramChangeCallback, Callback urlChangeCallback) {
+		isForumConfigured = false;
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.paramChangeCallback = paramChangeCallback;
 		this.urlChangeCallback = urlChangeCallback;
 		this.params = params;
+		this.threadId = null;
 		moderatorIds.clear();
 		resetView();
 		// get Forum and its moderators
@@ -238,8 +241,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			public void invoke() {
 				//are we just showing a single thread, or the full list?
 				if (params.containsKey(THREAD_ID_KEY)) {
-					String threadId = params.get(THREAD_ID_KEY);
-					showThread(threadId, params.get(REPLY_ID_KEY));
+					showThread(params.get(THREAD_ID_KEY), params.get(REPLY_ID_KEY));
 				} else {
 					showForum();
 				}
@@ -297,8 +299,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setDeletedThreadButtonVisible(false);
 	}
 
-	public void showThread(final String threadId, final String replyId) {
+	public void showThread(String threadId, final String replyId) {
 		resetView();
+		this.threadId = threadId;
 		isSingleThread = true;
 		stuAlert.clear();
 		subscribeToForumButton.clear();
@@ -315,8 +318,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				singleThreadWidget.configure(result, replyId, isCurrentUserModerator, moderatorIds, new Callback(){
 					@Override
 					public void invoke() {
-						showForum();
-						urlChangeCallback.invoke();
+						isForumConfigured = false;
+						ForumWidget.this.threadId = null;
+						onClickShowAllThreads();
 					}
 				});
 
@@ -332,7 +336,6 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		isSingleThread = false;
 		stuAlert.clear();
 		subscribeToForumButton.clear();
-		threadListWidget.clear();
 		updatePlaceToForum();
 		subscribeToForumButton.configure(SubscriptionObjectType.FORUM, forumId);
 		newThreadModal.configure(forumId, new Callback(){
@@ -342,18 +345,26 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 						moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			}
 		});
-		threadListWidget.configure(forumId, isCurrentUserModerator,
-				moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		view.setThreadListUIVisible(true);
 		view.setNewThreadButtonVisible(true);
 		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		view.setMainContainerVisible(true);
+		if (!isForumConfigured) {
+			isForumConfigured = true;
+			threadListWidget.clear();
+			threadListWidget.configure(forumId, isCurrentUserModerator,
+					moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+		}
 	}
 
 	@Override
 	public void onClickShowAllThreads() {
 		showForum();
 		urlChangeCallback.invoke();
+		// jump to single thread that we just showed (if set)
+		if (threadId != null) {
+			threadListWidget.scrollToThread(threadId);
+		}
 	}
 
 	@Override

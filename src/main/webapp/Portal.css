@@ -200,6 +200,10 @@ End Synapse color scheme
 	width: 0px;
 }
 
+.text-align-left {
+	text-align: left;
+}
+
 .mainPageHeader {
 	border: 1px solid black;
 	padding: 10px;
@@ -2366,6 +2370,11 @@ div.input-group > input.search-textbox {
   font-size: 1em;
 }
 
+.nav>li>a>div {
+	padding: 1em 2em .5em 2em;
+	margin: -1em -2em -.5em -2em;
+}
+
 /*===========*/
 
 .largeIconButton {
@@ -2381,6 +2390,10 @@ div.input-group > input.search-textbox {
 .text-align-right {
 	text-align: right;
 }
+.text-align-left {
+	text-align: left;
+}
+
 
 .inlineField {
 	overflow: hidden; 

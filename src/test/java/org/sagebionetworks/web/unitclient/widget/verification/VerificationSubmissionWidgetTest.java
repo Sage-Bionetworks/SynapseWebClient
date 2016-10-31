@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -81,7 +82,8 @@ public class VerificationSubmissionWidgetTest {
 	GWTWrapper mockGWT;
 	@Mock
 	HashMap<String,WikiPageKey> mockWikiPageMap;
-	
+	@Mock
+	AuthenticationController mockAuthenticationController;
 	PromptModalView.Presenter reasonPromptCallback;
 	
 	VerificationSubmissionWidget widget;
@@ -96,12 +98,14 @@ public class VerificationSubmissionWidgetTest {
 	List<String> submissionEmails = Collections.singletonList("doc@spacemail.org");
 	List<AttachmentMetadata> submissionAttachments;
 	List<String> fileHandleIds;
+	String xsrfToken = "lkjhgfdcvbn";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockGlobalApplicationState, mockGWT);
+		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockGlobalApplicationState, mockGWT, mockAuthenticationController);
 		
 		ArgumentCaptor<PromptModalView.Presenter> captor = ArgumentCaptor.forClass(PromptModalView.Presenter.class);
 		verify(mockPromptModalView).setPresenter(captor.capture());
@@ -217,7 +221,7 @@ public class VerificationSubmissionWidgetTest {
 		
 		String fileHandleId = "8888";
 		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-		verify(mockSynapseJSNIUtils).getFileHandleAssociationUrl(submissionId, FileHandleAssociateType.VerificationSubmission, fileHandleId);
+		verify(mockSynapseJSNIUtils).getFileHandleAssociationUrl(submissionId, FileHandleAssociateType.VerificationSubmission, fileHandleId, xsrfToken);
 		verify(mockView).openWindow(anyString());
 	}
 	
