@@ -12,7 +12,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -20,9 +19,6 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -40,7 +36,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -78,14 +73,14 @@ public class ApproveUserAccessModalTest {
 	Row r;
 	@Mock
 	List<String> ls;
-	@Mock
-	Set<String> strSet;
 	@Captor
 	ArgumentCaptor<AsyncCallback<AccessApproval>> aaCaptor;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> phCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback<String>> sCaptor;
+	@Mock
+	AccessApproval aa;
 	
 	Long accessReq;
 	String userId;
@@ -257,7 +252,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onSuccess(any(AccessApproval.class));
+		aaCaptor.getValue().onSuccess(aa);
 	}
 	
 	@Test
@@ -275,9 +270,9 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onSuccess(any(AccessApproval.class));
+		aaCaptor.getValue().onSuccess(aa);
 		
-		verify(mockSynapseClient).sendMessage(strSet, anyString(), anyString(), anyString(), sCaptor.capture());
+		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
 		sCaptor.getValue().onFailure(any(Throwable.class));
 		
 		verify(mockView).setApproveProcessing(false);
@@ -300,93 +295,14 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onSuccess(any(AccessApproval.class));
+		aaCaptor.getValue().onSuccess(aa);
+		
+		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
+		sCaptor.getValue().onSuccess(anyString());
+		
+		verify(mockView).setApproveProcessing(false);
+		verify(mockView).hide();
+		verify(mockView).showInfo("Successfully approved user; an email has been sent to notify them");
 	}
 	
-//	
-//	@Test
-//	public void testSetModalPresenter(){
-//		// This is the main entry to the page
-//		page.setModalPresenter(mockModalPresenter);
-//		verify(mockModalPresenter).setPrimaryButtonText(CreateDownloadPageImpl.NEXT);
-//		verify(mockView).setFileType(FileType.CSV);
-//		verify(mockView).setIncludeHeaders(true);
-//		verify(mockView).setIncludeRowMetadata(true);
-//		verify(mockView).setTrackerVisible(false);
-//	}
-//	
-//	@Test
-//	public void testgetDownloadFromTableRequest(){
-//		page.setModalPresenter(mockModalPresenter);
-//		DownloadFromTableRequest expected = new DownloadFromTableRequest();
-//		CsvTableDescriptor descriptor = new CsvTableDescriptor();
-//		descriptor.setSeparator("\t");
-//		expected.setCsvTableDescriptor(descriptor);
-//		expected.setIncludeRowIdAndRowVersion(false);
-//		expected.setSql(sql);
-//		expected.setWriteHeader(true);
-//		when(mockView.getFileType()).thenReturn(FileType.TSV);
-//		when(mockView.getIncludeHeaders()).thenReturn(true);
-//		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-//		
-//		DownloadFromTableRequest request = page.getDownloadFromTableRequest();
-//		assertEquals(expected, request);
-//	}
-//	
-//	@Test
-//	public void testOnPrimarySuccess(){
-//		page.setModalPresenter(mockModalPresenter);
-//		when(mockView.getFileType()).thenReturn(FileType.TSV);
-//		when(mockView.getIncludeHeaders()).thenReturn(true);
-//		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-//	
-//		String fileHandle = "45678";
-//		DownloadFromTableResult results = new DownloadFromTableResult();
-//		results.setResultsFileHandleId(fileHandle);
-//	
-//		jobTrackingWidgetStub.setResponse(results);
-//		page.onPrimary();
-//		verify(mockModalPresenter).setLoading(true);
-//		verify(mockView).setTrackerVisible(true);
-//		verify(mockNextPage).configure(fileHandle);
-//		verify(mockModalPresenter).setNextActivePage(mockNextPage);
-//	}
-//	
-//	@Test
-//	public void testOnPrimaryCancel(){
-//		page.setModalPresenter(mockModalPresenter);
-//		when(mockView.getFileType()).thenReturn(FileType.TSV);
-//		when(mockView.getIncludeHeaders()).thenReturn(true);
-//		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-//	
-//		String fileHandle = "45678";
-//		DownloadFromTableResult results = new DownloadFromTableResult();
-//		results.setResultsFileHandleId(fileHandle);
-//	
-//		jobTrackingWidgetStub.setOnCancel(true);
-//		page.onPrimary();
-//		verify(mockModalPresenter).setLoading(true);
-//		verify(mockView).setTrackerVisible(true);
-//		verify(mockNextPage, never()).configure(fileHandle);
-//		verify(mockModalPresenter).onCancel();
-//	}
-//	
-//	@Test
-//	public void testOnPrimaryFailure(){
-//		page.setModalPresenter(mockModalPresenter);
-//		when(mockView.getFileType()).thenReturn(FileType.TSV);
-//		when(mockView.getIncludeHeaders()).thenReturn(true);
-//		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-//	
-//		String fileHandle = "45678";
-//		DownloadFromTableResult results = new DownloadFromTableResult();
-//		results.setResultsFileHandleId(fileHandle);
-//		String error = "failure";
-//		jobTrackingWidgetStub.setError(new Throwable(error));
-//		page.onPrimary();
-//		verify(mockModalPresenter).setLoading(true);
-//		verify(mockView).setTrackerVisible(true);
-//		verify(mockNextPage, never()).configure(fileHandle);
-//		verify(mockModalPresenter).setErrorMessage(error);
-//	}
 }
