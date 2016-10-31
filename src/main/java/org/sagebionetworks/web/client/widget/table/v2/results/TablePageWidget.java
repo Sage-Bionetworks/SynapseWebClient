@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,6 +38,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	boolean isView;
+	FacetsWidget facetsWidget;
 	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
@@ -44,11 +46,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget){
+	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget, FacetsWidget facetsWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
+		this.facetsWidget = facetsWidget;
+		view.setFacetsWidget(facetsWidget.asWidget());
 	}
 	
 	/**
@@ -107,7 +111,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-
+		
+		view.setFacetsWidgetVisible(!isEditable);
+		facetsWidget.configure(bundle.getFacets());
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table

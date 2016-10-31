@@ -44,6 +44,8 @@ import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
+import org.sagebionetworks.web.client.view.DivView;
+import org.sagebionetworks.web.client.view.DivViewImpl;
 import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
@@ -1353,5 +1355,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class);
+		
+		bind(DivView.class).to(DivViewImpl.class);
 	}
 }

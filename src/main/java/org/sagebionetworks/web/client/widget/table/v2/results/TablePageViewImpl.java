@@ -31,7 +31,8 @@ public class TablePageViewImpl implements TablePageView {
 	SimplePanel paginationPanel;
 	@UiField
 	SimplePanel editorPopupBuffer;
-	
+	@UiField
+	SimplePanel facetsWidgetPanel;
 	Widget widget;
 	
 	@Inject
@@ -80,4 +81,13 @@ public class TablePageViewImpl implements TablePageView {
 		this.editorPopupBuffer.setVisible(isEditable);
 	}
 
+	@Override
+	public void setFacetsWidget(Widget w) {
+		facetsWidgetPanel.clear();
+		facetsWidgetPanel.add(w);
+	}
+	@Override
+	public void setFacetsWidgetVisible(boolean visible) {
+		facetsWidgetPanel.setVisible(visible);
+	}
 }
