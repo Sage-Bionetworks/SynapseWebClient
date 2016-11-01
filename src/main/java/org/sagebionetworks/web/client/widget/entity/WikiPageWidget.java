@@ -31,6 +31,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -208,9 +209,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					configureBreadcrumbs(isRootWiki, param);
 				}
 			});
-			if (wikiReloadHandler != null) {
-				wikiReloadHandler.invoke(currentPage.getId());
-			}
 			view.scrollWikiHeadingIntoView();
 			view.setLoadingVisible(false);
 		} catch (Exception e) {
@@ -273,6 +271,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			public void invoke(WikiPageKey param) {
 				wikiKey = param;
 				reloadWikiPage();
+				if (wikiReloadHandler != null) {
+					wikiReloadHandler.invoke(wikiKey.getWikiPageId());
+				}
 			}});
 		view.setWikiSubpagesWidget(wikiSubpages);
 	}
