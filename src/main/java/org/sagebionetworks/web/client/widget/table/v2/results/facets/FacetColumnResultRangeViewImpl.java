@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
-import org.gwtbootstrap3.extras.slider.client.ui.Slider;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,6 +19,7 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	
 	Widget w;
 	Presenter presenter;
+	
 	@Inject
 	public FacetColumnResultRangeViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
