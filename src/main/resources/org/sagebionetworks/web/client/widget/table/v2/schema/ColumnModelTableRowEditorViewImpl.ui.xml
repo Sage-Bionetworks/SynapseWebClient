@@ -39,5 +39,12 @@
 		<t:TableData>
 			<b:TextBox ui:field="restrictValues" placeholder="value1, value2, value-n..." />
 		</t:TableData>
+		<t:TableData>
+			<g:ListBox ui:field="facet" width="100px">
+			  <g:item>None</g:item>
+			  <g:item>Values</g:item>
+			  <g:item>Range</g:item>
+			</g:ListBox>
+		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

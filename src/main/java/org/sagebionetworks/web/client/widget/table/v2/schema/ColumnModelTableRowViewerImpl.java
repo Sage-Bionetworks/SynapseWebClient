@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
@@ -33,7 +32,7 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	FormControlStatic restrictValues;
 	
 	String id;
-	
+	ColumnFacetTypeViewEnum facetType;
 	@Inject
 	public ColumnModelTableRowViewerImpl(Binder uiBinder){
 		row = uiBinder.createAndBindUi(this);
@@ -109,5 +108,13 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 		return ColumnModelUtils.csvToList(restrictValues.getText());
 	}
 
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		return facetType;
+	}
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
+		this.facetType = type;
+	}
 
 }

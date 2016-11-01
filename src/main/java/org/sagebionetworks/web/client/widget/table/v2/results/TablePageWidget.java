@@ -79,7 +79,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(pageChangeListener != null){
 			this.paginationWidget.configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), pageChangeListener);
 			view.setPaginationWidgetVisible(true);
-		}else{
+		}else {
 			view.setPaginationWidgetVisible(false);
 		}
 		view.setEditorBufferVisible(isEditable);
@@ -120,9 +120,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-		
-		view.setFacetsWidgetVisible(!isEditable && facetChangedHandler != null);
-		facetsWidget.configure(bundle.getFacets(), facetChangedHandler);
+		boolean isFacetsWidgetVisible = !isEditable && facetChangedHandler != null;
+		view.setFacetsWidgetVisible(isFacetsWidgetVisible);
+		if (isFacetsWidgetVisible) {
+			facetsWidget.configure(bundle.getFacets(), facetChangedHandler);	
+		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table

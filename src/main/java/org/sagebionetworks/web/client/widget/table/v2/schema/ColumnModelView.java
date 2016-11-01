@@ -44,6 +44,17 @@ public interface ColumnModelView {
 	public void setColumnType(ColumnTypeViewEnum type);
 	
 	/**
+	 * ColumnModel.facetType
+	 * @return
+	 */
+	public ColumnFacetTypeViewEnum getFacetType();
+	
+	/**
+	 * ColumnModel.facetType
+	 */
+	public void setFacetType(ColumnFacetTypeViewEnum type);
+	
+	/**
 	 * ColumnModel.maximumSize
 	 * @return
 	 */

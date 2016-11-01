@@ -47,6 +47,9 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	CellEditor defaultWidget;
 	@UiField
 	TextBox restrictValues;
+	@UiField
+	ListBox facet;
+	
 	String id;
 	TypePresenter presenter;
 	
@@ -68,6 +71,11 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public ColumnTypeViewEnum getColumnType() {
 		return ColumnTypeViewEnum.valueOf(type.getSelectedValue());
+	}
+	
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		return ColumnFacetTypeViewEnum.valueOf(facet.getSelectedValue());
 	}
 
 	@Override
@@ -113,6 +121,19 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		}
 		this.type.setSelectedIndex(index);
 	}
+	
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
+		int index = 0;
+		String targetName = type.name();
+		for (int i = 0; i < this.facet.getItemCount(); i++) {
+			if (this.facet.getValue(i).equals(targetName)){
+				index = i;
+				break;
+			}
+		}
+		this.facet.setSelectedIndex(index);
+	}
 
 	@Override
 	public void setColumnName(String name) {
@@ -157,6 +178,8 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 			return defaultWidget;
 		case 4:
 			return restrictValues;
+		case 5:
+			return facet;
 		default:
 			throw new IllegalArgumentException("Unknown index: "+index);
 		}
@@ -164,7 +187,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public int getWidgetCount() {
-		return 5;
+		return 6;
 	}
 
 	@Override

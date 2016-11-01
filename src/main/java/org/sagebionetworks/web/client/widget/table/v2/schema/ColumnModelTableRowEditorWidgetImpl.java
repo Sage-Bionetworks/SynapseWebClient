@@ -135,8 +135,10 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		configureViewForType(ColumnTypeViewEnum.getViewForType(model.getColumnType()));
 		// Apply the column model to the view
 		ColumnModelUtils.applyColumnModelToRow(model, view);
+		view.setFacetType(ColumnFacetTypeViewEnum.getViewForType(model.getFacetType()));
 	}
 
+	
 	@Override
 	public IsWidget getWidget(int index) {
 		return view.getWidget(index);
@@ -202,6 +204,16 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		view.setColumnType(type);
 	}
 
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		return view.getFacetType();
+	}
+	
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
+		view.setFacetType(type);
+	}
+	
 	@Override
 	public String getMaxSize() {
 		return view.getMaxSize();
