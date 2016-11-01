@@ -625,6 +625,14 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testOnSelectApproveUserAccess(){
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		controller.onAction(Action.APPROVE_USER_ACCESS);
+		verify(mockApproveUserAccessModal).configure(new LinkedList<ACTAccessRequirement>(), entityBundle);
+		verify(mockApproveUserAccessModal).show();
+	}
+	
+	@Test
 	public void testOnEditProvenance(){
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.EDIT_PROVENANCE);
