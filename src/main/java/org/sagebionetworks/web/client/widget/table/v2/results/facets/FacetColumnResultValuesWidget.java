@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValueCount;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
@@ -24,7 +25,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		view.setPresenter(this);
 	}
 	
-	public void configure(FacetColumnResultValues facet, CallbackP<FacetColumnRequest> onFacetRequest) {
+	public void configure(FacetColumnResultValues facet, CallbackP<FacetColumnRequest> onFacetRequest, ColumnModel cm) {
 		facetValues = new HashSet<String>();
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;

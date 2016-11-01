@@ -123,7 +123,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		boolean isFacetsWidgetVisible = !isEditable && facetChangedHandler != null;
 		view.setFacetsWidgetVisible(isFacetsWidgetVisible);
 		if (isFacetsWidgetVisible) {
-			facetsWidget.configure(bundle.getFacets(), facetChangedHandler);	
+			facetsWidget.configure(bundle.getFacets(), facetChangedHandler, types);	
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
