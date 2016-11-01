@@ -294,7 +294,7 @@ public class ApproveUserAccessModalTest {
 		
 		verify(mockView).setApproveProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo("Successfully approved user; an email has been sent to notify them");
+		verify(mockView).showInfo("Successfully approved user", "An email has been sent to notify them");
 	}
 	
 }

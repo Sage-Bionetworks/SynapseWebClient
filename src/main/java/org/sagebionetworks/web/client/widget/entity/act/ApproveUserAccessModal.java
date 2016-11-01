@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -59,7 +60,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
-	private EmailMessagePreviewModal messagePreview;
+	private Dialog messagePreview;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -69,7 +70,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			JobTrackingWidget progressWidget,
-			EmailMessagePreviewModal messagePreview) {
+			Dialog messagePreview) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
@@ -80,6 +81,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		this.view.setLoadingEmailWidget(progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
@@ -89,7 +91,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
-		view.startLoadingEmail(progressWidget.asWidget());
+		view.startLoadingEmail();
 		this.entityBundle = bundle;
 		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
@@ -100,7 +102,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		view.setSynAlert(synAlert.asWidget());
 		view.setStates(list);
 		if (list.size() > 0) {
-			view.setAccessRequirement(list.get(0), GovernanceServiceHelper.getAccessRequirementText(arMap.get(list.get(0))));			
+			onStateSelected(list.get(0));			
 		}
 		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
 		view.setDatasetTitle(entityBundle.getEntity().getName());
@@ -123,9 +125,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				QueryResultBundle result = (QueryResultBundle) response;
-				if (hasResult1(result)) {
+				if (hasResult(result)) {
 					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-					messagePreview.configure(message);
+					messagePreview.configure("Email Message Preview", view.getEmailBodyWidget(message), null, "Close", null, true);
 					view.finishLoadingEmail();
 				} else {
 					synAlert.showError("An error was encountered while loading the email body");
@@ -139,22 +141,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 	
-	private boolean hasResult1(QueryResultBundle result) {
-		if (result.getQueryResult() != null) {
-			if (result.getQueryResult().getQueryResults() != null) {
-				if (result.getQueryResult().getQueryResults().getRows() != null && result.getQueryResult().getQueryResults().getRows().size() > 0) {
-					if (result.getQueryResult().getQueryResults().getRows().get(0) != null) {
-						if (result.getQueryResult().getQueryResults().getRows().get(0).getValues() != null && result.getQueryResult().getQueryResults().getRows().get(0).getValues().size() > 0) {
-							return result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0) != null;
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-	
-	private boolean hasResult2(QueryResultBundle result) {
+	private boolean hasResult(QueryResultBundle result) {
 		QueryResult qr = result.getQueryResult();
 		if (qr != null) {
 			RowSet rs = qr.getQueryResults();
@@ -202,9 +189,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError("An error was encountered while loading the email message body");
 			return;
 		}
-		if (accessRequirement == null) {
-			accessRequirement = view.getAccessRequirement();
-		}
+		accessRequirement = view.getAccessRequirement();
 		view.setApproveProcessing(true);
 		ACTAccessApproval aa  = new ACTAccessApproval();
 		aa.setAccessorId(userId);  //user id
@@ -220,23 +205,27 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				Set<String> recipients = new HashSet<String>();
-				recipients.add(userId);
-				synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+				sendEmail(result);
+			}
+		});
+	}
+	
+	private void sendEmail(AccessApproval result) {
+		Set<String> recipients = new HashSet<String>();
+		recipients.add(userId);
+		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						view.setApproveProcessing(false);
-						synAlert.showError("User has been approved; however, an error was encountered while emailing them");
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setApproveProcessing(false);
+				synAlert.showError("User has been approved, but an error was encountered while emailing them:" + caught.getMessage());
+			}
 
-					@Override
-					public void onSuccess(String result) {
-						view.setApproveProcessing(false);
-						view.hide();
-						view.showInfo("Successfully approved user; an email has been sent to notify them");
-					}
-				});
+			@Override
+			public void onSuccess(String result) {
+				view.setApproveProcessing(false);
+				view.hide();
+				view.showInfo("Successfully approved user", "An email has been sent to notify them");
 			}
 		});
 	}

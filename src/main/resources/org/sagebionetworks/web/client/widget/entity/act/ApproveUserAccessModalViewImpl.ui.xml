@@ -30,7 +30,7 @@
 				<b:Heading size="H5" text="Dataset" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 				<bh:Div ui:field="loadingEmail" />
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10" height="30px">
-					<bh:Div ui:field="emailTemplate" addStyleNames="read-only-box floatleft" width="75%" height="30px"/>
+					<g:HTMLPanel ui:field="emailTemplate" addStyleNames="read-only-box floatleft" width="75%" height="30px"/>
 					<b:Button ui:field="previewButton" addStyleNames="floatright" type="DEFAULT" text="Email Preview" />
 				</bh:Div>
 			</bh:Div>

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -74,7 +75,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		//any additional setup should go here
 	}
 	
 	@Override
@@ -99,20 +99,24 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setDatasetTitle(String text) {
+	public void setDatasetTitle(String html) {
 		HTML display = new HTML();
-		display.setHTML(text);
+		display.setHTML(html);
 		emailTemplate.clear();
-		emailTemplate.add(display.asWidget());
+		emailTemplate.add(display);
 	}
 	
 	@Override
-	public void startLoadingEmail(Widget w) {
+	public void setLoadingEmailWidget(Widget w) {
+		loadingEmail.add(w.asWidget());
+	}
+	
+	@Override
+	public void startLoadingEmail() {
 		emailTemplate.setVisible(false);
 		previewButton.setVisible(false);
 		loadingEmail.clear();
 		loadingEmail.setVisible(true);
-		loadingEmail.add(w.asWidget());
 	}
 	
 	@Override
@@ -139,8 +143,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, "");
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -158,10 +162,10 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setAccessRequirement(String num, String text) {
+	public void setAccessRequirement(String num, String html) {
 		accessReqNum.setText(num);
 		HTML display = new HTML();
-		display.setHTML(text);
+		display.setHTML(html);
 		accessReqText.clear();
 		accessReqText.add(display.asWidget());
 	}
@@ -170,5 +174,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void setSynAlert(Widget widget) {
 		synAlertContainer.clear();
 		synAlertContainer.add(widget.asWidget());		
+	}
+	
+	@Override
+	public Widget getEmailBodyWidget(String html) {
+		HTML display = new HTML();
+		display.setHTML(html);
+		return display.asWidget();
 	}
 }
