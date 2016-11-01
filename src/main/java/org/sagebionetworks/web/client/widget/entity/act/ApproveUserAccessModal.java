@@ -44,6 +44,13 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String EMAIL_SUBJECT = "Data access approval";
 	public static final String SELECT_FROM = "SELECT \"Email Body\" FROM ";
 	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
+	public static final String QUERY_CANCELLED = "Query cancelled";
+	public static final String NO_EMAIL_MESSAGE = "An error was encountered while loading the email body";
+	public static final String NO_USER_SELECTED = "You must select a user to approve";
+	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
+	public static final String APPROVED_USER = "Successfully approved user";
+	public static final String EMAIL_SENT = "An email has been sent to notify them";
+	
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	
@@ -130,13 +137,13 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 					messagePreview.configure("Email Message Preview", view.getEmailBodyWidget(message), null, "Close", null, true);
 					view.finishLoadingEmail();
 				} else {
-					synAlert.showError("An error was encountered while loading the email body");
+					synAlert.showError(NO_EMAIL_MESSAGE);
 				}
 			}
 
 			@Override
 			public void onCancel() {
-				synAlert.showError("Query cancelled");
+				synAlert.showError(QUERY_CANCELLED);
 			}
 		});
 	}
@@ -182,11 +189,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	@Override
 	public void onSubmit() {
 		if (userId == null) {
-			synAlert.showError("You must select a user to approve");
+			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
 		if (message == null) {
-			synAlert.showError("An error was encountered while loading the email message body");
+			synAlert.showError(NO_EMAIL_MESSAGE);
 			return;
 		}
 		accessRequirement = view.getAccessRequirement();
@@ -218,14 +225,14 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setApproveProcessing(false);
-				synAlert.showError("User has been approved, but an error was encountered while emailing them:" + caught.getMessage());
+				synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(String result) {
 				view.setApproveProcessing(false);
 				view.hide();
-				view.showInfo("Successfully approved user", "An email has been sent to notify them");
+				view.showInfo(APPROVED_USER, EMAIL_SENT);
 			}
 		});
 	}

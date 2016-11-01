@@ -91,7 +91,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	public static final String RENAME_PREFIX = "Rename ";
 	
-	public static final int IS_ACT_MEMBER = 0x20;
+	public static final int IS_ACT_MEMBER_MASK = 0x20;
 
 	EntityActionControllerView view;
 	PreflightController preflightController;
@@ -237,6 +237,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	
 	private void configureApproveUserAccess() {
+		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
 		List<AccessRequirement> requirements = entityBundle.getAccessRequirements();
 		for (AccessRequirement ar : requirements) {
@@ -246,16 +248,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		if (authenticationController.isLoggedIn()) {
 			
-			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER, new AsyncCallback<UserBundle>() {
+			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER_MASK, new AsyncCallback<UserBundle>() {
 				@Override
 				public void onSuccess(UserBundle userBundle) {
 					userBundle.setIsACTMember(true);
 					if (userBundle.getIsACTMember() && actRequirements.size() > 0) {
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
 						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
-					} else {
-						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
-						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 					}
 				}
 				

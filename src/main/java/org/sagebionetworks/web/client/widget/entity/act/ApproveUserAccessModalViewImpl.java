@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -16,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
@@ -40,7 +40,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button previewButton;
 	@UiField
-	Div emailTemplate;
+	HTMLPanel emailTemplate;
 	@UiField
 	Div userSelectContainer;
 	@UiField
@@ -100,10 +100,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	
 	@Override
 	public void setDatasetTitle(String html) {
-		HTML display = new HTML();
-		display.setHTML(html);
-		emailTemplate.clear();
-		emailTemplate.add(display);
+		emailTemplate.getElement().setInnerHTML(html);
 	}
 	
 	@Override

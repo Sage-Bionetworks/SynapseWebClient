@@ -586,8 +586,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
 		userBundleCaptor.getValue().onFailure(mockThrowable);
-		verify(mockActionMenu, times(0)).setActionVisible(eq(Action.APPROVE_USER_ACCESS), anyBoolean());
-		verify(mockActionMenu, times(0)).setActionEnabled(eq(Action.APPROVE_USER_ACCESS), anyBoolean());
+		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 		verify(mockView).showErrorMessage(any(String.class));
 	}
 	

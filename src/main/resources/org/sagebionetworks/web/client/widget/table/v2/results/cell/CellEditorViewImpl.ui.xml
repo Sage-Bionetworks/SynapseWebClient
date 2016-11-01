@@ -5,7 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<b:FormGroup ui:field="formGroup">
-		<b:TextArea ui:field="textBox"/>
+		<b:TextBox ui:field="textBox"/>
 		<b:HelpBlock ui:field="helpBlock"/>
 	</b:FormGroup>
 </ui:UiBinder>

@@ -10,6 +10,8 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.act.EmailMessagePreviewModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -58,70 +61,63 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	JobTrackingWidget mockProgressWidget;
 	@Mock
-	EmailMessagePreviewModal mockMessagePreview;
+	Dialog mockMessagePreview;
 	@Mock
 	SynapseSuggestion mockUser;
 	@Mock
-	EntityBundle entityBundle;
+	EntityBundle mockEntityBundle;
 	@Mock
-	Entity entity;
+	Entity mockEntity;
 	@Mock
-	QueryResultBundle qrb;
+	QueryResultBundle mockQrb;
 	@Mock
-	QueryResult qr;
+	QueryResult mockQr;
 	@Mock
-	RowSet rs;
+	RowSet mockRs;
 	@Mock
-	List<Row> lr;
+	List<Row> mockLr;
 	@Mock
-	Row r;
+	Row mockR;
 	@Mock
-	List<String> ls;
+	List<String> mockLs;
+	@Mock
+	AccessApproval mockAccessApproval;
 	@Captor
 	ArgumentCaptor<AsyncCallback<AccessApproval>> aaCaptor;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> phCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback<String>> sCaptor;
-	@Mock
-	AccessApproval aa;
 	
 	Long accessReq;
 	String userId;
 	List<ACTAccessRequirement> actList;
+	Exception ex;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		mockView = Mockito.mock(ApproveUserAccessModalView.class);
-		mockSynAlert = Mockito.mock(SynapseAlert.class);
-				
-		mockPeopleSuggestWidget = Mockito.mock(SynapseSuggestBox.class);
-		mockProvider = Mockito.mock(UserGroupSuggestionProvider.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		mockProgressWidget = Mockito.mock(JobTrackingWidget.class);
-		mockMessagePreview = Mockito.mock(EmailMessagePreviewModal.class);
 		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockMessagePreview);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		userId = "1234567";
 		accessReq = 123L;
+		ex = new Exception("error message");
 		
 		ACTAccessRequirement act = Mockito.mock(ACTAccessRequirement.class);
 		actList = new ArrayList<ACTAccessRequirement>();
 		actList.add(act);
 		
-		when(qrb.getQueryResult()).thenReturn(qr);		
-		when(qr.getQueryResults()).thenReturn(rs);
-		when(rs.getRows()).thenReturn(lr);
-		when(lr.size()).thenReturn(1);
-		when(lr.get(0)).thenReturn(r);
-		when(r.getValues()).thenReturn(ls);
-		when(ls.size()).thenReturn(1);
-		when(ls.get(0)).thenReturn("Message");
+		when(mockQrb.getQueryResult()).thenReturn(mockQr);		
+		when(mockQr.getQueryResults()).thenReturn(mockRs);
+		when(mockRs.getRows()).thenReturn(mockLr);
+		when(mockLr.size()).thenReturn(1);
+		when(mockLr.get(0)).thenReturn(mockR);
+		when(mockR.getValues()).thenReturn(mockLs);
+		when(mockLs.size()).thenReturn(1);
+		when(mockLs.get(0)).thenReturn("Message");
 		
-		when(entityBundle.getEntity()).thenReturn(entity);
+		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
 		when(mockUser.getId()).thenReturn(userId);
 		when(mockView.getAccessRequirement()).thenReturn(Long.toString(accessReq));
 	}
@@ -129,7 +125,7 @@ public class ApproveUserAccessModalTest {
 	@Test
 	public void testConfigureNoAccessReqs() {
 		List<ACTAccessRequirement> accessReqs = new ArrayList<ACTAccessRequirement>();
-		dialog.configure(accessReqs, entityBundle);
+		dialog.configure(accessReqs, mockEntityBundle);
 		verify(mockView, times(0)).setAccessRequirement(anyString(), anyString());
 	}
 	
@@ -138,33 +134,33 @@ public class ApproveUserAccessModalTest {
 		ACTAccessRequirement ar = actList.get(0);
 		String num = Long.toString(ar.getId());
 		String text = GovernanceServiceHelper.getAccessRequirementText(ar);
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		verify(mockView).setAccessRequirement(eq(num), eq(text));
 		verify(mockView, times(1)).setAccessRequirement(anyString(), anyString());
-		verify(mockView).setDatasetTitle(entityBundle.getEntity().getName());
+		verify(mockView).setDatasetTitle(mockEntityBundle.getEntity().getName());
 	}
 	
 	@Test
 	public void testLoadEmailMessageOnFailure() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onFailure(any(Throwable.class));
-		verify(mockSynAlert).handleException(any(Throwable.class));
+		phCaptor.getValue().onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
 	public void testLoadEmailMessageOnCancel() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onCancel();
-		verify(mockSynAlert).showError("Query cancelled");
+		verify(mockSynAlert).showError(QUERY_CANCELLED);
 	}
 	
 	@Test
 	public void testLoadEmailMessageOnComplete() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onComplete(qrb);
+		phCaptor.getValue().onComplete(mockQrb);
 		verify(mockView).finishLoadingEmail();
 	}
 	
@@ -173,128 +169,128 @@ public class ApproveUserAccessModalTest {
 		ACTAccessRequirement ar = actList.get(0);
 		String num = Long.toString(ar.getId());
 		String text = GovernanceServiceHelper.getAccessRequirementText(ar);
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		dialog.onStateSelected(num);
 		verify(mockView, times(2)).setAccessRequirement(eq(num), eq(text));
 	}
 	
 	@Test
 	public void testOnSubmitNoUserSelected() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		dialog.onSubmit();
-		verify(mockSynAlert).showError(eq("You must select a user to approve"));
+		verify(mockSynAlert).showError(eq(NO_USER_SELECTED));
 	}
 	
 	@Test
 	public void testOnSubmitNoMessage() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(null);
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq("You must select a user to approve"));
-		verify(mockSynAlert).showError("An error was encountered while loading the email message body");
+		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert).showError(NO_EMAIL_MESSAGE);
 	}
 	
 	@Test
 	public void testOnSubmitNullAccessReq() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onComplete(qrb);
+		phCaptor.getValue().onComplete(mockQrb);
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq("You must select a user to approve"));
-		verify(mockSynAlert, times(0)).showError("An error was encountered while loading the email message body");
+		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 	}
 	
 	@Test
 	public void testOnSubmitOnFailure() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onComplete(qrb);
+		phCaptor.getValue().onComplete(mockQrb);
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq("You must select a user to approve"));
-		verify(mockSynAlert, times(0)).showError("An error was encountered while loading the email message body");
+		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onFailure(any(Throwable.class));
-		verify(mockSynAlert).handleException(any(Throwable.class));
+		aaCaptor.getValue().onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
 	public void testOnSubmitOnSuccess() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onComplete(qrb);
+		phCaptor.getValue().onComplete(mockQrb);
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq("You must select a user to approve"));
-		verify(mockSynAlert, times(0)).showError("An error was encountered while loading the email message body");
+		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onSuccess(aa);
+		aaCaptor.getValue().onSuccess(mockAccessApproval);
 	}
 	
 	@Test
 	public void testOnSubmitSendMessageOnFailure() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onComplete(qrb);
+		phCaptor.getValue().onComplete(mockQrb);
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq("You must select a user to approve"));
-		verify(mockSynAlert, times(0)).showError("An error was encountered while loading the email message body");
+		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onSuccess(aa);
+		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
-		sCaptor.getValue().onFailure(any(Throwable.class));
+		sCaptor.getValue().onFailure(ex);
 		
 		verify(mockView).setApproveProcessing(false);
-		verify(mockSynAlert).showError("User has been approved; however, an error was encountered while emailing them");
+		verify(mockSynAlert).showError(APPROVE_BUT_FAIL_TO_EMAIL);
 	
 	}
 	
 	@Test
 	public void testOnSubmitSendMessageOnSuccess() {
-		dialog.configure(actList, entityBundle);
+		dialog.configure(actList, mockEntityBundle);
 		
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
-		phCaptor.getValue().onComplete(qrb);
+		phCaptor.getValue().onComplete(mockQrb);
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq("You must select a user to approve"));
-		verify(mockSynAlert, times(0)).showError("An error was encountered while loading the email message body");
+		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
-		aaCaptor.getValue().onSuccess(aa);
+		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
 		sCaptor.getValue().onSuccess(anyString());
 		
 		verify(mockView).setApproveProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo("Successfully approved user", "An email has been sent to notify them");
+		verify(mockView).showInfo(APPROVED_USER, EMAIL_SENT);
 	}
 	
 }
