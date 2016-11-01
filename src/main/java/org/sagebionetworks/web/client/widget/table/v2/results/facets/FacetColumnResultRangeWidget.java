@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
-import org.gwtbootstrap3.extras.slider.client.ui.Range;
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.FacetColumnRangeRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,59 +15,70 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	FacetColumnResultRangeView view;
 	FacetColumnResultRange facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
-	ColumnModel columnModel;
-	
+	SynapseAlert synAlert;
 	@Inject
-	public FacetColumnResultRangeWidget(FacetColumnResultRangeView view) {
+	public FacetColumnResultRangeWidget(FacetColumnResultRangeView view, SynapseAlert synAlert) {
 		this.view = view;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
 	}
 	
-	public void configure(FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest, ColumnModel columnModel) {
+	public void configure(FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
-		this.columnModel = columnModel;
-		
-		Number minMin = parseNumber(facet.getColumnMin());
-		Number maxMax = parseNumber(facet.getColumnMax());
-		double stepSize = (maxMax.doubleValue() - minMin.doubleValue()) / 200;
-		if (ColumnType.INTEGER.equals(columnModel.getColumnType())) {
-			stepSize = Math.round(stepSize);
+		if (facet.getSelectedMin() != null) {
+			view.setMin(facet.getSelectedMin());
 		}
-		view.setSliderMin(minMin.doubleValue());
-		view.setSliderMax(maxMax.doubleValue());
-		
-		Number min = parseNumber(facet.getSelectedMin());
-		if (min == null) {
-			min = minMin;
+		if (facet.getSelectedMax() != null) {
+			view.setMin(facet.getSelectedMax());
 		}
-		Number max = parseNumber(facet.getSelectedMax());
-		if (max == null) {
-			max = maxMax;
-		}
-		view.setSliderRange(new Range(min.doubleValue(), max.doubleValue()));
-		view.setSliderStepSize(stepSize);
 	}
 	
-	public static Number parseNumber(String s) {
-		Number number = null;
-		if (s != null) {
-			try {
-		        number = Double.parseDouble(s);
-		    } catch(NumberFormatException e) {
-		        number = Long.parseLong(s);
-		    }
+	public boolean isValidInput() {
+		synAlert.clear();
+		try {
+			String minString = view.getMin();
+			String columnMinString = facet.getColumnMin();
+			if (DisplayUtils.isDefined(minString)) {
+				double min = Double.parseDouble(view.getMin());
+				if (DisplayUtils.isDefined(columnMinString)) {
+					double columnMin = Double.parseDouble(columnMinString);
+					if (min < columnMin) {
+						synAlert.showError("Min must be >= " + columnMinString);
+						return false;
+					}
+				}
+			}
+			
+			String maxString = view.getMax();
+			String columnMaxString = facet.getColumnMax();
+			if (DisplayUtils.isDefined(maxString)) {
+				double max = Double.parseDouble(view.getMax());
+				if (DisplayUtils.isDefined(columnMaxString)) {
+					double columnMax = Double.parseDouble(columnMaxString);
+					if (max > columnMax) {
+						synAlert.showError("Max must be <= " + columnMaxString);
+						return false;
+					}
+				}
+			}
+			
+		} catch (NumberFormatException e) {
+			synAlert.showError("Min/max must be valid numbers.");
+			return false;
 		}
-	    return number;
+		
+		return true;
 	}
 	
 	@Override
 	public void onFacetChange() {
-		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
-		Range selectedRange = view.getSliderRange();
-		facetColumnRangeRequest.setMin(Double.toString(selectedRange.getMinValue()));
-		facetColumnRangeRequest.setMax(Double.toString(selectedRange.getMaxValue()));
-		onFacetRequest.invoke(facetColumnRangeRequest);
+		if (isValidInput()) {
+			FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
+			facetColumnRangeRequest.setMin(view.getMin());
+			facetColumnRangeRequest.setMax(view.getMax());
+			onFacetRequest.invoke(facetColumnRangeRequest);
+		}
 	}
 	
 	@Override

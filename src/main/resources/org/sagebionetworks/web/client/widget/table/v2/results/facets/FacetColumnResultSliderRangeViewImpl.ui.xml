@@ -7,8 +7,7 @@
 	<bh:Div>
 		<b:Heading size="H4" ui:field="columnName"/>
 		<bh:Div>
-			<b:TextBox ui:field="minField"/> <bh:Span text=" to " /> <b:TextBox ui:field="maxField"/>
-			<b:Button ui:field="applyButton" text="Apply" size="EXTRA_SMALL"/>
+			<b3:RangeSlider ui:field="slider" min="0" max="100" step="5" value="[0,100]"/>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>

@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.extras.slider.client.ui.Range;
-import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
+import org.gwtbootstrap3.client.ui.TextBox;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,14 +17,23 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	@UiField
 	Heading columnName;
 	@UiField
-	RangeSlider slider;
-	
+	TextBox minField;
+	@UiField
+	TextBox maxField;
+	@UiField
+	Button applyButton;
 	Widget w;
 	Presenter presenter;
 	
 	@Inject
 	public FacetColumnResultRangeViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
+		applyButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onFacetChange();
+			}
+		});
 	}
 
 	@Override
@@ -36,24 +47,22 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	}
 	
 	@Override
-	public Range getSliderRange() {
-		return slider.getValue();
+	public void setMax(String max) {
+		maxField.setValue(max);
 	}
 	
 	@Override
-	public void setSliderMin(double min) {
-		slider.setMin(min);
+	public void setMin(String min) {
+		minField.setValue(min);
 	}
+	
 	@Override
-	public void setSliderMax(double max) {
-		slider.setMax(max);
+	public String getMax() {
+		return maxField.getValue();
 	}
+	
 	@Override
-	public void setSliderRange(Range range) {
-		slider.setValue(range);
-	}
-	@Override
-	public void setSliderStepSize(double step) {
-		slider.setStep(step);
+	public String getMin() {
+		return minField.getValue();
 	}
 }

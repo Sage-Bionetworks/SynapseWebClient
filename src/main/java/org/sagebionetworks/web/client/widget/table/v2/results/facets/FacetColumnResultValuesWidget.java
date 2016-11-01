@@ -25,7 +25,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		view.setPresenter(this);
 	}
 	
-	public void configure(FacetColumnResultValues facet, CallbackP<FacetColumnRequest> onFacetRequest, ColumnModel cm) {
+	public void configure(FacetColumnResultValues facet, CallbackP<FacetColumnRequest> onFacetRequest) {
 		facetValues = new HashSet<String>();
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;

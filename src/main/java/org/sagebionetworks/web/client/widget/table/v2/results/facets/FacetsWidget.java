@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
@@ -36,13 +37,21 @@ public class FacetsWidget implements IsWidget {
 			switch(facet.getFacetType()) {
 				case enumeration:
 					FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
-					valuesWidget.configure((FacetColumnResultValues)facet, facetChangedHandler, columnName2ColumnModel.get(facet.getColumnName()));
+					valuesWidget.configure((FacetColumnResultValues)facet, facetChangedHandler);
 					view.add(valuesWidget);
 					break;
 				case range:
-					FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
-					rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler, columnName2ColumnModel.get(facet.getColumnName()));
-					view.add(rangeWidget);
+					ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
+					if (ColumnType.INTEGER.equals(cm.getColumnType())) {
+						FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
+						rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
+						view.add(rangeWidget);	
+					} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
+						FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
+						rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
+						view.add(rangeWidget);
+					}
+					
 					break;
 				default:
 					break;
