@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -8,7 +9,6 @@ import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
