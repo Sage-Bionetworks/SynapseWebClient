@@ -62,6 +62,10 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	SynapseSuggestion mockUser;
 	@Mock
+	EntityBundle entityBundle;
+	@Mock
+	Entity entity;
+	@Mock
 	QueryResultBundle qrb;
 	@Mock
 	QueryResult qr;
@@ -84,8 +88,6 @@ public class ApproveUserAccessModalTest {
 	
 	Long accessReq;
 	String userId;
-	String datasetId;
-	EntityBundle entityBundle;
 	List<ACTAccessRequirement> actList;
 	
 	@Before
@@ -104,14 +106,8 @@ public class ApproveUserAccessModalTest {
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		userId = "1234567";
-		datasetId = "syn9876543";
 		accessReq = 123L;
 		
-		entityBundle = new EntityBundle();
-		Entity entity = new FileEntity();
-		entity.setId(datasetId);
-		entity.setName("Test Study");
-		entityBundle.setEntity(entity);
 		ACTAccessRequirement act = Mockito.mock(ACTAccessRequirement.class);
 		actList = new ArrayList<ACTAccessRequirement>();
 		actList.add(act);
@@ -124,7 +120,8 @@ public class ApproveUserAccessModalTest {
 		when(r.getValues()).thenReturn(ls);
 		when(ls.size()).thenReturn(1);
 		when(ls.get(0)).thenReturn("Message");
-
+		
+		when(entityBundle.getEntity()).thenReturn(entity);
 		when(mockUser.getId()).thenReturn(userId);
 		when(mockView.getAccessRequirement()).thenReturn(Long.toString(accessReq));
 	}
@@ -150,29 +147,24 @@ public class ApproveUserAccessModalTest {
 	@Test
 	public void testLoadEmailMessageOnFailure() {
 		dialog.configure(actList, entityBundle);
-		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
-		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), captor.capture());
-		captor.getValue().onFailure(any(Throwable.class));
+		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
+		phCaptor.getValue().onFailure(any(Throwable.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 	
 	@Test
 	public void testLoadEmailMessageOnCancel() {
 		dialog.configure(actList, entityBundle);
-		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
-		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), captor.capture());
-		captor.getValue().onCancel();
+		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
+		phCaptor.getValue().onCancel();
 		verify(mockSynAlert).showError("Query cancelled");
 	}
 	
 	@Test
 	public void testLoadEmailMessageOnComplete() {
 		dialog.configure(actList, entityBundle);
-		
-		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
-		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), captor.capture());
-		captor.getValue().onComplete(qrb);
-		
+		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
+		phCaptor.getValue().onComplete(qrb);
 		verify(mockView).finishLoadingEmail();
 	}
 	
