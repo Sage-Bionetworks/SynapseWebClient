@@ -173,7 +173,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.view.addWidget(accessControlListModalWidget);
 		this.view.addWidget(evalEditor.asWidget());
 		this.view.addWidget(selectTeamModal.asWidget());
-		//this.view.addWidget(approveUserAccessModal.asWidget());
 		selectTeamModal.setTitle("Select Participant Team");
 		selectTeamModal.configure(new CallbackP<String>() {
 			@Override
@@ -262,7 +261,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					// not sure
+					view.showErrorMessage(caught.getMessage());
 				}
 			});	
 		}

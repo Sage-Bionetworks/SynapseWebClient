@@ -12,6 +12,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
@@ -23,6 +24,8 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -30,12 +33,15 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -46,6 +52,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -129,11 +136,13 @@ public class EntityActionControllerImplTest {
 	String wikiPageId = "999";
 	String parentWikiPageId = "888";
 	String wikiPageTitle="To delete, or not to delete.";
+	int IS_ACT_MEMBER = 0x20;
 	WikiMarkdownEditor mockMarkdownEditorWidget;
 	ProvenanceEditorWidget mockProvenanceEditorWidget;
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 	V2WikiPage mockWikiPageToDelete;
+	List<AccessRequirement> accessReqs;
 	@Mock
 	EvaluationEditorModal mockEvalEditor;
 	@Mock
@@ -147,6 +156,12 @@ public class EntityActionControllerImplTest {
 	ApproveUserAccessModal mockApproveUserAccessModal;
 	@Mock
 	UserProfileClientAsync mockUserProfileClient;
+	@Captor
+	ArgumentCaptor<AsyncCallback<UserBundle>> userBundleCaptor;
+	@Mock
+	UserBundle mockUserBundle;
+	@Mock
+	Throwable mockThrowable;
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -188,6 +203,7 @@ public class EntityActionControllerImplTest {
 		
 		parentId = "syn456";
 		entityId = "syn123";
+		accessReqs = new LinkedList<AccessRequirement>();
 		Entity table = new TableEntity();
 		table.setId(entityId);
 		table.setParentId(parentId);
@@ -204,6 +220,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setDoi(new Doi());
+		entityBundle.setAccessRequirements(accessReqs);
 		selected = new Reference();
 		selected.setTargetId("syn9876");
 		// Setup the mock entity selector to select an entity.
@@ -313,6 +330,7 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(file);
 		entityBundle.setPermissions(permissions);
+		entityBundle.setAccessRequirements(accessReqs);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
@@ -564,6 +582,49 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testConfigureApproveUserAccessOnFailure() {
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		userBundleCaptor.getValue().onFailure(mockThrowable);
+		verify(mockActionMenu, times(0)).setActionVisible(eq(Action.APPROVE_USER_ACCESS), anyBoolean());
+		verify(mockActionMenu, times(0)).setActionEnabled(eq(Action.APPROVE_USER_ACCESS), anyBoolean());
+		verify(mockView).showErrorMessage(any(String.class));
+	}
+	
+	@Test
+	public void testConfigureApproveUserAccessNoAccessReq() {
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		userBundleCaptor.getValue().onSuccess(mockUserBundle);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+	}
+	
+	@Test
+	public void testConfigureApproveUserAccessACTUser() {
+		accessReqs.add(new ACTAccessRequirement());
+		entityBundle.setAccessRequirements(accessReqs);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		when(mockUserBundle.getIsACTMember()).thenReturn(true);
+		userBundleCaptor.getValue().onSuccess(mockUserBundle);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+	}
+	
+	@Test
+	public void testConfigureApproveUserAccessNonACTUser() {
+		accessReqs.add(new ACTAccessRequirement());
+		entityBundle.setAccessRequirements(accessReqs);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		when(mockUserBundle.getIsACTMember()).thenReturn(false);
+		userBundleCaptor.getValue().onSuccess(mockUserBundle);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+	}
+	
+	@Test
 	public void testOnEditProvenance(){
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.EDIT_PROVENANCE);
@@ -758,6 +819,7 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(project);
 		entityBundle.setPermissions(permissions);
+		entityBundle.setAccessRequirements(accessReqs);
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();
