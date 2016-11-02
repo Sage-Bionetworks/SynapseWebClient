@@ -586,6 +586,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
 		userBundleCaptor.getValue().onFailure(mockThrowable);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
 		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
 		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 		verify(mockView).showErrorMessage(any(String.class));
@@ -610,8 +612,11 @@ public class EntityActionControllerImplTest {
 		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
 		when(mockUserBundle.getIsACTMember()).thenReturn(true);
 		userBundleCaptor.getValue().onSuccess(mockUserBundle);
-		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
-		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+		InOrder inOrder = inOrder(mockActionMenu);
+		inOrder.verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		inOrder.verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		inOrder.verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		inOrder.verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 	}
 	
 	@Test

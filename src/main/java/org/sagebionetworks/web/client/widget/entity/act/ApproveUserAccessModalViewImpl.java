@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -15,7 +16,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalView {
@@ -30,7 +30,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	DropDownMenu arDropdownMenu;
 	@UiField
-	Div accessReqText;
+	HTML accessReqText;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -40,7 +40,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button previewButton;
 	@UiField
-	HTMLPanel emailTemplate;
+	TextBox emailTemplate;
 	@UiField
 	Div userSelectContainer;
 	@UiField
@@ -48,7 +48,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Modal previewModal;
 	@UiField
-	HTMLPanel messageBody;
+	HTML messageBody;
 	@UiField
 	Button closeButton;
 	
@@ -111,8 +111,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 	
 	@Override
-	public void setDatasetTitle(String html) {
-		emailTemplate.getElement().setInnerHTML(html);
+	public void setDatasetTitle(String text) {
+		emailTemplate.setText(text);
 	}
 	
 	@Override
@@ -173,10 +173,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void setAccessRequirement(String num, String html) {
 		accessReqNum.setText(num);
-		HTML display = new HTML();
-		display.setHTML(html);
-		accessReqText.clear();
-		accessReqText.add(display.asWidget());
+		accessReqText.setHTML(html);
 	}
 
 	@Override
