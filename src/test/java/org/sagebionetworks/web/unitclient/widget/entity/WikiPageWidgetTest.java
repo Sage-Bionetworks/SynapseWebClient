@@ -19,6 +19,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -89,6 +90,8 @@ public class WikiPageWidgetTest {
 	SessionStorage mockSessionStorage;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Captor
+	ArgumentCaptor<CallbackP<WikiPageKey>> callbackPCaptor;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -233,22 +236,26 @@ public class WikiPageWidgetTest {
 
 	@Test
 	public void testReloadWikiPageSuccess() {
+		boolean canEdit = true;
+		boolean showSubpages = true;
 		presenter.setWikiReloadHandler(mockCallbackP);
-		presenter.setCanEdit(true);
 		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), "123", 1L);
 		WikiPage wikiPage = new WikiPage();
 		wikiPage.setId(wikiPageKey.getWikiPageId());
 		presenter.setWikiPageKey(wikiPageKey);
 		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.setWikiReloadHandler(mockCallbackP);
-		presenter.reloadWikiPage();
-		verify(mockStuAlert).clear();
-		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView).setDiffVersionAlertVisible(false);
-		verify(mockView).scrollWikiHeadingIntoView();
+		
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
+		
+		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), callbackPCaptor.capture());
+		// invoke subpage clicked
+		callbackPCaptor.getValue().invoke(wikiPageKey);
+		verify(mockSynapseClient, times(2)).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockView, times(2)).setDiffVersionAlertVisible(false);
+		verify(mockView, times(2)).scrollWikiHeadingIntoView();
 		verify(mockCallbackP).invoke(anyString());
 		//also verify that the created by and modified by are updated when wiki page is reloaded
-		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockModifiedCreatedBy, times(2)).configure(any(Date.class), anyString(), any(Date.class), anyString());
 	}
 
 	@Test
