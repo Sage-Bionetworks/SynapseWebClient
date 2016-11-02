@@ -41,11 +41,13 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.dev.shell.CloseButton.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ApproveUserAccessModalTest {
 
 	ApproveUserAccessModal dialog;
+	
 	@Mock
 	ApproveUserAccessModalView mockView;
 	@Mock
@@ -200,8 +202,7 @@ public class ApproveUserAccessModalTest {
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
-		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
+		verify(mockSynAlert, times(0)).showError(anyString());
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 	}
@@ -215,8 +216,7 @@ public class ApproveUserAccessModalTest {
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
-		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
+		verify(mockSynAlert, times(0)).showError(anyString());
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
@@ -234,13 +234,13 @@ public class ApproveUserAccessModalTest {
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
-		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
+		verify(mockSynAlert, times(0)).showError(anyString());
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
 		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
+		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
 	}
 	
 	@Test
@@ -252,7 +252,7 @@ public class ApproveUserAccessModalTest {
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
+		verify(mockSynAlert, times(0)).showError(NO_USER_SELECTED);
 		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
@@ -277,8 +277,7 @@ public class ApproveUserAccessModalTest {
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
-		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
-		verify(mockSynAlert, times(0)).showError(NO_EMAIL_MESSAGE);
+		verify(mockSynAlert, times(0)).showError(anyString());
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		

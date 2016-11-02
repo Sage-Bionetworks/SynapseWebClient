@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.IS_ACT_MEMBER_MASK;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
@@ -136,7 +137,6 @@ public class EntityActionControllerImplTest {
 	String wikiPageId = "999";
 	String parentWikiPageId = "888";
 	String wikiPageTitle="To delete, or not to delete.";
-	int IS_ACT_MEMBER = 0x20;
 	WikiMarkdownEditor mockMarkdownEditorWidget;
 	ProvenanceEditorWidget mockProvenanceEditorWidget;
 	StorageLocationWidget mockStorageLocationWidget;
@@ -584,7 +584,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureApproveUserAccessOnFailure() {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
 		userBundleCaptor.getValue().onFailure(mockThrowable);
 		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
 		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
@@ -594,10 +594,12 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureApproveUserAccessNoAccessReq() {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
 		userBundleCaptor.getValue().onSuccess(mockUserBundle);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
 		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 	}
 	
 	@Test
@@ -605,7 +607,7 @@ public class EntityActionControllerImplTest {
 		accessReqs.add(new ACTAccessRequirement());
 		entityBundle.setAccessRequirements(accessReqs);
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
 		when(mockUserBundle.getIsACTMember()).thenReturn(true);
 		userBundleCaptor.getValue().onSuccess(mockUserBundle);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
@@ -617,11 +619,13 @@ public class EntityActionControllerImplTest {
 		accessReqs.add(new ACTAccessRequirement());
 		entityBundle.setAccessRequirements(accessReqs);
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER), userBundleCaptor.capture());
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
 		when(mockUserBundle.getIsACTMember()).thenReturn(false);
 		userBundleCaptor.getValue().onSuccess(mockUserBundle);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
 		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 	}
 	
 	@Test

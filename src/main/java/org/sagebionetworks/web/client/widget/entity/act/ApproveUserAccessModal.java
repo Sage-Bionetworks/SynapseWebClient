@@ -48,7 +48,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String NO_EMAIL_MESSAGE = "An error was encountered while loading the email body";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
-	public static final String APPROVED_USER = "Successfully approved user";
+	public static final String APPROVED_USER = "Successfully Approved User";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	
 	// Mask to get all parts of a query.
