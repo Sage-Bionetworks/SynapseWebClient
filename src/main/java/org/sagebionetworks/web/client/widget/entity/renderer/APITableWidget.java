@@ -36,7 +36,6 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -55,7 +54,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	SynapseAlert synAlert;
-	Callback refreshRequiredCallback;
 	private GWTWrapper gwt;
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
@@ -87,12 +85,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.gwt = gwt;
-		refreshRequiredCallback = new Callback() {
-			@Override
-			public void invoke() {
-				refreshData();
-			}
-		};
 	}
 	
 	@Override
@@ -428,7 +420,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			div.removeAllChildren();
 			String json = gwt.decodeQueryString(div.getAttribute("value"));
 			CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
-			cancelRequestWidget.configure(json, refreshRequiredCallback);
+			cancelRequestWidget.configure(json);
 			view.addWidget(cancelRequestWidget.asWidget(), div.getAttribute("id"));
 		}
 		divs = view.findUserBadgeDivs();
