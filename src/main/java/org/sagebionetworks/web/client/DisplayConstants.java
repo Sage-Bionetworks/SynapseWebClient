@@ -56,7 +56,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ID = "Synapse Id";
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String BUTTON_CANCEL = "Cancel";
-	public static final String BUTTON_CANCELLING = "Cancelling...";
+	public static final String BUTTON_CANCEL_REQUESTED = "Cancel Requested";
 	public static final String BUTTON_DELETE = "Delete";
 	public static final String BUTTON_RESTORE = "Restore";
 	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
