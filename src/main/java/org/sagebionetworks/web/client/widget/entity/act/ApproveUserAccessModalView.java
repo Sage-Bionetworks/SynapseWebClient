@@ -17,6 +17,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setAccessRequirement(String num, String html);
 	void setApproveProcessing(boolean processing);
 	void setDatasetTitle(String text);
+	void setMessageBody(String html);
 	void startLoadingEmail();
 	void finishLoadingEmail();
 	void showInfo(String title, String message);
@@ -28,7 +29,6 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	public interface Presenter {
 		void onSubmit();
 		void onStateSelected(String state);
-		void showPreview();
 	}
 
 

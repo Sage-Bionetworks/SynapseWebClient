@@ -67,7 +67,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
-	private Dialog messagePreview;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -76,19 +75,16 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			JobTrackingWidget progressWidget,
-			Dialog messagePreview) {
+			JobTrackingWidget progressWidget) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
-		this.messagePreview = messagePreview;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
-		this.view.setLoadingEmailWidget(progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
@@ -134,7 +130,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				QueryResultBundle result = (QueryResultBundle) response;
 				if (hasResult(result)) {
 					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-					messagePreview.configure("Email Message Preview", view.getEmailBodyWidget(message), null, "Close", null, true);
+					view.setMessageBody(message);
 					view.finishLoadingEmail();
 				} else {
 					synAlert.showError(NO_EMAIL_MESSAGE);
@@ -146,6 +142,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				synAlert.showError(QUERY_CANCELLED);
 			}
 		});
+		view.setLoadingEmailWidget(progressWidget.asWidget());
 	}
 	
 	private boolean hasResult(QueryResultBundle result) {
@@ -250,11 +247,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public void onStateSelected(String state) {
 		accessRequirement = state;
 		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
-	}
-	
-	@Override
-	public void showPreview() {
-		messagePreview.show();
 	}
 		
 }

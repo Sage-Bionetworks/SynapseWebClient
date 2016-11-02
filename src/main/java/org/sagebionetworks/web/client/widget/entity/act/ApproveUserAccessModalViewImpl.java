@@ -45,6 +45,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	Div userSelectContainer;
 	@UiField
 	Div loadingEmail;
+	@UiField
+	Modal previewModal;
+	@UiField
+	HTMLPanel messageBody;
+	@UiField
+	Button closeButton;
 	
 	private Presenter presenter;
 	
@@ -67,8 +73,14 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.showPreview();
+				previewModal.show();
 			}
+		});
+		closeButton.addClickHandler(new ClickHandler() {		
+			@Override		
+			public void onClick(ClickEvent event) {		
+				previewModal.hide();		
+			}		
 		});
 	}
 	
@@ -178,5 +190,10 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		HTML display = new HTML();
 		display.setHTML(html);
 		return display.asWidget();
+	}
+	
+	@Override		
+	public void setMessageBody(String html) {		
+		messageBody.getElement().setInnerHTML(html);
 	}
 }

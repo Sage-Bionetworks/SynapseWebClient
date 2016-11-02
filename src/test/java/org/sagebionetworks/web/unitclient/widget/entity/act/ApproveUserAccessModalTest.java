@@ -62,8 +62,6 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	JobTrackingWidget mockProgressWidget;
 	@Mock
-	Dialog mockMessagePreview;
-	@Mock
 	SynapseSuggestion mockUser;
 	@Mock
 	EntityBundle mockEntityBundle;
@@ -98,7 +96,7 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockMessagePreview);
+		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		userId = "1234567";
