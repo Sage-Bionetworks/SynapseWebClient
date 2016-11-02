@@ -45,6 +45,9 @@
 					<t:TableHeader>
 						<b.html:Text>Restrict Values</b.html:Text>
 					</t:TableHeader>
+					<t:TableHeader>
+						<b.html:Text>Facet</b.html:Text>
+					</t:TableHeader>
 				</t:TableRow>
 			</t:THead>
 			<t:TBody ui:field="tableBody"></t:TBody>

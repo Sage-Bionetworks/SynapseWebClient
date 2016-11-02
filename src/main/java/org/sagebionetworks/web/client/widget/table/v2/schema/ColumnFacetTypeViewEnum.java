@@ -32,6 +32,9 @@ public enum ColumnFacetTypeViewEnum {
 	 * @return
 	 */
 	public static ColumnFacetTypeViewEnum getViewForType(FacetType type){
+		if (type == null) {
+			return ColumnFacetTypeViewEnum.None;
+		}
 		for(ColumnFacetTypeViewEnum view: ColumnFacetTypeViewEnum.values()){
 			if(view.type.equals(type)){
 				return view;

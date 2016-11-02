@@ -29,32 +29,34 @@ public class FacetsWidget implements IsWidget {
 	
 	public void configure(List<FacetColumnResult> facets, CallbackP<FacetColumnRequest> facetChangedHandler, List<ColumnModel> types) {
 		view.clear();
-		Map<String, ColumnModel> columnName2ColumnModel = new HashMap<String, ColumnModel>();
-		for (ColumnModel columnModel : types) {
-			columnName2ColumnModel.put(columnModel.getName(), columnModel);
-		}
-		for (FacetColumnResult facet : facets) {
-			switch(facet.getFacetType()) {
-				case enumeration:
-					FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
-					valuesWidget.configure((FacetColumnResultValues)facet, facetChangedHandler);
-					view.add(valuesWidget);
-					break;
-				case range:
-					ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
-					if (ColumnType.INTEGER.equals(cm.getColumnType())) {
-						FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
-						rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
-						view.add(rangeWidget);	
-					} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
-						FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
-						rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
-						view.add(rangeWidget);
-					}
-					
-					break;
-				default:
-					break;
+		if (facets != null) {
+			Map<String, ColumnModel> columnName2ColumnModel = new HashMap<String, ColumnModel>();
+			for (ColumnModel columnModel : types) {
+				columnName2ColumnModel.put(columnModel.getName(), columnModel);
+			}
+			for (FacetColumnResult facet : facets) {
+				switch(facet.getFacetType()) {
+					case enumeration:
+						FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
+						valuesWidget.configure((FacetColumnResultValues)facet, facetChangedHandler);
+						view.add(valuesWidget);
+						break;
+					case range:
+						ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
+						if (ColumnType.INTEGER.equals(cm.getColumnType())) {
+							FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
+							rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
+							view.add(rangeWidget);	
+						} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
+							FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
+							rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
+							view.add(rangeWidget);
+						}
+						
+						break;
+					default:
+						break;
+				}
 			}
 		}
 	}
