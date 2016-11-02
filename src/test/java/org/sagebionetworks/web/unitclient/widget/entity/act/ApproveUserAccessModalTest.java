@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
-import org.sagebionetworks.web.client.widget.entity.act.EmailMessagePreviewModal;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
