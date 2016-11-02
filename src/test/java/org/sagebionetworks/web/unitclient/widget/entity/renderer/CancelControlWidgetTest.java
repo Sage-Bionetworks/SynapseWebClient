@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.verification.AtLeast;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -44,27 +45,22 @@ public class CancelControlWidgetTest {
 	AuthenticationController mockAuthController; 
 	@Mock
 	SynapseAlert mockSynAlert;
-	@Mock
-	GWTWrapper mockGwt;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	CancelControlWidget widget;
 	
-	@Mock
-	Callback mockRefreshCallback;
 	public static final String SUBMITTER_ID = "1131050";
 	public static final String CAN_CANCEL_JSON = "{\"canCancel\":true,\"cancelRequested\":false,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
 	public static final String CANNOT_CANCEL_JSON = "{\"canCancel\":false,\"cancelRequested\":false,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
-	public static final String CAN_CANCEL_CANCEL_REQUESTED_JSON = "{\"canCancel\":false,\"cancelRequested\":true,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
+	public static final String CAN_CANCEL_CANCEL_REQUESTED_JSON = "{\"canCancel\":true,\"cancelRequested\":true,\"userId\":\"1131050\",\"submissionId\":\"7115005\"}";
 	
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(SUBMITTER_ID);
-		widget = new CancelControlWidget(mockView, mockChallengeClient, mockAuthController, mockSynAlert, adapterFactory, mockGwt);
+		widget = new CancelControlWidget(mockView, mockChallengeClient, mockAuthController, mockSynAlert, adapterFactory);
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).requestToCancelSubmission(anyString(), any(AsyncCallback.class));
-		CallbackMockStubber.invokeCallback().when(mockGwt).scheduleExecution(any(Callback.class), anyInt());
 	}
 	
 	@Test
@@ -84,7 +80,7 @@ public class CancelControlWidgetTest {
 	@Test
 	public void testConfigureAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		widget.configure(CAN_CANCEL_JSON, mockRefreshCallback);
+		widget.configure(CAN_CANCEL_JSON);
 		verify(mockSynAlert).clear();
 		verify(mockView).setButtonVisible(false);
 		verify(mockView, never()).setButtonVisible(true);
@@ -95,7 +91,7 @@ public class CancelControlWidgetTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		// different user than the submitter
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("9876543");
-		widget.configure(CAN_CANCEL_JSON, mockRefreshCallback);
+		widget.configure(CAN_CANCEL_JSON);
 		verify(mockSynAlert).clear();
 		verify(mockView).setButtonVisible(false);
 		verify(mockView, never()).setButtonVisible(true);
@@ -103,16 +99,19 @@ public class CancelControlWidgetTest {
 	
 	@Test
 	public void testConfigureSubmitter() {
-		widget.configure(CAN_CANCEL_JSON, mockRefreshCallback);
+		widget.configure(CAN_CANCEL_JSON);
 		verify(mockSynAlert).clear();
 		InOrder inOrder = inOrder(mockView);
 		inOrder.verify(mockView).setButtonVisible(false);
 		inOrder.verify(mockView).setButtonVisible(true);
+		
+		verify(mockView).setLoading(false);
+		verify(mockView, never()).setLoading(true);
 	}
 
 	@Test
 	public void testConfigureSubmitterCannotCancel() {
-		widget.configure(CANNOT_CANCEL_JSON, mockRefreshCallback);
+		widget.configure(CANNOT_CANCEL_JSON);
 		verify(mockSynAlert).clear();
 		verify(mockView).setButtonVisible(false);
 		verify(mockView, never()).setButtonVisible(true);
@@ -120,10 +119,14 @@ public class CancelControlWidgetTest {
 	
 	@Test
 	public void testConfigureSubmitterCancelRequested() {
-		widget.configure(CAN_CANCEL_CANCEL_REQUESTED_JSON, mockRefreshCallback);
+		widget.configure(CAN_CANCEL_CANCEL_REQUESTED_JSON);
 		verify(mockSynAlert).clear();
-		verify(mockView).setButtonVisible(false);
-		verify(mockView, never()).setButtonVisible(true);
+		InOrder inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setButtonVisible(false);
+		inOrder.verify(mockView).setButtonVisible(true);
+		inOrder = inOrder(mockView);
+		inOrder.verify(mockView).setLoading(false);
+		inOrder.verify(mockView).setLoading(true);
 	}
 	
 	@Test
@@ -135,12 +138,9 @@ public class CancelControlWidgetTest {
 	
 	@Test
 	public void testConfigureAndRequestToCancelSubmission() {
-		widget.configure(CAN_CANCEL_JSON, mockRefreshCallback);
+		widget.configure(CAN_CANCEL_JSON);
 		widget.requestToCancelSubmission();
-		InOrder inOrder = inOrder(mockView);
-		inOrder.verify(mockView).setLoading(true);
-		inOrder.verify(mockView).setLoading(false);
-		verify(mockRefreshCallback).invoke();
+		verify(mockView, times(2)).setLoading(true);
 	}
 }
 

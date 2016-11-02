@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,38 +21,33 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 	private SingleButtonView view;
 	private ChallengeClientAsync challengeClient;
 	AuthenticationController authController;
-	Callback refreshRequiredCallback;
 	SynapseAlert synAlert;
 	AdapterFactory adapterFactory;
 	CancelControl cancelControl;
-	GWTWrapper gwt;
+	
 	public static final String CONFIRM_CANCEL = "Are you sure that you want to request that this be cancelled?";
-	public static final int DELAY_MS = 2500;
 	@Inject
 	public CancelControlWidget(SingleButtonView view, 
 			ChallengeClientAsync challengeClient,
 			AuthenticationController authController, 
 			SynapseAlert synAlert,
-			AdapterFactory adapterFactory,
-			GWTWrapper gwt) {
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.challengeClient = challengeClient;
 		this.authController = authController;
 		this.synAlert = synAlert;
 		this.adapterFactory = adapterFactory;
-		this.gwt = gwt;
 		view.setButtonText(DisplayConstants.BUTTON_CANCEL);
-		view.setDataLoadingText(DisplayConstants.BUTTON_CANCELLING);
+		view.setDataLoadingText(DisplayConstants.BUTTON_CANCEL_REQUESTED);
 		view.setButtonType(ButtonType.DANGER);
 		view.setButtonSize(ButtonSize.EXTRA_SMALL);
 		view.setPresenter(this);
 		view.addWidget(synAlert.asWidget());
 	}
 	
-	public void configure(String json, Callback refreshRequiredCallback) {
+	public void configure(String json) {
 		view.setButtonVisible(false);
 		view.setLoading(false);
-		this.refreshRequiredCallback = refreshRequiredCallback;
 		synAlert.clear();
 		try {
 			// try to reconstruct the CancelControl object from the json
@@ -61,8 +55,11 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 			cancelControl.initializeFromJSONObject(adapterFactory.createNew(json));
 			String submissionUserId = cancelControl.getUserId();
 			if (authController.isLoggedIn() && authController.getCurrentUserPrincipalId().equals(submissionUserId)) {
-				if (!cancelControl.getCancelRequested() && cancelControl.getCanCancel()) {
+				if (cancelControl.getCanCancel()) {
 					view.setButtonVisible(true);
+					if (cancelControl.getCancelRequested()) {
+						view.setLoading(true);
+					}
 				}
 			}
 		} catch (JSONObjectAdapterException e) {
@@ -90,12 +87,8 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 		challengeClient.requestToCancelSubmission(cancelControl.getSubmissionId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				gwt.scheduleExecution(new Callback() {
-					@Override
-					public void invoke() {
-						invokeCallback();
-					}
-				}, DELAY_MS);
+				// cancel successfully requested
+				view.setLoading(true);
 			}
 			
 			@Override
@@ -104,13 +97,6 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 				view.setLoading(false);
 			}
 		});
-	}
-
-	public void invokeCallback() {
-		if (refreshRequiredCallback != null) {
-			view.setLoading(false);
-			refreshRequiredCallback.invoke();	
-		}
 	}
 	
 	@Override

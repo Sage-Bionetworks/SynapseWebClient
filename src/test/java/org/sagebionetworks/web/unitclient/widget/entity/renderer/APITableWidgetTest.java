@@ -594,7 +594,7 @@ public class APITableWidgetTest {
 		verify(userBadgeDiv1).removeAllChildren();
 		verify(userBadgeDiv2).removeAllChildren();
 		
-		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString(), any(Callback.class));
+		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString());
 		verify(mockUserBadge, times(userBadgeDivs.size())).configure(anyString());
 	}
 }
