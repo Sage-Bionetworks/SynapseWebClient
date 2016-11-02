@@ -261,7 +261,7 @@ public class ApproveUserAccessModalTest {
 		sCaptor.getValue().onFailure(ex);
 		
 		verify(mockView).setApproveProcessing(false);
-		verify(mockSynAlert).showError(APPROVE_BUT_FAIL_TO_EMAIL);
+		verify(mockSynAlert).showError(APPROVE_BUT_FAIL_TO_EMAIL + ex.getMessage());
 	
 	}
 	
