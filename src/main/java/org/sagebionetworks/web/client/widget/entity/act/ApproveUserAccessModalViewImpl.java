@@ -124,16 +124,20 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void startLoadingEmail() {
 		emailTemplate.setVisible(false);
 		previewButton.setVisible(false);
-		loadingEmail.clear();
-		loadingEmail.setVisible(true);
+		setLoadingEmailVisible(true);
 	}
 	
 	@Override
 	public void finishLoadingEmail() {
-		loadingEmail.clear();
-		loadingEmail.setVisible(false);
+		setLoadingEmailVisible(false);
 		emailTemplate.setVisible(true);
 		previewButton.setVisible(true);
+	}
+	
+	@Override
+	public void setLoadingEmailVisible(boolean visible) {
+		loadingEmail.clear();
+		loadingEmail.setVisible(visible);
 	}
 	
 	@Override

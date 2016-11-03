@@ -21,6 +21,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void startLoadingEmail();
 	void finishLoadingEmail();
 	void showInfo(String title, String message);
+	void setLoadingEmailVisible(boolean visible);
 	void show();
 	void hide();
 	/**

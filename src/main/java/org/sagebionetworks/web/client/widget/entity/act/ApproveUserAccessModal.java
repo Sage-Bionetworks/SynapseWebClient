@@ -134,12 +134,14 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 					view.setMessageBody(message);
 					view.finishLoadingEmail();
 				} else {
+					view.setLoadingEmailVisible(false);
 					synAlert.showError(NO_EMAIL_MESSAGE);
 				}
 			}
 
 			@Override
 			public void onCancel() {
+				view.setLoadingEmailVisible(false);
 				synAlert.showError(QUERY_CANCELLED);
 			}
 		});
