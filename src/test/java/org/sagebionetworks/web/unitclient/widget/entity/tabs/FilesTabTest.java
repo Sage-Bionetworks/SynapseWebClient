@@ -9,8 +9,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -96,6 +99,8 @@ public class FilesTabTest {
 	EntityBundle mockEntityBundle;
 	@Mock
 	EntityBundlePlus mockEntityBundlePlus;
+	@Mock
+	List<FileHandle> mockFileHandles;
 	@Mock
 	FileEntity mockFileEntity;
 	@Mock
@@ -257,13 +262,23 @@ public class FilesTabTest {
 	}
 	
 	@Test
-	public void testConfigureWithFile() {
+	public void testConfigureWithFileNoFileHandles() {
+		Long version = 4L;
+		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
+		
+		verify(mockView, times(2)).setPreviewVisible(false);
+		verify(mockView, never()).setPreviewVisible(true);
+	}
+	
+	@Test
+	public void testConfigureWithFileWithFileHandles() {
 		Long version = 4L;
 		
 		boolean canCertifiedUserAddChild = false;
 		boolean isCertifiedUser = true;
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		when(mockEntityBundle.getFileHandles()).thenReturn(mockFileHandles);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
