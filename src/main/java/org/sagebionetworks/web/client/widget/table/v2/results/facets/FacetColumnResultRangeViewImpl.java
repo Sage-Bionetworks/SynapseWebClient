@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,6 +23,8 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	TextBox maxField;
 	@UiField
 	Button applyButton;
+	@UiField
+	Div synAlertContainer;
 	Widget w;
 	Presenter presenter;
 	
@@ -64,5 +67,10 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	@Override
 	public String getMin() {
 		return minField.getValue();
+	}
+	@Override
+	public void setSynAlert(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

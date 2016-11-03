@@ -158,6 +158,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
@@ -431,4 +432,5 @@ public interface PortalGinInjector extends Ginjector {
 	public FacetColumnResultSliderRangeWidget getFacetColumnResultSliderRangeWidget();
 	public FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
 	public FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
+	public FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
 }

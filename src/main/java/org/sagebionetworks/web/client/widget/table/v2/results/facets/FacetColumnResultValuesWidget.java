@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValueCount;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValues;

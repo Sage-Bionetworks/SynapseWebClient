@@ -606,6 +606,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorC
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeView;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeView;
@@ -1366,5 +1368,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FacetColumnResultValuesView.class).to(FacetColumnResultValuesViewImpl.class);
 		bind(FacetColumnResultSliderRangeView.class).to(FacetColumnResultSliderRangeViewImpl.class);
 		bind(FacetColumnResultRangeView.class).to(FacetColumnResultRangeViewImpl.class);
+		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
 	}
 }

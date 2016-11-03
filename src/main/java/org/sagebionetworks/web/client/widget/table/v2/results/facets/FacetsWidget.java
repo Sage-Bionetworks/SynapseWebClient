@@ -51,6 +51,10 @@ public class FacetsWidget implements IsWidget {
 							FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
 							rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
 							view.add(rangeWidget);
+						} else if (ColumnType.DATE.equals(cm.getColumnType())) {
+							FacetColumnResultDateRangeWidget rangeWidget = ginInjector.getFacetColumnResultDateRangeWidget();
+							rangeWidget.configure((FacetColumnResultRange)facet, facetChangedHandler);
+							view.add(rangeWidget);
 						}
 						
 						break;

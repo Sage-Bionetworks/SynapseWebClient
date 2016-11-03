@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import java.util.Date;
+
 import org.sagebionetworks.repo.model.table.FacetColumnRangeRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
@@ -11,71 +13,77 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResultRangeView.Presenter {
-	public static final String MIN_MUST_BE_GREATER_THAN = "Min must be >= ";
-	public static final String MAX_MUST_BE_LESS_THAN = "Max must be <= ";
-	public static final String MIN_OR_MAX_MUST_BE_DEFINED = "Min or max must be defined.";
-	public static final String MIN_MAX_MUST_BE_VALID_NUMBERS = "Min/max must be valid numbers.";
-	FacetColumnResultRangeView view;
+public class FacetColumnResultDateRangeWidget implements IsWidget, FacetColumnResultDateRangeView.Presenter {
+	FacetColumnResultDateRangeView view;
 	FacetColumnResultRange facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
 	SynapseAlert synAlert;
 	@Inject
-	public FacetColumnResultRangeWidget(FacetColumnResultRangeView view, SynapseAlert synAlert) {
+	public FacetColumnResultDateRangeWidget(FacetColumnResultDateRangeView view, SynapseAlert synAlert) {
 		this.view = view;
 		this.synAlert = synAlert;
-		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
+		view.setSynAlert(synAlert.asWidget());
 	}
 	
 	public void configure(FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
+		synAlert.clear();
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
-		if (facet.getSelectedMin() != null) {
-			view.setMin(facet.getSelectedMin());
+		Date min = parseDate(facet.getSelectedMin());
+		if (min != null) {
+			view.setMin(min);
 		}
-		if (facet.getSelectedMax() != null) {
-			view.setMin(facet.getSelectedMax());
+		Date max = parseDate(facet.getSelectedMin());
+		if (max != null) {
+			view.setMax(max);
 		}
 	}
 	
+	public static Date parseDate(String s) {
+		Date number = null;
+		if (s != null) {
+			number = new Date(Long.parseLong(s));
+		}
+	    return number;
+	}
+	
+
 	public boolean isValidInput() {
 		synAlert.clear();
 		try {
-			String minString = view.getMin();
+			Date newMin = view.getMin();
 			String columnMinString = facet.getColumnMin();
-			if (DisplayUtils.isDefined(minString)) {
-				double min = Double.parseDouble(view.getMin());
+			if (newMin != null) {
 				if (DisplayUtils.isDefined(columnMinString)) {
-					double columnMin = Double.parseDouble(columnMinString);
-					if (min < columnMin) {
-						synAlert.showError(MIN_MUST_BE_GREATER_THAN + columnMinString);
+					double columnMin = Long.parseLong(columnMinString);
+					if (newMin.getTime() < columnMin) {
+						synAlert.showError(FacetColumnResultRangeWidget.MIN_MUST_BE_GREATER_THAN + columnMinString);
 						return false;
 					}
 				}
 			}
 			
-			String maxString = view.getMax();
+			Date newMax = view.getMax();
 			String columnMaxString = facet.getColumnMax();
-			if (DisplayUtils.isDefined(maxString)) {
-				double max = Double.parseDouble(view.getMax());
+			if (newMax != null) {
 				if (DisplayUtils.isDefined(columnMaxString)) {
-					double columnMax = Double.parseDouble(columnMaxString);
-					if (max > columnMax) {
-						synAlert.showError(MAX_MUST_BE_LESS_THAN + columnMaxString);
+					double columnMax = Long.parseLong(columnMaxString);
+					if (newMax.getTime() > columnMax) {
+						synAlert.showError(FacetColumnResultRangeWidget.MAX_MUST_BE_LESS_THAN + columnMaxString);
 						return false;
 					}
 				}
 			}
-			
-			if (!DisplayUtils.isDefined(minString) && !DisplayUtils.isDefined(maxString)) {
-				synAlert.showError(MIN_OR_MAX_MUST_BE_DEFINED);
+			if (newMin == null && newMax == null) {
+				synAlert.showError(FacetColumnResultRangeWidget.MIN_OR_MAX_MUST_BE_DEFINED);
 				return false;
 			}
 		} catch (NumberFormatException e) {
-			synAlert.showError(MIN_MAX_MUST_BE_VALID_NUMBERS);
+			synAlert.showError(FacetColumnResultRangeWidget.MIN_MAX_MUST_BE_VALID_NUMBERS);
 			return false;
 		}
+		
 		
 		return true;
 	}
@@ -84,8 +92,14 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	public void onFacetChange() {
 		if (isValidInput()) {
 			FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
-			facetColumnRangeRequest.setMin(view.getMin());
-			facetColumnRangeRequest.setMax(view.getMax());
+			Date newMin = view.getMin();
+			if (newMin != null) {
+				facetColumnRangeRequest.setMin(Long.toString(newMin.getTime()));	
+			}
+			Date newMax = view.getMax();
+			if (newMax != null) {
+				facetColumnRangeRequest.setMax(Long.toString(newMax.getTime()));
+			}
 			onFacetRequest.invoke(facetColumnRangeRequest);
 		}
 	}
