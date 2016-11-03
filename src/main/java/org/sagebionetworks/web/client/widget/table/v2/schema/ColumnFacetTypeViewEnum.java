@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.FacetType;
 
 /**
@@ -36,7 +35,7 @@ public enum ColumnFacetTypeViewEnum {
 			return ColumnFacetTypeViewEnum.None;
 		}
 		for(ColumnFacetTypeViewEnum view: ColumnFacetTypeViewEnum.values()){
-			if(view.type.equals(type)){
+			if(type.equals(view.type)){
 				return view;
 			}
 		}

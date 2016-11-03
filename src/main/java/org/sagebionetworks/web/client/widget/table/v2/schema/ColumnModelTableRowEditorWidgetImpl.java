@@ -135,7 +135,6 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		configureViewForType(ColumnTypeViewEnum.getViewForType(model.getColumnType()));
 		// Apply the column model to the view
 		ColumnModelUtils.applyColumnModelToRow(model, view);
-		view.setFacetType(ColumnFacetTypeViewEnum.getViewForType(model.getFacetType()));
 	}
 
 	

@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
