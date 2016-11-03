@@ -9,8 +9,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -96,6 +99,8 @@ public class FilesTabTest {
 	EntityBundle mockEntityBundle;
 	@Mock
 	EntityBundlePlus mockEntityBundlePlus;
+	@Mock
+	List<FileHandle> mockFileHandles;
 	@Mock
 	FileEntity mockFileEntity;
 	@Mock
@@ -257,13 +262,78 @@ public class FilesTabTest {
 	}
 	
 	@Test
-	public void testConfigureWithFile() {
+	public void testConfigureWithFileNoFileHandles() {
 		Long version = 4L;
 		
 		boolean canCertifiedUserAddChild = false;
 		boolean isCertifiedUser = true;
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
+		
+		verify(mockSynapseClientAsync).getEntityBundlePlusForVersion(eq(fileEntityId), eq(version), anyInt(), any(AsyncCallback.class));
+		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		
+		verify(mockView).setFileTitlebarVisible(false);
+		verify(mockView).setFileTitlebarVisible(true);
+		verify(mockView, times(2)).setFolderTitlebarVisible(false);
+		verify(mockView, times(2)).setPreviewVisible(false);
+		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setWikiPageWidgetVisible(false);
+		verify(mockView).setWikiPageWidgetVisible(true);
+		
+		verify(mockFileTitleBar).configure(mockEntityBundle);
+		verify(mockPreviewWidget).configure(mockEntityBundle);
+		
+		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
+		//show file history since we are asking for a specific version
+		verify(mockEntityMetadata).setFileHistoryVisible(true);
+		
+		
+		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
+		//hide project info
+		verify(mockProjectInfoCallback).invoke(false);
+		
+		verify(mockView, times(2)).clearActionMenuContainer();
+		verify(mockView).setProvenanceVisible(true);
+		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockView).setWikiPageWidgetVisible(true);
+		
+		verify(mockView, times(2)).setFileBrowserVisible(false);
+		verify(mockPortalGinInjector).createActionMenuWidget();
+		verify(mockPortalGinInjector).createEntityActionController();
+		verify(mockPortalGinInjector).getProvenanceRenderer();
+
+		verify(mockView).setRefreshAlert(any(Widget.class));
+		verify(mockView).setDiscussionText(fileName);
+		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
+
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(fileName), captor.capture());
+		Synapse place = (Synapse)captor.getValue();
+		assertEquals(fileEntityId, place.getEntityId());
+		assertEquals(version, place.getVersionNumber());
+		assertNull(place.getArea());
+		assertNull(place.getAreaToken());
+
+		verify(mockDiscussionThreadListWidget).configure(fileEntityId, null, null);
+		verify(mockView).setDiscussionThreadListWidgetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureWithFileWithFileHandles() {
+		Long version = 4L;
+		
+		boolean canCertifiedUserAddChild = false;
+		boolean isCertifiedUser = true;
+		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		when(mockEntityBundle.getFileHandles()).thenReturn(mockFileHandles);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
