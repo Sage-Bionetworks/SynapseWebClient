@@ -231,4 +231,16 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		this.restrictValues.setVisible(showRestrictValues);
 		this.restrictValues.clear();
 	}
+	
+	@Override
+	public void setFacetVisible(boolean showFacetTypes) {
+		facet.setVisible(showFacetTypes);
+	}
+	@Override
+	public void setFacetValues(String... items) {
+		facet.clear();
+		for (String item : items) {
+			facet.addItem(item);
+		}
+	}
 }
