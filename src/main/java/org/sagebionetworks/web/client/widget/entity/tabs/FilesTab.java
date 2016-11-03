@@ -319,13 +319,13 @@ public class FilesTab {
 		view.clearActionMenuContainer();
 		//Preview
 		if (!bundle.getFileHandles().isEmpty()) {
-			view.setPreviewVisible(isFile);	
-			previewWidget.configure(bundle);
+			view.setPreviewVisible(isFile);			
 		}
 		//File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
 			fileTitleBar.configure(bundle);
+			previewWidget.configure(bundle);
 			discussionThreadListWidget.configure(currentEntityId, null, null);
 			view.setDiscussionText(currentEntity.getName());
 		}
