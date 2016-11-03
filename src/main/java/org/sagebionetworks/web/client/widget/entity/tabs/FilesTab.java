@@ -318,12 +318,14 @@ public class FilesTab {
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
 		//Preview
-		view.setPreviewVisible(isFile);
+		if (!bundle.getFileHandles().isEmpty()) {
+			view.setPreviewVisible(isFile);	
+			previewWidget.configure(bundle);
+		}
 		//File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
 			fileTitleBar.configure(bundle);
-			previewWidget.configure(bundle);
 			discussionThreadListWidget.configure(currentEntityId, null, null);
 			view.setDiscussionText(currentEntity.getName());
 		}
