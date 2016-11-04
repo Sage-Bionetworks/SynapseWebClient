@@ -21,7 +21,7 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 	public static final String NO_ROWS_WERE_FOUND_IN_THE_FILE = "No rows were found in the file.";
 	public static final String NO_DATA_WAS_FOUND_IN_THE_FILE = "No data was found in the file.";
 	public static final String PREVIEW_MESSAGE_PREFIX = "Scanned ";
-	public static final String PREVIEW_MESSAGE_SUFFIX = " rows scaned to generate preview:";
+	public static final String PREVIEW_MESSAGE_SUFFIX = " rows to generate preview:";
 	public static final int MAX_CHARS_PER_CELL = 10;
 	UploadPreviewView view;
 	List<ColumnModel> columns;
