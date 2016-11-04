@@ -73,4 +73,8 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+	@Override
+	public void setColumnName(String name) {
+		columnName.setText(name);
+	}
 }

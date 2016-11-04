@@ -73,4 +73,8 @@ public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultDate
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+	@Override
+	public void setColumnName(String name) {
+		columnName.setText(name);
+	}
 }

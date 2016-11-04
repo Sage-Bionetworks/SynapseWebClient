@@ -24,7 +24,7 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 	public void configure(FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
-		
+		view.setColumnName(facet.getColumnName());
 		Number minMin = parseNumber(facet.getColumnMin());
 		Number maxMax = parseNumber(facet.getColumnMax());
 		double stepSize = 1;

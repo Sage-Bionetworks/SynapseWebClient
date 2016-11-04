@@ -7,6 +7,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
@@ -19,7 +20,6 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -121,10 +121,14 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-		boolean isFacetsWidgetVisible = !isEditable && facetChangedHandler != null;
+		List<FacetColumnResult> facets = bundle.getFacets();
+		boolean isFacetsWidgetVisible = !isEditable && 
+				facetChangedHandler != null && 
+				facets != null && 
+				!facets.isEmpty();
 		view.setFacetsWidgetVisible(isFacetsWidgetVisible);
 		if (isFacetsWidgetVisible) {
-			facetsWidget.configure(bundle.getFacets(), facetChangedHandler, types);	
+			facetsWidget.configure(facets, facetChangedHandler, types);	
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());

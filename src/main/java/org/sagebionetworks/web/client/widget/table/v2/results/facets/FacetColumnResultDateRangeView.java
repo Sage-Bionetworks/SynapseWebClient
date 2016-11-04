@@ -10,6 +10,7 @@ public interface FacetColumnResultDateRangeView extends IsWidget {
 		void onFacetChange();
 	}
 	void setPresenter(Presenter p);
+	void setColumnName(String columnName);
 	void setMin(Date min);
 	void setMax(Date max);
 	Date getMin();

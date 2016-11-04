@@ -47,6 +47,7 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 				presenter.onFacetChange(facetValue);
 			}
 		});
+		facetValues.add(valueWidget);
 	}
 	
 	@Override

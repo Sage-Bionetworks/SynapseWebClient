@@ -30,6 +30,7 @@ public class FacetColumnResultDateRangeWidget implements IsWidget, FacetColumnRe
 		synAlert.clear();
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
+		view.setColumnName(facet.getColumnName());
 		Date min = parseDate(facet.getSelectedMin());
 		if (min != null) {
 			view.setMin(min);

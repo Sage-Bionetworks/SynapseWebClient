@@ -9,6 +9,7 @@ public interface FacetColumnResultSliderRangeView extends IsWidget {
 		void onFacetChange();
 	}
 	void setPresenter(Presenter p);
+	void setColumnName(String columnName);
 	void setSliderMin(double min);
 	void setSliderMax(double max);
 	Range getSliderRange();

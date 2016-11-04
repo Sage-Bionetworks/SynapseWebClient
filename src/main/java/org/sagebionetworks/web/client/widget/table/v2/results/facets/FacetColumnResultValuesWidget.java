@@ -28,6 +28,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		facetValues = new HashSet<String>();
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
+		view.setColumnName(facet.getColumnName());
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
 			if (valueCount.getIsSelected()) {
 				facetValues.add(valueCount.getValue());

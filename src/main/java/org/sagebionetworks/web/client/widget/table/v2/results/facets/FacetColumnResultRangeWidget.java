@@ -31,6 +31,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	public void configure(FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
+		view.setColumnName(facet.getColumnName());
 		if (facet.getSelectedMin() != null) {
 			view.setMin(facet.getSelectedMin());
 		}

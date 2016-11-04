@@ -64,4 +64,8 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	public void setSliderStepSize(double step) {
 		slider.setStep(step);
 	}
+	@Override
+	public void setColumnName(String name) {
+		columnName.setText(name);
+	}
 }

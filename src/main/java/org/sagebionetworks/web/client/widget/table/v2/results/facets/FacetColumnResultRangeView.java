@@ -8,6 +8,7 @@ public interface FacetColumnResultRangeView extends IsWidget {
 		void onFacetChange();
 	}
 	void setPresenter(Presenter p);
+	void setColumnName(String columnName);
 	void setMin(String min);
 	String getMin();
 	void setMax(String max);
