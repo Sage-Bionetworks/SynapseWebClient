@@ -40,12 +40,13 @@
 					<b:Heading size="H5" text="Dataset" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
 					<bh:Div ui:field="loadingEmail" />
 					<bh:Div addStyleNames="margin-top-10 margin-bottom-10" height="30px">
-						<b:TextBox ui:field="emailTemplate" addStyleNames="read-only-box floatleft" width="75%" height="30px"></b:TextBox>
-						<b:Button ui:field="previewButton" addStyleNames="floatright" type="DEFAULT" text="Email Preview" />
+						<b:TextBox ui:field="emailTemplate" addStyleNames="read-only-box" width="100%" height="30px"></b:TextBox>
 					</bh:Div>
 				</bh:Div>
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
-					<b:Heading size="H5" text="Email Message" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+					<b:Heading size="H5" text="Email Message" addStyleNames="margin-left-10 margin-right-10 margin-top-20 margin-bottom-20" >
+						<b:Button ui:field="previewButton" addStyleNames="floatright margin-bottom-10" type="DEFAULT" text="Email Preview" />
+					</b:Heading>
 					<b:TextArea ui:field="messageEditArea" addStyleNames="min-height-200" placeholder="Enter a message to send the user upon approval..."></b:TextArea>
 				</bh:Div>
 				<bh:Div ui:field="synAlertContainer" addStyleNames="margin-top-10" />
