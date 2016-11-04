@@ -5,7 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:b3="urn:import:org.gwtbootstrap3.extras.slider.client.ui">
 	<bh:Div>
-		<b:Heading size="H4" ui:field="columnName"/>
+		<b:Heading size="H5" ui:field="columnName"/>
 		<bh:Div>
 			<b3:RangeSlider ui:field="slider" min="0" max="100" step="5" value="[0,100]"/>
 		</bh:Div>

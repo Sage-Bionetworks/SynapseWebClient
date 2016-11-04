@@ -5,11 +5,11 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:b3="urn:import:org.gwtbootstrap3.extras.slider.client.ui">
 	<bh:Div>
-		<b:Heading size="H4" ui:field="columnName"/>
-		<bh:Div>
+		<b:Heading size="H5" ui:field="columnName"/>
+		<g:HorizontalPanel>
 			<b:TextBox ui:field="minField"/> <bh:Span text=" to " /> <b:TextBox ui:field="maxField"/>
 			<b:Button ui:field="applyButton" text="Apply" size="EXTRA_SMALL"/>
-		</bh:Div>
+		</g:HorizontalPanel>
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>
 </ui:UiBinder>
