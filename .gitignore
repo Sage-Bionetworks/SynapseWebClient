@@ -7,3 +7,9 @@ target
 gwt-unitCache/
 war/
 .DS_Store
+src/main/webapp/META-INF
+src/main/webapp/Portal/
+src/main/webapp/WEB-INF/*.symbolMap
+src/main/webapp/WEB-INF/*_sourceMap*
+src/main/webapp/WEB-INF/classes/
+src/main/webapp/WEB-INF/lib/
