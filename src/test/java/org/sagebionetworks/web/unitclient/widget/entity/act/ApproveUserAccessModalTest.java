@@ -90,6 +90,7 @@ public class ApproveUserAccessModalTest {
 	
 	Long accessReq;
 	String userId;
+	String message;
 	List<ACTAccessRequirement> actList;
 	Exception ex;
 	
@@ -99,6 +100,7 @@ public class ApproveUserAccessModalTest {
 		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
+		message = "Message";
 		userId = "1234567";
 		accessReq = 123L;
 		ex = new Exception("error message");
@@ -114,11 +116,12 @@ public class ApproveUserAccessModalTest {
 		when(mockLr.get(0)).thenReturn(mockR);
 		when(mockR.getValues()).thenReturn(mockLs);
 		when(mockLs.size()).thenReturn(1);
-		when(mockLs.get(0)).thenReturn("Message");
+		when(mockLs.get(0)).thenReturn(message);
 		
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
 		when(mockUser.getId()).thenReturn(userId);
 		when(mockView.getAccessRequirement()).thenReturn(Long.toString(accessReq));
+		when(mockView.getEmailMessage()).thenReturn(message);
 	}
 	
 	@Test
@@ -144,6 +147,7 @@ public class ApproveUserAccessModalTest {
 		dialog.configure(actList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onFailure(ex);
+		verify(mockView).setLoadingEmailVisible(false);
 		verify(mockSynAlert).handleException(ex);
 	}
 	
@@ -152,6 +156,7 @@ public class ApproveUserAccessModalTest {
 		dialog.configure(actList, mockEntityBundle);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onCancel();
+		verify(mockView).setLoadingEmailVisible(false);
 		verify(mockSynAlert).showError(QUERY_CANCELLED);
 	}
 	
@@ -181,13 +186,42 @@ public class ApproveUserAccessModalTest {
 	}
 	
 	@Test
+	public void testOnSubmitQueryCancelledEditedEmail() {
+		dialog.configure(actList, mockEntityBundle);
+		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
+		phCaptor.getValue().onCancel();
+		verify(mockView).setLoadingEmailVisible(false);
+		verify(mockSynAlert).showError(QUERY_CANCELLED);
+		
+		when(mockView.getEmailMessage()).thenReturn("Updated email message");
+		dialog.onUserSelected(mockUser);
+		dialog.onSubmit();
+		verify(mockSynAlert, times(1)).showError(anyString()); //only shows query cancelled error
+	}
+	
+	@Test
+	public void testOnSubmitQueryFailedEditedEmail() {
+		dialog.configure(actList, mockEntityBundle);
+		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
+		phCaptor.getValue().onFailure(ex);
+		verify(mockView).setLoadingEmailVisible(false);
+		verify(mockSynAlert).handleException(ex);
+		
+		when(mockView.getEmailMessage()).thenReturn("Updated email message");
+		dialog.onUserSelected(mockUser);
+		dialog.onSubmit();
+		verify(mockSynAlert, times(0)).showError(anyString());
+	}
+	
+	@Test
 	public void testOnSubmitNoMessage() {
 		dialog.configure(actList, mockEntityBundle);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(null);
+		when(mockView.getEmailMessage()).thenReturn("");
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
 		verify(mockSynAlert, times(0)).showError(eq(NO_USER_SELECTED));
-		verify(mockSynAlert).showError(NO_EMAIL_MESSAGE);
+		verify(mockSynAlert).showError(MESSAGE_BLANK);
 	}
 	
 	@Test
@@ -210,6 +244,7 @@ public class ApproveUserAccessModalTest {
 		
 		verify(mockProgressWidget).startAndTrackJob(anyString(), anyBoolean(), any(AsynchType.class), any(QueryBundleRequest.class), phCaptor.capture());
 		phCaptor.getValue().onComplete(mockQrb);
+		verify(mockView).setMessageEditArea(message);
 		
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();

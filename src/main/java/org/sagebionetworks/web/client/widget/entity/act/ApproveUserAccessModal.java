@@ -144,6 +144,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			@Override
 			public void onCancel() {
 				view.setLoadingEmailVisible(false);
+				view.finishLoadingEmail();
 				synAlert.showError(QUERY_CANCELLED);
 			}
 		});
@@ -194,15 +195,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
-		if (message == null) {
-			//signifies that the query did not complete
-			synAlert.showError(NO_EMAIL_MESSAGE);
-			return;
-		}
-		//if message is not null, then the query completed, and we should
-		//get the most up-to-date message before proceding
 		message = view.getEmailMessage();
-		if (message.isEmpty()) {
+		if (message == null || message.isEmpty()) {
 			synAlert.showError(MESSAGE_BLANK);
 			return;
 		}

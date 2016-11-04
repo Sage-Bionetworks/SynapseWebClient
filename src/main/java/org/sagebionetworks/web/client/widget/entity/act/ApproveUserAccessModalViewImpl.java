@@ -41,7 +41,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button previewButton;
 	@UiField
-	TextBox emailTemplate;
+	HTML emailTemplate;
 	@UiField
 	Div userSelectContainer;
 	@UiField
