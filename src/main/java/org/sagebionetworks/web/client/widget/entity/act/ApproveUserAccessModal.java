@@ -46,11 +46,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
 	public static final String QUERY_CANCELLED = "Query cancelled";
 	public static final String NO_EMAIL_MESSAGE = "An error was encountered while loading the email body";
-	public static final String EMPTY_EMAIL_MESSAGE = "You must enter an email message to approve this user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
+	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
 	
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -203,7 +203,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		//get the most up-to-date message before proceding
 		message = view.getEmailMessage();
 		if (message.isEmpty()) {
-			synAlert.showError(EMPTY_EMAIL_MESSAGE);
+			synAlert.showError(MESSAGE_BLANK);
 			return;
 		}
 		accessRequirement = view.getAccessRequirement();
@@ -222,7 +222,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				sendEmail(result);
+				sendEmail(result);						
 			}
 		});
 	}
