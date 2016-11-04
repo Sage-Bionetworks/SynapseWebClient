@@ -44,6 +44,10 @@
 						<b:Button ui:field="previewButton" addStyleNames="floatright" type="DEFAULT" text="Email Preview" />
 					</bh:Div>
 				</bh:Div>
+				<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
+					<b:Heading size="H5" text="Email Message" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
+					<b:TextArea ui:field="messageEditArea" addStyleNames="min-height-200" placeholder="Enter a message to send the user upon approval..."></b:TextArea>
+				</bh:Div>
 				<bh:Div ui:field="synAlertContainer" addStyleNames="margin-top-10" />
 			</b:ModalBody>
 			<b:ModalFooter>

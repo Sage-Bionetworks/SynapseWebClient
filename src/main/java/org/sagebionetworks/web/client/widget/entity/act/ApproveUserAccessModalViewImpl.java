@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -51,6 +52,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	HTML messageBody;
 	@UiField
 	Button closeButton;
+	@UiField
+	TextArea messageEditArea;
 	
 	private Presenter presenter;
 	
@@ -73,6 +76,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				setPreview();
 				previewModal.show();
 			}
 		});
@@ -82,6 +86,15 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 				previewModal.hide();		
 			}		
 		});
+	}
+	
+	private void setPreview() {
+		messageBody.setHTML(messageEditArea.getText());
+	}
+	
+	@Override
+	public String getEmailMessage() {
+		return messageEditArea.getText();
 	}
 	
 	@Override
@@ -196,5 +209,10 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override		
 	public void setMessageBody(String html) {		
 		messageBody.getElement().setInnerHTML(html);
+	}
+	
+	@Override
+	public void setMessageEditArea(String html) {
+		messageEditArea.setText(html);
 	}
 }

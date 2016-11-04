@@ -46,6 +46,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
 	public static final String QUERY_CANCELLED = "Query cancelled";
 	public static final String NO_EMAIL_MESSAGE = "An error was encountered while loading the email body";
+	public static final String EMPTY_EMAIL_MESSAGE = "You must enter an email message to approve this user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User";
@@ -123,6 +124,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			
 			@Override
 			public void onFailure(Throwable failure) {
+				view.setLoadingEmailVisible(false);
 				synAlert.handleException(failure);
 			}
 			
@@ -131,12 +133,12 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				QueryResultBundle result = (QueryResultBundle) response;
 				if (hasResult(result)) {
 					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-					view.setMessageBody(message);
-					view.finishLoadingEmail();
+					view.setMessageEditArea(message);
 				} else {
-					view.setLoadingEmailVisible(false);
-					synAlert.showError(NO_EMAIL_MESSAGE);
+					message = "";
 				}
+				view.setMessageBody(message);
+				view.finishLoadingEmail();
 			}
 
 			@Override
@@ -193,7 +195,15 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			return;
 		}
 		if (message == null) {
+			//signifies that the query did not complete
 			synAlert.showError(NO_EMAIL_MESSAGE);
+			return;
+		}
+		//if message is not null, then the query completed, and we should
+		//get the most up-to-date message before proceding
+		message = view.getEmailMessage();
+		if (message.isEmpty()) {
+			synAlert.showError(EMPTY_EMAIL_MESSAGE);
 			return;
 		}
 		accessRequirement = view.getAccessRequirement();
