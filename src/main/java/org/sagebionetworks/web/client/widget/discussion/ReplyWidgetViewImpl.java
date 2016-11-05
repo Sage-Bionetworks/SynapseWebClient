@@ -10,7 +10,8 @@ import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -125,14 +126,15 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void showDeleteConfirm(String deleteConfirmMessage, AlertCallback deleteCallback) {
-		Bootbox.Dialog.create()
-		.setMessage(deleteConfirmMessage)
-		.setCloseButton(false)
-		.setTitle(CONFIRM_DELETE_DIALOG_TITLE)
-		.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
-		.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback)
-		.show();
+	public void showDeleteConfirm(String deleteConfirmMessage, SimpleCallback deleteCallback) {
+		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
+		options.setCloseButton(false);
+		options.setTitle(CONFIRM_DELETE_DIALOG_TITLE);
+		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
+		options.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback);
+		
+		Bootbox.dialog(options);
+		
 	}
 
 	@Override

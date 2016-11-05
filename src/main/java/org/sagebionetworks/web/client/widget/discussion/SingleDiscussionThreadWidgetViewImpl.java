@@ -10,7 +10,8 @@ import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -186,14 +187,14 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final AlertCallback deleteCallback) {
-		Bootbox.Dialog.create()
-				.setMessage(deleteConfirmMessage)
-				.setCloseButton(false)
-				.setTitle(dialogTitle)
-				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
-				.addButton(buttonName, buttonStyle, deleteCallback)
-				.show();
+	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final SimpleCallback deleteCallback) {
+		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
+		options.setCloseButton(false);
+		options.setTitle(dialogTitle);
+		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
+		options.addButton(buttonName, buttonStyle, deleteCallback);
+		
+		Bootbox.dialog(options);
 	}
 
 	@Override

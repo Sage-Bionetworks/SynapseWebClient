@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -717,7 +718,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
-		ArgumentCaptor<AlertCallback> captor = ArgumentCaptor.forClass(AlertCallback.class);
+		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
 		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
 		captor.getValue().callback();
 		verify(mockSynAlert).clear();
@@ -727,7 +728,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickRestoreThread() {
 		discussionThreadWidget.onClickRestore();
-		ArgumentCaptor<AlertCallback> captor = ArgumentCaptor.forClass(AlertCallback.class);
+		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
 		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
 		captor.getValue().callback();
 		verify(mockSynAlert).clear();

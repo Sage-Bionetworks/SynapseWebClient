@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResult;
+import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValueCount;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
 import org.sagebionetworks.repo.model.table.FacetType;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -125,7 +125,29 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-		List<FacetColumnResult> facets = bundle.getFacets();
+//		List<FacetColumnResult> facets = bundle.getFacets();
+		List<FacetColumnResult> facets = new ArrayList<FacetColumnResult>();
+		FacetColumnResultValues fcrv = new FacetColumnResultValues();
+		fcrv.setColumnName("name");
+		fcrv.setFacetType(FacetType.enumeration);
+		List<FacetColumnResultValueCount> l = new ArrayList<FacetColumnResultValueCount>();
+		FacetColumnResultValueCount fcrvc =  new FacetColumnResultValueCount();
+		fcrvc.setCount(22L);
+		fcrvc.setValue("test val");
+		fcrvc.setIsSelected(true);
+		l.add(fcrvc);
+		fcrv.setFacetValues(l);
+		facets.add(fcrv);
+		
+		FacetColumnResultRange fcrr = new FacetColumnResultRange();
+		fcrr.setColumnName("modifiedBy");
+		fcrr.setFacetType(FacetType.range);
+		fcrr.setColumnMin("4");
+		fcrr.setColumnMax("100");
+		fcrr.setSelectedMin("40");
+		fcrr.setSelectedMax("90");
+		facets.add(fcrr);
+		
 		boolean isFacetsWidgetVisible = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
