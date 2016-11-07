@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -95,5 +96,18 @@ public class FileHandleAsyncHandlerImplTest {
 		verify(mockSynapseClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(any(Throwable.class));
 	}
+	
+	@Test
+	public void testAutoExecute() {
+		// verify that if we ask for enough requests, it will automatically execute the rpc.
+		for (int i = 0; i < FileHandleAsyncHandlerImpl.LIMIT; i++) {
+			FileHandleAssociation mockFha = Mockito.mock(FileHandleAssociation.class);
+			when(mockFha.getFileHandleId()).thenReturn("file handle id = " + i);		
+			fileHandleAsyncHandler.getFileHandle(mockFha, mockCallback);	
+		}
+		verifyZeroInteractions(mockSynapseClient);
 
+		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback);
+		verify(mockSynapseClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
+	}
 }

@@ -24,6 +24,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 	SynapseClientAsync synapseClient;
 	// This singleton checks for new work every <DELAY> milliseconds.
 	public static final int DELAY = 325;
+	public static final int LIMIT = 95;
 	
 	@Inject
 	public FileHandleAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
@@ -46,6 +47,11 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 			fileHandleAssociations.add(fileHandleAssociation);
 		}
 		list.add(callback);
+
+		// if we are getting close to the limit, then force execute the batch
+		if (reference2Callback.size() > LIMIT) {
+			executeRequests();
+		}
 	}
 	
 	public void executeRequests() {
