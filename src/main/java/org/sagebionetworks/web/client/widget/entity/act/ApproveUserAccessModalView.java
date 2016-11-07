@@ -17,6 +17,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	Widget getEmailBodyWidget(String html);
 	void setAccessRequirement(String num, String html);
 	void setApproveProcessing(boolean processing);
+	void setRevokeProcessing(boolean processing);
 	void setDatasetTitle(String text);
 	void setMessageBody(String html);
 	void setMessageEditArea(String html);
@@ -32,6 +33,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	public interface Presenter {
 		void onSubmit();
 		void onStateSelected(String state);
+		void onRevoke();
 	}
 
 
