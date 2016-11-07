@@ -125,28 +125,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-//		List<FacetColumnResult> facets = bundle.getFacets();
-		List<FacetColumnResult> facets = new ArrayList<FacetColumnResult>();
-		FacetColumnResultValues fcrv = new FacetColumnResultValues();
-		fcrv.setColumnName("name");
-		fcrv.setFacetType(FacetType.enumeration);
-		List<FacetColumnResultValueCount> l = new ArrayList<FacetColumnResultValueCount>();
-		FacetColumnResultValueCount fcrvc =  new FacetColumnResultValueCount();
-		fcrvc.setCount(22L);
-		fcrvc.setValue("test val");
-		fcrvc.setIsSelected(true);
-		l.add(fcrvc);
-		fcrv.setFacetValues(l);
-		facets.add(fcrv);
-		
-		FacetColumnResultRange fcrr = new FacetColumnResultRange();
-		fcrr.setColumnName("modifiedBy");
-		fcrr.setFacetType(FacetType.range);
-		fcrr.setColumnMin("4");
-		fcrr.setColumnMax("100");
-		fcrr.setSelectedMin("40");
-		fcrr.setSelectedMax("90");
-		facets.add(fcrr);
+		List<FacetColumnResult> facets = bundle.getFacets();
 		
 		boolean isFacetsWidgetVisible = !isEditable && 
 				facetChangedHandler != null && 

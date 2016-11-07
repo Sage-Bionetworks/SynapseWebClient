@@ -66,13 +66,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			@Override
 			public void invoke(FacetColumnRequest request) {
 				List<FacetColumnRequest> selectedFacets = startingQuery.getSelectedFacets();
-				for (FacetColumnRequest facetColumnRequest : selectedFacets) {
-					if (facetColumnRequest.getColumnName().equals(request.getColumnName())) {
-						selectedFacets.remove(facetColumnRequest);
-						break;
+				if (selectedFacets != null) {
+					for (FacetColumnRequest facetColumnRequest : selectedFacets) {
+						if (facetColumnRequest.getColumnName().equals(request.getColumnName())) {
+							selectedFacets.remove(facetColumnRequest);
+							break;
+						}
+						selectedFacets.add(request);
 					}
 				}
-				selectedFacets.add(request);
 				runQuery();
 			}
 		};

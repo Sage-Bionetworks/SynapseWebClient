@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
-import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideEvent;
-import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideHandler;
+import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideStopEvent;
+import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideStopHandler;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -21,18 +21,27 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	
 	Widget w;
 	Presenter presenter;
+	double min, max, step;
+	Range range;
 	
 	@Inject
 	public FacetColumnResultSliderRangeViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
-		slider.addSlideHandler(new SlideHandler<Range>() {
+		slider.setEnabled(true);
+		slider.addSlideStopHandler(new SlideStopHandler<Range>() {
 			@Override
-			public void onSlide(SlideEvent<Range> event) {
-				presenter.onFacetChange();
+			public void onSlideStop(SlideStopEvent<Range> event) {
+				presenter.onFacetChange(event.getValue());
 			}
 		});
 	}
 
+	@Override
+	public void initSlider(double min, double max, Range range) {
+		slider.setMin(min);
+		slider.setMax(max);
+		slider.setValue(range);
+	}
 	@Override
 	public Widget asWidget() {
 		return w;
@@ -41,24 +50,6 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-	}
-	
-	@Override
-	public Range getSliderRange() {
-		return slider.getValue();
-	}
-	
-	@Override
-	public void setSliderMin(double min) {
-		slider.setMin(min);
-	}
-	@Override
-	public void setSliderMax(double max) {
-		slider.setMax(max);
-	}
-	@Override
-	public void setSliderRange(Range range) {
-		slider.setValue(range);
 	}
 	@Override
 	public void setSliderStepSize(double step) {

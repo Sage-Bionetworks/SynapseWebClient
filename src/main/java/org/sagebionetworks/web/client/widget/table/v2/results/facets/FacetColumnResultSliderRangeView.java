@@ -6,13 +6,10 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface FacetColumnResultSliderRangeView extends IsWidget {
 	public interface Presenter {
-		void onFacetChange();
+		void onFacetChange(Range newRange);
 	}
+	void initSlider(double min, double max, Range range);
 	void setPresenter(Presenter p);
 	void setColumnName(String columnName);
-	void setSliderMin(double min);
-	void setSliderMax(double max);
-	Range getSliderRange();
-	void setSliderRange(Range range);
 	void setSliderStepSize(double step);
 }

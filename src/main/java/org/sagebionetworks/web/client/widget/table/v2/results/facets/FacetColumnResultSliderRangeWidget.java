@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,9 +31,10 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		double stepSize = 1;
 		if (minMin != null && maxMax != null) {
 			stepSize = Math.round((maxMax.doubleValue() - minMin.doubleValue()) / 200);
+			if (stepSize < 1) {
+				stepSize = 1;
+			}
 		}
-		view.setSliderMin(minMin.doubleValue());
-		view.setSliderMax(maxMax.doubleValue());
 		
 		Number min = parseNumber(facet.getSelectedMin());
 		if (min == null) {
@@ -42,7 +44,7 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		if (max == null) {
 			max = maxMax;
 		}
-		view.setSliderRange(new Range(min.doubleValue(), max.doubleValue()));
+		view.initSlider(minMin.doubleValue(), maxMax.doubleValue(), new Range(min.doubleValue(), max.doubleValue()));
 		view.setSliderStepSize(stepSize);
 	}
 	
@@ -59,9 +61,8 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 	}
 	
 	@Override
-	public void onFacetChange() {
+	public void onFacetChange(Range selectedRange) {
 		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
-		Range selectedRange = view.getSliderRange();
 		facetColumnRangeRequest.setMin(Double.toString(selectedRange.getMinValue()));
 		facetColumnRangeRequest.setMax(Double.toString(selectedRange.getMaxValue()));
 		onFacetRequest.invoke(facetColumnRangeRequest);
