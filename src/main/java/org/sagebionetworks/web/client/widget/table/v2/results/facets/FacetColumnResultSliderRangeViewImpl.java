@@ -36,12 +36,22 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 		});
 	}
 
+	
 	@Override
-	public void initSlider(double min, double max, Range range) {
+	public void setMin(double min) {
 		slider.setMin(min);
+	}
+	
+	@Override
+	public void setMax(double max) {
 		slider.setMax(max);
+	}
+	
+	@Override
+	public void setRange(Range range) {
 		slider.setValue(range);
 	}
+	
 	@Override
 	public Widget asWidget() {
 		return w;

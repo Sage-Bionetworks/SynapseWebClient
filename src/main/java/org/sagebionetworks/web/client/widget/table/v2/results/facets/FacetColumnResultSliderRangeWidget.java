@@ -43,7 +43,16 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		if (max == null) {
 			max = maxMax;
 		}
-		view.initSlider(minMin.doubleValue(), maxMax.doubleValue(), new Range(min.doubleValue(), max.doubleValue()));
+		if (minMin != null) {
+			view.setMin(minMin.doubleValue());
+		}
+		if (maxMax != null) {
+			view.setMax(maxMax.doubleValue());
+		}
+		if (min != null && max != null) {
+			view.setRange(new Range(min.doubleValue(), max.doubleValue()));	
+		}
+		
 		view.setSliderStepSize(stepSize);
 	}
 	
