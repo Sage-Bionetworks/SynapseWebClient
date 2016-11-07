@@ -6,16 +6,17 @@
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
 		<b:Heading size="H5" ui:field="columnName"/>
-		<g:HorizontalPanel>
+		<g:HorizontalPanel  verticalAlignment="ALIGN_MIDDLE">
 			<bd:DateTimePicker ui:field="minDateTimePicker"
 				autoClose="true" highlightToday="true" showTodayButton="true"
 				showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
 				hasKeyboardNavigation="false" />
-			<bh:Span text=" to " />
+			<bh:Span text="to" addStyleNames="margin-left-5 margin-right-5"/>
 			<bd:DateTimePicker ui:field="maxDateTimePicker"
 				autoClose="true" highlightToday="true" showTodayButton="true"
 				showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
 				hasKeyboardNavigation="false" />
+			<b:Button ui:field="applyButton" text="Apply" type="PRIMARY" addStyleNames="margin-left-5" icon="FILTER" />
 		</g:HorizontalPanel>
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>

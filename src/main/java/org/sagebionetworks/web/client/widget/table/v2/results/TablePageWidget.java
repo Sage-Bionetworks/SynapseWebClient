@@ -131,7 +131,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty();
-		view.setFacetsWidgetVisible(isFacetsWidgetVisible);
+		if (isFacetsWidgetVisible) {
+			view.showFacets();
+		} else {
+			view.hideFacets();
+		}
 		if (isFacetsWidgetVisible) {
 			facetsWidget.configure(facets, facetChangedHandler, types);	
 		}

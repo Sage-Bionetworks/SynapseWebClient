@@ -2,12 +2,13 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
-import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
-import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,20 +25,19 @@ public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultDate
 	DateTimePicker maxDateTimePicker;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Button applyButton;
 	Widget w;
 	Presenter presenter;
 	
 	@Inject
 	public FacetColumnResultDateRangeViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
-		ChangeDateHandler changeDateHandler = new ChangeDateHandler() {
-			@Override
-			public void onChangeDate(ChangeDateEvent evt) {
+		applyButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
 				presenter.onFacetChange();
-			}
-		};
-		minDateTimePicker.addChangeDateHandler(changeDateHandler);
-		maxDateTimePicker.addChangeDateHandler(changeDateHandler);
+			};
+		});
 	}
 
 	@Override

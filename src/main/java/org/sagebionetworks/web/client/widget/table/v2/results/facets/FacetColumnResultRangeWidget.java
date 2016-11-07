@@ -36,7 +36,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 			view.setMin(facet.getSelectedMin());
 		}
 		if (facet.getSelectedMax() != null) {
-			view.setMin(facet.getSelectedMax());
+			view.setMax(facet.getSelectedMax());
 		}
 	}
 	

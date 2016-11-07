@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -60,6 +61,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 			request.setRequestedFiles(fileHandleAssociationsCopy);
 			request.setIncludeFileHandles(true);
 			request.setIncludePreSignedURLs(false);
+			GWT.debugger();
 			synapseClient.getFileHandleAndUrlBatch(request,new AsyncCallback<BatchFileResult>() {
 				@Override
 				public void onFailure(Throwable caught) {

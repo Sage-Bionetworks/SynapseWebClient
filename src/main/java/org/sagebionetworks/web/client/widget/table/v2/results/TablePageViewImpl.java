@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -32,7 +34,10 @@ public class TablePageViewImpl implements TablePageView {
 	@UiField
 	SimplePanel editorPopupBuffer;
 	@UiField
-	SimplePanel facetsWidgetPanel;
+	Column facetsWidgetPanel;
+	@UiField
+	Column tablePanel;
+	
 	Widget widget;
 	
 	@Inject
@@ -86,8 +91,16 @@ public class TablePageViewImpl implements TablePageView {
 		facetsWidgetPanel.clear();
 		facetsWidgetPanel.add(w);
 	}
+	
 	@Override
-	public void setFacetsWidgetVisible(boolean visible) {
-		facetsWidgetPanel.setVisible(visible);
+	public void showFacets() {
+		facetsWidgetPanel.setVisible(true);
+		tablePanel.setSize(ColumnSize.XS_12, ColumnSize.SM_8);
+	}
+	
+	@Override
+	public void hideFacets() {
+		facetsWidgetPanel.setVisible(false);
+		tablePanel.setSize(ColumnSize.XS_12);
 	}
 }

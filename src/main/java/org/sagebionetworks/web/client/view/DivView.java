@@ -11,4 +11,6 @@ public interface DivView extends IsWidget {
 	void add(Widget child);
 	void add(IsWidget child);
 	void clear();
+	void setAttribute(String name, String value);
+	void addStyleNames(String styles);
 }

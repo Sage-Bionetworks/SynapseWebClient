@@ -24,4 +24,14 @@ public class DivViewImpl implements DivView {
 	public void clear() {
 		div.clear();
 	}
+	
+	@Override
+	public void addStyleNames(String styles) {
+		div.addStyleName(styles);
+	}
+	
+	@Override
+	public void setAttribute(String name, String value) {
+		div.getElement().setAttribute(name, value);
+	}
 }

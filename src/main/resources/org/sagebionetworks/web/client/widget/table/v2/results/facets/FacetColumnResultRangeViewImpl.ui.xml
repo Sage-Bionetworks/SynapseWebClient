@@ -6,9 +6,11 @@
 	xmlns:b3="urn:import:org.gwtbootstrap3.extras.slider.client.ui">
 	<bh:Div>
 		<b:Heading size="H5" ui:field="columnName"/>
-		<g:HorizontalPanel>
-			<b:TextBox ui:field="minField"/> <bh:Span text=" to " /> <b:TextBox ui:field="maxField"/>
-			<b:Button ui:field="applyButton" text="Apply" size="EXTRA_SMALL"/>
+		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
+			<b:TextBox ui:field="minField"/>
+			<bh:Span text="to" addStyleNames="margin-left-5 margin-right-5"/>
+			<b:TextBox ui:field="maxField"/>
+			<b:Button ui:field="applyButton" text="Apply" type="PRIMARY" addStyleNames="margin-left-5" icon="FILTER" />
 		</g:HorizontalPanel>
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>
