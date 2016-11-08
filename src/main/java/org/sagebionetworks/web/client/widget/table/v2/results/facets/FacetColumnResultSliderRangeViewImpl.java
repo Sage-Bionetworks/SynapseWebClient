@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
-import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
 import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideStopEvent;
@@ -15,7 +15,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	
 	public interface Binder extends UiBinder<Widget, FacetColumnResultSliderRangeViewImpl> {	}
 	@UiField
-	Heading columnName;
+	Strong columnName;
 	@UiField
 	RangeSlider slider;
 	

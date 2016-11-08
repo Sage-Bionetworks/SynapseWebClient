@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
-import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Strong;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,7 +14,7 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 	
 	public interface Binder extends UiBinder<Widget, FacetColumnResultValuesViewImpl> {	}
 	@UiField
-	Heading columnName;
+	Strong columnName;
 	@UiField
 	Div facetValues;
 	

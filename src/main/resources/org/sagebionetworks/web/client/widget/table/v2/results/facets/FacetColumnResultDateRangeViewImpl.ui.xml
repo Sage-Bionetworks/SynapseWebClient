@@ -5,8 +5,10 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
-		<b:Heading size="H5" ui:field="columnName"/>
-		<g:HorizontalPanel  verticalAlignment="ALIGN_MIDDLE">
+		<bh:Div addStyleNames="margin-top-15 margin-bottom-5">
+			<bh:Strong ui:field="columnName"/>
+		</bh:Div>
+		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
 			<bd:DateTimePicker ui:field="minDateTimePicker"
 				autoClose="true" highlightToday="true" showTodayButton="true"
 				showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"

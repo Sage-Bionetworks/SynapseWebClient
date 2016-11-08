@@ -4,8 +4,10 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:b3="urn:import:org.gwtbootstrap3.extras.slider.client.ui">
 	<bh:Div>
-		<b:Heading size="H5" ui:field="columnName"/>
-		<bh:Div>
+		<bh:Div addStyleNames="margin-top-15 margin-bottom-5">
+			<bh:Strong ui:field="columnName"/>
+		</bh:Div>
+		<bh:Div addStyleNames="margin-left-10">
 			<b3:RangeSlider ui:field="slider" min="0" max="100" step="5" value="[0,100]"/>
 		</bh:Div>
 	</bh:Div>

@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,7 +18,7 @@ public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultDate
 	
 	public interface Binder extends UiBinder<Widget, FacetColumnResultDateRangeViewImpl> {}
 	@UiField
-	Heading columnName;
+	Strong columnName;
 	@UiField
 	DateTimePicker minDateTimePicker;
 	@UiField

@@ -6,8 +6,10 @@
 	<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
 		<b:CheckBox ui:field="select" addStyleNames="moveup-1"/>
 		<bh:Span ui:field="valueName" addStyleNames="margin-left-5"/>
-		<bh:Text>(</bh:Text>
-		<bh:Span ui:field="count"/>
-		<bh:Text>)</bh:Text>
+		<bh:Span addStyleNames="lightGreyText">
+			<bh:Text>(</bh:Text>
+			<bh:Span ui:field="count"/>
+			<bh:Text>)</bh:Text>
+		</bh:Span>
 	</g:HorizontalPanel>
 </ui:UiBinder>

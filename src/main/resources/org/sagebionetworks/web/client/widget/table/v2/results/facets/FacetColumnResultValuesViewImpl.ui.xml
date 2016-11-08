@@ -4,7 +4,9 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<b:Heading size="H5" ui:field="columnName"/>
+		<bh:Div addStyleNames="margin-top-15">
+			<bh:Strong ui:field="columnName"/>
+		</bh:Div>
 		<bh:Div ui:field="facetValues"/>
 	</bh:Div>
 </ui:UiBinder>

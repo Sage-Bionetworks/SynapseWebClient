@@ -5,7 +5,9 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:b3="urn:import:org.gwtbootstrap3.extras.slider.client.ui">
 	<bh:Div>
-		<b:Heading size="H5" ui:field="columnName"/>
+		<bh:Div addStyleNames="margin-top-15 margin-bottom-5">
+			<bh:Strong ui:field="columnName"/>
+		</bh:Div>
 		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
 			<b:TextBox ui:field="minField"/>
 			<bh:Span text="to" addStyleNames="margin-left-5 margin-right-5"/>
