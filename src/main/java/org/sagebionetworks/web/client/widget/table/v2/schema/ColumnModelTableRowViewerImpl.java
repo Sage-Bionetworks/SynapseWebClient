@@ -112,11 +112,11 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 
 	@Override
 	public ColumnFacetTypeViewEnum getFacetType() {
-		return ColumnFacetTypeViewEnum.valueOf(facetType.getText());
+		return ColumnFacetTypeViewEnum.getEnumForFriendlyName(facetType.getText());
 	}
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
-		this.facetType.setText(type.name());
+		this.facetType.setText(type.toString());
 	}
 
 }

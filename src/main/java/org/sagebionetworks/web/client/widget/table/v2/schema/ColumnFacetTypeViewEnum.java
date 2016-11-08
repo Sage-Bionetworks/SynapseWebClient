@@ -9,12 +9,13 @@ import org.sagebionetworks.repo.model.table.FacetType;
  *
  */
 public enum ColumnFacetTypeViewEnum {
-	None(null),
-	Values(FacetType.enumeration),
-	Range(FacetType.range);
+	None(null, ""),
+	Values(FacetType.enumeration, "Values"),
+	Range(FacetType.range, "Range");
 	
 	private FacetType type;
-	ColumnFacetTypeViewEnum(FacetType type){
+	private String friendlyDisplay;
+	ColumnFacetTypeViewEnum(FacetType type, String friendlyDisplay){
 		this.type = type;
 	}
 	/**
@@ -40,5 +41,27 @@ public enum ColumnFacetTypeViewEnum {
 			}
 		}
 		throw new IllegalArgumentException("Unknown type: "+type);
+	}
+	
+	/**
+	 * Lookup the view for a given friendly name.
+	 * @param type
+	 * @return
+	 */
+	public static ColumnFacetTypeViewEnum getEnumForFriendlyName(String targetFriendlyName){
+		if (targetFriendlyName == null) {
+			return ColumnFacetTypeViewEnum.None;
+		}
+		for(ColumnFacetTypeViewEnum view: ColumnFacetTypeViewEnum.values()){
+			if(targetFriendlyName.equals(view.toString())){
+				return view;
+			}
+		}
+		throw new IllegalArgumentException("Unknown friendly name: "+targetFriendlyName);
+	}
+	
+	@Override
+	public String toString() {
+		return friendlyDisplay;
 	}
 }

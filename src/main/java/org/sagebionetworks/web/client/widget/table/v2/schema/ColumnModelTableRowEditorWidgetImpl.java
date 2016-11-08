@@ -114,16 +114,16 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		switch(type){
 			case String:
 			case Integer:
-				view.setFacetValues(None.name(), Values.name(), Range.name());
+				view.setFacetValues(None.toString(), Values.toString(), Range.toString());
 				view.setFacetVisible(true);
 				break;
 			case Boolean:
-				view.setFacetValues(None.name(), Values.name());
+				view.setFacetValues(None.toString(), Values.toString());
 				view.setFacetVisible(true);
 				break;
 			case Double:
 			case Date:
-				view.setFacetValues(None.name(), Range.name());
+				view.setFacetValues(None.toString(), Range.toString());
 				view.setFacetVisible(true);
 				break;
 			default:

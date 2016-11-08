@@ -75,7 +75,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	
 	@Override
 	public ColumnFacetTypeViewEnum getFacetType() {
-		return ColumnFacetTypeViewEnum.valueOf(facet.getSelectedValue());
+		return ColumnFacetTypeViewEnum.getEnumForFriendlyName(facet.getSelectedValue());
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		int index = 0;
-		String targetName = type.name();
+		String targetName = type.toString();
 		for (int i = 0; i < this.facet.getItemCount(); i++) {
 			if (this.facet.getValue(i).equals(targetName)){
 				index = i;
