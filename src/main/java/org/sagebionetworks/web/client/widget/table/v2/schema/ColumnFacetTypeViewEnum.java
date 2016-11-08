@@ -17,6 +17,7 @@ public enum ColumnFacetTypeViewEnum {
 	private String friendlyDisplay;
 	ColumnFacetTypeViewEnum(FacetType type, String friendlyDisplay){
 		this.type = type;
+		this.friendlyDisplay = friendlyDisplay;
 	}
 	/**
 	 * Get the type for this view.
