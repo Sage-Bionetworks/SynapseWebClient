@@ -13,6 +13,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setUserPickerWidget(Widget w);
 	void setLoadingEmailWidget(Widget w);
 	String getAccessRequirement();
+	String getEmailMessage();
 	Widget getEmailBodyWidget(String html);
 	void setAccessRequirement(String num, String html);
 	void setApproveProcessing(boolean processing);
@@ -30,6 +31,8 @@ public interface ApproveUserAccessModalView extends IsWidget {
 		void onSubmit();
 		void onStateSelected(String state);
 	}
+	void setLoadingEmailVisible(boolean visible);
+	void setMessageEditArea(String html);
 
 
 }

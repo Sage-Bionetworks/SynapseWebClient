@@ -45,7 +45,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String SELECT_FROM = "SELECT \"Email Body\" FROM ";
 	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
 	public static final String QUERY_CANCELLED = "Query cancelled";
-	public static final String NO_EMAIL_MESSAGE = "An error was encountered while loading the email body";
+	public static final String NO_EMAIL_MESSAGE = "You must enter an email to send to the user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User";
@@ -123,7 +123,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			
 			@Override
 			public void onFailure(Throwable failure) {
-				view.finishLoadingEmail();
+				view.setLoadingEmailVisible(false);
 				synAlert.handleException(failure);
 			}
 			
@@ -132,16 +132,17 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				QueryResultBundle result = (QueryResultBundle) response;
 				if (hasResult(result)) {
 					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-					view.setMessageBody(message);
-					view.finishLoadingEmail();
+					view.setMessageEditArea(message);
 				} else {
-					view.finishLoadingEmail();
-					synAlert.showError(NO_EMAIL_MESSAGE);
+					message = "";
 				}
+				view.setMessageBody(message);
+				view.finishLoadingEmail();
 			}
 
 			@Override
 			public void onCancel() {
+				view.setLoadingEmailVisible(false);
 				view.finishLoadingEmail();
 				synAlert.showError(QUERY_CANCELLED);
 			}
@@ -193,7 +194,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
-		if (message == null) {
+		message = view.getEmailMessage();
+		if (message == null || message.isEmpty()) {
 			synAlert.showError(NO_EMAIL_MESSAGE);
 			return;
 		}

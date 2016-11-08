@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -40,7 +41,9 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button previewButton;
 	@UiField
-	TextBox emailTemplate;
+	HTML emailTemplate;
+	@UiField
+	TextArea messageEditArea;
 	@UiField
 	Div userSelectContainer;
 	@UiField
@@ -73,6 +76,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				messageBody.setHTML(messageEditArea.getText());
 				previewModal.show();
 			}
 		});
@@ -124,16 +128,25 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void startLoadingEmail() {
 		emailTemplate.setVisible(false);
 		previewButton.setVisible(false);
-		loadingEmail.clear();
-		loadingEmail.setVisible(true);
+		setLoadingEmailVisible(true);
 	}
 	
 	@Override
 	public void finishLoadingEmail() {
-		loadingEmail.clear();
-		loadingEmail.setVisible(false);
+		setLoadingEmailVisible(false);
 		emailTemplate.setVisible(true);
 		previewButton.setVisible(true);
+	}
+	
+	@Override
+	public void setLoadingEmailVisible(boolean visible) {
+		loadingEmail.clear();
+		loadingEmail.setVisible(visible);
+	}
+	
+	@Override
+	public void setMessageEditArea(String html) {
+		messageEditArea.setText(html);
 	}
 	
 	@Override
@@ -174,6 +187,11 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	public void setAccessRequirement(String num, String html) {
 		accessReqNum.setText(num);
 		accessReqText.setHTML(html);
+	}
+	
+	@Override
+	public String getEmailMessage() {
+		return messageEditArea.getText();
 	}
 
 	@Override
