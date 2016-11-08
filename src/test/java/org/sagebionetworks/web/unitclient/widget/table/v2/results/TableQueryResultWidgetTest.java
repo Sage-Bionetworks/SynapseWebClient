@@ -9,7 +9,10 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -21,6 +24,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
@@ -53,9 +57,12 @@ public class TableQueryResultWidgetTest {
 	SelectColumn select;
 	SynapseAlert mockSynapseAlert;
 	boolean isView;
+	@Mock
+	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		jobTrackingStub = new JobTrackingWidgetStub();
 		mockListner = Mockito.mock(QueryResultsListener.class);
 		mockView = Mockito.mock(TableQueryResultView.class);
@@ -108,7 +115,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget, mockFacetChangedHandler);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -141,7 +148,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget, mockFacetChangedHandler);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -162,7 +169,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget, mockFacetChangedHandler);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);

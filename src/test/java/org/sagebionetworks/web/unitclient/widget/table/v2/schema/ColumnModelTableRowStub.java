@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
@@ -147,6 +148,16 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	}
 	@Override
 	public void setSelectVisible(boolean visible) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		// TODO Auto-generated method stub
 		
 	}
