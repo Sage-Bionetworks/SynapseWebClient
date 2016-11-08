@@ -25,6 +25,8 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	@UiField
 	FormControlStatic type;
 	@UiField
+	FormControlStatic facetType;
+	@UiField
 	FormControlStatic maxSize;
 	@UiField
 	FormControlStatic defaultValue;
@@ -32,7 +34,7 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	FormControlStatic restrictValues;
 	
 	String id;
-	ColumnFacetTypeViewEnum facetType;
+	
 	@Inject
 	public ColumnModelTableRowViewerImpl(Binder uiBinder){
 		row = uiBinder.createAndBindUi(this);
@@ -110,11 +112,11 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 
 	@Override
 	public ColumnFacetTypeViewEnum getFacetType() {
-		return facetType;
+		return ColumnFacetTypeViewEnum.valueOf(facetType.getText());
 	}
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
-		this.facetType = type;
+		this.facetType.setText(type.name());
 	}
 
 }
