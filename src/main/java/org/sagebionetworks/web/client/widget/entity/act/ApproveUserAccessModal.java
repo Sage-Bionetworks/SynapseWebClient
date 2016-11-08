@@ -123,6 +123,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			
 			@Override
 			public void onFailure(Throwable failure) {
+				view.finishLoadingEmail();
 				synAlert.handleException(failure);
 			}
 			
@@ -134,12 +135,14 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 					view.setMessageBody(message);
 					view.finishLoadingEmail();
 				} else {
+					view.finishLoadingEmail();
 					synAlert.showError(NO_EMAIL_MESSAGE);
 				}
 			}
 
 			@Override
 			public void onCancel() {
+				view.finishLoadingEmail();
 				synAlert.showError(QUERY_CANCELLED);
 			}
 		});
