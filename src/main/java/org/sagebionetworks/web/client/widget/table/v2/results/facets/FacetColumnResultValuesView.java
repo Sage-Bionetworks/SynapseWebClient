@@ -10,4 +10,7 @@ public interface FacetColumnResultValuesView extends IsWidget {
 	void setColumnName(String columnName);
 	void clearValues();
 	void addValue(boolean isSelected, String facetValue, Long count);
+	void addValueToOverflow(boolean isSelected, String facetValue, Long count);
+	void setShowAllButtonVisible(boolean visible);
+	void setShowAllButtonText(String text); 
 }

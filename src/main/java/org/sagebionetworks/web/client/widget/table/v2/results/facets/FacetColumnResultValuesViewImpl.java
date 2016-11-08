@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
 
@@ -17,12 +18,22 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 	Strong columnName;
 	@UiField
 	Div facetValues;
-	
+	@UiField
+	Button showAllButton;
+	@UiField
+	Div overflowFacetValues;
 	Widget w;
 	Presenter presenter;
 	@Inject
 	public FacetColumnResultValuesViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
+		showAllButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showAllButton.setVisible(false);
+				overflowFacetValues.setVisible(true);
+			}
+		});
 	}
 
 	@Override
@@ -36,8 +47,27 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 	}
 	
 	@Override
-	public void addValue(boolean isSelected, final String facetValue, Long count) {
-		FacetColumnResultValueWidget valueWidget = new FacetColumnResultValueWidget();
+	public void addValue(boolean isSelected, String facetValue, Long count) {
+		facetValues.add(getNewFacetColumnResultValueWidget(isSelected, facetValue, count));
+	}
+	
+	@Override
+	public void addValueToOverflow(boolean isSelected, String facetValue, Long count) {
+		overflowFacetValues.add(getNewFacetColumnResultValueWidget(isSelected, facetValue, count));
+	}
+	
+	@Override
+	public void setShowAllButtonText(String text) {
+		showAllButton.setText(text);
+	}
+	
+	@Override
+	public void setShowAllButtonVisible(boolean visible) {
+		showAllButton.setVisible(visible);
+	}
+	
+	private FacetColumnResultValueWidgetImpl getNewFacetColumnResultValueWidget(boolean isSelected, final String facetValue, Long count){
+		FacetColumnResultValueWidgetImpl valueWidget = new FacetColumnResultValueWidgetImpl();
 		valueWidget.setIsSelected(isSelected);
 		valueWidget.setValueName(facetValue);
 		valueWidget.setCount(count);
@@ -47,12 +77,14 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 				presenter.onFacetChange(facetValue);
 			}
 		});
-		facetValues.add(valueWidget);
+		return valueWidget;
 	}
 	
 	@Override
 	public void clearValues() {
 		facetValues.clear();
+		overflowFacetValues.clear();
+		overflowFacetValues.setVisible(false);
 	}
 	
 	@Override

@@ -8,5 +8,7 @@
 			<bh:Strong ui:field="columnName"/>
 		</bh:Div>
 		<bh:Div ui:field="facetValues"/>
+		<b:Button ui:field="showAllButton" visible="false" size="EXTRA_SMALL"/>
+		<bh:Div ui:field="overflowFacetValues" />
 	</bh:Div>
 </ui:UiBinder>
