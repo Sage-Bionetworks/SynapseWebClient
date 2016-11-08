@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -88,7 +89,11 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 	@Override
 	public void clearTableEntityWidget() {
-		tableWidgetContainer.clear();
+		try{
+			tableWidgetContainer.clear();	
+		} catch(Throwable t) {
+			SynapseJSNIUtilsImpl._consoleError(t.getMessage());
+		}
 	}
 	
 	@Override
