@@ -30,9 +30,11 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	public interface Presenter {
 		void onSubmit();
 		void onStateSelected(String state);
+		void onRevoke();
 	}
 	void setLoadingEmailVisible(boolean visible);
 	void setMessageEditArea(String html);
+	void setRevokeProcessing(boolean b);
 
 
 }

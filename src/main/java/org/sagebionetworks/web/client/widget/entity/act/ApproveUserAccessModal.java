@@ -49,6 +49,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User";
+	public static final String REVOKED_USER = "User access has been revoked";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	
 	// Mask to get all parts of a query.
@@ -186,6 +187,35 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public void show() {
 		synAlert.clear();
 		view.show();
+	}
+	
+	@Override
+	public void onRevoke() {
+		if (userId == null) {
+			synAlert.showError(NO_USER_SELECTED);
+			return;
+		}
+		accessRequirement = view.getAccessRequirement();
+		view.setRevokeProcessing(true);
+		ACTAccessApproval aa  = new ACTAccessApproval();
+		aa.setAccessorId(userId);  //user id
+		aa.setApprovalStatus(ACTApprovalStatus.PENDING);
+		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
+		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				view.setApproveProcessing(false);
+			}
+
+			@Override
+			public void onSuccess(AccessApproval result) {
+				view.setRevokeProcessing(false);
+				view.hide();
+				view.showInfo(REVOKED_USER, "");
+			}
+		});
 	}
 	
 	@Override

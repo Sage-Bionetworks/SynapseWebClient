@@ -37,6 +37,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button submitButton;
 	@UiField
+	Button revokeButton;
+	@UiField
 	Button cancelButton;
 	@UiField
 	Button previewButton;
@@ -71,6 +73,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
+			}
+		});
+		revokeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onRevoke();
 			}
 		});
 		previewButton.addClickHandler(new ClickHandler() {
@@ -181,6 +189,19 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		}else{
 			submitButton.state().reset();
 		}
+		cancelButton.setEnabled(!processing);
+		revokeButton.setEnabled(!processing);
+	}
+	
+	@Override
+	public void setRevokeProcessing(boolean processing) {
+		if(processing){
+			revokeButton.state().loading();
+		}else{
+			revokeButton.state().reset();
+		}
+		cancelButton.setEnabled(!processing);
+		submitButton.setEnabled(!processing);
 	}
 	
 	@Override
