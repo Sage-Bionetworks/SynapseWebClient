@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -146,6 +145,13 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 	
 	public void addColumns(List<ColumnModel> models) {
+		List<ColumnModel> existingColumns = getEditedColumnModels();
+		for (ColumnModel cm : existingColumns) {
+			cm.setId(null);
+			if (models.contains(cm)) {
+				models.remove(cm);
+			}
+		}
 		for(ColumnModel cm: models){
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
