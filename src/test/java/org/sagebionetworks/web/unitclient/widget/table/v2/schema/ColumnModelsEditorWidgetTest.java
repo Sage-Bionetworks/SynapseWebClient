@@ -23,6 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
@@ -51,6 +52,8 @@ public class ColumnModelsEditorWidgetTest {
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
 	@Before
@@ -75,7 +78,7 @@ public class ColumnModelsEditorWidgetTest {
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
-		widget = new ColumnModelsEditorWidget(mockGinInjector);
+		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
 	}
@@ -217,7 +220,7 @@ public class ColumnModelsEditorWidgetTest {
 		reset(mockKeyboardNavigationHandler, mockEditor);
 		// when not in test website, existing columns will be viewers (not editors)
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		widget = new ColumnModelsEditorWidget(mockGinInjector);
+		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
