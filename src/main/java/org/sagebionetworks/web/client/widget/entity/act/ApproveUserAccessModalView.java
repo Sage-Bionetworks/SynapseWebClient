@@ -36,5 +36,4 @@ public interface ApproveUserAccessModalView extends IsWidget {
 		void onRevoke();
 	}
 
-
 }

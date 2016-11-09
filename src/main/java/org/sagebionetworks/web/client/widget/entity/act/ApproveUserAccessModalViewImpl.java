@@ -45,6 +45,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	HTML emailTemplate;
 	@UiField
+	TextArea messageEditArea;
+	@UiField
 	Div userSelectContainer;
 	@UiField
 	Div loadingEmail;
@@ -54,8 +56,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	HTML messageBody;
 	@UiField
 	Button closeButton;
-	@UiField
-	TextArea messageEditArea;
 	
 	private Presenter presenter;
 	
@@ -75,10 +75,16 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 				modal.hide();
 			}
 		});
+		revokeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onRevoke();
+			}
+		});
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				setPreview();
+				messageBody.setHTML(messageEditArea.getText());
 				previewModal.show();
 			}
 		});
@@ -94,10 +100,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 				presenter.onRevoke();
 			}
 		});
-	}
-	
-	private void setPreview() {
-		messageBody.setHTML(messageEditArea.getText());
 	}
 	
 	@Override

@@ -45,7 +45,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String SELECT_FROM = "SELECT \"Email Body\" FROM ";
 	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
 	public static final String QUERY_CANCELLED = "Query cancelled";
-	public static final String NO_EMAIL_MESSAGE = "An error was encountered while loading the email body";
+	public static final String NO_EMAIL_MESSAGE = "You must enter an email to send to the user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User";
