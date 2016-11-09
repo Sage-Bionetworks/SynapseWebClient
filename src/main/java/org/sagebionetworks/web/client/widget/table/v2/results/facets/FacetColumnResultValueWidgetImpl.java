@@ -58,7 +58,7 @@ public class FacetColumnResultValueWidgetImpl implements FacetColumnResultValueW
 		valueName.setText(name.substring(0, 40));
 	}
 	public void setCount(Long c) {
-		count.setText(c.toString());
+		count.setText("("+c.toString()+")");
 	}
 	
 	public void addClickHandler(ClickHandler clickHandler) {

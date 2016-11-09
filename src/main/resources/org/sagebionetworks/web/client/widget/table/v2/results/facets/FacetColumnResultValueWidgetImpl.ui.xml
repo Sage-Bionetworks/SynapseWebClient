@@ -10,9 +10,7 @@
 		</g:FocusPanel>
 		<g:FocusPanel ui:field="countContainer">
 			<bh:Span addStyleNames="lightGreyText imageButton">
-				<bh:Text>(</bh:Text>
 				<bh:Span ui:field="count"/>
-				<bh:Text>)</bh:Text>
 			</bh:Span>
 		</g:FocusPanel>
 		

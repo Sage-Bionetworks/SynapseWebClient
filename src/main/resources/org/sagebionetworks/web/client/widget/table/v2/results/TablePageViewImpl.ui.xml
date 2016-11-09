@@ -4,7 +4,10 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<g:ScrollPanel ui:field="facetsWidgetPanel" addStyleNames="pull-left-unless-xs margin-right-10 panel panel-default padding-10" />
+		<g:ScrollPanel ui:field="facetsWidgetContainer" addStyleNames="pull-left-unless-xs margin-right-10 panel panel-default padding-10">
+			<bh:Div ui:field="facetsWidgetPanel"/>
+		</g:ScrollPanel>
+		
 		<bh:Div ui:field="tablePanel">
 			<g:ScrollPanel>
 				<bh:Div>

@@ -15,6 +15,7 @@ import com.google.inject.Inject;
 
 public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResultValuesView.Presenter {
 	public static final String UNSPECIFIED = "(not set)";
+	public static final String EMPTY_STRING = "(empty string)";
 	FacetColumnResultValuesView view;
 	FacetColumnResultValues facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
@@ -34,17 +35,19 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		view.setColumnName(facet.getColumnName());
 		int i = 0;
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
-			String value = valueCount.getValue();
-			if (value == null) {
-				value = UNSPECIFIED;
+			String displayValue = valueCount.getValue();
+			if (displayValue == null) {
+				displayValue = UNSPECIFIED;
+			} else if (displayValue.trim().isEmpty()) {
+				displayValue = EMPTY_STRING;
 			}
 			if (valueCount.getIsSelected()) {
 				facetValues.add(valueCount.getValue());
 			}
 			if (i < MAX_VISIBLE_FACET_VALUES) {
-				view.addValue(valueCount.getIsSelected(), value, valueCount.getCount());	
+				view.addValue(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());	
 			} else {
-				view.addValueToOverflow(valueCount.getIsSelected(), value, valueCount.getCount());
+				view.addValueToOverflow(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());
 			}
 			i++;
 		}
@@ -55,7 +58,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 			view.setShowAllButtonVisible(false);
 		}
 	}
-
+	
 	@Override
 	public void onFacetChange(String facetValue) {
 		FacetColumnValuesRequest facetColumnValuesRequest = new FacetColumnValuesRequest();

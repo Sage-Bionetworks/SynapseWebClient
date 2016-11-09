@@ -9,8 +9,8 @@ public interface FacetColumnResultValuesView extends IsWidget {
 	void setPresenter(Presenter p);
 	void setColumnName(String columnName);
 	void clearValues();
-	void addValue(boolean isSelected, String facetValue, Long count);
-	void addValueToOverflow(boolean isSelected, String facetValue, Long count);
+	void addValue(boolean isSelected, String displayValue, Long count, String originalFacetValue);
+	void addValueToOverflow(boolean isSelected, String displayValue, Long count, String originalFacetValue);
 	void setShowAllButtonVisible(boolean visible);
 	void setShowAllButtonText(String text); 
 }

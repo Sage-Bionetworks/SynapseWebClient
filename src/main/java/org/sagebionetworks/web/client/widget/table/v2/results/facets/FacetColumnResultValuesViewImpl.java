@@ -47,13 +47,13 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 	}
 	
 	@Override
-	public void addValue(boolean isSelected, String facetValue, Long count) {
-		facetValues.add(getNewFacetColumnResultValueWidget(isSelected, facetValue, count));
+	public void addValue(boolean isSelected, String displayValue, Long count, String originalFacetValue) {
+		facetValues.add(getNewFacetColumnResultValueWidget(isSelected, displayValue, count, originalFacetValue));
 	}
 	
 	@Override
-	public void addValueToOverflow(boolean isSelected, String facetValue, Long count) {
-		overflowFacetValues.add(getNewFacetColumnResultValueWidget(isSelected, facetValue, count));
+	public void addValueToOverflow(boolean isSelected, String displayValue, Long count, String originalFacetValue) {
+		overflowFacetValues.add(getNewFacetColumnResultValueWidget(isSelected, displayValue, count, originalFacetValue));
 	}
 	
 	@Override
@@ -66,15 +66,15 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 		showAllButton.setVisible(visible);
 	}
 	
-	private FacetColumnResultValueWidgetImpl getNewFacetColumnResultValueWidget(boolean isSelected, final String facetValue, Long count){
+	private FacetColumnResultValueWidgetImpl getNewFacetColumnResultValueWidget(boolean isSelected, String displayValue, Long count, final String originalFacetValue){
 		FacetColumnResultValueWidgetImpl valueWidget = new FacetColumnResultValueWidgetImpl();
 		valueWidget.setIsSelected(isSelected);
-		valueWidget.setValueName(facetValue);
+		valueWidget.setValueName(displayValue);
 		valueWidget.setCount(count);
 		valueWidget.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onFacetChange(facetValue);
+				presenter.onFacetChange(originalFacetValue);
 			}
 		});
 		return valueWidget;

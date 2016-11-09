@@ -34,7 +34,9 @@ public class TablePageViewImpl implements TablePageView {
 	@UiField
 	SimplePanel editorPopupBuffer;
 	@UiField
-	ScrollPanel facetsWidgetPanel;
+	Div facetsWidgetPanel;
+	@UiField
+	ScrollPanel facetsWidgetContainer;
 	@UiField
 	Div tablePanel;
 	
@@ -94,6 +96,6 @@ public class TablePageViewImpl implements TablePageView {
 	
 	@Override
 	public void setFacetsVisible(boolean visible) {
-		facetsWidgetPanel.setVisible(visible);
+		facetsWidgetContainer.setVisible(visible);
 	}
 }
