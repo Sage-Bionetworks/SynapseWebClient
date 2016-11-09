@@ -93,6 +93,7 @@ public class FacetColumnResultDateRangeWidget implements IsWidget, FacetColumnRe
 	public void onFacetChange() {
 		if (isValidInput()) {
 			FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
+			facetColumnRangeRequest.setColumnName(facet.getColumnName());
 			Date newMin = view.getMin();
 			if (newMin != null) {
 				facetColumnRangeRequest.setMin(Long.toString(newMin.getTime()));	

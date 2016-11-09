@@ -85,6 +85,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	public void onFacetChange() {
 		if (isValidInput()) {
 			FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
+			facetColumnRangeRequest.setColumnName(facet.getColumnName());
 			facetColumnRangeRequest.setMin(view.getMin());
 			facetColumnRangeRequest.setMax(view.getMax());
 			onFacetRequest.invoke(facetColumnRangeRequest);

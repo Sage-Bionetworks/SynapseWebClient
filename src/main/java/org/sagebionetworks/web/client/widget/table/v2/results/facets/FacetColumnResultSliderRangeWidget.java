@@ -71,6 +71,7 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 	@Override
 	public void onFacetChange(Range selectedRange) {
 		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
+		facetColumnRangeRequest.setColumnName(facet.getColumnName());
 		facetColumnRangeRequest.setMin(Double.toString(selectedRange.getMinValue()));
 		facetColumnRangeRequest.setMax(Double.toString(selectedRange.getMaxValue()));
 		onFacetRequest.invoke(facetColumnRangeRequest);
