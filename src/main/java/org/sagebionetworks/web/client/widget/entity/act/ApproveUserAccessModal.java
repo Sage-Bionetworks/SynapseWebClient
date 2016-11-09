@@ -50,6 +50,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
+	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
 	
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -123,6 +124,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			
 			@Override
 			public void onFailure(Throwable failure) {
+				view.setLoadingEmailVisible(false);
 				synAlert.handleException(failure);
 			}
 			
@@ -131,15 +133,18 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				QueryResultBundle result = (QueryResultBundle) response;
 				if (hasResult(result)) {
 					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-					view.setMessageBody(message);
-					view.finishLoadingEmail();
+					view.setMessageEditArea(message);
 				} else {
-					synAlert.showError(NO_EMAIL_MESSAGE);
+					message = "";
 				}
+				view.setMessageBody(message);
+				view.finishLoadingEmail();
 			}
 
 			@Override
 			public void onCancel() {
+				view.setLoadingEmailVisible(false);
+				view.finishLoadingEmail();
 				synAlert.showError(QUERY_CANCELLED);
 			}
 		});
@@ -190,8 +195,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
-		if (message == null) {
-			synAlert.showError(NO_EMAIL_MESSAGE);
+		message = view.getEmailMessage();
+		if (message == null || message.isEmpty()) {
+			synAlert.showError(MESSAGE_BLANK);
 			return;
 		}
 		accessRequirement = view.getAccessRequirement();
@@ -210,7 +216,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				sendEmail(result);
+				sendEmail(result);						
 			}
 		});
 	}
