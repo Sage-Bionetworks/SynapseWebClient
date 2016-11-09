@@ -61,6 +61,5 @@ public interface TablePageView extends IsWidget {
 	public void setEditorBufferVisible(boolean isEditable);
 	
 	void setFacetsWidget(Widget w);
-	void showFacets();
-	void hideFacets();
+	void setFacetsVisible(boolean visible);
 }

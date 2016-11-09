@@ -24,7 +24,6 @@ public class FacetsWidget implements IsWidget {
 	@Inject
 	public FacetsWidget(DivView view, PortalGinInjector ginInjector) {
 		this.view = view;
-		view.addStyleNames("panel panel-default padding-10");
 		this.ginInjector = ginInjector;
 	}
 	

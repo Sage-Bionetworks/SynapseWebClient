@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -66,15 +68,17 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			@Override
 			public void invoke(FacetColumnRequest request) {
 				List<FacetColumnRequest> selectedFacets = startingQuery.getSelectedFacets();
-				if (selectedFacets != null) {
-					for (FacetColumnRequest facetColumnRequest : selectedFacets) {
-						if (facetColumnRequest.getColumnName().equals(request.getColumnName())) {
-							selectedFacets.remove(facetColumnRequest);
-							break;
-						}
-						selectedFacets.add(request);
+				if (selectedFacets == null) {
+					selectedFacets = new ArrayList<FacetColumnRequest>();
+					startingQuery.setSelectedFacets(selectedFacets);
+				}
+				for (FacetColumnRequest facetColumnRequest : selectedFacets) {
+					if (facetColumnRequest.getColumnName().equals(request.getColumnName())) {
+						selectedFacets.remove(facetColumnRequest);
+						break;
 					}
 				}
+				selectedFacets.add(request);
 				runQuery();
 			}
 		};

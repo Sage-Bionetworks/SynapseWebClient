@@ -55,7 +55,7 @@ public class FacetColumnResultValueWidgetImpl implements FacetColumnResultValueW
 		select.setValue(isSelected);
 	}
 	public void setValueName(String name) {
-		valueName.setText(name);
+		valueName.setText(name.substring(0, 40));
 	}
 	public void setCount(Long c) {
 		count.setText(c.toString());

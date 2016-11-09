@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResultValuesView.Presenter {
+	public static final String UNSPECIFIED = "(not set)";
 	FacetColumnResultValuesView view;
 	FacetColumnResultValues facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
@@ -33,13 +34,17 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		view.setColumnName(facet.getColumnName());
 		int i = 0;
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
+			String value = valueCount.getValue();
+			if (value == null) {
+				value = UNSPECIFIED;
+			}
 			if (valueCount.getIsSelected()) {
 				facetValues.add(valueCount.getValue());
 			}
 			if (i < MAX_VISIBLE_FACET_VALUES) {
-				view.addValue(valueCount.getIsSelected(), valueCount.getValue(), valueCount.getCount());	
+				view.addValue(valueCount.getIsSelected(), value, valueCount.getCount());	
 			} else {
-				view.addValueToOverflow(valueCount.getIsSelected(), valueCount.getValue(), valueCount.getCount());
+				view.addValueToOverflow(valueCount.getIsSelected(), value, valueCount.getCount());
 			}
 			i++;
 		}
