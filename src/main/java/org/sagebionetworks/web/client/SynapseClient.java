@@ -549,5 +549,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;
 	
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
+	
+	void deleteAccessApproval(Long approvalId) throws RestServiceException;
 
 }

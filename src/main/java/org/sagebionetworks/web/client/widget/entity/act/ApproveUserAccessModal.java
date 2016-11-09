@@ -198,11 +198,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		accessRequirement = view.getAccessRequirement();
 		view.setRevokeProcessing(true);
-		ACTAccessApproval aa  = new ACTAccessApproval();
-		aa.setAccessorId(userId);  //user id
-		aa.setApprovalStatus(ACTApprovalStatus.PENDING);
-		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
-		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
+		synapseClient.deleteAccessApproval(Long.parseLong(accessRequirement), new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -211,7 +207,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			}
 
 			@Override
-			public void onSuccess(AccessApproval result) {
+			public void onSuccess(Void result) {
 				view.setRevokeProcessing(false);
 				view.hide();
 				view.showInfo(REVOKED_USER, "");
