@@ -97,7 +97,7 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget);
+		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, null);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		message = "Message";
