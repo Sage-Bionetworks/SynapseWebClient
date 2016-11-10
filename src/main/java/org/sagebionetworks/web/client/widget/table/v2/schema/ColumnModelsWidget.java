@@ -97,7 +97,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 			@Override
 			public void onSuccess(List<ColumnModel> columns) {
-				editor.addColumns(columns);
+				editor.configure(columns);
 			}
 		});
 	}

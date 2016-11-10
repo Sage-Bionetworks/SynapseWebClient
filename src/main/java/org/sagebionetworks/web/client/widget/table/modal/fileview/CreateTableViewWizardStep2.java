@@ -95,7 +95,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			}
 			@Override
 			public void onSuccess(List<ColumnModel> columns) {
-				editor.addColumns(columns);
+				editor.configure(columns);
 			}
 		});
 	}
