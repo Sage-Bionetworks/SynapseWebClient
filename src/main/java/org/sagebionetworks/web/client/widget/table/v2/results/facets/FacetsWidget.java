@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -42,7 +41,7 @@ public class FacetsWidget implements IsWidget {
 					case enumeration:
 						FacetColumnResultValues facetResultValues = (FacetColumnResultValues)facet;
 						// if values are not set, then don't show the facet
-						if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 1) {
+						if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 0) {
 							FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
 							valuesWidget.configure(facetResultValues, facetChangedHandler);
 							view.add(valuesWidget);
