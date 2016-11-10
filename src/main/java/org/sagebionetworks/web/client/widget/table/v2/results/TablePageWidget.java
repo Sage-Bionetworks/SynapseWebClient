@@ -8,10 +8,6 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResult;
-import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
-import org.sagebionetworks.repo.model.table.FacetColumnResultValueCount;
-import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
-import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
@@ -133,7 +129,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				!facets.isEmpty();
 		view.setFacetsVisible(isFacetsWidgetVisible);
 		if (isFacetsWidgetVisible) {
-			facetsWidget.configure(facets, facetChangedHandler, types);	
+			facetsWidget.configure(facets, facetChangedHandler, types);
+			view.setFacetsVisible(facetsWidget.isShowingFacets());
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
