@@ -18,7 +18,7 @@ public interface UserBadgeListView extends IsWidget {
 	void setToolbarVisible(boolean visible);
 	void setSelectorWidget(Widget widget);
 	void setUploadWidgetVisible(boolean visible);
-	void addFileLink(Widget fileLinkWidget);
+	void addUserBadge(String fileLinkWidget);
 	void clearFileLinks();
 	void setCanDelete(boolean canDelete);
 }

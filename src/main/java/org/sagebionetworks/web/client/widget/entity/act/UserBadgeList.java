@@ -30,7 +30,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	CallbackP<String> fileHandleClickedCallback;
 	Callback selectionChangedCallback;
 	List<FileHandleLink> links; //UserBadgeLink?
-	private SynapseSuggestBox peopleSuggestWidget;	
+	SynapseSuggestBox peopleSuggestWidget;	
 	
 	@Inject
 	public UserBadgeList (
@@ -62,8 +62,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
-		suggestion.getId();
-		//this.view.addFileLink(suggestion);
+		
+		view.addUserBadge(suggestion.getReplacementString());
 		peopleSuggestWidget.clear();
 	}
 	
@@ -108,7 +108,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	public void refreshLinkUI() {
 		view.clearFileLinks();
 		for (FileHandleLink fileHandleLink : links) {
-			view.addFileLink(fileHandleLink.asWidget());
+			view.addUserBadge(fileHandleLink.getFileHandleId());
 		}
 		
 		boolean toolbarVisible = isToolbarVisible && links.size() > 0;
