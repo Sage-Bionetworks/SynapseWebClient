@@ -20,14 +20,14 @@ import com.google.inject.Inject;
 
 
 public class UserBadgeList implements FileHandleListView.Presenter, IsWidget {
-	FileHandleUploadWidget uploadWidget;
+	FileHandleUploadWidget uploadWidget; //no
 	FileHandleListView view;
 	PortalGinInjector ginInjector;
-	boolean isToolbarVisible, changingSelection;
+	boolean isToolbarVisible, changingSelection; //canDelete
 	CallbackP<String> fileHandleClickedCallback;
 	Callback selectionChangedCallback;
-	CallbackP<FileUpload> fileUploadedCallback;
-	List<FileHandleLink> links;
+	CallbackP<FileUpload> fileUploadedCallback; //no
+	List<FileHandleLink> links; //UserBadgeLink?
 	
 	@Inject
 	public UserBadgeList(
@@ -68,7 +68,7 @@ public class UserBadgeList implements FileHandleListView.Presenter, IsWidget {
 		view.setUploadWidgetVisible(false);
 		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		uploadWidget.reset();
-		uploadWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, fileUploadedCallback);
+		uploadWidget.configure("Add user", fileUploadedCallback);
 		uploadWidget.allowMultipleFileUpload(true);
 		return this;
 	};
