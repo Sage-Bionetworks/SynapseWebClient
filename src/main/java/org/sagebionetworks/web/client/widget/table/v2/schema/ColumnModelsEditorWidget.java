@@ -61,25 +61,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		this.changingSelection = false;
 		this.startingModels = startingModels;
 		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
-		if (nonEditableColumns == null) {
-			synapseClient.getDefaultColumnsForView(org.sagebionetworks.repo.model.table.ViewType.file, new AsyncCallback<List<ColumnModel>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					editor.showErrorMessage(caught.getMessage());
-				}
-				@Override
-				public void onSuccess(List<ColumnModel> columns) {
-					nonEditableColumns = new ArrayList<ColumnModel>();
-					for (ColumnModel cm : columns) {
-						nonEditableColumns.add(cm);
-					}
-					resetEditor();
-				}
-			});
-		} else {
-			resetEditor();	
-		}
-		
+		resetEditor();
 	}
 	
 	@Override
@@ -144,7 +126,28 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		addColumns(this.startingModels);
 	}
 	
-	public void addColumns(List<ColumnModel> models) {
+	public void addColumns(final List<ColumnModel> models) {
+		if (nonEditableColumns == null) {
+			synapseClient.getDefaultColumnsForView(org.sagebionetworks.repo.model.table.ViewType.file, new AsyncCallback<List<ColumnModel>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					editor.showErrorMessage(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(List<ColumnModel> columns) {
+					nonEditableColumns = new ArrayList<ColumnModel>();
+					for (ColumnModel cm : columns) {
+						nonEditableColumns.add(cm);
+					}
+					addColumnsAfterInit(models);
+				}
+			});
+		} else {
+			addColumnsAfterInit(models);	
+		}
+	}
+	
+	public void addColumnsAfterInit(final List<ColumnModel> models) {
 		List<ColumnModel> existingColumns = getEditedColumnModels();
 		for (ColumnModel cm : existingColumns) {
 			cm.setId(null);
