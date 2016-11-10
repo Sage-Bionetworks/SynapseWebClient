@@ -5,13 +5,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -62,7 +63,12 @@ public class TableQueryResultWidgetTest {
 	boolean isView;
 	@Captor
 	ArgumentCaptor<CallbackP<FacetColumnRequest>> mockFacetChangedHandlerCaptor;
-	
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest;
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest2;
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest3;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -125,6 +131,28 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+		
+		// test facetChangeRequestHandler
+		CallbackP<FacetColumnRequest> facetChangeRequestHandler = mockFacetChangedHandlerCaptor.getValue();
+		assertNull(query.getSelectedFacets());
+		String facetColumnName = "country";
+		when(mockFacetColumnRequest.getColumnName()).thenReturn(facetColumnName);
+		facetChangeRequestHandler.invoke(mockFacetColumnRequest);
+		assertEquals(1, query.getSelectedFacets().size());
+		assertEquals(mockFacetColumnRequest, query.getSelectedFacets().get(0));
+		
+		//verify that if the column name is the same, then the selected facet is updated for that column
+		when(mockFacetColumnRequest2.getColumnName()).thenReturn(facetColumnName);
+		facetChangeRequestHandler.invoke(mockFacetColumnRequest2);
+		assertEquals(1, query.getSelectedFacets().size());
+		assertEquals(mockFacetColumnRequest2, query.getSelectedFacets().get(0));
+		
+		//but if it's a facet for a different column, then both should be included.
+		when(mockFacetColumnRequest3.getColumnName()).thenReturn("different column");
+		facetChangeRequestHandler.invoke(mockFacetColumnRequest3);
+		assertEquals(2, query.getSelectedFacets().size());
+		assertTrue(query.getSelectedFacets().contains(mockFacetColumnRequest2));
+		assertTrue(query.getSelectedFacets().contains(mockFacetColumnRequest3));
 	}
 	
 	@Test
