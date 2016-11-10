@@ -1066,6 +1066,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) 
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return convertPaginated(synapseClient.getEntityAccessApproval(entityId));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public Entity updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {

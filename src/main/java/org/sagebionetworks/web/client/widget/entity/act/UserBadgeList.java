@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.upload.FileHandleListView;
@@ -32,7 +33,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	private SynapseSuggestBox peopleSuggestWidget;	
 	
 	@Inject
-	public UserBadgeList(
+	public UserBadgeList (
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider, 
 			UserBadgeListView view, 
@@ -43,6 +44,13 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
+		this.view.setSelectorWidget(peopleSuggestWidget.asWidget());
+		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+			@Override
+			public void invoke(SynapseSuggestion suggestion) {
+				onUserSelected(suggestion);
+			}
+		});
 		
 		selectionChangedCallback = new Callback() {
 			@Override
@@ -51,6 +59,12 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			}
 		};
 		
+	}
+	
+	public void onUserSelected(SynapseSuggestion suggestion) {
+		suggestion.getId();
+		//this.view.addFileLink(suggestion);
+		peopleSuggestWidget.clear();
 	}
 	
 	/**

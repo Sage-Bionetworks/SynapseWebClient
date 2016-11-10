@@ -63,7 +63,7 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 
 	
 	@Override
-	public void setUploadWidget(Widget widget) {
+	public void setSelectorWidget(Widget widget) {
 		userSelectorContainer.clear();
 		userSelectorContainer.add(widget);
 	}

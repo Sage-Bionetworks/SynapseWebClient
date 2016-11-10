@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -52,6 +53,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String REVOKED_USER = "Successfully Revoked User Access";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
+	public static final String NO_APPROVAL_FOUND = "There was no approval found for the specified user and requirement";
 	
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -69,7 +71,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
-	private UserBadgeList userBadgeList;
 	
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
@@ -78,18 +79,16 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			JobTrackingWidget progressWidget,
-			UserBadgeList userBadgeList) {
+			JobTrackingWidget progressWidget) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
-		this.userBadgeList = userBadgeList;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
-		this.view.setUserPickerWidget(userBadgeList.asWidget());
+		this.view.setUserPickerWidget(peopleSuggestBox.asWidget());
 		//this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
@@ -202,7 +201,33 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		accessRequirement = view.getAccessRequirement();
 		view.setRevokeProcessing(true);
-		synapseClient.deleteAccessApproval(Long.parseLong(accessRequirement), new AsyncCallback<Void>() {
+		synapseClient.getEntityAccessApproval(datasetId, new AsyncCallback<PaginatedResults<AccessApproval>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				view.setRevokeProcessing(false);
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<AccessApproval> result) {
+				List<AccessApproval> results = result.getResults();
+				Long accessReq = Long.parseLong(accessRequirement);
+				for (AccessApproval approval : results) {
+					if (approval.getAccessorId().equals(userId) && approval.getRequirementId().equals(accessReq)) {
+						removeAccess(approval.getId());
+						return;
+					}
+				}
+				//no AccessApproval was found for this user
+				view.setRevokeProcessing(false);
+				synAlert.showError(NO_APPROVAL_FOUND);
+			}
+		});
+	}
+
+	private void removeAccess(Long id) {
+		synapseClient.deleteAccessApproval(id, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -217,6 +242,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				view.showInfo(REVOKED_USER, "");
 			}
 		});
+		
 	}
 	
 	@Override

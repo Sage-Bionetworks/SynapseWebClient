@@ -551,5 +551,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 	
 	void deleteAccessApproval(Long approvalId) throws RestServiceException;
+	PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) throws RestServiceException;
 
 }

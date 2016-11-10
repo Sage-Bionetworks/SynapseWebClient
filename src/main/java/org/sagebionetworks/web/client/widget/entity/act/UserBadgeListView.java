@@ -16,7 +16,7 @@ public interface UserBadgeListView extends IsWidget {
 	
 	void setPresenter(Presenter presenter);
 	void setToolbarVisible(boolean visible);
-	void setUploadWidget(Widget widget);
+	void setSelectorWidget(Widget widget);
 	void setUploadWidgetVisible(boolean visible);
 	void addFileLink(Widget fileLinkWidget);
 	void clearFileLinks();
