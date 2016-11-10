@@ -217,6 +217,18 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testPreviewFileWithNoFileHandle() {
+		testBundle.setFileHandles(new ArrayList<FileHandle>());
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView, times(0)).setTextPreview(anyString());
+		verify(mockView, times(0)).setCodePreview(anyString());
+		verify(mockView, times(0)).setTablePreview(anyString(), anyString());
+		verify(mockView, times(0)).setImagePreview(anyString(), anyString());
+		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
+	}
+	
+	@Test
 	public void testWikiConfigure() {		
 		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
 		previewWidget.configure(null, descriptor, null, null);
