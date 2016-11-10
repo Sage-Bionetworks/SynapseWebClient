@@ -318,7 +318,8 @@ public class FilesTab {
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
 		//Preview
-		view.setPreviewVisible(isFile);
+		view.setPreviewVisible(isFile && !bundle.getFileHandles().isEmpty());		
+		
 		//File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {

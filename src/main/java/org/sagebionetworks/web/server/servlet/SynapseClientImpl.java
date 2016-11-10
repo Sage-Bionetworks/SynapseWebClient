@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
@@ -94,6 +95,7 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -194,6 +196,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/html", MESSAGE_CHARSET);
+	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
+			.create("text/plain", MESSAGE_CHARSET);
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
@@ -2532,7 +2536,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			message.setSubject(subject);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
-			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
 			String fileHandleId = synapseClient.uploadToFileHandle(
 					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
 					HTML_MESSAGE_CONTENT_TYPE);

@@ -1,7 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -12,6 +17,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -32,12 +38,15 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.UserProfileClient;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -52,6 +61,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -80,6 +90,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETE_PREFIX = "Delete ";
 	
 	public static final String RENAME_PREFIX = "Rename ";
+	
+	public static final int IS_ACT_MEMBER_MASK = 0x20;
 
 	EntityActionControllerView view;
 	PreflightController preflightController;
@@ -100,6 +112,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	String enityTypeDisplay;
 	boolean isUserAuthenticated;
 	boolean isCurrentVersion;
+	List<ACTAccessRequirement> actRequirements;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
@@ -110,6 +123,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
+	ApproveUserAccessModal approveUserAccessModal;
+	UserProfileClientAsync userProfileClient;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -130,7 +145,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EvaluationEditorModal evalEditor,
 			CookieProvider cookies,
 			ChallengeClientAsync challengeClient,
-			SelectTeamModal selectTeamModal) {
+			SelectTeamModal selectTeamModal,
+			ApproveUserAccessModal approveUserAccessModal,
+			UserProfileClientAsync userProfileClient) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -164,6 +181,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}
 		});
 		this.selectTeamModal = selectTeamModal;
+		this.approveUserAccessModal = approveUserAccessModal;
+		this.userProfileClient = userProfileClient;
+		this.actRequirements = new ArrayList<ACTAccessRequirement>();
 	}
 
 	@Override
@@ -211,9 +231,41 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureEditFileMetadataAction();
 			configureAddEvaluationAction();
 			configureCreateChallenge();
+			configureApproveUserAccess();
 		}
 	}
 	
+	
+	private void configureApproveUserAccess() {
+		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
+		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
+		List<AccessRequirement> requirements = entityBundle.getAccessRequirements();
+		for (AccessRequirement ar : requirements) {
+			if (ar instanceof ACTAccessRequirement) {
+				actRequirements.add((ACTAccessRequirement) ar);
+			}
+		}
+		if (authenticationController.isLoggedIn()) {
+			
+			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER_MASK, new AsyncCallback<UserBundle>() {
+				@Override
+				public void onSuccess(UserBundle userBundle) {
+					if (userBundle.getIsACTMember() && actRequirements.size() > 0) {
+						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
+						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});	
+		}
+	}
+	
+
 	public void onSelectChallengeTeam(String id) {
 		Challenge c = new Challenge();
 		c.setProjectId(entity.getId());
@@ -639,10 +691,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_CHALLENGE:
 			onCreateChallenge();
 			break;
+		case APPROVE_USER_ACCESS:
+			onApproveUserAccess();
+			break;
 		default:
 			break;
 		}
 	}
+
+	
+	private void onApproveUserAccess() {
+		approveUserAccessModal.configure(actRequirements, entityBundle);
+		approveUserAccessModal.show();
+	}
+	
 
 	private void onAddCommit() {
 		// TODO Auto-generated method stub
