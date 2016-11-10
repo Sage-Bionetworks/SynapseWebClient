@@ -127,10 +127,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty();
-		view.setFacetsVisible(isFacetsWidgetVisible);
+		
 		if (isFacetsWidgetVisible) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
 			view.setFacetsVisible(facetsWidget.isShowingFacets());
+		} else {
+			view.setFacetsVisible(false);	
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());

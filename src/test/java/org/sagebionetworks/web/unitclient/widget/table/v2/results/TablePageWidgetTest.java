@@ -4,13 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,6 +28,7 @@ import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -81,9 +85,15 @@ public class TablePageWidgetTest {
 	FacetsWidget mockFacetsWidget;
 	@Mock
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
+	@Mock
+	FacetColumnResult mockFacetColumnResult;
+	List<FacetColumnResult> facets;
+	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
+		facets = new ArrayList<FacetColumnResult>();
+		facets.add(mockFacetColumnResult);
 		mockView = Mockito.mock(TablePageView.class);
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockCellFactory = Mockito.mock(CellFactory.class);
@@ -163,7 +173,8 @@ public class TablePageWidgetTest {
 		query.setLimit(100L);
 		query.setOffset(0L);
 		query.setSql("select * from syn123");
-	
+		bundle.setFacets(facets);
+		when(mockFacetsWidget.isShowingFacets()).thenReturn(true);
 		isView = false;
 	}
 	
@@ -201,6 +212,8 @@ public class TablePageWidgetTest {
 		// Static headers should be used for edits
 		assertTrue(staticHeader.isEmpty());
 		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockView).setFacetsVisible(false);
+		verify(mockView, never()).setFacetsVisible(true);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(true);
 		assertEquals(bundle.getColumnModels().size()+1, staticHeader.size());
@@ -212,9 +225,31 @@ public class TablePageWidgetTest {
 		// Sortable headers should be used for views.
 		assertTrue(sortHeaders.isEmpty());
 		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockView).setFacetsVisible(true);
+		verify(mockView, never()).setFacetsVisible(false);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
+	}
+	
+	@Test
+	public void testConfigureNotEditableNoFacets(){
+		boolean isEditable = false;
+		facets.clear();
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockView).setFacetsVisible(false);
+		verify(mockView, never()).setFacetsVisible(true);
+	}
+	
+	@Test
+	public void testConfigureNotEditableNoValidFacets(){
+		boolean isEditable = false;
+		when(mockFacetsWidget.isShowingFacets()).thenReturn(false);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockView).setFacetsVisible(false);
+		verify(mockView, never()).setFacetsVisible(true);
 	}
 	
 	@Test
