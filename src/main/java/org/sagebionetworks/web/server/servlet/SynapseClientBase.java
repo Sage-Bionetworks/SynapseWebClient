@@ -130,6 +130,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 				.getFileServiceEndpoint());
 		// Append the portal's version information to the user agent.
 		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
+		synapseClient.setUserIpAddress(this.getThreadLocalRequest().getRemoteAddr());
 		return synapseClient;
 	}
 }
