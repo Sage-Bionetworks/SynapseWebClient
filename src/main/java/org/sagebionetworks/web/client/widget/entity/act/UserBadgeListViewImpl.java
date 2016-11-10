@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 
-public class UserBadgeListViewImpl {
+public class UserBadgeListViewImpl implements UserBadgeListView {
 
 	public interface Binder extends UiBinder<Widget, UserBadgeListViewImpl> {}
 	

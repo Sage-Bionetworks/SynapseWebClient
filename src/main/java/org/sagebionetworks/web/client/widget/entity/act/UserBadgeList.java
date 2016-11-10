@@ -8,6 +8,8 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.upload.FileHandleListView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -19,27 +21,28 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 
-public class UserBadgeList implements FileHandleListView.Presenter, IsWidget {
-	FileHandleUploadWidget uploadWidget; //no
-	FileHandleListView view;
+public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
+
+	UserBadgeListView view;
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection; //canDelete
 	CallbackP<String> fileHandleClickedCallback;
 	Callback selectionChangedCallback;
-	CallbackP<FileUpload> fileUploadedCallback; //no
 	List<FileHandleLink> links; //UserBadgeLink?
+	private SynapseSuggestBox peopleSuggestWidget;	
 	
 	@Inject
 	public UserBadgeList(
-			FileHandleListView view, 
-			FileHandleUploadWidget uploadWidget,
+			SynapseSuggestBox peopleSuggestBox,
+			UserGroupSuggestionProvider provider, 
+			UserBadgeListView view, 
 			PortalGinInjector ginInjector) {
 		super();
 		this.view = view;
-		this.uploadWidget = uploadWidget;
+		this.peopleSuggestWidget = peopleSuggestBox;
+		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
-		view.setUploadWidget(uploadWidget.asWidget());
 		
 		selectionChangedCallback = new Callback() {
 			@Override
@@ -48,12 +51,6 @@ public class UserBadgeList implements FileHandleListView.Presenter, IsWidget {
 			}
 		};
 		
-		fileUploadedCallback = new CallbackP<FileUpload>() {
-			@Override
-			public void invoke(FileUpload fileUpload) {
-				addFileLink(fileUpload);
-			}
-		};
 	}
 	
 	/**
@@ -67,20 +64,9 @@ public class UserBadgeList implements FileHandleListView.Presenter, IsWidget {
 		view.setToolbarVisible(false);
 		view.setUploadWidgetVisible(false);
 		this.fileHandleClickedCallback = fileHandleClickedCallback;
-		uploadWidget.reset();
-		uploadWidget.configure("Add user", fileUploadedCallback);
-		uploadWidget.allowMultipleFileUpload(true);
 		return this;
 	};
 	
-	public UserBadgeList setUploadButtonText(String uploadButtonText) {
-		uploadWidget.configure(uploadButtonText, fileUploadedCallback);
-		return this;
-	}
-	public UserBadgeList setCanUpload(boolean canUpload) {
-		view.setUploadWidgetVisible(canUpload);
-		return this;
-	}
 	/**
 	 * If true then show toolbar with the delete button.
 	 * @param canDelete

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public class UserBadgeListView extends IsWidget {
+public interface UserBadgeListView extends IsWidget {
 	
 	public interface Presenter{
 		List<String> getFileHandleIds();
