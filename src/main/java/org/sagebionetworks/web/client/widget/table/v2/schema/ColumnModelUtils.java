@@ -100,7 +100,9 @@ public class ColumnModelUtils {
 			model.setEnumValues(row.getEnumValues());
 		}
 		model.setDefaultValue(treatEmptyAsNull(row.getDefaultValue()));
-		model.setFacetType(row.getFacetType().getType());
+		if (row.getFacetType() != null) {
+			model.setFacetType(row.getFacetType().getType());	
+		}
 		return model;
 	}
 	

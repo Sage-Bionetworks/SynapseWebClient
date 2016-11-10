@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,7 +10,8 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -28,6 +30,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -57,8 +60,8 @@ public class TableQueryResultWidgetTest {
 	SelectColumn select;
 	SynapseAlert mockSynapseAlert;
 	boolean isView;
-	@Mock
-	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
+	@Captor
+	ArgumentCaptor<CallbackP<FacetColumnRequest>> mockFacetChangedHandlerCaptor;
 	
 	@Before
 	public void before(){
@@ -115,7 +118,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget, mockFacetChangedHandler);
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -148,7 +151,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget, mockFacetChangedHandler);
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -169,7 +172,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget, mockFacetChangedHandler);
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);

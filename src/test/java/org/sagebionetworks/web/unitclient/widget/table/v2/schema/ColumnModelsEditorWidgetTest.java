@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -33,7 +34,10 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit test for ColumnModelsViewWidget
@@ -56,6 +60,10 @@ public class ColumnModelsEditorWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
+	
+	@Mock
+	ColumnModel nonEditableColumn;
+	List<ColumnModel> nonEditableColumns;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -78,6 +86,9 @@ public class ColumnModelsEditorWidgetTest {
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+		nonEditableColumns = new ArrayList<ColumnModel>();
+		nonEditableColumns.add(nonEditableColumn);
+		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockSynapseClient).getDefaultColumnsForView(any(org.sagebionetworks.repo.model.table.ViewType.class), any(AsyncCallback.class));
 		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
@@ -210,20 +221,5 @@ public class ColumnModelsEditorWidgetTest {
 		assertTrue(one.isSelected());
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
-	}
-
-	/**
-	 * 	THIS TEST TO BE DELETED ONCE WE EXPOSE EDITING EXISTING TABLE COLUMNS AGAIN
-	 */
-	@Test
-	public void testNoneditableColumns() {
-		reset(mockKeyboardNavigationHandler, mockEditor);
-		// when not in test website, existing columns will be viewers (not editors)
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
-		schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(schema);
-		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
-		verify(mockGinInjector, times(schema.size())).createNewColumnModelTableRowViewer();
 	}
 }

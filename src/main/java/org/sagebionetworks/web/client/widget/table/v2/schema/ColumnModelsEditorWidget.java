@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -128,23 +127,32 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	
 	public void addColumns(final List<ColumnModel> models) {
 		if (nonEditableColumns == null) {
-			synapseClient.getDefaultColumnsForView(org.sagebionetworks.repo.model.table.ViewType.file, new AsyncCallback<List<ColumnModel>>() {
+			initNonEditableColumns(new Callback() {
 				@Override
-				public void onFailure(Throwable caught) {
-					editor.showErrorMessage(caught.getMessage());
-				}
-				@Override
-				public void onSuccess(List<ColumnModel> columns) {
-					nonEditableColumns = new ArrayList<ColumnModel>();
-					for (ColumnModel cm : columns) {
-						nonEditableColumns.add(cm);
-					}
-					addColumnsAfterInit(models);
+				public void invoke() {
+					addColumnsAfterInit(models);					
 				}
 			});
 		} else {
 			addColumnsAfterInit(models);	
 		}
+	}
+	
+	public void initNonEditableColumns(final Callback callback) {
+		synapseClient.getDefaultColumnsForView(org.sagebionetworks.repo.model.table.ViewType.file, new AsyncCallback<List<ColumnModel>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				editor.showErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(List<ColumnModel> columns) {
+				nonEditableColumns = new ArrayList<ColumnModel>();
+				for (ColumnModel cm : columns) {
+					nonEditableColumns.add(cm);
+				}
+				callback.invoke();
+			}
+		});
 	}
 	
 	public void addColumnsAfterInit(final List<ColumnModel> models) {
@@ -161,7 +169,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 				// default column model ids are cleared on the servlet.
 				ColumnModel cmCopy = copyColumnModel(cm);
 				cmCopy.setId(null);
-				if (DisplayUtils.isInTestWebsite(cookies) && !nonEditableColumns.contains(cmCopy)) {
+				if (!nonEditableColumns.contains(cmCopy)) {
 					createColumnModelEditorWidget(cm);	
 				} else {
 					createColumnModelViewerWidget(cm);
