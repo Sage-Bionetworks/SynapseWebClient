@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +34,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -205,6 +207,14 @@ public class SynapseClientImplTest {
 	private static final String EVAL_ID_2 = "eval ID 2";
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private TeamMembershipStatus membershipStatus;
+	
+	@Mock
+	ThreadLocal<HttpServletRequest> mockThreadLocal;
+	
+	@Mock 
+	HttpServletRequest mockRequest;
+	
+	String userIp = "127.0.0.1";
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
@@ -471,6 +481,11 @@ public class SynapseClientImplTest {
 		when(mockSynapse.copyFileHandles(any(BatchFileHandleCopyRequest.class))).thenReturn(mockBatchCopyResults);
 		batchCopyResultsList = new ArrayList<FileHandleCopyResult>();
 		when(mockBatchCopyResults.getCopyResults()).thenReturn(batchCopyResultsList);
+		
+		Whitebox.setInternalState(synapseClient, "perThreadRequest", mockThreadLocal);
+		userIp = "127.0.0.1";
+		when(mockThreadLocal.get()).thenReturn(mockRequest);
+		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
