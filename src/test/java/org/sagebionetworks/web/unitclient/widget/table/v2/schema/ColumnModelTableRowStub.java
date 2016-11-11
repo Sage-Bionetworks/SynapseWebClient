@@ -23,6 +23,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	private boolean isSelected;
 	private SelectionPresenter selectionPresenter;
 	private List<String> enumValues;
+	private ColumnFacetTypeViewEnum facetType;
 	public String getColumnName() {
 		return columnName;
 	}
@@ -61,6 +62,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	public void setId(String id) {
 		this.id = id;
 	}
+	
 	@Override
 	public Widget asWidget() {
 		return null;
@@ -153,13 +155,11 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	}
 	@Override
 	public ColumnFacetTypeViewEnum getFacetType() {
-		// TODO Auto-generated method stub
-		return null;
+		return facetType;
 	}
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
-		// TODO Auto-generated method stub
-		
+		this.facetType = type;
 	}
 	
 }
