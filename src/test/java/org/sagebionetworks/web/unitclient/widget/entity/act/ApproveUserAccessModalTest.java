@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessApproval;
@@ -38,6 +39,7 @@ import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.dev.shell.CloseButton.Callback;
@@ -81,12 +83,22 @@ public class ApproveUserAccessModalTest {
 	List<String> mockLs;
 	@Mock
 	AccessApproval mockAccessApproval;
+	@Mock
+	PaginatedResults<AccessApproval> mockPagRes;
+	@Mock
+	List<AccessApproval> mockAccAppList;
+	@Mock
+	Iterator<AccessApproval> mockAccAppItr;
 	@Captor
 	ArgumentCaptor<AsyncCallback<AccessApproval>> aaCaptor;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> phCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback<String>> sCaptor;
+	@Captor
+	ArgumentCaptor<AsyncCallback<PaginatedResults<AccessApproval>>> prCaptor;
+	@Captor
+	ArgumentCaptor<AsyncCallback<Void>> vCaptor;
 	
 	Long accessReq;
 	String userId;
@@ -122,6 +134,13 @@ public class ApproveUserAccessModalTest {
 		when(mockUser.getId()).thenReturn(userId);
 		when(mockView.getAccessRequirement()).thenReturn(Long.toString(accessReq));
 		when(mockView.getEmailMessage()).thenReturn(message);
+		
+		when(mockPagRes.getResults()).thenReturn(mockAccAppList);
+		when(mockAccAppList.iterator()).thenReturn(mockAccAppItr);
+		when(mockAccAppItr.hasNext()).thenReturn(true);
+		when(mockAccAppItr.next()).thenReturn(mockAccessApproval);
+		when(mockAccessApproval.getRequirementId()).thenReturn(accessReq);
+		when(mockAccessApproval.getAccessorId()).thenReturn(userId);
 	}
 	
 	@Test
@@ -323,5 +342,83 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).hide();
 		verify(mockView).showInfo(APPROVED_USER, EMAIL_SENT);
 	}
+	
+	@Test
+	public void testOnRevokeNoUser() {
+		dialog.configure(actList, mockEntityBundle);
+		dialog.onRevoke();
+		verify(mockSynAlert).showError(NO_USER_SELECTED);
+	}
+	
+	@Test
+	public void testOnRevokeGetAccessApprovalFailure() {
+		dialog.configure(actList, mockEntityBundle);
+		dialog.onUserSelected(mockUser);
+		dialog.onRevoke();
+		
+		verify(mockView).setRevokeProcessing(true);
+		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
+		
+		prCaptor.getValue().onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).setRevokeProcessing(false);
+	}
+	
+	@Test
+	public void testOnRevokeGetAccessApprovalSuccessNoMatch() {
+		when(mockPagRes.getResults()).thenReturn(new ArrayList<AccessApproval>());
+		dialog.configure(actList, mockEntityBundle);
+		dialog.onUserSelected(mockUser);
+		dialog.onRevoke();
+		
+		verify(mockView).setRevokeProcessing(true);
+		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
+		
+		prCaptor.getValue().onSuccess(mockPagRes);
+		verify(mockView).setRevokeProcessing(false);
+		verify(mockSynAlert).showError(NO_APPROVAL_FOUND);
+	}
+	
+	@Test
+	public void testOnRevokeGetAccessApprovalSuccessMatchFound() {
+		dialog.configure(actList, mockEntityBundle);
+		dialog.onUserSelected(mockUser);
+		dialog.onRevoke();
+		
+		verify(mockView).setRevokeProcessing(true);
+		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
+		prCaptor.getValue().onSuccess(mockPagRes);
+		verify(mockSynAlert, times(0)).showError(NO_APPROVAL_FOUND);
+	}
+	
+	@Test
+	public void testRemoveAccessFailure() {
+		dialog.configure(actList, mockEntityBundle);
+		dialog.onUserSelected(mockUser);
+		dialog.onRevoke();
+		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
+		prCaptor.getValue().onSuccess(mockPagRes);
+		verify(mockSynapseClient).deleteAccessApproval(anyLong(), vCaptor.capture());
+		vCaptor.getValue().onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).setRevokeProcessing(false);
+	}
+	
+	@Test
+	public void testRemoveAccessSuccess() {
+		dialog.configure(actList, mockEntityBundle);
+		dialog.onUserSelected(mockUser);
+		dialog.onRevoke();
+		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
+		prCaptor.getValue().onSuccess(mockPagRes);
+		verify(mockSynapseClient).deleteAccessApproval(anyLong(), vCaptor.capture());
+		vCaptor.getValue().onSuccess(any(Void.class));
+		verify(mockView).setRevokeProcessing(false);
+		verify(mockView).hide();
+		verify(mockView).showInfo(REVOKED_USER, "");
+	}
+	
+	
+	
 	
 }
