@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumnResultSliderRangeView.Presenter {
+	public static final int NUMBER_OF_STEPS = 200;
 	FacetColumnResultSliderRangeView view;
 	FacetColumnResultRange facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
@@ -27,13 +28,7 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		view.setColumnName(facet.getColumnName());
 		Number minMin = parseNumber(facet.getColumnMin());
 		Number maxMax = parseNumber(facet.getColumnMax());
-		double stepSize = 1;
-		if (minMin != null && maxMax != null) {
-			stepSize = Math.round((maxMax.doubleValue() - minMin.doubleValue()) / 200);
-			if (stepSize < 1) {
-				stepSize = 1;
-			}
-		}
+		double stepSize = getStepSize(minMin, maxMax);
 		
 		Number min = parseNumber(facet.getSelectedMin());
 		if (min == null) {
@@ -54,6 +49,17 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		}
 		
 		view.setSliderStepSize(stepSize);
+	}
+	
+	public double getStepSize(Number min, Number max) {
+		double stepSize = 1;
+		if (min != null && max != null) {
+			stepSize = Math.round((max.doubleValue() - min.doubleValue()) / NUMBER_OF_STEPS);
+			if (stepSize < 1) {
+				stepSize = 1;
+			}
+		}
+		return stepSize;
 	}
 	
 	public static Number parseNumber(String s) {
