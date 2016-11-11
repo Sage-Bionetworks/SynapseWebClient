@@ -48,7 +48,7 @@
 						<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
 						<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link To This Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
-						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Approve User Access</a:ActionMenuItem>
+						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Change User Access</a:ActionMenuItem>
 					</b:DropDownMenu>
 				</b:DropDown>
 			</b:ButtonGroup>
