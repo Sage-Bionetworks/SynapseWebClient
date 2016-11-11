@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumn
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public class FacetsWidgetTest {
 	@Mock
