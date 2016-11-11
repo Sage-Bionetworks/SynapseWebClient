@@ -460,4 +460,6 @@ public interface SynapseClientAsync {
 
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 	
+	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
+	void getEntityAccessApproval(String entityId, AsyncCallback<PaginatedResults<AccessApproval>> callback);
 }

@@ -37,11 +37,15 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	Button submitButton;
 	@UiField
+	Button revokeButton;
+	@UiField
 	Button cancelButton;
 	@UiField
 	Button previewButton;
 	@UiField
 	HTML emailTemplate;
+	@UiField
+	TextArea messageEditArea;
 	@UiField
 	Div userSelectContainer;
 	@UiField
@@ -52,8 +56,6 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	HTML messageBody;
 	@UiField
 	Button closeButton;
-	@UiField
-	TextArea messageEditArea;
 	
 	private Presenter presenter;
 	
@@ -73,10 +75,16 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 				modal.hide();
 			}
 		});
+		revokeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onRevoke();
+			}
+		});
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				setPreview();
+				messageBody.setHTML(messageEditArea.getText());
 				previewModal.show();
 			}
 		});
@@ -86,10 +94,12 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 				previewModal.hide();		
 			}		
 		});
-	}
-	
-	private void setPreview() {
-		messageBody.setHTML(messageEditArea.getText());
+		revokeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onRevoke();
+			}
+		});
 	}
 	
 	@Override
@@ -185,6 +195,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		}else{
 			submitButton.state().reset();
 		}
+		cancelButton.setEnabled(!processing);
+		revokeButton.setEnabled(!processing);
 	}
 	
 	@Override
@@ -214,5 +226,16 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@Override
 	public void setMessageEditArea(String html) {
 		messageEditArea.setText(html);
+	}
+
+	@Override
+	public void setRevokeProcessing(boolean processing) {
+		if(processing){
+			revokeButton.state().loading();
+		}else{
+			revokeButton.state().reset();
+		}
+		cancelButton.setEnabled(!processing);
+		submitButton.setEnabled(!processing);
 	}
 }
