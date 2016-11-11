@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -118,7 +120,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	 * The org.sagebionetworks.client.SynapseClient client is stateful so we
 	 * must create a new one for each request
 	 */
-	private org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
+	public org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
 		// Create a new syanpse
 		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
 				.createNewClient();
