@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -61,7 +62,6 @@ public class ColumnModelsEditorWidgetTest {
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
 	
-	@Mock
 	ColumnModel nonEditableColumn;
 	List<ColumnModel> nonEditableColumns;
 	@Before
@@ -87,6 +87,9 @@ public class ColumnModelsEditorWidgetTest {
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		nonEditableColumns = new ArrayList<ColumnModel>();
+		nonEditableColumn = new ColumnModel();
+		nonEditableColumn.setColumnType(ColumnType.STRING);
+		nonEditableColumn.setName("non-editable default column");
 		nonEditableColumns.add(nonEditableColumn);
 		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockSynapseClient).getDefaultColumnsForView(any(org.sagebionetworks.repo.model.table.ViewType.class), any(AsyncCallback.class));
 		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
@@ -115,6 +118,10 @@ public class ColumnModelsEditorWidgetTest {
 		widget.deleteSelected();
 		widget.addColumns(schema);
 		verify(mockEditor, times(schema.size() * 2)).addColumn(any(ColumnModelTableRow.class));
+		
+		//try to add non-editable column
+		widget.addColumns(nonEditableColumns);
+		verify(mockGinInjector, times(nonEditableColumns.size())).createNewColumnModelTableRowViewer();
 	}
 	
 	@Test
