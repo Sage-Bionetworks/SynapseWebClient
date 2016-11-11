@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResultValuesView.Presenter {
+	public static final String SHOW_ALL = "Show all ";
 	public static final String UNSPECIFIED = "(not set)";
 	public static final String EMPTY_STRING = "(empty string)";
 	FacetColumnResultValuesView view;
@@ -52,7 +53,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 			i++;
 		}
 		if (facet.getFacetValues().size() > MAX_VISIBLE_FACET_VALUES) {
-			view.setShowAllButtonText("Show all " + facet.getFacetValues().size());
+			view.setShowAllButtonText(SHOW_ALL + facet.getFacetValues().size());
 			view.setShowAllButtonVisible(true);
 		} else {
 			view.setShowAllButtonVisible(false);
