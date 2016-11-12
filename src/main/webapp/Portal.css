@@ -2057,6 +2057,21 @@ a.projectTitle:hover {
 		width: 140px;
 	}
 }
+
+@media (max-width: 768px) {
+	.pull-left-unless-xs {
+		width: 100%;
+	}
+}
+
+@media (min-width: 769px) {
+	.pull-left-unless-xs {
+		float: left;
+		max-width: 460px;
+	}
+}
+
+
 .entity-tab > a {
 	text-align: center;
 }

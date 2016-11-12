@@ -7,7 +7,7 @@ import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STY
 
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -398,7 +398,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		view.showConfirm(DELETE_CONFIRM_MESSAGE, CONFIRM_DELETE_DIALOG_TITLE, BUTTON_DELETE, DANGER_BUTTON_STYLE, new AlertCallback(){
+		view.showConfirm(DELETE_CONFIRM_MESSAGE, CONFIRM_DELETE_DIALOG_TITLE, BUTTON_DELETE, DANGER_BUTTON_STYLE, new SimpleCallback(){
 
 			@Override
 			public void callback() {
@@ -478,7 +478,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 
 	public void onClickRestore() {
-		view.showConfirm(RESTORE_CONFIRM_MESSAGE, CONFIRM_RESTORE_DIALOG_TITLE, BUTTON_RESTORE, PRIMARY_BUTTON_STYLE, new AlertCallback(){
+		view.showConfirm(RESTORE_CONFIRM_MESSAGE, CONFIRM_RESTORE_DIALOG_TITLE, BUTTON_RESTORE, PRIMARY_BUTTON_STYLE, new SimpleCallback(){
 
 			@Override
 			public void callback() {

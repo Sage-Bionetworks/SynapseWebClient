@@ -29,8 +29,8 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -412,7 +412,7 @@ public class DisplayUtils {
 				}
 			});
 		} else {
-			Bootbox.alert(popupHtml.asString(), new AlertCallback() {
+			Bootbox.alert(popupHtml.asString(), new SimpleCallback() {
 				@Override
 				public void callback() {
 					if (primaryButtonCallback != null)

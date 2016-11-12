@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
@@ -35,6 +36,7 @@ public class ColumnModelUtilsTest {
 		model.setDefaultValue("foo and bar");
 		model.setMaximumSize(3L);
 		model.setEnumValues(Arrays.asList("one", "two","three"));
+		model.setFacetType(FacetType.enumeration);
 		// stub the view
 		ColumnModelTableRowStub row = new ColumnModelTableRowStub();
 		// apply to the row.
@@ -53,6 +55,7 @@ public class ColumnModelUtilsTest {
 		model.setColumnType(ColumnType.BOOLEAN);
 		model.setDefaultValue(null);
 		model.setMaximumSize(null);
+		model.setFacetType(null);
 		// stub the view
 		ColumnModelTableRowStub row = new ColumnModelTableRowStub();
 		// apply to the row.
@@ -71,6 +74,7 @@ public class ColumnModelUtilsTest {
 			model.setName("name");
 			model.setId("id");
 			model.setColumnType(type);
+			model.setFacetType(FacetType.range);
 			models.add(model);
 			// stub the view
 			ColumnModelTableRowStub row = new ColumnModelTableRowStub();
@@ -82,6 +86,7 @@ public class ColumnModelUtilsTest {
 		List<ColumnModel> clones = ColumnModelUtils.extractColumnModels(rows);
 		assertEquals(models, clones);
 	}
+	
 	
 	@Test
 	public void testCSVRoundTripEmpty(){

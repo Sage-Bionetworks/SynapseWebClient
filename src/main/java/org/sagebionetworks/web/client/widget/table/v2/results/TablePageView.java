@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * 
@@ -59,5 +60,6 @@ public interface TablePageView extends IsWidget {
 	 */
 	public void setEditorBufferVisible(boolean isEditable);
 	
-
+	void setFacetsWidget(Widget w);
+	void setFacetsVisible(boolean visible);
 }

@@ -1,15 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -21,9 +27,11 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -53,9 +61,17 @@ public class TableQueryResultWidgetTest {
 	SelectColumn select;
 	SynapseAlert mockSynapseAlert;
 	boolean isView;
-	
+	@Captor
+	ArgumentCaptor<CallbackP<FacetColumnRequest>> mockFacetChangedHandlerCaptor;
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest;
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest2;
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest3;
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		jobTrackingStub = new JobTrackingWidgetStub();
 		mockListner = Mockito.mock(QueryResultsListener.class);
 		mockView = Mockito.mock(TableQueryResultView.class);
@@ -108,13 +124,35 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+		
+		// test facetChangeRequestHandler
+		CallbackP<FacetColumnRequest> facetChangeRequestHandler = mockFacetChangedHandlerCaptor.getValue();
+		assertNull(query.getSelectedFacets());
+		String facetColumnName = "country";
+		when(mockFacetColumnRequest.getColumnName()).thenReturn(facetColumnName);
+		facetChangeRequestHandler.invoke(mockFacetColumnRequest);
+		assertEquals(1, query.getSelectedFacets().size());
+		assertEquals(mockFacetColumnRequest, query.getSelectedFacets().get(0));
+		
+		//verify that if the column name is the same, then the selected facet is updated for that column
+		when(mockFacetColumnRequest2.getColumnName()).thenReturn(facetColumnName);
+		facetChangeRequestHandler.invoke(mockFacetColumnRequest2);
+		assertEquals(1, query.getSelectedFacets().size());
+		assertEquals(mockFacetColumnRequest2, query.getSelectedFacets().get(0));
+		
+		//but if it's a facet for a different column, then both should be included.
+		when(mockFacetColumnRequest3.getColumnName()).thenReturn("different column");
+		facetChangeRequestHandler.invoke(mockFacetColumnRequest3);
+		assertEquals(2, query.getSelectedFacets().size());
+		assertTrue(query.getSelectedFacets().contains(mockFacetColumnRequest2));
+		assertTrue(query.getSelectedFacets().contains(mockFacetColumnRequest3));
 	}
 	
 	@Test
@@ -141,7 +179,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -162,7 +200,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, isView, null, widget);
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);

@@ -44,6 +44,8 @@ import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
+import org.sagebionetworks.web.client.view.DivView;
+import org.sagebionetworks.web.client.view.DivViewImpl;
 import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
@@ -607,6 +609,14 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorC
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeView;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeView;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeView;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
@@ -1357,5 +1367,11 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class);
+		
+		bind(DivView.class).to(DivViewImpl.class);
+		bind(FacetColumnResultValuesView.class).to(FacetColumnResultValuesViewImpl.class);
+		bind(FacetColumnResultSliderRangeView.class).to(FacetColumnResultSliderRangeViewImpl.class);
+		bind(FacetColumnResultRangeView.class).to(FacetColumnResultRangeViewImpl.class);
+		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
 	}
 }

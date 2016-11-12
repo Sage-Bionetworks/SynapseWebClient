@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -18,11 +19,13 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
@@ -32,7 +35,10 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit test for ColumnModelsViewWidget
@@ -51,8 +57,13 @@ public class ColumnModelsEditorWidgetTest {
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
+	
+	ColumnModel nonEditableColumn;
+	List<ColumnModel> nonEditableColumns;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -75,7 +86,13 @@ public class ColumnModelsEditorWidgetTest {
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
-		widget = new ColumnModelsEditorWidget(mockGinInjector);
+		nonEditableColumns = new ArrayList<ColumnModel>();
+		nonEditableColumn = new ColumnModel();
+		nonEditableColumn.setColumnType(ColumnType.STRING);
+		nonEditableColumn.setName("non-editable default column");
+		nonEditableColumns.add(nonEditableColumn);
+		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockSynapseClient).getDefaultColumnsForView(any(org.sagebionetworks.repo.model.table.ViewType.class), any(AsyncCallback.class));
+		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
 	}
@@ -101,6 +118,10 @@ public class ColumnModelsEditorWidgetTest {
 		widget.deleteSelected();
 		widget.addColumns(schema);
 		verify(mockEditor, times(schema.size() * 2)).addColumn(any(ColumnModelTableRow.class));
+		
+		//try to add non-editable column
+		widget.addColumns(nonEditableColumns);
+		verify(mockGinInjector, times(nonEditableColumns.size())).createNewColumnModelTableRowViewer();
 	}
 	
 	@Test
@@ -207,20 +228,5 @@ public class ColumnModelsEditorWidgetTest {
 		assertTrue(one.isSelected());
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
-	}
-
-	/**
-	 * 	THIS TEST TO BE DELETED ONCE WE EXPOSE EDITING EXISTING TABLE COLUMNS AGAIN
-	 */
-	@Test
-	public void testNoneditableColumns() {
-		reset(mockKeyboardNavigationHandler, mockEditor);
-		// when not in test website, existing columns will be viewers (not editors)
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		widget = new ColumnModelsEditorWidget(mockGinInjector);
-		schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(schema);
-		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
-		verify(mockGinInjector, times(schema.size())).createNewColumnModelTableRowViewer();
 	}
 }

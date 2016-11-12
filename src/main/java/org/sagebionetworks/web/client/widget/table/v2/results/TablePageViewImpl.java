@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -10,6 +11,7 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,6 +33,12 @@ public class TablePageViewImpl implements TablePageView {
 	SimplePanel paginationPanel;
 	@UiField
 	SimplePanel editorPopupBuffer;
+	@UiField
+	Div facetsWidgetPanel;
+	@UiField
+	ScrollPanel facetsWidgetContainer;
+	@UiField
+	Div tablePanel;
 	
 	Widget widget;
 	
@@ -80,4 +88,14 @@ public class TablePageViewImpl implements TablePageView {
 		this.editorPopupBuffer.setVisible(isEditable);
 	}
 
+	@Override
+	public void setFacetsWidget(Widget w) {
+		facetsWidgetPanel.clear();
+		facetsWidgetPanel.add(w);
+	}
+	
+	@Override
+	public void setFacetsVisible(boolean visible) {
+		facetsWidgetContainer.setVisible(visible);
+	}
 }

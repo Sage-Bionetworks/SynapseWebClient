@@ -76,4 +76,14 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	 * @param showRestrictValues
 	 */
 	public void setRestrictValuesVisible(boolean showRestrictValues);
+	
+	/**
+	 * Show/hide the facets editor
+	 * @param showFacetTypes
+	 */
+	public void setFacetVisible(boolean showFacetTypes);
+	
+	public void setFacetValues(String...items);
+	
+	
 }

@@ -6,14 +6,18 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,6 +41,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	boolean isView;
+	FacetsWidget facetsWidget;
 	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
@@ -44,11 +49,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget){
+	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget, FacetsWidget facetsWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
+		this.facetsWidget = facetsWidget;
+		view.setFacetsWidget(facetsWidget.asWidget());
 	}
 	
 	/**
@@ -59,14 +66,21 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, Query query, SortItem sort, boolean isEditable, boolean isView, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
+	public void configure(QueryResultBundle bundle, 
+			Query query, 
+			SortItem sort, 
+			boolean isEditable, 
+			boolean isView, 
+			RowSelectionListener rowSelectionListener, 
+			final PagingAndSortingListener pageChangeListener,
+			CallbackP<FacetColumnRequest> facetChangedHandler){
 		this.isView = isView;
 		this.rowSelectionListener = rowSelectionListener;
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null){
 			this.paginationWidget.configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), pageChangeListener);
 			view.setPaginationWidgetVisible(true);
-		}else{
+		}else {
 			view.setPaginationWidgetVisible(false);
 		}
 		view.setEditorBufferVisible(isEditable);
@@ -107,7 +121,19 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-
+		List<FacetColumnResult> facets = bundle.getFacets();
+		
+		boolean isFacetsWidgetVisible = !isEditable && 
+				facetChangedHandler != null && 
+				facets != null && 
+				!facets.isEmpty();
+		
+		if (isFacetsWidgetVisible) {
+			facetsWidget.configure(facets, facetChangedHandler, types);
+			view.setFacetsVisible(facetsWidget.isShowingFacets());
+		} else {
+			view.setFacetsVisible(false);	
+		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table

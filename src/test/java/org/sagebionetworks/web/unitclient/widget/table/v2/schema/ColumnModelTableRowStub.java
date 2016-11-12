@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
@@ -22,6 +23,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	private boolean isSelected;
 	private SelectionPresenter selectionPresenter;
 	private List<String> enumValues;
+	private ColumnFacetTypeViewEnum facetType;
 	public String getColumnName() {
 		return columnName;
 	}
@@ -60,6 +62,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	public void setId(String id) {
 		this.id = id;
 	}
+	
 	@Override
 	public Widget asWidget() {
 		return null;
@@ -149,6 +152,14 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	public void setSelectVisible(boolean visible) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		return facetType;
+	}
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
+		this.facetType = type;
 	}
 	
 }

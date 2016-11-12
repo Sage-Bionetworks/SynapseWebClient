@@ -158,6 +158,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -425,4 +429,8 @@ public interface PortalGinInjector extends Ginjector {
 	public RadioWidget createNewRadioWidget();
 	public EntityListRowBadge getEntityListRowBadge();
 	public CancelControlWidget getCancelControlWidget();
+	public FacetColumnResultSliderRangeWidget getFacetColumnResultSliderRangeWidget();
+	public FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
+	public FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
+	public FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
 }

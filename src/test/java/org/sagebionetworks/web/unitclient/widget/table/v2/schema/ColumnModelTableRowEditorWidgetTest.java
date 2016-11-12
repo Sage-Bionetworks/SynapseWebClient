@@ -1,5 +1,19 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.None;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Range;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Values;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -7,10 +21,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
@@ -18,6 +28,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
+
 
 public class ColumnModelTableRowEditorWidgetTest {
 
@@ -247,5 +258,59 @@ public class ColumnModelTableRowEditorWidgetTest {
 		when(mockView.getMaxSize()).thenReturn("50");
 		when(mockView.validateDefault()).thenReturn(true);
 		assertTrue(editor.validate());
+	}
+	
+	@Test
+	public void testConfigureFacetsForTypeString() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.String);
+		verify(mockView).setFacetValues(None.toString(), Values.toString(), Range.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureFacetsForTypeInteger() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.Integer);
+		verify(mockView).setFacetValues(None.toString(), Values.toString(), Range.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureFacetsForTypeBoolean() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.Boolean);
+		verify(mockView).setFacetValues(None.toString(), Values.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureFacetsForTypeDouble() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.Double);
+		verify(mockView).setFacetValues(None.toString(), Range.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureFacetsForTypeDate() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.Date);
+		verify(mockView).setFacetValues(None.toString(), Range.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureFacetsForTypeUnsupported() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.LargeText);
+		verify(mockView, never()).setFacetValues(anyString());
+		verify(mockView).setFacetVisible(false);
+	}
+	@Test
+	public void testCanHaveFacet() {
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.String));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Integer));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Boolean));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Double));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Date));
+		
+		//other
+		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.LargeText));
+		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.Link));
 	}
 }

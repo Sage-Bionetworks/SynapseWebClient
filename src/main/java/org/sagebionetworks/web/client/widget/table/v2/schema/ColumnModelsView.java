@@ -168,5 +168,5 @@ public interface ColumnModelsView extends IsWidget {
 		VIEWER,
 		EDITOR
 	}
-
+	void showErrorMessage(String message);
 }

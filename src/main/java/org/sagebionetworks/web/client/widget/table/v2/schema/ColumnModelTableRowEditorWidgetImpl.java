@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.None;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Range;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Values;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -56,6 +60,8 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			view.setMaxSize(null);
 			view.setSizeFieldVisible(false);
 		}
+		
+		configureFacetsForType(newType);
 		view.setRestrictValuesVisible(canHaveRestrictedValues(newType));
 		view.clearSizeError();
 		this.currentType = newType;
@@ -98,6 +104,45 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			return false;
 		}
 	}
+	
+	/**
+	 * Configure the facet selection based on the column type
+	 * @param type
+	 * @return
+	 */
+	public void configureFacetsForType(ColumnTypeViewEnum type){
+		switch(type){
+			case String:
+			case Integer:
+				view.setFacetValues(None.toString(), Values.toString(), Range.toString());
+				view.setFacetVisible(true);
+				break;
+			case Boolean:
+				view.setFacetValues(None.toString(), Values.toString());
+				view.setFacetVisible(true);
+				break;
+			case Double:
+			case Date:
+				view.setFacetValues(None.toString(), Range.toString());
+				view.setFacetVisible(true);
+				break;
+			default:
+				view.setFacetVisible(false);
+		}
+	}
+	
+	public boolean canHaveFacet(ColumnTypeViewEnum type){
+		switch(type){
+			case String:
+			case Integer:
+			case Boolean:
+			case Double:
+			case Date:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 	/**
 	 * Get the default cell editor to be used for a type.
@@ -137,6 +182,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		ColumnModelUtils.applyColumnModelToRow(model, view);
 	}
 
+	
 	@Override
 	public IsWidget getWidget(int index) {
 		return view.getWidget(index);
@@ -202,6 +248,21 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		view.setColumnType(type);
 	}
 
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		if (canHaveFacet(view.getColumnType())) {
+			return view.getFacetType();	
+		} else {
+			return ColumnFacetTypeViewEnum.None;
+		}
+		
+	}
+	
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
+		view.setFacetType(type);
+	}
+	
 	@Override
 	public String getMaxSize() {
 		return view.getMaxSize();
