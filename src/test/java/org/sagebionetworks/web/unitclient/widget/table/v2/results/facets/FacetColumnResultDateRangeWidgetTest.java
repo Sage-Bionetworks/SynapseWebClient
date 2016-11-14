@@ -90,46 +90,6 @@ public class FacetColumnResultDateRangeWidgetTest {
 	}
 
 	@Test
-	public void testIsValidInputWithColumnMinMax() {
-		widget.configure(mockFacet, mockOnFacetRequest);
-		// none selected is ok (should default to column min max)
-		assertEquals(COLUMN_MIN_TIME, widget.getColumnMin());
-		assertEquals(COLUMN_MAX_TIME, widget.getColumnMax());
-		assertEquals(COLUMN_MIN_TIME, widget.getNewMin());
-		assertEquals(COLUMN_MAX_TIME, widget.getNewMax());
-		assertTrue(widget.isValidInput());
-		
-		// test override from view
-		when(mockView.getMin()).thenReturn(new Date(COLUMN_MIN_TIME + 1));
-		when(mockView.getMax()).thenReturn(new Date(COLUMN_MAX_TIME - 1));
-		assertEquals(new Long(COLUMN_MIN_TIME + 1), widget.getNewMin());
-		assertEquals(new Long(COLUMN_MAX_TIME - 1), widget.getNewMax());
-		assertTrue(widget.isValidInput());
-		
-		// test invalid min
-		when(mockView.getMin()).thenReturn(new Date(COLUMN_MIN_TIME - 1));
-		assertEquals(new Long(COLUMN_MIN_TIME - 1), widget.getNewMin());
-		assertFalse(widget.isValidInput());
-		when(mockView.getMin()).thenReturn(new Date(COLUMN_MIN_TIME + 1));
-		
-		// test invalid max
-		when(mockView.getMax()).thenReturn(new Date(COLUMN_MAX_TIME + 1));
-		assertEquals(new Long(COLUMN_MAX_TIME + 1), widget.getNewMax());
-		assertFalse(widget.isValidInput());
-	}
-	
-	@Test
-	public void testIsValidInputWithNullColumnMinMax() {
-		when(mockFacet.getColumnMin()).thenReturn(null);
-		when(mockFacet.getColumnMax()).thenReturn(null);
-		widget.configure(mockFacet, mockOnFacetRequest);
-		assertNull(widget.getColumnMin());
-		assertNull(widget.getColumnMax());
-		assertFalse(widget.isValidInput());
-	}
-
-
-	@Test
 	public void testOnFacetChange() {
 		widget.configure(mockFacet, mockOnFacetRequest);
 		
