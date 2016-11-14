@@ -92,46 +92,6 @@ public class FacetColumnResultRangeWidgetTest {
 	}
 
 	@Test
-	public void testIsValidInputWithColumnMinMax() {
-		widget.configure(mockFacet, mockOnFacetRequest);
-		// none selected is ok (should default to column min max)
-		assertEquals(COLUMN_MIN_DOUBLE, widget.getColumnMin());
-		assertEquals(COLUMN_MAX_DOUBLE, widget.getColumnMax());
-		assertEquals(COLUMN_MIN_DOUBLE, widget.getNewMin());
-		assertEquals(COLUMN_MAX_DOUBLE, widget.getNewMax());
-		assertTrue(widget.isValidInput());
-		
-		// test override from view
-		when(mockView.getMin()).thenReturn(Double.toString(COLUMN_MIN_DOUBLE + 1));
-		when(mockView.getMax()).thenReturn(Double.toString(COLUMN_MAX_DOUBLE - 1));
-		assertEquals(new Double(COLUMN_MIN_DOUBLE + 1), widget.getNewMin());
-		assertEquals(new Double(COLUMN_MAX_DOUBLE - 1), widget.getNewMax());
-		assertTrue(widget.isValidInput());
-		
-		// test invalid min
-		when(mockView.getMin()).thenReturn(Double.toString(COLUMN_MIN_DOUBLE - 1));
-		assertEquals(new Double(COLUMN_MIN_DOUBLE - 1), widget.getNewMin());
-		assertFalse(widget.isValidInput());
-		when(mockView.getMin()).thenReturn(Double.toString(COLUMN_MIN_DOUBLE + 1));
-		
-		// test invalid max
-		when(mockView.getMax()).thenReturn(Double.toString(COLUMN_MAX_DOUBLE + 1));
-		assertEquals(new Double(COLUMN_MAX_DOUBLE + 1), widget.getNewMax());
-		assertFalse(widget.isValidInput());
-	}
-	
-	@Test
-	public void testIsValidInputWithNullColumnMinMax() {
-		when(mockFacet.getColumnMin()).thenReturn(null);
-		when(mockFacet.getColumnMax()).thenReturn(null);
-		widget.configure(mockFacet, mockOnFacetRequest);
-		assertNull(widget.getColumnMin());
-		assertNull(widget.getColumnMax());
-		assertFalse(widget.isValidInput());
-	}
-
-
-	@Test
 	public void testOnFacetChange() {
 		widget.configure(mockFacet, mockOnFacetRequest);
 		

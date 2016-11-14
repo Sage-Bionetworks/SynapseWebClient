@@ -83,50 +83,19 @@ public class FacetColumnResultDateRangeWidget implements IsWidget, FacetColumnRe
 		}
 	}
 	
-	public boolean isValidInput() {
-		synAlert.clear();
-		try {
-			Long newMin = getNewMin();
-			Long facetColumnMin = getColumnMin();
-			if (newMin != null && facetColumnMin != null && newMin < facetColumnMin) {
-				synAlert.showError(FacetColumnResultRangeWidget.MIN_MUST_BE_GREATER_THAN + facetColumnMin);
-				return false;
-			}
-			
-			Long newMax = getNewMax();
-			Long facetColumnMax = getColumnMax();
-			if (newMax != null && facetColumnMax != null && newMax > facetColumnMax) {
-				synAlert.showError(FacetColumnResultRangeWidget.MAX_MUST_BE_LESS_THAN + facetColumnMax);
-				return false;
-			}
-			
-			if (newMin == null && newMax == null) {
-				synAlert.showError(FacetColumnResultRangeWidget.MIN_OR_MAX_MUST_BE_DEFINED);
-				return false;
-			}
-		} catch (NumberFormatException e) {
-			synAlert.showError(FacetColumnResultRangeWidget.MIN_MAX_MUST_BE_VALID_NUMBERS);
-			return false;
-		}
-		
-		return true;
-	}
-	
 	@Override
 	public void onFacetChange() {
-		if (isValidInput()) {
-			FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
-			facetColumnRangeRequest.setColumnName(facet.getColumnName());
-			Long newMin = getNewMin();
-			if (newMin != null) {
-				facetColumnRangeRequest.setMin(Long.toString(newMin));	
-			}
-			Long newMax = getNewMax();
-			if (newMax != null) {
-				facetColumnRangeRequest.setMax(Long.toString(newMax));
-			}
-			onFacetRequest.invoke(facetColumnRangeRequest);
+		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
+		facetColumnRangeRequest.setColumnName(facet.getColumnName());
+		Long newMin = getNewMin();
+		if (newMin != null) {
+			facetColumnRangeRequest.setMin(Long.toString(newMin));	
 		}
+		Long newMax = getNewMax();
+		if (newMax != null) {
+			facetColumnRangeRequest.setMax(Long.toString(newMax));
+		}
+		onFacetRequest.invoke(facetColumnRangeRequest);
 	}
 	
 	@Override
