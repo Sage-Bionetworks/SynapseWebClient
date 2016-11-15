@@ -31,6 +31,8 @@ public class CellFactoryImpl implements CellFactory {
 			return ginInjector.createLinkCellRenderer();
 		case FILEHANDLEID:
 			return ginInjector.createFileCellRenderer();
+		case USERID:
+			return ginInjector.createUserIdCellRenderer();
 		default:
 			return ginInjector.createStringRendererCell();
 		}
@@ -63,7 +65,7 @@ public class CellFactoryImpl implements CellFactory {
 				break;
 			case FILEHANDLEID:
 				editor = ginInjector.createFileCellEditor();
-				break;		
+				break;
 			default:
 				StringEditorCell stringEditor = ginInjector.createStringEditorCell();
 				stringEditor.setMaxSize(model.getMaximumSize());

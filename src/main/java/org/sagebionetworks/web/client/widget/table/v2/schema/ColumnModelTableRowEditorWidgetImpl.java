@@ -118,6 +118,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 				view.setFacetVisible(true);
 				break;
 			case Boolean:
+			case User:
 				view.setFacetValues(None.toString(), Values.toString());
 				view.setFacetVisible(true);
 				break;
