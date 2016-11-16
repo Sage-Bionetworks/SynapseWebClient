@@ -1733,7 +1733,7 @@ ol.lowerroman {
 	color: #d3d3d3 !important;
 }
 
-.topLevelZIndex, {
+.topLevelZIndex {
 	z-index: 2000;
 }
 
