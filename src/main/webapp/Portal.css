@@ -1733,7 +1733,7 @@ ol.lowerroman {
 	color: #d3d3d3 !important;
 }
 
-.topLevelZIndex {
+.topLevelZIndex, bootbox {
 	z-index: 2000;
 }
 
@@ -2215,6 +2215,7 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 .modal-90-percent [class*="modal-dialog"] {
 	width: 90%;
 }
+
 
 
 .gwt-TreeItem-selected [class*="link"] {
