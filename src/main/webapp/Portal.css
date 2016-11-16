@@ -2217,6 +2217,7 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 }
 
 
+
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
 }
@@ -2263,6 +2264,11 @@ iframe[seamless] {
 .modal {
     overflow-y: auto !important;
 }
+
+.bootbox {
+	z-index: 2000 !important;
+}
+
 
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
