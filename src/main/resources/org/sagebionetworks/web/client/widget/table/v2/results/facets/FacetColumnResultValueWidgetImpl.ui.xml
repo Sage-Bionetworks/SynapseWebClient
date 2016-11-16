@@ -5,14 +5,13 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
 		<b:CheckBox ui:field="select" addStyleNames="moveup-1"/>
-		<g:FocusPanel ui:field="valueNameContainer">
-			<bh:Span ui:field="valueName" addStyleNames="margin-right-5 link"/>
-		</g:FocusPanel>
-		<g:FocusPanel ui:field="countContainer">
-			<bh:Span addStyleNames="lightGreyText imageButton">
-				<bh:Span ui:field="count"/>
+		<g:FocusPanel ui:field="focusPanel">
+			<bh:Span>
+				<bh:Span ui:field="valueName" addStyleNames="margin-right-5 link"/>
+				<bh:Span addStyleNames="lightGreyText imageButton">
+					<bh:Span ui:field="count"/>
+				</bh:Span>
 			</bh:Span>
 		</g:FocusPanel>
-		
 	</g:HorizontalPanel>
 </ui:UiBinder>
