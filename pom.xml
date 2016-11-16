@@ -27,8 +27,8 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.6.1</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
-		<gwtboostrap3.version>1.5</gwtboostrap3.version>
-		<gwtboostrap3.extras.version>1.5</gwtboostrap3.extras.version>
+		<gwtboostrap3.version>1.5.1</gwtboostrap3.version>
+		<gwtboostrap3.extras.version>1.5.1</gwtboostrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
