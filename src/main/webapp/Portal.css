@@ -1733,7 +1733,7 @@ ol.lowerroman {
 	color: #d3d3d3 !important;
 }
 
-.topLevelZIndex, .bootbox {
+.topLevelZIndex, {
 	z-index: 2000;
 }
 
@@ -2264,6 +2264,11 @@ iframe[seamless] {
 .modal {
     overflow-y: auto !important;
 }
+
+.bootbox {
+	z-index: 2000 !important;
+}
+
 
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
