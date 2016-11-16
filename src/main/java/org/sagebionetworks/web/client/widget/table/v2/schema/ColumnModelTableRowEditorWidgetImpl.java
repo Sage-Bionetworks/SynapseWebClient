@@ -139,6 +139,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case Boolean:
 			case Double:
 			case Date:
+			case User:
 				return true;
 			default:
 				return false;

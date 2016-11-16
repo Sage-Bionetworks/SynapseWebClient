@@ -37,13 +37,16 @@ public class FacetsWidget implements IsWidget {
 				columnName2ColumnModel.put(columnModel.getName(), columnModel);
 			}
 			for (FacetColumnResult facet : facets) {
+				ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
+				
 				switch(facet.getFacetType()) {
 					case enumeration:
 						FacetColumnResultValues facetResultValues = (FacetColumnResultValues)facet;
 						// if values are not set, then don't show the facet
 						if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 0) {
 							FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
-							valuesWidget.configure(facetResultValues, facetChangedHandler);
+							boolean isUserIdColumnType = ColumnType.USERID.equals(cm.getColumnType());
+							valuesWidget.configure(facetResultValues, isUserIdColumnType, facetChangedHandler);
 							view.add(valuesWidget);
 							isShowingFacets = true;
 						}
@@ -53,7 +56,6 @@ public class FacetsWidget implements IsWidget {
 						// if there are no values found in the column, don't show the facet
 						if (rangeFacet.getColumnMin() != null) {
 							isShowingFacets = true;
-							ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
 							if (ColumnType.INTEGER.equals(cm.getColumnType())) {
 								FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
 								rangeWidget.configure(rangeFacet, facetChangedHandler);

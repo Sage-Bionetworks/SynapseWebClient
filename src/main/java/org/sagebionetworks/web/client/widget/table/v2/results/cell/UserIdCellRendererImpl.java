@@ -23,7 +23,9 @@ public class UserIdCellRendererImpl implements UserIdCellRenderer{
 	@Override
 	public void setValue(String value) {
 		principalId = value;
-		userBadge.configure(principalId);
+		if (value != null) {
+			userBadge.configure(principalId);
+		}
 	}
 
 	@Override
