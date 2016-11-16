@@ -57,7 +57,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	
 	public void addUserBadge(String userId) {
 		UserBadgeItem item = ginInjector.getUserBadgeItem();
-		item.configure(userId).setSelectionChangedCallback(selectionChangedCallback);
+		item.configure(userId);
+		item.setSelectionChangedCallback(selectionChangedCallback);
 		users.add(item);
 		view.addUserBadge(item.asWidget());
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
