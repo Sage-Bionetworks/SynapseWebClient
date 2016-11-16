@@ -9,7 +9,6 @@
 		<t:Table width="100%">
 			<t:TBody ui:field="userBadgeContainer" />
 		</t:Table>
-		<bh:Div addStyleNames="margin-top-15" ui:field="userSelectorContainer" />
 	</bh:Div>
 
 </ui:UiBinder>
