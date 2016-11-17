@@ -20,7 +20,16 @@
 				<b:ModalBody>
 					<g:SimplePanel ui:field="unsubscribeUserBadgeContainer" />
 					<bh:Paragraph addStyleNames="margin-top-10">
-						You’ll miss out on invitations to join a team, requests to join your team, invitations to access data, requests to view your projects,  user verification status notifications, discussion forum notifications, and challenge submission notifications.
+						You’ll miss out on:
+						<bh:UnorderedList>
+							<b:ListItem text="invitations to join a team"></b:ListItem>
+							<b:ListItem text="requests to join your team"></b:ListItem>
+							<b:ListItem text="invitations to access data"></b:ListItem>
+							<b:ListItem text="requests to view your projects"></b:ListItem>
+							<b:ListItem text="user verification status notifications"></b:ListItem>
+							<b:ListItem text="discussion forum notifications"></b:ListItem>
+							<b:ListItem text="challenge submission notifications"></b:ListItem>
+						</bh:UnorderedList>
 					</bh:Paragraph>
 				</b:ModalBody>
 				<b:ModalFooter>

@@ -60,6 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -344,6 +345,7 @@ public interface PortalGinInjector extends Ginjector {
 	public URLProvEntryView getURLEntry();
 	public ProvenanceListWidget getProvenanceListWidget();
 	public PreviewWidget getPreviewWidget();
+	public UserBadgeItem getUserBadgeItem();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
@@ -435,4 +437,5 @@ public interface PortalGinInjector extends Ginjector {
 	public FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
 	public FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
 	public FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
+	
 }
