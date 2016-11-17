@@ -36,6 +36,8 @@ public class FileHandleAsyncHandlerImplTest {
 	@Mock
 	AsyncCallback mockCallback;
 	@Mock
+	AsyncCallback mockCallback2;
+	@Mock
 	BatchFileResult mockResult;
 	List<FileResult> resultList;
 	@Mock
@@ -65,13 +67,16 @@ public class FileHandleAsyncHandlerImplTest {
 		fileHandleAsyncHandler.executeRequests();
 		verifyZeroInteractions(mockSynapseClient);
 		
-		//add one, simulate single file response
+		//simulate single file response for multiple requests for that file
 		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback);
+		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback2);
+		
 		resultList.add(mockFileResult);
 		
 		fileHandleAsyncHandler.executeRequests();
 		verify(mockSynapseClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(mockFileResult);
+		verify(mockCallback2).onSuccess(mockFileResult);
 	}
 	
 	@Test
