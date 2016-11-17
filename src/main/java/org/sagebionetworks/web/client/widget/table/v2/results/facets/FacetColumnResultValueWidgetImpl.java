@@ -25,9 +25,7 @@ public class FacetColumnResultValueWidgetImpl implements FacetColumnResultValueW
 	@UiField
 	Span count;
 	@UiField
-	FocusPanel valueNameContainer;
-	@UiField
-	FocusPanel countContainer;
+	FocusPanel focusPanel;
 	
 	Widget w;
 	Presenter presenter;
@@ -42,8 +40,7 @@ public class FacetColumnResultValueWidgetImpl implements FacetColumnResultValueW
 				clickHandler.onClick(event);
 			}
 		};
-		valueNameContainer.addClickHandler(toggleSelect);
-		countContainer.addClickHandler(toggleSelect);
+		focusPanel.addClickHandler(toggleSelect);
 	}
 	
 	@Override

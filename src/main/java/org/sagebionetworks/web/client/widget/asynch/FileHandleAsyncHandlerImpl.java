@@ -40,7 +40,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 	
 	@Override
 	public void getFileHandle(FileHandleAssociation fileHandleAssociation, AsyncCallback<FileResult> callback) {
-		List<AsyncCallback<FileResult>> list = reference2Callback.get(fileHandleAssociation);
+		List<AsyncCallback<FileResult>> list = reference2Callback.get(fileHandleAssociation.getFileHandleId());
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<FileResult>>();
 			reference2Callback.put(fileHandleAssociation.getFileHandleId(), list);

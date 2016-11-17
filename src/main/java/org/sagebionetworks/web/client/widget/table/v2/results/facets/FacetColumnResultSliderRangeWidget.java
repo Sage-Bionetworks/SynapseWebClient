@@ -26,24 +26,22 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
 		view.setColumnName(facet.getColumnName());
-		Number minMin = parseNumber(facet.getColumnMin());
-		Number maxMax = parseNumber(facet.getColumnMax());
+		Number minMin = Double.parseDouble(facet.getColumnMin());
+		Number maxMax = Double.parseDouble(facet.getColumnMax());
 		double stepSize = getStepSize(minMin, maxMax);
 		
-		Number min = parseNumber(facet.getSelectedMin());
-		if (min == null) {
-			min = minMin;
+		Number min = minMin;
+		if (facet.getSelectedMin() != null) {
+			min = Double.parseDouble(facet.getSelectedMin());
 		}
-		Number max = parseNumber(facet.getSelectedMax());
-		if (max == null) {
-			max = maxMax;
+		
+		Number max = maxMax;
+		if (facet.getSelectedMax() != null) {
+			max = Double.parseDouble(facet.getSelectedMax());
 		}
-		if (minMin != null) {
-			view.setMin(minMin.doubleValue());
-		}
-		if (maxMax != null) {
-			view.setMax(maxMax.doubleValue());
-		}
+		view.setMin(minMin.doubleValue());
+		view.setMax(maxMax.doubleValue());
+		
 		if (min != null && max != null) {
 			view.setRange(new Range(min.doubleValue(), max.doubleValue()));	
 		}
@@ -60,18 +58,6 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 			}
 		}
 		return stepSize;
-	}
-	
-	public static Number parseNumber(String s) {
-		Number number = null;
-		if (s != null) {
-			try {
-		        number = Double.parseDouble(s);
-		    } catch(NumberFormatException e) {
-		        number = Long.parseLong(s);
-		    }
-		}
-	    return number;
 	}
 	
 	@Override
