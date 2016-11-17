@@ -44,11 +44,12 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	private Presenter presenter;
 	Widget widget;
 	Callback onAttachCallback;
+	ClickHandler badgeClicked;
 	
 	@Inject
 	public UserBadgeViewImpl(Binder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
-		ClickHandler badgeClicked = new ClickHandler() {
+		badgeClicked = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.badgeClicked(event);
@@ -186,6 +187,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void clearHref() {
 		usernameLink.setHref(HasHref.EMPTY_HREF);
+		usernameLink.addClickHandler(badgeClicked);
 	}
 	
 	@Override
