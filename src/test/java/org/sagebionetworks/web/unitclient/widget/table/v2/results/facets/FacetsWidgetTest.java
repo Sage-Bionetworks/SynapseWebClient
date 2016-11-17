@@ -108,7 +108,8 @@ public class FacetsWidgetTest {
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, mockFacetChangedHandler);
+		boolean isUserId = false;
+		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, isUserId, mockFacetChangedHandler);
 	}
 	
 	@Test
