@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -91,10 +93,10 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		types = ColumnModelUtils.buildTypesForQueryResults(QueryBundleUtils.getSelectFromBundle(bundle), bundle.getColumnModels());
 		// setup the headers from the types
 		List<IsWidget> headers = new ArrayList<IsWidget>();
-		Set<String> sortedHeaders = new HashSet<String>();
+		Map<String, SortItem> sortedHeaders = new HashMap<String, SortItem>();
 		if (sortList != null) {
 			for (SortItem sort : sortList) {
-				sortedHeaders.add(sort.getColumn());
+				sortedHeaders.put(sort.getColumn(), sort);
 			}	
 		}
 		for (ColumnModel type: types) {
@@ -105,9 +107,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				SortableTableHeader sth = ginInjector.createSortableTableHeader();
 				sth.configure(type.getName(), pageChangeListener);
 				headers.add(sth);
-				if(sortList != null){
-					if(sortedHeaders.contains(headerName)) {
-						sth.setIcon(getSortDirection(headerName, sortList));
+				if(sortedHeaders.containsKey(headerName)) {
+					SortItem sortItem = sortedHeaders.get(headerName);
+					if(SortDirection.DESC.equals(sortItem.getDirection())){
+						sth.setIcon(IconType.SORT_DESC);
+					}else{
+						sth.setIcon(IconType.SORT_ASC);
 					}
 				}
 			}else{
@@ -145,18 +150,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
-	}
-	private IconType getSortDirection(String headerName, List<SortItem> sortList) {
- 		for (SortItem sort : sortList) {
- 			if (sort.getColumn().equals(headerName)) {
- 				if(SortDirection.DESC.equals(sort.getDirection())){
- 					return IconType.SORT_DESC;
- 				}else{
- 					return IconType.SORT_ASC;
- 				}
- 			}
- 		}
- 		return null;
 	}
 
 	/**
