@@ -49,7 +49,12 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 
 	@Override
 	public String getValue() {
-		return peopleSuggestWidget.getText();
+		// if empty, then value is null
+		String value = peopleSuggestWidget.getText();
+		if (value != null && value.trim().isEmpty()) {
+			value = null;
+		}
+		return value;
 	}
 	
 	@Override
