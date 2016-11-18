@@ -21,6 +21,8 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	public static final String SHOW_ALL = "Show all ";
 	public static final String UNSPECIFIED = "(not set)";
 	public static final String EMPTY_STRING = "(empty string)";
+	public static final String NULL_VALUE_KEYWORD = "org.sagebionetworks.UNDEFINED_NULL_NOTSET";
+	
 	FacetColumnResultValuesView view;
 	FacetColumnResultValues facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
@@ -28,6 +30,8 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	public static final int MAX_VISIBLE_FACET_VALUES=5;
 	PortalGinInjector ginInjector;
 	ClickHandler doNothingClickHandler;
+	
+	
 	@Inject
 	public FacetColumnResultValuesWidget(FacetColumnResultValuesView view, PortalGinInjector ginInjector) {
 		this.view = view;
@@ -54,7 +58,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 			
 			Widget displayWidget;
 			
-			if (valueCount.getValue() == null) { //change to look for special constant when implemented in the backend
+			if (NULL_VALUE_KEYWORD.equals(valueCount.getValue())) {
 				displayWidget = view.getSpanWithText(UNSPECIFIED);
 			} else if (isUserId) {
 				displayWidget = getUserBadge(valueCount.getValue());	

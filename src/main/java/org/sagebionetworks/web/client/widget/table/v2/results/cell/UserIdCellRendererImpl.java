@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -23,7 +24,7 @@ public class UserIdCellRendererImpl implements UserIdCellRenderer{
 	@Override
 	public void setValue(String value) {
 		principalId = value;
-		if (value != null) {
+		if (DisplayUtils.isDefined(principalId)) {
 			userBadge.configure(principalId);
 		}
 	}
