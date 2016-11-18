@@ -1,11 +1,16 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import java.util.Date;
+
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.event.dom.client.HasKeyDownHandlers;
+import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface SynapseSuggestBoxView extends IsWidget, SynapseView {
+public interface SynapseSuggestBoxView extends IsWidget, SynapseView, Focusable, HasKeyDownHandlers {
 	
 	/**
 	 * Gets the string of text in the suggest box.

@@ -66,6 +66,9 @@ public class CellFactoryImpl implements CellFactory {
 			case FILEHANDLEID:
 				editor = ginInjector.createFileCellEditor();
 				break;
+			case USERID:
+				editor = ginInjector.createUserIdCellEditor();
+				break;
 			default:
 				StringEditorCell stringEditor = ginInjector.createStringEditorCell();
 				stringEditor.setMaxSize(model.getMaximumSize());
@@ -105,7 +108,10 @@ public class CellFactoryImpl implements CellFactory {
 				break;
 			case FILEHANDLEID:
 				editor = ginInjector.createFileCellEditor();
-				break;		
+				break;
+			case USERID:
+				editor = ginInjector.createUserIdCellEditor();
+				break;
 			default:
 				StringEditorCell stringEditor = ginInjector.createStringEditorCell();
 				stringEditor.setMaxSize(model.getMaximumSize());
