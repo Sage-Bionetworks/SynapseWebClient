@@ -11,13 +11,12 @@ import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, TakesValue<String>, Focusable, HasKeyDownHandlers {
+public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, Focusable, HasKeyDownHandlers {
 	
 	public static final int DELAY = 750;	// milliseconds
 	public static final int PAGE_SIZE = 10;
@@ -163,14 +162,5 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	public void setTabIndex(int index) {
 		view.setTabIndex(index);
 	}
-
-	@Override
-	public void setValue(String value) {
-		setText(value);
-	}
-
-	@Override
-	public String getValue() {
-		return selectedSuggestion != null ? selectedSuggestion.getId() : null;
-	}
+	
 }

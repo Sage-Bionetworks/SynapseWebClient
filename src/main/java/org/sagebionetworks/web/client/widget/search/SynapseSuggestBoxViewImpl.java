@@ -129,10 +129,10 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	public void selectSuggestion(SynapseSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
 		synAlert.clear();
-		presenter.setSelectedSuggestion(suggestion);
 		selectedItem.setText(suggestion.getReplacementString());
 		selectedItem.setVisible(true);
 		suggestBox.setVisible(false);
+		presenter.setSelectedSuggestion(suggestion);
 	}
 	
 	@Override

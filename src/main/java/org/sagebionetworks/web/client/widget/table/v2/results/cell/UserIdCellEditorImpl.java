@@ -20,7 +20,7 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 	UserIdCellEditorView view;
 	SynapseSuggestBox peopleSuggestWidget;
 	UserGroupSuggestionProvider provider;
-	String value;
+	
 	@Inject
 	public UserIdCellEditorImpl(UserIdCellEditorView view, 
 			SynapseSuggestBox peopleSuggestWidget,
@@ -39,7 +39,7 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 	}
 	
 	public void onUserSelected(SynapseSuggestion suggestion) {
-		value = suggestion.getId();
+		setValue(suggestion.getId());
 	}
 	
 	@Override
@@ -49,7 +49,7 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 
 	@Override
 	public String getValue() {
-		return value;
+		return peopleSuggestWidget.getText();
 	}
 	
 	@Override
@@ -89,7 +89,7 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 
 	@Override
 	public void setValue(String value) {
-		this.value = value;
-		peopleSuggestWidget.setValue(value);
+		peopleSuggestWidget.clear();
+		peopleSuggestWidget.setText(value);
 	}
 }
