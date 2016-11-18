@@ -159,12 +159,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.bundle = bundle;
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
-		SortItem sort = null;
-		if(sortItems != null && !sortItems.isEmpty()){
-			sort = sortItems.get(0);
-		}
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, isView, null, this, facetChangedHandler);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}

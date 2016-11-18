@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -68,7 +70,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 */
 	public void configure(QueryResultBundle bundle, 
 			Query query, 
-			SortItem sort, 
+			List<SortItem> sortList, 
 			boolean isEditable, 
 			boolean isView, 
 			RowSelectionListener rowSelectionListener, 
@@ -89,6 +91,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		types = ColumnModelUtils.buildTypesForQueryResults(QueryBundleUtils.getSelectFromBundle(bundle), bundle.getColumnModels());
 		// setup the headers from the types
 		List<IsWidget> headers = new ArrayList<IsWidget>();
+		Set<String> sortedHeaders = new HashSet<String>();
+		if (sortList != null) {
+			for (SortItem sort : sortList) {
+				sortedHeaders.add(sort.getColumn());
+			}	
+		}
 		for (ColumnModel type: types) {
 			// Create each header
 			String headerName = type.getName();
@@ -97,13 +105,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				SortableTableHeader sth = ginInjector.createSortableTableHeader();
 				sth.configure(type.getName(), pageChangeListener);
 				headers.add(sth);
-				if(sort != null){
-					if(headerName.equals(sort.getColumn())){
-						if(SortDirection.DESC.equals(sort.getDirection())){
-							sth.setIcon(IconType.SORT_DESC);
-						}else{
-							sth.setIcon(IconType.SORT_ASC);
-						}
+				if(sortList != null){
+					if(sortedHeaders.contains(headerName)) {
+						sth.setIcon(getSortDirection(headerName, sortList));
 					}
 				}
 			}else{
@@ -141,6 +145,18 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
+	}
+	private IconType getSortDirection(String headerName, List<SortItem> sortList) {
+ 		for (SortItem sort : sortList) {
+ 			if (sort.getColumn().equals(headerName)) {
+ 				if(SortDirection.DESC.equals(sort.getDirection())){
+ 					return IconType.SORT_DESC;
+ 				}else{
+ 					return IconType.SORT_ASC;
+ 				}
+ 			}
+ 		}
+ 		return null;
 	}
 
 	/**

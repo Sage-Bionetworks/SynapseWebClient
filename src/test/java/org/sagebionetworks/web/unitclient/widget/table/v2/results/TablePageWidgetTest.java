@@ -258,8 +258,10 @@ public class TablePageWidgetTest {
 		SortItem sort = new SortItem();
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		sort.setDirection(SortDirection.DESC);
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		sortList.add(sort);
 		boolean isEditable = false;
-		widget.configure(bundle, query, sort, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -288,8 +290,10 @@ public class TablePageWidgetTest {
 		SortItem sort = new SortItem();
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		sort.setDirection(SortDirection.ASC);
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		sortList.add(sort);
 		boolean isEditable = false;
-		widget.configure(bundle, query, sort, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -315,8 +319,10 @@ public class TablePageWidgetTest {
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		// When the direction is null
 		sort.setDirection(null);
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		sortList.add(sort);
 		boolean isEditable = false;
-		widget.configure(bundle, query, sort, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
