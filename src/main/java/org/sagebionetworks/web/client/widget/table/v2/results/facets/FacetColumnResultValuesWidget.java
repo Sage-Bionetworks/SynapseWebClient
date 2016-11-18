@@ -7,8 +7,12 @@ import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValueCount;
 import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,18 +21,30 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	public static final String SHOW_ALL = "Show all ";
 	public static final String UNSPECIFIED = "(not set)";
 	public static final String EMPTY_STRING = "(empty string)";
+	public static final String NULL_VALUE_KEYWORD = "org.sagebionetworks.UNDEFINED_NULL_NOTSET";
+	
 	FacetColumnResultValuesView view;
 	FacetColumnResultValues facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
 	Set<String> facetValues;
 	public static final int MAX_VISIBLE_FACET_VALUES=5;
+	PortalGinInjector ginInjector;
+	ClickHandler doNothingClickHandler;
+	
+	
 	@Inject
-	public FacetColumnResultValuesWidget(FacetColumnResultValuesView view) {
+	public FacetColumnResultValuesWidget(FacetColumnResultValuesView view, PortalGinInjector ginInjector) {
 		this.view = view;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
+		doNothingClickHandler = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+			}
+		};
 	}
 	
-	public void configure(FacetColumnResultValues facet, CallbackP<FacetColumnRequest> onFacetRequest) {
+	public void configure(FacetColumnResultValues facet, boolean isUserId, CallbackP<FacetColumnRequest> onFacetRequest) {
 		view.clearValues();
 		facetValues = new HashSet<String>();
 		this.facet = facet;
@@ -36,19 +52,24 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		view.setColumnName(facet.getColumnName());
 		int i = 0;
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
-			String displayValue = valueCount.getValue();
-			if (displayValue == null) {
-				displayValue = UNSPECIFIED;
-			} else if (displayValue.trim().isEmpty()) {
-				displayValue = EMPTY_STRING;
-			}
 			if (valueCount.getIsSelected()) {
 				facetValues.add(valueCount.getValue());
 			}
-			if (i < MAX_VISIBLE_FACET_VALUES) {
-				view.addValue(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());	
+			
+			Widget displayWidget;
+			
+			if (valueCount.getValue() == null || NULL_VALUE_KEYWORD.equals(valueCount.getValue())) {
+				displayWidget = view.getSpanWithText(UNSPECIFIED);
+			} else if (isUserId) {
+				displayWidget = getUserBadge(valueCount.getValue());	
 			} else {
-				view.addValueToOverflow(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());
+				displayWidget = view.getSpanWithText(valueCount.getValue());
+			}
+			
+			if (i < MAX_VISIBLE_FACET_VALUES) {
+				view.addValue(valueCount.getIsSelected(), displayWidget, valueCount.getCount(), valueCount.getValue());	
+			} else {
+				view.addValueToOverflow(valueCount.getIsSelected(), displayWidget, valueCount.getCount(), valueCount.getValue());
 			}
 			i++;
 		}
@@ -58,6 +79,13 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		} else {
 			view.setShowAllButtonVisible(false);
 		}
+	}
+	
+	public Widget getUserBadge(String userId) {
+		UserBadge userBadge = ginInjector.getUserBadgeWidget();
+		userBadge.configure(userId);
+		userBadge.setCustomClickHandler(doNothingClickHandler);
+		return userBadge.asWidget();
 	}
 	
 	@Override

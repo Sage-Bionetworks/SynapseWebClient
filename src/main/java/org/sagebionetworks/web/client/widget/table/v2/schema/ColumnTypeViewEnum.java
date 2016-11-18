@@ -19,7 +19,7 @@ public enum ColumnTypeViewEnum {
 	Entity(ColumnType.ENTITYID),
 	Link(ColumnType.LINK),
 	LargeText(ColumnType.LARGETEXT),
-	UserId(ColumnType.USERID);
+	User(ColumnType.USERID);
 	
 	private ColumnType type;
 	ColumnTypeViewEnum(ColumnType type){

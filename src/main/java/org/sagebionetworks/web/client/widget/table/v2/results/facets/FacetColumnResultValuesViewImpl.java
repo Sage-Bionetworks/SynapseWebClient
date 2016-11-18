@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -47,13 +48,13 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 	}
 	
 	@Override
-	public void addValue(boolean isSelected, String displayValue, Long count, String originalFacetValue) {
-		facetValues.add(getNewFacetColumnResultValueWidget(isSelected, displayValue, count, originalFacetValue));
+	public void addValue(boolean isSelected, Widget displayWidget, Long count, String originalFacetValue) {
+		facetValues.add(getNewFacetColumnResultValueWidget(isSelected, displayWidget, count, originalFacetValue));
 	}
 	
 	@Override
-	public void addValueToOverflow(boolean isSelected, String displayValue, Long count, String originalFacetValue) {
-		overflowFacetValues.add(getNewFacetColumnResultValueWidget(isSelected, displayValue, count, originalFacetValue));
+	public void addValueToOverflow(boolean isSelected, Widget displayWidget, Long count, String originalFacetValue) {
+		overflowFacetValues.add(getNewFacetColumnResultValueWidget(isSelected, displayWidget, count, originalFacetValue));
 	}
 	
 	@Override
@@ -66,10 +67,10 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 		showAllButton.setVisible(visible);
 	}
 	
-	private FacetColumnResultValueWidgetImpl getNewFacetColumnResultValueWidget(boolean isSelected, String displayValue, Long count, final String originalFacetValue){
+	private FacetColumnResultValueWidgetImpl getNewFacetColumnResultValueWidget(boolean isSelected, Widget displayWidget, Long count, final String originalFacetValue){
 		FacetColumnResultValueWidgetImpl valueWidget = new FacetColumnResultValueWidgetImpl();
 		valueWidget.setIsSelected(isSelected);
-		valueWidget.setValueName(displayValue);
+		valueWidget.setValue(displayWidget);
 		valueWidget.setCount(count);
 		valueWidget.addClickHandler(new ClickHandler() {
 			@Override
@@ -90,5 +91,12 @@ public class FacetColumnResultValuesViewImpl implements FacetColumnResultValuesV
 	@Override
 	public void setColumnName(String name) {
 		columnName.setText(name);
+	}
+	
+	@Override
+	public Span getSpanWithText(String text) {
+		Span s = new Span();
+		s.setText(text);
+		return s;
 	}
 }

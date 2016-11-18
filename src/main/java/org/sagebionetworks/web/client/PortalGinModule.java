@@ -611,6 +611,12 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorC
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeView;
@@ -1160,7 +1166,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ListCellEdtiorView.class).to(ListCellEditorViewImpl.class);
 		bind(BooleanCellEditor.class).to(BooleanCellEditorImpl.class);
 		bind(DateCellEditorView.class).to(DateCellEditorViewImpl.class);
+		bind(UserIdCellEditorView.class).to(UserIdCellEditorViewImpl.class);
 		bind(DateCellEditor.class).to(DateCellEditorImpl.class);
+		bind(UserIdCellEditor.class).to(UserIdCellEditorImpl.class);
 		bind(DateCellRenderer.class).to(DateCellRendererImpl.class);
 		bind(DateCellRendererView.class).to(DateCellRendererViewImpl.class);
 		bind(DoubleCellEditor.class).to(DoubleCellEditorImpl.class);
@@ -1171,6 +1179,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileCellRenderer.class).to(FileCellRendererImpl.class);
 		bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
 		bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
+		bind(UserIdCellRenderer.class).to(UserIdCellRendererImpl.class);
 		
 		/*
 		 * Teams Places

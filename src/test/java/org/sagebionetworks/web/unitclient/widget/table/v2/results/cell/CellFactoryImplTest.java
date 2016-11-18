@@ -32,6 +32,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 
 public class CellFactoryImplTest {
 
@@ -55,7 +57,10 @@ public class CellFactoryImplTest {
 	EnumFormCellEditor mockEnumFormCellEditor;
 	@Mock
 	BooleanFormCellEditor mockBooleanFormCellEditor;
-	
+	@Mock
+	UserIdCellEditor mockUserIdCellEditor;
+	@Mock
+	UserIdCellRenderer mockUserIdCellRenderer;
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -89,6 +94,8 @@ public class CellFactoryImplTest {
 		when(mockInjector.createFileCellRenderer()).thenReturn(mockFileCellRenderer);
 		when(mockInjector.createBooleanFormCellEditor()).thenReturn(mockBooleanFormCellEditor);
 		when(mockInjector.createEnumFormCellEditor()).thenReturn(mockEnumFormCellEditor);
+		when(mockInjector.createUserIdCellEditor()).thenReturn(mockUserIdCellEditor);
+		when(mockInjector.createUserIdCellRenderer()).thenReturn(mockUserIdCellRenderer);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 

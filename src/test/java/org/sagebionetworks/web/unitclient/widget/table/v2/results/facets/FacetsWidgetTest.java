@@ -81,6 +81,7 @@ public class FacetsWidgetTest {
 		when(mockFacetColumnResultRange.getColumnMax()).thenReturn("120");
 		when(mockColumnModel.getName()).thenReturn(COLUMN_NAME);
 		when(mockFacetColumnResultRange.getColumnName()).thenReturn(COLUMN_NAME);
+		when(mockFacetColumnResultValues.getColumnName()).thenReturn(COLUMN_NAME);
 	}
 
 	@Test
@@ -108,7 +109,21 @@ public class FacetsWidgetTest {
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, mockFacetChangedHandler);
+		boolean isUserId = false;
+		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, isUserId, mockFacetChangedHandler);
+	}
+	
+	@Test
+	public void testConfigureResultUserIdsValuesFacet() {
+		facets.add(mockFacetColumnResultValues);
+		facetValues.add(mockFacetResultValueCount);
+		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.USERID);
+		widget.configure(facets, mockFacetChangedHandler, columnModels);
+		assertTrue(widget.isShowingFacets());
+		verify(mockView).clear();
+		verify(mockView).add(any(IsWidget.class));
+		boolean isUserId = true;
+		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, isUserId, mockFacetChangedHandler);
 	}
 	
 	@Test

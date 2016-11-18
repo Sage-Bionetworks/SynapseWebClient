@@ -7,11 +7,16 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.event.dom.client.HasKeyDownHandlers;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget {
+public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, Focusable, HasKeyDownHandlers {
 	
 	public static final int DELAY = 750;	// milliseconds
 	public static final int PAGE_SIZE = 10;
@@ -20,7 +25,6 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	private SynapseSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
 	private CallbackP<SynapseSuggestion> callback;
-	
 	
 	@Inject
 	public SynapseSuggestBox(SynapseSuggestBoxView view,
@@ -133,4 +137,30 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	public void setFocus(boolean focused) {
 		view.setFocus(focused);
 	}
+	
+	@Override
+	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+		return view.addKeyDownHandler(handler);
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
+		view.fireEvent(event);
+	}
+
+	@Override
+	public int getTabIndex() {
+		return view.getTabIndex();
+	}
+
+	@Override
+	public void setAccessKey(char key) {
+		view.setAccessKey(key);
+	}
+
+	@Override
+	public void setTabIndex(int index) {
+		view.setTabIndex(index);
+	}
+	
 }
