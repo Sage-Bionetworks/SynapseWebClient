@@ -309,6 +309,38 @@ public class TablePageWidgetTest {
 		}
 	}
 	
+	@Test
+	public void testConfigureWithMultipleSorts(){
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		int ascColumnIndex = 1;
+		int descColumnIndex = 2;
+		SortItem sort = new SortItem();
+		sort.setColumn(schema.get(ascColumnIndex).getName());
+		sort.setDirection(SortDirection.ASC);
+		sortList.add(sort);
+		sort = new SortItem();
+		sort.setColumn(schema.get(descColumnIndex).getName());
+		sort.setDirection(SortDirection.DESC);
+		sortList.add(sort);
+		boolean isEditable = false;
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		// Pagination should be setup since a page change listener was provided.
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setPaginationWidgetVisible(true);
+		
+		// Check each header
+		for(int i=0; i<sortHeaders.size(); i++){
+			SortableTableHeader sth = sortHeaders.get(i);
+			if(i == ascColumnIndex){
+				verify(sth).setIcon(IconType.SORT_ASC);
+			}else if(i == descColumnIndex){
+				verify(sth).setIcon(IconType.SORT_DESC);
+			}else {
+				verify(sth, never()).setIcon(any(IconType.class));
+			}
+		}
+	}
+	
 	/**
 	 * Test for SWC-2312
 	 */
