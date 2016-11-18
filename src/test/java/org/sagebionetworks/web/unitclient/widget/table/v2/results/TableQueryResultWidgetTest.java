@@ -6,7 +6,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +57,7 @@ public class TableQueryResultWidgetTest {
 	Query query;
 	QueryResultBundle bundle;
 	PartialRowSet delta;
-	SortItem sort;
+	List<SortItem> sortList;
 	Row row;
 	RowSet rowSet;
 	QueryResult results;
@@ -100,9 +103,11 @@ public class TableQueryResultWidgetTest {
 		bundle.setQueryCount(88L);
 		bundle.setQueryResult(results);
 		
-		sort = new SortItem();
+		sortList = new ArrayList<SortItem>();
+		SortItem sort = new SortItem();
 		sort.setColumn("a");
 		sort.setDirection(SortDirection.DESC);
+		sortList.add(sort);
 		AsyncMockStubber.callSuccessWith(Arrays.asList(sort)).when(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
 		
 		// delta
@@ -124,7 +129,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -179,7 +184,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -200,7 +205,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sort), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
