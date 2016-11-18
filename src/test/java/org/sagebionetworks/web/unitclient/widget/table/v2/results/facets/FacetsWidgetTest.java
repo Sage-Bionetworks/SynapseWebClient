@@ -81,6 +81,7 @@ public class FacetsWidgetTest {
 		when(mockFacetColumnResultRange.getColumnMax()).thenReturn("120");
 		when(mockColumnModel.getName()).thenReturn(COLUMN_NAME);
 		when(mockFacetColumnResultRange.getColumnName()).thenReturn(COLUMN_NAME);
+		when(mockFacetColumnResultValues.getColumnName()).thenReturn(COLUMN_NAME);
 	}
 
 	@Test

@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.facets;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,7 +90,7 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(nullValueCount);
 		widget.configure(mockFacet, isUserId, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView).addValue(DEFAULT_SELECTED, any(Widget.class), DEFAULT_COUNT, null);
+		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq((String)null));
 		verify(mockView).setShowAllButtonVisible(false);
 	}
 	
@@ -97,7 +99,7 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(emptyValueCount);
 		widget.configure(mockFacet, isUserId, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView).addValue(DEFAULT_SELECTED, any(Widget.class), DEFAULT_COUNT, "");
+		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(""));
 		verify(mockView).setShowAllButtonVisible(false);
 	}
 	
@@ -106,7 +108,7 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(valueCount);
 		widget.configure(mockFacet, isUserId, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView).addValue(DEFAULT_SELECTED, any(Widget.class), DEFAULT_COUNT, VALUE);
+		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(VALUE));
 		verify(mockView).setShowAllButtonVisible(false);
 	}
 	
