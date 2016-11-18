@@ -58,7 +58,7 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 			
 			Widget displayWidget;
 			
-			if (NULL_VALUE_KEYWORD.equals(valueCount.getValue())) {
+			if (valueCount.getValue() == null || NULL_VALUE_KEYWORD.equals(valueCount.getValue())) {
 				displayWidget = view.getSpanWithText(UNSPECIFIED);
 			} else if (isUserId) {
 				displayWidget = getUserBadge(valueCount.getValue());	
