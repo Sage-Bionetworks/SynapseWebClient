@@ -36,19 +36,21 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		view.setColumnName(facet.getColumnName());
 		int i = 0;
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
-			String displayValue = valueCount.getValue();
-			if (displayValue == null) {
-				displayValue = UNSPECIFIED;
-			} else if (displayValue.trim().isEmpty()) {
-				displayValue = EMPTY_STRING;
-			}
-			if (valueCount.getIsSelected()) {
-				facetValues.add(valueCount.getValue());
-			}
-			if (i < MAX_VISIBLE_FACET_VALUES) {
-				view.addValue(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());	
-			} else {
-				view.addValueToOverflow(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());
+			if (valueCount.getValue() != null) {
+				String displayValue = valueCount.getValue();
+				if (displayValue == null) {
+					displayValue = UNSPECIFIED;
+				} else if (displayValue.trim().isEmpty()) {
+					displayValue = EMPTY_STRING;
+				}
+				if (valueCount.getIsSelected()) {
+					facetValues.add(valueCount.getValue());
+				}
+				if (i < MAX_VISIBLE_FACET_VALUES) {
+					view.addValue(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());	
+				} else {
+					view.addValueToOverflow(valueCount.getIsSelected(), displayValue, valueCount.getCount(), valueCount.getValue());
+				}
 			}
 			i++;
 		}
