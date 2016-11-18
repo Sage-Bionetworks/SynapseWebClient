@@ -29,6 +29,7 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 		this.peopleSuggestWidget = peopleSuggestWidget;
 		this.provider = provider;
 		view.setSynapseSuggestBoxWidget(peopleSuggestWidget.asWidget());
+		peopleSuggestWidget.setPlaceholderText("Enter ID or name...");
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
