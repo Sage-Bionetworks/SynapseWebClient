@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.facets;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,7 +82,7 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(nullValueCount);
 		widget.configure(mockFacet, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView).addValue(DEFAULT_SELECTED, FacetColumnResultValuesWidget.UNSPECIFIED, DEFAULT_COUNT, null);
+		verify(mockView, never()).addValue(anyBoolean(), anyString(), anyLong(), anyString());
 		verify(mockView).setShowAllButtonVisible(false);
 	}
 	
@@ -109,6 +109,7 @@ public class FacetColumnResultValuesWidgetTest {
 		int numberOfFacets = FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES + 20;
 		for (int i = 0; i < numberOfFacets; i++) {
 			FacetColumnResultValueCount valuesCount = Mockito.mock(FacetColumnResultValueCount.class);
+			when(valuesCount.getValue()).thenReturn(VALUE);
 			facetValues.add(valuesCount);
 		}
 		widget.configure(mockFacet, mockOnFacetRequest);
