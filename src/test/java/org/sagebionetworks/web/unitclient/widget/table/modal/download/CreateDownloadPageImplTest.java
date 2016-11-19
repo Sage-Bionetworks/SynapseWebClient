@@ -2,7 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.table.modal.download;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -31,9 +33,11 @@ public class CreateDownloadPageImplTest {
 	String sql;
 	String tableId;
 	List<FacetColumnRequest> selectedFacets;
-	
+	@Mock
+	FacetColumnRequest mockFacetColumnRequest;
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(CreateDownloadPageView.class);
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockNextPage = Mockito.mock(DownloadFilePage.class);
@@ -58,6 +62,7 @@ public class CreateDownloadPageImplTest {
 	
 	@Test
 	public void testgetDownloadFromTableRequest(){
+		selectedFacets.add(mockFacetColumnRequest);
 		page.setModalPresenter(mockModalPresenter);
 		DownloadFromTableRequest expected = new DownloadFromTableRequest();
 		CsvTableDescriptor descriptor = new CsvTableDescriptor();
@@ -66,6 +71,7 @@ public class CreateDownloadPageImplTest {
 		expected.setIncludeRowIdAndRowVersion(false);
 		expected.setSql(sql);
 		expected.setWriteHeader(true);
+		expected.setSelectedFacets(selectedFacets);
 		when(mockView.getFileType()).thenReturn(FileType.TSV);
 		when(mockView.getIncludeHeaders()).thenReturn(true);
 		when(mockView.getIncludeRowMetadata()).thenReturn(false);
