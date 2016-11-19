@@ -7,9 +7,13 @@ import org.mockito.Mockito;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPageView;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePage;
@@ -26,6 +30,7 @@ public class CreateDownloadPageImplTest {
 	CreateDownloadPageImpl page;
 	String sql;
 	String tableId;
+	List<FacetColumnRequest> selectedFacets;
 	
 	@Before
 	public void before(){
@@ -33,10 +38,11 @@ public class CreateDownloadPageImplTest {
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockNextPage = Mockito.mock(DownloadFilePage.class);
 		mockModalPresenter = Mockito.mock(ModalPresenter.class);
+		selectedFacets = new ArrayList<FacetColumnRequest>();
 		page = new CreateDownloadPageImpl(mockView, jobTrackingWidgetStub, mockNextPage);
 		tableId = "syn123";
 		sql = "select * from " + tableId;
-		page.configure(sql, tableId);
+		page.configure(sql, tableId, selectedFacets);
 	}
 	
 	@Test
