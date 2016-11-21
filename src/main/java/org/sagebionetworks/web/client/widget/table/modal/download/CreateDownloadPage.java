@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
 /**
@@ -15,6 +18,6 @@ public interface CreateDownloadPage extends ModalPage {
 	 * Configure this widget before using it.
 	 * @param sql
 	 */
-	public void configure(String sql, String tableId);
+	public void configure(String sql, String tableId, List<FacetColumnRequest> selectedFacets);
 
 }

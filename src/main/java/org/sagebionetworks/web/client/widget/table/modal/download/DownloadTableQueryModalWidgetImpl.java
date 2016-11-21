@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -11,9 +14,6 @@ public class DownloadTableQueryModalWidgetImpl implements DownloadTableQueryModa
 	// injected dependencies
 	ModalWizardWidget modalWizardWidget;
 	CreateDownloadPage createDownloadPage;
-	
-	// Configured values
-	String sql;
 	
 	@Inject
 	public DownloadTableQueryModalWidgetImpl(
@@ -27,8 +27,8 @@ public class DownloadTableQueryModalWidgetImpl implements DownloadTableQueryModa
 
 
 	@Override
-	public void configure(String sql, String tableId) {
-		this.createDownloadPage.configure(sql, tableId);
+	public void configure(String sql, String tableId, List<FacetColumnRequest> selectedFacets) {
+		this.createDownloadPage.configure(sql, tableId, selectedFacets);
 	}
 
 
