@@ -22,7 +22,7 @@ public class DisplayConstants {
 	public static final String CLOSE_PORTAL_CONFIRMATION_MESSAGE = "Any unsaved changes will be lost. Are you sure that you would like to leave Synapse?";
 	public static final String NAVIGATE_AWAY_CONFIRMATION_MESSAGE = "Any unsaved changes may be lost. Are you sure that you would like to navigate away from this editor?";
 	
-	public static final String LOGOUT_TEXT = "You have been logged out of Synapse.";
+	public static final String LOGOUT_TEXT = "You have signed out of Synapse.";
 	public static final String PERMISSIONS_INHERITED_TEXT = "Sharing settings are being inherited from the parent resource and cannot be modified.";
 	public static final String PERMISSIONS_APPLY_ACL_TO_CHILDREN_TEXT = "Sharing settings of all child resources will be overwritten.";
 	
@@ -54,7 +54,7 @@ public class DisplayConstants {
 	public static final String SERVICE_LAYER_TYPE_KEY = "type";
 	
 	public static final String SYNAPSE_ID = "Synapse Id";
-	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
+	public static final String BUTTON_LOGIN_AGAIN = "Go to the Synapse login page";
 	public static final String BUTTON_CANCEL = "Cancel";
 	public static final String BUTTON_CANCEL_REQUESTED = "Cancel Requested";
 	public static final String BUTTON_DELETE = "Delete";
@@ -70,7 +70,7 @@ public class DisplayConstants {
 	public static final String ERROR_GENERIC_RELOAD = "An error occurred. Please try reloading the page.";
 	public static final String ERROR_SAVE_MESSAGE = "An error occuring attempting to save. Please try again.";
 	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
-	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
+	public static final String ERROR_LOGIN_REQUIRED = "You will need to sign in for access to that resource.";
 	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
 	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String BUTTON_DOWNLOAD = "Download";
@@ -94,8 +94,8 @@ public class DisplayConstants {
 	public static final String ERROR_UPLOAD_TITLE = "Upload Error";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_INITIALIZING = "Initializing...";
-	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
-	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
+	public static final String ANONYMOUS_JOIN_EVALUATION = "Please sign in or register for a free Synapse account to participate in this challenge.";
+	public static final String ANONYMOUS_JOIN = "Please sign in or register for a free Synapse account to join.";
 	public static final String ERROR_TOO_MANY_REQUESTS = "Synapse is over capacity.  You've been temporarily blocked from Synapse due to a high level of activity.  Please wait a moment and try again.";
 	public static final String ERROR_NOT_FOUND = "Sorry, the requested object was not found or no longer exists.";
 	public static final String ERROR_NOT_AUTHORIZED = "Sorry, you are not authorized to modify the requested entity.";
@@ -210,7 +210,7 @@ public class DisplayConstants {
 	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";
 	public static final String PASSWORD = "Password";
 	public static final String SIGN_IN = "Sign in";
-	public static final String REGISTER_BUTTON = "Register for a Synapse Account";
+	public static final String REGISTER_BUTTON = "Register for a free Synapse account";
 	public static final String NEW_PROJECT_NAME = "New Project Name";
 	public static final String NEW_TEAM_NAME = "New Team Name";
 	public static final String INVALID_USERNAME_OR_PASSWORD = "The user name or password is incorrect.  Please try again.";
@@ -239,7 +239,7 @@ public class DisplayConstants {
 	public static final String BETA_BADGE_HTML="<span class=\"smallerText\"><span class=\"label label-warning label-as-badge moveup-8 margin-left-5\">beta</span></span>";
 	public static final String DETAILS_UNAVAILABLE = "Details unavailable";	 	
 	public static final String CREATE_ACCOUNT_MESSAGE_SSO = "The email address supplied by Google was not found in our user list. Please check that you are signed in to the proper Google account, or complete registration if you are new to Synapse.";
-	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google Account Login. Please try again or use your Synapse username and password.";
+	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google account login. Please try again or use your Synapse username and password.";
 	
 	public static final String CONFIRM_DELETE_EVAL_QUEUE = "Are you sure you want to delete evaluation queue: ";
 	public static final String CONFIRM_DELETE_CHALLENGE = "Are you sure you want to delete the challenge associated with this project?";
@@ -249,7 +249,7 @@ public class DisplayConstants {
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
 	public static final String SET_PASSWORD_EXPIRED = "This set password request has expired. Please make a new request via the login page.";
 	public static final String REQUEST_EXPIRED = "Request Expired";
-	public static final String LOGIN_READ_ONLY_MODE = "Synapse is currently in READ ONLY mode. You can browse during this time but not login or modify.";
+	public static final String LOGIN_READ_ONLY_MODE = "Synapse is currently in READ ONLY mode. You can browse during this time but not sign in or modify.";
 	public static final String LOGIN_DOWN_MODE = "Synapse is currently DOWN. Please try back soon.";
 	public static final String TABLE_UNAVAILABLE = "Table Unavailable";
 	public static final String TABLE_PROCESSING_DESCRIPTION = "This table is processing an update. To avoid displaying stale data, query is temporarily unavailable until the processing has completed.";
@@ -269,7 +269,7 @@ public class DisplayConstants {
 	public static final String API_KEY_CHANGED = "API Key successfully changed";
 	public static final String API_KEY_CONFIRMATION = "Any scripts using the old API key will break. Are you sure you want Synapse to generate a new API Key?";
 	public static final String SESSION_TIMEOUT = "Session Timeout";
-	public static final String SESSION_HAS_TIMED_OUT = "Your session has timed out. Please login again.";
+	public static final String SESSION_HAS_TIMED_OUT = "Your session has timed out. Please sign in again.";
 	
 	public static final String UPLOAD_DESTINATION = "All uploaded files will be stored in ";
 	public static final String DOWNLOAD_CREDENTIALS_REQUIRED = "Sign in to download from ";

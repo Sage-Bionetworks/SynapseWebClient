@@ -3,9 +3,6 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
-	<ui:with field='icons'
-		type='org.sagebionetworks.web.client.IconsImageBundle' />
-	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
 		<div>
 			<g:SimplePanel ui:field="googleSSOContainer">
@@ -13,7 +10,7 @@
 					in with Google</b:Button>
 			</g:SimplePanel>
 			<div class="signin-panel panel panel-body margin-top-15">
-				<h4 class="form-signin-heading">Sign in with a Synapse Account</h4>
+				<h4 class="form-signin-heading">Sign in with a Synapse account</h4>
 				<g:FlowPanel ui:field="synapseLoginFieldsContainer" />
 				<span ui:field="messageLabel" />
 			</div>
