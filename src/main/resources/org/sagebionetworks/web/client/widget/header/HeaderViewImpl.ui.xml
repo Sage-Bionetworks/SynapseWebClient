@@ -17,7 +17,7 @@
 		        	</b:Heading>
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
-					<b:Tooltip placement="BOTTOM" title="Log out">
+					<b:Tooltip placement="BOTTOM" title="Sign out">
 						<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="28px" />	
 					</b:Tooltip>
 					<b:Button ui:field="helpButton" size="EXTRA_SMALL" height="28px" text="Help" addStyleNames="right margin-left-5 margin-right-5 margin-top-5"/>
@@ -29,7 +29,7 @@
 						</b:ButtonGroup>
 					</b:Tooltip>
 				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Log in</b:Button>
+						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Sign in</b:Button>
 					</g:SimplePanel>
 				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
