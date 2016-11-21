@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
@@ -20,8 +19,6 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
 	private UserListener listener;	
-	private String openIdActionUrl;
-	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJsniUtils;
 	
@@ -34,9 +31,6 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJsniUtils = synapseJsniUtils;
-		openIdActionUrl = WebConstants.OPEN_ID_URI;
-		// note, this is now a relative URL
-		openIdReturnUrl = synapseJsniUtils.getLocationPath()+synapseJsniUtils.getLocationQueryString()+"#!"+LOGIN_PLACE;
 	}
 
 	public Widget asWidget() {
@@ -87,24 +81,6 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private void fireUserChange(UserSessionData user) {
 		if (listener != null)
 			listener.userChanged(user);
-	}
-	
-	public void setOpenIdActionUrl(String url) {
-		this.openIdActionUrl = url;
-	}
-
-	public void setOpenIdReturnUrl(String url) {
-		this.openIdReturnUrl = url;
-	}
-	
-	@Override
-	public String getOpenIdActionUrl() {
-		return openIdActionUrl;
-	}
-	
-	@Override
-	public String getOpenIdReturnUrl() {
-		return openIdReturnUrl;
 	}
 
 	@Override

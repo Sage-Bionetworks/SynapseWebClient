@@ -31,6 +31,8 @@ import com.google.inject.Inject;
 public class LoginWidgetViewImpl extends Composite implements
 		LoginWidgetView {
 
+	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
+
 	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
 	
 	@UiField
@@ -77,10 +79,9 @@ public class LoginWidgetViewImpl extends Composite implements
 		});
 		
 		googleSignInButton.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0", "_self", "");
+				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL, "_self", "");
 			}
 		});
 		
