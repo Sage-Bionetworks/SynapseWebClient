@@ -22,6 +22,7 @@ a:focus{color:#1e7098; text-decoration:underline;}
 #rootPanel .google-button {
 	background: #DF4A32;
 	color: white;
+	border-color: transparent;
 }
 
 .pagination>li>a, .pagination>li>span
