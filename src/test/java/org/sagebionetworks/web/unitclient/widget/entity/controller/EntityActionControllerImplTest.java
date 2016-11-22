@@ -108,6 +108,8 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
+
 public class EntityActionControllerImplTest {
 
 	EntityActionControllerView mockView;
@@ -1489,6 +1491,44 @@ public class EntityActionControllerImplTest {
 		verify(mockView).showErrorMessage(error);
 	}
 	
+	@Test
+	public void testFolderDeletionPrompt() {
+		/*
+		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
+		 *  in this case we do not want to confirm.
+		 */
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		Folder f = new Folder();
+		f.setName("Test");
+		entityBundle.setEntity(f);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"Folder Test?" + DELETE_FOLDER_EXPLANATION;
+		// the call under tests
+		controller.onAction(Action.DELETE_ENTITY);
+		verify(mockView).showConfirmDialog(anyString(), eq(display), any(Callback.class));
+		// should not make it to the pre-flight check
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+	}
 	
+	@Test
+	public void testNotFolderDeletionPrompt() {
+		/*
+		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
+		 *  in this case we do not want to confirm.
+		 */
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		Project p = new Project();
+		p.setName("Test");
+		entityBundle.setEntity(p);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"Project Test?";
+		String folderDisplay = display + DELETE_FOLDER_EXPLANATION;
+		// the call under tests
+		controller.onAction(Action.DELETE_ENTITY);
+		verify(mockView).showConfirmDialog(anyString(), eq(display), any(Callback.class));
+		verify(mockView, times(0)).showConfirmDialog(anyString(), eq(folderDisplay), any(Callback.class));
+		// should not make it to the pre-flight check
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+	}
 	
 }
