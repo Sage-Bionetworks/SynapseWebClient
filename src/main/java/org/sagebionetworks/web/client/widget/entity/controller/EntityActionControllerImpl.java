@@ -1077,7 +1077,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onDeleteEntity() {
 		// Confirm the delete with the user. Mention that everything inside folder will also be deleted if this is a folder entity.
 		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" "+this.entity.getName()+"?";
-		if (this.enityTypeDisplay.equals("Folder")) {
+		if (this.entity instanceof Folder) {
 			display += DELETE_FOLDER_EXPLANATION;
 		}
 		
