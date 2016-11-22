@@ -69,6 +69,7 @@ public class DiscussionThreadListItemWidgetTest {
 	public void testConfigure() {
 		discussionThreadWidget.configure(mockThreadBundle);
 		verify(mockView).setTitle(title);
+		verify(mockView).clearActiveAuthors();
 		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());

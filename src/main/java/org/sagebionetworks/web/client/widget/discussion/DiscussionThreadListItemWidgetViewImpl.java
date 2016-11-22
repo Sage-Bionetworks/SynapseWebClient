@@ -77,6 +77,11 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	}
 
 	@Override
+	public void clearActiveAuthors() {
+		activeUsers.clear();
+	}
+
+	@Override
 	public void addActiveAuthor(Widget user) {
 		activeUsers.add(user);
 	}

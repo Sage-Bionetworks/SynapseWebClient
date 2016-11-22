@@ -45,6 +45,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		view.setTitle(bundle.getTitle());
 		authorWidget.configure(bundle.getCreatedBy());
 		authorWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
+		view.clearActiveAuthors();
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
 			user.configure(userId);
