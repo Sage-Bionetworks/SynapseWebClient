@@ -84,7 +84,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETED = "Deleted";
 
 	public static final String ARE_YOU_SURE_YOU_WANT_TO_DELETE = "Are you sure you want to delete ";
-
+	public static final String DELETE_FOLDER_EXPLANATION = " Everything contained within the folder will also be deleted.";
 	public static final String CONFIRM_DELETE_TITLE = "Confirm Delete";
 
 	public static final String DELETE_PREFIX = "Delete ";
@@ -1075,8 +1075,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	@Override
 	public void onDeleteEntity() {
-		// Confirm the delete with the user.
-		view.showConfirmDialog(CONFIRM_DELETE_TITLE,ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" "+this.entity.getName(), new Callback() {
+		// Confirm the delete with the user. Mention that everything inside folder will also be deleted if this is a folder entity.
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" "+this.entity.getName()+"?";
+		if (this.enityTypeDisplay.equals("Folder")) {
+			display += DELETE_FOLDER_EXPLANATION;
+		}
+		
+		view.showConfirmDialog(CONFIRM_DELETE_TITLE,display, new Callback() {
 			@Override
 			public void invoke() {
 				postConfirmedDeleteEntity();
