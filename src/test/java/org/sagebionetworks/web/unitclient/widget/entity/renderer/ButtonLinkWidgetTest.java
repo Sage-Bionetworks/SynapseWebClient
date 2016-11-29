@@ -63,7 +63,7 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		widget.configure(wikiKey, descriptor, null, null);
 		//Should pass through all params.  Should not highlight, and should open in a new window
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), (String) eq(null));
 	}
 	
 	@Test
@@ -72,7 +72,7 @@ public class ButtonLinkWidgetTest {
 		descriptor.put(WebConstants.HIGHLIGHT_KEY, Boolean.FALSE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
 		//Should pass through all params.  Should not highlight, and should open in a new window
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), (String) eq(null));
 	}
 	
 	@Test
@@ -81,7 +81,7 @@ public class ButtonLinkWidgetTest {
 		descriptor.put(WebConstants.HIGHLIGHT_KEY, Boolean.TRUE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
 		//Should pass through all params.  Should highlight, and should open in a new window
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(true), eq(true));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(true), eq(true), (String) eq(null));
 	}
 	
 	
@@ -98,7 +98,7 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		descriptor.put(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW, Boolean.TRUE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), (String) eq(null));
 	}
 	
 	@Test
@@ -106,8 +106,16 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		descriptor.put(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW, Boolean.FALSE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(false));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(false), (String) eq(null));
 	}
 
+	@Test
+	public void testConfigureWidth() {
+		String width = "20px";
+		Map<String, String> descriptor = getDefaultDescriptor();
+		descriptor.put(ButtonLinkWidget.WIDTH, width);
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), eq(width));
+	}
 	
 }

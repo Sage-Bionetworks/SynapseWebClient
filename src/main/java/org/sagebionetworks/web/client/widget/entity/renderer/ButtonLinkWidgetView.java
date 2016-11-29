@@ -12,7 +12,7 @@ public interface ButtonLinkWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(WikiPageKey wikiKey, String buttonText, String url, boolean isHighlight, boolean openInNewWindow);
+	public void configure(WikiPageKey wikiKey, String buttonText, String url, boolean isHighlight, boolean openInNewWindow, String width);
 	
 	/**
 	 * Presenter interface

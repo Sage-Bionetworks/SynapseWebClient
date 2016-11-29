@@ -18,6 +18,7 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	private Map<String,String> descriptor;
 	private GWTWrapper gwt;
 	public static final String LINK_OPENS_NEW_WINDOW = "openNewWindow";
+	public static final String WIDTH = "width";
 	
 	@Inject
 	public ButtonLinkWidget(ButtonLinkWidgetView view, GWTWrapper gwt) {
@@ -44,8 +45,12 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 			//param not present, make a smart choice
 			openInNewWindow = isOpenInNewWindow(url);
 		}
+		String width = null;
+		if (descriptor.containsKey(WIDTH)) {
+			width = descriptor.get(WIDTH);
+		}
 		
-		view.configure(wikiKey, buttonText, url, isHighlight, openInNewWindow);
+		view.configure(wikiKey, buttonText, url, isHighlight, openInNewWindow, width);
 		descriptor = widgetDescriptor;
 	}
 	

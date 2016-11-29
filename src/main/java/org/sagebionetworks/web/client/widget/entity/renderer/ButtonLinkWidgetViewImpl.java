@@ -25,12 +25,16 @@ public class ButtonLinkWidgetViewImpl extends FlowPanel implements ButtonLinkWid
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, String buttonText, final String url, boolean isHighlight, final boolean openInNewWindow) {
+	public void configure(WikiPageKey wikiKey, String buttonText, final String url, boolean isHighlight, final boolean openInNewWindow, String width) {
 		clear();
 		Button button = new Button(buttonText);
 		if (isHighlight)
 			button.setType(ButtonType.INFO);
-		button.setSize(ButtonSize.LARGE);
+		if (width == null) {
+			button.setSize(ButtonSize.LARGE);			
+		} else {
+			button.setWidth(width);
+		}
 		button.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
