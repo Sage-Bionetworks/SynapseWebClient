@@ -4,14 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -63,7 +66,7 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		widget.configure(wikiKey, descriptor, null, null);
 		//Should pass through all params.  Should not highlight, and should open in a new window
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), (String) eq(null));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
 	}
 	
 	@Test
@@ -72,7 +75,7 @@ public class ButtonLinkWidgetTest {
 		descriptor.put(WebConstants.HIGHLIGHT_KEY, Boolean.FALSE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
 		//Should pass through all params.  Should not highlight, and should open in a new window
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), (String) eq(null));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
 	}
 	
 	@Test
@@ -81,7 +84,7 @@ public class ButtonLinkWidgetTest {
 		descriptor.put(WebConstants.HIGHLIGHT_KEY, Boolean.TRUE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
 		//Should pass through all params.  Should highlight, and should open in a new window
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(true), eq(true), (String) eq(null));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(true), eq(true));
 	}
 	
 	
@@ -98,7 +101,7 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		descriptor.put(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW, Boolean.TRUE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), (String) eq(null));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
 	}
 	
 	@Test
@@ -106,7 +109,7 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		descriptor.put(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW, Boolean.FALSE.toString());
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(false), (String) eq(null));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(false));
 	}
 
 	@Test
@@ -115,7 +118,17 @@ public class ButtonLinkWidgetTest {
 		Map<String, String> descriptor = getDefaultDescriptor();
 		descriptor.put(ButtonLinkWidget.WIDTH, width);
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true), eq(width));
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).setWidth(width);
+	}
+	
+	@Test
+	public void testConfigureNoWidth() {
+		Map<String, String> descriptor = getDefaultDescriptor();
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).setSize(ButtonSize.LARGE);
+		verify(mockView, times(0)).setWidth(anyString());
 	}
 	
 }
