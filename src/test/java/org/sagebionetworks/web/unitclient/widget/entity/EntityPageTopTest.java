@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -113,6 +114,8 @@ public class EntityPageTopTest {
 	AccessControlList mockACL;
 	@Mock
 	CookieProvider mockCookies;
+	@Captor
+	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
@@ -402,4 +405,41 @@ public class EntityPageTopTest {
 		assertEquals(rootWikiId, pageTop.getWikiPageId("", rootWikiId));
 		assertEquals(rootWikiId, pageTop.getWikiPageId(null, rootWikiId));
 	}
+	
+	@Test
+	public void testConfigureProjectInvalidWikiId() {
+		Synapse.EntityArea area = null;
+		String invalidWikiId = "1234";
+		Long versionNumber = null;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, invalidWikiId);
+		
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(invalidWikiId), eq(canEdit), wikiCallbackCaptor.capture());
+		
+		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
+		//simulate not found
+		wikiCallbackCaptor.getValue().noWikiFound();
+		//since the project has a root wiki id, it should try to load that instead.
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
+	}
+	
+	@Test
+	public void testConfigureProjectNoWiki() {
+		// we are asking for an invalid wiki id for a project that contains no wiki.
+		Synapse.EntityArea area = null;
+		String invalidWikiId = "1234";
+		Long versionNumber = null;
+		when(mockProjectBundle.getRootWikiId()).thenReturn(null);
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, invalidWikiId);
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(invalidWikiId), eq(canEdit), wikiCallbackCaptor.capture());
+		
+		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
+		//simulate not found
+		wikiCallbackCaptor.getValue().noWikiFound();
+		//since the project does not have a root wiki id, it should go to the files tab
+		
+		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
+	}
+	
 }

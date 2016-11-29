@@ -33,9 +33,13 @@ public class WikiTab {
 	
 	public void configure(String entityId, String entityName, String wikiPageId, Boolean canEdit,
 			Callback callback) {
-		Long versionNumber = null; //version is always null for project
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
+		setEntityNameAndPlace(entityId, entityName, wikiPageId);
+	}
+	
+	public void setEntityNameAndPlace(String entityId, String entityName, String wikiPageId) {
+		Long versionNumber = null; //version is always null for project
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
 	}
 	
