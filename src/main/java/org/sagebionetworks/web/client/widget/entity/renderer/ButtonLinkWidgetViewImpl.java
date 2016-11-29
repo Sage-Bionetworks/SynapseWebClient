@@ -18,19 +18,20 @@ public class ButtonLinkWidgetViewImpl extends FlowPanel implements ButtonLinkWid
 
 	private Presenter presenter;
 	private GWTWrapper gwt;
+	private Button button;
 	
 	@Inject
 	public ButtonLinkWidgetViewImpl(GWTWrapper gwt) {
 		this.gwt = gwt;
+		button = new Button();
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, String buttonText, final String url, boolean isHighlight, final boolean openInNewWindow) {
 		clear();
-		Button button = new Button(buttonText);
+		button.setText(buttonText);
 		if (isHighlight)
 			button.setType(ButtonType.INFO);
-		button.setSize(ButtonSize.LARGE);
 		button.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -57,7 +58,17 @@ public class ButtonLinkWidgetViewImpl extends FlowPanel implements ButtonLinkWid
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
+	
+	@Override
+	public void setWidth(String width) {
+		button.setWidth(width);
+	}
+	
+	@Override
+	public void setSize(ButtonSize size) {
+		button.setSize(size);					
+	}
+	
 	
 	/*
 	 * Private Methods

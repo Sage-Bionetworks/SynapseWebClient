@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -18,6 +19,7 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	private Map<String,String> descriptor;
 	private GWTWrapper gwt;
 	public static final String LINK_OPENS_NEW_WINDOW = "openNewWindow";
+	public static final String WIDTH = "width";
 	
 	@Inject
 	public ButtonLinkWidget(ButtonLinkWidgetView view, GWTWrapper gwt) {
@@ -46,6 +48,11 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 		}
 		
 		view.configure(wikiKey, buttonText, url, isHighlight, openInNewWindow);
+		if (descriptor.containsKey(WIDTH)) {
+			view.setWidth(descriptor.get(WIDTH));
+		} else {
+			view.setSize(ButtonSize.LARGE);
+		}
 		descriptor = widgetDescriptor;
 	}
 	

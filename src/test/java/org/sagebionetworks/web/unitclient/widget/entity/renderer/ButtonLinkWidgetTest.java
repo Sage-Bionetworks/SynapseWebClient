@@ -4,14 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -109,5 +112,23 @@ public class ButtonLinkWidgetTest {
 		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(false));
 	}
 
+	@Test
+	public void testConfigureWidth() {
+		String width = "20px";
+		Map<String, String> descriptor = getDefaultDescriptor();
+		descriptor.put(ButtonLinkWidget.WIDTH, width);
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).setWidth(width);
+	}
+	
+	@Test
+	public void testConfigureNoWidth() {
+		Map<String, String> descriptor = getDefaultDescriptor();
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+		verify(mockView).setSize(ButtonSize.LARGE);
+		verify(mockView, times(0)).setWidth(anyString());
+	}
 	
 }
