@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
@@ -19,9 +20,13 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	@UiField
 	RangeSlider slider;
 	
+	@UiField
+	Span minField;
+	@UiField
+	Span maxField;
+	
 	Widget w;
 	Presenter presenter;
-	double min, max, step;
 	Range range;
 	
 	@Inject
@@ -50,6 +55,8 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	@Override
 	public void setRange(Range range) {
 		slider.setValue(range);
+		minField.setText(range.getMinValue() + "");
+		maxField.setText(range.getMaxValue() + "");
 	}
 	
 	@Override

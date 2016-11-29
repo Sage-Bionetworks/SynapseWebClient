@@ -8,7 +8,8 @@
 			<bh:Strong ui:field="columnName"/>
 		</bh:Div>
 		<bh:Div addStyleNames="margin-left-10">
-			<b3:RangeSlider ui:field="slider" min="0" max="100" step="5" value="[0,100]"/>
+			<b3:RangeSlider ui:field="slider" min="0" max="100" step="5" value="[0,100]"/> 
+			<bh:Span ui:field="minField" addStyleNames="margin-left-20"/><bh:Span text=":" addStyleNames="margin-left-5 margin-right-5" /><bh:Span ui:field="maxField"/>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>
