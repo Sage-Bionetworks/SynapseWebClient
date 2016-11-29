@@ -23,12 +23,13 @@ public class ButtonLinkWidgetViewImpl extends FlowPanel implements ButtonLinkWid
 	@Inject
 	public ButtonLinkWidgetViewImpl(GWTWrapper gwt) {
 		this.gwt = gwt;
+		button = new Button();
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, String buttonText, final String url, boolean isHighlight, final boolean openInNewWindow) {
 		clear();
-		button = new Button(buttonText);
+		button.setText(buttonText);
 		if (isHighlight)
 			button.setType(ButtonType.INFO);
 		button.addClickHandler(new ClickHandler() {			
