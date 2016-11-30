@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import static org.sagebionetworks.repo.model.table.TableConstants.NULL_VALUE_KEYWORD;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,7 +12,6 @@ import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,7 +22,6 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	public static final String SHOW_ALL = "Show all ";
 	public static final String UNSPECIFIED = "(not set)";
 	public static final String EMPTY_STRING = "(empty string)";
-	public static final String NULL_VALUE_KEYWORD = "org.sagebionetworks.UNDEFINED_NULL_NOTSET";
 	
 	FacetColumnResultValuesView view;
 	FacetColumnResultValues facet;
