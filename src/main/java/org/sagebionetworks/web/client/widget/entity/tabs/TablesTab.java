@@ -66,47 +66,43 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	CallbackP<Boolean> showProjectInfoCallack;
 	TableEntityWidget v2TableWidget;
 	@Inject
-	public TablesTab(
-			TablesTabView view,
-			Tab t,
-			TableListWidget tableListWidget,
-			BasicTitleBar tableTitleBar,
-			Breadcrumb breadcrumb,
-			EntityMetadata metadata,
-			QueryTokenProvider queryTokenProvider,
-			StuAlert synAlert,
-			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector,
-			ModifiedCreatedByWidget modifiedCreatedBy
+	public TablesTab(Tab tab,
+			PortalGinInjector ginInjector
 			) {
-		this.view = view;
-		this.tab = t;
-		this.tableListWidget = tableListWidget;
-		this.tableTitleBar = tableTitleBar;
-		this.breadcrumb = breadcrumb;
-		this.metadata = metadata;
-		this.queryTokenProvider = queryTokenProvider;
-		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
+		this.tab = tab;
 		this.ginInjector = ginInjector;
-		this.modifiedCreatedBy = modifiedCreatedBy;
-		
-		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setTableList(tableListWidget.asWidget());
-		view.setTitlebar(tableTitleBar.asWidget());
-		view.setEntityMetadata(metadata.asWidget());
-		view.setSynapseAlert(synAlert.asWidget());
-		view.setModifiedCreatedBy(modifiedCreatedBy);
-		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
-		
-		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
-			@Override
-			public void invoke(String entityId) {
-				areaToken = null;
-				getTargetBundleAndDisplay(entityId);
-			}
-		});
-		initBreadcrumbLinkClickedHandler();
+		tab.configure("Tables", "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
+	}
+	
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getTablesTabView();
+			this.tableListWidget = ginInjector.getTableListWidget();
+			this.tableTitleBar = ginInjector.getBasicTitleBar();
+			this.breadcrumb = ginInjector.getBreadcrumb();
+			this.metadata = ginInjector.getEntityMetadata();
+			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
+			this.synAlert = ginInjector.getStuAlert();
+			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
+			
+			view.setBreadcrumb(breadcrumb.asWidget());
+			view.setTableList(tableListWidget.asWidget());
+			view.setTitlebar(tableTitleBar.asWidget());
+			view.setEntityMetadata(metadata.asWidget());
+			view.setSynapseAlert(synAlert.asWidget());
+			view.setModifiedCreatedBy(modifiedCreatedBy);
+			tab.setContent(view.asWidget());
+			
+			tableListWidget.setTableClickedCallback(new CallbackP<String>() {
+				@Override
+				public void invoke(String entityId) {
+					areaToken = null;
+					getTargetBundleAndDisplay(entityId);
+				}
+			});
+			initBreadcrumbLinkClickedHandler();
+		}
 	}
 	
 	@Override
@@ -143,6 +139,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
+		lazyInject();
 		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;

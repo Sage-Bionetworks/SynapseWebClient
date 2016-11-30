@@ -156,11 +156,22 @@ public class FilesTabTest {
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
-		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
-				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
-				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync,
-				mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy,
-				mockDiscussionThreadListWidget);
+		tab = new FilesTab(mockTab, mockPortalGinInjector);
+		
+		when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
+		when(mockPortalGinInjector.getFileTitleBar()).thenReturn(mockFileTitleBar);
+		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
+		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
+		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
+		when(mockPortalGinInjector.getFilesBrowser()).thenReturn(mockFilesBrowser);
+		when(mockPortalGinInjector.getPreviewWidget()).thenReturn(mockPreviewWidget);
+		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
+		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
+		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
+		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
+		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
+		
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -186,6 +197,8 @@ public class FilesTabTest {
 
 		when(mockBundle.getProjectId()).thenReturn(projectEntityId);
 		when(mockBundle.getId()).thenReturn(threadId);
+		
+		tab.lazyInject();
 	}
 
 	@Test

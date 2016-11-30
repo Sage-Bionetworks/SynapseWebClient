@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +22,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
-import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,8 +60,10 @@ public class TabTest {
 		//and configure
 		String tabTitle = "TestTab";
 		Widget content = null;
-		tab.configure(tabTitle, content, "help markdown", "link");
-		verify(mockView).configure(eq(tabTitle), eq(content), anyString(), anyString());
+		tab.configure(tabTitle, "help markdown", "link");
+		verify(mockView).configure(eq(tabTitle), anyString(), anyString());
+		tab.setContent(content);
+		verify(mockView).setContent(content);
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -14,15 +15,22 @@ import com.google.inject.Inject;
 public class WikiTab {
 	Tab tab;
 	private WikiPageWidget wikiPageWidget;
+	PortalGinInjector ginInjector;
 	
 	@Inject
-	public WikiTab(Tab tab, WikiPageWidget wikiPageWidget) {
+	public WikiTab(Tab tab, PortalGinInjector ginInjector) {
+		this.ginInjector = ginInjector;
 		this.tab = tab;
-		this.wikiPageWidget = wikiPageWidget;
-		tab.configure("Wiki", wikiPageWidget.asWidget(), "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html");
-		wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
+		tab.configure("Wiki", "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html");
 	}
 	
+	public void lazyInject() {
+		if (wikiPageWidget == null) {
+			this.wikiPageWidget = ginInjector.getWikiPageWidget();
+			wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
+			tab.setContent(wikiPageWidget.asWidget());
+		}
+	}
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
@@ -33,6 +41,7 @@ public class WikiTab {
 	
 	public void configure(String entityId, String entityName, String wikiPageId, Boolean canEdit,
 			Callback callback) {
+		lazyInject();
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
 		setEntityNameAndPlace(entityId, entityName, wikiPageId);
@@ -44,7 +53,9 @@ public class WikiTab {
 	}
 	
 	public void clear() {
-		wikiPageWidget.clear();
+		if (wikiPageWidget != null) {
+			wikiPageWidget.clear();	
+		}
 	}
 	
 	public Tab asTab(){

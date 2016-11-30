@@ -6,12 +6,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -29,12 +31,16 @@ public class WikiTabTest {
 	CallbackP<Tab> mockOnClickCallback;
 	@Mock
 	CallbackP<String> mockWikiReloadHandler;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	WikiTab tab;
 	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new WikiTab(mockTab, mockWikiPageWidget);
+		tab = new WikiTab(mockTab, mockPortalGinInjector);
+		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
+		tab.lazyInject();
 	}
 	
 	@Test
