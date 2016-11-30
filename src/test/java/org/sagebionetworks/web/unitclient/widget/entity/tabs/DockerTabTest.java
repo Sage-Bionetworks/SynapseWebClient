@@ -129,6 +129,7 @@ public class DockerTabTest {
 		path = new EntityPath();
 		path.setPath(pathHeaders);
 		when(mockDockerRepoEntityBundle.getPath()).thenReturn(path);
+		tab.lazyInject();
 	}
 
 	@SuppressWarnings("unchecked")

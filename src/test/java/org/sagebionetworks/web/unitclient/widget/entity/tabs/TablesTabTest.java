@@ -168,6 +168,7 @@ public class TablesTabTest {
 		two.setColumn("one");
 		two.setDirection(SortDirection.DESC);
 		query.setSort(Arrays.asList(one, two));
+		tab.lazyInject();
 	}
 	
 	@Test

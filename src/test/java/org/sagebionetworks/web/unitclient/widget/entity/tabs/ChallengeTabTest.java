@@ -48,6 +48,7 @@ public class ChallengeTabTest {
 		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);
 		when(mockPortalGinInjector.getChallengeWidget()).thenReturn(mockChallengeWidget);
+		tab.lazyInject();
 	}
 
 	@Test

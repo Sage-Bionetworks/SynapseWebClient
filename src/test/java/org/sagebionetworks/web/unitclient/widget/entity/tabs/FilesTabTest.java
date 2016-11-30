@@ -197,6 +197,8 @@ public class FilesTabTest {
 
 		when(mockBundle.getProjectId()).thenReturn(projectEntityId);
 		when(mockBundle.getId()).thenReturn(threadId);
+		
+		tab.lazyInject();
 	}
 
 	@Test

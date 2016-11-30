@@ -40,6 +40,7 @@ public class WikiTabTest {
 		MockitoAnnotations.initMocks(this);
 		tab = new WikiTab(mockTab, mockPortalGinInjector);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
+		tab.lazyInject();
 	}
 	
 	@Test

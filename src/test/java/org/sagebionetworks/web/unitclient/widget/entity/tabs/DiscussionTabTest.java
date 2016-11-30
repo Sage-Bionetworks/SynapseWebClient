@@ -59,6 +59,7 @@ public class DiscussionTabTest {
 		when(mockPortalGinInjector.getDiscussionTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getForumWidget()).thenReturn(mockForumWidget);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		tab.lazyInject();
 	}
 
 	@Test
