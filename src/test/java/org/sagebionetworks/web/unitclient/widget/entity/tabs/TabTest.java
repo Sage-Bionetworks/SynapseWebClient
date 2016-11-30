@@ -136,4 +136,11 @@ public class TabTest {
 		verify(mockGlobalAppState).pushCurrentPlace(any(Place.class));
 		verify(mockView).setActive(true);
 	}
+	
+	@Test
+	public void testAddTabListItemStyle() {
+		String style = "min-width-150";
+		tab.addTabListItemStyle(style);
+		verify(mockView).addTabListItemStyle(style);
+	}
 }
