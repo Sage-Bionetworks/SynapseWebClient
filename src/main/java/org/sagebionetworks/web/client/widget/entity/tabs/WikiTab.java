@@ -53,7 +53,9 @@ public class WikiTab {
 	}
 	
 	public void clear() {
-		wikiPageWidget.clear();
+		if (wikiPageWidget != null) {
+			wikiPageWidget.clear();	
+		}
 	}
 	
 	public Tab asTab(){
