@@ -9,6 +9,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.repo.model.table.TableConstants.NULL_VALUE_KEYWORD;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues = new ArrayList<FacetColumnResultValueCount>();
 		when(mockFacet.getFacetValues()).thenReturn(facetValues);
 		
-		when(nullValueCount.getValue()).thenReturn(FacetColumnResultValuesWidget.NULL_VALUE_KEYWORD);
+		when(nullValueCount.getValue()).thenReturn(NULL_VALUE_KEYWORD);
 		when(nullValueCount.getCount()).thenReturn(DEFAULT_COUNT);
 		when(nullValueCount.getIsSelected()).thenReturn(DEFAULT_SELECTED);
 		
@@ -94,7 +95,7 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(nullValueCount);
 		widget.configure(mockFacet, isUserId, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(FacetColumnResultValuesWidget.NULL_VALUE_KEYWORD));
+		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(NULL_VALUE_KEYWORD));
 		verify(mockView).setShowAllButtonVisible(false);
 	}
 	
