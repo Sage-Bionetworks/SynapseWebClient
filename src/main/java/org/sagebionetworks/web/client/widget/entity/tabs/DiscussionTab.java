@@ -35,8 +35,6 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			this.view = ginInjector.getDiscussionTabView();
 			this.forumWidget = ginInjector.getForumWidget();
 			this.globalAppState = ginInjector.getGlobalApplicationState();
-			// Necessary for "beta" badge.  Remove when bringing out of beta.
-			view.updateWidth(tab);
 			view.setPresenter(this);
 			view.setForum(forumWidget.asWidget());
 			tab.setContent(view.asWidget());

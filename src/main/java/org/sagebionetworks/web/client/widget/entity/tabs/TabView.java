@@ -10,6 +10,7 @@ public interface TabView {
 	void setContent(Widget content);
 	Widget getTabListItem();
 	void setTabListItemVisible(boolean visible);
+	void addTabListItemStyle(String style);
 	TabPane getTabPane();
 	void setActive(boolean isActive);
 	boolean isActive();

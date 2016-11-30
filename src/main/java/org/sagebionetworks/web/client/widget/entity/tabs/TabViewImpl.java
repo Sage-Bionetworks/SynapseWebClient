@@ -78,6 +78,12 @@ public class TabViewImpl implements TabView {
 	public Widget getTabListItem() {
 		return tabListItem;
 	}
+	
+	@Override
+	public void addTabListItemStyle(String style) {
+		tabListItem.addStyleName(style);
+	}
+	
 	@Override
 	public void setTabListItemVisible(boolean visible) {
 		tabListItem.setVisible(visible);
