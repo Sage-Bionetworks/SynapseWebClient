@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -134,8 +133,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal,
-			SettingsPresenter settingsPresenter) {
+			VerificationSubmissionWidget verificationModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -151,7 +149,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
-		this.settingsPresenter = settingsPresenter;
+		
 		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -189,6 +187,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		};
 	}
 
+	public SettingsPresenter getSettingsPresenter() {
+		if (settingsPresenter == null) {
+			settingsPresenter = ginInjector.getSettingsPresenter();
+		}
+		return settingsPresenter;
+	}
 	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
@@ -262,7 +266,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setProfileEditButtonVisible(isOwner);
 		view.setOrcIDLinkButtonVisible(isOwner);
 		view.showTabs(isOwner);
-		settingsPresenter.clear();
+		if (settingsPresenter != null) {
+			settingsPresenter.clear();	
+		}
 		myTeamsWidget.clear();
 		view.clearTeamNotificationCount();
 		myTeamsWidget.configure(false);
@@ -1045,8 +1051,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				refreshTeams();
 				break;
 			case SETTINGS:
-				settingsPresenter.configure();
-				view.setSettingsWidget(settingsPresenter.asWidget());
+				getSettingsPresenter().configure();
+				view.setSettingsWidget(getSettingsPresenter().asWidget());
 				break;
 			case CHALLENGES:
 			default:
