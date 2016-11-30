@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
+import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.SubscriptionPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseForumPresenter;
@@ -475,5 +476,6 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeWidget getChallengeWidget();
 	public TablesTabView getTablesTabView();
 	public QueryTokenProvider getQueryTokenProvider();
+	public SettingsPresenter getSettingsPresenter();
 	
 }
