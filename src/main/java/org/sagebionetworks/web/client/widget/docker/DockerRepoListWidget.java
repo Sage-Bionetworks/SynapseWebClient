@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -49,6 +50,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 	private EntityBundle projectBundle;
 	private EntityQuery query;
 	private CallbackP<EntityBundle> onRepoClickCallback;
+	private LazyLoadHelper lazyLoadHelper;
 
 	@Inject
 	public DockerRepoListWidget(
@@ -57,7 +59,8 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 			PaginationWidget paginationWidget,
 			AddExternalRepoModal addExternalRepoModal,
 			PreflightController preflightController,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			LazyLoadHelper lazyLoadHelper
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -65,10 +68,18 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		this.addExternalRepoModal = addExternalRepoModal;
 		this.preflightController = preflightController;
 		this.synAlert = synAlert;
+		this.lazyLoadHelper = lazyLoadHelper;
 		view.setPresenter(this);
 		view.addPaginationWidget(paginationWidget);
 		view.addExternalRepoModal(addExternalRepoModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
+		Callback loadDataCallback = new Callback() {
+			@Override
+			public void invoke() {
+				
+			}
+		};
+		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 
 	public Widget asWidget() {

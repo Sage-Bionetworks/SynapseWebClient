@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface DockerRepoListWidgetView extends IsWidget {
+public interface DockerRepoListWidgetView extends IsWidget, SupportsLazyLoadInterface  {
 
 	public interface Presenter {
 
