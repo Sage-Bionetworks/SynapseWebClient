@@ -55,9 +55,13 @@ public class TabViewImpl implements TabView {
 	}
 	
 	@Override
-	public void configure(String tabTitle, Widget content, String helpMarkdown, String helpLink) {
+	public void setContent(Widget content) {
 		contentDiv.clear();
 		contentDiv.add(content);
+	}
+	
+	@Override
+	public void configure(String tabTitle, String helpMarkdown, String helpLink) {
 		helpWidget.setHelpMarkdown(helpMarkdown);
 		helpWidget.setHref(helpLink);
 		helpWidget.setPlacement(Placement.BOTTOM);

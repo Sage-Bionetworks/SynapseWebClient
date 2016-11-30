@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -36,12 +37,17 @@ public class ChallengeTabTest {
 	AdministerEvaluationsList mockAdministerEvaluationsList;
 	@Mock
 	ChallengeWidget mockChallengeWidget;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	ChallengeTab tab;
 	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		tab = new ChallengeTab(mockView, mockTab, mockAdministerEvaluationsList, mockChallengeWidget);
+		tab = new ChallengeTab(mockTab, mockPortalGinInjector);
+		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
+		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);
+		when(mockPortalGinInjector.getChallengeWidget()).thenReturn(mockChallengeWidget);
 	}
 
 	@Test

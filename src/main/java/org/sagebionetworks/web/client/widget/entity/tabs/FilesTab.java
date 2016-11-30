@@ -92,69 +92,58 @@ public class FilesTab {
 	String projectEntityId;
 	
 	@Inject
-	public FilesTab(FilesTabView view, 
-			Tab tab,
-			FileTitleBar fileTitleBar,
-			BasicTitleBar folderTitleBar,
-			Breadcrumb breadcrumb,
-			EntityMetadata metadata,
-			FilesBrowser filesBrowser,
-			PreviewWidget previewWidget,
-			WikiPageWidget wikiPageWidget,
-			StuAlert synAlert,
-			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector,
-			final GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy,
-			DiscussionThreadListWidget discussionThreadListWidget
-			) {
-		this.view = view;
+	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
-		this.fileTitleBar = fileTitleBar;
-		this.folderTitleBar = folderTitleBar;
-		this.breadcrumb = breadcrumb;
-		this.metadata = metadata;
-		this.filesBrowser = filesBrowser;
-		this.previewWidget = previewWidget;
-		this.wikiPageWidget = wikiPageWidget;
-		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
-		this.globalApplicationState = globalApplicationState;
-		this.modifiedCreatedBy = modifiedCreatedBy;
-		this.discussionThreadListWidget = discussionThreadListWidget;
-		
-		previewWidget.addStyleName("min-height-200");
-		view.setFileTitlebar(fileTitleBar.asWidget());
-		view.setFolderTitlebar(folderTitleBar.asWidget());
-		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setFileBrowser(filesBrowser.asWidget());
-		view.setPreview(previewWidget.asWidget());
-		view.setMetadata(metadata.asWidget());
-		view.setWikiPage(wikiPageWidget.asWidget());
-		view.setSynapseAlert(synAlert.asWidget());
-		view.setModifiedCreatedBy(modifiedCreatedBy);
-		view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
-		discussionThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>(){
-
-			@Override
-			public void invoke(DiscussionThreadBundle bundle) {
-				globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId()));
-			}
-		});
-		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
-		
-		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
-		CallbackP<String> entityClicked = new CallbackP<String> () {
-			@Override
-			public void invoke(String id) {
-				getTargetBundleAndDisplay(id, null);
-			}
-		};
-		filesBrowser.setEntityClickedHandler(entityClicked);
-		initBreadcrumbLinkClickedHandler();
+		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", null);
 	}
-
+	
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getFilesTabView();
+			this.fileTitleBar = ginInjector.getFileTitleBar();
+			this.folderTitleBar = ginInjector.getBasicTitleBar();
+			this.breadcrumb = ginInjector.getBreadcrumb();
+			this.metadata = ginInjector.getEntityMetadata();
+			this.filesBrowser = ginInjector.getFilesBrowser();
+			this.previewWidget = ginInjector.getPreviewWidget();
+			this.wikiPageWidget = ginInjector.getWikiPageWidget();
+			this.synAlert = ginInjector.getStuAlert();
+			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.globalApplicationState = ginInjector.getGlobalApplicationState();
+			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
+			this.discussionThreadListWidget = ginInjector.getDiscussionThreadListWidget();
+			tab.setContent(view.asWidget());
+			previewWidget.addStyleName("min-height-200");
+			view.setFileTitlebar(fileTitleBar.asWidget());
+			view.setFolderTitlebar(folderTitleBar.asWidget());
+			view.setBreadcrumb(breadcrumb.asWidget());
+			view.setFileBrowser(filesBrowser.asWidget());
+			view.setPreview(previewWidget.asWidget());
+			view.setMetadata(metadata.asWidget());
+			view.setWikiPage(wikiPageWidget.asWidget());
+			view.setSynapseAlert(synAlert.asWidget());
+			view.setModifiedCreatedBy(modifiedCreatedBy);
+			view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
+			discussionThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>(){
+	
+				@Override
+				public void invoke(DiscussionThreadBundle bundle) {
+					globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId()));
+				}
+			});
+			
+			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
+			CallbackP<String> entityClicked = new CallbackP<String> () {
+				@Override
+				public void invoke(String id) {
+					getTargetBundleAndDisplay(id, null);
+				}
+			};
+			filesBrowser.setEntityClickedHandler(entityClicked);
+			initBreadcrumbLinkClickedHandler();
+		}
+	}
 	public void initBreadcrumbLinkClickedHandler() {
 		CallbackP<Place> breadcrumbClicked = new CallbackP<Place>() {
 			public void invoke(Place place) {
@@ -210,6 +199,7 @@ public class FilesTab {
 	}
 	
 	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+		lazyInject();
 		this.currentEntity = targetEntity;
 		this.currentEntityId = targetEntity.getId();
 		this.handler = handler;

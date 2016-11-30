@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -21,29 +22,33 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	ForumWidget forumWidget;
 	String entityName, entityId;
 	GlobalApplicationState globalAppState;
+	PortalGinInjector ginInjector;
 	@Inject
-	public DiscussionTab(
-			DiscussionTabView view,
-			Tab tab,
-			ForumWidget forumWidget,
-			GlobalApplicationState globalAppState
-			) {
-		this.view = view;
+	public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
-		this.forumWidget = forumWidget;
-		this.globalAppState = globalAppState;
-		// Necessary for "beta" badge.  Remove when bringing out of beta.
-		view.updateWidth(tab);
-		tab.configure("Discussion", view.asWidget(), "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
-		view.setPresenter(this);
-		view.setForum(forumWidget.asWidget());
+		this.ginInjector = ginInjector;
+		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
 	}
-
+	
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getDiscussionTabView();
+			this.forumWidget = ginInjector.getForumWidget();
+			this.globalAppState = ginInjector.getGlobalApplicationState();
+			// Necessary for "beta" badge.  Remove when bringing out of beta.
+			view.updateWidth(tab);
+			view.setPresenter(this);
+			view.setForum(forumWidget.asWidget());
+			tab.setContent(view.asWidget());
+		}
+	}
+	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
 	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
+		lazyInject();
 		this.entityId = entityId;
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);

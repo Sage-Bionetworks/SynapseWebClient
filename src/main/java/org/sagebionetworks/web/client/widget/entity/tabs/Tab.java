@@ -42,9 +42,12 @@ public class Tab implements TabView.Presenter {
 		};
 	}
 	
-	public void configure(String tabTitle, Widget content, String helpMarkdown, String helpLink) {
-		view.configure(tabTitle, content, helpMarkdown, helpLink);
+	public void configure(String tabTitle, String helpMarkdown, String helpLink) {
+		view.configure(tabTitle, helpMarkdown, helpLink);
 		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
+	}
+	public void setContent(Widget widget) {
+		view.setContent(widget);
 	}
 	
 	public Widget getTabListItem() {

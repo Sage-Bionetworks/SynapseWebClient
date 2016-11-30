@@ -54,31 +54,28 @@ public class DockerTab implements DockerTabView.Presenter{
 	CallbackP<Boolean> showProjectInfoCallack;
 
 	@Inject
-	public DockerTab(
-			DockerTabView view,
-			Tab tab,
-			DockerRepoListWidget dockerListRepoWidget,
-			Breadcrumb breadcrumb,
-			PortalGinInjector ginInjector,
-			SynapseClientAsync synapseClient,
-			StuAlert synAlert
-			) {
-		this.view = view;
+	public DockerTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
-		this.dockerRepoListWidget = dockerListRepoWidget;
-		this.breadcrumb = breadcrumb;
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
-		this.synAlert = synAlert;
-		view.updateWidth(tab);
-		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
-		view.setPresenter(this);
-		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setDockerRepoList(dockerListRepoWidget.asWidget());
-		view.setSynapseAlert(synAlert.asWidget());
-		initClickHandler();
+		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
 	}
-
+			
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getDockerTabView();
+			this.dockerRepoListWidget = ginInjector.getDockerRepoListWidget();
+			this.breadcrumb = ginInjector.getBreadcrumb();
+			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.synAlert = ginInjector.getStuAlert();
+			view.updateWidth(tab);
+			view.setPresenter(this);
+			view.setBreadcrumb(breadcrumb.asWidget());
+			view.setDockerRepoList(dockerRepoListWidget.asWidget());
+			view.setSynapseAlert(synAlert.asWidget());
+			tab.setContent(view.asWidget());
+			initClickHandler();
+		}
+	}
 	private void initClickHandler() {
 		breadcrumb.setLinkClickedHandler(new CallbackP<Place>() {
 			public void invoke(Place place) {
@@ -121,6 +118,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	}
 
 	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
+		lazyInject();
 		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;

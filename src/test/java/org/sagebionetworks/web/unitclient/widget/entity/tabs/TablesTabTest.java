@@ -120,9 +120,18 @@ public class TablesTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl());
-		tab = new TablesTab(mockView, mockTab, mockTableListWidget, mockBasicTitleBar, 
-				mockBreadcrumb, mockEntityMetadata, queryTokenProvider, mockSynapseAlert, mockSynapseClientAsync,
-				mockPortalGinInjector, mockModifiedCreatedBy);
+		tab = new TablesTab(mockTab, mockPortalGinInjector);
+		
+		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
+		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
+		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
+		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
+		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
+		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(queryTokenProvider);
+		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
+		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
+		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
+		
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
