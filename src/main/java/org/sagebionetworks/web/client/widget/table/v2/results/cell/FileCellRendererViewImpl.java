@@ -52,7 +52,7 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	public void setAnchor(String fileName, String createAnchorHref) {
 		this.anchor.setText(fileName);
 		this.anchor.setHref(createAnchorHref);
-		this.anchor.setTarget(HasTarget.BLANK);
+		this.anchor.setTarget("_self");
 	}
 
 }
