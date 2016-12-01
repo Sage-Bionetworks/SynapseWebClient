@@ -51,6 +51,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	private CallbackP<EntityBundle> onRepoClickCallback;
 	private LoadMoreWidgetContainer membersContainer;
 
+
 	@Inject
 	public DockerRepoListWidget(
 			DockerRepoListWidgetView view,

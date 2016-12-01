@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
