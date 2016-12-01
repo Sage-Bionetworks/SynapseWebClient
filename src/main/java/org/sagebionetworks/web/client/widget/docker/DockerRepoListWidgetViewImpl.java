@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.widget.docker;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,6 +29,8 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	SimplePanel addExternalRepoModalPanel;
 	@UiField
 	SimplePanel synAlertContainer;
+	@UiField
+	Div membersContainer;
 
 	Widget widget;
 	Presenter presenter;
@@ -98,5 +102,10 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	@Override
 	public void setSynAlertVisible(boolean visible) {
 		synAlertContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setMembersContainer(LoadMoreWidgetContainer membersContainerW) {
+		membersContainer.add(membersContainerW.asWidget());
 	}
 }

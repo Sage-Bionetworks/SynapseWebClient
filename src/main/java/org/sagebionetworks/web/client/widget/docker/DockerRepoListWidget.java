@@ -25,50 +25,61 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter, PageChangeListener {
+public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter {
 
 	public static final Long PAGE_SIZE = 10L;
 	public static final Long OFFSET_ZERO = 0L;
+	
+	private Long offset;
 
 	private DockerRepoListWidgetView view;
 	private SynapseClientAsync synapseClient;
-	private PaginationWidget paginationWidget;
 	private AddExternalRepoModal addExternalRepoModal;
 	private PreflightController preflightController;
 	private SynapseAlert synAlert;
 	private EntityBundle projectBundle;
 	private EntityQuery query;
 	private CallbackP<EntityBundle> onRepoClickCallback;
+	private LoadMoreWidgetContainer membersContainer;
 
 	@Inject
 	public DockerRepoListWidget(
 			DockerRepoListWidgetView view,
 			SynapseClientAsync synapseClient,
-			PaginationWidget paginationWidget,
 			AddExternalRepoModal addExternalRepoModal,
 			PreflightController preflightController,
+			LoadMoreWidgetContainer membersContainer,
 			SynapseAlert synAlert
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.paginationWidget = paginationWidget;
 		this.addExternalRepoModal = addExternalRepoModal;
 		this.preflightController = preflightController;
 		this.synAlert = synAlert;
+		this.membersContainer = membersContainer;
+		offset = OFFSET_ZERO;
 		view.setPresenter(this);
-		view.addPaginationWidget(paginationWidget);
 		view.addExternalRepoModal(addExternalRepoModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
+		view.setMembersContainer(membersContainer);
+		membersContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
 	}
 
 	public Widget asWidget() {
@@ -97,31 +108,20 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		this.projectBundle = projectBundle;
 		String projectId = projectBundle.getEntity().getId();
 		this.query = createDockerRepoEntityQuery(projectId);
-		addExternalRepoModal.configuration(projectId, new Callback(){
-
-			@Override
-			public void invoke() {
-				queryForOnePage(OFFSET_ZERO);
-			}
-		});
-		queryForOnePage(OFFSET_ZERO);
 		view.setAddExternalRepoButtonVisible(projectBundle.getPermissions().getCanAddChild());
+		loadMore();
 	}
 
-	/**
-	 * Run a query and populate the page with the results.
-	 * @param offset The offset used by the query.
-	 */
-	private void queryForOnePage(final Long offset){
+	public void loadMore() {
 		synAlert.clear();
 		this.query.setOffset(offset);
 		synapseClient.executeEntityQuery(this.query, new AsyncCallback<EntityQueryResults>() {
 			
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				paginationWidget.configure(query.getLimit(), query.getOffset(), results.getTotalEntityCount(), DockerRepoListWidget.this);
-				boolean showPagination = results.getTotalEntityCount() > query.getLimit();
-				view.showPaginationVisible(showPagination);
+				offset += PAGE_SIZE;
+				long numberOfMembers = results.getTotalEntityCount();
+				membersContainer.setIsMore(offset < numberOfMembers);
 				setResults(results);
 			}
 
@@ -131,9 +131,9 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 			}
 		});
 	}
+	
 
 	private void setResults(EntityQueryResults results) {
-		view.clear();
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | DOI;
 		for (EntityQueryResult header: results.getEntities()) {
@@ -168,11 +168,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter,
 		newQuery.setLimit(PAGE_SIZE);
 		newQuery.setOffset(OFFSET_ZERO);
 		return newQuery;
-	}
-
-	@Override
-	public void onPageChange(Long newOffset) {
-		queryForOnePage(newOffset);
 	}
 
 	@Override

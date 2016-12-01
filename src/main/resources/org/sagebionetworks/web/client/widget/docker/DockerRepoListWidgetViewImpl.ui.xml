@@ -15,5 +15,6 @@
 		</b:Row>
 		<g:SimplePanel ui:field="synAlertContainer" />
 		<g:SimplePanel ui:field="addExternalRepoModalPanel" />
+		<bh:Div ui:field="membersContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>
