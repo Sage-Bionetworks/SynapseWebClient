@@ -194,9 +194,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				addPeoplePanel.configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
-				deleteAclButton.setEnabled(canEnableInheritance);
-				add(deleteAclButton);
-				add(deleteAclHelpWidget.asWidget());
+				if (canEnableInheritance) {
+					add(deleteAclButton);
+					add(deleteAclHelpWidget.asWidget());	
+				}
 			}
 		}
 	}
