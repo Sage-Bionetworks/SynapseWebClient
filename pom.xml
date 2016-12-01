@@ -205,8 +205,10 @@
 			        <logLevel>INFO</logLevel>
 			        <sourceLevel>auto</sourceLevel>
 			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
-			        <!-- comment out closure compiler to generate compile report -->
+			        
+			        <!-- set enableClosureCompiler to false to generate source maps and compile report -->
 			        <enableClosureCompiler>true</enableClosureCompiler>
+			        
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
