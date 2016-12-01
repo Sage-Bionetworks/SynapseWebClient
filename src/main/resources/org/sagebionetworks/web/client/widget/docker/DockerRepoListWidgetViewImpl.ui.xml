@@ -8,11 +8,6 @@
 			<b:Button ui:field="addExternalRepo" icon="PLUS">Add External Repository</b:Button>
 		</b:ButtonToolBar>
 		<b:ListGroup ui:field="dockerList" />
-		<b:Row >
-			<b:Column size="XS_2" offset="XS_5">
-				<g:SimplePanel ui:field="paginationPanel" visible="false"/>
-			</b:Column>
-		</b:Row>
 		<g:SimplePanel ui:field="synAlertContainer" />
 		<g:SimplePanel ui:field="addExternalRepoModalPanel" />
 		<bh:Div ui:field="membersContainer" />

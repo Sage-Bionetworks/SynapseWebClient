@@ -16,10 +16,6 @@ public interface DockerRepoListWidgetView extends IsWidget {
 		void onRepoClicked(EntityBundle bundle);
 	}
 
-	void addPaginationWidget(PaginationWidget paginationWidget);
-
-	void showPaginationVisible(boolean visible);
-
 	void setAddExternalRepoButtonVisible(boolean visibile);
 
 	void addExternalRepoModal(IsWidget addExternalRepoModel);

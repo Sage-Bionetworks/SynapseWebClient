@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -23,8 +22,6 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	ListGroup dockerList;
 	@UiField
 	Button addExternalRepo;
-	@UiField
-	SimplePanel paginationPanel;
 	@UiField
 	SimplePanel addExternalRepoModalPanel;
 	@UiField
@@ -72,16 +69,6 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	@Override
 	public void clear() {
 		dockerList.clear();
-	}
-
-	@Override
-	public void addPaginationWidget(PaginationWidget paginationWidget) {
-		paginationPanel.add(paginationWidget);
-	}
-
-	@Override
-	public void showPaginationVisible(boolean visible) {
-		paginationPanel.setVisible(visible);
 	}
 
 	@Override
