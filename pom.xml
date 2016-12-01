@@ -200,10 +200,13 @@
 					<module>org.sagebionetworks.web.Portal</module>
 					<!-- GWT compiler options -->
 			        <compileReport>true</compileReport>
+			        <soycDetailed>true</soycDetailed>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
 			        <sourceLevel>auto</sourceLevel>
 			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
+			        <!-- comment out closure compiler to generate compile report -->
+			        <enableClosureCompiler>true</enableClosureCompiler>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
