@@ -19,12 +19,6 @@ a:focus{color:#1e7098; text-decoration:underline;}
 .synapse-purple-bg, #rootPanel .synapse-purple-bg {background-color:#7772b4;}
 .synapse-green-bg, #rootPanel .synapse-green-bg {background-color:#0ea862;}
 
-#rootPanel .google-button {
-	background: #DF4A32;
-	color: white;
-	border-color: transparent;
-}
-
 .pagination>li>a, .pagination>li>span
 {
 	color: #1e7098;
