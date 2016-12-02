@@ -56,6 +56,10 @@ public class ImageFileValidatorTest {
 		when(mockMeta.getContentType()).thenReturn(null);	
 		assertTrue(imageValidator.isValid(mockMeta));
 
+		when(mockMeta.getContentType()).thenReturn("image/svg+xml");
+		when(mockMeta.getFileName()).thenReturn("test.svg");
+		assertTrue(imageValidator.isValid(mockMeta));
+		
 		//test non-null max file size
 		imageValidator.setMaxSize(100.0);
 		assertTrue(imageValidator.isValid(mockMeta));

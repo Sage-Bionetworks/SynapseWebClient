@@ -72,7 +72,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
-		if (previewHandle != null && originalFileHandle != null) {
+		if (previewHandle == null && originalFileHandle != null) {
+			String contentType = originalFileHandle.getContentType();
+			if (contentType != null && DisplayUtils.isRecognizedImageContentType(contentType)) {
+				previewFileType = PreviewFileType.IMAGE;
+			}
+		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
 			if (contentType != null) {
 				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
@@ -170,8 +175,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
+				boolean hasPreviewFileHandle = handle != null;
 				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
-									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, xsrfToken));
+									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
 			}
 			else { //must be a text type of some kind
 				//try to load the text of the preview, if available

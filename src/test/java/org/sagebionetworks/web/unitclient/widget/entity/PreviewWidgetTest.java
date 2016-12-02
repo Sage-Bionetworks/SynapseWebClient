@@ -149,6 +149,26 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testPreviewSvgImageContentType(){
+		// images that do not have a preview file handle will use the original
+		mainFileHandle.setContentType("image/svg+xml");
+		mainFileHandle.setFileName("original.svg");
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setImagePreview(anyString(), anyString());
+	}
+	
+	@Test
+	public void testPreviewPngImageContentType(){
+		// images that do not have a preview file handle will use the original
+		mainFileHandle.setContentType("image/png");
+		mainFileHandle.setFileName("original.png");
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setImagePreview(anyString(), anyString());
+	}
+	
+	@Test
 	public void testPreviewCodeContentType(){
 		mainFileHandle.setFileName("codeFile.R");
 		PreviewFileHandle fh = new PreviewFileHandle();
