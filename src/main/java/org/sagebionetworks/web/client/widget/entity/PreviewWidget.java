@@ -4,9 +4,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import java.util.Map;
-
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -113,6 +114,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		configure(entityId, version);
+	}
+	
+	public void configure(String entityId, String version) {
 		if (version == null && entityId.contains(".")) {
 			String[] tokens = entityId.split("\\.");
 			entityId = tokens[0];
@@ -150,6 +155,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
 			synapseAlert.showLogin();
 		} else if (bundle != null) {
+			// SWC-2652: follow Link
+			if (bundle.getEntity() instanceof Link) {
+				// configure based on target
+				Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+				String targetVersion = ref.getTargetVersionNumber() == null ? null : ref.getTargetVersionNumber() + "";
+				configure(ref.getTargetId(), targetVersion);
+				return;
+			}
 			if (!(bundle.getEntity() instanceof FileEntity)) {
 				//not a file!
 				view.addSynapseAlertWidget(synapseAlert.asWidget());
