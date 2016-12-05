@@ -288,7 +288,7 @@ public class UploaderTest {
 	private void verifyUploadError() {
 		verify(view).showErrorMessage(anyString(), anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
-		verify(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
+		//verify(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
 	}
 	
 	@Test
@@ -622,8 +622,12 @@ public class UploaderTest {
 		wrapper1.add(ex);
 		Exception wrappedException = new UmbrellaException(wrapper1);
 		uploader.uploadError(message, wrappedException);
-		//verify unwrapped exception is sent to the server logs
-		verify(mockLogger).errorToRepositoryServices(anyString(), eq(ex));
 	}
 
+	@Test
+	public void testUploadFailed() {
+		String message = "meow there's an error.";
+		uploader.uploadFailed(message);
+		verify(mockLogger).errorToRepositoryServices(eq(message), any(Exception.class));
+	}
 }
