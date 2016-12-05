@@ -93,6 +93,7 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 
 	@Override
 	public void setMembersContainer(LoadMoreWidgetContainer membersContainerW) {
+		membersContainer.clear();
 		membersContainer.add(membersContainerW.asWidget());
 	}
 }

@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -62,6 +64,8 @@ public class DockerRepoListWidgetTest {
 	private UserEntityPermissions mockUserEntityPermissions;
 	@Mock
 	private LoadMoreWidgetContainer mockMembersContainer;
+	@Captor
+	ArgumentCaptor<EntityQuery> entityQueryCaptor;
 
 	DockerRepoListWidget dockerRepoListWidget;
 	String projectId;
@@ -252,5 +256,23 @@ public class DockerRepoListWidgetTest {
 		when(mockUserEntityPermissions.getCanAddChild()).thenReturn(false);
 		dockerRepoListWidget.configure(mockProjectBundle);
 		verify(mockView).setAddExternalRepoButtonVisible(false);
+	}
+	
+	@Test
+	public void testLoadMore() {
+		Long count = PAGE_SIZE + 2L;
+		when(mockEntityQueryResults.getTotalEntityCount()).thenReturn(count);
+		AsyncMockStubber.callSuccessWith(mockEntityQueryResults)
+			.when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		dockerRepoListWidget.configure(mockProjectBundle);
+		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		verify(mockSynapseClient).executeEntityQuery(entityQueryCaptor.capture(), any(AsyncCallback.class));
+		Long offset = entityQueryCaptor.getValue().getOffset();
+		assertTrue(offset.equals(OFFSET_ZERO));
+		reset(mockSynapseClient);
+		dockerRepoListWidget.loadMore();
+		verify(mockSynapseClient).executeEntityQuery(entityQueryCaptor.capture(), any(AsyncCallback.class));
+		offset = entityQueryCaptor.getValue().getOffset();
+		assertTrue(offset.equals(PAGE_SIZE));
 	}
 }

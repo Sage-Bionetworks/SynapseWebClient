@@ -67,7 +67,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 		this.preflightController = preflightController;
 		this.synAlert = synAlert;
 		this.membersContainer = membersContainer;
-		offset = OFFSET_ZERO;
 		view.setPresenter(this);
 		view.addExternalRepoModal(addExternalRepoModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
@@ -103,6 +102,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	 * @param projectBundle
 	 */
 	public void configure(EntityBundle projectBundle) {
+		offset = OFFSET_ZERO;
 		this.projectBundle = projectBundle;
 		String projectId = projectBundle.getEntity().getId();
 		this.query = createDockerRepoEntityQuery(projectId);
