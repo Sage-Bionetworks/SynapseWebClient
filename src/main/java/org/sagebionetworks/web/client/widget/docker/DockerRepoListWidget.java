@@ -102,7 +102,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	 * @param projectBundle
 	 */
 	public void configure(EntityBundle projectBundle) {
-		offset = OFFSET_ZERO;
 		this.projectBundle = projectBundle;
 		String projectId = projectBundle.getEntity().getId();
 		this.query = createDockerRepoEntityQuery(projectId);
@@ -111,12 +110,15 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 			
 			@Override		
 			public void invoke() {		
-				view.clear();
-				offset = OFFSET_ZERO;
-				loadMore();
+				performInitialLoad();
 			}		
 		});
+		performInitialLoad();
+	}
+	
+	private void performInitialLoad() {
 		view.clear();
+		offset = OFFSET_ZERO;
 		loadMore();
 	}
 
