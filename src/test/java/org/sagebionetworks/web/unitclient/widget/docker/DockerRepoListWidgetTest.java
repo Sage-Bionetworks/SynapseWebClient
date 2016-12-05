@@ -84,7 +84,7 @@ public class DockerRepoListWidgetTest {
 		verify(mockView).setPresenter(dockerRepoListWidget);
 		verify(mockView).addExternalRepoModal(any(Widget.class));
 		verify(mockView).setMembersContainer(mockMembersContainer);
-		(mockView).setSynAlert(any(Widget.class));
+		verify(mockView).setSynAlert(any(Widget.class));
 	}
 
 	@Test
