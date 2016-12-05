@@ -181,6 +181,7 @@ public class DockerRepoListWidgetTest {
 			.when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(mockProjectBundle);
 		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		reset(mockView);
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		verify(mockView, never()).clear();
 		verify(mockView, never()).addRepo(any(EntityBundle.class));
