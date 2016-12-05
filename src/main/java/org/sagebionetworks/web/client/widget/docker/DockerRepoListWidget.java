@@ -107,6 +107,16 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 		String projectId = projectBundle.getEntity().getId();
 		this.query = createDockerRepoEntityQuery(projectId);
 		view.setAddExternalRepoButtonVisible(projectBundle.getPermissions().getCanAddChild());
+		addExternalRepoModal.configuration(projectId, new Callback(){		
+			
+			@Override		
+			public void invoke() {		
+				view.clear();
+				offset = OFFSET_ZERO;
+				loadMore();
+			}		
+		});
+		view.clear();
 		loadMore();
 	}
 
