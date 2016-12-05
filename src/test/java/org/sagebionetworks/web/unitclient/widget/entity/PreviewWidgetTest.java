@@ -29,7 +29,9 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -80,6 +82,8 @@ public class PreviewWidgetTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	VideoWidget mockVideoWidget;
+	@Mock
+	EntityBundle linkBundle;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
@@ -143,6 +147,26 @@ public class PreviewWidgetTest {
 		fh.setFileName("preview.png");
 		fh.setContentType("image/png");
 		testFileHandleList.add(fh);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setImagePreview(anyString(), anyString());
+	}
+	
+	@Test
+	public void testPreviewSvgImageContentType(){
+		// images that do not have a preview file handle will use the original
+		mainFileHandle.setContentType("image/svg+xml");
+		mainFileHandle.setFileName("original.svg");
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setImagePreview(anyString(), anyString());
+	}
+	
+	@Test
+	public void testPreviewPngImageContentType(){
+		// images that do not have a preview file handle will use the original
+		mainFileHandle.setContentType("image/png");
+		mainFileHandle.setFileName("original.png");
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString(), anyString());
@@ -227,6 +251,39 @@ public class PreviewWidgetTest {
 		verify(mockView, times(0)).setImagePreview(anyString(), anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
 	}
+	
+	@Test
+	public void testFollowLink(){
+		Link link = new Link();
+		Reference ref = new Reference();
+		String targetEntityId = "syn9876";
+		ref.setTargetId(targetEntityId);
+		link.setLinksTo(ref);
+		
+		when(linkBundle.getEntity()).thenReturn(link);
+		previewWidget.configure(linkBundle);
+		previewWidget.asWidget();
+		
+		verify(mockSynapseClient).getEntityBundle(eq(targetEntityId), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testFollowLinkWithVersion(){
+		Link link = new Link();
+		Reference ref = new Reference();
+		String targetEntityId = "syn9876";
+		Long targetVersion = 882L;
+		ref.setTargetVersionNumber(targetVersion);
+		ref.setTargetId(targetEntityId);
+		link.setLinksTo(ref);
+		
+		when(linkBundle.getEntity()).thenReturn(link);
+		previewWidget.configure(linkBundle);
+		previewWidget.asWidget();
+		
+		verify(mockSynapseClient).getEntityBundleForVersion(eq(targetEntityId), eq(targetVersion), anyInt(), any(AsyncCallback.class));
+	}
+
 	
 	@Test
 	public void testWikiConfigure() {		

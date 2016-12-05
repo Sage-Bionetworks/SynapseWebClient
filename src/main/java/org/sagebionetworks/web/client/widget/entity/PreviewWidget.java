@@ -4,9 +4,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import java.util.Map;
-
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -72,7 +73,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
-		if (previewHandle != null && originalFileHandle != null) {
+		if (previewHandle == null && originalFileHandle != null) {
+			String contentType = originalFileHandle.getContentType();
+			if (contentType != null && DisplayUtils.isRecognizedImageContentType(contentType)) {
+				previewFileType = PreviewFileType.IMAGE;
+			}
+		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
 			if (contentType != null) {
 				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
@@ -113,6 +119,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		configure(entityId, version);
+	}
+	
+	public void configure(String entityId, String version) {
 		if (version == null && entityId.contains(".")) {
 			String[] tokens = entityId.split("\\.");
 			entityId = tokens[0];
@@ -150,6 +160,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
 			synapseAlert.showLogin();
 		} else if (bundle != null) {
+			// SWC-2652: follow Link
+			if (bundle.getEntity() instanceof Link) {
+				// configure based on target
+				Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+				String targetVersion = ref.getTargetVersionNumber() == null ? null : ref.getTargetVersionNumber() + "";
+				configure(ref.getTargetId(), targetVersion);
+				return;
+			}
 			if (!(bundle.getEntity() instanceof FileEntity)) {
 				//not a file!
 				view.addSynapseAlertWidget(synapseAlert.asWidget());
@@ -170,8 +188,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
+				boolean hasPreviewFileHandle = handle != null;
 				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
-									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, xsrfToken));
+									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
 			}
 			else { //must be a text type of some kind
 				//try to load the text of the preview, if available

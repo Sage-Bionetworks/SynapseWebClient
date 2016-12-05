@@ -64,7 +64,8 @@
 	<add-linker name="xsiframe"/>
 	<set-configuration-property name="devModeRedirectEnabled" value="true"/>
 	<set-property name="compiler.useSourceMaps" value="true"/>
-	<set-property name="compiler.stackMode" value="emulated"/>
+	<!-- set stackMode to "emulated" for stack traces -->
+	<set-property name="compiler.stackMode" value="strip"/>
 	
 	<!-- Specify the paths for translatable code -->
 	<source path='client' />
@@ -77,7 +78,8 @@
 	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
-
+	<inherits name="com.google.gwt.user.RemoteServiceObfuscateTypeNames" />
+	
 	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
 	<set-property name="user.agent" value="safari"/>
 	  -->
