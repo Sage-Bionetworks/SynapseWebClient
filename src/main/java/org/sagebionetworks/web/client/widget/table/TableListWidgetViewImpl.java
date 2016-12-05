@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
@@ -16,6 +17,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -67,6 +69,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Inject
 	public TableListWidgetViewImpl(Binder binder) {
 		this.panel = binder.createAndBindUi(this);
+		HTML html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add File View" + DisplayConstants.BETA_BADGE_HTML);
+		addFileView.add(html);
 		createdOnDesc.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
