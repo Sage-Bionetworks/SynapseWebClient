@@ -59,6 +59,5 @@ public class CopyTextModalImpl implements CopyTextModal {
 	@Override
 	public void show() {
 		modal.show();
-		textBox.selectAll();
 	}
 }
