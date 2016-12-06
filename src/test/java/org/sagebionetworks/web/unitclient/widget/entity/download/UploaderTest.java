@@ -288,7 +288,6 @@ public class UploaderTest {
 	private void verifyUploadError() {
 		verify(view).showErrorMessage(anyString(), anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
-		//verify(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
 	}
 	
 	@Test
@@ -612,16 +611,6 @@ public class UploaderTest {
 	public void testGetSelectedFilesTextMultipleFiles() {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"file1", "file2"});
 		assertEquals("2 files", uploader.getSelectedFilesText());
-	}
-	
-	@Test
-	public void testUwrapException() {
-		String message = "meow there's an error.";
-		Exception ex = new Exception("exception to log");
-		Set<Throwable> wrapper1 = new HashSet<Throwable>();
-		wrapper1.add(ex);
-		Exception wrappedException = new UmbrellaException(wrapper1);
-		uploader.uploadError(message, wrappedException);
 	}
 
 	@Test
