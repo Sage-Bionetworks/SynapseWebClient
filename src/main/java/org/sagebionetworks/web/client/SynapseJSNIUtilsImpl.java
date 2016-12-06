@@ -638,19 +638,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native String _copyToClipboard() /*-{
 		$doc.execCommand('copy');
 	}-*/;
-	
+
 	private final static native String _deselect() /*-{
 		if ($wnd.getSelection) {
-		  if ($wnd.getSelection().empty) {
-		  	// Chrome
-		    $wnd.getSelection().empty();
-		  } else if ($wnd.getSelection().removeAllRanges) {
-		  	// Firefox
-		    $wnd.getSelection().removeAllRanges();
-		  }
+			if ($wnd.getSelection().empty) {
+				// Chrome
+				$wnd.getSelection().empty();
+			} else if ($wnd.getSelection().removeAllRanges) {
+				// Firefox
+				$wnd.getSelection().removeAllRanges();
+			}
 		} else if ($doc.selection) {
 			// IE/Edge?
-		  $doc.selection.empty();
+			$doc.selection.empty();
 		}
 		$doc.activeElement.blur();
 	}-*/;
