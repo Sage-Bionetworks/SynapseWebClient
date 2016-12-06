@@ -648,7 +648,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				// Firefox
 				$wnd.getSelection().removeAllRanges();
 			}
-		} else if ($doc.selection) {
+		} else if ($doc.selection && $doc.selection.empty) {
 			// IE/Edge?
 			$doc.selection.empty();
 		}
