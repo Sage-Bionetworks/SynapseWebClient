@@ -623,4 +623,17 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		parser = null; 
 		return v;
 	}-*/;
+	
+	@Override
+	public void copyToClipboard() {
+		try {
+			_copyToClipboard();
+			DisplayUtils.showInfo("Copied to clipboard", "");
+		} catch (Throwable t) {
+		}
+	}
+
+	private final static native String _copyToClipboard() /*-{
+		$doc.execCommand('copy');
+	}-*/;
 }
