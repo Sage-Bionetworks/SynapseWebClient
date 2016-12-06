@@ -105,4 +105,6 @@ public interface SynapseJSNIUtils {
 	String getPort(String url);
 
 	String getPathname(String url);
+	
+	void copyToClipboard();
 }
