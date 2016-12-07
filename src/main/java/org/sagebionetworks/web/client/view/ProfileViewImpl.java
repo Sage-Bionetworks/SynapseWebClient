@@ -451,6 +451,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				synapseEmailField.selectAll();
+				ProfileViewImpl.this.synapseJSNIUtils.copyToClipboard();
 			}
 		});
 		
