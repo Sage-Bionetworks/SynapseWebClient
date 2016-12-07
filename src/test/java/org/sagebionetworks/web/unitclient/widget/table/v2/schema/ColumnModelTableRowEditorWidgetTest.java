@@ -313,4 +313,18 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.LargeText));
 		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.Link));
 	}
+
+	@Test
+	public void testCanHaveDefault() {
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Integer));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Double));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Date));
+		
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Entity));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.User));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.File));
+	}
+	
 }

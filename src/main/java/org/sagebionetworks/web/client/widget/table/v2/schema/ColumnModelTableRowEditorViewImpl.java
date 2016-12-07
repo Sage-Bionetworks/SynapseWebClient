@@ -196,6 +196,10 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		defaultPanel.clear();
 		defaultPanel.add(defaultEditor);
 	}
+	@Override
+	public void setDefaultEditorVisible(boolean visible) {
+		defaultPanel.setVisible(visible);
+	}
 
 	@Override
 	public void setNameError(String error) {
