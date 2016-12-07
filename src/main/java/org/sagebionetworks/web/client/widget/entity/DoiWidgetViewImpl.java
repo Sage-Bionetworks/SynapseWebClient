@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,7 +41,8 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 	@Inject
 	public DoiWidgetViewImpl(GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			Binder uiBinder) {
+			Binder uiBinder,
+			final SynapseJSNIUtils jsniUtils) {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		widget = uiBinder.createAndBindUi(this);
@@ -49,6 +51,7 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				doi.selectAll();
+				jsniUtils.copyToClipboard();
 			}
 		});
 	}

@@ -623,4 +623,35 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		parser = null; 
 		return v;
 	}-*/;
+	
+	@Override
+	public void copyToClipboard() {
+		try {
+			_copyToClipboard();
+			_deselect();
+			DisplayUtils.showInfo("Copied to clipboard", "");
+		} catch (Throwable t) {
+			consoleError(t.getMessage());
+		}
+	}
+
+	private final static native String _copyToClipboard() /*-{
+		$doc.execCommand('copy');
+	}-*/;
+
+	private final static native String _deselect() /*-{
+		if ($wnd.getSelection) {
+			if ($wnd.getSelection().empty) {
+				// Chrome
+				$wnd.getSelection().empty();
+			} else if ($wnd.getSelection().removeAllRanges) {
+				// Firefox
+				$wnd.getSelection().removeAllRanges();
+			}
+		} else if ($doc.selection && $doc.selection.empty) {
+			// IE/Edge?
+			$doc.selection.empty();
+		}
+		$doc.activeElement.blur();
+	}-*/;
 }
