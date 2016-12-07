@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -78,6 +79,11 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	@Override
 	public void setLinkHref(String href) {
 		entityLink.setHref(href);
+	}
+	
+	@Override
+	public void setClickHandler(ClickHandler clickHandler) {
+		entityLink.addClickHandler(clickHandler);
 	}
 	
 	@Override
