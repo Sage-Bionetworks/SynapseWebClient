@@ -27,7 +27,6 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	private static final String INSTRUCTIONS = "Use the schema options button to make changes to the columns of the table.  Use the create button to finish building the table.";
 	private static final String COL = "col";
 	private static final String CREATE = "Create";
-	public static final double COLUMN_SIZE_BUFFER = 0.25;
 	public static final String APPLYING_CSV_TO_THE_TABLE = "Applying CSV to the Table...";
 	public static final String CREATING_TABLE_COLUMNS = "Creating table columns...";
 	public static final String CREATING_THE_TABLE = "Creating the table...";
@@ -192,11 +191,6 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 			// Set a default name
 			if (cm.getName() == null) {
 				cm.setName(COL + (i + 1));
-			}
-			if (cm.getMaximumSize() != null) {
-				// Add a buffer to the max size
-				double startingMax = cm.getMaximumSize();
-				cm.setMaximumSize((long) (startingMax + (startingMax * COLUMN_SIZE_BUFFER)));
 			}
 		}
 		return columns;
