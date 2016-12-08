@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -41,12 +42,13 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	Widget widget;
 
 	@Inject
-	public DockerRepoWidgetViewImpl(Binder binder){
+	public DockerRepoWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils){
 		this.widget = binder.createAndBindUi(this);
 		dockerPullCommand.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				dockerPullCommand.selectAll();
+				jsniUtils.copyToClipboard();
 			}
 		});
 	}
