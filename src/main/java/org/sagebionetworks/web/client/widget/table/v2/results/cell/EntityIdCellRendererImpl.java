@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,6 +18,7 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	LazyLoadHelper lazyLoadHelper;
 	EntityHeaderAsyncHandler entityHeaderAsyncHandler;
 	String entityId, entityName;
+	ClickHandler customClickHandler;
 	@Inject
 	public EntityIdCellRendererImpl(EntityIdCellRendererView view, 
 			LazyLoadHelper lazyLoadHelper,
@@ -37,7 +39,12 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
 			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn"+entityId;
-			view.setLinkHref(Synapse.getHrefForDotVersion(requestEntityId));
+			if (customClickHandler == null) {
+				view.setLinkHref(Synapse.getHrefForDotVersion(requestEntityId));	
+			} else {
+				view.setClickHandler(customClickHandler);
+			}
+			
 			entityHeaderAsyncHandler.getEntityHeader(requestEntityId, new AsyncCallback<EntityHeader>() {
 				@Override
 				public void onSuccess(EntityHeader entity) {
@@ -60,11 +67,17 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 		return this.view.asWidget();
 	}
 	
+
 	@Override
 	public void setValue(String value) {
+		setValue(value, null);
+	}
+	
+	public void setValue(String value, ClickHandler customClickHandler) {
 		view.hideAllIcons();
 		this.entityId = value;
 		entityName = null;
+		this.customClickHandler = customClickHandler;
 		lazyLoadHelper.setIsConfigured();
 	}
 

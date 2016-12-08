@@ -181,6 +181,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
@@ -503,4 +504,5 @@ public interface PortalGinInjector extends Ginjector {
 	public ApproveUserAccessModal getApproveUserAccessModal();
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();
+	public EntityIdCellRendererImpl getEntityIdCellRenderer();
 }

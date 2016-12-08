@@ -45,8 +45,7 @@ public class FacetsWidget implements IsWidget {
 						// if values are not set, then don't show the facet
 						if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 0) {
 							FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
-							boolean isUserIdColumnType = ColumnType.USERID.equals(cm.getColumnType());
-							valuesWidget.configure(facetResultValues, isUserIdColumnType, facetChangedHandler);
+							valuesWidget.configure(facetResultValues, cm.getColumnType(), facetChangedHandler);
 							view.add(valuesWidget);
 							isShowingFacets = true;
 						}
