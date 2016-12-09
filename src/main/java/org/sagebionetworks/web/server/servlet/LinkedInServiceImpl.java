@@ -137,8 +137,6 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 			temp = ServiceUtils.writeToTempFile(conn.getInputStream(),
 					MAX_ATTACHMENT_SIZE_IN_BYTES);
 			// Now upload the file
-			String contentType = conn.getContentType();
-			ContentType type = ContentType.create(contentType);
 			S3FileHandle s3fh = client.multipartUpload(temp, null, false, false);
 			return s3fh.getId();
 		} catch (Throwable t) {
