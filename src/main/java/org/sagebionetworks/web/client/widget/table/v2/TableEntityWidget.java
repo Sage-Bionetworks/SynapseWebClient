@@ -256,7 +256,7 @@ public class TableEntityWidget implements IsWidget,
 			// does the current query have a where clause?
 			if (isWhereClause()) {
 				// we must wipe it out.  Confirm with the user that this is acceptable.
-				view.showConfirmDialog("Clear current query?", "In order to switch to simple search, the current query must be cleared.  Clear current query?", new Callback() {
+				view.showConfirmDialog("Reset search query?", "The search query will be reset. Are you sure that you would like to switch to simple search mode?", new Callback() {
 					@Override
 					public void invoke() {
 						showSimpleSearchUI();
