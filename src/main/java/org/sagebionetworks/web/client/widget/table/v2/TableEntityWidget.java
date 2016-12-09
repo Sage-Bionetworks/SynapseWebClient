@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
@@ -214,10 +215,15 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	private boolean isFacets() {
-		if (currentQuery == null || currentQuery.getSelectedFacets() == null) {
+		if (tableBundle == null || tableBundle.getColumnModels() == null || tableBundle.getColumnModels().isEmpty()) {
 			return false;
 		}
-		return !currentQuery.getSelectedFacets().isEmpty();
+		for (ColumnModel cm : tableBundle.getColumnModels()) {
+			if (cm.getFacetType() != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private boolean isWhereClause() {
@@ -228,12 +234,16 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	private void showSimpleSearchUI() {
+		view.setAdvancedSearchLinkVisbile(true);
+		view.setSimpleSearchLinkVisbile(false);
 		queryResultsWidget.setFacetsVisible(true);
 		queryInputWidget.setShowQueryVisible(true);
 		queryInputWidget.setQueryInputVisible(false);
 	}
 	
 	private void showAdvancedSearchUI() {
+		view.setAdvancedSearchLinkVisbile(false);
+		view.setSimpleSearchLinkVisbile(true);
 		queryResultsWidget.setFacetsVisible(false);
 		queryInputWidget.setShowQueryVisible(false);
 		queryInputWidget.setQueryInputVisible(true);

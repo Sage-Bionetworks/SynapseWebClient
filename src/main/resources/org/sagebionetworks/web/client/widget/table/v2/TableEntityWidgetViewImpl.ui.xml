@@ -24,15 +24,15 @@
 		<b:Alert ui:field="tableMessage" type="INFO" />
 
 		<bh:Div>
-			<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" />
+			<b:Anchor ui:field="showSimpleSearch" text="Show simple search"/>
 		</bh:Div>
 		<bh:Div>
-			<b:Anchor ui:field="showSimpleSearch" text="Show simple search" pull="RIGHT"/>
-			<g:SimplePanel ui:field="queryInputPanel" />
+			<g:SimplePanel ui:field="queryInputPanel" addStyleNames="displayInline" />
+			<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" pull="LEFT"/>
 		</bh:Div>
 		
 		
-		<bh:Div styleName="margin-top-15" />
+		<bh:Div styleName="margin-top-5" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
 		
 		<g:SimplePanel ui:field="downloadResultsPanel" />

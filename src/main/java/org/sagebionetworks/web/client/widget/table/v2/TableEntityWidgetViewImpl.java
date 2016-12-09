@@ -201,4 +201,14 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	public void showConfirmDialog(String title, String message, Callback yesCallback) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
 	}
+	
+	@Override
+	public void setAdvancedSearchLinkVisbile(boolean visible) {
+		showAdvancedSearch.setVisible(visible);
+	}
+	
+	@Override
+	public void setSimpleSearchLinkVisbile(boolean visible) {
+		showSimpleSearch.setVisible(visible);
+	}
 }
