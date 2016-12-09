@@ -2559,11 +2559,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
-			String fileHandleId = synapseClient.uploadToFileHandle(
-					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -2587,11 +2583,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
-			String fileHandleId = synapseClient.uploadToFileHandle(
-					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message, entityId);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
