@@ -231,7 +231,7 @@ public class TableEntityWidget implements IsWidget,
 		if (currentQuery == null || currentQuery.getSql() == null) {
 			return false;
 		}
-		return currentQuery.getSql().toUpperCase().contains("WHERE");
+		return currentQuery.getSql().toUpperCase().contains(" WHERE ");
 	}
 	
 	private void showSimpleSearchUI() {
