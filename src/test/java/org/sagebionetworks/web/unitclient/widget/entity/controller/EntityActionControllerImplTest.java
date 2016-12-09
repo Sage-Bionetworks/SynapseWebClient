@@ -12,17 +12,21 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.IS_ACT_MEMBER_MASK;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -35,9 +39,10 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.util.MockCreationValidator;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -48,9 +53,11 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -61,7 +68,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -75,6 +84,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -98,6 +108,8 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
 
 public class EntityActionControllerImplTest {
 
@@ -133,6 +145,7 @@ public class EntityActionControllerImplTest {
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 	V2WikiPage mockWikiPageToDelete;
+	List<AccessRequirement> accessReqs;
 	@Mock
 	EvaluationEditorModal mockEvalEditor;
 	@Mock
@@ -142,6 +155,18 @@ public class EntityActionControllerImplTest {
 	ChallengeClientAsync mockChallengeClient;
 	@Mock
 	SelectTeamModal mockSelectTeamModal;
+	@Mock
+	ApproveUserAccessModal mockApproveUserAccessModal;
+	@Mock
+	UserProfileClientAsync mockUserProfileClient;
+	@Captor
+	ArgumentCaptor<AsyncCallback<UserBundle>> userBundleCaptor;
+	@Mock
+	UserBundle mockUserBundle;
+	@Mock
+	Throwable mockThrowable;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -171,18 +196,34 @@ public class EntityActionControllerImplTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
+		when(mockPortalGinInjector.getAccessControlListModalWidget()).thenReturn(mockAccessControlListModalWidget);
+		when(mockPortalGinInjector.getRenameEntityModalWidget()).thenReturn(mockRenameEntityModalWidget);
+		when(mockPortalGinInjector.getEditFileMetadataModalWidget()).thenReturn(mockEditFileMetadataModalWidget);
+		when(mockPortalGinInjector.getEditProjectMetadataModalWidget()).thenReturn(mockEditProjectMetadataModalWidget);
+		when(mockPortalGinInjector.getEntityFinder()).thenReturn(mockEntityFinder);
+		when(mockPortalGinInjector.getUploadDialogWidget()).thenReturn(mockUploader);
+		when(mockPortalGinInjector.getWikiMarkdownEditor()).thenReturn(mockMarkdownEditorWidget);
+		when(mockPortalGinInjector.getProvenanceEditorWidget()).thenReturn(mockProvenanceEditorWidget);
+		when(mockPortalGinInjector.getStorageLocationWidget()).thenReturn(mockStorageLocationWidget);
+		when(mockPortalGinInjector.getEvaluationEditorModal()).thenReturn(mockEvalEditor);
+		when(mockPortalGinInjector.getSelectTeamModal()).thenReturn(mockSelectTeamModal);
+		when(mockPortalGinInjector.getApproveUserAccessModal()).thenReturn(mockApproveUserAccessModal);
+		when(mockPortalGinInjector.getChallengeClientAsync()).thenReturn(mockChallengeClient);
+		when(mockPortalGinInjector.getUserProfileClientAsync()).thenReturn(mockUserProfileClient);
+		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
+		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
+		
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
-				mockSynapseClient, mockGlobalApplicationState,
-				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
-				mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
-				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal);
+				mockPortalGinInjector,
+				mockAuthenticationController, 
+				mockCookies);
 		
 		parentId = "syn456";
 		entityId = "syn123";
+		accessReqs = new LinkedList<AccessRequirement>();
 		Entity table = new TableEntity();
 		table.setId(entityId);
 		table.setParentId(parentId);
@@ -199,6 +240,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setDoi(new Doi());
+		entityBundle.setAccessRequirements(accessReqs);
 		selected = new Reference();
 		selected.setTargetId("syn9876");
 		// Setup the mock entity selector to select an entity.
@@ -221,7 +263,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigure(){
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
-		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
+		
 		// delete
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -308,6 +350,7 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(file);
 		entityBundle.setPermissions(permissions);
+		entityBundle.setAccessRequirements(accessReqs);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
@@ -559,6 +602,66 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testConfigureApproveUserAccessOnFailure() {
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
+		userBundleCaptor.getValue().onFailure(mockThrowable);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+		verify(mockView).showErrorMessage(any(String.class));
+	}
+	
+	@Test
+	public void testConfigureApproveUserAccessNoAccessReq() {
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
+		userBundleCaptor.getValue().onSuccess(mockUserBundle);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+	}
+	
+	@Test
+	public void testConfigureApproveUserAccessACTUser() {
+		accessReqs.add(new ACTAccessRequirement());
+		entityBundle.setAccessRequirements(accessReqs);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
+		when(mockUserBundle.getIsACTMember()).thenReturn(true);
+		userBundleCaptor.getValue().onSuccess(mockUserBundle);
+		InOrder inOrder = inOrder(mockActionMenu);
+		inOrder.verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		inOrder.verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		inOrder.verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		inOrder.verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+	}
+	
+	@Test
+	public void testConfigureApproveUserAccessNonACTUser() {
+		accessReqs.add(new ACTAccessRequirement());
+		entityBundle.setAccessRequirements(accessReqs);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
+		when(mockUserBundle.getIsACTMember()).thenReturn(false);
+		userBundleCaptor.getValue().onSuccess(mockUserBundle);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+	}
+	
+	@Test
+	public void testOnSelectApproveUserAccess(){
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		controller.onAction(Action.APPROVE_USER_ACCESS);
+		verify(mockApproveUserAccessModal).configure(new LinkedList<ACTAccessRequirement>(), entityBundle);
+		verify(mockApproveUserAccessModal).show();
+	}
+	
+	@Test
 	public void testOnEditProvenance(){
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.EDIT_PROVENANCE);
@@ -753,6 +856,7 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(project);
 		entityBundle.setPermissions(permissions);
+		entityBundle.setAccessRequirements(accessReqs);
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();
@@ -799,6 +903,7 @@ public class EntityActionControllerImplTest {
 		// method under test
 		controller.onAction(Action.SHARE);
 		verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
+		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 	
@@ -809,6 +914,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// method under test
 		controller.onAction(Action.SHARE);
+		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
 		verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -865,12 +971,12 @@ public class EntityActionControllerImplTest {
 		Synapse currentPlace = new Synapse(currentUserId, null, null, currentUserId);
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(currentPlace);
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), any(FileHandle.class), any(Callback.class));
 		
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// method under test
 		controller.onAction(Action.EDIT_FILE_METADATA);
-		verify(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		verify(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), any(FileHandle.class), any(Callback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 	
@@ -883,11 +989,11 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(file);
 		// currentPlace returns a non-null versionNumber
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), any(FileHandle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, false, wikiPageId, mockEntityUpdatedHandler);
 		// method under test
 		controller.onAction(Action.EDIT_FILE_METADATA);
-		verify(mockEditFileMetadataModalWidget, never()).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		verify(mockEditFileMetadataModalWidget, never()).configure(any(FileEntity.class), any(FileHandle.class), any(Callback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 		verify(mockView).showErrorMessage("Can only edit the metadata of the most recent file version.");
 	}
@@ -1355,6 +1461,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		String error = "an error";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
+		controller.onAction(Action.CREATE_CHALLENGE);
 		//now simulate that a challenge team was selected
 		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
@@ -1405,6 +1512,44 @@ public class EntityActionControllerImplTest {
 		verify(mockView).showErrorMessage(error);
 	}
 	
+	@Test
+	public void testFolderDeletionPrompt() {
+		/*
+		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
+		 *  in this case we do not want to confirm.
+		 */
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		Folder f = new Folder();
+		f.setName("Test");
+		entityBundle.setEntity(f);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"Folder Test?" + DELETE_FOLDER_EXPLANATION;
+		// the call under tests
+		controller.onAction(Action.DELETE_ENTITY);
+		verify(mockView).showConfirmDialog(anyString(), eq(display), any(Callback.class));
+		// should not make it to the pre-flight check
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+	}
 	
+	@Test
+	public void testNotFolderDeletionPrompt() {
+		/*
+		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
+		 *  in this case we do not want to confirm.
+		 */
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		Project p = new Project();
+		p.setName("Test");
+		entityBundle.setEntity(p);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"Project Test?";
+		String folderDisplay = display + DELETE_FOLDER_EXPLANATION;
+		// the call under tests
+		controller.onAction(Action.DELETE_ENTITY);
+		verify(mockView).showConfirmDialog(anyString(), eq(display), any(Callback.class));
+		verify(mockView, times(0)).showConfirmDialog(anyString(), eq(folderDisplay), any(Callback.class));
+		// should not make it to the pre-flight check
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+	}
 	
 }

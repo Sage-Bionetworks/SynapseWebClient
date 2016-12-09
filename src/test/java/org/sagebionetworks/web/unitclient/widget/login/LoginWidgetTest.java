@@ -72,11 +72,6 @@ public class LoginWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).clearUsername();
 	}
-
-	@Test
-	public void testOpenIdReturnUrl() {
-		Assert.assertEquals("/Portal.html?foo=bar#!LoginPlace", loginWidget.getOpenIdReturnUrl());
-	}
 	
 	@Test
 	public void testSetUsernameAndPasswordErrorHandling() {

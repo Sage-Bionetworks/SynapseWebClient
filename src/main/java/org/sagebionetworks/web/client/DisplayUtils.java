@@ -29,8 +29,8 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -73,6 +73,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
@@ -412,7 +413,7 @@ public class DisplayUtils {
 				}
 			});
 		} else {
-			Bootbox.alert(popupHtml.asString(), new AlertCallback() {
+			Bootbox.alert(popupHtml.asString(), new SimpleCallback() {
 				@Override
 				public void callback() {
 					if (primaryButtonCallback != null)
@@ -1232,7 +1233,7 @@ public class DisplayUtils {
 	 * return true if the widget is in the visible part of the page
 	 */
 	public static boolean isInViewport(Widget widget) {
-		return isInViewport(widget, 100);
+		return isInViewport(widget, 300);
 	}
 	
 	/**

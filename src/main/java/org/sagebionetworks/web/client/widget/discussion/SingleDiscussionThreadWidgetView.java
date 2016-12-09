@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -10,8 +10,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	public interface Presenter {
 
 		Widget asWidget();
-
-		void onClickNewReply();
 
 		void loadMore();
 
@@ -42,11 +40,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 
 	void setDeleteIconVisible(boolean visible);
 
-	void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, AlertCallback deleteCallback);
+	void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, SimpleCallback deleteCallback);
 	
 	void setShowAllRepliesButtonVisible(boolean visible);
-	
-	void setReplyTextBoxVisible(boolean visible);
 
 	void setCommandsVisible(boolean visible);
 
@@ -72,19 +68,17 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setUnpinIconVisible(boolean visible);
 	void setIsAuthorModerator(boolean isModerator);
 
-	void resetButton();
-
-	void setNewReplyContainerVisible(boolean visible);
-
-	void setMarkdownEditorWidget(Widget widget);
-
-	void showSaving();
-
-	void setReplyContainerVisible(boolean visible);
+	void setReplyContainersVisible(boolean visible);
 
 	void setDeletedThreadVisible(boolean visible);
 
 	void setReplyListContainerVisible(boolean visible);
 
 	void setRestoreIconVisible(boolean visible);
+
+	void setNewReplyContainer(Widget widget);
+
+	void setSecondNewReplyContainer(Widget widget);
+
+	void setSecondNewReplyContainerVisible(boolean visible);
 }

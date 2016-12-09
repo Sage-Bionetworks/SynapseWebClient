@@ -10,8 +10,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -127,10 +129,10 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	public void selectSuggestion(SynapseSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
 		synAlert.clear();
-		presenter.setSelectedSuggestion(suggestion);
 		selectedItem.setText(suggestion.getReplacementString());
 		selectedItem.setVisible(true);
 		suggestBox.setVisible(false);
+		presenter.setSelectedSuggestion(suggestion);
 	}
 	
 	@Override
@@ -193,4 +195,25 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	public void setSelectedText(String displayString) {
 		selectedItemText.setText(displayString);
 	}
+	
+	@Override
+	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+		return suggestBox.getValueBox().addKeyDownHandler(handler);
+	}
+
+	@Override
+	public int getTabIndex() {
+		return suggestBox.getValueBox().getTabIndex();
+	}
+
+	@Override
+	public void setAccessKey(char key) {
+		suggestBox.getValueBox().setAccessKey(key);
+	}
+
+	@Override
+	public void setTabIndex(int index) {
+		suggestBox.getValueBox().setTabIndex(index);
+	}
+	
 }

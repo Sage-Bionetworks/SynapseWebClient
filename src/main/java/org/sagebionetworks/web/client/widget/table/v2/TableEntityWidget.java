@@ -188,7 +188,7 @@ public class TableEntityWidget implements IsWidget,
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		if(!isFromResults){
-			this.queryResultsWidget.configure(query, this.canEditResults, this);
+			this.queryResultsWidget.configure(query, this.canEditResults, this.isView, this);
 		}
 	}
 
@@ -301,7 +301,7 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onDownloadResults() {
-		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId);
+		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId, currentQuery.getSelectedFacets());
 		downloadTableQueryModalWidget.showModal();
 	}
 	

@@ -211,6 +211,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_EPOCH_DATE = "epochdate";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
+	public static final String API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL = "cancelcontrol";
 	
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
 	public static final String MARKDOWN_TABLE_ID_PREFIX = "markdown-table-";

@@ -17,7 +17,8 @@ public class MarkdownItImpl implements MarkdownIt {
 			$wnd.markdownitSynapseTable,
 			$wnd.markdownitStrikethroughAlt,
 			$wnd.markdownitContainer,
-			$wnd.markdownitEmphasisAlt
+			$wnd.markdownitEmphasisAlt,
+			$wnd.markdownitInlineComments
 			);
 		
 	     $wnd.md.set({

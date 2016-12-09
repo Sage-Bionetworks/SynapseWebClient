@@ -78,6 +78,7 @@ public class BasicTitleBarTest {
 		verify(mockView).setTitle(testEntityName);
 		verify(mockView).setIconType(IconType.FOLDER);
 		verify(mockContainerClientsHelp).configure(entityId);
+		verify(mockView).setContainerHelpWidgetVisible(true);
 	}
 	
 	@Test
@@ -90,6 +91,7 @@ public class BasicTitleBarTest {
 		verify(mockView).setFavoritesWidgetVisible(false);
 		verify(mockView).setIconType(IconType.TABLE);
 		verify(mockContainerClientsHelp).configure(entityId);
+		verify(mockView).setContainerHelpWidgetVisible(false);
 	}
 
 

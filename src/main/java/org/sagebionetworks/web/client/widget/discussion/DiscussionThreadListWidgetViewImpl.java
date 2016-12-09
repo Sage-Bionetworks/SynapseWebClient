@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -105,5 +106,10 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Override
 	public void setNoThreadsFoundVisible(boolean visible) {
 		noThreadsFound.setVisible(visible);
+	}
+	
+	@Override
+	public void scrollIntoView(Widget w) {
+		Window.scrollTo(0, w.getElement().getOffsetTop());
 	}
 }

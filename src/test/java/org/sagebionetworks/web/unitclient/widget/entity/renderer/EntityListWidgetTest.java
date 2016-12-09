@@ -112,10 +112,12 @@ public class EntityListWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureNoRows() {		
+	public void testConfigureNoRows() {					
+		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY, Boolean.FALSE.toString());
 		widget.configure(null, descriptor, null, null);
 		verify(mockView).setTableVisible(false);	
 		verify(mockView).setEmptyUiVisible(true);
+		verify(mockView).setDescriptionHeaderVisible(false);
 		
 		reset(mockView);
 		widget.addRecord(new EntityGroupRecord());

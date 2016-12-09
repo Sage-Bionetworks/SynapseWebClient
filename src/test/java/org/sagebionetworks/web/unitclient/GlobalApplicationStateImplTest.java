@@ -15,9 +15,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Before;
@@ -132,18 +134,22 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testUnwrap(){
 		Throwable actualException = new Exception("I am dead, Horatio");
-		Set<Throwable> causes = new HashSet<Throwable>();
+		Set<Throwable> causes = new LinkedHashSet<Throwable>();
 		causes.add(actualException);
 		UmbrellaException umbrellaException = new UmbrellaException(causes);
+		Set<Throwable> umbrellaUmbrellaCauses = new HashSet<Throwable>();
+		umbrellaUmbrellaCauses.add(umbrellaException);
+		UmbrellaException umbrellaUmbrellaException = new UmbrellaException(umbrellaUmbrellaCauses);
 		
-		//single exception being wrapped, unwrap it!
-		assertEquals(actualException, globalApplicationState.unwrap(umbrellaException));
+		//single exception being wrapped twice with umbrella exceptions, unwrap it!
+		assertEquals(actualException, globalApplicationState.unwrap(umbrellaUmbrellaException));
 		//pass through for non-umbrella exceptions
 		assertEquals(actualException, globalApplicationState.unwrap(actualException));
 		
-		//more than one cause, just log the umbrella exception
-		causes.add(new Exception("more than one"));
-		assertEquals(umbrellaException, globalApplicationState.unwrap(umbrellaException));
+		//more than one cause, log one of the exceptions
+		Throwable secondException = new Exception("Thou livest.");
+		causes.add(secondException);
+		assertEquals(actualException, globalApplicationState.unwrap(umbrellaException));
 	}
 	
 	@Test

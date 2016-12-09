@@ -9,8 +9,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -97,6 +100,8 @@ public class FilesTabTest {
 	@Mock
 	EntityBundlePlus mockEntityBundlePlus;
 	@Mock
+	List<FileHandle> mockFileHandles;
+	@Mock
 	FileEntity mockFileEntity;
 	@Mock
 	Folder mockFolderEntity;
@@ -151,11 +156,22 @@ public class FilesTabTest {
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
-		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
-				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
-				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync,
-				mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy,
-				mockDiscussionThreadListWidget);
+		tab = new FilesTab(mockTab, mockPortalGinInjector);
+		
+		when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
+		when(mockPortalGinInjector.getFileTitleBar()).thenReturn(mockFileTitleBar);
+		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
+		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
+		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
+		when(mockPortalGinInjector.getFilesBrowser()).thenReturn(mockFilesBrowser);
+		when(mockPortalGinInjector.getPreviewWidget()).thenReturn(mockPreviewWidget);
+		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
+		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
+		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
+		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
+		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
+		
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -181,6 +197,8 @@ public class FilesTabTest {
 
 		when(mockBundle.getProjectId()).thenReturn(projectEntityId);
 		when(mockBundle.getId()).thenReturn(threadId);
+		
+		tab.lazyInject();
 	}
 
 	@Test
@@ -257,13 +275,23 @@ public class FilesTabTest {
 	}
 	
 	@Test
-	public void testConfigureWithFile() {
+	public void testConfigureWithFileNoFileHandles() {
+		Long version = 4L;
+		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
+		
+		verify(mockView, times(2)).setPreviewVisible(false);
+		verify(mockView, never()).setPreviewVisible(true);
+	}
+	
+	@Test
+	public void testConfigureWithFileWithFileHandles() {
 		Long version = 4L;
 		
 		boolean canCertifiedUserAddChild = false;
 		boolean isCertifiedUser = true;
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		when(mockEntityBundle.getFileHandles()).thenReturn(mockFileHandles);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);

@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -178,7 +178,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickDeleteReply() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new AlertCallback(){
+		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new SimpleCallback(){
 
 			@Override
 			public void callback() {

@@ -16,10 +16,11 @@ public interface EditFileMetadataModalView extends IsWidget {
 		public void onPrimary();
 	}
 
-	public void configure(String entityName, String fileName);
+	public void configure(String entityName, String fileName, String contentType);
 	
 	public String getEntityName();
 	public String getFileName();
+	public String getContentType();
 	
 	/**
 	 * Show an error message..

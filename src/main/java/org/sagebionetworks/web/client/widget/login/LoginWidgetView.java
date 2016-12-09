@@ -19,10 +19,6 @@ public interface LoginWidgetView extends IsWidget {
 		
 		public void setUsernameAndPassword(String username, String password);
 		
-		public String getOpenIdActionUrl();
-		
-		public String getOpenIdReturnUrl();
-
 		public void goTo(Place place);
 	}
 

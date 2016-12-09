@@ -94,6 +94,8 @@ public class ShinySiteWidgetTest {
 		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
 		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("anything.synapse.org");
 		assertTrue(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
+		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("anything.sagebase.org");
+		assertTrue(ShinySiteWidget.isValidShinySite(invalidSiteUrl, mockSynapseJSNIUtils));
 	}
 	
 	@Test

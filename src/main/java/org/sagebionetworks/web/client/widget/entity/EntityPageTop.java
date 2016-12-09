@@ -324,6 +324,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
 				wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 			}
+			
 			final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
@@ -331,14 +332,24 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				@Override
 				public void noWikiFound() {
-					//if wiki area not specified and no wiki found, show Files tab instead for projects 
-					// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
-					if(isWikiTabShown) {
-						configureFilesTab();
-						tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+					if (isWikiTabShown) {
+						if (projectBundle.getRootWikiId() == null) {
+							// no wiki to load!  configure and show the files tab.
+							// clear out wiki page id token.
+							wikiTab.setEntityNameAndPlace(projectHeader.getId(), projectHeader.getName(), null);
+							configureFilesTab();
+							tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+						} else {
+							// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
+							view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
+							wikiTab.asTab().setContentStale(true);
+							wikiAreaToken = projectBundle.getRootWikiId();
+							configureWikiTab();	
+						}
 					}
 				}
 			};
+			
 			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
 					canEdit, callback);
 			

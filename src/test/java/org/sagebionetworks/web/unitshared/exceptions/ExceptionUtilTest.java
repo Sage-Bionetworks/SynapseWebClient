@@ -12,6 +12,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
+import org.sagebionetworks.client.exceptions.SynapseConflictingUpdateException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -20,6 +21,7 @@ import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
+import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -43,6 +45,7 @@ public class ExceptionUtilTest {
             		{ UnknownErrorException.class, new SynapseServerException(500, message) },
             		{ TooManyRequestsException.class, new SynapseTooManyRequestsException(message) },
             		{ ConflictException.class, new SynapseServerException(409, "Service Error(409):  FAILURE: Got HTTP status 409 for") },
+            		{ ConflictingUpdateException.class, new SynapseConflictingUpdateException(message) },
             		});
     }
 	

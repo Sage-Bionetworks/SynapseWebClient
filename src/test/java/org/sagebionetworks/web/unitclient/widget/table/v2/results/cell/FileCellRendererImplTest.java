@@ -16,19 +16,25 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
+import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.shared.table.CellAddress;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class FileCellRendererImplTest {
 
 	FileCellRendererView mockView;
-	AsynchTableFileHandleProvider mockFileHandleProvider;
+	@Mock
+	FileHandleAsyncHandler mockFileHandleAsyncHandler;
 	FileCellRendererImpl renderer;
 	String tableId;
 	ColumnModel column;
@@ -43,39 +49,46 @@ public class FileCellRendererImplTest {
 	@Mock
 	AuthenticationController mockAuthController;
 	String xsrfToken = "98208";
+	boolean isView;
+	@Mock
+	FileResult mockFileResult;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(FileCellRendererView.class);
-		mockFileHandleProvider = Mockito.mock(AsynchTableFileHandleProvider.class);
-		renderer = new FileCellRendererImpl(mockView, mockFileHandleProvider, mockAuthController);
+		renderer = new FileCellRendererImpl(mockView, mockAuthController, mockFileHandleAsyncHandler);
 		tableId = "syn123";
 		column = new ColumnModel();
 		column.setId("456");
 		rowId = 15L;
 		rowVersion = 2L;
-		address = new CellAddress(tableId, column, rowId, rowVersion);
+		isView = false;
+		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
 		renderer.setCellAddresss(address);
 		fileHandleId = "999";
 		fileHandle = new S3FileHandle();
 		fileHandle.setId(fileHandleId);
 		fileHandle.setFileName("filename.jpg");
 		
-		Mockito.doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation)
-					throws Throwable {
-				TableFileHandleRequest request =  (TableFileHandleRequest) invocation.getArguments()[0];
-				request.getCallback().onSuccess(fileHandle);
-				return null;
-			}
-		}).when(mockFileHandleProvider).requestFileHandle(any(TableFileHandleRequest.class));
+		when(mockFileResult.getFileHandle()).thenReturn(fileHandle);
+		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
 	public void testCreateAnchorHref(){
-		String expectedHref = "/Portal/filehandle?entityId=syn123&columnId=456&rowId=15&rowVersionNumber=2&xsrfToken=98208";
+		renderer.setValue(fileHandleId);
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
+		assertEquals(expectedHref, renderer.createAnchorHref());
+	}
+	
+	@Test
+	public void testCreateAnchorHrefView(){
+		isView = true;
+		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
+		renderer.setCellAddresss(address);
+		renderer.setValue(fileHandleId);
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	
@@ -105,16 +118,10 @@ public class FileCellRendererImplTest {
 	@Test
 	public void testSetValueFailureAttached(){
 		// setup an error.
-		final Throwable error = new Throwable("an error");
-		Mockito.doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation)
-					throws Throwable {
-				TableFileHandleRequest request =  (TableFileHandleRequest) invocation.getArguments()[0];
-				request.getCallback().onFailure(error);
-				return null;
-			}
-		}).when(mockFileHandleProvider).requestFileHandle(any(TableFileHandleRequest.class));
+		String errorMessage = "an error";
+		final Throwable error = new Throwable(errorMessage);
+		
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		//attached.
 		when(mockView.isAttached()).thenReturn(true);
 		renderer.setValue(fileHandleId);
@@ -122,22 +129,14 @@ public class FileCellRendererImplTest {
 		verify(mockView).setLoadingVisible(true);
 		// hide loading
 		verify(mockView).setLoadingVisible(false);
-		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA);
+		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA + ": " + errorMessage);
 	}
 	
 	@Test
 	public void testSetValueFailureNotAttached(){
 		// setup an error.
 		final Throwable error = new Throwable("an error");
-		Mockito.doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation)
-					throws Throwable {
-				TableFileHandleRequest request =  (TableFileHandleRequest) invocation.getArguments()[0];
-				request.getCallback().onFailure(error);
-				return null;
-			}
-		}).when(mockFileHandleProvider).requestFileHandle(any(TableFileHandleRequest.class));
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		//not attached.
 		when(mockView.isAttached()).thenReturn(false);
 		renderer.setValue(fileHandleId);

@@ -44,11 +44,12 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	private Presenter presenter;
 	Widget widget;
 	Callback onAttachCallback;
+	ClickHandler badgeClicked;
 	
 	@Inject
 	public UserBadgeViewImpl(Binder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
-		ClickHandler badgeClicked = new ClickHandler() {
+		badgeClicked = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.badgeClicked(event);
@@ -80,7 +81,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(widget);
+		return DisplayUtils.isInViewport(widget, 600);
 	}
 	
 	@Override
@@ -186,7 +187,20 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void clearHref() {
 		usernameLink.setHref(HasHref.EMPTY_HREF);
+		usernameLink.addClickHandler(badgeClicked);
 	}
+	
+	@Override
+	public void openNewWindow(String url) {
+		DisplayUtils.newWindow(url, "_blank", "");
+		
+	}
+	
+	@Override
+	public void setOpenNewWindow(String target) {
+		usernameLink.setTarget(target);
+	}
+	
 	/*
 	 * Private Methods
 	 */

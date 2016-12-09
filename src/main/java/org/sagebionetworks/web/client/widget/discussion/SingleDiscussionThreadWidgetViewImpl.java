@@ -7,11 +7,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.IconStack;
 import org.gwtbootstrap3.client.ui.Label;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -68,19 +68,11 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Div commandsContainer;
 	@UiField
-	TextBox replyTextBox;
+	Button showAllRepliesButton;
 	@UiField
 	Div newReplyContainer;
 	@UiField
-	Div markdownEditorContainer;
-	@UiField
-	Button cancelButton;
-	@UiField
-	Button saveButton;
-	@UiField
-	Button showAllRepliesButton;
-	@UiField
-	Div replyContainer;
+	Div secondNewReplyContainer;
 	@UiField
 	Div deletedThread;
 	
@@ -91,13 +83,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Inject
 	public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		replyTextBox.addClickHandler(new ClickHandler(){
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickNewReply();
-			}
-		});
 		deleteIcon.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
@@ -123,18 +108,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickUnpinThread();
-			}
-		});
-		cancelButton.addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickCancel();
-			}
-		});
-		saveButton.addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickSave();
 			}
 		});
 		showAllRepliesButton.addClickHandler(new ClickHandler() {
@@ -214,14 +187,14 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final AlertCallback deleteCallback) {
-		Bootbox.Dialog.create()
-				.setMessage(deleteConfirmMessage)
-				.setCloseButton(false)
-				.setTitle(dialogTitle)
-				.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE)
-				.addButton(buttonName, buttonStyle, deleteCallback)
-				.show();
+	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final SimpleCallback deleteCallback) {
+		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
+		options.setCloseButton(false);
+		options.setTitle(dialogTitle);
+		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
+		options.addButton(buttonName, buttonStyle, deleteCallback);
+		
+		Bootbox.dialog(options);
 	}
 
 	@Override
@@ -290,33 +263,14 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void setReplyTextBoxVisible(boolean visible) {
-		replyTextBox.setVisible(visible);
-	}
-
-	@Override
-	public void resetButton() {
-		saveButton.state().reset();
-	}
-
-	@Override
-	public void setNewReplyContainerVisible(boolean visible) {
+	public void setReplyContainersVisible(boolean visible) {
 		newReplyContainer.setVisible(visible);
+		secondNewReplyContainer.setVisible(visible);
 	}
 
 	@Override
-	public void setMarkdownEditorWidget(Widget widget) {
-		markdownEditorContainer.add(widget);
-	}
-
-	@Override
-	public void showSaving() {
-		saveButton.state().loading();
-	}
-
-	@Override
-	public void setReplyContainerVisible(boolean visible) {
-		replyContainer.setVisible(visible);
+	public void setSecondNewReplyContainerVisible(boolean visible) {
+		secondNewReplyContainer.setVisible(visible);
 	}
 
 	@Override
@@ -332,5 +286,17 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setRestoreIconVisible(boolean visible) {
 		restoreIcon.setVisible(visible);
+	}
+
+	@Override
+	public void setNewReplyContainer(Widget widget) {
+		newReplyContainer.clear();
+		newReplyContainer.add(widget);
+	}
+
+	@Override
+	public void setSecondNewReplyContainer(Widget widget) {
+		secondNewReplyContainer.clear();
+		secondNewReplyContainer.add(widget);
 	}
 }

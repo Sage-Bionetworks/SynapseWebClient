@@ -10,7 +10,7 @@
 					<b:FormLabel addStyleNames="margin-right-10">Select Team</b:FormLabel>
 					<g:ListBox ui:field="teamComboBox" styleName="form-control" />
 				</bh:Div>					
-				<b:Anchor ui:field="createNewTeamLink" text="Create a new team" />
+				<b:Anchor ui:field="createNewTeamLink" text="Create a new team" target="_blank"/>
 				<bh:Paragraph emphasis="WARNING" ui:field="noTeamsFoundUI" visible="false">No teams found</bh:Paragraph>	
 			</b:FormGroup>
 			<b:FormGroup>

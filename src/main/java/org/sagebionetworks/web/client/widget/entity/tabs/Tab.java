@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.TabPane;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.core.client.GWT;
@@ -22,21 +24,38 @@ public class Tab implements TabView.Presenter {
 	String entityName;
 	List<CallbackP<Tab>> onClickCallbacks;
 	boolean isContentStale;
+	GWTWrapper gwt;
+	Callback deferredShowTabCallback;
+	boolean pushState;
 	@Inject
-	public Tab(TabView view, GlobalApplicationState globalAppState, SynapseJSNIUtils synapseJSNIUtils) {
+	public Tab(TabView view, GlobalApplicationState globalAppState, SynapseJSNIUtils synapseJSNIUtils, GWTWrapper gwt) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.gwt = gwt;
 		view.setPresenter(this);
+		deferredShowTabCallback = new Callback() {
+			@Override
+			public void invoke() {
+				showTab(pushState);
+			}
+		};
 	}
 	
-	public void configure(String tabTitle, Widget content, String helpMarkdown, String helpLink) {
-		view.configure(tabTitle, content, helpMarkdown, helpLink);
+	public void configure(String tabTitle, String helpMarkdown, String helpLink) {
+		view.configure(tabTitle, helpMarkdown, helpLink);
 		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
+	}
+	public void setContent(Widget widget) {
+		view.setContent(widget);
 	}
 	
 	public Widget getTabListItem() {
 		return view.getTabListItem();
+	}
+	
+	public void addTabListItemStyle(String style) {
+		view.addTabListItemStyle(style);
 	}
 	
 	public void setTabListItemVisible(boolean visible) {
@@ -58,6 +77,12 @@ public class Tab implements TabView.Presenter {
 	}
 	
 	public void showTab(boolean pushState) {
+		this.pushState = pushState;
+		if (place == null) {
+			//try again later
+			gwt.scheduleExecution(deferredShowTabCallback, 200);
+			return;
+		}
 		if (pushState) {
 			globalAppState.pushCurrentPlace(place);	
 		} else {

@@ -196,7 +196,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		becomeCertifiedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_qualified_researchers.html", "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_profile_validation.html", "", "");
 			}
 		});
 		

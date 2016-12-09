@@ -21,6 +21,9 @@
 		</t:TableData>
 		<t:TableData>
 			<b:FormControlStatic ui:field="restrictValues"/>
-		</t:TableData>		
+		</t:TableData>
+		<t:TableData>
+			<b:FormControlStatic ui:field="facetType"/>
+		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

@@ -20,4 +20,5 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	
 	void setNoThreadsFoundVisible(boolean visible);
 	void setThreadsContainer(IsWidget container);
+	void scrollIntoView(Widget w);
 }

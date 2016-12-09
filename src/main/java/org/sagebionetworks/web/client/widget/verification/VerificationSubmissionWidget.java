@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -49,6 +50,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
+	private AuthenticationController authController;
 	CallbackP<String> fileHandleClickedCallback;
 	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
@@ -68,7 +70,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			SynapseJSNIUtils jsniUtils,
 			PromptModalView promptModalView,
 			GlobalApplicationState globalAppState,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			AuthenticationController authController
 			) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
@@ -80,6 +83,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.promptModal = promptModalView;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
+		this.authController = authController;
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -158,7 +162,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	public void getVerificationSubmissionHandleUrlAndOpen(String fileHandleId) {
-		String url = jsniUtils.getFileHandleAssociationUrl(submission.getId(), FileHandleAssociateType.VerificationSubmission, fileHandleId);
+		String xsrfToken = authController.getCurrentXsrfToken();
+		String url = jsniUtils.getFileHandleAssociationUrl(submission.getId(), FileHandleAssociateType.VerificationSubmission, fileHandleId, xsrfToken);
 		view.openWindow(url);
 	}
 	

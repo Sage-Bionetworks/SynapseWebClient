@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.docker;
 import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,16 +30,16 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 
 	private Widget widget;
 	private Presenter presenter;
-
 	public interface Binder extends UiBinder<Widget, DockerCommitRowWidgetViewImpl> {}
 
 	@Inject
-	public DockerCommitRowWidgetViewImpl(Binder binder) {
+	public DockerCommitRowWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils) {
 		this.widget = binder.createAndBindUi(this);
 		digest.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				digest.selectAll();
+				jsniUtils.copyToClipboard();
 			}
 		});
 		row.addClickHandler(new ClickHandler(){

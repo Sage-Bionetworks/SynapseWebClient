@@ -660,7 +660,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	public void uploadError(String message, Throwable t) {
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, message);
-		logger.errorToRepositoryServices(message, GlobalApplicationStateImpl.unwrap(t));
 		fireCancelEvent();
 	}
 	
@@ -711,6 +710,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void uploadFailed(String string) {
 		this.uploadError(string, new Exception(string));
+		logger.errorToRepositoryServices(string, new Exception(string));
 	}
 	
 	/**

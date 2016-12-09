@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
@@ -25,6 +24,8 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	FormControlStatic name;
 	@UiField
 	FormControlStatic type;
+	@UiField
+	FormControlStatic facetType;
 	@UiField
 	FormControlStatic maxSize;
 	@UiField
@@ -109,5 +110,13 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 		return ColumnModelUtils.csvToList(restrictValues.getText());
 	}
 
+	@Override
+	public ColumnFacetTypeViewEnum getFacetType() {
+		return ColumnFacetTypeViewEnum.getEnumForFriendlyName(facetType.getText());
+	}
+	@Override
+	public void setFacetType(ColumnFacetTypeViewEnum type) {
+		this.facetType.setText(type.toString());
+	}
 
 }

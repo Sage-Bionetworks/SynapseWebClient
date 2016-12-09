@@ -88,7 +88,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(memberListWidget.asWidget());
 		view.setMap(map.asWidget());
-		view.setShowMapVisible(true);
+		view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
 		Callback refreshCallback = new Callback() {
 			@Override
 			public void invoke() {

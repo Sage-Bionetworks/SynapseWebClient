@@ -112,7 +112,7 @@ public class SelectionToolbar implements IsWidget {
 		moveDownButton.setVisible(false);
 	}
 	
-	public void addStyleName(String style) {
+	public void setAddStyleNames(String style) {
 		widget.addStyleName(style);
 	}
 }

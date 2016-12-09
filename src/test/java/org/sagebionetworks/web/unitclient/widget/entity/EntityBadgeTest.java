@@ -83,6 +83,7 @@ public class EntityBadgeTest {
 	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
 	EntityBadgeView mockView;
 	String entityId = "syn123";
+	Long entityThreadCount;
 	EntityBadge widget;
 	AnnotationTransformer mockTransformer;
 	String rootWikiKeyId;
@@ -94,8 +95,6 @@ public class EntityBadgeTest {
 	AccessControlList mockBenefactorAcl;
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
-	@Mock
-	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	
@@ -118,7 +117,7 @@ public class EntityBadgeTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
 				mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
-				mockFileDownloadButton, mockDiscussionForumClient, mockLazyLoadHelper);
+				mockFileDownloadButton, mockLazyLoadHelper);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
@@ -128,6 +127,7 @@ public class EntityBadgeTest {
 		when(mockTransformer.getFriendlyValues(any(Annotation.class))).thenReturn(TRANSFORMED_FRIENDLY_VALUE);
 		rootWikiKeyId = "123";
 		when(mockView.isAttached()).thenReturn(true);
+		entityThreadCount = 0L;
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -137,6 +137,7 @@ public class EntityBadgeTest {
 		when(bundle.getPermissions()).thenReturn(mockPermissions);
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
 		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
+		when(bundle.getThreadCount()).thenReturn(entityThreadCount);
 		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		return bundle;
 	}
@@ -156,36 +157,6 @@ public class EntityBadgeTest {
 		//in this case, "modified by" and "modified on" are not set.
 		verify(mockView).setModifiedByWidgetVisible(false);
 		verify(mockView).setModifiedOn("");
-		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockDiscussionForumClient).getEntityThreadCount(eq(Arrays.asList(entityId)), captor.capture());
-		AsyncCallback callback = captor.getValue();
-
-		EntityThreadCounts entityThreadCounts = new EntityThreadCounts();
-		entityThreadCounts.setList(new ArrayList<EntityThreadCount>());
-
-		// case empty list
-		callback.onSuccess(entityThreadCounts);
-		verify(mockView).setDiscussionThreadIconVisible(false);
-
-		EntityThreadCount entityThreadCount = new EntityThreadCount();
-		entityThreadCounts.setList(Arrays.asList(entityThreadCount));
-		entityThreadCount.setCount(0L);
-
-		// case zero thread
-		callback.onSuccess(entityThreadCounts);
-		verify(mockView, times(2)).setDiscussionThreadIconVisible(false);
-
-		// case more than one item in the list
-		entityThreadCounts.setList(Arrays.asList(entityThreadCount, entityThreadCount));
-		callback.onSuccess(entityThreadCounts);
-		verify(mockView).showErrorIcon();
-		verify(mockView).setError(anyString());
-
-		String message = "message";
-		Throwable exception = new Throwable(message);
-		callback.onFailure(exception);
-		verify(mockView, times(2)).showErrorIcon();
-		verify(mockView).setError(message);
 	}
 	
 	@Test
@@ -219,6 +190,7 @@ public class EntityBadgeTest {
 		testProject.setModifiedBy("4444");
 		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
 		testProject.setId(entityId);
+		entityThreadCount = 0L;
 		setupEntity(testProject);
 		
 		//configure
@@ -234,6 +206,7 @@ public class EntityBadgeTest {
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
+		verify(mockView).setDiscussionThreadIconVisible(false);
 		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
 		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
 	}
@@ -245,6 +218,7 @@ public class EntityBadgeTest {
 		FileEntity testFile = new FileEntity();
 		testFile.setModifiedBy("4444");
 		testFile.setId(entityId);
+		entityThreadCount = 1L;
 		setupEntity(testFile);
 		configure();
 		widget.getEntityBundle();
@@ -255,6 +229,7 @@ public class EntityBadgeTest {
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
+		verify(mockView).setDiscussionThreadIconVisible(true);
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}

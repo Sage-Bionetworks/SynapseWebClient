@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
@@ -30,7 +31,9 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	public void showError(Widget synAlert);
 	
 	void showTableUnavailable();
-	
+	List<ElementWrapper> findCancelRequestDivs();
+	List<ElementWrapper> findUserBadgeDivs();
+	void addWidget(Widget widget, String divID);
 	/**
 	 * Presenter interface
 	 */

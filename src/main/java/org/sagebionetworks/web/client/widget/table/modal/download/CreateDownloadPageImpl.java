@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -22,6 +25,7 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 
 	// Configured values
 	String sql;
+	List<FacetColumnRequest> selectedFacets;
 	ModalPresenter presenter;
 	String tableId;
 	
@@ -88,9 +92,10 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 	}
 
 	@Override
-	public void configure(String sql, String tableId) {
+	public void configure(String sql, String tableId, List<FacetColumnRequest> selectedFacets) {
 		this.sql = sql;
 		this.tableId = tableId;
+		this.selectedFacets = selectedFacets;
 	}
 	
 	/**
@@ -105,6 +110,7 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 		request.setWriteHeader(view.getIncludeHeaders());
 		request.setIncludeRowIdAndRowVersion(view.getIncludeRowMetadata());
 		request.setSql(this.sql);
+		request.setSelectedFacets(selectedFacets);
 		return request;
 	}
 

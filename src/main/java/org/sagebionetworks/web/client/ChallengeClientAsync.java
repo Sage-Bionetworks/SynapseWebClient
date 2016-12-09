@@ -66,4 +66,5 @@ public interface ChallengeClientAsync {
 	void deleteChallenge(String challengeId, AsyncCallback<Void> callback);
 	void updateChallenge(Challenge challenge, AsyncCallback<Challenge> callback);
 	void createChallenge(Challenge challenge, AsyncCallback<Challenge> callback);
+	void requestToCancelSubmission(String submissionId, AsyncCallback<Void> callback);
 }

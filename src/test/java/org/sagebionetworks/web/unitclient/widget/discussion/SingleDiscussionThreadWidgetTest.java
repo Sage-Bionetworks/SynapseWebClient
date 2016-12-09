@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -11,7 +13,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.LIMIT;
 
@@ -20,13 +21,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -44,11 +44,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
+import org.sagebionetworks.web.client.widget.discussion.NewReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
@@ -77,8 +77,6 @@ public class SingleDiscussionThreadWidgetTest {
 	ReplyWidget mockReplyWidget;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
-	@Mock
-	MarkdownEditorWidget mockMarkdownEditorWidget;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -114,9 +112,11 @@ public class SingleDiscussionThreadWidgetTest {
 	@Mock
 	CallbackP<String> mockReplyIdCallback;
 	@Mock
-	DiscussionReplyBundle mockDiscussionReplyBundle;
-	@Mock
 	LoadMoreWidgetContainer mockRepliesContainer;
+	@Mock
+	NewReplyWidget mockNewReplyWidget;
+	@Mock
+	private DiscussionReplyBundle mockDiscussionReplyBundle;
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -131,12 +131,12 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
-		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockMarkdownEditorWidget,
-				mockSynAlert, mockAuthorWidget, mockDiscussionForumClientAsync,
-				mockGinInjector, mockJsniUtils, mockRequestBuilder, mockAuthController,
+		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockSynAlert,
+				mockAuthorWidget, mockDiscussionForumClientAsync, mockGinInjector,
+				mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
-				mockRepliesContainer, mockSubscribeButtonWidget);
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
+				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
+				mockNewReplyWidget);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
@@ -145,15 +145,14 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(discussionThreadWidget);
-		verify(mockView).setMarkdownEditorWidget(any(Widget.class));
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
 		verify(mockRepliesContainer).configure(any(Callback.class));
-		verify(mockMarkdownEditorWidget).showExternalImageButton();
-		verify(mockMarkdownEditorWidget).hideUploadRelatedCommands();
+		verify(mockView).setNewReplyContainer(any(Widget.class));
+		verify(mockView).setSecondNewReplyContainer(any(Widget.class));
 	}
 
 	@Test
@@ -182,9 +181,19 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 		verify(mockRefreshAlert).configure(threadId);
 		verify(mockView).setDeletedThreadVisible(false);
-		verify(mockView).setReplyContainerVisible(true);
+		verify(mockView).setReplyContainersVisible(true);
 		verify(mockView).setCommandsVisible(true);
 		verify(mockView).setRestoreIconVisible(false);
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockNewReplyWidget, times(2)).configure(eq(threadId), captor.capture());
+		List<Callback> captured = captor.getAllValues();
+		assertNotNull(captured);
+		assertEquals(2, captured.size());
+		captured.get(0).invoke();
+		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+		reset(mockDiscussionForumClientAsync);
+		captured.get(1).invoke();
+		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -213,7 +222,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).setRefreshCallback(any(Callback.class));
 		verify(mockRefreshAlert).configure(threadId);
 		verify(mockView).setDeletedThreadVisible(true);
-		verify(mockView).setReplyContainerVisible(false);
+		verify(mockView).setReplyContainersVisible(false);
 		verify(mockView).setCommandsVisible(false);
 		verify(mockView).setRestoreIconVisible(true);
 	}
@@ -441,26 +450,7 @@ public class SingleDiscussionThreadWidgetTest {
 	
 	//Note: The discussion thread widget no longer supports toggling.  It is initially configured to show message/replies.
 
-	@Test
-	public void testOnClickNewReply() {
-		discussionThreadWidget.onClickNewReply();
-		verify(mockMarkdownEditorWidget).configure(anyString());
-		verify(mockView).setReplyTextBoxVisible(false);
-		verify(mockView).setNewReplyContainerVisible(true);
-		verify(mockMarkdownEditorWidget).setMarkdownFocus();
-	}
 
-	@Test
-	public void testOnClickNewReplyAnonymous() {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		discussionThreadWidget.onClickNewReply();
-		verify(mockMarkdownEditorWidget, never()).configure(anyString());
-		verify(mockGlobalApplicationState).getPlaceChanger();
-		verify(mockView).showErrorMessage(anyString());
-		verify(mockView, never()).setReplyTextBoxVisible(false);
-		verify(mockView, never()).setNewReplyContainerVisible(true);
-		verify(mockMarkdownEditorWidget, never()).setMarkdownFocus();
-	}
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -490,8 +480,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isPinned = false;
 		String replyId = "123";
 		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-			.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
-
+				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
@@ -523,7 +512,6 @@ public class SingleDiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(threadBundle, replyId, canModerate, moderatorIds, mockCallback);
 		verify(mockSynAlert).handleException(ex);;
 	}
-	
 
 	@Test
 	public void testOnClickShowAllReplies() {
@@ -566,6 +554,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRepliesContainer, times(2)).add(any(Widget.class));
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setDeleteIconVisible(false);
+		verify(mockView).setSecondNewReplyContainerVisible(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -576,10 +565,10 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
-				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
+				Arrays.asList("123"), 0L, 0L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		bundleList = DiscussionTestUtils.createReplyBundleList(0);
-		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(2L);
+		when(mockReplyBundlePage.getTotalNumberOfResults()).thenReturn(0L);
 		when(mockReplyBundlePage.getResults()).thenReturn(bundleList);
 		AsyncMockStubber.callSuccessWith(mockReplyBundlePage)
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
@@ -592,6 +581,7 @@ public class SingleDiscussionThreadWidgetTest {
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockRepliesContainer, atLeastOnce()).clear();
+		verify(mockView).setSecondNewReplyContainerVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -728,7 +718,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
-		ArgumentCaptor<AlertCallback> captor = ArgumentCaptor.forClass(AlertCallback.class);
+		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
 		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
 		captor.getValue().callback();
 		verify(mockSynAlert).clear();
@@ -738,7 +728,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickRestoreThread() {
 		discussionThreadWidget.onClickRestore();
-		ArgumentCaptor<AlertCallback> captor = ArgumentCaptor.forClass(AlertCallback.class);
+		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
 		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
 		captor.getValue().callback();
 		verify(mockSynAlert).clear();
@@ -859,56 +849,5 @@ public class SingleDiscussionThreadWidgetTest {
 		discussionThreadWidget.reconfigureThread();
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testOnClickCancel() {
-		discussionThreadWidget.onClickCancel();
-		verify(mockView).resetButton();
-		verify(mockView).setReplyTextBoxVisible(true);
-		verify(mockView).setNewReplyContainerVisible(false);
-	}
-
-	@Test
-	public void testOnClickSaveInvalidArgument() {
-		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("");
-		discussionThreadWidget.onClickSave();
-		verify(mockSynAlert).clear();
-		verify(mockMarkdownEditorWidget).getMarkdown();
-		verify(mockSynAlert).showError(anyString());
-		verifyZeroInteractions(mockDiscussionForumClientAsync);
-	}
-
-	@Test
-	public void testOnClickSaveSuccess() {
-		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-			.when(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class),
-					any(AsyncCallback.class));
-		discussionThreadWidget.onClickSave();
-		verify(mockSynAlert, atLeastOnce()).clear();
-		verify(mockView).showSaving();
-		verify(mockView).showSuccess(anyString(), anyString());
-		verify(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
-		verify(mockView).resetButton();
-		verify(mockView).setReplyTextBoxVisible(true);
-		verify(mockView).setNewReplyContainerVisible(false);
-		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
-	}
-
-	@Test
-	public void testOnSaveFailure() {
-		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("message");
-		Exception exception = new Exception();
-		AsyncMockStubber.callFailureWith(exception)
-			.when(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class),
-					any(AsyncCallback.class));
-		discussionThreadWidget.onClickSave();
-		verify(mockSynAlert).clear();
-		verify(mockView).showSaving();
-		verify(mockDiscussionForumClientAsync).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
-		verifyZeroInteractions(mockCallback);
-		verify(mockSynAlert).handleException(exception);
-		verify(mockView).resetButton();
 	}
 }

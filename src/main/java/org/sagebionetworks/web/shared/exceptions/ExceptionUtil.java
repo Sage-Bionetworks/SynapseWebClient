@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
+import org.sagebionetworks.client.exceptions.SynapseConflictingUpdateException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -39,6 +40,8 @@ public class ExceptionUtil {
 			return new LockedException(ex.getMessage());
 		} else if(ex instanceof SynapseTooManyRequestsException) {
 			return new TooManyRequestsException(ex.getMessage());
+		} else if (ex instanceof SynapseConflictingUpdateException) {
+			return new ConflictingUpdateException(ex.getMessage());
 		} else if (ex instanceof SynapseServerException) {
 			SynapseServerException sse = (SynapseServerException)ex;
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {

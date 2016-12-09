@@ -13,10 +13,14 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
+import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.table.TimedRetryWidget;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -34,6 +38,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	HTMLPanel panel;
 	
 	@Inject
 	public APITableWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
@@ -121,7 +126,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 			if (isCssStyled)
 				builder.append("</span>");
 
-			HTMLPanel panel = new HTMLPanel(builder.toString());
+			panel = new HTMLPanel(builder.toString());
 			add(panel);
 			
 			for (ClickHandler clickHandler : clickHandler2ElementsMap.keySet()) {
@@ -143,8 +148,45 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 			}
 
 		}
-	}	
+	}
 	
+	public List<ElementWrapper> findDivs(String prefix) {
+		List<ElementWrapper> wrappedElements = new ArrayList<ElementWrapper>();
+		JsArray<JavaScriptObject> elements = _findDivs(prefix);
+		if (elements != null) {
+			for (int i = 0; i < elements.length(); i++) {
+				DivElement div = (DivElement) elements.get(i);
+				wrappedElements.add(new ElementWrapper(div));
+			}
+		}
+		return wrappedElements;
+	}
+	
+	
+	@Override
+	public List<ElementWrapper> findUserBadgeDivs() {
+		return findDivs(APITableColumnRendererUserId.USER_WIDGET_DIV_PREFIX);
+	}
+	
+	@Override
+	public List<ElementWrapper> findCancelRequestDivs() {
+		return findDivs(APITableColumnRendererCancelControl.CANCEL_REQUEST_WIDGET_DIV_PREFIX);
+	}
+	
+	@Override
+	public void addWidget(Widget widget, String divID) {
+		panel.add(widget, divID);
+	}
+	
+	/**
+	 * Return all divs on the page that have an id that begins with the given prefix
+	 * @param prefix
+	 * @return
+	 */
+	private static native JsArray<JavaScriptObject> _findDivs(String prefix) /*-{
+		return $wnd.jQuery('div[id^='+prefix+']');
+	}-*/;
+
 	@Override
 	public void configurePager(int start, int end, int total) {
 		UnorderedListPanel panel = new UnorderedListPanel();

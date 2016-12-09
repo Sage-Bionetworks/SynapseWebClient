@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox.Defaults;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 
 public class GlobalApplicationStateViewImpl implements
 		GlobalApplicationStateView {
@@ -14,8 +14,8 @@ public class GlobalApplicationStateViewImpl implements
 	
 	@Override
 	public void initGlobalViewProperties() {
-		Defaults defaults = Bootbox.createDefaults();
-		defaults.setAnimate(false);
-		defaults.setDefaults();
+		DialogOptions options = DialogOptions.newOptions("");
+		options.setAnimate(false);
+		Bootbox.setDefaults(options);
 	}
 }

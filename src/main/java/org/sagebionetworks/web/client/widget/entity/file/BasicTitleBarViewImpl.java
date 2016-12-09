@@ -82,7 +82,11 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	}
 	
 	@Override
+	public void setContainerHelpWidgetVisible(boolean visible) {
+		containerHelpContainer.setVisible(visible);
+	}
+	
+	@Override
 	public void clear() {
 	}
-
 }

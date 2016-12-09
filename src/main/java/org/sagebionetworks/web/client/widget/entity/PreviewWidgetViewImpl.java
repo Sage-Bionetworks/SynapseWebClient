@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -90,6 +91,12 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		
 		currentPopupPreviewWidget = new Image(previewUrl);
 		currentPopupPreviewWidget.addStyleName("maxWidth100 maxHeight100");
+	}
+	
+	@Override
+	public void setPreviewWidget(Widget w) {
+		clear();
+		add(w.asWidget());
 	}
 	
 	@Override

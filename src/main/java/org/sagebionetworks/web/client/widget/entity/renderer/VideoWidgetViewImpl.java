@@ -22,7 +22,7 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height, final boolean isLoggedIn, Long wikiVersion, String xsrfToken) {
+	public void configure(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height, String xsrfToken) {
 		this.clear();
 		
 		StringBuilder builder = new StringBuilder();

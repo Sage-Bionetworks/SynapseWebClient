@@ -81,7 +81,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Callback onAttachCallback;
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
-			SynapseJSNIUtils synapseJSNIUtils,
+			final SynapseJSNIUtils synapseJSNIUtils,
 			SageImageBundle sageImageBundle, 
 			PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -91,12 +91,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				idField.selectAll();
+				synapseJSNIUtils.copyToClipboard();
 			}
 		});
 		md5Field.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				md5Field.selectAll();
+				synapseJSNIUtils.copyToClipboard();
 			}
 		});
 	}

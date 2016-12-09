@@ -200,6 +200,10 @@ End Synapse color scheme
 	width: 0px;
 }
 
+.text-align-left {
+	text-align: left;
+}
+
 .mainPageHeader {
 	border: 1px solid black;
 	padding: 10px;
@@ -686,6 +690,9 @@ a.shortBtn {
 }
 .min-width-25 {
 	min-width: 25px;
+}
+.min-width-150 {
+	min-width: 150px;
 }
 .min-width-200 {
 	min-width: 200px;
@@ -2053,6 +2060,21 @@ a.projectTitle:hover {
 		width: 140px;
 	}
 }
+
+@media (max-width: 768px) {
+	.pull-left-unless-xs {
+		width: 100%;
+	}
+}
+
+@media (min-width: 769px) {
+	.pull-left-unless-xs {
+		float: left;
+		max-width: 460px;
+	}
+}
+
+
 .entity-tab > a {
 	text-align: center;
 }
@@ -2198,6 +2220,7 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 }
 
 
+
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
 }
@@ -2244,6 +2267,11 @@ iframe[seamless] {
 .modal {
     overflow-y: auto !important;
 }
+
+.bootbox {
+	z-index: 2000 !important;
+}
+
 
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
@@ -2366,6 +2394,11 @@ div.input-group > input.search-textbox {
   font-size: 1em;
 }
 
+.nav>li>a>div {
+	padding: 1em 2em .5em 2em;
+	margin: -1em -2em -.5em -2em;
+}
+
 /*===========*/
 
 .largeIconButton {
@@ -2381,6 +2414,10 @@ div.input-group > input.search-textbox {
 .text-align-right {
 	text-align: right;
 }
+.text-align-left {
+	text-align: left;
+}
+
 
 .inlineField {
 	overflow: hidden; 
@@ -2517,6 +2554,12 @@ td.datePickerMonth {
   border-top: 1px solid #dddddd;
 }
 
+.read-only-box {
+	padding: 5px;
+    border: 1px solid #dddddd;
+    border-radius: .2em;
+    box-shadow: inset 0 -1px 0 #ddd;
+}
 
 /* Provenance graph css */
 .provEntityNode {

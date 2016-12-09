@@ -36,13 +36,13 @@
 				<t:TableData width="60px" addStyleNames="overflow-x-hidden">
 					<g:Label ui:field="versionField"/>
 				</t:TableData>
-				<t:TableData width="165px" ui:field="descriptionTableData" addStyleNames="overflow-x-hidden" visible="false">
+				<t:TableData width="165px" ui:field="descriptionTableData" addStyleNames="overflow-x-hidden text-align-left padding-right-5" visible="false">
 					<g:Label ui:field="descriptionField"/>
 				</t:TableData>
 				<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden" >
 					<g:Label ui:field="createdOnField"/>
 				</t:TableData>
-				<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden" >
+				<t:TableData width="310px" addStyleNames="visible-md visible-lg overflow-x-hidden" >
 					<g:SimplePanel ui:field="createdByField"/>
 				</t:TableData>
 				<t:TableData width="165px" ui:field="noteTableData" addStyleNames="visible-md visible-lg overflow-x-hidden">

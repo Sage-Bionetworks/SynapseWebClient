@@ -53,7 +53,7 @@ public interface SynapseJSNIUtils {
 	
 	public String getBaseProfileAttachmentUrl();
 	
-	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId);
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId, String xsrfToken);
 
 	public int randomNextInt();
 	
@@ -105,4 +105,6 @@ public interface SynapseJSNIUtils {
 	String getPort(String url);
 
 	String getPathname(String url);
+	
+	void copyToClipboard();
 }

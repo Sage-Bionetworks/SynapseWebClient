@@ -2,12 +2,16 @@ package org.sagebionetworks.web.unitclient.widget.discussion;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -277,7 +281,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testOnClickDeleteReply() {
 		replyWidget.onClickDeleteReply();
-		verify(mockView).showDeleteConfirm(anyString(), any(AlertCallback.class));
+		verify(mockView).showDeleteConfirm(anyString(), any(SimpleCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")

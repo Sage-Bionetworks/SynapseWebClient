@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -14,7 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityIdCellRendererImplTest {
@@ -35,6 +37,8 @@ public class EntityIdCellRendererImplTest {
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
 	EntityHeader mockProjectHeader;
+	@Mock
+	ClickHandler mockClickHandler;
 	private static final String PROJECT_NAME = "Project Win";
 	
 	@Before
@@ -70,6 +74,25 @@ public class EntityIdCellRendererImplTest {
 		verify(mockView).setIcon(any(IconType.class));
 		verify(mockView).setLinkText(PROJECT_NAME);
 		verify(mockView).setLinkHref("#!Synapse:syn987654");
+		verify(mockView, never()).setClickHandler(any(ClickHandler.class));
+		
+		//verify that attempting to load data again is a no-op
+		reset(mockEntityHeaderAsyncHandler);
+		renderer.loadData();
+		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
+	}
+	
+	@Test
+	public void testSetValueAndCallback(){
+		String entityId = "987654";
+		renderer.setValue(entityId, mockClickHandler);
+		verify(mockLazyLoadHelper).setIsConfigured();
+		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
+		
+		simulateInView();
+		verify(mockView).showLoadingIcon();
+		verify(mockView, never()).setLinkHref(anyString());
+		verify(mockView).setClickHandler(mockClickHandler);
 		
 		//verify that attempting to load data again is a no-op
 		reset(mockEntityHeaderAsyncHandler);

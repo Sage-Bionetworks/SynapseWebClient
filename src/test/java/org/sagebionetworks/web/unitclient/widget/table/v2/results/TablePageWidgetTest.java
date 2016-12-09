@@ -4,24 +4,31 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -31,6 +38,7 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -44,9 +52,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
-import com.google.gwt.thirdparty.javascript.rhino.jstype.StaticSourceFile;
 
 /**
  * Business logic unit tests for the TablePageWidget.
@@ -73,9 +80,20 @@ public class TablePageWidgetTest {
 	List<Row> rows;
 	Query query;
 	List<CellStub> cellStubs;
-
+	boolean isView;
+	@Mock
+	FacetsWidget mockFacetsWidget;
+	@Mock
+	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
+	@Mock
+	FacetColumnResult mockFacetColumnResult;
+	List<FacetColumnResult> facets;
+	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
+		facets = new ArrayList<FacetColumnResult>();
+		facets.add(mockFacetColumnResult);
 		mockView = Mockito.mock(TablePageView.class);
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockCellFactory = Mockito.mock(CellFactory.class);
@@ -123,7 +141,7 @@ public class TablePageWidgetTest {
 				return header;
 			}
 		});
-		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
+		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
 		headers = TableModelTestUtils.buildSelectColumns(schema);
@@ -155,13 +173,15 @@ public class TablePageWidgetTest {
 		query.setLimit(100L);
 		query.setOffset(0L);
 		query.setSql("select * from syn123");
-	
+		bundle.setFacets(facets);
+		when(mockFacetsWidget.isShowingFacets()).thenReturn(true);
+		isView = false;
 	}
 	
 	@Test
 	public void testConfigureRoundTrip(){
 		boolean isEditable = true;
-		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		List<Row> extracted = widget.extractRowSet();
 		assertEquals(rows, extracted);
 		List<ColumnModel> headers = widget.extractHeaders();
@@ -179,7 +199,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureWithPaging(){
 		boolean isEditable = true;
-		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -191,7 +211,9 @@ public class TablePageWidgetTest {
 		boolean isEditable = true;
 		// Static headers should be used for edits
 		assertTrue(staticHeader.isEmpty());
-		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockView).setFacetsVisible(false);
+		verify(mockView, never()).setFacetsVisible(true);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(true);
 		assertEquals(bundle.getColumnModels().size()+1, staticHeader.size());
@@ -202,10 +224,32 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		// Sortable headers should be used for views.
 		assertTrue(sortHeaders.isEmpty());
-		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockView).setFacetsVisible(true);
+		verify(mockView, never()).setFacetsVisible(false);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
+	}
+	
+	@Test
+	public void testConfigureNotEditableNoFacets(){
+		boolean isEditable = false;
+		facets.clear();
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockView).setFacetsVisible(false);
+		verify(mockView, never()).setFacetsVisible(true);
+	}
+	
+	@Test
+	public void testConfigureNotEditableNoValidFacets(){
+		boolean isEditable = false;
+		when(mockFacetsWidget.isShowingFacets()).thenReturn(false);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockView).setFacetsVisible(false);
+		verify(mockView, never()).setFacetsVisible(true);
 	}
 	
 	@Test
@@ -214,8 +258,10 @@ public class TablePageWidgetTest {
 		SortItem sort = new SortItem();
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		sort.setDirection(SortDirection.DESC);
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		sortList.add(sort);
 		boolean isEditable = false;
-		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -244,8 +290,10 @@ public class TablePageWidgetTest {
 		SortItem sort = new SortItem();
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		sort.setDirection(SortDirection.ASC);
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		sortList.add(sort);
 		boolean isEditable = false;
-		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -261,6 +309,38 @@ public class TablePageWidgetTest {
 		}
 	}
 	
+	@Test
+	public void testConfigureWithMultipleSorts(){
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		int ascColumnIndex = 1;
+		int descColumnIndex = 2;
+		SortItem sort = new SortItem();
+		sort.setColumn(schema.get(ascColumnIndex).getName());
+		sort.setDirection(SortDirection.ASC);
+		sortList.add(sort);
+		sort = new SortItem();
+		sort.setColumn(schema.get(descColumnIndex).getName());
+		sort.setDirection(SortDirection.DESC);
+		sortList.add(sort);
+		boolean isEditable = false;
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
+		// Pagination should be setup since a page change listener was provided.
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setPaginationWidgetVisible(true);
+		
+		// Check each header
+		for(int i=0; i<sortHeaders.size(); i++){
+			SortableTableHeader sth = sortHeaders.get(i);
+			if(i == ascColumnIndex){
+				verify(sth).setIcon(IconType.SORT_ASC);
+			}else if(i == descColumnIndex){
+				verify(sth).setIcon(IconType.SORT_DESC);
+			}else {
+				verify(sth, never()).setIcon(any(IconType.class));
+			}
+		}
+	}
+	
 	/**
 	 * Test for SWC-2312
 	 */
@@ -271,8 +351,10 @@ public class TablePageWidgetTest {
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		// When the direction is null
 		sort.setDirection(null);
+		List<SortItem> sortList = new ArrayList<SortItem>();
+		sortList.add(sort);
 		boolean isEditable = false;
-		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, sortList, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -291,7 +373,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureNoPaging(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, null, isEditable, null, null);
+		widget.configure(bundle, null, null, isEditable, isView, null, null, mockFacetChangedHandler);
 		verify(mockPaginationWidget, never()).configure(anyLong(), anyLong(), anyLong(), any(PageChangeListener.class));
 		verify(mockView).setPaginationWidgetVisible(false);
 	}
@@ -299,7 +381,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testOnAddNewRow(){
 		boolean isEditable = true;
-		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		widget.onAddNewRow();
 		widget.onAddNewRow();
 		widget.onAddNewRow();
@@ -310,7 +392,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testSelectAllAndDeleteSelected(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, isView, mockListner, null, mockFacetChangedHandler);
 		widget.onSelectAll();
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
@@ -330,7 +412,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testSelectNone(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, isView, mockListner, null, mockFacetChangedHandler);
 		widget.onSelectAll();
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
@@ -345,7 +427,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testToggleSelect(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, isView, mockListner, null, mockFacetChangedHandler);
 		widget.onSelectNone();
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
@@ -365,7 +447,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testIsValid(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, isView, mockListner, null, mockFacetChangedHandler);
 		assertTrue(widget.isValid());
 		// Set on cell to be invalid
 		cellStubs.get(3).setIsValid(false);

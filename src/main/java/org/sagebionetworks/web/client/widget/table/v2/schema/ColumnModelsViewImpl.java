@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
@@ -197,5 +198,10 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
 		addDefaultViewColumnsButton.setVisible(visible);
+	}
+	
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }

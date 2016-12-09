@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
@@ -88,8 +89,15 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
+import org.sagebionetworks.repo.model.file.BatchFileRequest;
+import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
@@ -169,6 +177,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.cache.Cache;
@@ -187,6 +196,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/html", MESSAGE_CHARSET);
+	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
+			.create("text/plain", MESSAGE_CHARSET);
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
@@ -1040,6 +1051,28 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.createAccessApproval(aaEW);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void deleteAccessApproval(Long approvalId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteAccessApproval(approvalId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) 
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return convertPaginated(synapseClient.getEntityAccessApproval(entityId));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -2525,7 +2558,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			message.setSubject(subject);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
-			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
 			String fileHandleId = synapseClient.uploadToFileHandle(
 					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
 					HTML_MESSAGE_CONTENT_TYPE);
@@ -3099,5 +3132,45 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
+	public Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			BatchFileHandleCopyRequest batchRequest =  new BatchFileHandleCopyRequest();
+			batchRequest.setCopyRequests(Collections.singletonList(copyRequest));
+			BatchFileHandleCopyResult batchCopyResults = synapseClient.copyFileHandles(batchRequest);
+			List<FileHandleCopyResult> copyResults = batchCopyResults.getCopyResults();
+			// sanity check
+			if (copyResults.size() != 1) {
+				throw new UnknownErrorException("Copy file handle resulted in unexpected response list size.");
+			}
+			FileHandleCopyResult copyResult = copyResults.get(0);
+			if (copyResult.getFailureCode() != null) {
+				switch(copyResult.getFailureCode()) {
+					case NOT_FOUND:
+						throw new NotFoundException();
+					case UNAUTHORIZED:
+						throw new UnauthorizedException();
+					default:
+						throw new UnknownErrorException();
+				}
+			} else {
+				FileHandle newFileHandle = copyResult.getNewFileHandle();
+				toUpdate.setDataFileHandleId(newFileHandle.getId());
+				return synapseClient.putEntity(toUpdate);
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
+	@Override
+	public BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.getFileHandleAndUrlBatch(request);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 }

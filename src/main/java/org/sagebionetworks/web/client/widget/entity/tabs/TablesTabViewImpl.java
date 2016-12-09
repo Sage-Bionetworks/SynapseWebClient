@@ -88,7 +88,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 	@Override
 	public void clearTableEntityWidget() {
-		tableWidgetContainer.clear();
+		tableWidgetContainer.clear();	
 	}
 	
 	@Override

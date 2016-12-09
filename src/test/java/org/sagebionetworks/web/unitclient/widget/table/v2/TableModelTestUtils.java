@@ -86,6 +86,9 @@ public class TableModelTestUtils {
 				case LARGETEXT:
 					defaultValue = null;
 					break;
+				case USERID:
+					defaultValue = "1234567";
+					break;
 				default:
 					throw new IllegalStateException("huh? missing enum");
 				}
@@ -284,6 +287,8 @@ public class TableModelTestUtils {
 			return "";
 		case LARGETEXT:
 			return "";	
+		case USERID:
+			return "" + i;
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());
 	}

@@ -43,6 +43,13 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	 */
 	public void setDefaultEditor(CellEditor defaultEditor);
 
+
+	/**
+	 * Clear the editor to be used for default values.
+	 * @param defaultEditor
+	 */
+	public void setDefaultEditorVisible(boolean visible);
+
 	/**
 	 * Set an error for a name.
 	 * @param string
@@ -76,4 +83,14 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	 * @param showRestrictValues
 	 */
 	public void setRestrictValuesVisible(boolean showRestrictValues);
+	
+	/**
+	 * Show/hide the facets editor
+	 * @param showFacetTypes
+	 */
+	public void setFacetVisible(boolean showFacetTypes);
+	
+	public void setFacetValues(String...items);
+	
+	
 }

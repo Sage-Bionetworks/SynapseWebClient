@@ -24,6 +24,7 @@
 				<g:item>markdown link</g:item>
 				<g:item>epochdate</g:item>
 				<g:item>synapseid</g:item>
+				<g:item>cancelcontrol</g:item>
 			</b:ListBox>
 		</t:TableData>
 		<t:TableData width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">

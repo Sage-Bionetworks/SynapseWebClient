@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
@@ -53,7 +54,7 @@ public class RegisterTeamDialogTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new RegisterTeamDialog(mockView, mockChallengeClient, mockGlobalApplicationState, mockAuthenticationController);
 		registratableTeams = new ArrayList<Team>();
-		
+
 		firstTeam = new Team();
 		firstTeam.setId("1001");
 		Team secondTeam = new Team();
@@ -73,6 +74,7 @@ public class RegisterTeamDialogTest {
 		widget.configure(CHALLENGE_ID, mockCallback);
 		
 		verify(mockView).setRecruitmentMessage("");
+		verify(mockView).setNewTeamLink(eq("#!Profile:"+mockAuthenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS));
 		verify(mockView).setNoTeamsFoundVisible(false);
 		verify(mockView).setTeams(registratableTeams);
 		assertEquals(firstTeam.getId(), widget.getSelectedTeamId());
@@ -95,6 +97,7 @@ public class RegisterTeamDialogTest {
 		widget.configure(CHALLENGE_ID, mockCallback);
 		
 		verify(mockView).setRecruitmentMessage("");
+		verify(mockView).setNewTeamLink(eq("#!Profile:"+mockAuthenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS));
 		verify(mockView).setNoTeamsFoundVisible(true);
 		verify(mockView).showModal();
 	}
@@ -139,11 +142,5 @@ public class RegisterTeamDialogTest {
 		widget.onOk();
 		verify(mockChallengeClient).registerChallengeTeam(any(ChallengeTeam.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testOnNewTeamClicked() {
-		widget.onNewTeamClicked();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 }

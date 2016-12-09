@@ -61,20 +61,14 @@
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div ui:field="replyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT">
-					<b:TextBox ui:field="replyTextBox" placeholder="Write a reply..."/>
-					<bh:Div ui:field="newReplyContainer" visible="false">
-						<bh:Div ui:field="markdownEditorContainer" />
-						<b:Button ui:field="cancelButton" type="DEFAULT" text="Cancel" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
-						<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Posting..." text="Post" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
-					</bh:Div>
-			</bh:Div>
+			<bh:Div ui:field="newReplyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT"/>
 			<bh:Div ui:field="replyDetails">
 				<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
 					<b:Button ui:field="showAllRepliesButton" type="DEFAULT" size="EXTRA_SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10" visible="false">Show all replies</b:Button>
 				</bh:Div>
 				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
 			</bh:Div>
+			<bh:Div ui:field="secondNewReplyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT" visible="false"/>
 		</bh:Div>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>

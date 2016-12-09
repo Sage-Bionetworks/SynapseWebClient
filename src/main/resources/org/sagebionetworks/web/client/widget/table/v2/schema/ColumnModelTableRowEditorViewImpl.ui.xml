@@ -25,6 +25,7 @@
 			  <g:item>Entity</g:item>
 			  <g:item>Link</g:item>
 			  <g:item>LargeText</g:item>
+			  <g:item>User</g:item>
 			</g:ListBox>
 		</t:TableData>
 		<t:TableData>
@@ -38,6 +39,10 @@
 		</t:TableData>
 		<t:TableData>
 			<b:TextBox ui:field="restrictValues" placeholder="value1, value2, value-n..." />
+		</t:TableData>
+		<t:TableData>
+			<g:ListBox ui:field="facet" width="100px">
+			</g:ListBox>
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>
