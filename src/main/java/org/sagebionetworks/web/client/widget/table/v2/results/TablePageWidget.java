@@ -302,4 +302,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 		return isValid;
 	}
+	
+	public void setFacetsVisible(boolean visible) {
+		view.setFacetsVisible(visible);
+	}
 }

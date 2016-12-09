@@ -23,7 +23,14 @@
 		
 		<b:Alert ui:field="tableMessage" type="INFO" />
 
-		<g:SimplePanel ui:field="queryInputPanel" />
+		<bh:Div>
+			<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" />
+		</bh:Div>
+		<bh:Div>
+			<b:Anchor ui:field="showSimpleSearch" text="Show simple search" pull="RIGHT"/>
+			<g:SimplePanel ui:field="queryInputPanel" />
+		</bh:Div>
+		
 		
 		<bh:Div styleName="margin-top-15" />
 		<g:SimplePanel ui:field="queryResultsPanel" />

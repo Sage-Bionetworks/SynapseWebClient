@@ -5,15 +5,20 @@ import org.gwtbootstrap3.client.shared.event.HiddenHandler;
 import org.gwtbootstrap3.client.shared.event.ShownEvent;
 import org.gwtbootstrap3.client.shared.event.ShownHandler;
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -53,7 +58,10 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	SimplePanel downloadResultsPanel;
 	@UiField
 	SimplePanel uploadResultsPanel;
-	
+	@UiField
+	Anchor showSimpleSearch;
+	@UiField
+	Anchor showAdvancedSearch;
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	ScopeWidget scopeWidget;
@@ -99,6 +107,19 @@ public class TableEntityWidgetViewImpl extends Composite implements
 			@Override
 			public void onHidden(HiddenEvent event) {
 				presenter.onScopeToggle(false);
+			}
+		});
+		
+		showSimpleSearch.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onShowSimpleSearch();
+			}
+		});
+		showAdvancedSearch.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onShowAdvancedSearch();
 			}
 		});
 	}
@@ -171,5 +192,13 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setScopeVisible(boolean visible) {
 		scopeCollapse.setVisible(visible);
+	}
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+	@Override
+	public void showConfirmDialog(String title, String message, Callback yesCallback) {
+		DisplayUtils.showConfirmDialog(title, message, yesCallback);
 	}
 }

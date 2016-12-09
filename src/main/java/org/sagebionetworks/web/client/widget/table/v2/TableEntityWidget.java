@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -60,20 +61,24 @@ public class TableEntityWidget implements IsWidget,
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
 	Query currentQuery;
-
+	CopyTextModal copyTextModal;
+	
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
 			QueryInputWidget queryInputWidget,
 			DownloadTableQueryModalWidget downloadTableQueryModalWidget,
 			UploadTableModalWidget uploadTableModalWidget,
-			PreflightController preflightController) {
+			PreflightController preflightController,
+			CopyTextModal copyTextModal) {
 		this.view = view;
 		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
 		this.preflightController = preflightController;
+		this.copyTextModal = copyTextModal;
+		copyTextModal.setTitle("Query:");
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
@@ -111,6 +116,7 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu = actionMenu;
 		configureActions();
 		checkState();
+		initSimpleAdvancedQueryState();
 	}
 
 	/**
@@ -192,6 +198,69 @@ public class TableEntityWidget implements IsWidget,
 		}
 	}
 
+	private void initSimpleAdvancedQueryState() {
+		boolean isWhereClause = isWhereClause();
+		if (!isWhereClause) {
+			// show simple search if facets are available.
+			boolean isFacets = isFacets();
+			if (isFacets) {
+				showSimpleSearchUI();
+			} else {
+				showAdvancedSearchUI();
+			}
+		} else {
+			showAdvancedSearchUI();
+		}
+	}
+	
+	private boolean isFacets() {
+		return currentQuery.getSelectedFacets() != null && !currentQuery.getSelectedFacets().isEmpty();
+	}
+	
+	private boolean isWhereClause() {
+		return currentQuery.getSql().toUpperCase().contains("WHERE");
+	}
+	
+	private void showSimpleSearchUI() {
+		queryResultsWidget.setFacetsVisible(true);
+		queryInputWidget.setShowQueryVisible(true);
+		queryInputWidget.setQueryInputVisible(false);
+	}
+	
+	private void showAdvancedSearchUI() {
+		queryResultsWidget.setFacetsVisible(false);
+		queryInputWidget.setShowQueryVisible(false);
+		queryInputWidget.setQueryInputVisible(true);
+	}
+	
+	@Override
+	public void onShowSimpleSearch() {
+		if (isFacets()) {
+			// does the current query have a where clause?
+			if (isWhereClause()) {
+				// we must wipe it out.  Confirm with the user that this is acceptable.
+				view.showConfirmDialog("Clear current query?", "In order to switch to simple search, the current query must be cleared.  Clear current query?", new Callback() {
+					@Override
+					public void invoke() {
+						showSimpleSearchUI();
+						queryChangeHandler.onQueryChange(getDefaultQuery());
+					}
+				});
+			} else {
+				showSimpleSearchUI();
+			}
+		} else {
+			// show error, must define facets for simple search.
+			view.showErrorMessage("In order to use simple search, you must first set columns to be facets in the schema editor.");
+		}
+	}
+	
+	@Override
+	public void onShowAdvancedSearch() {
+		showAdvancedSearchUI();
+		queryChangeHandler.onQueryChange(getDefaultQuery());
+	}
+	
 	/**
 	 * Set the view to show no columns message.
 	 */
@@ -350,5 +419,11 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onStartingNewQuery(Query newQuery) {
 		setQuery(newQuery, true);
+	}
+	
+	@Override
+	public void onShowQuery() {
+		copyTextModal.setText(currentQuery.getSql());
+		copyTextModal.show();
 	}
 }

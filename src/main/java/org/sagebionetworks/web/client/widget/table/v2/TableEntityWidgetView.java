@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -22,6 +23,9 @@ public interface TableEntityWidgetView extends IsWidget {
 		 * Called when the view scope is shown or hidden.
 		 */
 		void onScopeToggle(boolean shown);
+		
+		void onShowSimpleSearch();
+		void onShowAdvancedSearch();
 	}
 	
 	/**
@@ -107,5 +111,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	public void toggleScope();
 
 	void setScopeVisible(boolean visible);
-
+	
+	void showErrorMessage(String message);
+	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);
 }

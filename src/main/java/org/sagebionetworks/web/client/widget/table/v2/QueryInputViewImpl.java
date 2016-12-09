@@ -51,6 +51,8 @@ public class QueryInputViewImpl implements QueryInputView{
 	Button downloadResultsButton;
 	@UiField
 	Button helpButton;
+	@UiField
+	Button showQueryButton;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -164,5 +166,15 @@ public class QueryInputViewImpl implements QueryInputView{
 	}
 
 
+	@Override
+	public void setQueryInputVisible(boolean visible) {
+		inputFormGroup.setVisible(visible);
+		queryButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setShowQueryVisible(boolean visible) {
+		showQueryButton.setVisible(visible);
+	}
 
 }
