@@ -260,7 +260,7 @@ public class TableEntityWidget implements IsWidget,
 					@Override
 					public void invoke() {
 						showSimpleSearchUI();
-						queryChangeHandler.onQueryChange(getDefaultQuery());
+						setQuery(getDefaultQuery(), false);
 					}
 				});
 			} else {
@@ -275,7 +275,10 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onShowAdvancedSearch() {
 		showAdvancedSearchUI();
-		queryChangeHandler.onQueryChange(getDefaultQuery());
+		// TODO: set sql to the query that was executed (based on facets)
+		Query q = getDefaultQuery();
+//		q.setSql(currentQuery.getEffectiveSql());
+		setQuery(q, false);
 	}
 	
 	/**
@@ -441,6 +444,7 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onShowQuery() {
 		// TODO:  change this to show the sql executed instead of the original (default) sql
+//		copyTextModal.setText(currentQuery.getEffectiveSql());
 		copyTextModal.setText(currentQuery.getSql());
 		copyTextModal.show();
 	}

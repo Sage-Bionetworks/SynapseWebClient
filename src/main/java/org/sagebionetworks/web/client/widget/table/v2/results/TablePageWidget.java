@@ -132,14 +132,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 		List<FacetColumnResult> facets = bundle.getFacets();
 		
-		boolean isFacetsWidgetVisible = !isEditable && 
+		boolean isFacetsSupported = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty();
 		
-		if (isFacetsWidgetVisible) {
+		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
-			view.setFacetsVisible(facetsWidget.isShowingFacets());
 		} else {
 			view.setFacetsVisible(false);	
 		}
