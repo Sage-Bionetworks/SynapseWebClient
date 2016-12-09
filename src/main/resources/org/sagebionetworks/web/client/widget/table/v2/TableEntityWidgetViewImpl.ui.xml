@@ -28,14 +28,13 @@
 		</bh:Div>
 		<bh:Div>
 			<g:SimplePanel ui:field="queryInputPanel" addStyleNames="displayInline" />
-			<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" pull="LEFT"/>
+			<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" pull="LEFT" addStyleNames="moveup-18"/>
 		</bh:Div>
 		
 		
 		<bh:Div styleName="margin-top-5" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
 		
-		<g:SimplePanel ui:field="downloadResultsPanel" />
-		<g:SimplePanel ui:field="uploadResultsPanel" />
+		<bh:Div ui:field="modalContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>

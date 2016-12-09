@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.shared.event.ShownHandler;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -55,9 +54,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	SimplePanel queryResultsPanel;
 	@UiField
-	SimplePanel downloadResultsPanel;
-	@UiField
-	SimplePanel uploadResultsPanel;
+	Div modalContainer;
 	@UiField
 	Anchor showSimpleSearch;
 	@UiField
@@ -169,14 +166,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void setDownloadTableQueryModalWidget(
-			IsWidget downloadTableQueryModalWidget) {
-		downloadResultsPanel.add(downloadTableQueryModalWidget);
-	}
-
-	@Override
-	public void setUploadTableModalWidget(IsWidget uploadTableModalWidget) {
-		this.uploadResultsPanel.add(uploadTableModalWidget);
+	public void addModalWidget(IsWidget w) {
+		modalContainer.add(w);
 	}
 
 	@Override

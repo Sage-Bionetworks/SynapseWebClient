@@ -83,8 +83,9 @@ public class TableEntityWidget implements IsWidget,
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
-		this.view.setDownloadTableQueryModalWidget(this.downloadTableQueryModalWidget);
-		this.view.setUploadTableModalWidget(this.uploadTableModalWidget);
+		this.view.addModalWidget(this.downloadTableQueryModalWidget);
+		this.view.addModalWidget(this.uploadTableModalWidget);
+		view.addModalWidget(copyTextModal);
 	}
 
 	@Override
@@ -439,6 +440,7 @@ public class TableEntityWidget implements IsWidget,
 	
 	@Override
 	public void onShowQuery() {
+		// TODO:  change this to show the sql executed instead of the original (default) sql
 		copyTextModal.setText(currentQuery.getSql());
 		copyTextModal.show();
 	}

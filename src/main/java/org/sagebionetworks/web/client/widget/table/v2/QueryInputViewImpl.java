@@ -107,6 +107,12 @@ public class QueryInputViewImpl implements QueryInputView{
 				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
 			}
 		});
+		showQueryButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onShowQuery();
+			}
+		});
 	}
 	
 	@Override
