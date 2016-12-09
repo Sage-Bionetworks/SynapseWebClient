@@ -214,10 +214,16 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	private boolean isFacets() {
-		return currentQuery.getSelectedFacets() != null && !currentQuery.getSelectedFacets().isEmpty();
+		if (currentQuery == null || currentQuery.getSelectedFacets() == null) {
+			return false;
+		}
+		return !currentQuery.getSelectedFacets().isEmpty();
 	}
 	
 	private boolean isWhereClause() {
+		if (currentQuery == null || currentQuery.getSql() == null) {
+			return false;
+		}
 		return currentQuery.getSql().toUpperCase().contains("WHERE");
 	}
 	

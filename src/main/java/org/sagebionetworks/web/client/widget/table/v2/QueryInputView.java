@@ -97,7 +97,6 @@ public interface QueryInputView extends IsWidget {
 	 * @param isEditable
 	 */
 	public void setEditVisible(boolean visibile);
-	
 	public void setQueryInputVisible(boolean visible);
 	public void setShowQueryVisible(boolean visible);
 }
