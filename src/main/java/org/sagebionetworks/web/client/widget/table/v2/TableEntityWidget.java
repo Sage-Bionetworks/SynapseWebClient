@@ -40,6 +40,9 @@ public class TableEntityWidget implements IsWidget,
 		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
+	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
+	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
+	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select 'Schema' to add columns to the this table.";
@@ -256,7 +259,7 @@ public class TableEntityWidget implements IsWidget,
 			// does the current query have a where clause?
 			if (isWhereClause()) {
 				// we must wipe it out.  Confirm with the user that this is acceptable.
-				view.showConfirmDialog("Reset search query?", "The search query will be reset. Are you sure that you would like to switch to simple search mode?", new Callback() {
+				view.showConfirmDialog(RESET_SEARCH_QUERY, RESET_SEARCH_QUERY_MESSAGE, new Callback() {
 					@Override
 					public void invoke() {
 						showSimpleSearchUI();
@@ -268,7 +271,7 @@ public class TableEntityWidget implements IsWidget,
 			}
 		} else {
 			// show error, must define facets for simple search.
-			view.showErrorMessage("In order to use simple search, you must first set columns to be facets in the schema editor.");
+			view.showErrorMessage(NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED);
 		}
 	}
 	
