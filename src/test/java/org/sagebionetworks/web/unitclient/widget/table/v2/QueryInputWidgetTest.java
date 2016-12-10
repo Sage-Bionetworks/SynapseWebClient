@@ -189,16 +189,9 @@ public class QueryInputWidgetTest {
 	}
 	
 	@Test
-	public void testOnShowQuery(){
-		widget.onShowQuery();
-		verify(mockQueryInputListener).onShowQuery();
-	}
-	
-	@Test
 	public void testQueryInputVisible(){
-		boolean visible = true;
-		widget.setQueryInputVisible(visible);
-		verify(mockView).setQueryInputLoading(visible);
+		widget.setQueryInputVisible(true);
+		verify(mockView).setQueryInputVisible(true);
 	}
 
 	@Test
