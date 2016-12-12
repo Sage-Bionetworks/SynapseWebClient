@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -35,14 +34,12 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.dev.shell.CloseButton.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ApproveUserAccessModalTest {
@@ -83,8 +80,6 @@ public class ApproveUserAccessModalTest {
 	List<String> mockLs;
 	@Mock
 	AccessApproval mockAccessApproval;
-	@Mock
-	PaginatedResults<AccessApproval> mockPagRes;
 	@Mock
 	List<AccessApproval> mockAccAppList;
 	@Mock
@@ -135,7 +130,6 @@ public class ApproveUserAccessModalTest {
 		when(mockView.getAccessRequirement()).thenReturn(Long.toString(accessReq));
 		when(mockView.getEmailMessage()).thenReturn(message);
 		
-		when(mockPagRes.getResults()).thenReturn(mockAccAppList);
 		when(mockAccAppList.iterator()).thenReturn(mockAccAppItr);
 		when(mockAccAppItr.hasNext()).thenReturn(true);
 		when(mockAccAppItr.next()).thenReturn(mockAccessApproval);
@@ -357,26 +351,24 @@ public class ApproveUserAccessModalTest {
 		dialog.onRevoke();
 		
 		verify(mockView).setRevokeProcessing(true);
-		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
-		
-		prCaptor.getValue().onFailure(ex);
+		verify(mockSynapseClient).deleteAccessApprovals(anyString(), anyString(), vCaptor.capture());
+		vCaptor.getValue().onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).setRevokeProcessing(false);
 	}
 	
 	@Test
 	public void testOnRevokeGetAccessApprovalSuccessNoMatch() {
-		when(mockPagRes.getResults()).thenReturn(new ArrayList<AccessApproval>());
 		dialog.configure(actList, mockEntityBundle);
 		dialog.onUserSelected(mockUser);
 		dialog.onRevoke();
 		
 		verify(mockView).setRevokeProcessing(true);
-		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
-		
-		prCaptor.getValue().onSuccess(mockPagRes);
+		verify(mockSynapseClient).deleteAccessApprovals(anyString(), anyString(), vCaptor.capture());
+		vCaptor.getValue().onSuccess((Void)null);
 		verify(mockView).setRevokeProcessing(false);
-		verify(mockSynAlert).showError(NO_APPROVAL_FOUND);
+		verify(mockView).hide();
+		verify(mockView).showInfo(REVOKED_USER, "");
 	}
 	
 	@Test
@@ -386,39 +378,11 @@ public class ApproveUserAccessModalTest {
 		dialog.onRevoke();
 		
 		verify(mockView).setRevokeProcessing(true);
-		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
-		prCaptor.getValue().onSuccess(mockPagRes);
-		verify(mockSynAlert, times(0)).showError(NO_APPROVAL_FOUND);
-	}
-	
-	@Test
-	public void testRemoveAccessFailure() {
-		dialog.configure(actList, mockEntityBundle);
-		dialog.onUserSelected(mockUser);
-		dialog.onRevoke();
-		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
-		prCaptor.getValue().onSuccess(mockPagRes);
-		verify(mockSynapseClient).deleteAccessApproval(anyLong(), vCaptor.capture());
-		vCaptor.getValue().onFailure(ex);
-		verify(mockSynAlert).handleException(ex);
-		verify(mockView).setRevokeProcessing(false);
-	}
-	
-	@Test
-	public void testRemoveAccessSuccess() {
-		dialog.configure(actList, mockEntityBundle);
-		dialog.onUserSelected(mockUser);
-		dialog.onRevoke();
-		verify(mockSynapseClient).getEntityAccessApproval(anyString(), prCaptor.capture());
-		prCaptor.getValue().onSuccess(mockPagRes);
-		verify(mockSynapseClient).deleteAccessApproval(anyLong(), vCaptor.capture());
-		vCaptor.getValue().onSuccess(any(Void.class));
+		verify(mockSynapseClient).deleteAccessApprovals(anyString(), anyString(), vCaptor.capture());
+		vCaptor.getValue().onSuccess((Void)null);
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
 		verify(mockView).showInfo(REVOKED_USER, "");
 	}
-	
-	
-	
-	
+
 }
