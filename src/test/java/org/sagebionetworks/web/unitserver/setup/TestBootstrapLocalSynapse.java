@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.NewIntegrationTestUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.Condition;
@@ -282,7 +283,10 @@ public class TestBootstrapLocalSynapse {
 		try {
 			synapseClient.logout();
 		} catch (Exception e) {}
-		synapseClient.login(userName, PASSWORD);
+		LoginRequest request = new LoginRequest();
+		request.setUsername(userName);
+		request.setPassword(PASSWORD);
+		synapseClient.login(request);
 	}
 	
 	/**

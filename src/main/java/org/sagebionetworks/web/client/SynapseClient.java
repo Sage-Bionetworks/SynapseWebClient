@@ -323,7 +323,6 @@ public interface SynapseClient extends XsrfProtectedService {
     
 	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException;
 	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
-	public S3FileHandle zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
 	
 	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
@@ -363,7 +362,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
 	
-	public UploadDaemonStatus getUploadDaemonStatus(String daemonId) throws RestServiceException;
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 	
