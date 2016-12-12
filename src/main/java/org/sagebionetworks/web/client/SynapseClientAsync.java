@@ -459,4 +459,6 @@ public interface SynapseClientAsync {
 	
 	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
 	void getEntityAccessApproval(String entityId, AsyncCallback<PaginatedResults<AccessApproval>> callback);
+
+	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);
 }
