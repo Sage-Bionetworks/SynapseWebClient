@@ -1068,6 +1068,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
+	public void deleteAccessApprovals(String accessRequirement, String accessorId) 
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteAccessApprovals(accessRequirement, accessorId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) 
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
