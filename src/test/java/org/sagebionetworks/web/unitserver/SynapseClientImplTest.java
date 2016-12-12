@@ -1548,8 +1548,6 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor
 				.forClass(MessageToUser.class);
-		ArgumentCaptor<String> entityIdCaptor = ArgumentCaptor
-				.forClass(String.class);
 		
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
@@ -1561,7 +1559,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
-		assertEquals(entityId, toSendMessage.getId());
 		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 
