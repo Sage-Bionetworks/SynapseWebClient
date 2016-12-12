@@ -237,8 +237,6 @@ public interface SynapseClientAsync {
 
 	public void getMarkdown(WikiPageKey key, AsyncCallback<String> callback);
 	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
-	void zipAndUploadFile(String content, String fileName,
-			AsyncCallback<S3FileHandle> callback);
 	
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
@@ -291,7 +289,6 @@ public interface SynapseClientAsync {
 	void submitCertificationQuizResponse(QuizResponse response,
 			AsyncCallback<PassingRecord> callback);
 	
-	void getUploadDaemonStatus(String daemonId,AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
 	
