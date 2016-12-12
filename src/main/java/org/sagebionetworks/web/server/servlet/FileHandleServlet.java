@@ -304,61 +304,6 @@ public class FileHandleServlet extends HttpServlet {
 				response.sendRedirect(resolvedUrl.toString());	
 		}
 	}
-
-//	public static FileHandle uploadFile(SynapseClient client, HttpServletRequest request) throws FileUploadException, IOException, SynapseException {
-//		FileHandle newFileHandle = null;
-//		ServletFileUpload upload = new ServletFileUpload();
-//		FileItemIterator iter = upload.getItemIterator(request);
-//		while (iter.hasNext()) {
-//			FileItemStream item = iter.next();
-//			String name = item.getFieldName();
-//			InputStream stream = item.openStream();
-//			String fileName = item.getName();
-//			if (fileName.contains("\\")){
-//				fileName = fileName.substring(fileName.lastIndexOf("\\")+1);
-//			}
-//            File tempDir = Files.createTempDir();
-//			File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
-//
-//			ServiceUtils.writeToFile(temp, stream, Long.MAX_VALUE);
-//			try{
-//				// Now upload the file
-//				String contentType = item.getContentType();
-//				if (SynapseClientImpl.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
-//					//see if we can make a better guess based on the file stream
-//					contentType = SynapseClientImpl.guessContentTypeFromStream(temp);
-//					//some source code files still register as application/octet-stream, but the preview manager in the backend should recognize those specific file extensions
-//				}
-//				client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-//				newFileHandle = client.createFileHandle(temp, contentType);
-//			}finally{
-//				// Unconditionally delete the tmp file
-//				temp.delete();
-//			}
-//		}
-//		return newFileHandle;
-//	}
-//	
-//	@Override
-//	public void doPost(final HttpServletRequest request,
-//			HttpServletResponse response) throws ServletException, IOException {
-//		// Before we do anything make sure we can get the users token
-//		String token = getSessionToken(request);
-//		if (token == null) {
-//			FileHandleServlet.setForbiddenMessage(response);
-//			return;
-//		}
-//
-//		try {
-//			//Connect to synapse
-//			SynapseClient client = createNewClient(token);
-//			FileHandle newFileHandle = FileHandleServlet.uploadFile(client, request);
-//			FileHandleServlet.fillResponseWithSuccess(response, newFileHandle.getId());
-//		} catch (Exception e) {
-//			FileHandleServlet.fillResponseWithFailure(response, e);
-//			return;
-//		}
-//	}
 	
 	public static void fillResponseWithSuccess(HttpServletResponse response, String id) throws JSONObjectAdapterException, UnsupportedEncodingException, IOException {
 		UploadResult result = new UploadResult();
