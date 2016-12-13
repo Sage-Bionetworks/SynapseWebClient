@@ -13,9 +13,10 @@ public interface MarkdownWidgetView extends IsWidget {
 		void configure(String md, WikiPageKey wikiKey, Long wikiVersionInView);
 
 		void clear();
-
+		
+		void hideAllNavPanels(String suffix);
 	}
-
+	void setPresenter(Presenter p);
 	void setSynAlertWidget(Widget synAlert);
 
 	void setEmptyVisible(boolean b);
@@ -30,5 +31,6 @@ public interface MarkdownWidgetView extends IsWidget {
 	void callbackWhenAttached(final Callback callback);
 
 	void clearMarkdown();
-
+	
+	void addNavItem(String text, ElementWrapper target, boolean active, String suffix);
 }
