@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -628,8 +631,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void copyToClipboard() {
 		try {
 			_copyToClipboard();
-			_deselect();
-			DisplayUtils.showInfo("Copied to clipboard", "");
+			Notify.hideAll();
+			NotifySettings settings = DisplayUtils.getDefaultSettings();
+			settings.setType(NotifyType.INFO);
+			Notify.notify("Copied to clipboard", settings);
 		} catch (Throwable t) {
 			consoleError(t.getMessage());
 		}
@@ -637,21 +642,5 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private final static native String _copyToClipboard() /*-{
 		$doc.execCommand('copy');
-	}-*/;
-
-	private final static native String _deselect() /*-{
-		if ($wnd.getSelection) {
-			if ($wnd.getSelection().empty) {
-				// Chrome
-				$wnd.getSelection().empty();
-			} else if ($wnd.getSelection().removeAllRanges) {
-				// Firefox
-				$wnd.getSelection().removeAllRanges();
-			}
-		} else if ($doc.selection && $doc.selection.empty) {
-			// IE/Edge?
-			$doc.selection.empty();
-		}
-		$doc.activeElement.blur();
 	}-*/;
 }
