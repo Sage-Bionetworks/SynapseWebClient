@@ -289,6 +289,14 @@ public class ColumnModelTableRowEditorWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureFacetsForTypeEntity() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.Entity);
+		verify(mockView).setFacetValues(None.toString(), Values.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+
+	
+	@Test
 	public void testConfigureFacetsForTypeDate() {
 		editor.configureFacetsForType(ColumnTypeViewEnum.Date);
 		verify(mockView).setFacetValues(None.toString(), Range.toString());
