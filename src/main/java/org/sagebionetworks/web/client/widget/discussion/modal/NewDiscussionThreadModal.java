@@ -29,6 +29,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private AuthenticationController authController;
 	private String forumId;
 	private Storage storage = null;
+	private String key;
 	Callback newThreadCallback;
 
 	@Inject
@@ -56,13 +57,27 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
 		this.storage = Storage.getSessionStorageIfSupported();
+		this.key = forumId + "_" + authController.getCurrentUserPrincipalId();
 	}
 
 	@Override
 	public void show() {
 		view.clear();
-		markdownEditor.configure(DEFAULT_MARKDOWN);
+		checkForSavedThread();
 		view.showDialog();
+	}
+	
+	private void checkForSavedThread() {
+		String value = storage.getItem(key);
+		if (value == null) {
+			markdownEditor.configure(DEFAULT_MARKDOWN);			
+		} else {
+			String[] stored = value.split(",");
+			String title = stored[0].split(":")[1].replace("\"","").trim();
+			String message = stored[1].split(":")[1].replace("\"","").replace("}", "").trim();
+			view.setThreadTitle(title);
+			markdownEditor.configure(message);
+		}
 	}
 
 	@Override
@@ -82,7 +97,6 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		String key = forumId + "_" + authController.getCurrentUserPrincipalId();
 		storage.setItem(key, "{\"Title\":\"" + threadTitle + "\", \"Message\":\"" + messageMarkdown + "\"}");
 		view.showSaving();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
@@ -103,7 +117,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 				if (newThreadCallback != null) {
 					newThreadCallback.invoke();
 				}
-				storage.removeItem(forumId + "_" + authController.getCurrentUserPrincipalId());
+				storage.removeItem(key);
 			}
 
 		});

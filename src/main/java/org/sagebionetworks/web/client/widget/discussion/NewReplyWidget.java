@@ -34,6 +34,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	private Callback newReplyCallback;
 	private String threadId;
 	private Storage storage = null;
+	private String key;
 
 	@Inject
 	public NewReplyWidget(
@@ -61,6 +62,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
 		this.storage = Storage.getSessionStorageIfSupported();
+		this.key = threadId + "_" + authController.getCurrentUserPrincipalId();
 	}
 
 	@Override
@@ -70,9 +72,19 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else {
 			view.setReplyTextBoxVisible(false);
-			markdownEditor.configure(DEFAULT_MARKDOWN);
+			checkForSavedReply();
 			view.setNewReplyContainerVisible(true);
 			markdownEditor.setMarkdownFocus();
+		}
+	}
+	
+	private void checkForSavedReply() {
+		String value = storage.getItem(key);
+		if (value == null) {
+			markdownEditor.configure(DEFAULT_MARKDOWN);			
+		} else {
+			String message = value.split(":")[1].replace("\"","").replace("}", "").trim();
+			markdownEditor.configure(message);
 		}
 	}
 
@@ -86,7 +98,6 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		String key = threadId + "_" + authController.getCurrentUserPrincipalId();
 		storage.setItem(key, "{\"Message\":\"" + messageMarkdown + "\"}");
 		view.showSaving();
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
@@ -106,7 +117,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 					newReplyCallback.invoke();
 				}
 				onCancel();
-				storage.removeItem(threadId + "_" + authController.getCurrentUserPrincipalId());
+				storage.removeItem(key);
 			}
 		});
 	}
