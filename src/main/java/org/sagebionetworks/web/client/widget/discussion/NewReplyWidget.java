@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.storage.client.Storage;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,6 +33,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	private GlobalApplicationState globalApplicationState;
 	private Callback newReplyCallback;
 	private String threadId;
+	private Storage storage = null;
 
 	@Inject
 	public NewReplyWidget(
@@ -58,6 +60,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	public void configure(String threadId, Callback newReplyCallback) {
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
+		this.storage = Storage.getSessionStorageIfSupported();
 	}
 
 	@Override
@@ -83,6 +86,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
+		String key = threadId + "_" + authController.getCurrentUserPrincipalId();
+		storage.setItem(key, "{\"Message\":\"" + messageMarkdown + "\"}");
 		view.showSaving();
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
 		toCreate.setThreadId(threadId);
@@ -101,6 +106,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 					newReplyCallback.invoke();
 				}
 				onCancel();
+				storage.removeItem(threadId + "_" + authController.getCurrentUserPrincipalId());
 			}
 		});
 	}

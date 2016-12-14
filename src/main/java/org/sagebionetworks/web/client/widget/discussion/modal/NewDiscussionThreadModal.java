@@ -3,15 +3,16 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.storage.client.Storage;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
 /**
  * A simple modal dialog for adding a new thread.
  */
@@ -25,7 +26,9 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private MarkdownEditorWidget markdownEditor;
+	private AuthenticationController authController;
 	private String forumId;
+	private Storage storage = null;
 	Callback newThreadCallback;
 
 	@Inject
@@ -33,12 +36,14 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			DiscussionThreadModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor
+			MarkdownEditorWidget markdownEditor,
+			AuthenticationController authController
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		this.authController = authController;
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
@@ -50,6 +55,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
+		this.storage = Storage.getSessionStorageIfSupported();
 	}
 
 	@Override
@@ -76,6 +82,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
+		String key = forumId + "_" + authController.getCurrentUserPrincipalId();
+		storage.setItem(key, "{\"Title\":\"" + threadTitle + "\", \"Message\":\"" + messageMarkdown + "\"}");
 		view.showSaving();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
@@ -95,6 +103,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 				if (newThreadCallback != null) {
 					newThreadCallback.invoke();
 				}
+				storage.removeItem(forumId + "_" + authController.getCurrentUserPrincipalId());
 			}
 
 		});
