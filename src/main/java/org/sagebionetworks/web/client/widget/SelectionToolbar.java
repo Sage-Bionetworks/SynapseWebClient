@@ -111,4 +111,8 @@ public class SelectionToolbar implements IsWidget {
 		moveUpButton.setVisible(false);
 		moveDownButton.setVisible(false);
 	}
+	
+	public void setAddStyleNames(String style) {
+		widget.addStyleName(style);
+	}
 }

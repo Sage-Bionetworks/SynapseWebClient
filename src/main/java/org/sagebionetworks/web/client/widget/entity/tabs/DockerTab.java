@@ -11,7 +11,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
@@ -29,6 +28,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -54,31 +54,30 @@ public class DockerTab implements DockerTabView.Presenter{
 	CallbackP<Boolean> showProjectInfoCallack;
 
 	@Inject
-	public DockerTab(
-			DockerTabView view,
-			Tab tab,
-			DockerRepoListWidget dockerListRepoWidget,
-			Breadcrumb breadcrumb,
-			PortalGinInjector ginInjector,
-			SynapseClientAsync synapseClient,
-			StuAlert synAlert
-			) {
-		this.view = view;
+	public DockerTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
-		this.dockerRepoListWidget = dockerListRepoWidget;
-		this.breadcrumb = breadcrumb;
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
-		this.synAlert = synAlert;
-		view.updateWidth(tab);
-		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, view.asWidget(), "Not yet implemented", "");
-		view.setPresenter(this);
-		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setDockerRepoList(dockerListRepoWidget.asWidget());
-		view.setSynapseAlert(synAlert.asWidget());
-		initClickHandler();
+		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
+
+		// Necessary for "beta" badge.  Remove when bringing out of beta.
+		tab.addTabListItemStyle("min-width-150");
 	}
 
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getDockerTabView();
+			this.dockerRepoListWidget = ginInjector.getDockerRepoListWidget();
+			this.breadcrumb = ginInjector.getBreadcrumb();
+			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.synAlert = ginInjector.getStuAlert();
+			view.setPresenter(this);
+			view.setBreadcrumb(breadcrumb.asWidget());
+			view.setDockerRepoList(dockerRepoListWidget.asWidget());
+			view.setSynapseAlert(synAlert.asWidget());
+			tab.setContent(view.asWidget());
+			initClickHandler();
+		}
+	}
 	private void initClickHandler() {
 		breadcrumb.setLinkClickedHandler(new CallbackP<Place>() {
 			public void invoke(Place place) {
@@ -121,6 +120,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	}
 
 	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
+		lazyInject();
 		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;
@@ -169,8 +169,8 @@ public class DockerTab implements DockerTabView.Presenter{
 		if (isRepo) {
 			List<LinkData> links = new ArrayList<LinkData>();
 			Place projectPlace = new Synapse(projectEntityId);
-			Place repoPlace = new Synapse(entity.getId());
-			links.add(new LinkData(projectBundle.getEntity().getName(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
+			String projectName = bundle.getPath().getPath().get(1).getName();
+			links.add(new LinkData(projectName, EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
 			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 			DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 			view.setDockerRepoWidget(repoWidget.asWidget());

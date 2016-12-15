@@ -103,6 +103,11 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 		synapseClient.getEntityBundle(ref.getTargetId(), mask, ebCallback);
 	}
 	
+	public static boolean isRecognizedVideoFileName(String fileName) {
+		String extension = getExtension(fileName);
+		return MP4_EXTENSIONS_SET.contains(extension) || ".webm".equals(extension) || OGG_EXTENSIONS_SET.contains(extension);
+	}
+	
 	public static boolean isRecognizedMP4FileName(String fileName) {
 		String extension = getExtension(fileName);
 		if (extension != null) {

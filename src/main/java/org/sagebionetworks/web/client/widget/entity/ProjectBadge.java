@@ -80,7 +80,12 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		return ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
 	}
 	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
+	
 	public ProjectHeader getHeader() {
 		return header;
 	}
 }
+;

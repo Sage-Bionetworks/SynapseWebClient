@@ -1,16 +1,18 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -75,18 +77,23 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	 * @param id
 	 */
 	public void onAddProject(String id) {
-		synapseClient.getEntity(id, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity entity) {
-				entityIds.add(entity.getId());
-				view.setNoContainers(false);
-				view.addEntity(entity.getId(), entity.getName(), canEdit);
-				finder.hide();
-			}
-			
+		synapseClient.getEntityHeaderBatch(Collections.singletonList(id), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				finder.showError(caught.getMessage());
+			}
+		
+			@Override
+			public void onSuccess(ArrayList<EntityHeader> entityHeaders) {
+				if (entityHeaders.size() == 1) {
+					EntityHeader entity = entityHeaders.get(0);
+					entityIds.add(entity.getId());
+					view.setNoContainers(false);
+					view.addEntity(entity.getId(), entity.getName(), canEdit);
+					finder.hide();
+				} else {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_LOADING));
+				}
 			}
 		});
 	}

@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
+import org.sagebionetworks.web.server.servlet.DockerClientImpl;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
@@ -156,6 +157,10 @@ public class PortalServletModule extends ServletModule {
 		// Discussion message download
 		bind(DiscussionMessageServlet.class).in(Singleton.class);
 		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
+
+		// Setup the Docker service mapping
+		bind(DockerClientImpl.class).in(Singleton.class);
+		serve("/Portal/dockerclient").with(DockerClientImpl.class);
 
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);

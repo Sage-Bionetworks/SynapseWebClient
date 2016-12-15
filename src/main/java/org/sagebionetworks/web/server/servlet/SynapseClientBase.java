@@ -118,7 +118,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	 * The org.sagebionetworks.client.SynapseClient client is stateful so we
 	 * must create a new one for each request
 	 */
-	private org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
+	public org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
 		// Create a new syanpse
 		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
 				.createNewClient();
@@ -130,6 +130,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 				.getFileServiceEndpoint());
 		// Append the portal's version information to the user agent.
 		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
+		synapseClient.setUserIpAddress(this.getThreadLocalRequest().getRemoteAddr());
 		return synapseClient;
 	}
 }

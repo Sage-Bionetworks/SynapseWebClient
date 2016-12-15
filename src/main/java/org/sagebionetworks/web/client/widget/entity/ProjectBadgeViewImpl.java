@@ -93,5 +93,9 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	public boolean isAttached() {
 		return widget.isAttached();
 	}
+	@Override
+	public void addStyleName(String style) {
+		widget.addStyleName(style);
+	}
 
 }

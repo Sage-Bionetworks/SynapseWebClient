@@ -29,8 +29,8 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -73,6 +73,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
@@ -247,9 +248,17 @@ public class DisplayUtils {
 	public static void showInfo(String title, String message) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.INFO);
-		Notify.notify(title, message, settings);
+		notify(title, message, settings);
 	}
-
+	
+	public static void notify(String title, String message, NotifySettings settings) {
+		try{
+			Notify.notify(title, message, settings);
+		} catch(Throwable t) {
+			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
+		}
+	}
+	
 	/**
 	 * Shows an warning message to the user in the "Global Alert area".
 	 * @param title
@@ -262,7 +271,7 @@ public class DisplayUtils {
 		if (timeout != null) {
 			settings.setDelay(timeout);	
 		}
-		Notify.notify(title, message, settings);
+		notify(title, message, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
@@ -404,7 +413,7 @@ public class DisplayUtils {
 				}
 			});
 		} else {
-			Bootbox.alert(popupHtml.asString(), new AlertCallback() {
+			Bootbox.alert(popupHtml.asString(), new SimpleCallback() {
 				@Override
 				public void callback() {
 					if (primaryButtonCallback != null)
@@ -872,6 +881,10 @@ public class DisplayUtils {
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
 		String[] parts = entityVersion.split(WebConstants.ENTITY_VERSION_STRING);
+		if (parts.length == 1) {
+			// version may be using a dot delimiter:
+			parts = entityVersion.split("\\.");
+		}
 		Reference ref = null;
 		if(parts.length > 0) {
 			ref = new Reference();
@@ -1220,8 +1233,16 @@ public class DisplayUtils {
 	 * return true if the widget is in the visible part of the page
 	 */
 	public static boolean isInViewport(Widget widget) {
+		return isInViewport(widget, 300);
+	}
+	
+	/**
+	 * return true if the widget is in the visible part of the page
+	 * paddingBottom is the extra space (in px) to enlarge the viewport (in order to preemptively load the widget before scrolling into view).
+	 */
+	public static boolean isInViewport(Widget widget, int paddingBottom) {
 		int docViewTop = Window.getScrollTop();
-		int docViewBottom = docViewTop + Window.getClientHeight();
+		int docViewBottom = docViewTop + Window.getClientHeight() + paddingBottom;
 		int elemTop = widget.getAbsoluteTop();
 		int elemBottom = elemTop + widget.getOffsetHeight();
 		return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));

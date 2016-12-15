@@ -68,6 +68,11 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		view.clear();
 		this.view.setPresenter(this);
 		emailValidationToken = place.toToken();
+		
+		//SWC-3222: if token is encoded, then decode before parsing.
+		if (emailValidationToken != null && emailValidationToken.contains("&amp;")) {
+			emailValidationToken = gwt.decodeQueryString(emailValidationToken);
+		}
 		emailValidationTokenParams = parseEmailValidationToken(emailValidationToken);
 		String email = emailValidationTokenParams.get(EMAIL_KEY);
 		view.setEmail(email);
@@ -161,6 +166,10 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	 */
 	public void setEmailValidationToken(String emailValidationToken) {
 		this.emailValidationToken = emailValidationToken;
+	}
+	
+	public String getEmailValidationToken() {
+		return emailValidationToken;
 	}
 	
 	@Override

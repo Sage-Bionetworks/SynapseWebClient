@@ -1,26 +1,27 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_RESTORE;
+import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
+
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
-import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -45,14 +46,17 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	private static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 5L;
-	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
+
+	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
+	private static final String CONFIRM_RESTORE_DIALOG_TITLE = "Confirm Restoration";
+	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A thread has been deleted.";
-	private static final String NEW_REPLY_SUCCESS_TITLE = "Reply created";
-	private static final String NEW_REPLY_SUCCESS_MESSAGE = "A new reply has been created.";
+	private static final String RESTORE_SUCCESS_TITLE = "Thread restored";
+	private static final String RESTORE_SUCCESS_MESSAGE = "A thread has been restored.";
 	public static final String CREATED_ON_PREFIX = "posted ";
-	public static final String DEFAULT_MARKDOWN = "";
+	public static final String RESTORE_CONFIRM_MESSAGE = "Are you sure you want to restore this thread?";
 	SingleDiscussionThreadWidgetView view;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
@@ -67,6 +71,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	LoadMoreWidgetContainer repliesContainer;
 	SubscribeButtonWidget subscribeButtonWidget;
 	MarkdownEditorWidget markdownEditor;
+	NewReplyWidget newReplyWidget;
+	NewReplyWidget secondNewReplyWidget;
 	private CallbackP<String> threadIdClickedCallback, replyIdCallback;
 	
 	private Long offset;
@@ -76,16 +82,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private String messageKey;
 	private Boolean isCurrentUserModerator;
 	private String title;
-	private Callback deleteCallback;
+	private Callback deleteOrRestoreCallback;
 	private String projectId;
 	private Callback refreshCallback;
-	private Set<Long> moderatorIds;
+	private Set<String> moderatorIds;
 	private boolean isThreadDeleted;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
 			SingleDiscussionThreadWidgetView view,
-			MarkdownEditorWidget markdownEditor,
 			SynapseAlert synAlert,
 			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
@@ -97,12 +102,13 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			SubscribeButtonWidget subscribeButtonWidget
+			SubscribeButtonWidget subscribeButtonWidget,
+			NewReplyWidget newReplyWidget,
+			NewReplyWidget secondNewReplyWidget
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.jsniUtils = jsniUtils;
-		this.markdownEditor = markdownEditor;
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
@@ -113,14 +119,16 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.markdownWidget = markdownWidget;
 		this.repliesContainer = loadMoreWidgetContainer;
 		this.subscribeButtonWidget = subscribeButtonWidget;
-		
+		this.newReplyWidget = newReplyWidget;
+		this.secondNewReplyWidget = secondNewReplyWidget;
 		view.setPresenter(this);
-		view.setMarkdownEditorWidget(markdownEditor.asWidget());
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
 		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
+		view.setNewReplyContainer(newReplyWidget.asWidget());
+		view.setSecondNewReplyContainer(secondNewReplyWidget.asWidget());
 		
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
@@ -143,17 +151,17 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<Long> moderatorIds, Callback deleteCallback) {
+	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<String> moderatorIds, Callback deleteOrRestoreCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
 		this.messageKey = bundle.getMessageKey();
-		this.deleteCallback = deleteCallback;
+		this.deleteOrRestoreCallback = deleteOrRestoreCallback;
 		this.projectId = bundle.getProjectId();
 		this.moderatorIds = moderatorIds;
 		this.isThreadDeleted = bundle.getIsDeleted();
 		configureView(bundle);
-		boolean isAuthorModerator = moderatorIds.contains(Long.parseLong(bundle.getCreatedBy()));
+		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
 		view.setIsAuthorModerator(isAuthorModerator);
 
 		authorWidget.configure(bundle.getCreatedBy());
@@ -166,6 +174,18 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		}
 
+		newReplyWidget.configure(threadId, getNewReplyCallback());
+		secondNewReplyWidget.configure(threadId, getNewReplyCallback());
+	}
+
+	private Callback getNewReplyCallback() {
+		return new Callback() {
+
+			@Override
+			public void invoke() {
+				reconfigureThread();
+			}
+		};
 	}
 
 	/**
@@ -186,8 +206,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setEditedLabelVisible(bundle.getIsEdited());
 		boolean isDeleted = bundle.getIsDeleted();
 		view.setDeletedThreadVisible(isDeleted);
-		view.setReplyContainerVisible(!isDeleted);
+		view.setReplyContainersVisible(!isDeleted);
 		view.setCommandsVisible(!isDeleted);
+		view.setRestoreIconVisible(isDeleted);
 		if (!isDeleted) {
 			view.setDeleteIconVisible(isCurrentUserModerator);
 
@@ -230,7 +251,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result, replyId, isCurrentUserModerator, moderatorIds, deleteCallback);
+				configure(result, replyId, isCurrentUserModerator, moderatorIds, deleteOrRestoreCallback);
 			}
 		});
 	}
@@ -312,19 +333,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 
 	@Override
-	public void onClickNewReply() {
-		if (!authController.isLoggedIn()) {
-			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		} else {
-			view.setReplyTextBoxVisible(false);
-			markdownEditor.configure(DEFAULT_MARKDOWN);
-			view.setNewReplyContainerVisible(true);
-			markdownEditor.setMarkdownFocus();
-		}
-	}
-
-	@Override
 	public void loadMore() {
 		synAlert.clear();
 		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset,
@@ -349,6 +357,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 							}
 						}
 						repliesContainer.setIsMore(offset < result.getTotalNumberOfResults());
+						view.setSecondNewReplyContainerVisible(result.getTotalNumberOfResults() > 0);
 					}
 		});
 	}
@@ -389,7 +398,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new AlertCallback(){
+		view.showConfirm(DELETE_CONFIRM_MESSAGE, CONFIRM_DELETE_DIALOG_TITLE, BUTTON_DELETE, DANGER_BUTTON_STYLE, new SimpleCallback(){
 
 			@Override
 			public void callback() {
@@ -410,8 +419,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			@Override
 			public void onSuccess(Void result) {
 				view.showSuccess(DELETE_SUCCESS_TITLE, DELETE_SUCCESS_MESSAGE);
-				if (deleteCallback != null) {
-					deleteCallback.invoke();
+				if (deleteOrRestoreCallback != null) {
+					deleteOrRestoreCallback.invoke();
 				}
 			}
 		});
@@ -456,45 +465,43 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		});
 	}
 	
-	public void setReplyTextBoxVisible(boolean visible) {
-		view.setReplyTextBoxVisible(visible);
+	public void setNewReplyContainerVisible(boolean visible) {
+		view.setReplyContainersVisible(visible);;
 	}
 	
 	public void setCommandsVisible(boolean visible) {
 		view.setCommandsVisible(visible);
 	}
 
-	public void onClickCancel() {
-		view.resetButton();
-		view.setReplyTextBoxVisible(true);
-		view.setNewReplyContainerVisible(false);
+	public void setReplyListVisible(boolean visible) {
+		view.setReplyListContainerVisible(visible);
 	}
 
-	public void onClickSave() {
+	public void onClickRestore() {
+		view.showConfirm(RESTORE_CONFIRM_MESSAGE, CONFIRM_RESTORE_DIALOG_TITLE, BUTTON_RESTORE, PRIMARY_BUTTON_STYLE, new SimpleCallback(){
+
+			@Override
+			public void callback() {
+				restoreThread();
+			}
+		});
+	}
+
+	public void restoreThread() {
 		synAlert.clear();
-		String messageMarkdown = markdownEditor.getMarkdown();
-		ValidationResult result = new ValidationResult();
-		result.requiredField("Message", messageMarkdown);
-		if (!result.isValid()) {
-			synAlert.showError(result.getErrorMessage());
-			return;
-		}
-		view.showSaving();
-		CreateDiscussionReply toCreate = new CreateDiscussionReply();
-		toCreate.setThreadId(threadId);
-		toCreate.setMessageMarkdown(messageMarkdown);
-		discussionForumClientAsync.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>(){
+		discussionForumClientAsync.restoreThread(threadId, new AsyncCallback<Void>(){
+
 			@Override
 			public void onFailure(Throwable caught) {
-				view.resetButton();
 				synAlert.handleException(caught);
 			}
 
 			@Override
-			public void onSuccess(DiscussionReplyBundle result) {
-				view.showSuccess(NEW_REPLY_SUCCESS_TITLE, NEW_REPLY_SUCCESS_MESSAGE);
-				reconfigureThread();
-				onClickCancel();
+			public void onSuccess(Void result) {
+				view.showSuccess(RESTORE_SUCCESS_TITLE, RESTORE_SUCCESS_MESSAGE);
+				if (deleteOrRestoreCallback != null) {
+					deleteOrRestoreCallback.invoke();
+				}
 			}
 		});
 	}

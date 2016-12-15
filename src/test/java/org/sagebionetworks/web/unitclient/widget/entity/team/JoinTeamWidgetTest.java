@@ -110,7 +110,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.configure(teamId, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(status).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
 		when(mockGwt.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
@@ -156,6 +156,32 @@ public class JoinTeamWidgetTest {
 		verify(mockView, times(2)).setButtonsEnabled(anyBoolean());
 	}
 	
+
+	@Test
+	public void testInvitedToTeamWithAccessRequirements() throws Exception {
+		// set up the team membership status so that the current user has been invited to a team (that requires membership approval) that has unmet access requirements.
+		reset(mockView);
+		TeamMembershipStatus mockStatus = mock(TeamMembershipStatus.class);
+		when(mockStatus.getIsMember()).thenReturn(false);
+		when(mockStatus.getCanJoin()).thenReturn(false);
+		when(mockStatus.getHasOpenRequest()).thenReturn(false);
+		when(mockStatus.getMembershipApprovalRequired()).thenReturn(true);
+		when(mockStatus.getHasOpenInvitation()).thenReturn(true);
+		when(mockStatus.getHasUnmetAccessRequirement()).thenReturn(true);
+		
+		String isMemberMessage = "already a member";
+		String successMessage = "successfully joined";
+		String buttonText = "join a team";
+		String openRequestText = "you have an open request.";
+		boolean isChallenge = false;
+		boolean isSimpleRequestButton = true;
+		joinWidget.configure(teamId, isChallenge, mockStatus, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText, openRequestText, isSimpleRequestButton);
+		
+		verify(mockView).setJoinButtonsText(buttonText);
+		verify(mockView).setRequestOpenText(openRequestText);
+		verify(mockView).setUserPanelVisible(true);
+		verify(mockView).setAcceptInviteButtonVisible(true);
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Test

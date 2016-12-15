@@ -15,8 +15,8 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	void setUpdatableEntities(List<EntityHeader> rootEntities);
-	
+	void addUpdatableEntities(List<EntityHeader> rootEntities);
+	void setIsMoreUpdatableEntities(boolean isMore);
 	public EntityTreeBrowser getEntityTreeBrowser();
 	
 	void setFavoriteEntities(List<EntityHeader> favoriteEntities);
@@ -29,14 +29,8 @@ public interface MyEntitiesBrowserView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
 		void entitySelected(String selectedEntityId);		
-		
-		public void loadUserUpdateable();
-
+		void loadMoreUserUpdateable();
 		void loadFavorites();
 	}
-
-
-
 }

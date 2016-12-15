@@ -1,31 +1,34 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -43,11 +46,9 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private UserBadge modifiedByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private SynapseClientAsync synapseClient;
-	private GWTWrapper gwt;
 	private CallbackP<String> customEntityClickHandler;
-	private Callback invokeCheckForInViewAndLoadData;
-	private boolean isConfigured;
-	private boolean isAttached;
+	private FileDownloadButton fileDownloadButton;
+	private LazyLoadHelper lazyLoadHelper;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -55,50 +56,37 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			UserBadge modifiedByUserBadge,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
-			GWTWrapper gwt) {
+			FileDownloadButton fileDownloadButton,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
-		this.gwt = gwt;
+		this.fileDownloadButton = fileDownloadButton;
+		this.lazyLoadHelper = lazyLoadHelper;
 		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
-		invokeCheckForInViewAndLoadData = new Callback() {
+		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
-				checkForInViewAndLoadData();
+				getEntityBundle();
 			}
 		};
-		isConfigured = false;
-		isAttached = false;
-	}
-	public void startCheckingIfAttachedAndConfigured() {
-		if (isAttached && isConfigured) {
-			checkForInViewAndLoadData();
-		}
-	}
-	public void checkForInViewAndLoadData() {
-		if (!view.isAttached()) {
-			//Done, view has been detached and widget was never in the viewport
-			return;
-		} else if (view.isInViewport()) {
-			//try to load data!
-			getEntityBundle();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
-		}
-	}
-	@Override
-	public void viewAttached() {
-		isAttached = true;
-		startCheckingIfAttachedAndConfigured();
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
+		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
+		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				getEntityBundle();
+			}
+		});
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL;
+		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
 		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -128,11 +116,9 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		} else {
 			view.setModifiedOn("");
 		}
-		isConfigured = true;
-		startCheckingIfAttachedAndConfigured();
+		lazyLoadHelper.setIsConfigured();
 	}
 	
-
 	public void clearState() {
 	}
 
@@ -166,6 +152,14 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		if (DisplayUtils.isDefined(rootWikiId)) {
 			view.showHasWikiIcon();
 		}
+		
+		if (eb.getEntity() instanceof FileEntity) {
+			fileDownloadButton.configure(eb);
+			fileDownloadButton.setClientsHelpVisible(false);
+			view.setFileDownloadButton(fileDownloadButton.asWidget());
+		}
+		
+		view.setDiscussionThreadIconVisible(eb.getThreadCount() > 0);
 	}
 	
 	public String getContentSize(List<FileHandle> handles) {

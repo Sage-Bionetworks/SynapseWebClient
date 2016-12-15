@@ -147,6 +147,46 @@ public class SubmitToEvaluationWidgetTest {
 		verify(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testGetEvaluationIdsFromProject() throws Exception {
+		//test resolving evaluation ids from project id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.PROJECT_ID_KEY, "1");
+		Set<String> evaluationIds = Collections.singleton("5");
+		AsyncMockStubber.callSuccessWith(evaluationIds).when(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockCallback).invoke(evaluationIds);
+	}
+	
+	@Test
+	public void testGetEvaluationIdsEmptyFromProject() throws Exception {
+		//test resolving evaluation ids from project id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.PROJECT_ID_KEY, "1");
+		Set<String> evaluationIds = Collections.emptySet();
+		AsyncMockStubber.callSuccessWith(evaluationIds).when(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockCallback, never()).invoke(anySet());
+		verify(mockView).showUnavailable(anyString());
+	}
+	
+	@Test
+	public void testGetEvaluationIdsErrorFromProject() throws Exception {
+		//test resolving evaluation ids from challenge id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.PROJECT_ID_KEY, "1");
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
 
 	@Test
 	public void testConfigureServiceFailure() throws Exception {

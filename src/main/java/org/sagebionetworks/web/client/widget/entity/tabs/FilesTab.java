@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -33,7 +34,9 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
@@ -49,6 +52,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.Act
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -56,7 +60,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class FilesTab implements FilesTabView.Presenter{
+public class FilesTab {
 	Tab tab;
 	FilesTabView view;
 	FileTitleBar fileTitleBar;
@@ -71,6 +75,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	DiscussionThreadListWidget discussionThreadListWidget;
 	
 	Entity currentEntity;
 	String currentEntityId;
@@ -88,61 +93,58 @@ public class FilesTab implements FilesTabView.Presenter{
 	String projectEntityId;
 	
 	@Inject
-	public FilesTab(FilesTabView view, 
-			Tab tab,
-			FileTitleBar fileTitleBar,
-			BasicTitleBar folderTitleBar,
-			Breadcrumb breadcrumb,
-			EntityMetadata metadata,
-			FilesBrowser filesBrowser,
-			PreviewWidget previewWidget,
-			WikiPageWidget wikiPageWidget,
-			StuAlert synAlert,
-			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector,
-			GlobalApplicationState globalApplicationState,
-			ModifiedCreatedByWidget modifiedCreatedBy
-			) {
-		this.view = view;
+	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
-		this.fileTitleBar = fileTitleBar;
-		this.folderTitleBar = folderTitleBar;
-		this.breadcrumb = breadcrumb;
-		this.metadata = metadata;
-		this.filesBrowser = filesBrowser;
-		this.previewWidget = previewWidget;
-		this.wikiPageWidget = wikiPageWidget;
-		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
-		this.globalApplicationState = globalApplicationState;
-		this.modifiedCreatedBy = modifiedCreatedBy;
-		view.setPresenter(this);
-		
-		previewWidget.addStyleName("min-height-200");
-		view.setFileTitlebar(fileTitleBar.asWidget());
-		view.setFolderTitlebar(folderTitleBar.asWidget());
-		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setFileBrowser(filesBrowser.asWidget());
-		view.setPreview(previewWidget.asWidget());
-		view.setMetadata(metadata.asWidget());
-		view.setWikiPage(wikiPageWidget.asWidget());
-		view.setSynapseAlert(synAlert.asWidget());
-		view.setModifiedCreatedBy(modifiedCreatedBy);
-		
-		tab.configure("Files", view.asWidget(), "Organize your data by uploading files into a directory structure built in the Files section.", null);
-		
-		configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
-		CallbackP<String> entityClicked = new CallbackP<String> () {
-			@Override
-			public void invoke(String id) {
-				getTargetBundleAndDisplay(id, null);
-			}
-		};
-		filesBrowser.setEntityClickedHandler(entityClicked);
-		initBreadcrumbLinkClickedHandler();
+		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "versioning.html");
 	}
-
+	
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getFilesTabView();
+			this.fileTitleBar = ginInjector.getFileTitleBar();
+			this.folderTitleBar = ginInjector.getBasicTitleBar();
+			this.breadcrumb = ginInjector.getBreadcrumb();
+			this.metadata = ginInjector.getEntityMetadata();
+			this.filesBrowser = ginInjector.getFilesBrowser();
+			this.previewWidget = ginInjector.getPreviewWidget();
+			this.wikiPageWidget = ginInjector.getWikiPageWidget();
+			this.synAlert = ginInjector.getStuAlert();
+			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.globalApplicationState = ginInjector.getGlobalApplicationState();
+			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
+			this.discussionThreadListWidget = ginInjector.getDiscussionThreadListWidget();
+			tab.setContent(view.asWidget());
+			previewWidget.addStyleName("min-height-200");
+			view.setFileTitlebar(fileTitleBar.asWidget());
+			view.setFolderTitlebar(folderTitleBar.asWidget());
+			view.setBreadcrumb(breadcrumb.asWidget());
+			view.setFileBrowser(filesBrowser.asWidget());
+			view.setPreview(previewWidget.asWidget());
+			view.setMetadata(metadata.asWidget());
+			view.setWikiPage(wikiPageWidget.asWidget());
+			view.setSynapseAlert(synAlert.asWidget());
+			view.setModifiedCreatedBy(modifiedCreatedBy);
+			view.setDiscussionThreadListWidget(discussionThreadListWidget.asWidget());
+			discussionThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>(){
+	
+				@Override
+				public void invoke(DiscussionThreadBundle bundle) {
+					globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(bundle.getProjectId(), bundle.getId()));
+				}
+			});
+			
+			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
+			CallbackP<String> entityClicked = new CallbackP<String> () {
+				@Override
+				public void invoke(String id) {
+					getTargetBundleAndDisplay(id, null);
+				}
+			};
+			filesBrowser.setEntityClickedHandler(entityClicked);
+			initBreadcrumbLinkClickedHandler();
+		}
+	}
 	public void initBreadcrumbLinkClickedHandler() {
 		CallbackP<Place> breadcrumbClicked = new CallbackP<Place>() {
 			public void invoke(Place place) {
@@ -186,9 +188,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
 		modifiedCreatedBy.setVisible(false);
+		view.setDiscussionThreadListWidgetVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
@@ -198,6 +200,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	
 	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+		lazyInject();
 		this.currentEntity = targetEntity;
 		this.currentEntityId = targetEntity.getId();
 		this.handler = handler;
@@ -207,6 +210,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		//reset view
 		resetView();
+		view.showLoading(true);
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
@@ -299,18 +303,23 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		showProjectInfoCallack.invoke(isProject);
 		
+		view.showLoading(false);
+		
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
 		//Preview
-		view.setPreviewVisible(isFile);
+		view.setPreviewVisible(isFile && !bundle.getFileHandles().isEmpty());		
+		
 		//File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
 			fileTitleBar.configure(bundle);
 			previewWidget.configure(bundle);
+			discussionThreadListWidget.configure(currentEntityId, null, null);
+			view.setDiscussionText(currentEntity.getName());
 		}
-		
+		view.setDiscussionThreadListWidgetVisible(isFile);
 		view.setFolderTitlebarVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);
@@ -335,12 +344,6 @@ public class FilesTab implements FilesTabView.Presenter{
 			filesBrowser.configure(currentEntityId, bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser());	
 		}
 		
-		//Programmatic Clients
-		view.setProgrammaticClientsVisible(isFile);
-		if (isFile) {
-			view.configureProgrammaticClients(currentEntityId, shownVersionNumber);	
-		}
-
 		//Provenance
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));

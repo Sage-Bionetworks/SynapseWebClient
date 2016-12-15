@@ -65,8 +65,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
-		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay, true));
+	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {
+		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay, deleteButtonVisible));
 	}
 	
 	private TableRow createAclEntryTableRow(final AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {

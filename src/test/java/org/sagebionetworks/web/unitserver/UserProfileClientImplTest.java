@@ -4,12 +4,15 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -47,6 +50,16 @@ public class UserProfileClientImplTest {
 
 	@Mock
 	SynapseClient mockSynapse;
+	
+	
+	@Mock
+	ThreadLocal<HttpServletRequest> mockThreadLocal;
+	
+	@Mock 
+	HttpServletRequest mockRequest;
+	
+	String userIp = "127.0.0.1";
+	
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -67,6 +80,11 @@ public class UserProfileClientImplTest {
 		when(mockUserSessionData.getProfile()).thenReturn(testProfile);
 		when(mockUserSessionData.getSession()).thenReturn(testSession);
 		when(mockSynapse.getMyProfile()).thenReturn(testProfile);
+		
+		Whitebox.setInternalState(userProfileClient, "perThreadRequest", mockThreadLocal);
+		userIp = "127.0.0.1";
+		when(mockThreadLocal.get()).thenReturn(mockRequest);
+		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
 	}
 
 	@Test

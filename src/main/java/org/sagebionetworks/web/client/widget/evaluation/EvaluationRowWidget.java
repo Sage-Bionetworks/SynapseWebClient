@@ -70,7 +70,8 @@ public class EvaluationRowWidget implements IsWidget {
 	public void configure(Evaluation evaluation, EvaluationActionHandler handler) {
 		this.evaluation = evaluation;
 		this.handler = handler;
-		evaluationNameText.setText(evaluation.getName());
+		String evaluationText = evaluation.getName() + " (" + evaluation.getId() + ")";
+		evaluationNameText.setText(evaluationText);
 	}
 	
 	@Override

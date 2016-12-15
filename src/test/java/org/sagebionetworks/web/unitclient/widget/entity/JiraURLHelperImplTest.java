@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,7 @@ public class JiraURLHelperImplTest {
 		when(mockAuthController.getCurrentUserSessionData()).thenReturn(mockSessionData);
 		testProfile = new UserProfile();
 		testProfile.setUserName("007");
+		testProfile.setEmails(Collections.singletonList("test@test.com"));
 		when(mockSessionData.getProfile()).thenReturn(testProfile);
 		
 		helper = new JiraURLHelperImpl(new JiraGovernanceConstants() {
@@ -126,6 +128,19 @@ public class JiraURLHelperImplTest {
 				"syn123", "432");
 		URL url = new URL(urlString); // this will check that the url is well formed
 	}
+	
+	@Test
+	public void testCreateReportAbuseIssueURL() throws MalformedURLException {
+		String urlString = helper.createReportAbuseIssueURL();
+		URL url = new URL(urlString); // this will check that the url is well formed
+	}
+	@Test
+	public void testAnonymousCreateReportAbuseIssueURL() throws MalformedURLException {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		String urlString = helper.createReportAbuseIssueURL();
+		URL url = new URL(urlString); // this will check that the url is well formed
+	}
+	
 	@Test
 	public void testCreateIssueOnBackend() {
 		String userSteps = "user steps to repro (optional)";

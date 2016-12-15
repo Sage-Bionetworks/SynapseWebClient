@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 
@@ -21,10 +22,11 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	public TextBox heightField;
 	
 	Widget widget;
-	
+	SynapseJSNIUtils jsniUtils;
 	@Inject
-	public ShinySiteConfigViewImpl(ShinySiteConfigViewImplUiBinder binder) {
+	public ShinySiteConfigViewImpl(ShinySiteConfigViewImplUiBinder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
+		this.jsniUtils = jsniUtils;
 	}
 	
 	@Override
@@ -35,7 +37,7 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	public void checkParams() throws IllegalArgumentException {
 		if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_URL_MESSAGE);
-		if(!ShinySiteWidget.isValidShinySite(urlField.getValue()))
+		if(!ShinySiteWidget.isValidShinySite(urlField.getValue(), jsniUtils))
 			throw new IllegalArgumentException(urlField.getValue() + DisplayConstants.INVALID_SHINY_SITE);
 	}
 	@Override

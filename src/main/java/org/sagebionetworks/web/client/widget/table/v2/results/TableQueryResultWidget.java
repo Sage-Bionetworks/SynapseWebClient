@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -11,11 +13,13 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,9 +43,11 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
+	boolean isView;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
+	CallbackP<FacetColumnRequest> facetChangedHandler;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
@@ -58,16 +64,36 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
 		this.view.setSynapseAlertWidget(synapseAlert.asWidget());
+		facetChangedHandler = new CallbackP<FacetColumnRequest>() {
+			@Override
+			public void invoke(FacetColumnRequest request) {
+				List<FacetColumnRequest> selectedFacets = startingQuery.getSelectedFacets();
+				if (selectedFacets == null) {
+					selectedFacets = new ArrayList<FacetColumnRequest>();
+					startingQuery.setSelectedFacets(selectedFacets);
+				}
+				for (FacetColumnRequest facetColumnRequest : selectedFacets) {
+					if (facetColumnRequest.getColumnName().equals(request.getColumnName())) {
+						selectedFacets.remove(facetColumnRequest);
+						break;
+					}
+				}
+				selectedFacets.add(request);
+				runQuery();
+			}
+		};
 	}
 	
 	/**
 	 * Configure this widget with a query string.
 	 * @param queryString
 	 * @param isEditable Is the user allowed to edit the query results?
+	 * @param is table a file view?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, QueryResultsListener listener){
+	public void configure(Query query, boolean isEditable, boolean isView, QueryResultsListener listener){
 		this.isEditable = isEditable;
+		this.isView = isView;
 		this.startingQuery = query;
 		this.queryListener = listener;
 		if (!synapseAlert.isUserLoggedIn()) {
@@ -133,12 +159,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.bundle = bundle;
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
-		SortItem sort = null;
-		if(sortItems != null && !sortItems.isEmpty()){
-			sort = sortItems.get(0);
-		}
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, null, this);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}

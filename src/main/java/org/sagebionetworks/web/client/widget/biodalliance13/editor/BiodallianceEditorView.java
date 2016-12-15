@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 
+import org.sagebionetworks.web.client.widget.SelectableListView;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface BiodallianceEditorView extends IsWidget, WidgetEditorView {
+public interface BiodallianceEditorView extends IsWidget, WidgetEditorView, SelectableListView {
 
 	/**
 	 * Set the presenter.
@@ -20,11 +21,6 @@ public interface BiodallianceEditorView extends IsWidget, WidgetEditorView {
 	 */
 	public interface Presenter {
 		void addTrackClicked();
-		void onMoveDown();
-		void onMoveUp();
-		void deleteSelected();
-		void selectNone();
-		void selectAll();
 	}
 	
 	String getChr();
@@ -38,10 +34,4 @@ public interface BiodallianceEditorView extends IsWidget, WidgetEditorView {
 	boolean isHuman();
 	void setHuman();
 	void setTrackHeaderColumnsVisible(boolean visible);
-	
-	//selection toolbar state
-	void setCanDelete(boolean canDelete);
-	void setCanMoveUp(boolean canMoveUp);
-	void setCanMoveDown(boolean canMoveDown);
-	void setButtonToolbarVisible(boolean visible);
 }

@@ -20,7 +20,9 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -29,11 +31,16 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
@@ -41,6 +48,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -48,6 +57,7 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class APITableWidgetTest {
 		
@@ -69,8 +79,23 @@ public class APITableWidgetTest {
 	String col1Name ="column 1";
 	String col2Name ="column 2";
 	public static final int COLUMN_ROW_COUNT = 10;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	CancelControlWidget mockCancelControlWidget;
+	@Mock
+	UserBadge mockUserBadge;
+	@Mock
+	ElementWrapper cancelControlDiv;
+	@Mock
+	ElementWrapper userBadgeDiv1;
+	@Mock
+	ElementWrapper userBadgeDiv2;
+	@Mock
+	GWTWrapper mockGWT;
 	@Before
 	public void setup() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(APITableWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
@@ -79,6 +104,8 @@ public class APITableWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		noneColumnRenderer = new APITableColumnRendererNone();
 		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
+		when(mockGinInjector.getCancelControlWidget()).thenReturn(mockCancelControlWidget);
+		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
@@ -97,7 +124,7 @@ public class APITableWidgetTest {
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(synapseIDColumnRenderer);
 		
 		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController);
+		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockGWT);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
@@ -169,16 +196,19 @@ public class APITableWidgetTest {
 	public void testMissingServiceURI() throws JSONObjectAdapterException {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).showError(anyString());
+		verify(mockSynAlert).showError(DisplayConstants.API_TABLE_MISSING_URI);
+		verify(mockView).showError(any(Widget.class));
 	}
 	
 	//test uri call failure causes view to render error
 	@Test
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).showError(eq(errorMessage));
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showError(any(Widget.class));
 	}
 	
 	@Test
@@ -234,6 +264,23 @@ public class APITableWidgetTest {
 	@Test
 	public void testCurrentUserVariable() throws JSONObjectAdapterException {
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project+where+userId==" + APITableWidget.CURRENT_USER_SQL_VARIABLE;
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		String testUserId = "12345test";
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		
+		assertTrue(arg.getValue().endsWith(testUserId));
+	}
+	
+	@Test
+	public void testCurrentUserVariableEncoded() throws JSONObjectAdapterException {
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project+where+userId==" + APITableWidget.ENCODED_CURRENT_USER_SQL_VARIABLE;
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -526,5 +573,28 @@ public class APITableWidgetTest {
 		assertNotNull(absentColumn);
 		assertEquals(COLUMN_ROW_COUNT, absentColumn.size());
 		assertNull(absentColumn.get(0));
+	}
+	
+	@Test
+	public void testInjectWidgets() {
+		List<ElementWrapper> cancelRequestDivs = new ArrayList<ElementWrapper>();
+		cancelRequestDivs.add(cancelControlDiv);
+		when(mockView.findCancelRequestDivs()).thenReturn(cancelRequestDivs);
+		
+		List<ElementWrapper> userBadgeDivs = new ArrayList<ElementWrapper>();
+		userBadgeDivs.add(userBadgeDiv1);
+		userBadgeDivs.add(userBadgeDiv2);
+		when(mockView.findUserBadgeDivs()).thenReturn(userBadgeDivs);
+		
+		widget.injectWidgets();
+		verify(mockGinInjector, times(cancelRequestDivs.size())).getCancelControlWidget();
+		verify(mockGinInjector, times(userBadgeDivs.size())).getUserBadgeWidget();
+		
+		verify(cancelControlDiv).removeAllChildren();
+		verify(userBadgeDiv1).removeAllChildren();
+		verify(userBadgeDiv2).removeAllChildren();
+		
+		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString());
+		verify(mockUserBadge, times(userBadgeDivs.size())).configure(anyString());
 	}
 }

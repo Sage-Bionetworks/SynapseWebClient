@@ -18,6 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -25,14 +26,16 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,6 +43,7 @@ import com.google.inject.Inject;
 public class APITableWidget implements APITableWidgetView.Presenter, WidgetRendererPresenter {
 	
 	public static final String CURRENT_USER_SQL_VARIABLE = "@CURRENT_USER";
+	public static final String ENCODED_CURRENT_USER_SQL_VARIABLE = "%40CURRENT_USER";
 	private APITableWidgetView view;
 	private Map<String, String> descriptor;
 	private SynapseClientAsync synapseClient;
@@ -49,6 +53,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private APITableConfig tableConfig;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	SynapseAlert synAlert;
+	private GWTWrapper gwt;
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
 	public static Set<String> dateColumnNames = new HashSet<String>();
@@ -68,14 +74,17 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	@Inject
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseAlert synAlert, GWTWrapper gwt) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.ginInjector = ginInjector;
+		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;		
+		this.authenticationController = authenticationController;
+		this.gwt = gwt;
 	}
 	
 	@Override
@@ -93,8 +102,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		if (tableConfig.getUri() != null) {
 			refreshData();
 		}
-		else
-			view.showError(DisplayConstants.API_TABLE_MISSING_URI);
+		else {
+			synAlert.showError(DisplayConstants.API_TABLE_MISSING_URI);
+			view.showError(synAlert.asWidget());
+		}
 	}
 	
 	@Override
@@ -124,8 +135,11 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 		
 		
-		if (authenticationController.isLoggedIn())
-			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, authenticationController.getCurrentUserPrincipalId());
+		if (authenticationController.isLoggedIn()) {
+			String userId = authenticationController.getCurrentUserPrincipalId();
+			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, userId).replace(ENCODED_CURRENT_USER_SQL_VARIABLE, userId);
+		}
+			
 		synapseClient.getJSONEntity(fullUri, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -201,8 +215,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			public void onFailure(Throwable caught) {
 				if(caught instanceof TableUnavilableException)
 					view.showTableUnavailable();
-				else
-					view.showError(caught.getMessage());
+				else {
+					synAlert.handleException(caught);
+					view.showError(synAlert.asWidget());
+				}
 			}
 		});
 	}
@@ -375,7 +391,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			@Override
 			public void onFailure(Throwable caught) {
 				//there was a problem initializing a particular renderer
-				view.showError(caught.getMessage());
+				synAlert.handleException(caught);
+				view.showError(synAlert.asWidget());
 			}
 			private void processNext() {
 				//after all renderers have initialized, then configure the view
@@ -386,6 +403,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						int end = start + rowCount - 1;
 						view.configurePager(start, end, total);
 					}
+					// fill in user badges and cancel buttons
+					injectWidgets();
 				} else
 					tableColumnRendererInit(columnData, columnNames, renderers, initializedRenderers, currentIndex+1);
 			}
@@ -393,6 +412,25 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 
 		APITableColumnConfig config = tableConfig.getColumnConfigs().get(currentIndex);
 		renderers[currentIndex].init(columnData, config, callback);
+	}
+	
+	public void injectWidgets() {
+		List<ElementWrapper> divs = view.findCancelRequestDivs();
+		for (ElementWrapper div : divs) {
+			div.removeAllChildren();
+			String json = gwt.decodeQueryString(div.getAttribute("value"));
+			CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
+			cancelRequestWidget.configure(json);
+			view.addWidget(cancelRequestWidget.asWidget(), div.getAttribute("id"));
+		}
+		divs = view.findUserBadgeDivs();
+		for (ElementWrapper div : divs) {
+			div.removeAllChildren();
+			String userId = div.getAttribute("value");
+			UserBadge userBadge = ginInjector.getUserBadgeWidget();
+			userBadge.configure(userId);
+			view.addWidget(userBadge.asWidget(), div.getAttribute("id"));
+		}
 	}
 	
 	/**
@@ -452,6 +490,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			} else if (synapseIdColumnNames.contains(lowerCaseColumnName) || 
 					(isNodeQueryService(tableConfig.getUri()) && WebConstants.DEFAULT_COL_NAME_ID.equals(lowerCaseColumnName))) {
 				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
+			} else if (lowerCaseColumnName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL;
 			}
 		}
 		return defaultRendererName;
@@ -474,6 +514,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			renderer = ginInjector.getAPITableColumnRendererSynapseID();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS))
 			renderer = ginInjector.getAPITableColumnRendererEntityAnnotations();
+		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL))
+			renderer = ginInjector.getAPITableColumnRendererCancelControl();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE))
 			renderer = ginInjector.getAPITableColumnRendererNone();
 		else

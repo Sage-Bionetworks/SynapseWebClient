@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,11 +9,16 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,18 +35,25 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	Callback onAddDefaultViewColumnsCallback;
 	Set<String> columnModelIds;
+	CookieProvider cookies;
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
 	
+	public static List<ColumnModel> nonEditableColumns = null;
+	public SynapseClientAsync synapseClient;
+	public AdapterFactory adapterFactory;
 	@Inject
-	public ColumnModelsEditorWidget(PortalGinInjector ginInjector) {
+	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
 		columnModelIds = new HashSet<String>();
 		this.ginInjector = ginInjector;
 		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
+		this.synapseClient = synapseClient;
+		this.adapterFactory = adapterFactory;
+		cookies = ginInjector.getCookieProvider();
 	}
 	
 	public void configure(List<ColumnModel> startingModels) {
@@ -73,7 +86,10 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
-		// Assign an id to this column
+		return createColumnModelEditorWidget(cm);
+	}
+	
+	private ColumnModelTableRowEditorWidget createColumnModelEditorWidget(ColumnModel cm) {
 		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
 		// bind this row for navigation.
 		if(this.keyboardNavigationHandler != null){
@@ -84,6 +100,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		rowEditor.configure(cm, this);
 		checkSelectionState();
 		return rowEditor;
+	}
+	
+	private ColumnModelTableRowViewer createColumnModelViewerWidget(ColumnModel cm) {
+		ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
+		ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
+		rowViewer.setSelectable(true);
+		rowViewer.setSelectionPresenter(this);
+		editor.addColumn(rowViewer);
+		this.editorRows.add(rowViewer);
+		checkSelectionState();
+		return rowViewer;
 	}
 	
 	/**
@@ -98,22 +125,69 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		addColumns(this.startingModels);
 	}
 	
-	public void addColumns(List<ColumnModel> models) {
+	public void addColumns(final List<ColumnModel> models) {
+		if (nonEditableColumns == null) {
+			initNonEditableColumns(new Callback() {
+				@Override
+				public void invoke() {
+					addColumnsAfterInit(models);					
+				}
+			});
+		} else {
+			addColumnsAfterInit(models);	
+		}
+	}
+	
+	public void initNonEditableColumns(final Callback callback) {
+		synapseClient.getDefaultColumnsForView(org.sagebionetworks.repo.model.table.ViewType.file, new AsyncCallback<List<ColumnModel>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				editor.showErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(List<ColumnModel> columns) {
+				nonEditableColumns = new ArrayList<ColumnModel>();
+				for (ColumnModel cm : columns) {
+					nonEditableColumns.add(cm);
+				}
+				callback.invoke();
+			}
+		});
+	}
+	
+	public void addColumnsAfterInit(final List<ColumnModel> models) {
+		List<ColumnModel> existingColumns = getEditedColumnModels();
+		for (ColumnModel cm : existingColumns) {
+			cm.setId(null);
+			if (models.contains(cm)) {
+				models.remove(cm);
+			}
+		}
 		for(ColumnModel cm: models){
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
-				ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
-				ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
-				rowViewer.setSelectable(true);
-				rowViewer.setSelectionPresenter(this);
-				editor.addColumn(rowViewer);
-				this.editorRows.add(rowViewer);
+				// default column model ids are cleared on the servlet.
+				ColumnModel cmCopy = copyColumnModel(cm);
+				cmCopy.setId(null);
+				if (!nonEditableColumns.contains(cmCopy)) {
+					createColumnModelEditorWidget(cm);	
+				} else {
+					createColumnModelViewerWidget(cm);
+				}
 				columnModelIds.add(columnModelId);
 			}
 		}
 		checkSelectionState();
 	}
-
+	
+	private ColumnModel copyColumnModel(ColumnModel cm) {
+		try {
+			return new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
+		} catch (JSONObjectAdapterException e) {
+			editor.showErrorMessage(e.getMessage());
+			return null;
+		}
+	}
 
 	@Override
 	public void toggleSelect() {

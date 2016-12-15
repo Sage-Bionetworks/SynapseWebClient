@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.footer;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -13,11 +14,16 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	private FooterView view;
 	GlobalApplicationState globalAppState;
 	private boolean isInitialized = false;
+	JiraURLHelper jiraHelper;
 	
 	@Inject
-	public Footer(FooterView view, GlobalApplicationState globalAppState) {
+	public Footer(FooterView view, 
+			GlobalApplicationState globalAppState,
+			JiraURLHelper jiraHelper
+			) {
 		this.view = view;
 		this.globalAppState = globalAppState;
+		this.jiraHelper = jiraHelper;
 		view.setPresenter(this);
 	}
 
@@ -49,5 +55,10 @@ public class Footer implements FooterView.Presenter, IsWidget {
 			});
 		}
 		return view.asWidget();
+	}
+	
+	@Override
+	public void onReportAbuseClicked() {
+		view.open(jiraHelper.createReportAbuseIssueURL());
 	}
 }

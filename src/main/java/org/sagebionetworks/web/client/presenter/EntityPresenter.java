@@ -38,6 +38,7 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -101,6 +102,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		clear();
 		// Install the view
 		panel.setWidget(view);
+		view.setLoadingVisible(true);
 	}
 
 	@Override
@@ -178,7 +180,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
 					}
-					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
+					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
 					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);

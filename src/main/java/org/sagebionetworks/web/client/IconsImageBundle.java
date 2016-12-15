@@ -252,5 +252,14 @@ public interface IconsImageBundle extends ClientBundle {
 	ImageResource usersGrey40();
 	
 	@Source("resource/images/icons/exclamation-16.png")
-	ImageResource warning16();	
+	ImageResource warning16();
+
+	@Source("resource/images/icons/restore-16.png")
+	ImageResource restore16();
+
+	@Source("resource/images/icons/restore-24.png")
+	ImageResource restore24();
+
+	@Source("resource/images/icons/restore-36.png")
+	ImageResource restore36();
 }

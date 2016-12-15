@@ -42,6 +42,8 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	SimplePanel deletedThreadListContainer;
 	@UiField
 	Div deleteThreadsArea;
+	@UiField
+	Div mainContainer;
 	
 	Timer newThreadTooltipHider = new Timer() { 
 	    public void run() {
@@ -177,5 +179,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setDeletedThreadButtonIcon(IconType icon) {
 		deletedThreadButton.setIcon(icon);
+	}
+
+	@Override
+	public void setMainContainerVisible(boolean visible) {
+		mainContainer.setVisible(visible);
 	}
 }

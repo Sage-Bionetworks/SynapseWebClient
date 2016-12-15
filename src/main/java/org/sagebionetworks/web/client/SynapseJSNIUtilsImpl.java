@@ -134,11 +134,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId, String xsrfToken) {
 		return GWT.getModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
 				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
-				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId + "&" +
+				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
 
 	@Override
@@ -559,4 +560,98 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String getCurrentHostName() {
 		return Location.getHostName();
 	}
+	
+	@Override
+	public String getProtocol(String url) {
+		return _getProtocol(url);
+	}
+	private final static native String _getProtocol(String url) /*-{
+		var parser = $doc.createElement('a');
+		parser.href = url;
+		var v = parser.protocol; // for example, "https:"
+		parser = null; 
+		return v;
+	}-*/;
+	
+	@Override
+	public String getHost(String url) {
+		return _getHost(url);
+	}
+	
+	private final static native String _getHost(String url) /*-{
+		var parser = $doc.createElement('a');
+		parser.href = url;
+		var v = parser.host;     // for example, "test.com:8080"
+		parser = null; 
+		return v;
+	}-*/;
+	
+	@Override
+	public String getHostname(String url) {
+		return _getHostname(url);
+	}
+	
+	private final static native String _getHostname(String url) /*-{
+		var parser = $doc.createElement('a');
+		parser.href = url;
+		var v = parser.hostname; // for example, "test.com"
+		parser = null; 
+		return v;
+	}-*/;
+	
+	@Override
+	public String getPort(String url) {
+		return _getPort(url);
+	}
+	private final static native String _getPort(String url) /*-{
+		var parser = $doc.createElement('a');
+		parser.href = url;
+		var v = parser.port;     // for example, "8080"
+		parser = null; 
+		return v;
+	}-*/;
+	
+	@Override
+	public String getPathname(String url) {
+		return _getPathname(url);
+	}
+	
+	private final static native String _getPathname(String url) /*-{
+		var parser = $doc.createElement('a');
+		parser.href = url;
+		var v = parser.pathname; // for example, "/resources/images/" 
+		parser = null; 
+		return v;
+	}-*/;
+	
+	@Override
+	public void copyToClipboard() {
+		try {
+			_copyToClipboard();
+			_deselect();
+			DisplayUtils.showInfo("Copied to clipboard", "");
+		} catch (Throwable t) {
+			consoleError(t.getMessage());
+		}
+	}
+
+	private final static native String _copyToClipboard() /*-{
+		$doc.execCommand('copy');
+	}-*/;
+
+	private final static native String _deselect() /*-{
+		if ($wnd.getSelection) {
+			if ($wnd.getSelection().empty) {
+				// Chrome
+				$wnd.getSelection().empty();
+			} else if ($wnd.getSelection().removeAllRanges) {
+				// Firefox
+				$wnd.getSelection().removeAllRanges();
+			}
+		} else if ($doc.selection && $doc.selection.empty) {
+			// IE/Edge?
+			$doc.selection.empty();
+		}
+		$doc.activeElement.blur();
+	}-*/;
 }

@@ -1,18 +1,24 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
@@ -22,61 +28,83 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EditFileMetadataModalWidgetTest {
-
+	@Mock
 	EditFileMetadataModalView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	Callback mockCallback;
-	String startName;
 	String parentId;
 	EditFileMetadataModalWidgetImpl widget;
-	FileEntity entity;
-	String startingFilename;
-	String newName = "modified entity name";
-	String newFileName = "modified file name";
+	@Mock
+	FileEntity mockFileEntity;
+	
+	public static final String ENTITY_ID = "syn007";
+	public static final String OLD_NAME = "Start Name";
+	public static final String OLD_DATA_FILE_HANDLE_ID = "1";
+	public static final String OLD_FILENAME = "temp.txt";
+	public static final String OLD_CONTENT_TYPE = "txt/plain";
+	
+	public static final String NEW_NAME = "modified entity name";
+	public static final String NEW_FILENAME = "modified file name";
+	public static final String NEW_CONTENT_TYPE = "modified content type";
+	@Mock
+	FileHandle mockFileHandle;
 			
 	@Before
 	public void before(){
-		mockView = mock(EditFileMetadataModalView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockCallback = mock(Callback.class);
-		entity = new FileEntity();
-		startName = "Start Name";
-		entity.setName(startName);
-		String dataFileHandleId = "1";
-		startingFilename = "temp.txt";
-		entity.setDataFileHandleId(dataFileHandleId);
+		MockitoAnnotations.initMocks(this);
+		when(mockFileEntity.getName()).thenReturn(OLD_NAME);
+		when(mockFileEntity.getDataFileHandleId()).thenReturn(OLD_DATA_FILE_HANDLE_ID);
+		when(mockFileHandle.getContentType()).thenReturn(OLD_CONTENT_TYPE);
+		when(mockFileHandle.getFileName()).thenReturn(OLD_FILENAME);
+		when(mockFileHandle.getId()).thenReturn(OLD_DATA_FILE_HANDLE_ID);
+		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
 		
 		widget = new EditFileMetadataModalWidgetImpl(mockView, mockSynapseClient);
-		when(mockView.getEntityName()).thenReturn(newName);
-		when(mockView.getFileName()).thenReturn(newFileName);
+		when(mockView.getEntityName()).thenReturn(NEW_NAME);
+		when(mockView.getFileName()).thenReturn(NEW_FILENAME);
+		when(mockView.getContentType()).thenReturn(NEW_CONTENT_TYPE);
 	}
 	
 	@Test
 	public void testConfigure(){
-		widget.configure(entity, startingFilename, mockCallback);
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).show();
-		verify(mockView).configure(startName, startingFilename);
+		verify(mockView).configure(OLD_NAME, OLD_FILENAME, OLD_CONTENT_TYPE);
 	}
 	
 	@Test
 	public void testNullName(){
-		widget.configure(entity, startingFilename, mockCallback);
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		when(mockView.getEntityName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockView).showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		verifyZeroInteractions(mockSynapseClient);
 		// should only be called on success
 		verify(mockCallback, never()).invoke();
 	}
 	
 	@Test
 	public void testNullFileName(){
-		widget.configure(entity, startingFilename, mockCallback);
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		when(mockView.getFileName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockView).showError(EditFileMetadataModalWidgetImpl.FILE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		verifyZeroInteractions(mockSynapseClient);
+		// should only be called on success
+		verify(mockCallback, never()).invoke();
+	}
+	
+	@Test
+	public void testNullContentType(){
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
+		when(mockView.getContentType()).thenReturn(null);
+		widget.onPrimary();
+		verify(mockView).showError(EditFileMetadataModalWidgetImpl.CONTENT_TYPE_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
+		verifyZeroInteractions(mockSynapseClient);
+		
 		// should only be called on success
 		verify(mockCallback, never()).invoke();
 	}
@@ -84,9 +112,10 @@ public class EditFileMetadataModalWidgetTest {
 	
 	@Test
 	public void testNoChange(){
-		widget.configure(entity, startingFilename, mockCallback);
-		when(mockView.getEntityName()).thenReturn(startName);
-		when(mockView.getFileName()).thenReturn(startingFilename);
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
+		when(mockView.getEntityName()).thenReturn(OLD_NAME);
+		when(mockView.getFileName()).thenReturn(OLD_FILENAME);
+		when(mockView.getContentType()).thenReturn(OLD_CONTENT_TYPE);
 		
 		// Calling save with no real change just closes the dialog.
 		widget.onPrimary();
@@ -98,8 +127,12 @@ public class EditFileMetadataModalWidgetTest {
 	}
 	
 	@Test
-	public void testHappyCase(){
-		widget.configure(entity, startingFilename, mockCallback);
+	public void testUpdateEntity(){
+		//only the entity name has changed
+		when(mockView.getFileName()).thenReturn(OLD_FILENAME);
+		when(mockView.getContentType()).thenReturn(OLD_CONTENT_TYPE);
+		
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
@@ -107,28 +140,54 @@ public class EditFileMetadataModalWidgetTest {
 		verify(mockView).hide();
 		verify(mockCallback).invoke();
 		verify(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
-		assertEquals(newFileName, entity.getFileNameOverride());
+		verify(mockFileEntity).setName(NEW_NAME);
 	}
 	
 	@Test
-	public void testUpdateEntityNameNotFileName(){
-		widget.configure(entity, startingFilename, mockCallback);
-		when(mockView.getFileName()).thenReturn(startingFilename);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+	public void testUpdateFileEntityHandle(){
+		// simulate user changed all three values
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateFileEntity(any(FileEntity.class), any(FileHandleCopyRequest.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
 		verify(mockView).setLoading(true);
 		verify(mockView).hide();
 		verify(mockCallback).invoke();
-		assertNull(entity.getFileNameOverride());
+		ArgumentCaptor<FileHandleCopyRequest> captor = ArgumentCaptor.forClass(FileHandleCopyRequest.class);
+		verify(mockSynapseClient).updateFileEntity(any(FileEntity.class), captor.capture(), any(AsyncCallback.class));
+		FileHandleCopyRequest fileHandleCopyRequest = captor.getValue();
+		assertEquals(NEW_CONTENT_TYPE, fileHandleCopyRequest.getNewContentType());
+		assertEquals(NEW_FILENAME, fileHandleCopyRequest.getNewFileName());
+		FileHandleAssociation fha = fileHandleCopyRequest.getOriginalFile();
+		assertEquals(ENTITY_ID, fha.getAssociateObjectId());
+		assertEquals(FileHandleAssociateType.FileEntity, fha.getAssociateObjectType());
+		assertEquals(OLD_DATA_FILE_HANDLE_ID, fha.getFileHandleId());
+		verify(mockFileEntity).setName(NEW_NAME);
 	}
 	
 	@Test
-	public void testUpdateFailed(){
+	public void testUpdateEntityFailed(){
+		//only the entity name has changed
+		when(mockView.getFileName()).thenReturn(OLD_FILENAME);
+		when(mockView.getContentType()).thenReturn(OLD_CONTENT_TYPE);
+		
 		Exception error = new Exception("an object already exists with that name");
-		String newName = "a new name";
-		widget.configure(entity, startingFilename, mockCallback);
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		// save button
+		widget.onPrimary();
+		verify(mockView).setLoading(true);
+		verify(mockView).showError(error.getMessage());
+		verify(mockView).setLoading(false);
+		verify(mockView, never()).hide();
+		verify(mockCallback, never()).invoke();
+	}
+	
+	@Test
+	public void testUpdateFileEntityHandleFailed(){
+		Exception error = new Exception("something wrong with file name, content type, or entity name");
+		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).updateFileEntity(any(FileEntity.class), any(FileHandleCopyRequest.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
 		verify(mockView).setLoading(true);

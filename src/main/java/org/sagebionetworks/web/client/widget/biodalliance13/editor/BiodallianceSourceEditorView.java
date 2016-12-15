@@ -2,12 +2,13 @@ package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView {
+public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView, SelectableListItem {
 
 	/**
 	 * Set the presenter.
@@ -17,12 +18,11 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter {
+	public interface Presenter extends SelectableListItem.Presenter {
 		void entitySelected(Reference ref);
 		void indexEntitySelected(Reference ref);
 		void entityPickerClicked();
 		void indexEntityPickerClicked();
-		void onSelectionChanged();
 	}
 	
 	void setEntityFinderText(String text);
@@ -36,7 +36,4 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 	
 	String getSourceName();
 	void setSourceName(String sourceName);
-	
-	boolean isSelected();
-	void setSelected(boolean selected);
 }

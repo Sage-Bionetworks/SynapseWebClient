@@ -38,6 +38,8 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	@UiField
 	Alert alert;
 	Presenter presenter;
+	@UiField
+	SimplePanel jobTrackerWidgetContainer;
 	
 	@Inject
 	public ColumnModelsViewBaseImpl(final Binder uiBinder){
@@ -95,5 +97,14 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	public void hideErrors() {
 		alert.clear();
 		alert.setVisible(false);
+	}
+	@Override
+	public void setJobTrackingWidget(IsWidget jobTrackingWidget) {
+		jobTrackerWidgetContainer.clear();
+		jobTrackerWidgetContainer.add(jobTrackingWidget);
+	}
+	@Override
+	public void setJobTrackingWidgetVisible(boolean visible) {
+		jobTrackerWidgetContainer.setVisible(visible);
 	}
 }

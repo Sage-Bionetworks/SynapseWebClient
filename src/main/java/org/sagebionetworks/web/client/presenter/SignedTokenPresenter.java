@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
@@ -7,6 +11,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -26,7 +31,6 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	private GlobalApplicationState globalApplicationState;
 	SignedTokenInterface signedToken;
 	UserBadge unsubscribingUserBadge;
-	
 	@Inject
 	public SignedTokenPresenter(SignedTokenView view, 
 			SynapseClientAsync synapseClient, 
@@ -72,6 +76,8 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 				signedToken = result;
 				if (result instanceof NotificationSettingsSignedToken) {
 					handleSettingsToken();
+				} else if (result instanceof JoinTeamSignedToken) {
+					handleJoinTeamToken();
 				} else {
 					handleSignedToken();
 				}
@@ -90,6 +96,31 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		view.showConfirmUnsubscribe();
 	}
 	
+	public void handleJoinTeamToken() {
+		final JoinTeamSignedToken token = (JoinTeamSignedToken) signedToken;
+		String teamId = token.getTeamId();
+		view.setLoadingVisible(true);
+		// look for access requirements
+		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<List<AccessRequirement>>() {
+			@Override
+			public void onSuccess(List<AccessRequirement> accessRequirements) {
+				if (accessRequirements.size() > 0) {
+					// does not support single click join, go to the team page.
+					view.setLoadingVisible(false);
+					globalApplicationState.getPlaceChanger().goTo(new Team(token.getTeamId()));
+				} else {
+					handleSignedToken();
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
+				synapseAlert.handleException(caught);
+			}
+		});
+	}
+	
 	public void handleSignedToken() {
 		view.clear();
 		view.setLoadingVisible(true);
@@ -97,7 +128,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			@Override
 			public void onSuccess(ResponseMessage result) {
 				view.setLoadingVisible(false);
-				view.showSuccess(result.getMessage());		
+				view.showSuccess(result.getMessage());
 			}
 			@Override
 			public void onFailure(Throwable caught) {

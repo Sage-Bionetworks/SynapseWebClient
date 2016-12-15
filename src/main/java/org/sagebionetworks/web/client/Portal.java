@@ -8,6 +8,7 @@ import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
@@ -98,6 +99,7 @@ public class Portal implements EntryPoint {
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
 								loading.hide();
+								delayLoadOfZxcvbn();
 							}
 						});
 						
@@ -109,6 +111,17 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
+	}
+	
+	public void delayLoadOfZxcvbn() {
+		Timer timer = new Timer() { 
+		    public void run() {
+		    	ScriptInjector.fromUrl("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.3.0/zxcvbn.js")
+		    		.setWindow(ScriptInjector.TOP_WINDOW)
+		    		.inject();
+		    }
+		};
+		timer.schedule(10000);
 	}
 	
 	public void reloadApp(int delay) {

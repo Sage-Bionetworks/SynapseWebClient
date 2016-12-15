@@ -41,7 +41,7 @@ public class DiscussionThreadListItemWidgetTest {
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
-	CallbackP<String> mockThreadIdClickedCallback;
+	CallbackP<DiscussionThreadBundle> mockThreadIdClickedCallback;
 	@Mock
 	DiscussionThreadBundle mockThreadBundle;
 	DiscussionThreadListItemWidget discussionThreadWidget;
@@ -69,6 +69,7 @@ public class DiscussionThreadListItemWidgetTest {
 	public void testConfigure() {
 		discussionThreadWidget.configure(mockThreadBundle);
 		verify(mockView).setTitle(title);
+		verify(mockView).clearActiveAuthors();
 		verify(mockView).addActiveAuthor(any(Widget.class));
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
@@ -96,13 +97,13 @@ public class DiscussionThreadListItemWidgetTest {
 	@Test
 	public void testOnClickThreadNoCallback() {
 		discussionThreadWidget.onClickThread();
-		verify(mockThreadIdClickedCallback, never()).invoke(anyString());
+		verify(mockThreadIdClickedCallback, never()).invoke(any(DiscussionThreadBundle.class));
 	}
 	
 	@Test
 	public void testOnClickThreadWithCallback() {
 		discussionThreadWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadWidget.onClickThread();
-		verify(mockThreadIdClickedCallback).invoke(anyString());
+		verify(mockThreadIdClickedCallback).invoke(any(DiscussionThreadBundle.class));
 	}
 }

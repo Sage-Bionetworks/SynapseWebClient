@@ -242,11 +242,10 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			final String principalId = ra.getPrincipalId().toString();
 			final UserGroupHeader header = userGroupHeaders.get(principalId);
-			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
 				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
 					header.getUserName();
-				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, title, "", header.getIsIndividual()));
+				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), title, "", header.getIsIndividual()));
 			} else {
 				showErrorMessage("Could not find user " + principalId);
 			}

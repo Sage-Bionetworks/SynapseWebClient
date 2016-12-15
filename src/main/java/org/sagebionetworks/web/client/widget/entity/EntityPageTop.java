@@ -11,10 +11,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -42,7 +38,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-import org.sagebionetworks.web.shared.users.AclUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -222,7 +217,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			default:
 		}
 
-		dockerTab.asTab().setTabListItemVisible(DisplayUtils.isInTestWebsite(cookies));
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
@@ -330,6 +324,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
 				wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 			}
+			
 			final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
@@ -337,14 +332,24 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				@Override
 				public void noWikiFound() {
-					//if wiki area not specified and no wiki found, show Files tab instead for projects 
-					// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
-					if(isWikiTabShown) {
-						configureFilesTab();
-						tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+					if (isWikiTabShown) {
+						if (projectBundle.getRootWikiId() == null) {
+							// no wiki to load!  configure and show the files tab.
+							// clear out wiki page id token.
+							wikiTab.setEntityNameAndPlace(projectHeader.getId(), projectHeader.getName(), null);
+							configureFilesTab();
+							tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+						} else {
+							// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
+							view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
+							wikiTab.asTab().setContentStale(true);
+							wikiAreaToken = projectBundle.getRootWikiId();
+							configureWikiTab();	
+						}
 					}
 				}
 			};
+			
 			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
 					canEdit, callback);
 			
@@ -377,12 +382,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (discussionTab.asTab().isContentStale()) {
 			String projectId = projectHeader.getId();
 			boolean canModerate = false;
-			Set<Long> moderatorIds = new HashSet<Long>();
 			if (projectBundle != null) {
 				canModerate = projectBundle.getPermissions().getCanModerate();
-				moderatorIds = AclUtils.getPrincipalIds(projectBundle.getAccessControlList(), ACCESS_TYPE.MODERATE);
 			}
-			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, moderatorIds);
+			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
 			discussionTab.asTab().setContentStale(false);
 		}
 	}

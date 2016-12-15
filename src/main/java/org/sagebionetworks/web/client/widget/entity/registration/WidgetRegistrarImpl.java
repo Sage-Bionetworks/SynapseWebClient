@@ -12,9 +12,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
 
@@ -61,8 +63,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE)) {
-			presenter = ginInjector.getExternalImageConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
+			presenter = ginInjector.getImageLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {
@@ -112,7 +114,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
+	public IsWidget getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -125,7 +127,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getVimeoRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE) ||
+				contentTypeKey.equals(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE) || 
 				contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE) ||
@@ -175,12 +178,17 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getSynapseTableFormWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE)) {
 			presenter = ginInjector.getTeamMembersWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE)) {
+			presenter = ginInjector.getTeamMemberCountWidget();
 		}	
 		
 		//TODO: add other widget descriptors to this mapping as they become available
 		
-		if (presenter != null)
-			presenter.configure(wikiKey, model, widgetRefreshRequired, wikiVersionInView);
+		if (presenter != null) {
+			LazyLoadWikiWidgetWrapper wrapper = ginInjector.getLazyLoadWikiWidgetWrapper();
+			wrapper.configure(presenter, wikiKey, model, widgetRefreshRequired, wikiVersionInView);
+			return wrapper;
+		}	
 		return presenter;
 	}
 	@Override
@@ -250,7 +258,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.VIMEO_CONTENT_TYPE, WidgetConstants.VIMEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.EXTERNAL_IMAGE_CONTENT_TYPE, WidgetConstants.EXTERNAL_IMAGE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, WidgetConstants.IMAGE_LINK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, WidgetConstants.TABBED_TABLE_FRIENDLY_NAME);

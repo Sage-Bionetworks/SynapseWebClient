@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -8,6 +11,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
@@ -70,4 +74,14 @@ public interface DiscussionForumClientAsync{
 	void pinThread(String threadId, AsyncCallback<Void> callback);
 
 	void unpinThread(String threadId, AsyncCallback<Void> callback);
+
+	void getThreadsForEntity(String entityId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
+
+	void getEntityThreadCount(List<String> idList, AsyncCallback<EntityThreadCounts> callback);
+
+	void restoreThread(String threadId, AsyncCallback<Void> callback);
+
+	void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback);
 }

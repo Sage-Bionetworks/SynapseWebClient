@@ -181,7 +181,7 @@ public class EntityPresenterTest {
 		//verify synapse client call
 		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		//redirects to the wiki place
-		verify(mockPlaceChanger).goTo(any(Wiki.class));
+		verify(mockPlaceChanger).goTo(isA(Wiki.class));
 		verify(mockView, never()).setEntityPageTopVisible(true);
 	}
 	

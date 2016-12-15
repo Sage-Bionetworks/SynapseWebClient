@@ -2,12 +2,16 @@ package org.sagebionetworks.web.unitclient.widget.discussion;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -65,7 +69,7 @@ public class ReplyWidgetTest {
 	GWTWrapper mockGwt;
 	@Mock
 	CopyTextModal mockCopyTextModal;
-	Set<Long> moderatorIds;
+	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
 	
 	private static final String CREATED_BY = "123";
@@ -79,7 +83,7 @@ public class ReplyWidgetTest {
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
 				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
-		moderatorIds = new HashSet<Long>();
+		moderatorIds = new HashSet<String>();
 	}
 
 	@Test
@@ -141,7 +145,7 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		moderatorIds.add(Long.parseLong(CREATED_BY));
+		moderatorIds.add(CREATED_BY);
 		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockJsniUtils.getRelativeTime(any(Date.class))).thenReturn("today");
@@ -277,7 +281,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testOnClickDeleteReply() {
 		replyWidget.onClickDeleteReply();
-		verify(mockView).showDeleteConfirm(anyString(), any(AlertCallback.class));
+		verify(mockView).showDeleteConfirm(anyString(), any(SimpleCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")

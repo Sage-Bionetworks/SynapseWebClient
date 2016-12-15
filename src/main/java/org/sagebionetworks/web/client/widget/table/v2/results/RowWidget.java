@@ -46,7 +46,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	 * @param row The row contains the data for this row.
 	 * @param rowSelectionListener A listener to row selection changes. When null, the row will not be selectable.
 	 */
-	public void configure(String tableId, List<ColumnModel> types, boolean isEditor, Row row, RowSelectionListener rowSelectionListener){
+	public void configure(String tableId, List<ColumnModel> types, boolean isEditor, boolean isView, Row row, RowSelectionListener rowSelectionListener){
 		this.rowSelectionListener = rowSelectionListener;
 		this.view.setSelectVisible(rowSelectionListener != null);
 		this.rowId = row.getRowId();
@@ -66,7 +66,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 			// Pass the address to cells the need it.
 			if(cell instanceof TakesAddressCell){
 				TakesAddressCell takesAddress = (TakesAddressCell) cell;
-				takesAddress.setCellAddresss(new CellAddress(tableId, type, rowId, rowVersion));
+				takesAddress.setCellAddresss(new CellAddress(tableId, type, rowId, rowVersion, isView));
 			}
 		}
 		// Set each cell with the data from the row.

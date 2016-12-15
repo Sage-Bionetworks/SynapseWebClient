@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -8,6 +11,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
@@ -71,5 +75,16 @@ public interface DiscussionForumClient extends RemoteService {
 	Long getReplyCountForThread(String threadId, DiscussionFilter filter) throws RestServiceException;
 	
 	void pinThread(String threadId) throws RestServiceException;
+
 	void unpinThread(String threadId) throws RestServiceException;
+
+	PaginatedResults<DiscussionThreadBundle> getThreadsForEntity(String entityId,
+			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending,
+			DiscussionFilter filter) throws RestServiceException;
+
+	EntityThreadCounts getEntityThreadCount(List<String> idList) throws RestServiceException;
+
+	void restoreThread(String threadId) throws RestServiceException;
+
+	PaginatedIds getModerators(String forumId, Long limit, Long offset) throws RestServiceException;
 }

@@ -322,6 +322,7 @@ public class TableEntityWidgetTest {
 	
 	@Test
 	public void testOnExecuteQuery(){
+		boolean isView = false;
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
 		Query startQuery = new Query();
@@ -331,7 +332,7 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, isView, widget);
 		reset(mockQueryResultsWidget);
 		// Set new sql
 		String newSQL = "select 1,2,3 from syn123";
@@ -341,11 +342,12 @@ public class TableEntityWidgetTest {
 		expected.setSql(newSQL);
 		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
-		verify(mockQueryResultsWidget).configure(expected, canEdit, widget);
+		verify(mockQueryResultsWidget).configure(expected, canEdit, isView, widget);
 	}
 
 	@Test
 	public void testOnExecuteViewQuery(){
+		boolean isView = true;
 		configureBundleWithView();
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
@@ -357,7 +359,7 @@ public class TableEntityWidgetTest {
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
 		boolean expectedCanEditResults = false;
-		verify(mockQueryResultsWidget).configure(startQuery, expectedCanEditResults, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, expectedCanEditResults, isView, widget);
 	}
 	
 	@Test
@@ -421,6 +423,7 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testOnStartingnewQuery(){
 		boolean canEdit = true;
+		boolean isView = false;
 		// Start with a query that is not on the first page
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
@@ -436,7 +439,7 @@ public class TableEntityWidgetTest {
 		// Should get passed to the input widget
 		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
 		// Should not be sent to the results as that is where it came from.
-		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(QueryResultsListener.class));
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), eq(isView), any(QueryResultsListener.class));
 	}
 	
 

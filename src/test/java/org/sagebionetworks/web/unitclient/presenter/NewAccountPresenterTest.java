@@ -47,7 +47,8 @@ public class NewAccountPresenterTest {
 	NewAccountView mockView;
 	UserAccountServiceAsync mockUserService;
 	GlobalApplicationState mockGlobalApplicationState;
-	GWTWrapper gwtStub;
+	@Mock
+	GWTWrapper mockGWT;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthController;
@@ -67,10 +68,9 @@ public class NewAccountPresenterTest {
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		gwtStub = new GWTStub();
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, gwtStub, mockPasswordStrengthWidget);			
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockPasswordStrengthWidget);			
 		verify(mockView).setPresenter(newAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
@@ -87,6 +87,17 @@ public class NewAccountPresenterTest {
 		NewAccount newPlace = Mockito.mock(NewAccount.class);
 		newAccountPresenter.setPlace(newPlace);
 		verify(mockView).setPresenter(newAccountPresenter);
+	}
+	
+	@Test
+	public void testSetPlaceEncodedToken() {
+		String token = "firstname=&amp;lastname=&amp;email=decode-test%40j.com&amp;timestamp=2016-08-11T22%3A21%3A16.111%2B0000&amp;domain=SYNAPSE&amp;mac=gLaTfdsfB0TSy6JMsfdsuA1k%3D";
+		String decodedToken = "firstname=&lastname=&email=decode-test%40j.com&timestamp=2016-08-11T22%3A22%3A59.022%2B0000&domain=SYNAPSE&mac=EckukfdsGjPbzLVVaaaaLs%3D";
+		NewAccount newPlace = Mockito.mock(NewAccount.class);
+		when(newPlace.toToken()).thenReturn(token);
+		when(mockGWT.decodeQueryString(token)).thenReturn(decodedToken);
+		newAccountPresenter.setPlace(newPlace);
+		assertEquals(decodedToken, newAccountPresenter.getEmailValidationToken());
 	}
 	
 	@Test
@@ -128,6 +139,7 @@ public class NewAccountPresenterTest {
 
 	@Test
 	public void testParseValidationToken() {
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, new GWTStub(), mockPasswordStrengthWidget);
 		String token = "firstname=&lastname=&email=unittest%40jayhodgson.com&timestamp=2014-09-03T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=DyXg5wUR3aqDABpnvYE%3D";
 		Map<String, String> result = newAccountPresenter.parseEmailValidationToken(token);
 		assertEquals("unittest@jayhodgson.com", result.get("email"));

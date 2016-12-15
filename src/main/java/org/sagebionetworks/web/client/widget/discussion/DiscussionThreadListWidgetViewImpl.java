@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,6 +32,8 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	FocusPanel sortByViews;
 	@UiField
 	FocusPanel sortByActivity;
+	@UiField
+	FocusPanel sortByTopic;
 	@UiField
 	Div threadHeader;
 	@UiField
@@ -58,6 +61,12 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
+			}
+		});
+		sortByTopic.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sortBy(DiscussionThreadOrder.THREAD_TITLE);
 			}
 		});
 	}
@@ -97,5 +106,10 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	@Override
 	public void setNoThreadsFoundVisible(boolean visible) {
 		noThreadsFound.setVisible(visible);
+	}
+	
+	@Override
+	public void scrollIntoView(Widget w) {
+		Window.scrollTo(0, w.getElement().getOffsetTop());
 	}
 }

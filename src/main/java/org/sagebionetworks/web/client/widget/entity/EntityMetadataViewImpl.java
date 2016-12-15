@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,7 +54,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	final IconsImageBundle icons;
 	
 	@Inject
-	public EntityMetadataViewImpl(IconsImageBundle icons) {
+	public EntityMetadataViewImpl(IconsImageBundle icons, final SynapseJSNIUtils jsniUtils) {
 		this.icons = icons;
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
@@ -61,6 +62,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			@Override
 			public void onClick(ClickEvent event) {
 				idField.selectAll();
+				jsniUtils.copyToClipboard();
 			}
 		});
 	}

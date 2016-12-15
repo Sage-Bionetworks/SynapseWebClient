@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.controller;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -89,14 +91,14 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceExceptionReadOnly() {
 		widget.handleException(new ReadOnlyModeException());
 		verify(mockView, times(2)).clearState();
-		verify(mockPlaceChanger).goTo(any(Down.class));
+		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
 	public void testHandleServiceExceptionDown() {
 		widget.handleException(new SynapseDownException());
 		verify(mockView, times(2)).clearState();
-		verify(mockPlaceChanger).goTo(any(Down.class));
+		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
@@ -205,7 +207,15 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceUnauthorizedExceptionMessage() {
 		widget.handleException(new UnauthorizedException());
 		verify(mockAuthenticationController).logoutUser();
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
+	}
+	
+	@Test
+	public void testHandleServiceConflictingUpdateExceptionMessage() {
+		String errorMessage = "error";
+		widget.handleException(new ConflictingUpdateException(errorMessage));
+		verify(mockView, times(0)).showJiraDialog(anyString());
+		verify(mockView).showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + errorMessage);
 	}
 	
 	@Test

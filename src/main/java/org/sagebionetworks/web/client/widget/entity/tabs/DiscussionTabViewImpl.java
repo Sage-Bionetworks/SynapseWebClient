@@ -32,10 +32,6 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 		});
 	}
 	
-	public void updateWidth(Tab tab) {
-		tab.getTabListItem().setWidth("200px");
-	};
-	
 	@Override
 	public void setForum(Widget w) {
 		forumContainer.add(w);

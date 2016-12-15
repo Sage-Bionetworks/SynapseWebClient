@@ -10,13 +10,9 @@ import org.sagebionetworks.client.SynapseProfileProxy;
  *
  */
 public class SynapseProviderImpl implements SynapseProvider {
-	
-
 	@Override
 	public SynapseClient createNewClient() {
-		return SynapseProfileProxy.createProfileProxy(new SynapseClientImpl());
-		// ONE LINE CHANGE TO USE STUB SYNAPSE CLIENT:		
-		//return SynapseClientStubUtil.createSynapseClient();		
+		return SynapseRetryProxy.createProxy(SynapseProfileProxy.createProfileProxy(new SynapseClientImpl()));
 	}
 
 

@@ -1,0 +1,29 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+
+	<bh:Span>
+ 		<b:Anchor ui:field="directDownloadLink">
+			<button class="btn btn-primary btn-lg" ui:field="directDownloadButton"><i class="fa fa-download margin-right-5" />Download</button>
+		</b:Anchor>
+		<b:Anchor ui:field="directDownloadLink2" icon="DOWNLOAD" visible="false"/>
+		<b:Anchor ui:field="authorizedDirectDownloadLink">
+			<button class="btn btn-primary btn-lg" ui:field="authorizedDownloadButton"><i class="fa fa-download margin-right-5" />Download</button>
+		</b:Anchor>
+		<b:Anchor ui:field="authorizedDirectDownloadLink2" icon="DOWNLOAD" visible="false"/>
+		<b:Anchor ui:field="licensedDownloadLink">
+			<button class="btn btn-primary btn-lg" ui:field="licensedDownloadButton"><i class="fa fa-download margin-right-5" />Download</button>
+		</b:Anchor>
+		<b:Anchor ui:field="licensedDownloadLink2" icon="DOWNLOAD" visible="false"/>
+		<bh:Span ui:field="clientsHelpButtonSize">
+  			<bh:Span ui:field="clientsHelpContainer"/>
+  		</bh:Span>
+  		<bh:Span ui:field="synAlertContainer"/>
+	</bh:Span>
+</ui:UiBinder>

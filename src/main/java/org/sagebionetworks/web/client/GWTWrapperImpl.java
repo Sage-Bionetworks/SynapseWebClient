@@ -19,6 +19,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -99,7 +100,20 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
+	public void scheduleFixedDelay(final Callback callback, int delayMs) {
+		Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
+			@Override
+			public boolean execute() {
+				callback.invoke();
+				return true;
+			}
+		}, delayMs);
+		
+	}
+	
+	@Override
 	public void scheduleDeferred(final Callback callback) {
+		
 		Scheduler.get().scheduleDeferred(new Command() {
 			@Override
 			public void execute() {
@@ -149,5 +163,10 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public HasRpcToken asHasRpcToken(Object service) {
 		return (HasRpcToken) service;
+	}
+
+	@Override
+	public String getUniqueElementId() {
+		return HTMLPanel.createUniqueId();
 	}
 }

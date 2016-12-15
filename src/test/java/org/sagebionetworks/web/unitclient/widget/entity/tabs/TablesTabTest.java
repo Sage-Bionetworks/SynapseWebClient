@@ -120,9 +120,18 @@ public class TablesTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl());
-		tab = new TablesTab(mockView, mockTab, mockTableListWidget, mockBasicTitleBar, 
-				mockBreadcrumb, mockEntityMetadata, queryTokenProvider, mockSynapseAlert, mockSynapseClientAsync,
-				mockPortalGinInjector, mockModifiedCreatedBy);
+		tab = new TablesTab(mockTab, mockPortalGinInjector);
+		
+		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
+		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
+		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
+		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
+		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
+		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(queryTokenProvider);
+		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
+		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
+		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
+		
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
@@ -159,6 +168,7 @@ public class TablesTabTest {
 		two.setColumn("one");
 		two.setDirection(SortDirection.DESC);
 		query.setSort(Arrays.asList(one, two));
+		tab.lazyInject();
 	}
 	
 	@Test
@@ -226,7 +236,7 @@ public class TablesTabTest {
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(tableEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
-		assertNull(place.getArea());
+		assertEquals(EntityArea.TABLES, place.getArea());
 		assertNull(place.getAreaToken());
 	}
 	
@@ -283,17 +293,18 @@ public class TablesTabTest {
 		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
 		
 		reset(mockTab);
-		String queryToken = queryTokenProvider.queryToToken(query);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
 		tab.onQueryChange(query);
 		
 		Synapse place = getNewPlace(tableName);
 		assertEquals(EntityArea.TABLES, place.getArea());
-		assertTrue(place.getAreaToken().contains(queryToken));
+		assertTrue(place.getAreaToken().isEmpty());
 	}
 	
 	@Test
 	public void testSetTableQueryWithToken() {
 		query.setOffset(1L);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(new Query());
 		String startToken = queryTokenProvider.queryToToken(query);
 		// Start with a token.
 		

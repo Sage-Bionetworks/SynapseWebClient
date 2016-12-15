@@ -15,9 +15,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Before;
@@ -132,18 +134,22 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testUnwrap(){
 		Throwable actualException = new Exception("I am dead, Horatio");
-		Set<Throwable> causes = new HashSet<Throwable>();
+		Set<Throwable> causes = new LinkedHashSet<Throwable>();
 		causes.add(actualException);
 		UmbrellaException umbrellaException = new UmbrellaException(causes);
+		Set<Throwable> umbrellaUmbrellaCauses = new HashSet<Throwable>();
+		umbrellaUmbrellaCauses.add(umbrellaException);
+		UmbrellaException umbrellaUmbrellaException = new UmbrellaException(umbrellaUmbrellaCauses);
 		
-		//single exception being wrapped, unwrap it!
-		assertEquals(actualException, globalApplicationState.unwrap(umbrellaException));
+		//single exception being wrapped twice with umbrella exceptions, unwrap it!
+		assertEquals(actualException, globalApplicationState.unwrap(umbrellaUmbrellaException));
 		//pass through for non-umbrella exceptions
 		assertEquals(actualException, globalApplicationState.unwrap(actualException));
 		
-		//more than one cause, just log the umbrella exception
-		causes.add(new Exception("more than one"));
-		assertEquals(umbrellaException, globalApplicationState.unwrap(umbrellaException));
+		//more than one cause, log one of the exceptions
+		Throwable secondException = new Exception("Thou livest.");
+		causes.add(secondException);
+		assertEquals(actualException, globalApplicationState.unwrap(umbrellaException));
 	}
 	
 	@Test
@@ -192,6 +198,27 @@ public class GlobalApplicationStateImplTest {
 		//showVersionOutOfDateGlobalMessage() has still only been called once, despite detecting another version change
 		verify(mockView).showVersionOutOfDateGlobalMessage();
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCheckVersionCompatibilityCheckedRecently() {
+		when(mockLocalStorage.get(GlobalApplicationStateImpl.RECENTLY_CHECKED_SYNAPSE_VERSION)).thenReturn(Boolean.TRUE.toString());
+		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
+		globalApplicationState.initSynapseProperties(new Callback() {
+			@Override
+			public void invoke() {}
+		});
+		
+		reset(mockSynapseClient);
+		globalApplicationState.checkVersionCompatibility(callback);
+		
+		verify(mockSynapseClient, never()).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
+		//verify callback was given the correct version
+		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
+		verify(callback).onSuccess(captor.capture());
+		assertEquals("v1", captor.getValue().getVersion());
 	}
 	
 	@Test

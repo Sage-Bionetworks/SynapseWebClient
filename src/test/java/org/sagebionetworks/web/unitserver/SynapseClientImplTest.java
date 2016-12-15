@@ -1,30 +1,9 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,11 +16,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,6 +34,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -61,50 +43,20 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.reflection.model.PaginatedResults;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityIdList;
-import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.ExampleEntity;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.JoinTeamSignedToken;
-import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
-import org.sagebionetworks.repo.model.MembershipRequest;
-import org.sagebionetworks.repo.model.MembershipRqstSubmission;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
-import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.repo.model.SignedTokenInterface;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserGroup;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.*;
+
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
+import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
@@ -125,6 +77,13 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
+import org.sagebionetworks.repo.model.table.ColumnChange;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -136,7 +95,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
@@ -157,9 +115,12 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.appengine.repackaged.com.google.common.base.Objects;
 import com.google.common.cache.Cache;
 
 /**
@@ -221,13 +182,44 @@ public class SynapseClientImplTest {
 	UserGroupHeader mockUserGroupHeader;
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
+	@Mock
+	ColumnModel mockOldColumnModel;
+	@Mock
+	ColumnModel mockNewColumnModel;
+	@Mock
+	ColumnModel mockNewColumnModelAfterCreate;
 	
+	@Mock
+	BatchFileHandleCopyResult mockBatchCopyResults;
+	@Mock
+	FileHandleCopyResult mockFileHandleCopyResult;
+	@Mock
+	FileEntity mockFileEntity;
+	@Mock
+	FileHandleCopyRequest mockFileHandleCopyRequest;
+	@Mock
+	MessageToUser mockMessageToUser;
+	@Mock
+	JSONObjectAdapter mockJSONObjAd;
+	List<FileHandleCopyResult> batchCopyResultsList;
+	
+	
+	public static final String OLD_COLUMN_MODEL_ID = "4444";
+	public static final String NEW_COLUMN_MODEL_ID = "837837";
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private TeamMembershipStatus membershipStatus;
+	
+	@Mock
+	ThreadLocal<HttpServletRequest> mockThreadLocal;
+	
+	@Mock 
+	HttpServletRequest mockRequest;
+	
+	String userIp = "127.0.0.1";
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
@@ -276,7 +268,9 @@ public class SynapseClientImplTest {
 		userEvaluationPermissions.setCanChangePermissions(true);
 		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2)).thenReturn(
 				userEvaluationPermissions);
-
+		when(mockOldColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
+		when(mockNewColumnModelAfterCreate.getId()).thenReturn(NEW_COLUMN_MODEL_ID);
+		
 		// Setup the path
 		path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
@@ -412,14 +406,10 @@ public class SynapseClientImplTest {
 		String fileHandleId = "myFileHandleId";
 		status.setFileHandleId(fileHandleId);
 		status.setState(State.COMPLETED);
-		when(mockSynapse.getCompleteUploadDaemonStatus(anyString()))
-				.thenReturn(status);
 
 		status = new UploadDaemonStatus();
 		status.setState(State.PROCESSING);
 		status.setPercentComplete(.05d);
-		when(mockSynapse.startUploadDeamon(any(CompleteAllChunksRequest.class)))
-				.thenReturn(status);
 
 		PaginatedResults<MembershipInvitation> openInvites = new PaginatedResults<MembershipInvitation>();
 		openInvites.setTotalNumberOfResults(0);
@@ -487,7 +477,16 @@ public class SynapseClientImplTest {
 		notificationSettingsToken.setHmac("987654");
 		notificationSettingsToken.setSettings(new Settings());
 		notificationSettingsToken.setUserId("4");
-		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);		
+		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);
+		
+		when(mockSynapse.copyFileHandles(any(BatchFileHandleCopyRequest.class))).thenReturn(mockBatchCopyResults);
+		batchCopyResultsList = new ArrayList<FileHandleCopyResult>();
+		when(mockBatchCopyResults.getCopyResults()).thenReturn(batchCopyResultsList);
+		
+		Whitebox.setInternalState(synapseClient, "perThreadRequest", mockThreadLocal);
+		userIp = "127.0.0.1";
+		when(mockThreadLocal.get()).thenReturn(mockRequest);
+		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -921,18 +920,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testZipAndUpload() throws IOException, RestServiceException,
-			JSONObjectAdapterException, SynapseException {
-		Mockito.when(
-				mockSynapse
-						.createFileHandle(any(File.class), any(String.class)))
-				.thenReturn(handle);
-		synapseClient.zipAndUploadFile("markdown", "fileName");
-		verify(mockSynapse)
-				.createFileHandle(any(File.class), any(String.class));
-	}
-
-	@Test
 	public void testGetMarkdown() throws IOException, RestServiceException,
 			SynapseException {
 		String someMarkDown = "someMarkDown";
@@ -1180,13 +1167,6 @@ public class SynapseClientImplTest {
 		// wiring test
 		synapseClient.createDoi("test entity id", null);
 		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
-	}
-
-	@Test
-	public void testGetUploadDaemonStatus() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		synapseClient.getUploadDaemonStatus("daemonId");
-		verify(mockSynapse).getCompleteUploadDaemonStatus(anyString());
 	}
 
 	/**
@@ -1553,9 +1533,10 @@ public class SynapseClientImplTest {
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(messageBody))).thenReturn(mockMessageToUser);
+		when(mockMessageToUser.writeToJSONObject(any(JSONObjectAdapter.class))).thenReturn(mockJSONObjAd);
 		synapseClient.sendMessage(recipients, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
-		verify(mockSynapse).sendMessage(arg.capture());
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
@@ -1567,19 +1548,17 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor
 				.forClass(MessageToUser.class);
-		ArgumentCaptor<String> entityIdCaptor = ArgumentCaptor
-				.forClass(String.class);
 		
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		String entityId = "syn98765";
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(messageBody))).thenReturn(mockMessageToUser);
+		when(mockMessageToUser.writeToJSONObject(any(JSONObjectAdapter.class))).thenReturn(mockJSONObjAd);
 		synapseClient.sendMessageToEntityOwner(entityId, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
-		verify(mockSynapse).sendMessage(arg.capture(), entityIdCaptor.capture());
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
-		assertEquals(entityId, entityIdCaptor.getValue());
 		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 
@@ -2274,5 +2253,146 @@ public class SynapseClientImplTest {
 		//test error from backend
 		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
 		synapseClient.getUserIdFromUsername("bad-request");
+	}
+	
+	@Test
+	public void testGetTableUpdateTransactionRequestNoChange()  throws RestServiceException, SynapseException {
+		String tableId = "syn93939";
+		
+		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(oldColumnModels);
+		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
+		assertEquals(0, synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, oldColumnModels).getChanges().size());
+	}
+	
+	@Test
+	public void testGetTableUpdateTransactionRequestNewColumn()  throws RestServiceException, SynapseException {
+		String tableId = "syn93939";
+		List<ColumnModel> oldColumnModels = new ArrayList<ColumnModel>();
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(Collections.singletonList(mockNewColumnModelAfterCreate));
+		List<ColumnModel> newColumnModels = Collections.singletonList(mockNewColumnModel);
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, newColumnModels);
+		verify(mockSynapse).createColumnModels(anyList());
+		assertEquals(tableId, request.getEntityId());
+		List<TableUpdateRequest> tableUpdates = request.getChanges();
+		assertEquals(1, tableUpdates.size());
+		TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest)tableUpdates.get(0);
+		List<ColumnChange> changes = schemaChange.getChanges();
+		assertEquals(1, changes.size());
+		ColumnChange columnChange = changes.get(0);
+		assertNull(columnChange.getOldColumnId());
+		assertEquals(NEW_COLUMN_MODEL_ID, columnChange.getNewColumnId());
+	}
+	
+	private ColumnModel getColumnModel(String id, ColumnType columnType) {
+		ColumnModel cm = new ColumnModel();
+		cm.setId(id);
+		cm.setColumnType(columnType);
+		return cm;
+	}
+	
+	private ColumnChange getColumnChange(String oldColumnId, List<ColumnChange> changes) {
+		for (ColumnChange columnChange : changes) {
+			if (Objects.equal(oldColumnId, columnChange.getOldColumnId())) {
+				return columnChange;
+			}
+		}
+		throw new NoSuchElementException();
+	}
+	
+	@Test
+	public void testGetTableUpdateTransactionRequestFullTest()  throws RestServiceException, SynapseException {
+		//In this test, we will change a column, delete a column, and add a column (with appropriately mocked responses)
+		// Modify colA, delete colB, no change to colC, and add colD
+		ColumnModel colA, colB, colC, colD, colAModified, colAAfterSave, colDAfterSave;
+		String tableId = "syn93939";
+		colA = getColumnModel("1", ColumnType.STRING);
+		colB = getColumnModel("2", ColumnType.STRING);
+		colC = getColumnModel("3", ColumnType.STRING);
+		colD = getColumnModel(null, ColumnType.STRING);
+		colAModified = getColumnModel("1", ColumnType.INTEGER);
+		colAAfterSave = getColumnModel("4", ColumnType.INTEGER);
+		colDAfterSave = getColumnModel("5", ColumnType.STRING);
+		
+		List<ColumnModel> oldSchema = Arrays.asList(colA, colB, colC);
+		List<ColumnModel> proposedNewSchema = Arrays.asList(colAModified, colC, colD);
+		List<ColumnModel> newSchemaAfterUpdate = Arrays.asList(colAAfterSave, colC, colDAfterSave);
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(newSchemaAfterUpdate);
+		
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldSchema, proposedNewSchema);
+		verify(mockSynapse).createColumnModels(anyList());
+		assertEquals(tableId, request.getEntityId());
+		List<TableUpdateRequest> tableUpdates = request.getChanges();
+		assertEquals(1, tableUpdates.size());
+		TableSchemaChangeRequest schemaChange = (TableSchemaChangeRequest)tableUpdates.get(0);
+		
+		//changes should consist of a create, an update, and a delete
+		List<ColumnChange> changes = schemaChange.getChanges();
+		assertEquals(3, changes.size());
+		
+		// colB should be deleted
+		ColumnChange columnChange = getColumnChange("2", changes);
+		assertNull(columnChange.getNewColumnId());
+		// colA should be modified
+		columnChange = getColumnChange("1", changes);
+		assertEquals("4", columnChange.getNewColumnId());
+		// colD should be new
+		columnChange = getColumnChange(null, changes);
+		assertEquals("5", columnChange.getNewColumnId());
+	}
+	
+	@Test
+	public void testGetDefaultColumnsForView()  throws RestServiceException, SynapseException{
+		ColumnModel colA, colB;
+		colA = getColumnModel("1", ColumnType.STRING);
+		colB = getColumnModel("2", ColumnType.STRING);
+		
+		List<ColumnModel> defaultColumns = Arrays.asList(colA, colB);
+		when(mockSynapse.getDefaultColumnsForView(any(ViewType.class))).thenReturn(defaultColumns);
+		List<ColumnModel> returnedColumns = synapseClient.getDefaultColumnsForView(ViewType.file);
+		
+		assertEquals(2, returnedColumns.size());
+		assertNull(returnedColumns.get(0).getId());
+		assertNull(returnedColumns.get(1).getId());
+	}
+	
+
+	@Test(expected = UnknownErrorException.class)
+	public void testUpdateFileEntityWrongResponseSize() throws RestServiceException, SynapseException {
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+	}
+	
+	@Test(expected = UnknownErrorException.class)
+	public void testUpdateFileEntityWrongResponseSizeTooMany() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+	}
+	
+	@Test
+	public void testUpdateFileEntity() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		when(mockFileHandleCopyResult.getFailureCode()).thenReturn(null);
+		when(mockFileHandleCopyResult.getNewFileHandle()).thenReturn(handle);
+		
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+		
+		verify(mockSynapse).copyFileHandles(isA(BatchFileHandleCopyRequest.class));
+		verify(mockFileEntity).setDataFileHandleId(handle.getId());
+		verify(mockSynapse).putEntity(mockFileEntity);
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void testUpdateFileEntityNotFound() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		when(mockFileHandleCopyResult.getFailureCode()).thenReturn(FileResultFailureCode.NOT_FOUND);
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
+	}
+	
+	@Test(expected = UnauthorizedException.class)
+	public void testUpdateFileEntityUnauthorized() throws RestServiceException, SynapseException {
+		batchCopyResultsList.add(mockFileHandleCopyResult);
+		when(mockFileHandleCopyResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
+		synapseClient.updateFileEntity(mockFileEntity, mockFileHandleCopyRequest);
 	}
 }

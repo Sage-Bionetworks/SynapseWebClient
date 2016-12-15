@@ -6,17 +6,13 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,26 +22,29 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	private AuthenticationController authenticationController;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private EntityBundle entityBundle;
-	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
-	
+	private FileDownloadButton fileDownloadButton;
 	@Inject
-	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, GlobalApplicationState globalAppState) {
+	public FileTitleBar(FileTitleBarView view, 
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalAppState,
+			FileDownloadButton fileDownloadButton) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
+		this.fileDownloadButton = fileDownloadButton;
 		view.setPresenter(this);
+		view.setFileDownloadButton(fileDownloadButton.asWidget());
 	}	
 	
-	public void configure(EntityBundle bundle) {		
+	public void configure(EntityBundle bundle) {
 		view.setPresenter(this);
 		this.entityBundle = bundle;
 
 		// Get EntityType
 		EntityType entityType = EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass());
 		view.createTitlebar(bundle, entityType, authenticationController);
+		fileDownloadButton.configure(bundle);
 	}
 	
 	/**
@@ -79,6 +78,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
+		fileDownloadButton.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -90,21 +90,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
-	}
-
-	
-	public void queryForSftpLoginInstructions(String url) {
-		synapseClient.getHost(url, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String host) {
-				//update the download login dialog message
-				view.setLoginInstructions(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SafeHtmlUtils.htmlEscape(host));
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
 	}
 
 	@Override

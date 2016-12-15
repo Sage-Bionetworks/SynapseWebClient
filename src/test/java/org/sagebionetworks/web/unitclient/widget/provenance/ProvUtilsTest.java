@@ -5,51 +5,32 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Matchers.*;
-
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
-import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
@@ -57,10 +38,6 @@ import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
-import com.google.gwt.core.client.Callback;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {
 		
@@ -70,10 +47,9 @@ public class ProvUtilsTest {
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
 	LayoutServiceAsync mockLayoutService;
-	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	
 	@Before
-	public void setup(){		
+	public void setup(){
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -266,225 +242,5 @@ public class ProvUtilsTest {
 		assertTrue(refToHeader.containsKey(ref));
 		assertEquals(header, refToHeader.get(ref));
 	}
-	
-	/*
-	 * Private Methods
-	 */
-	private SynapseJSNIUtils implJSNIUtils() {
-		return new SynapseJSNIUtils() {
-			Random rand = new Random();
-			
-			@Override
-			public void recordPageVisit(String token) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public int randomNextInt() {
-				return rand.nextInt();
-			}
-			
-			@Override
-			public void highlightCodeBlocks() {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void hideBootstrapTooltip(String id) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public String getCurrentHistoryToken() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String getBaseProfileAttachmentUrl() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public String convertDateToSmallString(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getLongFriendlyDate(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public void bindBootstrapTooltip(String id) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void bindBootstrapPopover(String id) {
-				// TODO Auto-generated method stub
-				
-			}
 
-			@Override
-			public String getLocationPath() {
-				return "/Portal.html";
-			}
-
-			@Override
-			public String getLocationQueryString() {
-				return "?foo=bar";
-			}
-			@Override
-			public String getBaseFileHandleUrl() {
-				return "";
-			}
-			
-			@Override
-			public LayoutResult nChartlayout(NChartLayersArray layers, NChartCharacters characters) {
-				return null;
-			}
-			@Override
-			public void setPageDescription(String newDescription) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public void setPageTitle(String newTitle) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public void loadTableSorters() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void uploadUrlToGenomeSpace(String url) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public String getRelativeTime(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getCalendarTime(Date toFormat) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public void uploadUrlToGenomeSpace(String url, String filename) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void processWithMathJax(Element element) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void loadCss(String url, Callback<Void, Exception> callback) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public String getFileUrl(String fileFieldId) {
-				return null;
-			}
-			
-			@Override
-			public void consoleError(String message) {
-			}
-			
-			@Override
-			public void consoleLog(String message) {
-			}
-
-			@Override
-			public void uploadFileChunk(String contentType, int index,
-					String fileFieldId, Long startByte, Long endByte,
-					String url, XMLHttpRequest xhr, ProgressCallback callback) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public String getContentType(String fileFieldId, int index) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public void getFilePartMd5(String fileFieldId, int currentChunk,
-					Long chunkSize, int fileIndex, MD5Callback md5Callback) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public void getFileMd5(String fileFieldId, int index,
-					MD5Callback callback) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public boolean isElementExists(String elementId) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public double getFileSize(String fileFieldId, int index) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public String[] getMultipleUploadFileNames(String fileFieldId) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public boolean isFileAPISupported() {
-				return true;
-			}
-
-			@Override
-			public void initOnPopStateHandler() {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void showTwitterFeed(String dataWidgetId, String elementId,
-					String linkColor, String borderColor, int height) {
-				// TODO Auto-generated method stub
-				
-			}
-			@Override
-			public String getCurrentURL() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getCurrentHostName() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
-	}
 }

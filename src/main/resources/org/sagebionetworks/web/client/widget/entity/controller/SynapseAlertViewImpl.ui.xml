@@ -29,8 +29,8 @@
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelButton" type="DEFAULT" text="Don't Send" />
 			    <b:Button ui:field="okButton" type="PRIMARY" text="Send Error Report" />
+			    <b:Button ui:field="cancelButton" type="DEFAULT" text="Don't Send" />
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

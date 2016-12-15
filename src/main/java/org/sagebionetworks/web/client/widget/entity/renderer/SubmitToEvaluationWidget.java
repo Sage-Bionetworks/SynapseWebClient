@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -113,11 +112,8 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				view.showUnavailable(evaluationUnavailableMessage);
 			}
 			return;
-		} 
-		//else, look for the challenge id
-		if (descriptor.containsKey(WidgetConstants.CHALLENGE_ID_KEY)) {
-			String challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
-			challengeClient.getChallengeEvaluationIds(challengeId, new AsyncCallback<Set<String>>() {
+		} else {
+			AsyncCallback<Set<String>> asyncCallback = new AsyncCallback<Set<String>>() {
 				@Override
 				public void onSuccess(Set<String> evaluationIds) {
 					//if no evaluations are accessible, do not continue (show nothing)
@@ -130,7 +126,17 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(DisplayConstants.CHALLENGE_EVALUATIONS_ERROR + caught.getMessage());
 				}
-			});
+			};
+			
+			if (descriptor.containsKey(WidgetConstants.CHALLENGE_ID_KEY)) {
+				//else, look for the challenge id
+				String challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
+				challengeClient.getChallengeEvaluationIds(challengeId, asyncCallback);
+			} else if (descriptor.containsKey(WidgetConstants.PROJECT_ID_KEY)) {
+				//else, look for the project id
+				String projectId = descriptor.get(WidgetConstants.PROJECT_ID_KEY);
+				challengeClient.getProjectEvaluationIds(projectId, asyncCallback);
+			}
 		}
 	}
 	

@@ -4,7 +4,14 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	
 	<b:Row>
+		<bh:Span ui:field="loading" addStyleNames="center-block center min-height-400">
+			<g:Image resource='{sageImageBundle.loading31}' />
+			<bh:Text> Loading...</bh:Text>
+		</bh:Span>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
@@ -20,7 +27,7 @@
 			<g:SimplePanel ui:field="fileHistoryContainer"/>
 			<g:SimplePanel ui:field="filesWikiPageContainer" addStyleNames="panel panel-default panel-body margin-bottom-0-imp" visible="false"/>
 			<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
-			<b:Row>
+			<b:Row addStyleNames="margin-top-10">
 				<b:Column size="MD_6" ui:field="filePreviewContainer">
 					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
 			    		<bh:Div addStyleNames="highlight-title">
@@ -41,10 +48,13 @@
 			    		<bh:Div ui:field="fileProvenanceContainerHighlightBox" />
 			    	</g:FlowPanel>
 				</b:Column>
-			</b:Row>
-			<b:Row>
-				<b:Column size="XS_12">
-					<g:HTMLPanel ui:field="fileProgrammaticClientsContainer"/>		
+				<b:Column size="MD_12" ui:field="discussionContainer">
+					<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+			    		<bh:Div addStyleNames="highlight-title">
+			    			<bh:Text ui:field="discussionText" />
+			    		</bh:Div>
+			    		<bh:Div ui:field="discussionThreadsContainer" />
+			    	</g:FlowPanel>
 				</b:Column>
 			</b:Row>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>

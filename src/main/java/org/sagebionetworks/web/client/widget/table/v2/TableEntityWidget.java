@@ -40,7 +40,7 @@ public class TableEntityWidget implements IsWidget,
 
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
-	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Schema' to add columns to the this table.";
+	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select 'Schema' to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
@@ -188,7 +188,7 @@ public class TableEntityWidget implements IsWidget,
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		if(!isFromResults){
-			this.queryResultsWidget.configure(query, this.canEditResults, this);
+			this.queryResultsWidget.configure(query, this.canEditResults, this.isView, this);
 		}
 	}
 
@@ -301,7 +301,7 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onDownloadResults() {
-		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId);
+		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId, currentQuery.getSelectedFacets());
 		downloadTableQueryModalWidget.showModal();
 	}
 	

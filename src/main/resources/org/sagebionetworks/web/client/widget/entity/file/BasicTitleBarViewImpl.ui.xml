@@ -7,10 +7,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
-		<h2 style="margin-bottom: 0px;">
+		<h2 style="margin-bottom: 0px;" class="displayInlineBlock margin-right-5">
 		 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FOLDER"/>
 		 	<bh:Span ui:field="fileName"/>
 		 	<g:SimplePanel ui:field="favoritePanel"/>
 		</h2>
+		<bh:Span ui:field="containerHelpContainer"/>
 	</g:HTMLPanel>
 </ui:UiBinder>

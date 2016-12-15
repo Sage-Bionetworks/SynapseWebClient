@@ -44,6 +44,7 @@ public class ColumnModelUtils {
 			row.setEnumValues(model.getEnumValues());
 		}
 		row.setDefaultValue(model.getDefaultValue());
+		row.setFacetType(ColumnFacetTypeViewEnum.getViewForType(model.getFacetType()));
 	}
 	
 	/**
@@ -99,6 +100,9 @@ public class ColumnModelUtils {
 			model.setEnumValues(row.getEnumValues());
 		}
 		model.setDefaultValue(treatEmptyAsNull(row.getDefaultValue()));
+		if (row.getFacetType() != null) {
+			model.setFacetType(row.getFacetType().getType());	
+		}
 		return model;
 	}
 	

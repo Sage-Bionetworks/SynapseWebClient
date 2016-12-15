@@ -9,8 +9,8 @@
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving...">Save</b:Button>
+			<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder> 

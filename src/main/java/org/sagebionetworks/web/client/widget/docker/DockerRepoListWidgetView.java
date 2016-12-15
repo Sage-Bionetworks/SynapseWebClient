@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,10 +14,6 @@ public interface DockerRepoListWidgetView extends IsWidget {
 
 		void onRepoClicked(EntityBundle bundle);
 	}
-
-	void addPaginationWidget(PaginationWidget paginationWidget);
-
-	void showPaginationVisible(boolean visible);
 
 	void setAddExternalRepoButtonVisible(boolean visibile);
 
@@ -32,4 +28,6 @@ public interface DockerRepoListWidgetView extends IsWidget {
 	void clear();
 
 	void addRepo(EntityBundle bundle);
+
+	void setMembersContainer(LoadMoreWidgetContainer membersContainer);
 }

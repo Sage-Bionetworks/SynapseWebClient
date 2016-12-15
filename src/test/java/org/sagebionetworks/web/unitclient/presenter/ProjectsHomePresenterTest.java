@@ -15,18 +15,14 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -39,18 +35,15 @@ public class ProjectsHomePresenterTest {
 
 	ProjectsHomePresenter projectsHomePresenter;
 	ProjectsHomeView mockView;
-	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
 	SynapseAlert mockSynAlert;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();	
 	
 	@Before
 	public void setup(){
 		mockView = mock(ProjectsHomeView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockSynAlert = mock(SynapseAlert.class);
@@ -58,9 +51,8 @@ public class ProjectsHomePresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);	
 		projectsHomePresenter = new ProjectsHomePresenter(mockView,
 				mockGlobalApplicationState, 
-				mockAuthenticationController,
 				mockSynapseClient, 
-				adapterFactory, mockSynAlert);
+				mockSynAlert);
 		verify(mockView).setPresenter(projectsHomePresenter);
 	}	
 	

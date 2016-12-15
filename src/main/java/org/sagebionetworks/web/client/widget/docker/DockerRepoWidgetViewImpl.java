@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -19,6 +21,8 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@UiField
 	Div dockerRepoProvenanceContainer;
 	@UiField
+	FlowPanel provenancePanel;
+	@UiField
 	TextBox dockerPullCommand;
 	@UiField
 	SimplePanel synapseAlertContainer;
@@ -30,19 +34,21 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	SimplePanel dockerModifiedAndCreatedContainer;
 	@UiField
 	SimplePanel dockerActionMenuContainer;
+	@UiField
+	Div dockerCommitListContainer;
 
 	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {}
 	private Presenter presenter;
 	Widget widget;
 
 	@Inject
-	public DockerRepoWidgetViewImpl(Binder binder){
+	public DockerRepoWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils){
 		this.widget = binder.createAndBindUi(this);
-		dockerRepoProvenanceContainer.getElement().setAttribute("highlight-box-title", "Provenance");
 		dockerPullCommand.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				dockerPullCommand.selectAll();
+				jsniUtils.copyToClipboard();
 			}
 		});
 	}
@@ -97,4 +103,13 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 		dockerActionMenuContainer.add(w);
 	}
 
+	@Override
+	public void setDockerCommitListWidget(Widget widget){
+		dockerCommitListContainer.add(widget);
+	}
+
+	@Override
+	public void setProvenanceWidgetVisible(boolean visible) {
+		provenancePanel.setVisible(visible);
+	}
 }

@@ -58,7 +58,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
 	private int currentAccessRequirement;
-	private TeamMembershipStatus teamMembershipStatus;
 	
 	public static final String[] EXTRA_INFO_URL_WHITELIST = { 
 		"https://www.projectdatasphere.org/projectdatasphere/",
@@ -115,7 +114,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
-		this.teamMembershipStatus = teamMembershipStatus;
 		view.clear();
 		if (buttonText != null && !buttonText.isEmpty()) {
 			view.setJoinButtonsText(buttonText);
@@ -140,7 +138,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			} else if (teamMembershipStatus.getHasOpenRequest()) {
 				// display a message saying "your membership request is pending review by team administration"
 				view.setRequestMessageVisible(true);
-			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
+			} else if (teamMembershipStatus.getMembershipApprovalRequired() && !teamMembershipStatus.getHasOpenInvitation()) {
 				// show request UI
 				if (isSimpleRequestButton) {
 					view.setSimpleRequestButtonVisible(true);
@@ -424,10 +422,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			expiresOn = new Date();
 			gwt.addDaysToDate(expiresOn, requestExpiresInXDays);
 		}
-		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), expiresOn, new AsyncCallback<Void>() {
+		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), expiresOn, new AsyncCallback<TeamMembershipStatus>() {
 			@Override
-			public void onSuccess(Void result) {
-				if (teamMembershipStatus.getCanJoin()) {
+			public void onSuccess(TeamMembershipStatus teamMembershipStatus) {
+				if (teamMembershipStatus.getIsMember()) {
 					refresh();
 				} else {
 					view.showInfo("Request Sent", "");

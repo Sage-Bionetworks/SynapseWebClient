@@ -99,7 +99,15 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	SimplePanel contributorSynAlertPanel;
 	@UiField
+	SimplePanel dockerCommitListSynAlertPanel;
+	@UiField
 	FormGroup evaluationListUI;
+	@UiField
+	Modal dockerCommitModal;
+	@UiField
+	SimplePanel dockerCommitListContainer;
+	@UiField
+	Button dockerCommitNextButton;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -124,6 +132,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 					nextButton.click();
 				}
+			}
+		});
+		dockerCommitNextButton.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onDockerCommitNextButton();
 			}
 		});
 		nextButton.addClickHandler(new ClickHandler() {
@@ -256,7 +271,23 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-	
+
+	@Override
+	public void setDockerCommitList(Widget widget){
+		dockerCommitListContainer.clear();
+		dockerCommitListContainer.add(widget);
+	}
+
+	@Override
+	public void showDockerCommitModal() {
+		dockerCommitModal.show();
+	}
+
+	@Override
+	public void hideDockerCommitModal() {
+		dockerCommitModal.hide();
+	}
+
 	@Override
 	public void showModal1(boolean showEntityFinder, List<Evaluation> evaluations) {
 		clear();
@@ -382,6 +413,12 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	@Override
 	public void setEvaluationListVisible(boolean visible) {
-		evaluationListUI.setVisible(visible);	
+		evaluationListUI.setVisible(visible);
+	}
+
+	@Override
+	public void setDockerCommitSynAlert(Widget widget) {
+		this.dockerCommitListSynAlertPanel.clear();
+		this.dockerCommitListSynAlertPanel.add(widget);
 	}
 }

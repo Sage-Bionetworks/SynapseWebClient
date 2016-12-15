@@ -1,23 +1,29 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.GwtEvent;
 
 public class SynapseSuggestBoxTest {
 
@@ -68,4 +74,38 @@ public class SynapseSuggestBoxTest {
 		//no error
 	}
 	
+	@Test
+	public void testAddKeyDownHandler() {
+		KeyDownHandler handler = Mockito.mock(KeyDownHandler.class);
+		suggestBox.addKeyDownHandler(handler);
+		verify(mockView).addKeyDownHandler(handler);
+	}
+	
+	@Test
+	public void testFireEvent() {
+		GwtEvent event = Mockito.mock(GwtEvent.class);
+		suggestBox.fireEvent(event);
+		verify(mockView).fireEvent(event);
+	}
+	
+	@Test
+	public void testGetTabIndex() {
+		int tabIndex = 4;
+		when(mockView.getTabIndex()).thenReturn(tabIndex);
+		assertEquals(tabIndex, suggestBox.getTabIndex());
+	}
+	
+	@Test
+	public void testSetAccessKey() {
+		char key = 'a';
+		suggestBox.setAccessKey(key);
+		verify(mockView).setAccessKey(key);
+	}
+	
+	@Test
+	public void testSetTabIndex() {
+		int tabIndex = 5;
+		suggestBox.setTabIndex(tabIndex);
+		verify(mockView).setTabIndex(tabIndex);
+	}
 }

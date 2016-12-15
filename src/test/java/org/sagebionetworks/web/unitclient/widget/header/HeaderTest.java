@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.header;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -95,20 +96,20 @@ public class HeaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("008");
 		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(any(Profile.class));
+		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 
 	@Test
 	public void testOnDashboardClickAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 
 	@Test
 	public void testOnTrashClick() {
 		header.onTrashClick();
-		verify(mockPlaceChanger).goTo(any(Trash.class));
+		verify(mockPlaceChanger).goTo(isA(Trash.class));
 	}
 
 	@Test
@@ -145,7 +146,7 @@ public class HeaderTest {
 	@Test
 	public void testOnRegisterClick() {
 		header.onRegisterClick();
-		verify(mockPlaceChanger).goTo(any(RegisterAccount.class));
+		verify(mockPlaceChanger).goTo(isA(RegisterAccount.class));
 	}
 
 	@Test

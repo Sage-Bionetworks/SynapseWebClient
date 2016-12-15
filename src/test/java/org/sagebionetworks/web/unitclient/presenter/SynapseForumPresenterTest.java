@@ -3,14 +3,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.presenter.SynapseForumPresenter.DEFAULT_IS_MODERATOR;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +61,6 @@ public class SynapseForumPresenterTest {
 	AccessControlList mockACL;
 	
 	SynapseForumPresenter presenter;
-	Set<Long> moderatorIds;
 	
 	@Before
 	public void setUp() {
@@ -76,7 +72,6 @@ public class SynapseForumPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPlace.toToken()).thenReturn("fake token");
 		AsyncMockStubber.callSuccessWith(mockACL).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
-		moderatorIds = new HashSet<Long>();
 	}
 
 	@Test
@@ -117,19 +112,7 @@ public class SynapseForumPresenterTest {
 		presenter.setPlace(mockPlace);
 		presenter.showForum(entityId);
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
-				eq(DEFAULT_IS_MODERATOR), eq(moderatorIds), any(CallbackP.class), any(Callback.class));
-	}
-	
-	@Test
-	public void testShowForumACLFailure() {
-		String entityId = "syn1";
-		Exception ex = new Exception("error");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
-		presenter.setPlace(mockPlace);
-		presenter.showForum(entityId);
-		verify(mockSynAlert).handleException(ex);
-		verify(mockForumWidget, never()).configure(anyString(), any(ParameterizedToken.class),
-				eq(DEFAULT_IS_MODERATOR), eq(moderatorIds), any(CallbackP.class), any(Callback.class));
+				eq(DEFAULT_IS_MODERATOR), any(CallbackP.class), any(Callback.class));
 	}
 
 }

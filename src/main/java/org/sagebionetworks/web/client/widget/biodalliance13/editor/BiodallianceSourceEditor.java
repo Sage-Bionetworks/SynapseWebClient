@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -25,7 +26,7 @@ import com.google.inject.Inject;
 /**
  * Source object represents a Biodalliance track source.  The view is optional, and only needs to be injected if showing an editor for the source object.
  */
-public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Presenter, IsWidget{
+public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Presenter, IsWidget, SelectableListItem {
 	//view, may not be set if only using this class to pass data around
 	BiodallianceSourceEditorView view;
 	private SynapseClientAsync synapseClient;

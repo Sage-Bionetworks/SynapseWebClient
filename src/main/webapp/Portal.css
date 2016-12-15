@@ -200,6 +200,10 @@ End Synapse color scheme
 	width: 0px;
 }
 
+.text-align-left {
+	text-align: left;
+}
+
 .mainPageHeader {
 	border: 1px solid black;
 	padding: 10px;
@@ -640,6 +644,11 @@ a.shortBtn {
 .margin-right-40 {
 	margin-right: 40px;
 }
+
+.margin-right-30 {
+	margin-right: 30px;
+}
+
 .margin-right-65 {
 	margin-right: 65px;
 }
@@ -682,6 +691,13 @@ a.shortBtn {
 .min-width-25 {
 	min-width: 25px;
 }
+.min-width-150 {
+	min-width: 150px;
+}
+.min-width-200 {
+	min-width: 200px;
+}
+
 .profile-image-40px {
 	width: 40px;	
 }
@@ -973,8 +989,9 @@ a.shortBtn {
 }
 
 .markdown {
-	word-wrap:break-word;
-	overflow: auto;
+	word-wrap: break-word;
+	overflow-x: auto;
+	overflow-y: hidden;
 	text-align: justify;
 	line-height: 1.6em;
 }
@@ -1284,6 +1301,14 @@ h1, h2, h3, h4, h5, h6 {
   padding: 2px 4px;
   font-weight: 500;
   font-size: 1.1em;
+}
+
+.markdowntable .userBadgeTable {
+	top: 0px;
+}
+
+.userBadgeTable td {
+	border: 0px;
 }
 
 /* Markdown table styles */
@@ -2022,9 +2047,34 @@ a.projectTitle:hover {
 }
 
 .entity-tab {
-	width: 140px;
 	font-size: 16px;	
 }
+
+@media (max-width: 991px) {
+	.entity-tab {
+		width: 100%;
+	}
+}
+@media (min-width: 992px) {
+	.entity-tab {
+		width: 140px;
+	}
+}
+
+@media (max-width: 768px) {
+	.pull-left-unless-xs {
+		width: 100%;
+	}
+}
+
+@media (min-width: 769px) {
+	.pull-left-unless-xs {
+		float: left;
+		max-width: 460px;
+	}
+}
+
+
 .entity-tab > a {
 	text-align: center;
 }
@@ -2165,6 +2215,12 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	width: 95%;
 }
 
+.modal-90-percent [class*="modal-dialog"] {
+	width: 90%;
+}
+
+
+
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
 }
@@ -2211,6 +2267,11 @@ iframe[seamless] {
 .modal {
     overflow-y: auto !important;
 }
+
+.bootbox {
+	z-index: 2000 !important;
+}
+
 
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
@@ -2333,6 +2394,11 @@ div.input-group > input.search-textbox {
   font-size: 1em;
 }
 
+.nav>li>a>div {
+	padding: 1em 2em .5em 2em;
+	margin: -1em -2em -.5em -2em;
+}
+
 /*===========*/
 
 .largeIconButton {
@@ -2348,6 +2414,10 @@ div.input-group > input.search-textbox {
 .text-align-right {
 	text-align: right;
 }
+.text-align-left {
+	text-align: left;
+}
+
 
 .inlineField {
 	overflow: hidden; 
@@ -2478,6 +2548,17 @@ td.datePickerMonth {
 
 .border-left-1 {
   border-left: 1px solid #dddddd;
+}
+
+.border-top-1 {
+  border-top: 1px solid #dddddd;
+}
+
+.read-only-box {
+	padding: 5px;
+    border: 1px solid #dddddd;
+    border-radius: .2em;
+    box-shadow: inset 0 -1px 0 #ddd;
 }
 
 /* Provenance graph css */

@@ -63,50 +63,46 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	SynapseClientAsync synapseClient;
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
-	
 	CallbackP<Boolean> showProjectInfoCallack;
+	TableEntityWidget v2TableWidget;
 	@Inject
-	public TablesTab(
-			TablesTabView view,
-			Tab t,
-			TableListWidget tableListWidget,
-			BasicTitleBar tableTitleBar,
-			Breadcrumb breadcrumb,
-			EntityMetadata metadata,
-			QueryTokenProvider queryTokenProvider,
-			StuAlert synAlert,
-			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector,
-			ModifiedCreatedByWidget modifiedCreatedBy
+	public TablesTab(Tab tab,
+			PortalGinInjector ginInjector
 			) {
-		this.view = view;
-		this.tab = t;
-		this.tableListWidget = tableListWidget;
-		this.tableTitleBar = tableTitleBar;
-		this.breadcrumb = breadcrumb;
-		this.metadata = metadata;
-		this.queryTokenProvider = queryTokenProvider;
-		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
+		this.tab = tab;
 		this.ginInjector = ginInjector;
-		this.modifiedCreatedBy = modifiedCreatedBy;
-		
-		view.setBreadcrumb(breadcrumb.asWidget());
-		view.setTableList(tableListWidget.asWidget());
-		view.setTitlebar(tableTitleBar.asWidget());
-		view.setEntityMetadata(metadata.asWidget());
-		view.setSynapseAlert(synAlert.asWidget());
-		view.setModifiedCreatedBy(modifiedCreatedBy);
-		tab.configure("Tables", view.asWidget(), "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
-		
-		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
-			@Override
-			public void invoke(String entityId) {
-				areaToken = null;
-				getTargetBundleAndDisplay(entityId);
-			}
-		});
-		initBreadcrumbLinkClickedHandler();
+		tab.configure("Tables", "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
+	}
+	
+	public void lazyInject() {
+		if (view == null) {
+			this.view = ginInjector.getTablesTabView();
+			this.tableListWidget = ginInjector.getTableListWidget();
+			this.tableTitleBar = ginInjector.getBasicTitleBar();
+			this.breadcrumb = ginInjector.getBreadcrumb();
+			this.metadata = ginInjector.getEntityMetadata();
+			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
+			this.synAlert = ginInjector.getStuAlert();
+			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
+			
+			view.setBreadcrumb(breadcrumb.asWidget());
+			view.setTableList(tableListWidget.asWidget());
+			view.setTitlebar(tableTitleBar.asWidget());
+			view.setEntityMetadata(metadata.asWidget());
+			view.setSynapseAlert(synAlert.asWidget());
+			view.setModifiedCreatedBy(modifiedCreatedBy);
+			tab.setContent(view.asWidget());
+			
+			tableListWidget.setTableClickedCallback(new CallbackP<String>() {
+				@Override
+				public void invoke(String entityId) {
+					areaToken = null;
+					getTargetBundleAndDisplay(entityId);
+				}
+			});
+			initBreadcrumbLinkClickedHandler();
+		}
 	}
 	
 	@Override
@@ -124,7 +120,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				String entityId = synapse.getEntityId();
 				if (entityId.equals(projectEntityId)) {
 				    showProjectLevelUI();
-				    tab.showTab();
 				} else {
 				    getTargetBundleAndDisplay(entityId);
 				}
@@ -144,6 +139,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
+		lazyInject();
 		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;
@@ -169,6 +165,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			showError(projectBundleLoadError);
 		}
 		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
+		tab.showTab(true);
 	}
 	
 	public void resetView() {
@@ -207,7 +204,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			ActionMenuWidget actionMenu = initActionMenu(bundle);
 			
-			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
+			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), this, actionMenu);
 		} else if (isProject) {
@@ -241,16 +238,17 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(entityId, null, null, null));
+				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(entityId, null, EntityArea.TABLES, null));
 				setTargetBundle(bundle);
-				tab.showTab();
+				// note: let TableEntityWidget query control browser history.  when the query is run, push url into the stack. 
+				tab.showTab(false);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				tab.setEntityNameAndPlace(entityId, new Synapse(entityId, null, null, null));
+				tab.setEntityNameAndPlace(entityId, new Synapse(entityId, null, EntityArea.TABLES, null));
 				showError(caught);
-				tab.showTab();
+				tab.showTab(false);
 			}			
 		};
 		
@@ -262,14 +260,15 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void onQueryChange(Query newQuery) {
-		if(newQuery != null){
+		if(newQuery != null) {
 			String token = queryTokenProvider.queryToToken(newQuery);
-			if(token != null){
+			if(token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())){
 				areaToken = TABLE_QUERY_PREFIX + token;
-				tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
-				// replace state if configuring table query widget, push history state after configuration.
-				tab.showTab(false);
+			} else {
+				areaToken = "";
 			}
+			tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
+			tab.showTab(true);
 		}
 	}
 	

@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -115,7 +116,7 @@ public class WikiMarkdownEditorTest {
 		captor.getValue().callback(isConfirmed);
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).hideEditorModal();
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 	
 	@Test

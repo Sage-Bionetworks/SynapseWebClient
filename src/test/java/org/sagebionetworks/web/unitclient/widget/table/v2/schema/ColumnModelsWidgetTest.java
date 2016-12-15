@@ -1,16 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -21,6 +25,9 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -28,6 +35,10 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -36,11 +47,13 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBase;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Unit test for ColumnModelsViewWidget
@@ -70,7 +83,13 @@ public class ColumnModelsWidgetTest {
 	EntityView mockView;
 	@Mock
 	List<ColumnModel> mockDefaultColumnModels;
-	
+	@Mock
+	TableUpdateTransactionRequest mockTableSchemaChangeRequest;
+	@Mock
+	JobTrackingWidget mockJobTrackingWidget;
+	@Mock
+	TableUpdateRequest mockTableUpdateRequest;
+
 	TableEntity table;
 	TableBundle tableBundle;
 	
@@ -98,11 +117,18 @@ public class ColumnModelsWidgetTest {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
-		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor);
+		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget);
+		when(mockEditor.validate()).thenReturn(true);
+		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
+		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testConstruction() {
 		verify(mockBaseView).setViewer(mockViewer);
 		verify(mockBaseView).setEditor(mockEditor);
-		when(mockEditor.validate()).thenReturn(true);
-		
+		verify(mockBaseView).setJobTrackingWidget(any(IsWidget.class));
+		verify(mockBaseView).setJobTrackingWidgetVisible(false);
 	}
 	
 	@Test
@@ -177,22 +203,55 @@ public class ColumnModelsWidgetTest {
 		widget.onEditColumns();
 	}
 	
-	@Test
-	public void testOnSaveSuccess() throws JSONObjectAdapterException{
+	private AsynchronousProgressHandler onSave() {
 		boolean isEditable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(Table.class), anyList(), any(AsyncCallback.class));
+		when(mockEditor.getEditedColumnModels()).thenReturn(TableModelTestUtils.createOneOfEachType(false));
 		// Now call save
 		widget.onSave();
-		verify(mockBaseView, times(1)).setLoading();
+		boolean isDeterminate = false;
+		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(ColumnModelsWidget.UPDATING_SCHEMA), eq(isDeterminate), eq(AsynchType.TableTransaction), eq(mockTableSchemaChangeRequest), captor.capture());
+		return captor.getValue();
+	}
+	
+	@Test
+	public void testOnSaveSuccess() throws JSONObjectAdapterException{
+		onSave().onComplete(null);
+		InOrder inOrder = inOrder(mockBaseView);
+		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+		
+		verify(mockBaseView).setLoading();
 		verify(mockBaseView).hideEditor();
 		verify(mockBaseView).hideErrors();
 		// Save success should be called.
 		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+
+	@Test
+	public void testOnPrimaryAsyncCancelled(){
+		onSave().onCancel();
+		InOrder inOrder = inOrder(mockBaseView);
+		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+		verify(mockBaseView, times(2)).showEditor();
+	}
+	
+	@Test
+	public void testOnPrimaryAsyncFailure(){
+		String errorMessage = "error during schema update";
+		Exception ex = new Exception(errorMessage);
+		onSave().onFailure(ex);
+		InOrder inOrder = inOrder(mockBaseView);
+		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
+		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
+		verify(mockBaseView).showError(errorMessage);
 	}
 	
 	@Test
@@ -222,7 +281,7 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		String errorMessage = "Something went wrong";
-		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(any(Table.class), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(),  anyList(), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();

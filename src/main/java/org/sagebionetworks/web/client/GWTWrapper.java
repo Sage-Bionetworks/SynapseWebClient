@@ -32,7 +32,9 @@ public interface GWTWrapper {
 	
 	DateTimeFormat getDateTimeFormat(PredefinedFormat format);
 	
-	void scheduleExecution(Callback callback, int delay);
+	void scheduleFixedDelay(final Callback callback, int delayMs);
+	
+	void scheduleExecution(Callback callback, int delayMs);
 	
 	void scheduleDeferred(Callback callback);
 	
@@ -54,4 +56,6 @@ public interface GWTWrapper {
 	
 	ServiceDefTarget asServiceDefTarget(Object service);
 	HasRpcToken asHasRpcToken(Object service);
+
+	String getUniqueElementId();
 }

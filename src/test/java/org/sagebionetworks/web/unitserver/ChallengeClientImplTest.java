@@ -22,9 +22,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -69,6 +75,7 @@ import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ChallengeClientImplTest {
 	
 	
@@ -114,6 +121,15 @@ public class ChallengeClientImplTest {
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	ChallengeTeam testChallengeTeam1, testChallengeTeam2;
 	Challenge testChallenge;
+	
+	
+	@Mock
+	ThreadLocal<HttpServletRequest> mockThreadLocal;
+	
+	@Mock 
+	HttpServletRequest mockRequest;
+	
+	String userIp = "127.0.0.1";
 	
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException{
@@ -163,6 +179,11 @@ public class ChallengeClientImplTest {
 		testChallenge = getTestChallenge();
 		setupChallengeteamPagedResults();
 		when(mockSynapse.getChallenge(anyString())).thenReturn(testChallenge);
+		
+		Whitebox.setInternalState(synapseClient, "perThreadRequest", mockThreadLocal);
+		userIp = "127.0.0.1";
+		when(mockThreadLocal.get()).thenReturn(mockRequest);
+		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
 	}
 	
 	@Test

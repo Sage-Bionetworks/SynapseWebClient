@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.user;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface UserBadgeView extends IsWidget, SynapseView {
+public interface UserBadgeView extends IsWidget, SynapseView, SupportsLazyLoadInterface {
 
 	/**
 	 * Set the presenter.
@@ -22,6 +23,8 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setDefaultPictureLetter(String letter);
 	void setHref(String href);
 	void clearHref();
+	void openNewWindow(String url);
+	void setOpenNewWindow(String target);
 	/**
 	 * Presenter interface
 	 */

@@ -25,8 +25,8 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 
-	public static final String EXTERNAL_IMAGE_CONTENT_TYPE = "externalImage";
-	public static final String EXTERNAL_IMAGE_FRIENDLY_NAME = "External Image";
+	public static final String IMAGE_LINK_EDITOR_CONTENT_TYPE = "imageLink";
+	public static final String IMAGE_LINK_FRIENDLY_NAME = "Image Link";
 	
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
@@ -91,6 +91,7 @@ public class WidgetConstants {
 	public static final String TEAM_MEMBERS_CONTENT_TYPE = "members";
 	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
 	
+	public static final String TEAM_MEMBER_COUNT_CONTENT_TYPE = "teammembercount";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
@@ -180,6 +181,7 @@ public class WidgetConstants {
 	public static final String BIODALLIANCE_SOURCE_PREFIX = "source";
 	
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
+	public static final String PROJECT_ID_KEY = "projectId";
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
@@ -209,6 +211,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_EPOCH_DATE = "epochdate";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
+	public static final String API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL = "cancelcontrol";
 	
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
 	public static final String MARKDOWN_TABLE_ID_PREFIX = "markdown-table-";

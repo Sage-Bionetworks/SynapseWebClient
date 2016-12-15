@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,7 +20,7 @@ import com.google.inject.Inject;
  * @author jayhodgson
  *
  */
-public class FileHandleLink implements IsWidget {
+public class FileHandleLink implements IsWidget, SelectableListItem {
 	public interface FileHandleLinkUiBinder extends UiBinder<Widget, FileHandleLink> {}
 	
 	@UiField

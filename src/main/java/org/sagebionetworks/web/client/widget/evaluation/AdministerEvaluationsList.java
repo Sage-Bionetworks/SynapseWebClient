@@ -5,7 +5,6 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
@@ -21,7 +20,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	private EvaluationAccessControlListModalWidget aclEditor;
 	private SynapseAlert synAlert;
 	private String entityId;
-	private CallbackP<Boolean> isChallengeCallback;
+	private Callback isChallengeCallback;
 	private EvaluationEditorModal evalEditor;
 	
 	@Inject
@@ -47,7 +46,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	 * @param evaluations List of evaluations to display
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
-	public void configure(String entityId, final CallbackP<Boolean> isChallengeCallback) {
+	public void configure(String entityId, final Callback isChallengeCallback) {
 		this.entityId = entityId;
 		this.isChallengeCallback = isChallengeCallback;
 		view.clearRows();
@@ -58,8 +57,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 				for (Evaluation evaluation : evaluations) {
 					view.addRow(evaluation);
 				}
-				if (isChallengeCallback != null)
-					isChallengeCallback.invoke(evaluations.size() > 0);
+				if (isChallengeCallback != null && evaluations.size() > 0)
+					isChallengeCallback.invoke();
 				
 			}
 			

@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
 import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -232,7 +231,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						innerText = innerText.trim();
 						String contentType = widgetRegistrar.getWidgetContentType(innerText);
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, 
+						IsWidget presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, 
 								new Callback() {
 									@Override
 									public void invoke() {

@@ -35,6 +35,8 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setEditorEnabled(boolean enabled);
 	void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
 	void showPreview();
+	void showEditMode();
+	void setSelectTeamModal(Widget widget);
 	
 	/**
 	 * Presenter interface

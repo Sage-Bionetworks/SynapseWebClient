@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,10 +21,12 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -100,6 +103,32 @@ public class EntityMetadataTest {
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
 	}
+
+	@Test
+	public void testSetEntityBundleDockerRepo() {
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = true;
+		boolean canCertifiedUserEdit = false;
+		boolean isCurrentVersion = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		DockerRepository dockerRepo = new DockerRepository();
+		dockerRepo.setName(entityName);
+		dockerRepo.setId(entityId);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(dockerRepo);
+		bundle.setPermissions(permissions);
+		bundle.setDoi(mockDoi);
+		Long versionNumber = null;
+		widget.setEntityBundle(bundle, versionNumber);
+		verify(mockView).setDetailedMetadataVisible(true);
+		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber);
+		verify(mockFileHistoryWidget, never()).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
+		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
+				Mockito.anyBoolean(), any(Callback.class));
+	}
 	
 	@Test
 	public void testSetEntityBundleFileEntityMostRecent() {
@@ -169,9 +198,24 @@ public class EntityMetadataTest {
 	}
 	
 	@Test
+	public void testConfigureStorageLocationExternalSftp() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
+		exS3Destination.setUrl("sftp://testUrl.com/abcdef");
+		exS3Destination.setUploadType(UploadType.SFTP);
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(en);
+		verify(mockView).setUploadDestinationText("sftp://testUrl.com");
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView).setUploadDestinationPanelVisible(true);
+	}
+	
+	@Test
 	public void testConfigureStorageLocationExternal() {
 		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
 		ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
+		exS3Destination.setUploadType(UploadType.HTTPS);
 		exS3Destination.setUrl("testUrl.com");
 		uploadDestinations.add(exS3Destination);
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -121,7 +122,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		clear();
 		headerWidget.refresh();
 		
-		Panel cp = new Panel();
+		Div cp = new Div();
 		cp.addStyleName("padding-15");
 		HTML message = new HTML();
 		message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");

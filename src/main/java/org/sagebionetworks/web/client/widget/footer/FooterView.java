@@ -15,6 +15,7 @@ public interface FooterView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void onReportAbuseClicked();
 	}
 
 	/**
@@ -22,5 +23,6 @@ public interface FooterView extends IsWidget {
 	 * @param portalVersion
 	 * @param repoVersion
 	 */
-	public void setVersion(String portalVersion, String repoVersion);
+	void setVersion(String portalVersion, String repoVersion);
+	void open(String url);
 }

@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -119,16 +120,8 @@ public class MultipartUploaderTest {
 		}).when(synapseJsniUtils).getFilePartMd5(anyString(), anyInt(), anyLong(), anyInt(), any(MD5Callback.class));
 
 		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(FILE_SIZE);
-		// fire the timer 
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				final Object[] args = invocation.getArguments();
-				Callback callback = (Callback) args[0];
-				callback.invoke();
-				return null;
-			}
-		}).when(gwt).scheduleExecution(any(Callback.class), anyInt());
+		// fire the timer
+		CallbackMockStubber.invokeCallback().when(gwt).scheduleExecution(any(Callback.class), anyInt());
 		when(gwt.createXMLHttpRequest()).thenReturn(null);
 
 		String[] fileNames = {"newFile.txt"};

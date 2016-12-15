@@ -47,6 +47,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private PermissionLevel[] permList;	// To enforce order.
 	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
+	private HelpWidget deleteAclHelpWidget = new HelpWidget();
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
@@ -55,6 +56,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
 		
+		// 'Delete ACL' HelpWidget
+		deleteAclHelpWidget.setHelpMarkdown(DELETE_ACL_HELP_TEXT);
+		deleteAclHelpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
+		deleteAclHelpWidget.setAddStyleNames("margin-left-5");
 		// 'Delete ACL' button
 		deleteAclButton.setType(ButtonType.DANGER);
 		deleteAclButton.setSize(ButtonSize.SMALL);
@@ -82,17 +87,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
 			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
-		} else if (aclEntry.isOwner()) {
-			//owner should be the first (after groups, if present)
-			int insertIndex = 0;
-			for (; insertIndex < permissionsGrid.getCount(); insertIndex++) {
-				if (permissionsGrid.getAt(insertIndex).isIndividual())
-					break;
-			}
-			permissionsGrid.insert(aclEntry, insertIndex, permList, permissionDisplay, false); // insert owner
-		}
-		else
+		} else {
 			permissionsGrid.add(aclEntry, permList, permissionDisplay);
+		}
 	}
 	
 	@Override
@@ -197,13 +194,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				addPeoplePanel.configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
-				deleteAclButton.setEnabled(canEnableInheritance);
-				add(deleteAclButton);
-				HelpWidget helpWidget = new HelpWidget();
-				helpWidget.setHelpMarkdown(DELETE_ACL_HELP_TEXT);
-				helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
-				helpWidget.setAddStyleNames("margin-left-5");
-				add(helpWidget.asWidget());
+				if (canEnableInheritance) {
+					add(deleteAclButton);
+					add(deleteAclHelpWidget.asWidget());	
+				}
 			}
 		}
 	}
@@ -220,6 +214,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void setDeleteLocalACLButtonVisible(boolean isVisible) {
 		deleteAclButton.setVisible(isVisible);
+		deleteAclHelpWidget.setVisible(isVisible);
 	}
 	@Override
 	public void setIsNotifyPeople(Boolean value) {

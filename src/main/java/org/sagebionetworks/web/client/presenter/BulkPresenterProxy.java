@@ -99,156 +99,168 @@ public class BulkPresenterProxy extends AbstractActivity {
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		globalApplicationState.checkVersionCompatibility(versionCheckCallback);
 		globalApplicationState.setIsEditing(false);
-		GWT.runAsync(new RunAsyncCallback() {
-			@Override
-			public void onSuccess() {
-				// detect prefetch
-				if (panel == null && eventBus == null) return;
-				if (loading != null) loading.hide();
-				if (place instanceof Synapse) {
+		// detect prefetch
+		if (panel == null && eventBus == null) return;
+		if (loading != null) loading.hide();
+		if (place instanceof Synapse) {
+			// synapse entity page
+			GWT.runAsync(new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
 					EntityPresenter presenter = ginjector.getEntityPresenter();
 					presenter.setPlace((Synapse) place);
 					presenter.start(panel, eventBus);
-				} else if (place instanceof ProjectsHome) {
-					// Projects Home
-					ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
-					presenter.setPlace((ProjectsHome) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof LoginPlace) {
-					// login view
-					LoginPresenter presenter = ginjector.getLoginPresenter();
-					presenter.setPlace((LoginPlace) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof PasswordReset) {
-					// reset passwords
-					PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
-					presenter.setPlace((PasswordReset) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof RegisterAccount) {
-					// register for a new account
-					RegisterAccountPresenter presenter = ginjector.getRegisterAccountPresenter();
-					presenter.setPlace((RegisterAccount) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Profile) {
-					// user's profile page
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}
+			});
+		} else if (place instanceof Profile) {
+			// user dashboard
+			GWT.runAsync(new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
 					ProfilePresenter presenter = ginjector.getProfilePresenter();
 					presenter.setPlace((Profile) place);
 					presenter.start(panel, eventBus);
-				} else if (place instanceof ComingSoon) {
-					// user's profile page
-					ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
-					presenter.setPlace((ComingSoon) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Challenges) {
-					// user's profile page
-					ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
-					presenter.setPlace((Challenges) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Help) {
-					HelpPresenter presenter = ginjector.getHelpPresenter();
-					presenter.setPlace((Help) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Search) {
-					// search results page
-					SearchPresenter presenter = ginjector.getSearchPresenter();
-					presenter.setPlace((Search) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Wiki) {
-					SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
-					presenter.setPlace((Wiki) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Down) {
-					DownPresenter presenter = ginjector.getDownPresenter();
-					presenter.setPlace((Down) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Team) {
-					// Team page
-					TeamPresenter presenter = ginjector.getTeamPresenter();
-					presenter.setPlace((Team) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof TeamSearch) {
-					// Team Search page
-					TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
-					presenter.setPlace((TeamSearch) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof PeopleSearch) {
-					// People Search Page
-					PeopleSearchPresenter presenter = ginjector.getPeopleSearchPresenter();
-					presenter.setPlace((PeopleSearch) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Quiz) {
-					// Test page
-					QuizPresenter presenter = ginjector.getQuizPresenter();
-					presenter.setPlace((Quiz) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Certificate) {
-					CertificatePresenter presenter = ginjector.getCertificatePresenter();
-					presenter.setPlace((Certificate) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Account) {
-					AccountPresenter presenter = ginjector.getAccountPresenter();
-					presenter.setPlace((Account) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof ChangeUsername) {
-					ChangeUsernamePresenter presenter = ginjector.getChangeUsernamePresenter();
-					presenter.setPlace((ChangeUsername) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Trash) {
-					TrashPresenter presenter = ginjector.getTrashPresenter();
-					presenter.setPlace((Trash) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof NewAccount) {
-					NewAccountPresenter presenter = ginjector.getNewAccountPresenter();
-					presenter.setPlace((NewAccount) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof StandaloneWiki) {
-					SynapseStandaloneWikiPresenter presenter = ginjector.getSynapseStandaloneWikiPresenter();
-					presenter.setPlace((StandaloneWiki) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof SignedToken) {
-					SignedTokenPresenter presenter = ginjector.getSignedTokenPresenter();
-					presenter.setPlace((SignedToken) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof ErrorPlace) {
-					ErrorPresenter presenter = ginjector.getErrorPresenter();
-					presenter.setPlace((ErrorPlace) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof ACTPlace) {
-					ACTPresenter presenter = ginjector.getACTPresenter();
-					presenter.setPlace((ACTPlace) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof SynapseForumPlace) {
-					SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();
-					presenter.setPlace((SynapseForumPlace) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof SubscriptionPlace) {
-					SubscriptionPresenter presenter = ginjector.getSubscriptionPresenter();
-					presenter.setPlace((SubscriptionPlace) place);
-					presenter.start(panel, eventBus);
-
-				} else {
-					// Log that we have an unknown place but send the user to the default
-					log.log(Level.WARNING, "Unknown Place: " + place.getClass().getName());
-					// Go to the default place
-					place = getDefaultPlace();
-					onSuccess();
-					return;
 				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				//SWC-2444: if there is a problem getting the code, try to reload the app
-				jsniUtils.consoleError(caught.getMessage());
-				gwt.scheduleExecution(new Callback() {
-					@Override
-					public void invoke() {
-						Window.Location.reload();		
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}});
+		} else {
+			GWT.runAsync(new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					if (place instanceof ProjectsHome) {
+						// Projects Home
+						ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
+						presenter.setPlace((ProjectsHome) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof PasswordReset) {
+						// reset passwords
+						PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
+						presenter.setPlace((PasswordReset) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof RegisterAccount) {
+						RegisterAccountPresenter presenter = ginjector.getRegisterAccountPresenter();
+						presenter.setPlace((RegisterAccount) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ComingSoon) {
+						ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
+						presenter.setPlace((ComingSoon) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Challenges) {
+						ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
+						presenter.setPlace((Challenges) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Help) {
+						HelpPresenter presenter = ginjector.getHelpPresenter();
+						presenter.setPlace((Help) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Search) {
+						SearchPresenter presenter = ginjector.getSearchPresenter();
+						presenter.setPlace((Search) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Wiki) {
+						SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
+						presenter.setPlace((Wiki) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Down) {
+						DownPresenter presenter = ginjector.getDownPresenter();
+						presenter.setPlace((Down) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Team) {
+						TeamPresenter presenter = ginjector.getTeamPresenter();
+						presenter.setPlace((Team) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof TeamSearch) {
+						TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
+						presenter.setPlace((TeamSearch) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof PeopleSearch) {
+						PeopleSearchPresenter presenter = ginjector.getPeopleSearchPresenter();
+						presenter.setPlace((PeopleSearch) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Quiz) {
+						QuizPresenter presenter = ginjector.getQuizPresenter();
+						presenter.setPlace((Quiz) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Certificate) {
+						CertificatePresenter presenter = ginjector.getCertificatePresenter();
+						presenter.setPlace((Certificate) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Account) {
+						AccountPresenter presenter = ginjector.getAccountPresenter();
+						presenter.setPlace((Account) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ChangeUsername) {
+						ChangeUsernamePresenter presenter = ginjector.getChangeUsernamePresenter();
+						presenter.setPlace((ChangeUsername) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof Trash) {
+						TrashPresenter presenter = ginjector.getTrashPresenter();
+						presenter.setPlace((Trash) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof NewAccount) {
+						NewAccountPresenter presenter = ginjector.getNewAccountPresenter();
+						presenter.setPlace((NewAccount) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof StandaloneWiki) {
+						SynapseStandaloneWikiPresenter presenter = ginjector.getSynapseStandaloneWikiPresenter();
+						presenter.setPlace((StandaloneWiki) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof SignedToken) {
+						SignedTokenPresenter presenter = ginjector.getSignedTokenPresenter();
+						presenter.setPlace((SignedToken) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ErrorPlace) {
+						ErrorPresenter presenter = ginjector.getErrorPresenter();
+						presenter.setPlace((ErrorPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ACTPlace) {
+						ACTPresenter presenter = ginjector.getACTPresenter();
+						presenter.setPlace((ACTPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof SynapseForumPlace) {
+						SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();
+						presenter.setPlace((SynapseForumPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof SubscriptionPlace) {
+						SubscriptionPresenter presenter = ginjector.getSubscriptionPresenter();
+						presenter.setPlace((SubscriptionPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof LoginPlace) {
+						LoginPresenter presenter = ginjector.getLoginPresenter();
+						presenter.setPlace((LoginPlace) place);
+						presenter.start(panel, eventBus);
+					} else {
+						// Log that we have an unknown place but send the user to the default
+						log.log(Level.WARNING, "Unknown Place: " + place.getClass().getName());
+						// Go to the default place
+						place = getDefaultPlace();
+						start(panel, eventBus);
+						return;
 					}
-				}, Portal.CODE_LOAD_DELAY);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}
+			});
+		}
+	}
+	
+	public void loadError(Throwable caught) {
+		//SWC-2444: if there is a problem getting the code, try to reload the app
+		jsniUtils.consoleError(caught.getMessage());
+		gwt.scheduleExecution(new Callback() {
+			@Override
+			public void invoke() {
+				Window.Location.reload();		
 			}
-
-		});
+		}, Portal.CODE_LOAD_DELAY);
 	}
 	
 	public void setPlace(Place place) {
