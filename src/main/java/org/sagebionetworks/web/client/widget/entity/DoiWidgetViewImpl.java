@@ -51,7 +51,6 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				doi.selectAll();
-				jsniUtils.copyToClipboard();
 			}
 		});
 	}

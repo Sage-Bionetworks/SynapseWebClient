@@ -38,7 +38,6 @@ public class CopyTextModalImpl implements CopyTextModal {
 			@Override
 			public void onClick(ClickEvent event) {
 				textBox.selectAll();
-				jsniUtils.copyToClipboard();
 			}
 		});
 	}
