@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -282,6 +281,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			public void onSuccess(String sql) {
 				runSql(sql);
 			}});
+	}
+	
+	public void setFacetsVisible(boolean visible) {
+		pageViewerWidget.setFacetsVisible(visible);
 	}
 	
 }

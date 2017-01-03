@@ -66,7 +66,7 @@ public class TestBootstrapLocalSynapse {
 		adminClient.setAuthEndpoint(StackConfiguration.getAuthenticationServicePrivateEndpoint());
 		adminClient.setRepositoryEndpoint(StackConfiguration.getRepositoryServiceEndpoint());
 		adminClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-		adminClient.setUserName(StackConfiguration.getMigrationAdminUsername());
+		adminClient.setUsername(StackConfiguration.getMigrationAdminUsername());
 		adminClient.setApiKey(StackConfiguration.getMigrationAdminAPIKey());
 		SynapseVersionInfo info = adminClient.getVersionInfo();
 		System.out.println(info);

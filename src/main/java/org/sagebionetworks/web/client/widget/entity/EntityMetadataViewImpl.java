@@ -62,7 +62,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			@Override
 			public void onClick(ClickEvent event) {
 				idField.selectAll();
-				jsniUtils.copyToClipboard();
 			}
 		});
 	}

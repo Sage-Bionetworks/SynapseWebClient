@@ -187,4 +187,17 @@ public class QueryInputWidgetTest {
 		verify(mockView).setEditEnabled(false);
 		verify(mockView).setDownloadEnabled(false);
 	}
+	
+	@Test
+	public void testQueryInputVisible(){
+		widget.setQueryInputVisible(true);
+		verify(mockView).setQueryInputVisible(true);
+	}
+
+	@Test
+	public void testShowQueryVisible(){
+		boolean visible = true;
+		widget.setShowQueryVisible(visible);
+		verify(mockView).setShowQueryVisible(visible);
+	}
 }

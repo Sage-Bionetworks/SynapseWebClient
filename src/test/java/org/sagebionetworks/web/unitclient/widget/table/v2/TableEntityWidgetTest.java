@@ -14,10 +14,15 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -25,6 +30,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -61,9 +67,15 @@ public class TableEntityWidgetTest {
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	CopyTextModal mockCopyTextModal;
+	
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		// mocks
 		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockView = Mockito.mock(TableEntityWidgetView.class);
@@ -83,7 +95,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController, mockCopyTextModal, mockSynapseClient);
 		// The test bundle
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(tableEntity);
@@ -458,5 +470,112 @@ public class TableEntityWidgetTest {
 		
 		boolean expectedCanEditResults = false;
 		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget, expectedCanEditResults);
+	}
+	
+	
+	private void verifySimpleSearchUI() {
+		verify(mockView).setAdvancedSearchLinkVisbile(true);
+		verify(mockView).setSimpleSearchLinkVisbile(false);
+		verify(mockQueryResultsWidget).setFacetsVisible(true);
+		verify(mockQueryInputWidget).setShowQueryVisible(true);
+		verify(mockQueryInputWidget).setQueryInputVisible(false);
+	}
+	
+	private void verifyAdvancedSearchUI() {
+		verify(mockView).setAdvancedSearchLinkVisbile(false);
+		verify(mockView).setSimpleSearchLinkVisbile(true);
+		verify(mockQueryResultsWidget).setFacetsVisible(false);
+		verify(mockQueryInputWidget).setShowQueryVisible(false);
+		verify(mockQueryInputWidget).setQueryInputVisible(true);
+	}
+	
+	@Test
+	public void testInitSimpleSearchUI(){
+		configureBundleWithView();
+		// mark a column as being faceted
+		columns.get(0).setFacetType(FacetType.enumeration);
+		boolean canEdit = false;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verifySimpleSearchUI();
+		
+		//show query
+		//TODO: verify facet select info sql is used
+//		String facetBasedSql = "select * from syn123 where x>1";
+//		startQuery.setFacetSql(facetBasedSql);
+		widget.onShowQuery();
+//		verify(mockCopyTextModal).setText(facetBasedSql);
+		verify(mockCopyTextModal).show();
+		
+		// TODO: change to advanced (verify sql that has facet selection info sql used)
+		widget.onShowAdvancedSearch();
+		verifyAdvancedSearchUI();
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, true, widget);
+	}
+	
+	@Test
+	public void testInitAdvancedQueryStateUI1(){
+		// simple query, but no facets
+		configureBundleWithView();
+		boolean canEdit = false;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verifyAdvancedSearchUI();
+		
+		//try to flip to simple search
+		widget.onShowSimpleSearch();
+		verify(mockView).showErrorMessage(TableEntityWidget.NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED);
+	}
+	
+	@Test
+	public void testInitAdvancedQueryStateUI2(){
+		// facet, but not a simple query
+		configureBundleWithView();
+		columns.get(0).setFacetType(FacetType.enumeration);
+		boolean canEdit = false;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123 where x='1'");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verifyAdvancedSearchUI();
+		
+		//now test the confirmation when switching to simple search mode
+		widget.onShowSimpleSearch();
+		
+		verify(mockView).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), callbackCaptor.capture());
+		//on confirmation, show simple search ui
+		callbackCaptor.getValue().invoke();
+		verifySimpleSearchUI();
+		// reset query
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, true, widget);
+	}
+	
+	@Test
+	public void testInitAdvancedQueryStateUI3(){
+		// facet, but not a simple query
+		configureBundleWithView();
+		columns.get(0).setFacetType(FacetType.enumeration);
+		boolean canEdit = false;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123 where x='1'");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verifyAdvancedSearchUI();
+
+		// simple query
+		startQuery.setSql("select * from syn123 order by x desc");
+		
+		//no confirmation necessary
+		widget.onShowSimpleSearch();
+		verify(mockView, never()).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), any(Callback.class));
+		verifySimpleSearchUI();
 	}
 }

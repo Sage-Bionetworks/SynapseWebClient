@@ -48,7 +48,6 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 			@Override
 			public void onClick(ClickEvent event) {
 				dockerPullCommand.selectAll();
-				jsniUtils.copyToClipboard();
 			}
 		});
 	}
