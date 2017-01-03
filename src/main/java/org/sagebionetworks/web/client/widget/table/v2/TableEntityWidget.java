@@ -9,6 +9,8 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.table.query.ParseException;
+import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -277,11 +279,16 @@ public class TableEntityWidget implements IsWidget,
 	
 	@Override
 	public void onShowAdvancedSearch() {
-		showAdvancedSearchUI();
-		// TODO: set sql to the query that was executed (based on facets)
+		// set query based on selected facets
 		Query q = getDefaultQuery();
-//		q.setSql(currentQuery.getEffectiveSql());
-		setQuery(q, false);
+		try {
+			String newSql = TableSqlProcessor.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels());
+			q.setSql(newSql);
+			showAdvancedSearchUI();
+			setQuery(q, false);	
+		} catch (ParseException e) {
+			view.showErrorMessage(e.getMessage());
+		}
 	}
 	
 	/**
@@ -446,9 +453,13 @@ public class TableEntityWidget implements IsWidget,
 	
 	@Override
 	public void onShowQuery() {
-		// TODO:  change this to show the sql executed instead of the original (default) sql
-//		copyTextModal.setText(currentQuery.getEffectiveSql());
-		copyTextModal.setText(currentQuery.getSql());
-		copyTextModal.show();
+		// show the sql executed
+		try {
+			String sql = TableSqlProcessor.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels());
+			copyTextModal.setText(sql);
+			copyTextModal.show();
+		} catch (ParseException e) {
+			view.showErrorMessage(e.getMessage());
+		}
 	}
 }
