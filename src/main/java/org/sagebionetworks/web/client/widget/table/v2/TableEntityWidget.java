@@ -283,8 +283,7 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onShowAdvancedSearch() {
 		// set query based on selected facets
-		
-		synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), new AsyncCallback<String>() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
 				Query q = getDefaultQuery();
@@ -297,7 +296,16 @@ public class TableEntityWidget implements IsWidget,
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
-		});
+		};
+		generateSqlWithFacets(callback);
+	}
+	
+	private void generateSqlWithFacets(AsyncCallback<String> callback) {
+		if (currentQuery.getSelectedFacets() == null || currentQuery.getSelectedFacets().isEmpty()) {
+			callback.onSuccess(currentQuery.getSql());
+		} else {
+			synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), callback);	
+		}
 	}
 	
 	/**
@@ -463,7 +471,7 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onShowQuery() {
 		// show the sql executed
-		synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), new AsyncCallback<String>() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
 				copyTextModal.setText(sql);
@@ -474,6 +482,7 @@ public class TableEntityWidget implements IsWidget,
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
-		});
+		};
+		generateSqlWithFacets(callback);
 	}
 }
