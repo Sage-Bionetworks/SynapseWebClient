@@ -3064,7 +3064,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public String generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException {
 		try {
 			return TableSqlProcessor.generateSqlWithFacets(basicSql, selectedFacets, schema);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			throw new BadRequestException(e.getMessage());
 		}
 	}

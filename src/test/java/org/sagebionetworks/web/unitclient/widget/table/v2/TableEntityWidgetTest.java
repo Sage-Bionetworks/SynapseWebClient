@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
@@ -44,6 +47,8 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Business logic tests for the TableEntityWidget
@@ -72,6 +77,10 @@ public class TableEntityWidgetTest {
 	
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Captor
+	ArgumentCaptor<Query> queryCaptor;
+	
+	String facetBasedSql = "select * from syn123 where x>1";
 	
 	@Before
 	public void before(){
@@ -96,6 +105,8 @@ public class TableEntityWidgetTest {
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController, mockCopyTextModal, mockSynapseClient);
+		
+		AsyncMockStubber.callSuccessWith(facetBasedSql).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(tableEntity);
@@ -497,23 +508,29 @@ public class TableEntityWidgetTest {
 		boolean canEdit = false;
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
+		FacetColumnRequest facetColumnRequest = new FacetColumnValuesRequest();
+		facetColumnRequest.setColumnName("col1");
+		((FacetColumnValuesRequest)facetColumnRequest).setFacetValues(Collections.singleton("a"));
+		startQuery.setSelectedFacets(Collections.singletonList(facetColumnRequest));
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		
 		verifySimpleSearchUI();
 		
 		//show query
-		//TODO: verify facet select info sql is used
-//		String facetBasedSql = "select * from syn123 where x>1";
-//		startQuery.setFacetSql(facetBasedSql);
+		//verify facet select info sql is used
 		widget.onShowQuery();
-//		verify(mockCopyTextModal).setText(facetBasedSql);
+		verify(mockCopyTextModal).setText(facetBasedSql);
 		verify(mockCopyTextModal).show();
 		
-		// TODO: change to advanced (verify sql that has facet selection info sql used)
+		reset(mockQueryResultsWidget);
+		// change to advanced (verify sql that has facet selection info sql used)
 		widget.onShowAdvancedSearch();
 		verifyAdvancedSearchUI();
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, true, widget);
+		verify(mockQueryResultsWidget).configure(queryCaptor.capture(), eq(canEdit), eq(true), eq(widget));
+		Query query = queryCaptor.getValue();
+		assertEquals(facetBasedSql, query.getSql());
+		assertNull(query.getSelectedFacets());
 	}
 	
 	@Test
