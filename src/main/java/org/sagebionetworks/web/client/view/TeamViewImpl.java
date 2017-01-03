@@ -143,7 +143,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 			@Override
 			public void onClick(ClickEvent event) {
 				synapseEmailField.selectAll();
-				TeamViewImpl.this.synapseJSNIUtils.copyToClipboard();
 			}
 		});
 	}
