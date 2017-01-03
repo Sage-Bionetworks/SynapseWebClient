@@ -296,7 +296,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (filename.matches(VALID_ENTITY_NAME_REGEX)) {
 			view.setLabelAndStartUpload(filename);				
 		} else {
-			view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+			String message = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
+			uploadError(message, new Exception(message));
 		}
 	}
 
