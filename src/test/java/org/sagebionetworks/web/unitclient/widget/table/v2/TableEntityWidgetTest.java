@@ -95,7 +95,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController, mockCopyTextModal);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController, mockCopyTextModal, mockSynapseClient);
 		// The test bundle
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(tableEntity);

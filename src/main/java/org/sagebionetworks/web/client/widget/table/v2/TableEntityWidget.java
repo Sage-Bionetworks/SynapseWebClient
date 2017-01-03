@@ -9,8 +9,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.table.query.ParseException;
-import org.sagebionetworks.table.query.util.TableSqlProcessor;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -26,6 +25,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -68,6 +68,7 @@ public class TableEntityWidget implements IsWidget,
 	QueryInputWidget queryInputWidget;
 	Query currentQuery;
 	CopyTextModal copyTextModal;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
@@ -76,7 +77,8 @@ public class TableEntityWidget implements IsWidget,
 			DownloadTableQueryModalWidget downloadTableQueryModalWidget,
 			UploadTableModalWidget uploadTableModalWidget,
 			PreflightController preflightController,
-			CopyTextModal copyTextModal) {
+			CopyTextModal copyTextModal, 
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
@@ -84,6 +86,7 @@ public class TableEntityWidget implements IsWidget,
 		this.queryInputWidget = queryInputWidget;
 		this.preflightController = preflightController;
 		this.copyTextModal = copyTextModal;
+		this.synapseClient = synapseClient;
 		copyTextModal.setTitle("Query:");
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
@@ -280,15 +283,21 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onShowAdvancedSearch() {
 		// set query based on selected facets
-		Query q = getDefaultQuery();
-		try {
-			String newSql = TableSqlProcessor.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels());
-			q.setSql(newSql);
-			showAdvancedSearchUI();
-			setQuery(q, false);	
-		} catch (ParseException e) {
-			view.showErrorMessage(e.getMessage());
-		}
+		
+		synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String sql) {
+				Query q = getDefaultQuery();
+				q.setSql(sql);
+				showAdvancedSearchUI();
+				setQuery(q, false);	
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	/**
@@ -454,12 +463,17 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onShowQuery() {
 		// show the sql executed
-		try {
-			String sql = TableSqlProcessor.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels());
-			copyTextModal.setText(sql);
-			copyTextModal.show();
-		} catch (ParseException e) {
-			view.showErrorMessage(e.getMessage());
-		}
+		synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String sql) {
+				copyTextModal.setText(sql);
+				copyTextModal.show();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 }
