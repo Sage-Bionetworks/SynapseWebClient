@@ -497,8 +497,7 @@ public class UploaderViewImpl extends FlowPanel implements
 			public void onValueChange(ValueChangeEvent<String> event) {
 				String fileName = presenter.getSelectedFilesText();
 				if (fileName.matches(VALID_ENTITY_NAME_REGEX)) {
-					fileUploadLabel.setText(fileName);
-					uploadBtn.click();					
+										
 				} else {
 					showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 				}
@@ -619,5 +618,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void setUploaderLinkNameVisible(boolean visible) {
 		externalNameFormGroup.setVisible(visible);
 	}
-
+	
+	@Override
+	public void setLabelAndStartUpload(String filename) {
+		fileUploadLabel.setText(filename);
+		uploadBtn.click();		
+	}
 }

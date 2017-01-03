@@ -622,11 +622,8 @@ public class UploaderTest {
 	
 	@Test
 	public void testUploadIllegalEntityName() {
-		String filename = "test'.txt";
-		String[] names = new String[]{filename};
-		uploader.setFileNames(names);
-		when(uploader.getSelectedFileNames()).thenReturn(new String[]{filename});
-		uploader.uploadFiles();
+		String[] names = {"test'.txt"};
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(names);
 		verify(view).showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 	}
 }

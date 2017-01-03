@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -275,6 +277,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
+		validateFileName(fileNames[currIndex]);
 		if (currentUploadType == UploadType.S3) {
 			uploadToS3();
 		} else if (currentUploadType == UploadType.SFTP){
@@ -285,6 +288,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	/** Ensures that the name of the file being uploaded does not contain illegal characters;
+	 * If it does, displays error to user; otherwise begins upload
+	 * @param filename
+	 */
+	public void validateFileName(String filename) {
+		if (filename.matches(VALID_ENTITY_NAME_REGEX)) {
+			view.setLabelAndStartUpload(filename);				
+		} else {
+			view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		}
+	}
+
 	/**
 	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
 	 * @param realSftpUrl
