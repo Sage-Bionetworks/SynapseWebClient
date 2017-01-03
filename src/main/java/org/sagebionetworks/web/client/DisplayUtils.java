@@ -118,7 +118,7 @@ public class DisplayUtils {
 				"  <span data-notify=\"message\">{2}</span>\n" + 
 				"  <a href=\"{3}\" target=\"{4}\" data-notify=\"url\"></a>\n" + 
 				"</div>");
-		
+		notifySettings.setNewestOnTop(true);
 		return notifySettings;
 	}
 	/**
