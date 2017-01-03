@@ -22,7 +22,7 @@
 							href="http://docs.synapse.org/articles/tables.html#table-data" placement="LEFT" addStyleNames="margin-left-5 moveup-18" />
 					</b:InputGroup>
 				</t:TableData>
-				<t:TableData width="115px" paddingRight="5">
+				<t:TableData width="165px" paddingRight="5">
 					<b:Tooltip title="Download query results">
 						<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" addStyleNames="margin-left-5" pull="RIGHT" />
 					</b:Tooltip>
