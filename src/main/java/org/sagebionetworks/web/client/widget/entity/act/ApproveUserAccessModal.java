@@ -200,40 +200,13 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		accessRequirement = view.getAccessRequirement();
 		view.setRevokeProcessing(true);
-		synapseClient.getEntityAccessApproval(datasetId, new AsyncCallback<PaginatedResults<AccessApproval>>() {
-
+		synapseClient.deleteAccessApprovals(accessRequirement, userId, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				view.setRevokeProcessing(false);
 			}
-
-			@Override
-			public void onSuccess(PaginatedResults<AccessApproval> result) {
-				List<AccessApproval> results = result.getResults();
-				Long accessReq = Long.parseLong(accessRequirement);
-				for (AccessApproval approval : results) {
-					if (approval.getAccessorId().equals(userId) && approval.getRequirementId().equals(accessReq)) {
-						removeAccess(approval.getId());
-						return;
-					}
-				}
-				//no AccessApproval was found for this user
-				view.setRevokeProcessing(false);
-				synAlert.showError(NO_APPROVAL_FOUND);
-			}
-		});
-	}
-
-	private void removeAccess(Long id) {
-		synapseClient.deleteAccessApproval(id, new AsyncCallback<Void>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				view.setRevokeProcessing(false);
-			}
-
+			
 			@Override
 			public void onSuccess(Void result) {
 				view.setRevokeProcessing(false);
@@ -241,7 +214,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				view.showInfo(REVOKED_USER, "");
 			}
 		});
-		
 	}
 	
 	@Override

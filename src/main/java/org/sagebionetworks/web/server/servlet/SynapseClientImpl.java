@@ -1068,6 +1068,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
+	public void deleteAccessApprovals(String accessRequirement, String accessorId) 
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteAccessApprovals(accessRequirement, accessorId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) 
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1561,55 +1572,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					version);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public S3FileHandle zipAndUploadFile(String content, String fileName)
-			throws IOException, RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		File file = zipUp(content, fileName);
-		String contentType = guessContentTypeFromStream(file);
-		try {
-			// Upload the file and create S3 handle
-			S3FileHandle handle = synapseClient.createFileHandle(file,
-					contentType);
-			return handle;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	private File zipUp(String content, String fileName) throws IOException {
-		// Create a temporary file to write content to
-		File tempFile = File.createTempFile(fileName, ".tmp");
-		if (content != null) {
-			FileUtils.writeByteArrayToFile(tempFile, content.getBytes());
-		} else {
-			// When creating a wiki for the first time, markdown content doesn't
-			// exist
-			// Uploaded file should be empty
-			byte[] emptyByteArray = new byte[0];
-			FileUtils.writeByteArrayToFile(tempFile, emptyByteArray);
-		}
-		return tempFile;
-	}
-
-	private static String guessContentTypeFromStream(File file)
-			throws FileNotFoundException, IOException {
-		InputStream is = new BufferedInputStream(new FileInputStream(file));
-		try {
-			// Let java guess from the stream.
-			String contentType = URLConnection.guessContentTypeFromStream(is);
-			// If Java fails then set the content type to be octet-stream
-			if (contentType == null) {
-				contentType = "application/octet-stream";
-			}
-			return contentType;
-		} finally {
-			is.close();
 		}
 	}
 
@@ -2239,23 +2201,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
-	public UploadDaemonStatus getUploadDaemonStatus(String daemonId)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			UploadDaemonStatus status = synapseClient
-					.getCompleteUploadDaemonStatus(daemonId);
-			if (State.FAILED == status.getState()) {
-				logError(status.getErrorMessage());
-			}
-			return status;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-
-	}
-
 	/**
 	 * Gets the ID of the file entity with the given name whose parent has the given ID.
 	 * 
@@ -2559,11 +2504,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
-			String fileHandleId = synapseClient.uploadToFileHandle(
-					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -2587,11 +2528,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
-			String fileHandleId = synapseClient.uploadToFileHandle(
-					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message, entityId);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();

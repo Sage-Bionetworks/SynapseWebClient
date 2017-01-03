@@ -91,6 +91,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -196,6 +197,10 @@ public class SynapseClientImplTest {
 	FileEntity mockFileEntity;
 	@Mock
 	FileHandleCopyRequest mockFileHandleCopyRequest;
+	@Mock
+	MessageToUser mockMessageToUser;
+	@Mock
+	JSONObjectAdapter mockJSONObjAd;
 	List<FileHandleCopyResult> batchCopyResultsList;
 	
 	
@@ -401,14 +406,10 @@ public class SynapseClientImplTest {
 		String fileHandleId = "myFileHandleId";
 		status.setFileHandleId(fileHandleId);
 		status.setState(State.COMPLETED);
-		when(mockSynapse.getCompleteUploadDaemonStatus(anyString()))
-				.thenReturn(status);
 
 		status = new UploadDaemonStatus();
 		status.setState(State.PROCESSING);
 		status.setPercentComplete(.05d);
-		when(mockSynapse.startUploadDeamon(any(CompleteAllChunksRequest.class)))
-				.thenReturn(status);
 
 		PaginatedResults<MembershipInvitation> openInvites = new PaginatedResults<MembershipInvitation>();
 		openInvites.setTotalNumberOfResults(0);
@@ -919,18 +920,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testZipAndUpload() throws IOException, RestServiceException,
-			JSONObjectAdapterException, SynapseException {
-		Mockito.when(
-				mockSynapse
-						.createFileHandle(any(File.class), any(String.class)))
-				.thenReturn(handle);
-		synapseClient.zipAndUploadFile("markdown", "fileName");
-		verify(mockSynapse)
-				.createFileHandle(any(File.class), any(String.class));
-	}
-
-	@Test
 	public void testGetMarkdown() throws IOException, RestServiceException,
 			SynapseException {
 		String someMarkDown = "someMarkDown";
@@ -1178,13 +1167,6 @@ public class SynapseClientImplTest {
 		// wiring test
 		synapseClient.createDoi("test entity id", null);
 		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
-	}
-
-	@Test
-	public void testGetUploadDaemonStatus() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		synapseClient.getUploadDaemonStatus("daemonId");
-		verify(mockSynapse).getCompleteUploadDaemonStatus(anyString());
 	}
 
 	/**
@@ -1551,9 +1533,10 @@ public class SynapseClientImplTest {
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(messageBody))).thenReturn(mockMessageToUser);
+		when(mockMessageToUser.writeToJSONObject(any(JSONObjectAdapter.class))).thenReturn(mockJSONObjAd);
 		synapseClient.sendMessage(recipients, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
-		verify(mockSynapse).sendMessage(arg.capture());
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
@@ -1565,19 +1548,17 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor
 				.forClass(MessageToUser.class);
-		ArgumentCaptor<String> entityIdCaptor = ArgumentCaptor
-				.forClass(String.class);
 		
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		String entityId = "syn98765";
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(messageBody))).thenReturn(mockMessageToUser);
+		when(mockMessageToUser.writeToJSONObject(any(JSONObjectAdapter.class))).thenReturn(mockJSONObjAd);
 		synapseClient.sendMessageToEntityOwner(entityId, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
-		verify(mockSynapse).sendMessage(arg.capture(), entityIdCaptor.capture());
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
-		assertEquals(entityId, entityIdCaptor.getValue());
 		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 
