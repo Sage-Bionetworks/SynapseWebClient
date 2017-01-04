@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
