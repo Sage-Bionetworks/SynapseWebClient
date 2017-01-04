@@ -24,5 +24,9 @@ public interface QueryInputListener {
 	 * Called when the user clicks the download button
 	 */
 	public void onDownloadResults();
-
+	
+	/**
+	 * Called when the user clicks the show query button
+	 */
+	public void onShowQuery();
 }

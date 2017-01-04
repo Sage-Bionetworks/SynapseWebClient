@@ -254,4 +254,10 @@ public class TableQueryResultWidgetTest {
 		verify(mockSynapseAlert).handleException(error);
 	}
 	
+	@Test
+	public void testSetFacetsVisible() {
+		widget.setFacetsVisible(true);
+		verify(mockPageWidget).setFacetsVisible(true);
+	}
+	
 }
