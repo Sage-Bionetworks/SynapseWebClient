@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -43,6 +44,8 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
+import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
 
 /**
  * This Uploader class supports 2 use cases:
@@ -275,6 +278,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
+		validateFileName(fileNames[currIndex]);
 		if (currentUploadType == UploadType.S3) {
 			uploadToS3();
 		} else if (currentUploadType == UploadType.SFTP){
@@ -285,6 +289,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	private void validateFileName(String filename) {
+		if (!filename.matches(VALID_ENTITY_NAME_REGEX)) {
+			String message = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
+			uploadError(message, new Exception(message));
+		}		
+	}
+
 	/**
 	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
 	 * @param realSftpUrl
