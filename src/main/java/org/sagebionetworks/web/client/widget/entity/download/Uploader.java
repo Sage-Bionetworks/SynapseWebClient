@@ -278,22 +278,25 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
-		validateFileName(fileNames[currIndex]);
-		if (currentUploadType == UploadType.S3) {
-			uploadToS3();
-		} else if (currentUploadType == UploadType.SFTP){
-			uploadToSftpProxy(currentExternalUploadUrl);
-		} else {
-			String message = "Unsupported external upload type specified: " + currentUploadType;
-			uploadError(message, new Exception(message));
+		if (validateFileName(fileNames[currIndex])) {
+			if (currentUploadType == UploadType.S3) {
+				uploadToS3();
+			} else if (currentUploadType == UploadType.SFTP){
+				uploadToSftpProxy(currentExternalUploadUrl);
+			} else {
+				String message = "Unsupported external upload type specified: " + currentUploadType;
+				uploadError(message, new Exception(message));
+			}
 		}
 	}
-	
-	private void validateFileName(String filename) {
-		if (!filename.matches(VALID_ENTITY_NAME_REGEX)) {
+		
+	private boolean validateFileName(String filename) {
+		boolean valid = filename.matches(VALID_ENTITY_NAME_REGEX);
+		if (!valid) {
 			String message = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
 			uploadError(message, new Exception(message));
-		}		
+		}	
+		return valid;
 	}
 
 	/**
