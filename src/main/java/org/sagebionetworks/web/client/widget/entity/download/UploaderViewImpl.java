@@ -493,11 +493,7 @@ public class UploaderViewImpl extends FlowPanel implements
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
 				fileUploadLabel.setText(presenter.getSelectedFilesText());
-<<<<<<< HEAD
-				uploadBtn.click();	
-=======
 				uploadBtn.click();
->>>>>>> 6c938c791304489f73e87dbb0ca7f10469a9d37d
 			}
 		});
 		chooseFileBtn.addClickHandler(new ClickHandler() {
