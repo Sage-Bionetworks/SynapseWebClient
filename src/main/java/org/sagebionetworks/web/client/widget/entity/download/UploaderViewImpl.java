@@ -34,9 +34,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
-import org.sagebionetworks.web.shared.WebConstants;
-
-import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.InputElement;
@@ -495,13 +492,8 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
-				String fileName = presenter.getSelectedFilesText();
-				if (fileName.matches(VALID_ENTITY_NAME_REGEX)) {
-					fileUploadLabel.setText(fileName);
-					uploadBtn.click();					
-				} else {
-					showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
-				}
+				fileUploadLabel.setText(presenter.getSelectedFilesText());
+				uploadBtn.click();	
 			}
 		});
 		chooseFileBtn.addClickHandler(new ClickHandler() {
