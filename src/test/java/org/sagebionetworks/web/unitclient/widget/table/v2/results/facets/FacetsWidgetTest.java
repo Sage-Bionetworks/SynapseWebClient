@@ -125,6 +125,19 @@ public class FacetsWidgetTest {
 		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, ColumnType.USERID, mockFacetChangedHandler);
 	}
 	
+
+	@Test
+	public void testConfigureFacetColumnMissing() {
+		facets.add(mockFacetColumnResultValues);
+		facetValues.add(mockFacetResultValueCount);
+		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.USERID);
+		columnModels.clear();
+		widget.configure(facets, mockFacetChangedHandler, columnModels);
+		assertFalse(widget.isShowingFacets());
+		verify(mockView).clear();
+		verifyNoMoreInteractions(mockView);
+	}
+	
 	@Test
 	public void testRangeFacetColumnValuesUndefined() {
 		when(mockFacetColumnResultRange.getColumnMin()).thenReturn(null);

@@ -39,7 +39,6 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 			@Override
 			public void onClick(ClickEvent event) {
 				digest.selectAll();
-				jsniUtils.copyToClipboard();
 			}
 		});
 		row.addClickHandler(new ClickHandler(){

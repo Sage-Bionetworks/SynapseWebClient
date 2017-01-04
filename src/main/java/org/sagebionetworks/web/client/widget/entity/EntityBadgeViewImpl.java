@@ -91,14 +91,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				idField.selectAll();
-				synapseJSNIUtils.copyToClipboard();
 			}
 		});
 		md5Field.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				md5Field.selectAll();
-				synapseJSNIUtils.copyToClipboard();
 			}
 		});
 	}
