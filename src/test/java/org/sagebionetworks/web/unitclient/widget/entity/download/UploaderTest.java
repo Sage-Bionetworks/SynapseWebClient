@@ -619,4 +619,12 @@ public class UploaderTest {
 		uploader.uploadFailed(message);
 		verify(mockLogger).errorToRepositoryServices(eq(message), any(Exception.class));
 	}
+	
+	@Test
+	public void testUploadIllegalName() {
+		String[] files = {"test'.txt"};
+		uploader.setFileNames(files);
+		uploader.uploadBasedOnConfiguration();
+		verify(view).showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+	}
 }

@@ -44,6 +44,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
+
 /**
  * This Uploader class supports 2 use cases:
  * B. File Entity, newer client browser: Direct multipart upload to S3, using a PUT to presigned URLs.
@@ -275,16 +277,27 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
-		if (currentUploadType == UploadType.S3) {
-			uploadToS3();
-		} else if (currentUploadType == UploadType.SFTP){
-			uploadToSftpProxy(currentExternalUploadUrl);
-		} else {
-			String message = "Unsupported external upload type specified: " + currentUploadType;
-			uploadError(message, new Exception(message));
+		if (validateFileName(fileNames[currIndex])) {
+			if (currentUploadType == UploadType.S3) {
+				uploadToS3();
+			} else if (currentUploadType == UploadType.SFTP){
+				uploadToSftpProxy(currentExternalUploadUrl);
+			} else {
+				String message = "Unsupported external upload type specified: " + currentUploadType;
+				uploadError(message, new Exception(message));
+			}
 		}
 	}
-	
+		
+	private boolean validateFileName(String filename) {
+		boolean valid = filename.matches(VALID_ENTITY_NAME_REGEX);
+		if (!valid) {
+			String message = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
+			uploadError(message, new Exception(message));
+		}	
+		return valid;
+	}
+
 	/**
 	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
 	 * @param realSftpUrl
