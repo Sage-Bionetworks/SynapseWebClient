@@ -13,6 +13,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -622,11 +623,20 @@ public class UploaderTest {
 	
 	@Test
 	public void testUploadIllegalEntityName() {
-		String filename = "test'.txt";
-		String[] names = new String[]{filename};
+		String[] names = {"test'.txt"};
 		uploader.setFileNames(names);
-		when(uploader.getSelectedFileNames()).thenReturn(new String[]{filename});
-		uploader.uploadFiles();
+		uploader.uploadBasedOnConfiguration();
 		verify(view).showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		verify(view, times(0)).setLabelAndStartUpload(anyString());
+	}
+	
+	@Test
+	public void testUploadLegalEntityName() {
+		String filename = "test.txt";
+		String[] names = {filename};
+		uploader.setFileNames(names);
+		uploader.uploadBasedOnConfiguration();
+		verify(view).setLabelAndStartUpload(filename);
+		verify(view, times(0)).showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 	}
 }

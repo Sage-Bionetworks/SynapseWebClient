@@ -32,6 +32,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	void showUploadingBanner(String banner);
 	void showUploadingToExternalStorage(String host, String banner);
 	void setUploaderLinkNameVisible(boolean visible);
+	void setLabelAndStartUpload(String filename);
 	/**
 	 * SFTP requires username and password, so prompt for it in the upload form.
 	 * @return
@@ -71,4 +72,5 @@ public interface UploaderView extends IsWidget, SynapseView {
 
 		Long getStorageLocationId();
 	}
+
 }
