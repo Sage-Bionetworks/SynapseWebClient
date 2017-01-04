@@ -34,7 +34,10 @@ public interface QueryInputView extends IsWidget {
 		 * Called when the user clicks download results.
 		 */
 		void onDownloadResults();
-		
+		/**
+		 * Called when the user clicks show query.
+		 */
+		void onShowQuery();
 	}
 	
 	/**
@@ -94,5 +97,6 @@ public interface QueryInputView extends IsWidget {
 	 * @param isEditable
 	 */
 	public void setEditVisible(boolean visibile);
-
+	public void setQueryInputVisible(boolean visible);
+	public void setShowQueryVisible(boolean visible);
 }
