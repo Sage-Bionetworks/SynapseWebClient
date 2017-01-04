@@ -135,5 +135,17 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	public String getInputSQL() {
 		return view.getInputQueryString();
 	}
-
+	
+	@Override
+	public void onShowQuery() {
+		queryInputListener.onShowQuery();
+	}
+	
+	public void setQueryInputVisible(boolean visible) {
+		view.setQueryInputVisible(visible);
+	}
+	
+	public void setShowQueryVisible(boolean visible) {
+		view.setShowQueryVisible(visible);
+	}
 }
