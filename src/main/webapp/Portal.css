@@ -1161,6 +1161,12 @@ span.font-size-13,
 i.font-size-1x {
 	font-size:1em;
 }
+
+.font-size-0-9em, #rootPanel .font-size-0-9em,
+i.font-size-0-9em, #rootPanel i.font-size-0-9em {
+	font-size:0.9em;
+}
+
 .font-size-1-5x,
 i.font-size-1-5x {
 	font-size:1.5em;
