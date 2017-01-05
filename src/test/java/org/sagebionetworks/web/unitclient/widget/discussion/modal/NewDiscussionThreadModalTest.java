@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
@@ -41,6 +42,8 @@ public class NewDiscussionThreadModalTest {
 	MarkdownEditorWidget mockMarkdownEditor;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	SessionStorage mockStorage;
 	String forumId = "123";
 	NewDiscussionThreadModal modal;
 
@@ -48,7 +51,7 @@ public class NewDiscussionThreadModalTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient,
-				mockSynAlert, mockMarkdownEditor, mockAuthController);
+				mockSynAlert, mockMarkdownEditor, mockAuthController, mockStorage);
 		modal.configure(forumId, mockCallback);
 	}
 

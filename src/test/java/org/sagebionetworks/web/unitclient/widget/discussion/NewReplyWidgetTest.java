@@ -3,7 +3,9 @@ package org.sagebionetworks.web.unitclient.widget.discussion;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -15,8 +17,10 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.NewReplyWidget;
@@ -27,6 +31,8 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+
+import static org.sagebionetworks.web.client.widget.discussion.NewReplyWidget.*;
 
 public class NewReplyWidgetTest {
 	private NewReplyWidget newReplyWidget;
@@ -47,13 +53,15 @@ public class NewReplyWidgetTest {
 	@Mock
 	private DiscussionReplyBundle mockDiscussionReplyBundle;
 	@Mock
+	private SessionStorage mockStorage;
+	@Mock
 	Callback mockCallback;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		newReplyWidget = new NewReplyWidget(mockView, mockDiscussionForumClient, mockSynAlert,
-				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState);
+				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
@@ -141,6 +149,14 @@ public class NewReplyWidgetTest {
 		verify(mockView).setPresenter(newReplyWidget);
 		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
+	}
+	
+	@Test
+	public void testCacheReplyWhenLoggedOut() {
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		newReplyWidget.onSave();
+		verify(mockStorage).setItem(anyString(), eq("message"));	
 	}
 
 }

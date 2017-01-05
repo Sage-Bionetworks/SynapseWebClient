@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
@@ -30,8 +31,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private SynapseAlert synAlert;
 	private MarkdownEditorWidget markdownEditor;
 	private AuthenticationController authController;
+	private SessionStorage storage;
 	private String forumId;
-	private Storage storage = null;
 	private String key;
 	Callback newThreadCallback;
 
@@ -41,13 +42,15 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
 			MarkdownEditorWidget markdownEditor,
-			AuthenticationController authController
+			AuthenticationController authController,
+			SessionStorage sessionStorage
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
+		this.storage = sessionStorage;
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
@@ -59,7 +62,6 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
-		this.storage = Storage.getSessionStorageIfSupported();
 		this.key = forumId + "_" + authController.getCurrentUserPrincipalId();
 	}
 
