@@ -18,6 +18,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.UnauthorizedException;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
@@ -161,18 +162,6 @@ public class TableQueryResultWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureNotLoggedIn() {
-		boolean isEditable = false;
-		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
-		widget.configure(query, isEditable, isView, mockListner);
-		verify(mockView).setTableVisible(false);
-		verify(mockView).setProgressWidgetVisible(false);
-		verify(mockView).setErrorVisible(true);
-		verify(mockView).setSynapseAlertWidget(any(Widget.class));
-		verify(mockSynapseAlert).showLogin();
-	}
-	
-	@Test
 	public void testConfigureSuccessNotEditable(){
 		boolean isEditable = false;
 		isView = true;
@@ -237,7 +226,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigurError(){
 		boolean isEditable = true;
 		// Setup a failure
-		Throwable error = new Throwable("Failed!!");
+		UnauthorizedException error = new UnauthorizedException("Failed!!");
 		jobTrackingStub.setError(error);
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, isView, mockListner);
@@ -251,6 +240,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
+		// note that if not logged in, synapse alert will show prompt the user to login in order to run the query.
 		verify(mockSynapseAlert).handleException(error);
 	}
 	
