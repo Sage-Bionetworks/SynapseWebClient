@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -25,6 +26,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	public static final String DEFAULT_MARKDOWN = "";
 	private static final String SUCCESS_TITLE = "Reply created";
 	private static final String SUCCESS_MESSAGE = "A reply has been created.";
+	public static final String RESTORE_TITLE = "Restore draft?";
+	public static final String RESTORE_MESSAGE = "Would you like to continue writing where you left off?"; 
 	private NewReplyWidgetView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
@@ -62,7 +65,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
 		this.storage = Storage.getSessionStorageIfSupported();
-		this.key = threadId + "_" + authController.getCurrentUserPrincipalId();
+		this.key = threadId + "_" + authController.getCurrentUserPrincipalId() + "_reply";
 	}
 
 	@Override
@@ -79,12 +82,25 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	}
 	
 	private void checkForSavedReply() {
-		String value = storage.getItem(key);
-		if (value == null) {
+		if (storage.getItem(key) == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {
-			String message = value.split(":")[1].replace("\"","").replace("}", "").trim();
-			markdownEditor.configure(message);
+			Callback yesCallback = new Callback() {
+				@Override
+				public void invoke() {
+					String reply = storage.getItem(key);
+					markdownEditor.configure(reply);
+					storage.removeItem(key);
+				}
+			};
+			Callback noCallback = new Callback() {
+				@Override
+				public void invoke() {
+					markdownEditor.configure(DEFAULT_MARKDOWN);	
+					storage.removeItem(key);
+				}
+			};
+			DisplayUtils.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
 		}
 	}
 
@@ -98,7 +114,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		storage.setItem(key, "{\"Message\":\"" + messageMarkdown + "\"}");
+		storage.setItem(key, messageMarkdown);
 		view.showSaving();
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
 		toCreate.setThreadId(threadId);

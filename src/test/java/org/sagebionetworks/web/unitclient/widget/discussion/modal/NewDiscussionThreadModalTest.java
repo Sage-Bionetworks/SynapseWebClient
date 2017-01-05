@@ -45,7 +45,7 @@ public class NewDiscussionThreadModalTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient,
-				mockSynAlert, mockMarkdownEditor);
+				mockSynAlert, mockMarkdownEditor, null);
 		modal.configure(forumId, mockCallback);
 	}
 

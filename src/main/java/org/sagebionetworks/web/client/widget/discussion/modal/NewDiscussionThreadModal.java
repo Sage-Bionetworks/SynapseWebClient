@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
@@ -21,6 +22,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private static final String NEW_THREAD_MODAL_TITLE = "New Thread";
 	private static final String SUCCESS_TITLE = "Thread created";
 	private static final String SUCCESS_MESSAGE = "A new thread has been created.";
+	public static final String RESTORE_TITLE = "Restore draft?";
+	public static final String RESTORE_MESSAGE = "Would you like to continue writing where you left off?"; 
 	public static final String DEFAULT_MARKDOWN = "";
 	private DiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
@@ -68,15 +71,29 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	}
 	
 	private void checkForSavedThread() {
-		String value = storage.getItem(key);
-		if (value == null) {
+		if (storage.getItem(key + "_title") == null || storage.getItem(key + "_message") == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {
-			String[] stored = value.split(",");
-			String title = stored[0].split(":")[1].replace("\"","").trim();
-			String message = stored[1].split(":")[1].replace("\"","").replace("}", "").trim();
-			view.setThreadTitle(title);
-			markdownEditor.configure(message);
+			Callback yesCallback = new Callback() {
+				@Override
+				public void invoke() {
+					String title = storage.getItem(key + "_title");
+					String message = storage.getItem(key + "_message");
+					view.setThreadTitle(title);
+					markdownEditor.configure(message);
+					storage.removeItem(key + "_title");
+					storage.removeItem(key + "_message");
+				}
+			};
+			Callback noCallback = new Callback() {
+				@Override
+				public void invoke() {
+					markdownEditor.configure(DEFAULT_MARKDOWN);	
+					storage.removeItem(key + "_title");
+					storage.removeItem(key + "_message");
+				}
+			};
+			DisplayUtils.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
 		}
 	}
 
@@ -97,7 +114,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		storage.setItem(key, "{\"Title\":\"" + threadTitle + "\", \"Message\":\"" + messageMarkdown + "\"}");
+		storage.setItem(key + "_title", threadTitle);
+		storage.setItem(key + "_message", messageMarkdown);
 		view.showSaving();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
@@ -117,7 +135,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 				if (newThreadCallback != null) {
 					newThreadCallback.invoke();
 				}
-				storage.removeItem(key);
+				storage.removeItem(key + "_title");
+				storage.removeItem(key + "_message");
 			}
 
 		});
