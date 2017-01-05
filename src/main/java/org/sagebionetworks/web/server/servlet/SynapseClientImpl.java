@@ -2985,6 +2985,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					//not found, create a new one
 					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId();
 				}
+			} else {
+				locationId = defaultStorageLocation;
 			}
 			
 			ArrayList<Long> locationIds = new ArrayList<Long>();

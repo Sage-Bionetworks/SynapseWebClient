@@ -2183,6 +2183,24 @@ public class SynapseClientImplTest {
 		assertEquals(new Long(2), locations.get(0));
 	}
 	
+	@Test
+	public void testSetDefaultStorageLocationSetting() throws SynapseException, RestServiceException {
+		setupGetMyLocationSettings();
+		
+		UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
+		projectSetting.setLocations(Collections.EMPTY_LIST);
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(projectSetting);
+		
+		synapseClient.createStorageLocationSetting(entityId, null);
+		// do not try to create a new storage location setting
+		verify(mockSynapse, Mockito.never()).createStorageLocationSetting(any(StorageLocationSetting.class));
+		//verify updates project setting, and the new location list is a single value (id of existing storage location)
+		ArgumentCaptor<ProjectSetting> captor = ArgumentCaptor.forClass(ProjectSetting.class);
+		verify(mockSynapse).updateProjectSetting(captor.capture());
+		UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting)captor.getValue();
+		List<Long> locations = updatedProjectSetting.getLocations();
+		assertEquals(SynapseClientImpl.defaultStorageLocation, locations.get(0));
+	}
 
 	@Test
 	public void testCreateStorageLocationSettingNewStorageAndProjectSetting() throws SynapseException, RestServiceException {
