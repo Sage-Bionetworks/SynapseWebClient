@@ -5,6 +5,7 @@ import java.util.Map;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -28,6 +29,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		String id = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.setSize(BadgeSize.SMALLER);
 			String username = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
 			if (username != null) {
 				badge.configureWithUsername(username);
@@ -35,7 +37,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 				badge.configure(id);
 			}
 			theWidget = badge.asWidget();
-			theWidget.addStyleName("movedown-9");
+			theWidget.addStyleName("movedown-6");
 		} else {
 			//team
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();
