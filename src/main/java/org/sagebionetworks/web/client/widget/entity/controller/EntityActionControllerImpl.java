@@ -83,7 +83,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETED = "Deleted";
 
 	public static final String ARE_YOU_SURE_YOU_WANT_TO_DELETE = "Are you sure you want to delete ";
-	public static final String DELETE_FOLDER_EXPLANATION = " Everything contained within the folder will also be deleted.";
+	public static final String DELETE_FOLDER_EXPLANATION = " Everything contained within the Folder will also be deleted.";
 	public static final String CONFIRM_DELETE_TITLE = "Confirm Delete";
 
 	public static final String DELETE_PREFIX = "Delete ";

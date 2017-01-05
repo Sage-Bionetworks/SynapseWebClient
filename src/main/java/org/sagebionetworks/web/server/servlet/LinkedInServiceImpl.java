@@ -17,6 +17,7 @@ import org.codehaus.jackson.map.util.LinkedNode;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.table.query.model.LikePredicate;
 import org.sagebionetworks.web.client.LinkedInService;
@@ -136,10 +137,8 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 			temp = ServiceUtils.writeToTempFile(conn.getInputStream(),
 					MAX_ATTACHMENT_SIZE_IN_BYTES);
 			// Now upload the file
-			String contentType = conn.getContentType();
-			ContentType type = ContentType.create(contentType);
-			// Upload to Synapse with a file handle.
-			return client.uploadToFileHandle(FileUtils.readFileToByteArray(temp), type);
+			S3FileHandle s3fh = client.multipartUpload(temp, null, false, false);
+			return s3fh.getId();
 		} catch (Throwable t) {
 			// couldn't pull the picture from the external server. log
 			// and move on with the update

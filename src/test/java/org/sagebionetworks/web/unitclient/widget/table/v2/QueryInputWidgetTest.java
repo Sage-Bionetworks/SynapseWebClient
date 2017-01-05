@@ -187,4 +187,25 @@ public class QueryInputWidgetTest {
 		verify(mockView).setEditEnabled(false);
 		verify(mockView).setDownloadEnabled(false);
 	}
+	
+	@Test
+	public void testQueryInputVisible(){
+		widget.setQueryInputVisible(true);
+		verify(mockView).setQueryInputVisible(true);
+	}
+
+	@Test
+	public void testShowQueryVisible(){
+		boolean visible = true;
+		widget.setShowQueryVisible(visible);
+		verify(mockView).setShowQueryVisible(visible);
+	}
+	
+	@Test
+	public void testOnShowQuery(){
+		String sql = "select * from syn123";
+		widget.configure(sql, mockQueryInputListener, false);
+		widget.onShowQuery();
+		verify(mockQueryInputListener).onShowQuery();
+	}
 }

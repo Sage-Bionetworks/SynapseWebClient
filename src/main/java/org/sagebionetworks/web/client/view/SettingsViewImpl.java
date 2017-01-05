@@ -182,7 +182,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			@Override
 			public void onClick(ClickEvent event) {
 				apiKeyContainer.selectAll();
-				jsniUtils.copyToClipboard();
 			}
 		});
 		password1Field.addKeyUpHandler(new KeyUpHandler() {

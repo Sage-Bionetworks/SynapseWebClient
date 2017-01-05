@@ -55,6 +55,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
@@ -237,8 +238,6 @@ public interface SynapseClientAsync {
 
 	public void getMarkdown(WikiPageKey key, AsyncCallback<String> callback);
 	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
-	void zipAndUploadFile(String content, String fileName,
-			AsyncCallback<S3FileHandle> callback);
 	
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
@@ -291,7 +290,6 @@ public interface SynapseClientAsync {
 	void submitCertificationQuizResponse(QuizResponse response,
 			AsyncCallback<PassingRecord> callback);
 	
-	void getUploadDaemonStatus(String daemonId,AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
 	
@@ -459,4 +457,9 @@ public interface SynapseClientAsync {
 	
 	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
 	void getEntityAccessApproval(String entityId, AsyncCallback<PaginatedResults<AccessApproval>> callback);
+
+	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);
+
+	void generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema,
+			AsyncCallback<String> callback);
 }

@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,18 +15,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -45,7 +39,6 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.common.io.Files;
 import com.google.gwt.user.client.rpc.RpcTokenException;
 import com.google.gwt.util.tools.shared.Md5Utils;
 import com.google.gwt.util.tools.shared.StringUtils;
@@ -287,76 +280,26 @@ public class FileHandleServlet extends HttpServlet {
 			throws ClientProtocolException, IOException {
 		if (resolvedUrl != null){
 			if (isProxy) {
-				//do the get
-				HttpGet httpGet = new HttpGet(resolvedUrl.toString());
-				//copy headers
-				Enumeration<?> headerValues = request.getHeaders("Cookie");
-				while (headerValues.hasMoreElements()) {
-					String headerValue = (String) headerValues.nextElement();
-					httpGet.addHeader("Cookie", headerValue);
-				}
-				HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
-				HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
-				if (responseEntity != null) {
-					responseEntity.writeTo(response.getOutputStream());
+				CloseableHttpClient client = HttpClients.createDefault();
+				try {
+					// do the get
+					HttpGet httpGet = new HttpGet(resolvedUrl.toString());
+					//copy headers
+					Enumeration<?> headerValues = request.getHeaders("Cookie");
+					while (headerValues.hasMoreElements()) {
+						String headerValue = (String) headerValues.nextElement();
+						httpGet.addHeader("Cookie", headerValue);
+					}
+					HttpResponse newResponse = client.execute(httpGet);
+					HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
+					if (responseEntity != null) {
+						responseEntity.writeTo(response.getOutputStream());
+					}
+				} finally {
+					client.close();
 				}
 			}else
 				response.sendRedirect(resolvedUrl.toString());	
-		}
-	}
-
-	public static FileHandle uploadFile(SynapseClient client, HttpServletRequest request) throws FileUploadException, IOException, SynapseException {
-		FileHandle newFileHandle = null;
-		ServletFileUpload upload = new ServletFileUpload();
-		FileItemIterator iter = upload.getItemIterator(request);
-		while (iter.hasNext()) {
-			FileItemStream item = iter.next();
-			String name = item.getFieldName();
-			InputStream stream = item.openStream();
-			String fileName = item.getName();
-			if (fileName.contains("\\")){
-				fileName = fileName.substring(fileName.lastIndexOf("\\")+1);
-			}
-            File tempDir = Files.createTempDir();
-			File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
-
-			ServiceUtils.writeToFile(temp, stream, Long.MAX_VALUE);
-			try{
-				// Now upload the file
-				String contentType = item.getContentType();
-				if (SynapseClientImpl.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
-					//see if we can make a better guess based on the file stream
-					contentType = SynapseClientImpl.guessContentTypeFromStream(temp);
-					//some source code files still register as application/octet-stream, but the preview manager in the backend should recognize those specific file extensions
-				}
-				client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-				newFileHandle = client.createFileHandle(temp, contentType);
-			}finally{
-				// Unconditionally delete the tmp file
-				temp.delete();
-			}
-		}
-		return newFileHandle;
-	}
-	
-	@Override
-	public void doPost(final HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		// Before we do anything make sure we can get the users token
-		String token = getSessionToken(request);
-		if (token == null) {
-			FileHandleServlet.setForbiddenMessage(response);
-			return;
-		}
-
-		try {
-			//Connect to synapse
-			SynapseClient client = createNewClient(token);
-			FileHandle newFileHandle = FileHandleServlet.uploadFile(client, request);
-			FileHandleServlet.fillResponseWithSuccess(response, newFileHandle.getId());
-		} catch (Exception e) {
-			FileHandleServlet.fillResponseWithFailure(response, e);
-			return;
 		}
 	}
 	

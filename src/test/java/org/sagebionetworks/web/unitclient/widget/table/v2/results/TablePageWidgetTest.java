@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -226,8 +227,6 @@ public class TablePageWidgetTest {
 		assertTrue(sortHeaders.isEmpty());
 		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
-		verify(mockView).setFacetsVisible(true);
-		verify(mockView, never()).setFacetsVisible(false);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
@@ -245,11 +244,9 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureNotEditableNoValidFacets(){
 		boolean isEditable = false;
-		when(mockFacetsWidget.isShowingFacets()).thenReturn(false);
 		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
-		verify(mockView).setFacetsVisible(false);
-		verify(mockView, never()).setFacetsVisible(true);
+		verify(mockView, never()).setFacetsVisible(anyBoolean());
 	}
 	
 	@Test

@@ -1,15 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +22,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,13 +89,9 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.file.State;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
@@ -124,6 +114,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -353,8 +344,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.search(searchQuery);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		} catch (UnsupportedEncodingException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -1068,6 +1057,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
+	public void deleteAccessApprovals(String accessRequirement, String accessorId) 
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteAccessApprovals(accessRequirement, accessorId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) 
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1100,8 +1100,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return updatedEntity;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1136,8 +1134,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.createEntity(newEntity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1245,8 +1241,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					.getWikiHeaderTree(ownerId, ownerType));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1258,8 +1252,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return key.getWikiPageId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1303,8 +1295,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return results;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1318,8 +1308,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1342,8 +1330,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.getV2WikiPage(properKey);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1368,8 +1354,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					properKey, version);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1382,8 +1366,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1396,8 +1378,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					ObjectType.valueOf(ownerType), wikiId, versionToUpdate);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1425,8 +1405,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType)));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	
@@ -1443,8 +1421,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return orderHint;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	
@@ -1456,8 +1432,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return orderHint;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1482,8 +1456,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					.getV2WikiAttachmentHandles(properKey);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1508,8 +1480,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					.getVersionOfV2WikiAttachmentHandles(properKey, version);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1527,8 +1497,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					.getV2WikiHistory(properKey, limit, offset));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1565,55 +1533,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public S3FileHandle zipAndUploadFile(String content, String fileName)
-			throws IOException, RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		File file = zipUp(content, fileName);
-		String contentType = guessContentTypeFromStream(file);
-		try {
-			// Upload the file and create S3 handle
-			S3FileHandle handle = synapseClient.createFileHandle(file,
-					contentType);
-			return handle;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	private File zipUp(String content, String fileName) throws IOException {
-		// Create a temporary file to write content to
-		File tempFile = File.createTempFile(fileName, ".tmp");
-		if (content != null) {
-			FileUtils.writeByteArrayToFile(tempFile, content.getBytes());
-		} else {
-			// When creating a wiki for the first time, markdown content doesn't
-			// exist
-			// Uploaded file should be empty
-			byte[] emptyByteArray = new byte[0];
-			FileUtils.writeByteArrayToFile(tempFile, emptyByteArray);
-		}
-		return tempFile;
-	}
-
-	private static String guessContentTypeFromStream(File file)
-			throws FileNotFoundException, IOException {
-		InputStream is = new BufferedInputStream(new FileInputStream(file));
-		try {
-			// Let java guess from the stream.
-			String contentType = URLConnection.guessContentTypeFromStream(is);
-			// If Java fails then set the content type to be octet-stream
-			if (contentType == null) {
-				contentType = "application/octet-stream";
-			}
-			return contentType;
-		} finally {
-			is.close();
-		}
-	}
-
-	@Override
 	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType,
 			WikiPage page) throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1621,8 +1540,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.createWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1634,8 +1551,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.updateWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
@@ -1667,8 +1582,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			etag = page.getEtag();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 
 		MarkdownCacheRequest request = new MarkdownCacheRequest(properKey,
@@ -1693,8 +1606,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			key.setWikiPageId(page.getId());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 
 		MarkdownCacheRequest request = new MarkdownCacheRequest(properKey,
@@ -2239,23 +2150,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
-	public UploadDaemonStatus getUploadDaemonStatus(String daemonId)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			UploadDaemonStatus status = synapseClient
-					.getCompleteUploadDaemonStatus(daemonId);
-			if (State.FAILED == status.getState()) {
-				logError(status.getErrorMessage());
-			}
-			return status;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-
-	}
-
 	/**
 	 * Gets the ID of the file entity with the given name whose parent has the given ID.
 	 * 
@@ -2559,11 +2453,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
-			String fileHandleId = synapseClient.uploadToFileHandle(
-					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -2587,11 +2477,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
-			String fileHandleId = synapseClient.uploadToFileHandle(
-					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
-					HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message, entityId);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -3171,6 +3057,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.getFileHandleAndUrlBatch(request);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException {
+		try {
+			return TableSqlProcessor.generateSqlWithFacets(basicSql, selectedFacets, schema);
+		} catch (Exception e) {
+			throw new BadRequestException(e.getMessage());
 		}
 	}
 }

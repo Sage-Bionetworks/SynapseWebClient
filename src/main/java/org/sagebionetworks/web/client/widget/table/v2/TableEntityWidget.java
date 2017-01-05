@@ -4,12 +4,15 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -22,6 +25,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +42,9 @@ public class TableEntityWidget implements IsWidget,
 		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
+	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
+	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
+	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select 'Schema' to add columns to the this table.";
@@ -60,25 +67,33 @@ public class TableEntityWidget implements IsWidget,
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
 	Query currentQuery;
-
+	CopyTextModal copyTextModal;
+	SynapseClientAsync synapseClient;
+	
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
 			QueryInputWidget queryInputWidget,
 			DownloadTableQueryModalWidget downloadTableQueryModalWidget,
 			UploadTableModalWidget uploadTableModalWidget,
-			PreflightController preflightController) {
+			PreflightController preflightController,
+			CopyTextModal copyTextModal, 
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
 		this.preflightController = preflightController;
+		this.copyTextModal = copyTextModal;
+		this.synapseClient = synapseClient;
+		copyTextModal.setTitle("Query:");
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
-		this.view.setDownloadTableQueryModalWidget(this.downloadTableQueryModalWidget);
-		this.view.setUploadTableModalWidget(this.uploadTableModalWidget);
+		this.view.addModalWidget(this.downloadTableQueryModalWidget);
+		this.view.addModalWidget(this.uploadTableModalWidget);
+		view.addModalWidget(copyTextModal);
 	}
 
 	@Override
@@ -111,6 +126,7 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu = actionMenu;
 		configureActions();
 		checkState();
+		initSimpleAdvancedQueryState();
 	}
 
 	/**
@@ -192,6 +208,106 @@ public class TableEntityWidget implements IsWidget,
 		}
 	}
 
+	private void initSimpleAdvancedQueryState() {
+		boolean isWhereClause = isWhereClause();
+		if (!isWhereClause) {
+			// show simple search if facets are available.
+			boolean isFacets = isFacets();
+			if (isFacets) {
+				showSimpleSearchUI();
+			} else {
+				showAdvancedSearchUI();
+			}
+		} else {
+			showAdvancedSearchUI();
+		}
+	}
+	
+	private boolean isFacets() {
+		if (tableBundle == null || tableBundle.getColumnModels() == null || tableBundle.getColumnModels().isEmpty()) {
+			return false;
+		}
+		for (ColumnModel cm : tableBundle.getColumnModels()) {
+			if (cm.getFacetType() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isWhereClause() {
+		if (currentQuery == null || currentQuery.getSql() == null) {
+			return false;
+		}
+		return currentQuery.getSql().toUpperCase().contains(" WHERE ");
+	}
+	
+	private void showSimpleSearchUI() {
+		view.setAdvancedSearchLinkVisbile(true);
+		view.setSimpleSearchLinkVisbile(false);
+		queryResultsWidget.setFacetsVisible(true);
+		queryInputWidget.setShowQueryVisible(true);
+		queryInputWidget.setQueryInputVisible(false);
+	}
+	
+	private void showAdvancedSearchUI() {
+		view.setAdvancedSearchLinkVisbile(false);
+		view.setSimpleSearchLinkVisbile(true);
+		queryResultsWidget.setFacetsVisible(false);
+		queryInputWidget.setShowQueryVisible(false);
+		queryInputWidget.setQueryInputVisible(true);
+	}
+	
+	@Override
+	public void onShowSimpleSearch() {
+		if (isFacets()) {
+			// does the current query have a where clause?
+			if (isWhereClause()) {
+				// we must wipe it out.  Confirm with the user that this is acceptable.
+				view.showConfirmDialog(RESET_SEARCH_QUERY, RESET_SEARCH_QUERY_MESSAGE, new Callback() {
+					@Override
+					public void invoke() {
+						showSimpleSearchUI();
+						setQuery(getDefaultQuery(), false);
+					}
+				});
+			} else {
+				showSimpleSearchUI();
+			}
+		} else {
+			// show error, must define facets for simple search.
+			view.showErrorMessage(NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED);
+		}
+	}
+	
+	@Override
+	public void onShowAdvancedSearch() {
+		// set query based on selected facets
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String sql) {
+				Query q = getDefaultQuery();
+				q.setSql(sql);
+				showAdvancedSearchUI();
+				setQuery(q, false);	
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		};
+		generateSqlWithFacets(callback);
+	}
+	
+	private void generateSqlWithFacets(AsyncCallback<String> callback) {
+		if (currentQuery.getSelectedFacets() == null || currentQuery.getSelectedFacets().isEmpty()) {
+			callback.onSuccess(currentQuery.getSql());
+		} else {
+			synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), callback);	
+		}
+	}
+	
 	/**
 	 * Set the view to show no columns message.
 	 */
@@ -350,5 +466,23 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onStartingNewQuery(Query newQuery) {
 		setQuery(newQuery, true);
+	}
+	
+	@Override
+	public void onShowQuery() {
+		// show the sql executed
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String sql) {
+				copyTextModal.setText(sql);
+				copyTextModal.show();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		};
+		generateSqlWithFacets(callback);
 	}
 }
