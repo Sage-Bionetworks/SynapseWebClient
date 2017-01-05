@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -34,9 +35,9 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	private MarkdownEditorWidget markdownEditor;
 	private AuthenticationController authController;
 	private GlobalApplicationState globalApplicationState;
+	private SessionStorage storage;
 	private Callback newReplyCallback;
 	private String threadId;
-	private Storage storage = null;
 	private String key;
 
 	@Inject
@@ -46,7 +47,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			SynapseAlert synAlert,
 			MarkdownEditorWidget markdownEditor,
 			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState
+			GlobalApplicationState globalApplicationState,
+			SessionStorage sessionStorage
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
@@ -54,6 +56,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
+		this.storage = sessionStorage;
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
@@ -64,7 +67,6 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	public void configure(String threadId, Callback newReplyCallback) {
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
-		this.storage = Storage.getSessionStorageIfSupported();
 		this.key = threadId + "_" + authController.getCurrentUserPrincipalId() + "_reply";
 	}
 
