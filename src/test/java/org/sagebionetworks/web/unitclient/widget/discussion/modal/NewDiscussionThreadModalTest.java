@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.discussion.modal;
 import static org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -129,4 +130,14 @@ public class NewDiscussionThreadModalTest {
 		verify(mockView).resetButton();
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
+	
+	@Test
+	public void testCacheReplyWhenLoggedOut() {
+		when(mockView.getThreadTitle()).thenReturn("title");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		modal.onSave();
+		verify(mockStorage).setItem(anyString(), eq("message"));	
+	}
+	
 }
