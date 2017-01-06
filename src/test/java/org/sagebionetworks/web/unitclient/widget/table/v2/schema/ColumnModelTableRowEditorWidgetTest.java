@@ -316,6 +316,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Boolean));
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Double));
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Date));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Entity));
 		
 		//other
 		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.LargeText));
