@@ -56,9 +56,14 @@ public class FileCellRendererImpl implements FileCellRenderer {
 				
 				@Override
 				public void onSuccess(FileResult result) {
-					if(view.isAttached() && result != null && result.getFileHandle() != null){
+					if(view.isAttached() && result != null){
 						view.setLoadingVisible(false);
-						view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());
+						if (result.getFileHandle() != null) {
+							view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());	
+						} else if (result.getFailureCode() != null) {
+							//failed
+							view.setErrorText(UNABLE_TO_LOAD_FILE_DATA + ": " + result.getFailureCode().toString());
+						}
 					}
 				}
 				
