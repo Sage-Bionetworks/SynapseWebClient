@@ -1,11 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.NavPills;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
@@ -28,12 +35,16 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	
 	@UiField
 	Italic emptyPanel;
-	
+	@UiField
+	NavPills navContainer;
+	Presenter presenter;
+	List<AnchorListItem> items;
 	@Inject
 	public MarkdownWidgetViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils jsniUtils) {
 		widget = uiBinder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		items = new ArrayList<AnchorListItem>();
 	}
 	
 	@Override
@@ -84,7 +95,39 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	}
 	
 	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
+	}
+	
+	@Override
+	public void addNavItem(String text, final ElementWrapper target, boolean active, final String suffix) {
+		final AnchorListItem item = new AnchorListItem(text);
+		item.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.hideAllNavPanels(suffix);
+				markAllItemsInactive();
+				target.setVisible(true);
+				item.setActive(true);
+			}
+		});
+		
+		item.setActive(active);
+		target.setVisible(active);
+		items.add(item);
+		navContainer.add(item);
+	}
+	
+	private void markAllItemsInactive() {
+		for (AnchorListItem item : items) {
+			item.setActive(false);
+		}
+	}
+	
+	@Override
 	public void clearMarkdown() {
+		items.clear();
+		navContainer.clear();
 		contentPanel.clear();
 		setMarkdown("");
 	}

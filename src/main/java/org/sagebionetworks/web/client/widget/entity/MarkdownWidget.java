@@ -80,6 +80,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.sessionStorage = sessionStorage;
 		this.markdownIt = markdownIt;
 		view.setSynAlertWidget(synAlert.asWidget());
+		view.setPresenter(this);
 	}
 	
 	/**
@@ -152,17 +153,10 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		if(result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
-			boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-
-			//TODO: remove highlightCodeBlocks call once markdown-it has replaced the server-side processor
-			// (because code highlighting is does in the new parser)
-			if (!isInTestWebsite) {
-				synapseJSNIUtils.highlightCodeBlocks();
-			}
-				
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
+			loadNav(uniqueSuffix);
 		} else {
 			view.setEmptyVisible(true);
 		}
@@ -256,6 +250,35 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			el = view.getElementById(currentWidgetDiv);
 		}
 		return contentTypes;
+	}
+	
+	@Override
+	public void hideAllNavPanels(String suffix) {
+		int i = 0;
+		String currentWidgetDiv = WidgetConstants.DIV_ID_NAV_PREFIX + i + suffix;
+		ElementWrapper el = view.getElementById(currentWidgetDiv);
+		while (el != null) {
+			el.setVisible(false);
+			i++;
+			currentWidgetDiv = WidgetConstants.DIV_ID_NAV_PREFIX + i + suffix;
+			el = view.getElementById(currentWidgetDiv);
+		}
+	}
+	
+	public void loadNav(String suffix) {
+		//look for every element that has the right format
+		int i = 0;
+		String currentWidgetDiv = WidgetConstants.DIV_ID_NAV_PREFIX + i + suffix;
+		ElementWrapper el = view.getElementById(currentWidgetDiv);
+		while (el != null) {
+			String text = el.getAttribute("target-text");
+			//make the first one active by default
+			boolean isActive = i==0;
+			view.addNavItem(text, el, isActive, suffix);
+			i++;
+			currentWidgetDiv = WidgetConstants.DIV_ID_NAV_PREFIX + i + suffix;
+			el = view.getElementById(currentWidgetDiv);
+		}
 	}
 	
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isIgnoreLoadingFailure) {

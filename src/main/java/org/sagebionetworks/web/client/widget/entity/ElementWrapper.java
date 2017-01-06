@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.ui.UIObject;
 
 public class ElementWrapper {
 	Element element;
@@ -24,4 +25,9 @@ public class ElementWrapper {
 	public void removeAllChildren() {
 		element.removeAllChildren();
 	}
+	
+	public void setVisible(boolean visible) {
+		UIObject.setVisible(element, visible);
+	}
+	
 }
