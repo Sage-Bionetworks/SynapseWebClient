@@ -1,16 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
 
+import static org.sagebionetworks.web.client.widget.discussion.NewReplyWidget.DEFAULT_MARKDOWN;
 import static org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -45,6 +49,8 @@ public class NewDiscussionThreadModalTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	SessionStorage mockStorage;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	String forumId = "123";
 	NewDiscussionThreadModal modal;
 
@@ -138,6 +144,39 @@ public class NewDiscussionThreadModalTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		modal.onSave();
 		verify(mockStorage).setItem(anyString(), eq("message"));	
+	}
+	
+	@Test
+	public void testLoadCachedReplyClickYes() {
+		when(mockStorage.getItem(anyString())).thenReturn("data");
+		modal.show();
+		verify(mockView).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture(), any(Callback.class));
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownEditor).configure(anyString());
+		verify(mockView).setThreadTitle(anyString());
+		verify(mockStorage, times(2)).removeItem(anyString());
+	}
+	
+	@Test
+	public void testLoadCachedReplyClickNo() {
+		when(mockStorage.getItem(anyString())).thenReturn("data");
+		modal.show();
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
+		verify(mockStorage, times(2)).removeItem(anyString());
+	}
+	
+	@Test
+	public void testNoCacheToLoad() {
+		when(mockStorage.getItem(anyString())).thenReturn(null);
+		modal.show();
+		verify(mockView, times(0)).showConfirmDialog(anyString(), anyString(), any(Callback.class), any(Callback.class));
+		
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
+		verify(mockStorage, times(0)).removeItem(anyString());
 	}
 	
 }

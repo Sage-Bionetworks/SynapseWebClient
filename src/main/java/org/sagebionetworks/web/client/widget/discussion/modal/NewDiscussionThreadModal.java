@@ -95,7 +95,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 					storage.removeItem(key + "_message");
 				}
 			};
-			DisplayUtils.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
+			view.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
 		}
 	}
 
