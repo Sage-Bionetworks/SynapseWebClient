@@ -12,6 +12,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
@@ -56,6 +58,8 @@ public class NewReplyWidgetTest {
 	private SessionStorage mockStorage;
 	@Mock
 	Callback mockCallback;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 
 	@Before
 	public void before() {
@@ -156,7 +160,39 @@ public class NewReplyWidgetTest {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		newReplyWidget.onSave();
-		verify(mockStorage).setItem(anyString(), eq("message"));	
+		verify(mockStorage).setItem(anyString(), eq("message"));
+	}
+	
+	@Test
+	public void testLoadCachedReplyClickYes() {
+		when(mockStorage.getItem(anyString())).thenReturn("message");
+		newReplyWidget.onClickNewReply();
+		verify(mockView).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture(), any(Callback.class));
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownEditor).configure("message");
+		verify(mockStorage).removeItem(anyString());
+	}
+	
+	@Test
+	public void testLoadCachedReplyClickNo() {
+		when(mockStorage.getItem(anyString())).thenReturn("message");
+		newReplyWidget.onClickNewReply();
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
+		verify(mockStorage).removeItem(anyString());
+	}
+	
+	@Test
+	public void testNoCacheToLoad() {
+		when(mockStorage.getItem(anyString())).thenReturn(null);
+		newReplyWidget.onClickNewReply();
+		verify(mockView, times(0)).showConfirmDialog(anyString(), anyString(), any(Callback.class), any(Callback.class));
+		
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
+		verify(mockStorage, times(0)).removeItem(anyString());
 	}
 
 }

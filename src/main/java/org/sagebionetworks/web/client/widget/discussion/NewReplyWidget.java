@@ -102,7 +102,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 					storage.removeItem(key);
 				}
 			};
-			DisplayUtils.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
+			view.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
 		}
 	}
 
