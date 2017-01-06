@@ -23,7 +23,7 @@ public class ReplyCountAlert implements RefreshAlertView.Presenter, SynapseWidge
 	private String threadId;
 	private Callback refreshCallback;
 	private Callback invokeCheck;
-	public static final int DELAY = 15000; // check every 15 seconds (until detached, configuration cleared, or a change has been detected)
+	public static final int DELAY = 70000; // check every 70 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public ReplyCountAlert(RefreshAlertView view, 
 			DiscussionForumClientAsync discussionForumClient, 
