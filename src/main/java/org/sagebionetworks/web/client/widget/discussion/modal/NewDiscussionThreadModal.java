@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.discussion.modal;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -11,7 +10,6 @@ import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.storage.client.Storage;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -33,7 +31,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private AuthenticationController authController;
 	private SessionStorage storage;
 	private String forumId;
-	private String key;
+	private String titleKey;
+	private String messageKey;
 	Callback newThreadCallback;
 
 	@Inject
@@ -62,7 +61,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	public void configure(String forumId, Callback newThreadCallback) {
 		this.forumId = forumId;
 		this.newThreadCallback = newThreadCallback;
-		this.key = forumId + "_" + authController.getCurrentUserPrincipalId();
+		this.titleKey = forumId + "_" + authController.getCurrentUserPrincipalId() + "_title";
+		this.messageKey = forumId + "_" + authController.getCurrentUserPrincipalId() + "_message";
 	}
 
 	@Override
@@ -73,26 +73,26 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	}
 	
 	private void checkForSavedThread() {
-		if (storage.getItem(key + "_title") == null || storage.getItem(key + "_message") == null) {
+		if (storage.getItem(titleKey) == null || storage.getItem(messageKey) == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
-					String title = storage.getItem(key + "_title");
-					String message = storage.getItem(key + "_message");
+					String title = storage.getItem(titleKey);
+					String message = storage.getItem(messageKey);
 					view.setThreadTitle(title);
 					markdownEditor.configure(message);
-					storage.removeItem(key + "_title");
-					storage.removeItem(key + "_message");
+					storage.removeItem(titleKey);
+					storage.removeItem(messageKey);
 				}
 			};
 			Callback noCallback = new Callback() {
 				@Override
 				public void invoke() {
 					markdownEditor.configure(DEFAULT_MARKDOWN);	
-					storage.removeItem(key + "_title");
-					storage.removeItem(key + "_message");
+					storage.removeItem(titleKey);
+					storage.removeItem(messageKey);
 				}
 			};
 			view.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
@@ -116,8 +116,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
-		storage.setItem(key + "_title", threadTitle);
-		storage.setItem(key + "_message", messageMarkdown);
+		storage.setItem(titleKey, threadTitle);
+		storage.setItem(messageKey, messageMarkdown);
 		view.showSaving();
 		CreateDiscussionThread toCreate = new CreateDiscussionThread();
 		toCreate.setForumId(forumId);
@@ -137,8 +137,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 				if (newThreadCallback != null) {
 					newThreadCallback.invoke();
 				}
-				storage.removeItem(key + "_title");
-				storage.removeItem(key + "_message");
+				storage.removeItem(titleKey);
+				storage.removeItem(messageKey);
 			}
 
 		});
