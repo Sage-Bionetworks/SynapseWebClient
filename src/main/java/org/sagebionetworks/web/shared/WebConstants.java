@@ -191,6 +191,7 @@ public class WebConstants {
 	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
 	
 	public static final String FILE_HANDLE_ASSOCIATION_SERVLET = "filehandleassociation";
+	public static final String SLACK_SERVLET = "slack";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
