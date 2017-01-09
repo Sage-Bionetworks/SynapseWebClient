@@ -26,6 +26,8 @@ import com.google.inject.Inject;
 
 public class SlackServlet extends HttpServlet {
 
+	public static final String INVALID_COMMAND_MESSAGE = "Sorry, I didn't recognize your command.";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
@@ -70,7 +72,7 @@ public class SlackServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request, javax.servlet.http.HttpServletResponse response)
+	public void doGet(HttpServletRequest request, javax.servlet.http.HttpServletResponse response)
 			throws ServletException, IOException {
 		//instruct not to cache
 		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
@@ -128,12 +130,12 @@ public class SlackServlet extends HttpServlet {
 				out.println(json.toString());
 				response.setStatus(HttpServletResponse.SC_OK);
 			} else {
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				sendFailure(out, "Sorry, I didn't recognize your command.");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				sendFailure(out, INVALID_COMMAND_MESSAGE);
 			}
 		} catch (Exception e) {
 			try {
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				sendFailure(out, e.getMessage());
 			} catch (JSONException e1) {
 				e1.printStackTrace();
