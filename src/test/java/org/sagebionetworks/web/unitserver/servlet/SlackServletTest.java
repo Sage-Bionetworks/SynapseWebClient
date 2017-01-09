@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -50,6 +53,9 @@ public class SlackServletTest {
 	SlackServlet servlet;
 	public static final String ENTITY_NAME = "file.png";
 	public static final String ENTITY_PROJECT = "A Project";
+	public static final String ENTITY_STRING_ANNOTATION_KEY = "a string annotation key";
+	public static final String ENTITY_STRING_ANNOTATION_VALUE1 = "value1";
+	public static final String ENTITY_STRING_ANNOTATION_VALUE2 = "value2";
 	public static final Long THREAD_COUNT = 42L;
 	@Mock
 	EntityPath mockEntityPath;
@@ -62,6 +68,8 @@ public class SlackServletTest {
 	
 	@Mock
 	PrintWriter mockPrintWriter;
+	@Mock
+	Annotations mockAnnotations;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	List<EntityHeader> entityPath;
@@ -92,6 +100,13 @@ public class SlackServletTest {
 		//set up general synapse client configuration test
 		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
+		when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
+		Map<String, List<String>> stringAnnotations = new HashMap<String, List<String>>();
+		List<String> values = new ArrayList<String>();
+		values.add(ENTITY_STRING_ANNOTATION_VALUE1);
+		values.add(ENTITY_STRING_ANNOTATION_VALUE2);
+		stringAnnotations.put(ENTITY_STRING_ANNOTATION_KEY, values);
+		when(mockAnnotations.getStringAnnotations()).thenReturn(stringAnnotations);
 	}
 	
 	@Test
@@ -111,6 +126,9 @@ public class SlackServletTest {
 		assertTrue(outputValue.contains(ENTITY_NAME));
 		assertTrue(outputValue.contains(ENTITY_PROJECT));
 		assertTrue(outputValue.contains(THREAD_COUNT.toString()));
+		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_KEY));
+		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE1));
+		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE2));
 		
 		//as an additional test, verify that synapse client is set up
 		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
