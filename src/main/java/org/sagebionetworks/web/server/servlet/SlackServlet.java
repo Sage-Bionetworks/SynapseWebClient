@@ -103,7 +103,7 @@ public class SlackServlet extends HttpServlet {
 					int partsMask = ENTITY | ENTITY_PATH  | THREAD_COUNT;
 					EntityBundle bundle = client.getEntityBundle(text, partsMask);
 					title = bundle.getEntity().getName();
-					sb.append("https://www.synapse.org/#!Synapse:" + text);
+					sb.append("https://www.synapse.org/#!Synapse:" + bundle.getEntity().getId());
 					List<EntityHeader> path = bundle.getPath().getPath();
 					if (path.size() > 2) {
 						sb.append("\n*Project:* " + path.get(1).getName());	
