@@ -4,7 +4,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -19,10 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -80,14 +77,15 @@ public class SlackServlet extends HttpServlet {
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L);
 		String text = request.getParameter("text");
-		String token = request.getParameter("token");
-		String teamId = request.getParameter("team_id");
-		String teamDomain = request.getParameter("team_domain");
-		String channelId =  request.getParameter("channel_id");
-		String channelName =  request.getParameter("channel_name");
-		String userName = request.getParameter("user_name");
 		String command = request.getParameter("command");
-		String responseUrl = request.getParameter("response_url");
+		// other information available
+//		String token = request.getParameter("token");
+//		String teamId = request.getParameter("team_id");
+//		String teamDomain = request.getParameter("team_domain");
+//		String channelId =  request.getParameter("channel_id");
+//		String channelName =  request.getParameter("channel_name");
+//		String userName = request.getParameter("user_name");
+//		String responseUrl = request.getParameter("response_url");
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("application/json");
@@ -95,9 +93,10 @@ public class SlackServlet extends HttpServlet {
 				String title = null;
 				StringBuilder sb = new StringBuilder();
 				if (text.toLowerCase().equals("help")) {
-					sb.append("Given a Synapse ID (like syn123), post information about that entity.");
+					sb.append("Given a Synapse ID (like syn123), post public information about that entity.");
 				} else {
 					SynapseClient client = createNewClient();
+					// extend
 //					int partsMask = ENTITY | ENTITY_PATH | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
 					int partsMask = ENTITY | ENTITY_PATH  | THREAD_COUNT;
 					EntityBundle bundle = client.getEntityBundle(text, partsMask);
@@ -113,7 +112,8 @@ public class SlackServlet extends HttpServlet {
 				}
 					
 				JSONObject json = new JSONObject();
-				json.put("response_type", "in_channel");
+				//to send response to channel, change "response_type" to "in_channel"
+				json.put("response_type", "ephemeral");
 				JSONObject attachments = new JSONObject();
 				if (title != null) {
 					attachments.put("title", title);	
