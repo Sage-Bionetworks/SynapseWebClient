@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.server.servlet;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,11 +16,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -100,7 +105,7 @@ public class SlackServlet extends HttpServlet {
 					SynapseClient client = createNewClient();
 					// extend
 //					int partsMask = ENTITY | ENTITY_PATH | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
-					int partsMask = ENTITY | ENTITY_PATH  | THREAD_COUNT;
+					int partsMask = ENTITY | ENTITY_PATH  | THREAD_COUNT | ANNOTATIONS;
 					EntityBundle bundle = client.getEntityBundle(text, partsMask);
 					title = bundle.getEntity().getName();
 					sb.append("https://www.synapse.org/#!Synapse:" + bundle.getEntity().getId());
@@ -110,6 +115,10 @@ public class SlackServlet extends HttpServlet {
 					}
 					if (bundle.getThreadCount() > 0) {
 						sb.append("\n*Discussion thread count:* " + bundle.getThreadCount());	
+					}
+					if (bundle.getAnnotations() != null) {
+						sb.append("\n*Annotations:*");
+						outputAnnotations(sb, bundle.getAnnotations());
 					}
 				}
 					
@@ -150,6 +159,45 @@ public class SlackServlet extends HttpServlet {
 		json.put("response_type", "ephemeral");
 		json.put("text", error);
 		out.println(json.toString());
+	}
+	
+	private void outputAnnotations(StringBuilder sb, Annotations annos) {
+		// Strings
+		if (annos.getStringAnnotations() != null) {
+			for (String key : annos.getStringAnnotations().keySet()) {
+				sb.append("\n ");
+				sb.append(key);
+				sb.append(" : ");
+				sb.append(StringUtils.join(annos.getStringAnnotations().get(key), ","));
+			}
+		}
+		// Longs
+		if (annos.getLongAnnotations() != null) {
+			for (String key : annos.getLongAnnotations().keySet()) {
+				sb.append("\n ");
+				sb.append(key);
+				sb.append(" : ");
+				sb.append(StringUtils.join(annos.getLongAnnotations().get(key), ","));
+			}
+		}
+		// Doubles
+		if (annos.getDoubleAnnotations() != null) {
+			for (String key : annos.getDoubleAnnotations().keySet()) {
+				sb.append("\n ");
+				sb.append(key);
+				sb.append(" : ");
+				sb.append(StringUtils.join(annos.getDoubleAnnotations().get(key), ","));
+			}
+		}
+		// Dates
+		if (annos.getDateAnnotations() != null) {
+			for (String key : annos.getDateAnnotations().keySet()) {
+				sb.append("\n ");
+				sb.append(key);
+				sb.append(" : ");
+				sb.append(StringUtils.join(annos.getDateAnnotations().get(key), ","));
+			}
+		}
 	}
 
 	/**
