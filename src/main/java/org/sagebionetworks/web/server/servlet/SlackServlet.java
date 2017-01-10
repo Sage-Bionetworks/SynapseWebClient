@@ -5,6 +5,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -93,7 +94,8 @@ public class SlackServlet extends HttpServlet {
 //		String channelName =  request.getParameter("channel_name");
 //		String userName = request.getParameter("user_name");
 //		String responseUrl = request.getParameter("response_url");
-		PrintWriter out = response.getWriter();
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream(1024);
+		PrintWriter out = new PrintWriter(bytes, true);
 		try {
 			response.setContentType("application/json");
 			if (command.toLowerCase().equals("/synapse")) {
@@ -149,9 +151,9 @@ public class SlackServlet extends HttpServlet {
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
-		} finally {
-			out.close();
 		}
+	    response.setContentLength(bytes.size());
+	    bytes.writeTo(response.getOutputStream());
 	}
 	
 	private void sendFailure(PrintWriter out, String error) throws JSONException {
