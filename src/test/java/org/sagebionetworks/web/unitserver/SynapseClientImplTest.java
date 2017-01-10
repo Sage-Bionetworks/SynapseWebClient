@@ -1611,10 +1611,10 @@ public class SynapseClientImplTest {
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		String entityId = "syn98765";
-		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(messageBody))).thenReturn(mockMessageToUser);
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(entityId), eq(messageBody))).thenReturn(mockMessageToUser);
 		when(mockMessageToUser.writeToJSONObject(any(JSONObjectAdapter.class))).thenReturn(mockJSONObjAd);
 		synapseClient.sendMessageToEntityOwner(entityId, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(entityId), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
