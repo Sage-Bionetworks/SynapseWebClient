@@ -232,7 +232,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, new Callback() {
+		this.queryResultEditor.showEditor(isView, bundle, new Callback() {
 			@Override
 			public void invoke() {
 				runQuery();

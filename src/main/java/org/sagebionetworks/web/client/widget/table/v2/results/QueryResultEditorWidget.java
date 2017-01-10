@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,6 +35,7 @@ public class QueryResultEditorWidget implements
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
+	AsynchType jobType;
 
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -59,7 +61,7 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(QueryResultBundle bundle, Callback callback) {
+	public void showEditor(boolean isView, QueryResultBundle bundle, Callback callback) {
 		this.callback = callback;
 		this.startingBundle = bundle;
 		this.view.setErrorMessageVisible(false);
@@ -70,6 +72,7 @@ public class QueryResultEditorWidget implements
 		this.view.setSaveButtonLoading(false);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
+		this.jobType = isView ? AsynchType.ViewAppendRowSet : AsynchType.TableAppendRowSet;
 	}
 
 	@Override
@@ -183,7 +186,7 @@ public class QueryResultEditorWidget implements
 		request.setToAppend(prs);
 		request.setEntityId(this.tableId);
 		editJobTrackingWidget.startAndTrackJob("Applying changes...", false,
-				AsynchType.TableAppendRowSet, request,
+				jobType, request,
 				new AsynchronousProgressHandler() {
 
 					@Override
@@ -193,6 +196,8 @@ public class QueryResultEditorWidget implements
 
 					@Override
 					public void onComplete(AsynchronousResponseBody response) {
+						//TODO: if isView, then we need to show any row failures
+						GWT.debugger();
 						doHideEditor();
 						callback.invoke();
 					}

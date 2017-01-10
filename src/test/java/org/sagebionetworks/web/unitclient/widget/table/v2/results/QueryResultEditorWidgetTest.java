@@ -57,7 +57,7 @@ public class QueryResultEditorWidgetTest {
 	List<SelectColumn> headers;
 	List<Row> updates;
 	QueryResultBundle bundle;
-	
+	boolean isView;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -91,6 +91,7 @@ public class QueryResultEditorWidgetTest {
 		// By default the view returns a copy of the data.
 		when(mockPageWidget.extractHeaders()).thenReturn(schema);
 		when(mockPageWidget.extractRowSet()).thenReturn(updates);
+		isView = false;
 	}
 	
 	@Test
@@ -134,7 +135,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEdit(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
@@ -145,7 +146,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelNoChanges(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// No changes
@@ -156,7 +157,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmOkay(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -172,7 +173,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmCanceld(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -188,7 +189,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveNoChanges(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -205,7 +206,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesNotValid(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -228,7 +229,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobSuccessful(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -257,7 +258,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -292,7 +293,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobCanceled(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(isView, bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
