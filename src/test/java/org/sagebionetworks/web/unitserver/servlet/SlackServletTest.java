@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -67,11 +68,11 @@ public class SlackServletTest {
 	EntityHeader mockCurrentItem;
 	
 	@Mock
-	PrintWriter mockPrintWriter;
+	ServletOutputStream mockOutputStream;
 	@Mock
 	Annotations mockAnnotations;
 	@Captor
-	ArgumentCaptor<String> stringCaptor;
+	ArgumentCaptor<byte[]> byteArrayCaptor;
 	List<EntityHeader> entityPath;
 	
 	String authBaseUrl = "authbase";
@@ -95,7 +96,7 @@ public class SlackServletTest {
 		when(mockEntityBundle.getPath()).thenReturn(mockEntityPath);
 		when(mockParentProject.getName()).thenReturn(ENTITY_PROJECT);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-		when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
+		when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
 		when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
 		//set up general synapse client configuration test
 		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
@@ -121,8 +122,8 @@ public class SlackServletTest {
 
 		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
 		
-		verify(mockPrintWriter).println(stringCaptor.capture());
-		String outputValue = stringCaptor.getValue();
+		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
+		String outputValue = new String(byteArrayCaptor.getValue());
 		assertTrue(outputValue.contains(ENTITY_NAME));
 		assertTrue(outputValue.contains(ENTITY_PROJECT));
 		assertTrue(outputValue.contains(THREAD_COUNT.toString()));
@@ -136,15 +137,14 @@ public class SlackServletTest {
 		verify(mockSynapse).setFileEndpoint(anyString());
 	}
 
-
 	@Test
 	public void testDoGetError() throws Exception {
 		when(mockRequest.getParameter("text")).thenReturn("syn99");
 		when(mockRequest.getParameter("command")).thenReturn("/invalidcommand");
 		
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockPrintWriter).println(stringCaptor.capture());
-		String outputValue = stringCaptor.getValue();
+		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
+		String outputValue = new String(byteArrayCaptor.getValue());
 		assertTrue(outputValue.contains(SlackServlet.INVALID_COMMAND_MESSAGE));
 		verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
