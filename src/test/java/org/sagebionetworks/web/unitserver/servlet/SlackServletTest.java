@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -147,6 +147,23 @@ public class SlackServletTest {
 		String outputValue = new String(byteArrayCaptor.getValue());
 		assertTrue(outputValue.contains(SlackServlet.INVALID_COMMAND_MESSAGE));
 		verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	}
+	
+	@Test
+	public void testJoin() {
+		List list = new ArrayList<String>();
+		assertEquals("", SlackServlet.join(list));
+		list.add("a");
+		assertEquals("a", SlackServlet.join(list));
+		list.add("b");
+		assertEquals("a, b", SlackServlet.join(list));
+		
+		list = new ArrayList<Integer>();
+		assertEquals("", SlackServlet.join(list));
+		list.add(1);
+		assertEquals("1", SlackServlet.join(list));
+		list.add(2);
+		assertEquals("1, 2", SlackServlet.join(list));
 	}
 
 }
