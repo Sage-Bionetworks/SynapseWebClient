@@ -146,7 +146,7 @@ public class SlackServlet extends HttpServlet {
 		} catch (Exception e) {
 			try {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				sendFailure(out, e.getMessage());
+				sendFailure(out, text + ": " + e.getMessage());
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
