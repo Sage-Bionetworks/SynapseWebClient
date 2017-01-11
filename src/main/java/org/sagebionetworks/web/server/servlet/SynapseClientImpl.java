@@ -2477,7 +2477,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
-			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, entityId, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
