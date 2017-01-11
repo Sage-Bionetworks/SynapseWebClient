@@ -1029,8 +1029,6 @@ a.shortBtn {
 .markdown code {
 	background-clip: padding-box;
     border-radius: 3px 3px 3px 3px;
-    color: #666666;
-    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
     padding: 0 5px 2px;
     overflow:auto;
