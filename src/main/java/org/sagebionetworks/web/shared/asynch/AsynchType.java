@@ -36,8 +36,7 @@ public enum AsynchType implements IsSerializable{
 	TableCSVUploadPreview(UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
 	TableCSVDownload(DownloadFromTableRequest.class, DownloadFromTableResult.class),
 	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
-	TableTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class),
-	ViewAppendRowSet(AppendableRowSetRequest.class, EntityUpdateResults.class);
+	TableTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
 	
 	Class<? extends AsynchronousRequestBody> requestClass;
 	Class<? extends AsynchronousResponseBody> responseClass;

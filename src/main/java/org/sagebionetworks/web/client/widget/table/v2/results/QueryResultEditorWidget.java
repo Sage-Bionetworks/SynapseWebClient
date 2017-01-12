@@ -1,16 +1,23 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
+import org.sagebionetworks.repo.model.table.EntityUpdateResult;
+import org.sagebionetworks.repo.model.table.EntityUpdateResults;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,8 +42,8 @@ public class QueryResultEditorWidget implements
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
-	AsynchType jobType;
-
+	boolean isView;
+	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
 			TablePageWidget pageWidget,
@@ -72,7 +79,7 @@ public class QueryResultEditorWidget implements
 		this.view.setSaveButtonLoading(false);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
-		this.jobType = isView ? AsynchType.ViewAppendRowSet : AsynchType.TableAppendRowSet;
+		this.isView = isView;
 	}
 
 	@Override
@@ -182,11 +189,16 @@ public class QueryResultEditorWidget implements
 		}
 		// We have changes and they are valid so start the append job.
 		setJobRunning(true);
-		AppendableRowSetRequest request = new AppendableRowSetRequest();
-		request.setToAppend(prs);
+		TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
+		AppendableRowSetRequest rowSetRequest = new AppendableRowSetRequest();
+		rowSetRequest.setToAppend(prs);
+		rowSetRequest.setEntityId(this.tableId);
 		request.setEntityId(this.tableId);
+		List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
+		changes.add(rowSetRequest);
+		request.setChanges(changes);
 		editJobTrackingWidget.startAndTrackJob("Applying changes...", false,
-				jobType, request,
+				AsynchType.TableTransaction, request,
 				new AsynchronousProgressHandler() {
 
 					@Override
@@ -196,8 +208,26 @@ public class QueryResultEditorWidget implements
 
 					@Override
 					public void onComplete(AsynchronousResponseBody response) {
-						//TODO: if isView, then we need to show any row failures
-						GWT.debugger();
+						//if isView, then we need to show any row failures
+						if (isView) {
+							// if errors, show them.
+							EntityUpdateResults results = (EntityUpdateResults)(((TableUpdateTransactionResponse) response).getResults()).get(0);
+							
+							StringBuilder sb = new StringBuilder();
+							for (EntityUpdateResult result : results.getUpdateResults()) {
+								if (result.getFailureCode() != null) {
+									sb.append(result.getEntityId());
+									sb.append(" (");
+									sb.append(result.getFailureCode());
+									sb.append("): ");
+									sb.append(result.getFailureMessage());
+									sb.append("\n");
+								}
+							}
+							if (sb.length() > 0) {
+								view.showErrorDialog(sb.toString());
+							}
+						}
 						doHideEditor();
 						callback.invoke();
 					}
