@@ -363,7 +363,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		uploadLog = new StringBuilder();
 	}
 
-	public String fixDefaultContentType(String type, String fileName) {
+	public static String fixDefaultContentType(String type, String fileName) {
 		String contentType = type;
 		String lowercaseFilename = fileName.toLowerCase();
 		if (type == null || type.trim().length() == 0) {

@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -545,6 +546,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void updateExternalFileEntity(String entityId, String path, String name, Long fileSize, String md5, Long storageLocationId) {
 		try {
 			String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+			contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, name);
 			synapseClient.updateExternalFile(entityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (Throwable t) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
@@ -553,6 +555,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void createNewExternalFileEntity(final String path, final String name, Long fileSize, String md5, final Long storageLocationId) {
 		try {
 			String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+			contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, name);
 			synapseClient.createExternalFile(parentEntityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
