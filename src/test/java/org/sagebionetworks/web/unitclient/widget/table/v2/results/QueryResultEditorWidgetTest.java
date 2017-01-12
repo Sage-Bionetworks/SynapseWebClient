@@ -58,7 +58,6 @@ public class QueryResultEditorWidgetTest {
 	List<SelectColumn> headers;
 	List<Row> updates;
 	QueryResultBundle bundle;
-	boolean isView;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -92,7 +91,6 @@ public class QueryResultEditorWidgetTest {
 		// By default the view returns a copy of the data.
 		when(mockPageWidget.extractHeaders()).thenReturn(schema);
 		when(mockPageWidget.extractRowSet()).thenReturn(updates);
-		isView = false;
 	}
 	
 	@Test

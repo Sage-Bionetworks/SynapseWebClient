@@ -2737,11 +2737,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try{
 			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
 		} catch (SynapseException e) {
-			e.printStackTrace();
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch(Throwable th) {
-			th.printStackTrace();
-			throw th;
 		}
 	}
 

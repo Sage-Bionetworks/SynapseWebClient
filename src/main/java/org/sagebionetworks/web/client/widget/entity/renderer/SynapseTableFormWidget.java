@@ -138,7 +138,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		request.setToAppend(prs);
 		request.setEntityId(this.tableId);
 		view.setSubmitButtonLoading(true);
-		jobTracker.startAndTrack(AsynchType.TableTransaction, request, AsynchronousProgressWidget.WAIT_MS,
+		jobTracker.startAndTrack(AsynchType.TableAppendRowSet, request, AsynchronousProgressWidget.WAIT_MS,
 				new UpdatingAsynchProgressHandler() {
 					
 					@Override
