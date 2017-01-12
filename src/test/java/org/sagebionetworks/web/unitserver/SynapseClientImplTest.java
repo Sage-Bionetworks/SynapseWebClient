@@ -260,6 +260,8 @@ public class SynapseClientImplTest {
 	MessageToUser mockMessageToUser;
 	@Mock
 	JSONObjectAdapter mockJSONObjAd;
+	@Mock
+	ExternalFileHandle mockExternalFileHandle;
 	List<FileHandleCopyResult> batchCopyResultsList;
 	
 	
@@ -1110,7 +1112,7 @@ public class SynapseClientImplTest {
 		ExternalFileHandle capturedValue = captor.getValue();
 		assertEquals(testUrl.trim(), capturedValue.getExternalURL());
 		assertEquals(md5, capturedValue.getContentMd5());
-		assertEquals(contentType, capturedValue.getConcreteType());
+		assertEquals(contentType, capturedValue.getContentType());
 		assertEquals(myFileName, capturedValue.getFileName());
 //		assertEquals(fileSize, capturedValue.getContentSize());
 		
@@ -1173,10 +1175,10 @@ public class SynapseClientImplTest {
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		String contentType = "text/plain";
 		Long fileSize = 1024L;
+		when(mockExternalFileHandle.getFileName()).thenReturn(expectedAutoFilename);
 		when(
-				mockSynapse
-						.createExternalFileHandle(any(ExternalFileHandle.class)))
-				.thenReturn(new ExternalFileHandle());
+			mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class)))
+				.thenReturn(mockExternalFileHandle);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
 		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, storageLocationId);
@@ -1188,7 +1190,7 @@ public class SynapseClientImplTest {
 		assertEquals(expectedAutoFilename, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
 		assertEquals(storageLocationId, handle.getStorageLocationId());
-		assertEquals(contentType, handle.getConcreteType());
+		assertEquals(contentType, handle.getContentType());
 		assertEquals(md5, handle.getContentMd5());
 		
 		//also check the entity name

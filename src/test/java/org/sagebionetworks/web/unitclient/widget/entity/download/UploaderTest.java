@@ -225,9 +225,11 @@ public class UploaderTest {
 	
 	@Test
 	public void testSetSftpExternalFileEntityPathWithFileEntity() throws Exception {
+		String fileName = "test.txt";
 		uploader.asWidget(testEntity);
+		uploader.setFileNames(new String[] {fileName});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(synapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
+		verify(synapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 	
