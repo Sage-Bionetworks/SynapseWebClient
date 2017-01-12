@@ -55,7 +55,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Business logic unit tests for the TablePageWidget.
@@ -91,6 +94,8 @@ public class TablePageWidgetTest {
 	FacetColumnResult mockFacetColumnResult;
 	@Mock
 	FileViewDefaultColumns mockFileViewDefaultColumns;
+	List<ColumnModel> defaultColumnModels;
+
 	List<FacetColumnResult> facets;
 
 	@Before
@@ -145,6 +150,8 @@ public class TablePageWidgetTest {
 				return header;
 			}
 		});
+		defaultColumnModels = new ArrayList<ColumnModel>();
+		AsyncMockStubber.callSuccessWith(defaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();

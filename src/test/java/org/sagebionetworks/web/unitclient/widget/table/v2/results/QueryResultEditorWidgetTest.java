@@ -8,7 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -21,6 +23,9 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReferenceSetResults;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.repo.model.table.TableUpdateResponse;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -227,7 +232,7 @@ public class QueryResultEditorWidgetTest {
 	}
 	
 	@Test
-	public void testOnSaveWithChagnesValidJobSuccessful(){
+	public void testOnSaveWithChangesValidJobSuccessful(){
 		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
@@ -236,7 +241,11 @@ public class QueryResultEditorWidgetTest {
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(true);
 		// setup successful job
-		jobTrackingStub.setResponse(new RowReferenceSetResults());
+		TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
+		List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
+		results.add(new RowReferenceSetResults());
+		response.setResults(results);
+		jobTrackingStub.setResponse(response);
 		// the call
 		widget.onSave();
 		verify(mockView).setSaveButtonLoading(true);
