@@ -502,9 +502,9 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
-	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
+	Entity createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
 	void putActivity(Activity update) throws RestServiceException;
 
