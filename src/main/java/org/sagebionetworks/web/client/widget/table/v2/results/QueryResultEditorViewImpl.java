@@ -220,4 +220,8 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void showErrorDialog(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
+	@Override
+	public void showMessage(String message) {
+		DisplayUtils.showInfo(message, "");
+	}
 }

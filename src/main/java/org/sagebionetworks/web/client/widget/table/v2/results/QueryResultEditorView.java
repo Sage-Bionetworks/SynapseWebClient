@@ -133,4 +133,6 @@ public interface QueryResultEditorView extends IsWidget {
 	
 	void showErrorDialog(String message);
 	
+	void showMessage(String message);
+	
 }

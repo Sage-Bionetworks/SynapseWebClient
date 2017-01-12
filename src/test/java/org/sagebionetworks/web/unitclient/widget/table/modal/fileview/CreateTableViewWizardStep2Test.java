@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -67,12 +68,13 @@ public class CreateTableViewWizardStep2Test {
 	CreateTableViewWizardStep2View mockView;
 	@Mock
 	TableUpdateRequest mockTableUpdateRequest;
-	
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 	
-		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget);
+		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);

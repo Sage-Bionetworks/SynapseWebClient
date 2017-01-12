@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -39,5 +41,10 @@ public class UploadCSVAppendPageViewImpl implements UploadCSVAppendPageView {
 	@Override
 	public void setTrackingWidgetVisible(boolean visible) {
 		this.trackerPanel.setVisible(visible);
+	}
+
+	@Override
+	public void showErrorDialog(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }

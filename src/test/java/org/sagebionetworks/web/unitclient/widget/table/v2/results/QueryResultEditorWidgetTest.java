@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -135,7 +136,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEdit(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
@@ -146,7 +147,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelNoChanges(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// No changes
@@ -157,7 +158,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmOkay(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -173,7 +174,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmCanceld(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -189,7 +190,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveNoChanges(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -206,7 +207,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesNotValid(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -229,7 +230,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobSuccessful(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -258,7 +259,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -293,7 +294,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobCanceled(){
-		widget.showEditor(isView, bundle, mockCallback);
+		widget.showEditor(bundle, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes

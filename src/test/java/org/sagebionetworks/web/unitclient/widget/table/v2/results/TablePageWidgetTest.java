@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
@@ -88,8 +89,10 @@ public class TablePageWidgetTest {
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	@Mock
 	FacetColumnResult mockFacetColumnResult;
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
 	List<FacetColumnResult> facets;
-	
+
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -119,7 +122,7 @@ public class TablePageWidgetTest {
 			@Override
 			public RowWidget answer(InvocationOnMock invocation)
 					throws Throwable {
-				return new RowWidget(new RowViewStub(), mockCellFactory);
+				return new RowWidget(new RowViewStub(), mockCellFactory, mockFileViewDefaultColumns);
 			}});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		sortHeaders = new LinkedList<SortableTableHeader>();

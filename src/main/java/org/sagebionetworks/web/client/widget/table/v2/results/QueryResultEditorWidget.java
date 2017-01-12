@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.table.EntityUpdateResults;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -42,7 +44,6 @@ public class QueryResultEditorWidget implements
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
-	boolean isView;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -68,7 +69,7 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(boolean isView, QueryResultBundle bundle, Callback callback) {
+	public void showEditor(QueryResultBundle bundle, Callback callback) {
 		this.callback = callback;
 		this.startingBundle = bundle;
 		this.view.setErrorMessageVisible(false);
@@ -79,7 +80,6 @@ public class QueryResultEditorWidget implements
 		this.view.setSaveButtonLoading(false);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
-		this.isView = isView;
 	}
 
 	@Override
@@ -169,6 +169,38 @@ public class QueryResultEditorWidget implements
 		return false;
 	}
 
+	/**
+	 * @param response
+	 * @return Returns an EntityUpdateResults (if response contains one).  Otherwise this method returns null.
+	 */
+	public static EntityUpdateResults getEntityUpdateResults(AsynchronousResponseBody response) {
+		List<TableUpdateResponse> results = ((TableUpdateTransactionResponse) response).getResults();
+		for (TableUpdateResponse tableUpdateResponse : results) {
+			if (tableUpdateResponse instanceof EntityUpdateResults) {
+				return (EntityUpdateResults)tableUpdateResponse;
+			}
+		}
+		return null;
+	}
+	
+	public static String getEntityUpdateResultsFailures(AsynchronousResponseBody response) {
+		EntityUpdateResults results = getEntityUpdateResults(response);
+		StringBuilder sb = new StringBuilder();
+		if (results != null) {
+			for (EntityUpdateResult result : results.getUpdateResults()) {
+				if (result.getFailureCode() != null) {
+					sb.append(result.getEntityId());
+					sb.append(" (");
+					sb.append(result.getFailureCode());
+					sb.append("): ");
+					sb.append(result.getFailureMessage());
+					sb.append("\n");
+				}
+			}
+		}
+		return sb.toString();
+	}
+	
 	@Override
 	public void onSave() {
 		view.setErrorMessageVisible(false);
@@ -208,26 +240,11 @@ public class QueryResultEditorWidget implements
 
 					@Override
 					public void onComplete(AsynchronousResponseBody response) {
-						//if isView, then we need to show any row failures
-						if (isView) {
-							// if errors, show them.
-							EntityUpdateResults results = (EntityUpdateResults)(((TableUpdateTransactionResponse) response).getResults()).get(0);
-							
-							StringBuilder sb = new StringBuilder();
-							for (EntityUpdateResult result : results.getUpdateResults()) {
-								if (result.getFailureCode() != null) {
-									sb.append(result.getEntityId());
-									sb.append(" (");
-									sb.append(result.getFailureCode());
-									sb.append("): ");
-									sb.append(result.getFailureMessage());
-									sb.append("\n");
-								}
-							}
-							if (sb.length() > 0) {
-								view.showErrorDialog(sb.toString());
-							}
+						String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
+						if (!errors.isEmpty()){
+							view.showErrorDialog(errors);
 						}
+						view.showMessage("Your changes have been successfully submitted. It may take a few minutes these changes to propagate through the system.");
 						doHideEditor();
 						callback.invoke();
 					}

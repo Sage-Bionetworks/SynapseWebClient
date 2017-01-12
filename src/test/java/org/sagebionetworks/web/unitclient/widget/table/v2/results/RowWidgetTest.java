@@ -10,11 +10,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
@@ -41,8 +44,12 @@ public class RowWidgetTest {
 	List<CellStub> cellStubs;
 	String tableId;
 	boolean isView;
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
+	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(RowView.class);
 		mockCellFactory = Mockito.mock(CellFactory.class);
 		mockListner = Mockito.mock(RowSelectionListener.class);
@@ -63,7 +70,7 @@ public class RowWidgetTest {
 		types = TableModelTestUtils.createOneOfEachType();
 		// Create a row that matches the type.
 		aRow = TableModelTestUtils.createRows(types, 1).get(0);
-		rowWidget = new RowWidget(mockView, mockCellFactory);
+		rowWidget = new RowWidget(mockView, mockCellFactory, mockFileViewDefaultColumns);
 		isView = false;
 	}
 	

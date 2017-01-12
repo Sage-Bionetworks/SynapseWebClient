@@ -6,12 +6,15 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,11 +33,13 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	CellFactory cellFactory;
 	Long rowId;
 	Long rowVersion;
+	FileViewDefaultColumns fileViewDefaultColumns;
 	
 	@Inject
-	public RowWidget(RowView view, CellFactory cellFactory){
+	public RowWidget(RowView view, CellFactory cellFactory, FileViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.cellFactory = cellFactory;
+		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		view.setPresenter(this);
 	}
 	
@@ -46,17 +51,33 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	 * @param row The row contains the data for this row.
 	 * @param rowSelectionListener A listener to row selection changes. When null, the row will not be selectable.
 	 */
-	public void configure(String tableId, List<ColumnModel> types, boolean isEditor, boolean isView, Row row, RowSelectionListener rowSelectionListener){
+	public void configure(final String tableId, final List<ColumnModel> types, final boolean isEditor, final boolean isView, final Row row, RowSelectionListener rowSelectionListener){
 		this.rowSelectionListener = rowSelectionListener;
 		this.view.setSelectVisible(rowSelectionListener != null);
 		this.rowId = row.getRowId();
 		this.rowVersion = row.getVersionNumber();
 		this.cells = new ArrayList<Cell>(types.size());
+		boolean clearIds = false;
+		fileViewDefaultColumns.getDefaultColumns(clearIds, new AsyncCallback<List<ColumnModel>>() {
+			@Override
+			public void onSuccess(List<ColumnModel> defaultColumns) {
+				configureAfterInit(tableId, types, isEditor, isView, row, defaultColumns);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//unable to get the default columns.  try to edit all
+				configureAfterInit(tableId, types, isEditor, isView, row, new ArrayList<ColumnModel>());
+			}
+		});
+	}
+	
+	private void configureAfterInit(String tableId, List<ColumnModel> types, boolean isEditor, boolean isView, Row row, List<ColumnModel> defaultColumns){
 		// Setup each cell
 		for(ColumnModel type: types){
 			// Create each cell
 			Cell cell = null;
-			if(isEditor){
+			if(isEditor && !defaultColumns.contains(type)){
 				cell = cellFactory.createEditor(type);
 			}else{
 				cell = cellFactory.createRenderer(type);
@@ -78,7 +99,6 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 			}
 		}
 	}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -145,7 +165,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	public boolean isValid() {
 		boolean valid = true;
 		for(Cell cell: cells){
-			if(!((CellEditor)cell).isValid()){
+			if(cell instanceof CellEditor && !((CellEditor)cell).isValid()){
 				valid = false;
 			}
 		}
