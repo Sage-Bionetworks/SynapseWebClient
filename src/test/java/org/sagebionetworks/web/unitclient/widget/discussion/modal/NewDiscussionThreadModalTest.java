@@ -1,20 +1,27 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
 
+import static org.sagebionetworks.web.client.widget.discussion.NewReplyWidget.DEFAULT_MARKDOWN;
 import static org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
@@ -38,6 +45,12 @@ public class NewDiscussionThreadModalTest {
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
 	MarkdownEditorWidget mockMarkdownEditor;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	SessionStorage mockStorage;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	String forumId = "123";
 	NewDiscussionThreadModal modal;
 
@@ -45,7 +58,7 @@ public class NewDiscussionThreadModalTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient,
-				mockSynAlert, mockMarkdownEditor);
+				mockSynAlert, mockMarkdownEditor, mockAuthController, mockStorage);
 		modal.configure(forumId, mockCallback);
 	}
 
@@ -123,4 +136,47 @@ public class NewDiscussionThreadModalTest {
 		verify(mockView).resetButton();
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
+	
+	@Test
+	public void testCacheReplyWhenLoggedOut() {
+		when(mockView.getThreadTitle()).thenReturn("title");
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		modal.onSave();
+		verify(mockStorage).setItem(anyString(), eq("message"));	
+	}
+	
+	@Test
+	public void testLoadCachedReplyClickYes() {
+		when(mockStorage.getItem(anyString())).thenReturn("data");
+		modal.show();
+		verify(mockView).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture(), any(Callback.class));
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownEditor).configure(anyString());
+		verify(mockView).setThreadTitle(anyString());
+		verify(mockStorage, times(2)).removeItem(anyString());
+	}
+	
+	@Test
+	public void testLoadCachedReplyClickNo() {
+		when(mockStorage.getItem(anyString())).thenReturn("data");
+		modal.show();
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
+		verify(mockStorage, times(2)).removeItem(anyString());
+	}
+	
+	@Test
+	public void testNoCacheToLoad() {
+		when(mockStorage.getItem(anyString())).thenReturn(null);
+		modal.show();
+		verify(mockView, times(0)).showConfirmDialog(anyString(), anyString(), any(Callback.class), any(Callback.class));
+		
+		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
+		verify(mockStorage, times(0)).removeItem(anyString());
+	}
+	
 }
