@@ -199,7 +199,7 @@
 					<i18nMessagesBundle>org.sagebionetworks.web.client.Messages</i18nMessagesBundle>
 					<module>org.sagebionetworks.web.Portal</module>
 					<!-- GWT compiler options -->
-			        <compileReport>true</compileReport>
+			        <compileReport>false</compileReport>
 			        <soycDetailed>true</soycDetailed>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>

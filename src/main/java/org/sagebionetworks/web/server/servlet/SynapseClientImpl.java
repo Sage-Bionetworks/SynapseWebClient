@@ -1079,7 +1079,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Entity updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
+	public Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Entity entity = synapseClient.getEntityById(entityId);
@@ -1087,14 +1087,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				throw new RuntimeException("Upload failed. Entity id: "
 						+ entity.getId() + " is not a File.");
 			}
-
-			ExternalFileHandle efh = new ExternalFileHandle();
-			efh.setExternalURL(externalUrl.trim());
-			efh.setContentMd5(md5);
-			efh.setContentSize(fileSize);
-			efh.setStorageLocationId(storageLocationId);
-			ExternalFileHandle clone = synapseClient
-					.createExternalFileHandle(efh);
+			ExternalFileHandle clone = createExternalFileHandle(externalUrl, name, contentType, fileSize, md5, storageLocationId, synapseClient);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
 			Entity updatedEntity = synapseClient.putEntity(entity);
 			return updatedEntity;
@@ -1107,30 +1100,59 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return name != null && name.trim().length() > 0;
 	}
 
+	public static String getFileNameFromExternalUrl(String path){
+		//grab the text between the last '/' and following '?'
+		String fileName = "";
+		if (path != null) {
+			int lastSlash = path.lastIndexOf("/");
+			if (lastSlash > -1) {
+				int firstQuestionMark = path.indexOf("?", lastSlash);
+				if (firstQuestionMark > -1) {
+					fileName = path.substring(lastSlash+1, firstQuestionMark);
+				} else {
+					fileName = path.substring(lastSlash+1);
+				}
+			}
+		}
+		return fileName;
+	}
+	
+	private ExternalFileHandle createExternalFileHandle(
+			String externalUrl,
+			String name, 
+			String contentType,
+			Long fileSize, 
+			String md5, 
+			Long storageLocationId,
+			org.sagebionetworks.client.SynapseClient synapseClient
+			) throws SynapseException {
+		boolean isManuallySettingName = isManuallySettingExternalName(name);
+		ExternalFileHandle efh = new ExternalFileHandle();
+		efh.setExternalURL(externalUrl.trim());
+		efh.setContentMd5(md5);
+		efh.setContentSize(fileSize);
+		efh.setContentType(contentType);
+		String fileName;
+		if (isManuallySettingName) {
+			fileName = name;
+		} else {
+			fileName = getFileNameFromExternalUrl(externalUrl);
+		}
+		efh.setFileName(fileName);
+		efh.setStorageLocationId(storageLocationId);
+		return synapseClient.createExternalFileHandle(efh);
+	}
+
 	@Override
 	public Entity createExternalFile(String parentEntityId, String externalUrl,
-			String name, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
+			String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			FileEntity newEntity = new FileEntity();
-			ExternalFileHandle efh = new ExternalFileHandle();
-			efh.setExternalURL(externalUrl.trim());
-			efh.setContentMd5(md5);
-			efh.setContentSize(fileSize);
-			String fileName;
-			if (isManuallySettingName) {
-				fileName = name;
-			} else {
-				fileName = DisplayUtils.getFileNameFromExternalUrl(externalUrl);
-			}
-			efh.setFileName(fileName);
-			efh.setStorageLocationId(storageLocationId);
-			ExternalFileHandle clone = synapseClient
-					.createExternalFileHandle(efh);
+			ExternalFileHandle clone = createExternalFileHandle(externalUrl, name, contentType, fileSize, md5, storageLocationId, synapseClient);
 			newEntity.setDataFileHandleId(clone.getId());
 			newEntity.setParentId(parentEntityId);
-			newEntity.setName(fileName);
+			newEntity.setName(clone.getFileName());
 			return synapseClient.createEntity(newEntity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
