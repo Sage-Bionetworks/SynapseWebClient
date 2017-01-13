@@ -44,7 +44,6 @@ public class FileViewDefaultColumns {
 			@Override
 			public void onSuccess(List<ColumnModel> columns) {
 				defaultColumns = columns;
-				
 				callback.onSuccess(columns);
 			}
 		});
@@ -63,7 +62,6 @@ public class FileViewDefaultColumns {
 				for (ColumnModel cm : defaultColumnsWithoutIds) {
 					cm.setId(null);
 				}
-
 				callback.onSuccess(columns);
 			}
 		});

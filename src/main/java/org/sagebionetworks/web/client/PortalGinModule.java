@@ -513,6 +513,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
@@ -1195,7 +1196,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// People Search Page
 		bind(PeopleSearchViewImpl.class).in(Singleton.class);
 		bind(PeopleSearchView.class).to(PeopleSearchViewImpl.class);
-
+		
 		/*
 		 * Teams Widgets
 		 */
@@ -1385,5 +1386,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FacetColumnResultSliderRangeView.class).to(FacetColumnResultSliderRangeViewImpl.class);
 		bind(FacetColumnResultRangeView.class).to(FacetColumnResultRangeViewImpl.class);
 		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
+		
+		bind(FileViewDefaultColumns.class).in(Singleton.class);
 	}
 }
