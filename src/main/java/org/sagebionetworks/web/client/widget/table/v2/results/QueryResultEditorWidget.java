@@ -33,6 +33,8 @@ import com.google.inject.Inject;
 public class QueryResultEditorWidget implements
 		QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
 
+	public static final String CHANGES_SUBMITTED_MESSAGE = "It may take a few minutes these changes to propagate through the system.";
+	public static final String CHANGES_SUBMITTED_TITLE = "Your changes have been successfully submitted.";
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
@@ -244,7 +246,7 @@ public class QueryResultEditorWidget implements
 						if (!errors.isEmpty()){
 							view.showErrorDialog(errors);
 						}
-						view.showMessage("Your changes have been successfully submitted. It may take a few minutes these changes to propagate through the system.");
+						view.showMessage(CHANGES_SUBMITTED_TITLE, CHANGES_SUBMITTED_MESSAGE);
 						doHideEditor();
 						callback.invoke();
 					}

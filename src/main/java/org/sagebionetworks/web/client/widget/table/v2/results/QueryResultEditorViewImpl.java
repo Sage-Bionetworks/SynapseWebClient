@@ -221,7 +221,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 		DisplayUtils.showErrorMessage(message);
 	}
 	@Override
-	public void showMessage(String message) {
-		DisplayUtils.showInfo(message, "");
+	public void showMessage(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 }
