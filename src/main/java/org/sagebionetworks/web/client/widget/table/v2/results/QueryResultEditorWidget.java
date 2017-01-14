@@ -176,10 +176,14 @@ public class QueryResultEditorWidget implements
 	 * @return Returns an EntityUpdateResults (if response contains one).  Otherwise this method returns null.
 	 */
 	public static EntityUpdateResults getEntityUpdateResults(AsynchronousResponseBody response) {
-		List<TableUpdateResponse> results = ((TableUpdateTransactionResponse) response).getResults();
-		for (TableUpdateResponse tableUpdateResponse : results) {
-			if (tableUpdateResponse instanceof EntityUpdateResults) {
-				return (EntityUpdateResults)tableUpdateResponse;
+		if (response instanceof TableUpdateTransactionResponse) {
+			List<TableUpdateResponse> results = ((TableUpdateTransactionResponse) response).getResults();
+			if (results != null) {
+				for (TableUpdateResponse tableUpdateResponse : results) {
+					if (tableUpdateResponse instanceof EntityUpdateResults) {
+						return (EntityUpdateResults)tableUpdateResponse;
+					}
+				}
 			}
 		}
 		return null;

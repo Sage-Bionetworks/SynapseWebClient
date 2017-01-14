@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,14 +15,22 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.EntityUpdateFailureCode;
+import org.sagebionetworks.repo.model.table.EntityUpdateResult;
+import org.sagebionetworks.repo.model.table.EntityUpdateResults;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReferenceSetResults;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -35,6 +43,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for QueryResultEditorWidget.
@@ -63,9 +73,21 @@ public class QueryResultEditorWidgetTest {
 	List<SelectColumn> headers;
 	List<Row> updates;
 	QueryResultBundle bundle;
+	@Mock
+	TableUpdateTransactionResponse mockTableUpdateTransactionResponse;
+	@Mock
+	BulkFileDownloadResponse mockWrongType;
+	@Mock
+	EntityUpdateResults mockEntityUpdateResults;
+	@Mock
+	TableSchemaChangeResponse mockTableSchemaChangeResponse;
+	@Mock
+	EntityUpdateResult mockEntityUpdateResult;
+	List<TableUpdateResponse> tableUpdateResults;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(QueryResultEditorView.class);
 		mockPageWidget = Mockito.mock(TablePageWidget.class);
 		jobTrackingStub = new JobTrackingWidgetStub();
@@ -96,6 +118,8 @@ public class QueryResultEditorWidgetTest {
 		// By default the view returns a copy of the data.
 		when(mockPageWidget.extractHeaders()).thenReturn(schema);
 		when(mockPageWidget.extractRowSet()).thenReturn(updates);
+		tableUpdateResults = new ArrayList<TableUpdateResponse>();
+		when(mockTableUpdateTransactionResponse.getResults()).thenReturn(tableUpdateResults);
 	}
 	
 	@Test
@@ -327,4 +351,47 @@ public class QueryResultEditorWidgetTest {
 		verify(mockCallback).invoke();
 	}
 	
+	@Test
+	public void testGetEntityUpdateResultsEmpty() {
+		assertNull(QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsWrongType() {
+		assertNull(QueryResultEditorWidget.getEntityUpdateResults(mockWrongType));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsSingleValue() {
+		tableUpdateResults.add(mockEntityUpdateResults);
+		assertEquals(mockEntityUpdateResults, QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsMultipleValues() {
+		tableUpdateResults.add(mockTableSchemaChangeResponse);
+		tableUpdateResults.add(mockEntityUpdateResults);
+		assertEquals(mockEntityUpdateResults, QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsFailure() {
+		EntityUpdateResults results = new EntityUpdateResults();
+		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult));
+		tableUpdateResults.add(results);
+		when(mockEntityUpdateResult.getFailureCode()).thenReturn(EntityUpdateFailureCode.NOT_FOUND);
+		when(mockEntityUpdateResult.getEntityId()).thenReturn("syn29292");
+		when(mockEntityUpdateResult.getFailureMessage()).thenReturn("Not there, buddy");
+		assertEquals("syn29292 (NOT_FOUND): Not there, buddy\n", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsNoFailures() {
+		EntityUpdateResults results = new EntityUpdateResults();
+		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult));
+		tableUpdateResults.add(results);
+		when(mockEntityUpdateResult.getFailureCode()).thenReturn(null);
+		when(mockEntityUpdateResult.getEntityId()).thenReturn("syn29292");
+		assertEquals("", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+	}
 }
