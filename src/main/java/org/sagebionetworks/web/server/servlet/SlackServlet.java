@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +36,7 @@ public class SlackServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-	
+	public static final String COMMA = ", ";
 	/**
 	 * Injected with Gin
 	 */
@@ -147,7 +146,7 @@ public class SlackServlet extends HttpServlet {
 		} catch (Exception e) {
 			try {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				sendFailure(out, e.getMessage());
+				sendFailure(out, text + ": " + e.getMessage());
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
@@ -170,7 +169,7 @@ public class SlackServlet extends HttpServlet {
 				sb.append("\n ");
 				sb.append(key);
 				sb.append(" : ");
-				sb.append(StringUtils.join(annos.getStringAnnotations().get(key), ","));
+				sb.append(join(annos.getStringAnnotations().get(key)));
 			}
 		}
 		// Longs
@@ -179,7 +178,7 @@ public class SlackServlet extends HttpServlet {
 				sb.append("\n ");
 				sb.append(key);
 				sb.append(" : ");
-				sb.append(StringUtils.join(annos.getLongAnnotations().get(key), ","));
+				sb.append(join(annos.getLongAnnotations().get(key)));
 			}
 		}
 		// Doubles
@@ -188,7 +187,7 @@ public class SlackServlet extends HttpServlet {
 				sb.append("\n ");
 				sb.append(key);
 				sb.append(" : ");
-				sb.append(StringUtils.join(annos.getDoubleAnnotations().get(key), ","));
+				sb.append(join(annos.getDoubleAnnotations().get(key)));
 			}
 		}
 		// Dates
@@ -197,11 +196,23 @@ public class SlackServlet extends HttpServlet {
 				sb.append("\n ");
 				sb.append(key);
 				sb.append(" : ");
-				sb.append(StringUtils.join(annos.getDateAnnotations().get(key), ","));
+				sb.append(join(annos.getDateAnnotations().get(key)));
 			}
 		}
 	}
-
+	
+	public static String join(List list) {
+		StringBuilder sb = new StringBuilder();
+		for (Object s : list) {
+		    sb.append(COMMA).append(s);
+		}
+		String result = sb.toString();
+		if (list.size() > 0) {
+			result = result.substring(COMMA.length());
+		}
+		return result;
+	}
+	
 	/**
 	 * Create a new Synapse client.
 	 *
