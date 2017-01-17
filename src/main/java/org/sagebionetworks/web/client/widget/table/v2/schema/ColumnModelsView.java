@@ -83,7 +83,13 @@ public interface ColumnModelsView extends IsWidget {
 		/**
 		 * Add column models based on the default entity view fields
 		 */
-		 void onAddDefaultViewColumns();
+		void onAddDefaultViewColumns();
+		
+		/**
+		 * Add column models based on the annotations found in the view scope
+		 */
+		void onAddAnnotationColumns();
+
 	}
 
 	
@@ -159,6 +165,11 @@ public interface ColumnModelsView extends IsWidget {
 	 * @param visible
 	 */
 	 void setAddDefaultViewColumnsButtonVisible(boolean visible);
+	 /**
+	 * Is the Add Annotation Columns Button visible?
+	 * @param visible
+	 */
+	 void setAddAnnotationColumnsButtonVisible(boolean visible);
 	 
 	/**
 	 * The view can be used as a column viewer or as a column editor.

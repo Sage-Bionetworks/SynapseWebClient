@@ -33,7 +33,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	List<ColumnModelTableRow> editorRows;
 	String tableId;
 	KeyboardNavigationHandler keyboardNavigationHandler;
-	Callback onAddDefaultViewColumnsCallback;
+	Callback onAddDefaultViewColumnsCallback, onAddAnnotationColumnsCallback;
 	Set<String> columnModelIds;
 	CookieProvider cookies;
 	/*
@@ -355,4 +355,19 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			onAddDefaultViewColumnsCallback.invoke();
 		}
 	 }
+	
+	public void setAddAnnotationColumnsButtonVisible(boolean visible) {
+		editor.setAddAnnotationColumnsButtonVisible(visible);
+	}
+	
+	public void setOnAddAnnotationColumnsCallback(Callback onAddAnnotationColumnsCallback) {
+		this.onAddAnnotationColumnsCallback = onAddAnnotationColumnsCallback;
+	}
+	
+	@Override
+	public void onAddAnnotationColumns() {
+		if (onAddAnnotationColumnsCallback != null) {
+			onAddAnnotationColumnsCallback.invoke();
+		}
+	}
 }

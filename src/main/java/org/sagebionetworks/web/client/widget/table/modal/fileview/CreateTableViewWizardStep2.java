@@ -5,10 +5,11 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -71,6 +72,12 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 				getDefaultColumnsForView();
 			}
 		});
+		editor.setOnAddAnnotationColumnsCallback(new Callback() {
+			@Override
+			public void invoke() {
+				getPossibleColumnModelsForViewScope(null);
+			}
+		});
 	}
 
 	public void configure(Table entity, TableType tableType) {
@@ -80,12 +87,13 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.tableType = tableType;
 		
 		editor.configure(new ArrayList<ColumnModel>());
-		if (TableType.view.equals(tableType)) {
+		
+		boolean isView = TableType.view.equals(tableType);
+		this.editor.setAddDefaultViewColumnsButtonVisible(isView);
+		this.editor.setAddAnnotationColumnsButtonVisible(isView);
+		if (isView) {
 			// start with the default file columns
-			this.editor.setAddDefaultViewColumnsButtonVisible(true);
 			getDefaultColumnsForView();
-		} else {
-			this.editor.setAddDefaultViewColumnsButtonVisible(false);
 		}
 	}
 	
@@ -99,6 +107,24 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			@Override
 			public void onSuccess(List<ColumnModel> columns) {
 				editor.addColumns(columns);
+			}
+		});
+	}
+	
+	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+		ViewScope scope = new ViewScope();
+		scope.setScope(((EntityView)entity).getScopeIds());
+		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				presenter.setErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(ColumnModelPage columnPage) {
+				editor.addColumns(columnPage.getResults());
+				if (columnPage.getNextPageToken() != null) {
+					getPossibleColumnModelsForViewScope(columnPage.getNextPageToken());
+				}
 			}
 		});
 	}
