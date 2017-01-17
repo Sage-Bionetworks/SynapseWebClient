@@ -150,6 +150,19 @@ public class SlackServletTest {
 	}
 	
 	@Test
+	public void testDoGetInvalidSynIdError() throws Exception {
+		when(mockRequest.getParameter("text")).thenReturn("syn99invalid");
+		when(mockRequest.getParameter("command")).thenReturn("/synapse");
+		
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
+		String outputValue = new String(byteArrayCaptor.getValue());
+		assertTrue(outputValue.contains(SlackServlet.IS_INVALID_SYN_ID));
+		verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	}
+
+	
+	@Test
 	public void testJoin() {
 		List list = new ArrayList<String>();
 		assertEquals("", SlackServlet.join(list));
