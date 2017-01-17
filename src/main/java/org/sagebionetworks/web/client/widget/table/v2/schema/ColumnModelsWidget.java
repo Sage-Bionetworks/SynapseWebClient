@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -42,13 +43,20 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	EntityBundle bundle;
 	EntityUpdatedHandler updateHandler;
 	JobTrackingWidget jobTrackingWidget;
+	FileViewDefaultColumns fileViewDefaultColumns;
+	
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	/**
 	 * New presenter with its view.
 	 * @param view
 	 */
 	@Inject
-	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, ColumnModelsEditorWidget editor, JobTrackingWidget jobTrackingWidget){
+	public ColumnModelsWidget(ColumnModelsViewBase baseView, 
+			PortalGinInjector ginInjector, 
+			SynapseClientAsync synapseClient, 
+			ColumnModelsEditorWidget editor, 
+			JobTrackingWidget jobTrackingWidget,
+			FileViewDefaultColumns fileViewDefaultColumns){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
@@ -64,6 +72,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.baseView.setJobTrackingWidget(jobTrackingWidget);
 		this.baseView.setJobTrackingWidgetVisible(false);
 		this.synapseClient = synapseClient;
+		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
 			public void invoke() {
@@ -100,8 +109,9 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
-		org.sagebionetworks.repo.model.table.ViewType type = ((EntityView)bundle.getEntity()).getType(); 
-		synapseClient.getDefaultColumnsForView(type, new AsyncCallback<List<ColumnModel>>() {
+		org.sagebionetworks.repo.model.table.ViewType type = ((EntityView)bundle.getEntity()).getType();
+		boolean isClearIds = true;
+		fileViewDefaultColumns.getDefaultColumns(isClearIds, new AsyncCallback<List<ColumnModel>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				baseView.showError(caught.getMessage());

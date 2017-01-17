@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
@@ -89,7 +90,9 @@ public class ColumnModelsWidgetTest {
 	JobTrackingWidget mockJobTrackingWidget;
 	@Mock
 	TableUpdateRequest mockTableUpdateRequest;
-
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
+	
 	TableEntity table;
 	TableBundle tableBundle;
 	
@@ -117,7 +120,7 @@ public class ColumnModelsWidgetTest {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
-		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget);
+		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget, mockFileViewDefaultColumns);
 		when(mockEditor.validate()).thenReturn(true);
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
@@ -159,7 +162,7 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetDefaultColumnsForView() {
 		boolean isEditable = true;
-		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockSynapseClient).getDefaultColumnsForView(any(org.sagebionetworks.repo.model.table.ViewType.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
@@ -173,7 +176,7 @@ public class ColumnModelsWidgetTest {
 		String error = "error message getting default column models";
 		Exception ex = new Exception(error);
 		when(mockBundle.getEntity()).thenReturn(mockView);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getDefaultColumnsForView(any(org.sagebionetworks.repo.model.table.ViewType.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		widget.getDefaultColumnsForView();

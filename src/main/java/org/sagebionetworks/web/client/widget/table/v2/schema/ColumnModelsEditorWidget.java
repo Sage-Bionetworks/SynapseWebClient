@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -155,15 +157,25 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		});
 	}
 	
-	public void addColumnsAfterInit(final List<ColumnModel> models) {
+	public void addColumnsAfterInit(List<ColumnModel> models) {
+		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
+		newColumns.addAll(models);
 		List<ColumnModel> existingColumns = getEditedColumnModels();
+		Set<String> existingColumnNames = new HashSet<String>();
+		Map<String, ColumnModel> newModels = new HashMap<String, ColumnModel>();
+		for (ColumnModel cm : newColumns) {
+			newModels.put(cm.getName(), cm);
+		}
 		for (ColumnModel cm : existingColumns) {
-			cm.setId(null);
-			if (models.contains(cm)) {
-				models.remove(cm);
+			existingColumnNames.add(cm.getName());
+		}
+		for (String newModelName : newModels.keySet()) {
+			if (existingColumnNames.contains(newModelName)) {
+				newColumns.remove(newModels.get(newModelName));
 			}
 		}
-		for(ColumnModel cm: models){
+		
+		for(ColumnModel cm: newColumns){
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
 				// default column model ids are cleared on the servlet.
