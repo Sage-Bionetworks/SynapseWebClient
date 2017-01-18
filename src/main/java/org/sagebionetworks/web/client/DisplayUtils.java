@@ -147,23 +147,6 @@ public class DisplayUtils {
         return df.format(size) + " bytes";
     }
 	
-	public static String getFileNameFromExternalUrl(String path){
-		//grab the text between the last '/' and following '?'
-		String fileName = "";
-		if (path != null) {
-			int lastSlash = path.lastIndexOf("/");
-			if (lastSlash > -1) {
-				int firstQuestionMark = path.indexOf("?", lastSlash);
-				if (firstQuestionMark > -1) {
-					fileName = path.substring(lastSlash+1, firstQuestionMark);
-				} else {
-					fileName = path.substring(lastSlash+1);
-				}
-			}
-		}
-		return fileName;
-	}
-	
 	/**
 	 * Handles the exception. Returns true if the user has been alerted to the exception already
 	 * @param ex
