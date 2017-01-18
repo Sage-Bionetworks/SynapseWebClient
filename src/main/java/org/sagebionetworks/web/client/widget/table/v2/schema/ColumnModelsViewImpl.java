@@ -52,6 +52,8 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Button editColumnsButton;
 	@UiField
 	Button addDefaultViewColumnsButton;
+	@UiField
+	Button addAnnotationColumnsButton;
 	
 	ViewType viewType;
 	Presenter presenter;
@@ -128,7 +130,13 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		addDefaultViewColumnsButton.addClickHandler(new ClickHandler() {
 			 @Override
 			 public void onClick(ClickEvent event) {
-			 presenter.onAddDefaultViewColumns();
+				 presenter.onAddDefaultViewColumns();
+			 }
+		});
+		addAnnotationColumnsButton.addClickHandler(new ClickHandler() {
+			 @Override
+			 public void onClick(ClickEvent event) {
+				 presenter.onAddAnnotationColumns();
 			 }
 		});
 	}
@@ -200,6 +208,10 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		addDefaultViewColumnsButton.setVisible(visible);
 	}
 	
+	@Override
+	public void setAddAnnotationColumnsButtonVisible(boolean visible) {
+		addAnnotationColumnsButton.setVisible(visible);
+	}
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
