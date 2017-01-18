@@ -175,7 +175,7 @@ public class SlackServlet extends HttpServlet {
 	
 	private void sendFailure(PrintWriter out, String error) throws JSONException {
 		JSONObject json = new JSONObject();
-		json.put("response_type", "ephemeral");
+		json.put("response_type", "in_channel");
 		json.put("text", error);
 		out.println(json.toString());
 	}
