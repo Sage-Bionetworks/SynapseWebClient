@@ -136,7 +136,25 @@ public class SlackServletTest {
 		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
 		verify(mockSynapse).setFileEndpoint(anyString());
 	}
+	
+	@Test
+	public void testDoGetStaging() throws Exception {
+		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
+		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
+	
+		String requestSynId = "syn1234";
+		when(mockRequest.getParameter("text")).thenReturn(requestSynId);
+		when(mockRequest.getParameter("command")).thenReturn("/synapsestaging");
+		servlet.doGet(mockRequest, mockResponse);
 
+		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
+		
+		verify(mockOutputStream).write(byteArrayCaptor.capture(), anyInt(), anyInt());
+		String outputValue = new String(byteArrayCaptor.getValue());
+		assertTrue(outputValue.contains(ENTITY_NAME));
+		assertTrue(outputValue.contains(ENTITY_PROJECT));
+	}
+	
 	@Test
 	public void testDoGetError() throws Exception {
 		when(mockRequest.getParameter("text")).thenReturn("syn99");

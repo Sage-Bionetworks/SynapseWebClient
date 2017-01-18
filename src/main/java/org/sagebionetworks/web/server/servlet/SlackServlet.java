@@ -106,7 +106,8 @@ public class SlackServlet extends HttpServlet {
 		String entityURL = "";
 		try {
 			response.setContentType("application/json");
-			if (command.toLowerCase().equals("/synapse")) {
+			String lowercaseCommand = command.toLowerCase();
+			if (lowercaseCommand.equals("/synapse") || lowercaseCommand.equals("/synapsestaging")) {
 				String title = null;
 				StringBuilder sb = new StringBuilder();
 				if (text.toLowerCase().equals("help")) {
