@@ -113,7 +113,7 @@ public class RowSetUtils {
 				if(original == null){
 					map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 				}else{
-					if(isValueChanged(original.getValues().get(i), updateValue)){
+					if(isValueChanged(original.getValues().get(i), updateValue) || "etag".equals(header.getName())){
 						map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 					}
 				}

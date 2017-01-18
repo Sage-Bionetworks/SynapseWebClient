@@ -2437,8 +2437,8 @@ public class SynapseClientImplTest {
 		List<ColumnModel> returnedColumns = synapseClient.getDefaultColumnsForView(ViewType.file);
 		
 		assertEquals(2, returnedColumns.size());
-		assertNull(returnedColumns.get(0).getId());
-		assertNull(returnedColumns.get(1).getId());
+		assertEquals("1", returnedColumns.get(0).getId());
+		assertEquals("2", returnedColumns.get(1).getId());
 	}
 	
 

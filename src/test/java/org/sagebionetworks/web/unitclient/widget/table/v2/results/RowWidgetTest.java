@@ -2,19 +2,24 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
@@ -22,7 +27,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
 import org.sagebionetworks.web.shared.table.CellAddress;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit tests for RowWidget business logic.
@@ -41,8 +49,13 @@ public class RowWidgetTest {
 	List<CellStub> cellStubs;
 	String tableId;
 	boolean isView;
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
+	List<ColumnModel> defaultColumnModels;
+	
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(RowView.class);
 		mockCellFactory = Mockito.mock(CellFactory.class);
 		mockListner = Mockito.mock(RowSelectionListener.class);
@@ -59,11 +72,12 @@ public class RowWidgetTest {
 		};
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(answer);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenAnswer(answer);
-		
+		defaultColumnModels = new ArrayList<ColumnModel>();
+		AsyncMockStubber.callSuccessWith(defaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		types = TableModelTestUtils.createOneOfEachType();
 		// Create a row that matches the type.
 		aRow = TableModelTestUtils.createRows(types, 1).get(0);
-		rowWidget = new RowWidget(mockView, mockCellFactory);
+		rowWidget = new RowWidget(mockView, mockCellFactory, mockFileViewDefaultColumns);
 		isView = false;
 	}
 	
@@ -81,7 +95,7 @@ public class RowWidgetTest {
 	}
 	
 	@Test
-	public void testConfgureEditor(){
+	public void testConfigureEditor(){
 		boolean isEditor = true;
 		rowWidget.configure(tableId, types, isEditor, isView, aRow, null);
 		Row extracted = rowWidget.getRow();

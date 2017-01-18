@@ -25,7 +25,7 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	/**
 	 * 10 seconds.
 	 */
-	private static final int WAIT_FOR_PRVIEW_MS = 10000;
+	private static final int WAIT_FOR_PREVIEW_MS = 10000;
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,7 +34,9 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	 */
 	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
+	
+	private int previewTimeoutMs = WAIT_FOR_PREVIEW_MS;
+	
 	/**
 	 * Unit test can override this.
 	 * 
@@ -44,6 +46,14 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		this.synapseProvider = synapseProvider;
 	}
 
+	/**
+	 * For testing purposes only
+	 * @param previewTimeoutMs
+	 */
+	public void setPreviewTimeoutMs(int previewTimeoutMs) {
+		this.previewTimeoutMs = previewTimeoutMs;
+	}
+	
 	/**
 	 * Essentially the constructor. Setup synapse client.
 	 * 
@@ -171,7 +181,7 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 			try {
 				return callable.call();
 			} catch (Exception e) {
-				if (System.currentTimeMillis() - start > WAIT_FOR_PRVIEW_MS) {
+				if (System.currentTimeMillis() - start > previewTimeoutMs) {
 					throw e;
 				}
 				// Sleep and try again

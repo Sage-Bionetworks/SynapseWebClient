@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
@@ -54,7 +55,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Business logic unit tests for the TablePageWidget.
@@ -88,8 +92,12 @@ public class TablePageWidgetTest {
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	@Mock
 	FacetColumnResult mockFacetColumnResult;
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
+	List<ColumnModel> defaultColumnModels;
+
 	List<FacetColumnResult> facets;
-	
+
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -119,7 +127,7 @@ public class TablePageWidgetTest {
 			@Override
 			public RowWidget answer(InvocationOnMock invocation)
 					throws Throwable {
-				return new RowWidget(new RowViewStub(), mockCellFactory);
+				return new RowWidget(new RowViewStub(), mockCellFactory, mockFileViewDefaultColumns);
 			}});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		sortHeaders = new LinkedList<SortableTableHeader>();
@@ -142,6 +150,8 @@ public class TablePageWidgetTest {
 				return header;
 			}
 		});
+		defaultColumnModels = new ArrayList<ColumnModel>();
+		AsyncMockStubber.callSuccessWith(defaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();

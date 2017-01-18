@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -213,5 +214,14 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	@Override
 	public void showProgress() {
 		inProgressModal.show();	
+	}
+	
+	@Override
+	public void showErrorDialog(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+	@Override
+	public void showMessage(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 }

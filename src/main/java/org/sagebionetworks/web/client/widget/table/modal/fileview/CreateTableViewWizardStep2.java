@@ -47,6 +47,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
+	FileViewDefaultColumns fileViewDefaultColumns;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -55,11 +56,13 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view,
 			ColumnModelsEditorWidget editor, 
 			SynapseClientAsync synapseClient, 
-			JobTrackingWidget jobTrackingWidget){
+			JobTrackingWidget jobTrackingWidget,
+			FileViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.editor = editor;
 		this.jobTrackingWidget = jobTrackingWidget;
+		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		view.setJobTracker(jobTrackingWidget.asWidget());
 		view.setEditor(editor.asWidget());
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
@@ -87,8 +90,8 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 	
 	public void getDefaultColumnsForView() {
-		ViewType type = ((EntityView)entity).getType(); 
-		synapseClient.getDefaultColumnsForView(type, new AsyncCallback<List<ColumnModel>>() {
+		boolean clearIds = true;
+		fileViewDefaultColumns.getDefaultColumns(clearIds, new AsyncCallback<List<ColumnModel>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setErrorMessage(caught.getMessage());

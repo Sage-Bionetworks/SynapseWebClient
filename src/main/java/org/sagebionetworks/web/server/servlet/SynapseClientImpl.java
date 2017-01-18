@@ -2451,10 +2451,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			List<ColumnModel> defaultColumns = synapseClient.getDefaultColumnsForView(type);
-			// SWC-3264: in order for these to look like new columns in the TableUpdateTransactionRequest change set, set column ids to null
-			for (ColumnModel cm : defaultColumns) {
-				cm.setId(null);
-			}
 			return defaultColumns;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2762,7 +2758,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
-		}catch (SynapseException e) {
+		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}

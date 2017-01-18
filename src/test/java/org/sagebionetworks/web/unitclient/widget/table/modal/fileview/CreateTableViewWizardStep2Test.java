@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -22,7 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -57,7 +58,6 @@ public class CreateTableViewWizardStep2Test {
 	TableEntity tableEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
 	List<ColumnModel> mockDefaultColumnModels;
 	@Mock
 	JobTrackingWidget mockJobTrackingWidget;
@@ -67,17 +67,19 @@ public class CreateTableViewWizardStep2Test {
 	CreateTableViewWizardStep2View mockView;
 	@Mock
 	TableUpdateRequest mockTableUpdateRequest;
-	
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 	
-		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget);
+		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -103,7 +105,7 @@ public class CreateTableViewWizardStep2Test {
 	public void testConfigureViewFailure() {
 		String error = "error message getting default column models";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getDefaultColumnsForView(any(ViewType.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		widget.configure(viewEntity, TableType.view);
 		verify(mockWizardPresenter).setErrorMessage(error);
 	}
