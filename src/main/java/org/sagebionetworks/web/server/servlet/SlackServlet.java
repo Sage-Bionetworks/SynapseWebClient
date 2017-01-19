@@ -9,6 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -25,11 +27,14 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
 
 public class SlackServlet extends HttpServlet {
+
+	public static final String IS_INVALID_SYN_ID = " is not a valid Synapse ID (in the form syn123).";
 
 	public static final String INVALID_COMMAND_MESSAGE = "Sorry, I didn't recognize your command.";
 
@@ -37,6 +42,9 @@ public class SlackServlet extends HttpServlet {
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	public static final String COMMA = ", ";
+	public static final String SYNAPSE_ID_REGEX = "\\s*[sS]{1}[yY]{1}[nN]{1}\\d+\\s*";
+	Pattern p = Pattern.compile(SYNAPSE_ID_REGEX);
+	
 	/**
 	 * Injected with Gin
 	 */
@@ -95,21 +103,29 @@ public class SlackServlet extends HttpServlet {
 //		String responseUrl = request.getParameter("response_url");
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream(1024);
 		PrintWriter out = new PrintWriter(bytes, true);
+		String entityURL = "";
 		try {
 			response.setContentType("application/json");
-			if (command.toLowerCase().equals("/synapse")) {
+			String lowercaseCommand = command.toLowerCase();
+			if (lowercaseCommand.equals("/synapse") || lowercaseCommand.equals("/synapsestaging")) {
 				String title = null;
 				StringBuilder sb = new StringBuilder();
 				if (text.toLowerCase().equals("help")) {
 					sb.append("Given a Synapse ID (like syn123), post public information about that entity.");
 				} else {
+					Matcher m = p.matcher(text);
+					if (m.matches()) {
+						entityURL = "https://www.synapse.org/#!Synapse:" + text.trim();
+						sb.append(entityURL);	
+					} else {
+						throw new IllegalArgumentException(text + IS_INVALID_SYN_ID);
+					}
 					SynapseClient client = createNewClient();
 					// extend
 //					int partsMask = ENTITY | ENTITY_PATH | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
 					int partsMask = ENTITY | ENTITY_PATH  | THREAD_COUNT | ANNOTATIONS;
 					EntityBundle bundle = client.getEntityBundle(text, partsMask);
 					title = bundle.getEntity().getName();
-					sb.append("https://www.synapse.org/#!Synapse:" + bundle.getEntity().getId());
 					List<EntityHeader> path = bundle.getPath().getPath();
 					if (path.size() > 2) {
 						sb.append("\n*Project:* " + path.get(1).getName());	
@@ -117,15 +133,17 @@ public class SlackServlet extends HttpServlet {
 					if (bundle.getThreadCount() > 0) {
 						sb.append("\n*Discussion thread count:* " + bundle.getThreadCount());	
 					}
-					if (bundle.getAnnotations() != null) {
+					String annotationString = getAnnotationString(bundle.getAnnotations());
+					if (!annotationString.isEmpty()) {
 						sb.append("\n*Annotations:*");
-						outputAnnotations(sb, bundle.getAnnotations());
+						sb.append(annotationString);
 					}
 				}
 					
 				JSONObject json = new JSONObject();
+				//to send response to user, change "response_type" to "ephemeral"
 				//to send response to channel, change "response_type" to "in_channel"
-				json.put("response_type", "ephemeral");
+				json.put("response_type", "in_channel");
 				JSONObject attachments = new JSONObject();
 				if (title != null) {
 					attachments.put("title", title);	
@@ -146,7 +164,7 @@ public class SlackServlet extends HttpServlet {
 		} catch (Exception e) {
 			try {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				sendFailure(out, text + ": " + e.getMessage());
+				sendFailure(out, entityURL + "\n" + text + ": " + e.getMessage());
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
@@ -157,48 +175,52 @@ public class SlackServlet extends HttpServlet {
 	
 	private void sendFailure(PrintWriter out, String error) throws JSONException {
 		JSONObject json = new JSONObject();
-		json.put("response_type", "ephemeral");
+		json.put("response_type", "in_channel");
 		json.put("text", error);
 		out.println(json.toString());
 	}
 	
-	private void outputAnnotations(StringBuilder sb, Annotations annos) {
-		// Strings
-		if (annos.getStringAnnotations() != null) {
-			for (String key : annos.getStringAnnotations().keySet()) {
-				sb.append("\n ");
-				sb.append(key);
-				sb.append(" : ");
-				sb.append(join(annos.getStringAnnotations().get(key)));
+	private String getAnnotationString(Annotations annos) {
+		StringBuilder sb = new StringBuilder();
+		if (annos != null) {
+			// Strings
+			if (annos.getStringAnnotations() != null) {
+				for (String key : annos.getStringAnnotations().keySet()) {
+					sb.append("\n ");
+					sb.append(key);
+					sb.append(" : ");
+					sb.append(join(annos.getStringAnnotations().get(key)));
+				}
+			}
+			// Longs
+			if (annos.getLongAnnotations() != null) {
+				for (String key : annos.getLongAnnotations().keySet()) {
+					sb.append("\n ");
+					sb.append(key);
+					sb.append(" : ");
+					sb.append(join(annos.getLongAnnotations().get(key)));
+				}
+			}
+			// Doubles
+			if (annos.getDoubleAnnotations() != null) {
+				for (String key : annos.getDoubleAnnotations().keySet()) {
+					sb.append("\n ");
+					sb.append(key);
+					sb.append(" : ");
+					sb.append(join(annos.getDoubleAnnotations().get(key)));
+				}
+			}
+			// Dates
+			if (annos.getDateAnnotations() != null) {
+				for (String key : annos.getDateAnnotations().keySet()) {
+					sb.append("\n ");
+					sb.append(key);
+					sb.append(" : ");
+					sb.append(join(annos.getDateAnnotations().get(key)));
+				}
 			}
 		}
-		// Longs
-		if (annos.getLongAnnotations() != null) {
-			for (String key : annos.getLongAnnotations().keySet()) {
-				sb.append("\n ");
-				sb.append(key);
-				sb.append(" : ");
-				sb.append(join(annos.getLongAnnotations().get(key)));
-			}
-		}
-		// Doubles
-		if (annos.getDoubleAnnotations() != null) {
-			for (String key : annos.getDoubleAnnotations().keySet()) {
-				sb.append("\n ");
-				sb.append(key);
-				sb.append(" : ");
-				sb.append(join(annos.getDoubleAnnotations().get(key)));
-			}
-		}
-		// Dates
-		if (annos.getDateAnnotations() != null) {
-			for (String key : annos.getDateAnnotations().keySet()) {
-				sb.append("\n ");
-				sb.append(key);
-				sb.append(" : ");
-				sb.append(join(annos.getDateAnnotations().get(key)));
-			}
-		}
+		return sb.toString();
 	}
 	
 	public static String join(List list) {
