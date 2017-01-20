@@ -11,6 +11,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -18,8 +20,10 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -37,22 +41,25 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class StorageLocationWidgetTest {
 
+	@Mock
 	StorageLocationWidgetView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
 	StorageLocationWidget widget;
+	@Mock
 	SynapseAlert mockSynAlert;
 	List<String> locationSettingBanners;
+	@Mock
 	EntityBundle mockBundle;
 	Folder folder;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
-	
+	@Mock
+	CookieProvider mockCookies;
 	@Before
 	public void setup() {
-		mockView = mock(StorageLocationWidgetView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		widget = new StorageLocationWidget(mockView, mockSynapseClient, mockSynAlert);
-		mockBundle = mock(EntityBundle.class);
+		MockitoAnnotations.initMocks(this);
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
+		widget = new StorageLocationWidget(mockView, mockSynapseClient, mockSynAlert, mockCookies);
 		folder = new Folder();
 		folder.setId("syn420");
 		when(mockBundle.getEntity()).thenReturn(folder);
@@ -102,7 +109,8 @@ public class StorageLocationWidgetTest {
 		reset(mockView);
 		widget.getStorageLocationSetting();
 		//should remain set to the default config
-		verifyZeroInteractions(mockView);
+		verify(mockView).setSFTPVisible(anyBoolean());
+		verifyNoMoreInteractions(mockView);
 	}
 	
 	@Test
@@ -111,11 +119,11 @@ public class StorageLocationWidgetTest {
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
 		widget.getStorageLocationSetting();
 		verify(mockView).showErrorMessage(error);
-		verify(mockView).hide();
 	}
 	
 	@Test
 	public void testGetStorageLocationSettingExternalS3() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		ExternalS3StorageLocationSetting entityStorageLocationSetting = new ExternalS3StorageLocationSetting();
 		String baseKey = "key";
 		String bucket = "a.bucket     ";
@@ -129,6 +137,19 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setBucket(bucket.trim());
 		verify(mockView).setExternalS3Banner(banner);
 		verify(mockView).selectExternalS3Storage();
+		verify(mockView).setSFTPVisible(true);
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingHideSFTP() {
+		ExternalS3StorageLocationSetting entityStorageLocationSetting = new ExternalS3StorageLocationSetting();
+		entityStorageLocationSetting.setBanner("");
+		entityStorageLocationSetting.setBucket("");
+		entityStorageLocationSetting.setBaseKey("");
+		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
+		widget.getStorageLocationSetting();
+		verify(mockView).selectExternalS3Storage();
+		verify(mockView, never()).setSFTPVisible(true);
 	}
 	
 	@Test
@@ -143,6 +164,7 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setSFTPBanner(banner);
 		verify(mockView).setSFTPUrl(url);
 		verify(mockView).selectSFTPStorage();
+		verify(mockView, atLeast(1)).setSFTPVisible(true);
 	}
 	
 	@Test

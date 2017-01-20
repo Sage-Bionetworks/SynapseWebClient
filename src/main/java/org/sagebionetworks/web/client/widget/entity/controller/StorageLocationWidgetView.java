@@ -56,4 +56,5 @@ public interface StorageLocationWidgetView {
 	void showErrorMessage(String message);
 	void setBannerSuggestions(List<String> banners);
 	void setBannerDropdownVisible(boolean isVisible);
+	void setSFTPVisible(boolean visible);
 }

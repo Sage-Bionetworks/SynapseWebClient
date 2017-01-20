@@ -8,7 +8,9 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -26,15 +28,20 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	SynapseAlert synAlert;
 	EntityUpdatedHandler entityUpdatedHandler;
 	EntityBundle entityBundle;
+	CookieProvider cookies;
 	
 	@Inject
 	public StorageLocationWidget(StorageLocationWidgetView view,
-			SynapseClientAsync synapseClient, SynapseAlert synAlert) {
+			SynapseClientAsync synapseClient, 
+			SynapseAlert synAlert, 
+			CookieProvider cookies) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
+		this.cookies = cookies;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
+		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 	
 	@Override
@@ -62,10 +69,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
+		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				hide();
+				// unable to get storage location
+				// if this is a proxy, then upload is not supported.  Let the user set back to default Synapse.
 				view.showErrorMessage(caught.getMessage());
 			}
 			
@@ -81,6 +90,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.setExternalS3Banner(setting.getBanner().trim());
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalStorageLocationSetting) {
+						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
 						view.setSFTPUrl(setting.getUrl().trim());
 						view.setSFTPBanner(setting.getBanner().trim());
