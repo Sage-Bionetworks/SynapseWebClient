@@ -13,8 +13,10 @@ import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -31,6 +33,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	SimplePanel footer;
 	@UiField
 	Div widgetContainer;
+	@UiField
+	Div chart;
 	
 	private Presenter presenter;
 	
@@ -61,7 +65,15 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		widgetContainer.add(map.asWidget());
-		map.configure();
+		addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					showChart(chart.getElement());
+				}
+			}
+		});;
+//		map.configure();
 	}
 	
 	@Override
@@ -75,9 +87,29 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
-		headerWidget.refresh();	
+		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
+	
+	public void showChart(Element el) {
+		_showChart(el);
+	}
+
+	private static native void _showChart(Element el) /*-{
+		$wnd.Plotly.plot(el, 
+			[{
+				x: [1, 2, 3, 4, 5],
+				y: [1, 2, 4, 8, 16] 
+			}], 
+			{
+				margin: { t: 0 },
+				autosize: true
+			});
+		$wnd.onresize = function() {
+		    $wnd.Plotly.Plots.resize(el);
+		};
+	}-*/;
+
 
 	@Override
 	public void showErrorMessage(String message) {
