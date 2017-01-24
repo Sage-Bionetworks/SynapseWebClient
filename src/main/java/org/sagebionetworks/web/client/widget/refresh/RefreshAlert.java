@@ -25,7 +25,7 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	private ObjectType objectType;
 	private Callback invokeCheckEtag;
 	private Callback refreshCallback;
-	public static final int DELAY = 17000; // check every 17 seconds (until detached, configuration cleared, or a change has been detected)
+	public static final int DELAY = 60000; // check every minute (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public RefreshAlert(RefreshAlertView view, 
 			SynapseClientAsync synapseClient, 

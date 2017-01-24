@@ -67,6 +67,18 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		this.currentType = newType;
 		CellEditor defaultEditor = getDefaultEditorForType(newType);
 		view.setDefaultEditor(defaultEditor);
+		view.setDefaultEditorVisible(canHaveDefault(newType));
+	}
+	
+	public boolean canHaveDefault(ColumnTypeViewEnum type) {
+		switch(type.getType()){
+			case ENTITYID:
+			case FILEHANDLEID:
+			case USERID:
+				return false;
+			default:
+				return true;		
+		}
 	}
 	
 	/**
@@ -119,6 +131,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 				break;
 			case Boolean:
 			case User:
+			case Entity:
 				view.setFacetValues(None.toString(), Values.toString());
 				view.setFacetVisible(true);
 				break;
@@ -140,6 +153,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case Double:
 			case Date:
 			case User:
+			case Entity:
 				return true;
 			default:
 				return false;
@@ -155,7 +169,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		ColumnModel forFactory = new ColumnModel();
 		forFactory.setColumnType(newType.getType());
 		CellEditor defaultEditor = factory.createEditor(forFactory);
-		return defaultEditor;
+		return defaultEditor;		
 	}
 	
 	/**

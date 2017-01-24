@@ -30,7 +30,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -38,8 +40,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.UserProfileClient;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -62,7 +62,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -84,7 +83,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETED = "Deleted";
 
 	public static final String ARE_YOU_SURE_YOU_WANT_TO_DELETE = "Are you sure you want to delete ";
-	public static final String DELETE_FOLDER_EXPLANATION = " Everything contained within the folder will also be deleted.";
+	public static final String DELETE_FOLDER_EXPLANATION = " Everything contained within the Folder will also be deleted.";
 	public static final String CONFIRM_DELETE_TITLE = "Confirm Delete";
 
 	public static final String DELETE_PREFIX = "Delete ";
@@ -125,67 +124,146 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
 	UserProfileClientAsync userProfileClient;
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
-			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
+			PortalGinInjector ginInjector,
 			AuthenticationController authenticationController,
-			AccessControlListModalWidget accessControlListModalWidget,
-			RenameEntityModalWidget renameEntityModalWidget,
-			EditFileMetadataModalWidget editFileMetadataModalWidget,
-			EditProjectMetadataModalWidget editProjectMetadataModalWidget,
-			EntityFinder entityFinder,
-			EvaluationSubmitter submitter,
-			UploadDialogWidget uploader,
-			WikiMarkdownEditor wikiEditor,
-			ProvenanceEditorWidget provenanceEditor,
-			StorageLocationWidget storageLocationEditor,
-			EvaluationEditorModal evalEditor,
-			CookieProvider cookies,
-			ChallengeClientAsync challengeClient,
-			SelectTeamModal selectTeamModal,
-			ApproveUserAccessModal approveUserAccessModal,
-			UserProfileClientAsync userProfileClient) {
+			CookieProvider cookies) {
 		super();
 		this.view = view;
-		this.accessControlListModalWidget = accessControlListModalWidget;
+		this.ginInjector = ginInjector;
 		this.preflightController = preflightController;
-		this.synapseClient = synapseClient;
-		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.renameEntityModalWidget = renameEntityModalWidget;
-		this.editFileMetadataModalWidget = editFileMetadataModalWidget;
-		this.editProjectMetadataModalWidget = editProjectMetadataModalWidget;
-		this.entityFinder = entityFinder;
-		this.submitter = submitter;
-		this.uploader = uploader;
-		this.wikiEditor = wikiEditor;
-		this.provenanceEditor = provenanceEditor;
-		this.storageLocationEditor = storageLocationEditor;
-		this.evalEditor = evalEditor;
 		this.cookies = cookies;
-		this.challengeClient = challengeClient;
-		this.view.addWidget(wikiEditor.asWidget());
-		this.view.addWidget(provenanceEditor.asWidget());
-		this.view.addWidget(storageLocationEditor.asWidget());
-		this.view.addWidget(accessControlListModalWidget);
-		this.view.addWidget(evalEditor.asWidget());
-		this.view.addWidget(selectTeamModal.asWidget());
-		selectTeamModal.setTitle("Select Participant Team");
-		selectTeamModal.configure(new CallbackP<String>() {
-			@Override
-			public void invoke(String selectedTeamId) {
-				onSelectChallengeTeam(selectedTeamId);
-			}
-		});
-		this.selectTeamModal = selectTeamModal;
-		this.approveUserAccessModal = approveUserAccessModal;
-		this.userProfileClient = userProfileClient;
 		this.actRequirements = new ArrayList<ACTAccessRequirement>();
 	}
-
+	
+	private ApproveUserAccessModal getApproveUserAccessModal() {
+		if (approveUserAccessModal == null) {
+			approveUserAccessModal = ginInjector.getApproveUserAccessModal();
+		}
+		return approveUserAccessModal;
+	}
+	private SelectTeamModal getSelectTeamModal() {
+		if (selectTeamModal == null) {
+			selectTeamModal = ginInjector.getSelectTeamModal();
+			view.addWidget(selectTeamModal.asWidget());
+			selectTeamModal.setTitle("Select Participant Team");
+			selectTeamModal.configure(new CallbackP<String>() {
+				@Override
+				public void invoke(String selectedTeamId) {
+					onSelectChallengeTeam(selectedTeamId);
+				}
+			});
+		}
+		return selectTeamModal;
+	}
+	private UserProfileClientAsync getUserProfileClient() {
+		if (userProfileClient == null) {
+			userProfileClient = ginInjector.getUserProfileClientAsync();
+		}
+		return userProfileClient;
+	}
+	
+	private ChallengeClientAsync getChallengeClient() {
+		if (challengeClient == null) {
+			challengeClient = ginInjector.getChallengeClientAsync();
+		}
+		return challengeClient;
+	}
+	private SynapseClientAsync getSynapseClient() {
+		if (synapseClient == null) {
+			synapseClient = ginInjector.getSynapseClientAsync();
+		}
+		return synapseClient;
+	}
+	
+	private GlobalApplicationState getGlobalApplicationState() {
+		if (globalApplicationState == null) {
+			globalApplicationState = ginInjector.getGlobalApplicationState();
+		}
+		return globalApplicationState;
+	}
+	
+	private AccessControlListModalWidget getAccessControlListModalWidget() {
+		if (accessControlListModalWidget == null) {
+			accessControlListModalWidget = ginInjector.getAccessControlListModalWidget();
+			this.view.addWidget(accessControlListModalWidget);
+		}
+		return accessControlListModalWidget;
+	}
+	
+	private RenameEntityModalWidget getRenameEntityModalWidget() {
+		if (renameEntityModalWidget == null) {
+			renameEntityModalWidget = ginInjector.getRenameEntityModalWidget();
+		}
+		return renameEntityModalWidget;
+	}
+	private EditFileMetadataModalWidget getEditFileMetadataModalWidget() {
+		if (editFileMetadataModalWidget == null) {
+			editFileMetadataModalWidget = ginInjector.getEditFileMetadataModalWidget();
+		}
+		return editFileMetadataModalWidget;
+	}
+	private EditProjectMetadataModalWidget getEditProjectMetadataModalWidget() {
+		if (editProjectMetadataModalWidget == null) {
+			editProjectMetadataModalWidget = ginInjector.getEditProjectMetadataModalWidget();
+		}
+		return editProjectMetadataModalWidget;
+	}
+	private EntityFinder getEntityFinder() {
+		if (entityFinder == null) {
+			entityFinder = ginInjector.getEntityFinder();
+		}
+		return entityFinder;
+	}
+	private EvaluationSubmitter getEvaluationSubmitter() {
+		if (submitter == null) {
+			submitter = ginInjector.getEvaluationSubmitter();
+			view.addWidget(submitter.asWidget());
+		}
+		return submitter;
+	}
+	
+	private UploadDialogWidget getUploadDialogWidget() {
+		if (uploader == null) {
+			uploader = ginInjector.getUploadDialogWidget();
+			view.addWidget(uploader.asWidget());
+		}
+		return uploader;
+	}
+	private WikiMarkdownEditor getWikiMarkdownEditor() {
+		if (wikiEditor == null) {
+			wikiEditor = ginInjector.getWikiMarkdownEditor();
+			view.addWidget(wikiEditor.asWidget());
+		}
+		return wikiEditor;
+	}
+	private ProvenanceEditorWidget getProvenanceEditorWidget() {
+		if (provenanceEditor == null) {
+			provenanceEditor = ginInjector.getProvenanceEditorWidget();
+			view.addWidget(provenanceEditor.asWidget());
+		}
+		return provenanceEditor;
+	}
+	private StorageLocationWidget getStorageLocationWidget() {
+		if (storageLocationEditor == null) {
+			storageLocationEditor = ginInjector.getStorageLocationWidget();
+			view.addWidget(storageLocationEditor.asWidget());
+		}
+		return storageLocationEditor;
+	}
+	private EvaluationEditorModal getEvaluationEditorModal() {
+		if (evalEditor == null) {
+			evalEditor = ginInjector.getEvaluationEditorModal();
+			view.addWidget(evalEditor.asWidget());
+		}
+		return evalEditor;
+	}
+	
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
 			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityUpdatedHandler handler) {
@@ -198,9 +276,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
-		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
-		actionMenu.addControllerWidget(this.submitter.asWidget());
-		actionMenu.addControllerWidget(uploader.asWidget());
 		
 		if (!isUserAuthenticated) {
 			actionMenu.setToolsButtonVisible(false);
@@ -248,7 +323,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		if (authenticationController.isLoggedIn()) {
 			
-			userProfileClient.getMyOwnUserBundle(IS_ACT_MEMBER_MASK, new AsyncCallback<UserBundle>() {
+			getUserProfileClient().getMyOwnUserBundle(IS_ACT_MEMBER_MASK, new AsyncCallback<UserBundle>() {
 				@Override
 				public void onSuccess(UserBundle userBundle) {
 					if (userBundle.getIsACTMember() && actRequirements.size() > 0) {
@@ -270,13 +345,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Challenge c = new Challenge();
 		c.setProjectId(entity.getId());
 		c.setParticipantTeamId(id);
-		challengeClient.createChallenge(c, new AsyncCallback<Challenge>() {
+		getChallengeClient().createChallenge(c, new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge v) {
 				view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
 				// go to challenge tab
 				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
-				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -328,7 +403,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Project && canEdit && DisplayUtils.isInTestWebsite(cookies)) {
 			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
 			//find out if this project has a challenge
-			challengeClient.getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
+			getChallengeClient().getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
 				@Override
 				public void onSuccess(Challenge result) {
 					// challenge found, do nothing
@@ -357,7 +432,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onCreateDOI() {
-		synapseClient.createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
+		getSynapseClient().createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void v) {
 				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
@@ -372,7 +447,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onCreateChallenge() {
-		selectTeamModal.show();
+		getSelectTeamModal().show();
 	}
 	
 	private void configureFileUpload() {
@@ -701,8 +776,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onApproveUserAccess() {
-		approveUserAccessModal.configure(actRequirements, entityBundle);
-		approveUserAccessModal.show();
+		getApproveUserAccessModal().configure(actRequirements, entityBundle);
+		getApproveUserAccessModal().show();
 	}
 	
 
@@ -712,24 +787,24 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onAddEvaluationQueue() {
-		evalEditor.configure(entity.getId(), new Callback() {
+		getEvaluationEditorModal().configure(entity.getId(), new Callback() {
 			@Override
 			public void invoke() {
 				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
-				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
 			}
 		});
-		evalEditor.show();
+		getEvaluationEditorModal().show();
 	}
 
 	private void onChangeStorageLocation() {
-		storageLocationEditor.configure(this.entityBundle, entityUpdateHandler);
-		storageLocationEditor.show();
+		getStorageLocationWidget().configure(this.entityBundle, entityUpdateHandler);
+		getStorageLocationWidget().show();
 	}
 	
 	private void onEditProvenance() {
-		provenanceEditor.configure(this.entityBundle, entityUpdateHandler);
-		provenanceEditor.show();
+		getProvenanceEditorWidget().configure(this.entityBundle, entityUpdateHandler);
+		getProvenanceEditorWidget().show();
 	}
 	
 	private void onUploadFile() {
@@ -743,10 +818,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckUploadFile(){
-		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
-		uploader.disableMultipleFileUploads();
-		uploader.setUploaderLinkNameVisible(false);
-		uploader.show();
+		getUploadDialogWidget().configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
+		getUploadDialogWidget().disableMultipleFileUploads();
+		getUploadDialogWidget().setUploaderLinkNameVisible(false);
+		getUploadDialogWidget().show();
 	}
 
 	private void onSubmit() {
@@ -760,7 +835,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postOnSubmit(){
-		this.submitter.configure(this.entityBundle.getEntity(), null);
+		getEvaluationSubmitter().configure(this.entityBundle.getEntity(), null);
 	}
 	
 	private void onLink() {
@@ -774,14 +849,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckLink(){
-		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
+		getEntityFinder().configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				createLink(selected.getTargetId());
-				entityFinder.hide();
+				getEntityFinder().hide();
 			}
 		});
-		entityFinder.show();
+		getEntityFinder().show();
 	}
 	
 	/**
@@ -797,7 +872,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
 		link.setEntityType(Link.class.getName());
-		synapseClient.createEntity(link, new AsyncCallback<Entity>() {
+		getSynapseClient().createEntity(link, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {
@@ -835,14 +910,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove(){
-		entityFinder.configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
+		getEntityFinder().configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				moveEntity(selected.getTargetId());
-				entityFinder.hide();
+				getEntityFinder().hide();
 			}
 		});
-		entityFinder.show();
+		getEntityFinder().show();
 	}
 	
 	/**
@@ -851,7 +926,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	private void moveEntity(String target){
 		String entityId = entityBundle.getEntity().getId();
-		synapseClient.moveEntity(entityId, target, new AsyncCallback<Entity>() {
+		getSynapseClient().moveEntity(entityId, target, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {
@@ -867,7 +942,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onViewWikiSource() {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		synapseClient.getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
+		getSynapseClient().getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				view.showInfoDialog("Wiki Source", page.getMarkdown());
@@ -892,7 +967,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckEditWiki(){
 		//markdown editor will create a wiki if it does not already exist
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		wikiEditor.configure(key, new CallbackP<WikiPage>() {
+		getWikiMarkdownEditor().configure(key, new CallbackP<WikiPage>() {
 			@Override
 			public void invoke(WikiPage param) {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
@@ -928,16 +1003,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			WikiPage page = new WikiPage();
 			page.setParentWikiId(wikiPageId);
 			page.setTitle(name);
-	        synapseClient.createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
+			getSynapseClient().createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
 	            @Override
 	            public void onSuccess(WikiPage result) {
 	                view.showInfo("'" + name + "' Page Added", "");
 	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
-	                globalApplicationState.getPlaceChanger().goTo(newPlace);
+	                getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
-	                if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+	                if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(), authenticationController.isLoggedIn(), view))
 	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
 	            }
 	        });
@@ -958,7 +1033,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * Called if the preflight check for a rename passes.
 	 */
 	private void postCheckRename(){
-		renameEntityModalWidget.onRename(this.entity, new Callback() {
+		getRenameEntityModalWidget().onRename(this.entity, new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
@@ -987,7 +1062,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	private void postCheckEditFileMetadata() {
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(entityBundle);
-		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), originalFileHandle, new Callback() {
+		getEditFileMetadataModalWidget().configure((FileEntity)entityBundle.getEntity(), originalFileHandle, new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
@@ -1013,7 +1088,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (canChangeSettings == null) {
 			canChangeSettings = false;
 		}
-		editProjectMetadataModalWidget.configure((Project)entityBundle.getEntity(), canChangeSettings, new Callback() {
+		getEditProjectMetadataModalWidget().configure((Project)entityBundle.getEntity(), canChangeSettings, new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
@@ -1024,7 +1099,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onDeleteWiki() {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
 		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
-		synapseClient.getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
+		getSynapseClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage page) {
 				// Confirm the delete with the user.
@@ -1058,11 +1133,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	public void postConfirmedDeleteWiki(final String parentWikiId) {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		synapseClient.deleteV2WikiPage(key, new AsyncCallback<Void>() {
+		getSynapseClient().deleteV2WikiPage(key, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId(), null, EntityArea.WIKI, parentWikiId));
+				getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId(), null, EntityArea.WIKI, parentWikiId));
 			}
 			
 			@Override
@@ -1108,18 +1183,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	public void postCheckDeleteEntity() {
 		final String entityId = this.entityBundle.getEntity().getId();
-		synapseClient.deleteEntityById(entityId, new AsyncCallback<Void>() {
+		getSynapseClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
-				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState,isUserAuthenticated, view)) {
+				if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(),isUserAuthenticated, view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 				}
 			}
@@ -1145,7 +1220,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	@Override
 	public void onShare() {
-		this.accessControlListModalWidget.showSharing(new Callback() {
+		getAccessControlListModalWidget().configure(entity, permissions.getCanChangePermissions());
+		this.getAccessControlListModalWidget().showSharing(new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());

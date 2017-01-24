@@ -5,10 +5,11 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -47,6 +48,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
+	FileViewDefaultColumns fileViewDefaultColumns;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -55,17 +57,25 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view,
 			ColumnModelsEditorWidget editor, 
 			SynapseClientAsync synapseClient, 
-			JobTrackingWidget jobTrackingWidget){
+			JobTrackingWidget jobTrackingWidget,
+			FileViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.editor = editor;
 		this.jobTrackingWidget = jobTrackingWidget;
+		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		view.setJobTracker(jobTrackingWidget.asWidget());
 		view.setEditor(editor.asWidget());
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
 			public void invoke() {
 				getDefaultColumnsForView();
+			}
+		});
+		editor.setOnAddAnnotationColumnsCallback(new Callback() {
+			@Override
+			public void invoke() {
+				getPossibleColumnModelsForViewScope(null);
 			}
 		});
 	}
@@ -77,18 +87,19 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.tableType = tableType;
 		
 		editor.configure(new ArrayList<ColumnModel>());
-		if (TableType.view.equals(tableType)) {
+		
+		boolean isView = TableType.view.equals(tableType);
+		this.editor.setAddDefaultViewColumnsButtonVisible(isView);
+		this.editor.setAddAnnotationColumnsButtonVisible(isView);
+		if (isView) {
 			// start with the default file columns
-			this.editor.setAddDefaultViewColumnsButtonVisible(true);
 			getDefaultColumnsForView();
-		} else {
-			this.editor.setAddDefaultViewColumnsButtonVisible(false);
 		}
 	}
 	
 	public void getDefaultColumnsForView() {
-		ViewType type = ((EntityView)entity).getType(); 
-		synapseClient.getDefaultColumnsForView(type, new AsyncCallback<List<ColumnModel>>() {
+		boolean clearIds = true;
+		fileViewDefaultColumns.getDefaultColumns(clearIds, new AsyncCallback<List<ColumnModel>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setErrorMessage(caught.getMessage());
@@ -96,6 +107,24 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			@Override
 			public void onSuccess(List<ColumnModel> columns) {
 				editor.addColumns(columns);
+			}
+		});
+	}
+	
+	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+		ViewScope scope = new ViewScope();
+		scope.setScope(((EntityView)entity).getScopeIds());
+		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				presenter.setErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(ColumnModelPage columnPage) {
+				editor.addColumns(columnPage.getResults());
+				if (columnPage.getNextPageToken() != null) {
+					getPossibleColumnModelsForViewScope(columnPage.getNextPageToken());
+				}
 			}
 		});
 	}

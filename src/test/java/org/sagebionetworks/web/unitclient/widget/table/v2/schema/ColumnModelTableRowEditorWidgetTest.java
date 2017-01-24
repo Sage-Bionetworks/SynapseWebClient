@@ -289,6 +289,14 @@ public class ColumnModelTableRowEditorWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureFacetsForTypeEntity() {
+		editor.configureFacetsForType(ColumnTypeViewEnum.Entity);
+		verify(mockView).setFacetValues(None.toString(), Values.toString());
+		verify(mockView).setFacetVisible(true);
+	}
+
+	
+	@Test
 	public void testConfigureFacetsForTypeDate() {
 		editor.configureFacetsForType(ColumnTypeViewEnum.Date);
 		verify(mockView).setFacetValues(None.toString(), Range.toString());
@@ -308,9 +316,24 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Boolean));
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Double));
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Date));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Entity));
 		
 		//other
 		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.LargeText));
 		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.Link));
 	}
+
+	@Test
+	public void testCanHaveDefault() {
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Integer));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Double));
+		assertTrue(editor.canHaveDefault(ColumnTypeViewEnum.Date));
+		
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Entity));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.User));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.File));
+	}
+	
 }

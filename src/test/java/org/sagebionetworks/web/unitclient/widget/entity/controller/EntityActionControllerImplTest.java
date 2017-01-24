@@ -68,6 +68,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -164,6 +165,8 @@ public class EntityActionControllerImplTest {
 	UserBundle mockUserBundle;
 	@Mock
 	Throwable mockThrowable;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -193,15 +196,30 @@ public class EntityActionControllerImplTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
+		when(mockPortalGinInjector.getAccessControlListModalWidget()).thenReturn(mockAccessControlListModalWidget);
+		when(mockPortalGinInjector.getRenameEntityModalWidget()).thenReturn(mockRenameEntityModalWidget);
+		when(mockPortalGinInjector.getEditFileMetadataModalWidget()).thenReturn(mockEditFileMetadataModalWidget);
+		when(mockPortalGinInjector.getEditProjectMetadataModalWidget()).thenReturn(mockEditProjectMetadataModalWidget);
+		when(mockPortalGinInjector.getEntityFinder()).thenReturn(mockEntityFinder);
+		when(mockPortalGinInjector.getUploadDialogWidget()).thenReturn(mockUploader);
+		when(mockPortalGinInjector.getWikiMarkdownEditor()).thenReturn(mockMarkdownEditorWidget);
+		when(mockPortalGinInjector.getProvenanceEditorWidget()).thenReturn(mockProvenanceEditorWidget);
+		when(mockPortalGinInjector.getStorageLocationWidget()).thenReturn(mockStorageLocationWidget);
+		when(mockPortalGinInjector.getEvaluationEditorModal()).thenReturn(mockEvalEditor);
+		when(mockPortalGinInjector.getSelectTeamModal()).thenReturn(mockSelectTeamModal);
+		when(mockPortalGinInjector.getApproveUserAccessModal()).thenReturn(mockApproveUserAccessModal);
+		when(mockPortalGinInjector.getChallengeClientAsync()).thenReturn(mockChallengeClient);
+		when(mockPortalGinInjector.getUserProfileClientAsync()).thenReturn(mockUserProfileClient);
+		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
+		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
+		
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
-				mockSynapseClient, mockGlobalApplicationState,
-				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
-				mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget,
-				mockEvalEditor, mockCookies, mockChallengeClient, mockSelectTeamModal, mockApproveUserAccessModal, mockUserProfileClient);
+				mockPortalGinInjector,
+				mockAuthenticationController, 
+				mockCookies);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -245,7 +263,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigure(){
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
-		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
+		
 		// delete
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
@@ -885,6 +903,7 @@ public class EntityActionControllerImplTest {
 		// method under test
 		controller.onAction(Action.SHARE);
 		verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
+		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 	
@@ -895,6 +914,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// method under test
 		controller.onAction(Action.SHARE);
+		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
 		verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -1441,6 +1461,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		String error = "an error";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
+		controller.onAction(Action.CREATE_CHALLENGE);
 		//now simulate that a challenge team was selected
 		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());

@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -24,14 +25,18 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	public static final String DEFAULT_MARKDOWN = "";
 	private static final String SUCCESS_TITLE = "Reply created";
 	private static final String SUCCESS_MESSAGE = "A reply has been created.";
+	public static final String RESTORE_TITLE = "Restore draft?";
+	public static final String RESTORE_MESSAGE = "Would you like to continue writing where you left off?"; 
 	private NewReplyWidgetView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private MarkdownEditorWidget markdownEditor;
 	private AuthenticationController authController;
 	private GlobalApplicationState globalApplicationState;
+	private SessionStorage storage;
 	private Callback newReplyCallback;
 	private String threadId;
+	private String key;
 
 	@Inject
 	public NewReplyWidget(
@@ -40,7 +45,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			SynapseAlert synAlert,
 			MarkdownEditorWidget markdownEditor,
 			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState
+			GlobalApplicationState globalApplicationState,
+			SessionStorage sessionStorage
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
@@ -48,6 +54,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
+		this.storage = sessionStorage;
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
@@ -58,6 +65,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	public void configure(String threadId, Callback newReplyCallback) {
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
+		this.key = threadId + "_" + authController.getCurrentUserPrincipalId() + "_reply";
 	}
 
 	@Override
@@ -67,9 +75,32 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else {
 			view.setReplyTextBoxVisible(false);
-			markdownEditor.configure(DEFAULT_MARKDOWN);
+			checkForSavedReply();
 			view.setNewReplyContainerVisible(true);
 			markdownEditor.setMarkdownFocus();
+		}
+	}
+	
+	private void checkForSavedReply() {
+		if (storage.getItem(key) == null) {
+			markdownEditor.configure(DEFAULT_MARKDOWN);			
+		} else {
+			Callback yesCallback = new Callback() {
+				@Override
+				public void invoke() {
+					String reply = storage.getItem(key);
+					markdownEditor.configure(reply);
+					storage.removeItem(key);
+				}
+			};
+			Callback noCallback = new Callback() {
+				@Override
+				public void invoke() {
+					markdownEditor.configure(DEFAULT_MARKDOWN);	
+					storage.removeItem(key);
+				}
+			};
+			view.showConfirmDialog(RESTORE_TITLE, RESTORE_MESSAGE, yesCallback, noCallback);
 		}
 	}
 
@@ -83,6 +114,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			synAlert.showError(result.getErrorMessage());
 			return;
 		}
+		storage.setItem(key, messageMarkdown);
 		view.showSaving();
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
 		toCreate.setThreadId(threadId);
@@ -101,6 +133,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 					newReplyCallback.invoke();
 				}
 				onCancel();
+				storage.removeItem(key);
 			}
 		});
 	}

@@ -11,7 +11,9 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -65,10 +67,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 	HTMLPanel panel;
 	Presenter presenter;
+	PortalGinInjector ginInjector;
 	
 	@Inject
-	public TableListWidgetViewImpl(Binder binder) {
+	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		this.panel = binder.createAndBindUi(this);
+		this.ginInjector = ginInjector;
 		HTML html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add File View" + DisplayConstants.BETA_BADGE_HTML);
 		addFileView.add(html);
 		createdOnDesc.addClickHandler(new ClickHandler() {
@@ -106,7 +110,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
 		for(final EntityQueryResult header: tables){
-			tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, new ClickHandler() {
+			UserBadge createdByUserBadge = ginInjector.getUserBadgeWidget();
+			createdByUserBadge.configure(header.getCreatedByPrincipalId().toString());
+			UserBadge modifiedByUserBadge = ginInjector.getUserBadgeWidget();
+			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
+			tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, createdByUserBadge, modifiedByUserBadge, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.onTableClicked(header.getId());

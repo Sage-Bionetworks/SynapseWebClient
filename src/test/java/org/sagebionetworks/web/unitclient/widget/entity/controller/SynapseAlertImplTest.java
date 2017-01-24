@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -207,6 +208,14 @@ public class SynapseAlertImplTest {
 		widget.handleException(new UnauthorizedException());
 		verify(mockAuthenticationController).logoutUser();
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
+	}
+	
+	@Test
+	public void testHandleServiceConflictingUpdateExceptionMessage() {
+		String errorMessage = "error";
+		widget.handleException(new ConflictingUpdateException(errorMessage));
+		verify(mockView, times(0)).showJiraDialog(anyString());
+		verify(mockView).showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + errorMessage);
 	}
 	
 	@Test

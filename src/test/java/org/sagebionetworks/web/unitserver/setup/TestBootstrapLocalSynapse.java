@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.NewIntegrationTestUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.Condition;
@@ -65,7 +66,7 @@ public class TestBootstrapLocalSynapse {
 		adminClient.setAuthEndpoint(StackConfiguration.getAuthenticationServicePrivateEndpoint());
 		adminClient.setRepositoryEndpoint(StackConfiguration.getRepositoryServiceEndpoint());
 		adminClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-		adminClient.setUserName(StackConfiguration.getMigrationAdminUsername());
+		adminClient.setUsername(StackConfiguration.getMigrationAdminUsername());
 		adminClient.setApiKey(StackConfiguration.getMigrationAdminAPIKey());
 		SynapseVersionInfo info = adminClient.getVersionInfo();
 		System.out.println(info);
@@ -282,7 +283,10 @@ public class TestBootstrapLocalSynapse {
 		try {
 			synapseClient.logout();
 		} catch (Exception e) {}
-		synapseClient.login(userName, PASSWORD);
+		LoginRequest request = new LoginRequest();
+		request.setUsername(userName);
+		request.setPassword(PASSWORD);
+		synapseClient.login(request);
 	}
 	
 	/**

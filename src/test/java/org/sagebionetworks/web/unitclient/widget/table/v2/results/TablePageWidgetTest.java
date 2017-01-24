@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
@@ -53,7 +55,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Business logic unit tests for the TablePageWidget.
@@ -87,8 +92,12 @@ public class TablePageWidgetTest {
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	@Mock
 	FacetColumnResult mockFacetColumnResult;
+	@Mock
+	FileViewDefaultColumns mockFileViewDefaultColumns;
+	List<ColumnModel> defaultColumnModels;
+
 	List<FacetColumnResult> facets;
-	
+
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -118,7 +127,7 @@ public class TablePageWidgetTest {
 			@Override
 			public RowWidget answer(InvocationOnMock invocation)
 					throws Throwable {
-				return new RowWidget(new RowViewStub(), mockCellFactory);
+				return new RowWidget(new RowViewStub(), mockCellFactory, mockFileViewDefaultColumns);
 			}});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		sortHeaders = new LinkedList<SortableTableHeader>();
@@ -141,6 +150,8 @@ public class TablePageWidgetTest {
 				return header;
 			}
 		});
+		defaultColumnModels = new ArrayList<ColumnModel>();
+		AsyncMockStubber.callSuccessWith(defaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
@@ -226,8 +237,6 @@ public class TablePageWidgetTest {
 		assertTrue(sortHeaders.isEmpty());
 		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
-		verify(mockView).setFacetsVisible(true);
-		verify(mockView, never()).setFacetsVisible(false);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
@@ -245,11 +254,9 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureNotEditableNoValidFacets(){
 		boolean isEditable = false;
-		when(mockFacetsWidget.isShowingFacets()).thenReturn(false);
 		widget.configure(bundle, query, null, isEditable, isView, null, mockPageChangeListner, mockFacetChangedHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
-		verify(mockView).setFacetsVisible(false);
-		verify(mockView, never()).setFacetsVisible(true);
+		verify(mockView, never()).setFacetsVisible(anyBoolean());
 	}
 	
 	@Test

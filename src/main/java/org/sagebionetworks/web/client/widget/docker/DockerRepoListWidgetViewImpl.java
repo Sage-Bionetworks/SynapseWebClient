@@ -3,9 +3,10 @@ package org.sagebionetworks.web.client.widget.docker;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,11 +23,11 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	@UiField
 	Button addExternalRepo;
 	@UiField
-	SimplePanel paginationPanel;
-	@UiField
 	SimplePanel addExternalRepoModalPanel;
 	@UiField
 	SimplePanel synAlertContainer;
+	@UiField
+	Div membersContainer;
 
 	Widget widget;
 	Presenter presenter;
@@ -71,16 +72,6 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	}
 
 	@Override
-	public void addPaginationWidget(PaginationWidget paginationWidget) {
-		paginationPanel.add(paginationWidget);
-	}
-
-	@Override
-	public void showPaginationVisible(boolean visible) {
-		paginationPanel.setVisible(visible);
-	}
-
-	@Override
 	public void setAddExternalRepoButtonVisible(boolean visibile) {
 		addExternalRepo.setVisible(visibile);
 	}
@@ -98,5 +89,11 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	@Override
 	public void setSynAlertVisible(boolean visible) {
 		synAlertContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setMembersContainer(LoadMoreWidgetContainer membersContainerW) {
+		membersContainer.clear();
+		membersContainer.add(membersContainerW.asWidget());
 	}
 }

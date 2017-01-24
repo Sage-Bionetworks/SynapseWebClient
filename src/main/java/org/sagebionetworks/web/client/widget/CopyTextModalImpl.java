@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,7 +26,7 @@ public class CopyTextModalImpl implements CopyTextModal {
 	private static Binder uiBinder = GWT.create(Binder.class);
 	
 	@Inject
-	public CopyTextModalImpl() {
+	public CopyTextModalImpl(final SynapseJSNIUtils jsniUtils) {
 		widget = uiBinder.createAndBindUi(this);
 		closeButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -58,6 +58,5 @@ public class CopyTextModalImpl implements CopyTextModal {
 	@Override
 	public void show() {
 		modal.show();
-		textBox.selectAll();
 	}
 }

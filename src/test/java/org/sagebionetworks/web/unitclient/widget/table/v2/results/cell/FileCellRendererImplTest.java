@@ -18,6 +18,7 @@ import org.mockito.stubbing.Stubber;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -101,6 +102,19 @@ public class FileCellRendererImplTest {
 		// hide loading
 		verify(mockView).setLoadingVisible(false);
 		verify(mockView).setAnchor(fileHandle.getFileName(), renderer.createAnchorHref());
+	}
+	
+	@Test
+	public void testSetValueSuccessUnauthorized(){
+		when(mockView.isAttached()).thenReturn(true);
+		when(mockFileResult.getFileHandle()).thenReturn(null);
+		when(mockFileResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
+		renderer.setValue(fileHandleId);
+		// loading shown first
+		verify(mockView).setLoadingVisible(true);
+		// hide loading
+		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA + ": " + FileResultFailureCode.UNAUTHORIZED.toString());
 	}
 
 	@Test

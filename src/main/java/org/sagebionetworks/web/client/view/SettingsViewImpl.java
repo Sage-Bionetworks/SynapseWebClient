@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -113,7 +114,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	private Presenter presenter;
 	
 	@Inject
-	public SettingsViewImpl(SettingsViewImplUiBinder binder) {		
+	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();

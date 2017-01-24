@@ -134,6 +134,7 @@ public class EditFileMetadataModalWidgetTest {
 		
 		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		
 		// save button
 		widget.onPrimary();
 		verify(mockView).setLoading(true);
@@ -150,6 +151,7 @@ public class EditFileMetadataModalWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateFileEntity(any(FileEntity.class), any(FileHandleCopyRequest.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
+		verify(mockFileEntity).setFileNameOverride(null);
 		verify(mockView).setLoading(true);
 		verify(mockView).hide();
 		verify(mockCallback).invoke();

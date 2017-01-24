@@ -50,7 +50,7 @@ public class QueryInputViewImpl implements QueryInputView{
 	@UiField
 	Button downloadResultsButton;
 	@UiField
-	Button helpButton;
+	Button showQueryButton;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -98,11 +98,10 @@ public class QueryInputViewImpl implements QueryInputView{
 				presenter.onDownloadResults();
 			}
 		});
-		helpButton.addClickHandler(new ClickHandler() {
-			
+		showQueryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
+				presenter.onShowQuery();
 			}
 		});
 	}
@@ -164,5 +163,14 @@ public class QueryInputViewImpl implements QueryInputView{
 	}
 
 
+	@Override
+	public void setQueryInputVisible(boolean visible) {
+		queryInputGroup.setVisible(visible);
+	}
+	
+	@Override
+	public void setShowQueryVisible(boolean visible) {
+		showQueryButton.setVisible(visible);
+	}
 
 }

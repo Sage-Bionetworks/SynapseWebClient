@@ -58,6 +58,8 @@
 			Schema</b:Button>
 		<b:Button ui:field="addDefaultViewColumnsButton" type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
  			Default View Columns</b:Button>
+ 		<b:Button ui:field="addAnnotationColumnsButton" type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
+ 			All Annotations</b:Button>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

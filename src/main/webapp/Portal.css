@@ -1029,8 +1029,6 @@ a.shortBtn {
 .markdown code {
 	background-clip: padding-box;
     border-radius: 3px 3px 3px 3px;
-    color: #666666;
-    font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
     padding: 0 5px 2px;
     overflow:auto;
@@ -1161,6 +1159,12 @@ span.font-size-13,
 i.font-size-1x {
 	font-size:1em;
 }
+
+.font-size-0-9em, #rootPanel .font-size-0-9em,
+i.font-size-0-9em, #rootPanel i.font-size-0-9em {
+	font-size:0.9em;
+}
+
 .font-size-1-5x,
 i.font-size-1-5x {
 	font-size:1.5em;

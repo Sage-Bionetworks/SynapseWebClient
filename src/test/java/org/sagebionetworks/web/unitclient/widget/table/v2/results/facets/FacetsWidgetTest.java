@@ -105,12 +105,12 @@ public class FacetsWidgetTest {
 	public void testConfigureResultValuesFacet() {
 		facets.add(mockFacetColumnResultValues);
 		facetValues.add(mockFacetResultValueCount);
+		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.ENTITYID);
 		widget.configure(facets, mockFacetChangedHandler, columnModels);
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		boolean isUserId = false;
-		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, isUserId, mockFacetChangedHandler);
+		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, ColumnType.ENTITYID, mockFacetChangedHandler);
 	}
 	
 	@Test
@@ -122,8 +122,20 @@ public class FacetsWidgetTest {
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		boolean isUserId = true;
-		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, isUserId, mockFacetChangedHandler);
+		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, ColumnType.USERID, mockFacetChangedHandler);
+	}
+	
+
+	@Test
+	public void testConfigureFacetColumnMissing() {
+		facets.add(mockFacetColumnResultValues);
+		facetValues.add(mockFacetResultValueCount);
+		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.USERID);
+		columnModels.clear();
+		widget.configure(facets, mockFacetChangedHandler, columnModels);
+		assertFalse(widget.isShowingFacets());
+		verify(mockView).clear();
+		verifyNoMoreInteractions(mockView);
 	}
 	
 	@Test

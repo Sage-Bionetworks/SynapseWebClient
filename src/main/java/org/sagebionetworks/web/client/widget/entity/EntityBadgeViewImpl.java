@@ -81,7 +81,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Callback onAttachCallback;
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
-			SynapseJSNIUtils synapseJSNIUtils,
+			final SynapseJSNIUtils synapseJSNIUtils,
 			SageImageBundle sageImageBundle, 
 			PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;

@@ -144,7 +144,7 @@ public class UploadCSVFinalPageImplTest {
 		oneExpected.setColumnType(ColumnType.STRING);
 		// size should be increased by the buffer
 		oneExpected
-				.setMaximumSize((long) (100 + (100 * UploadCSVFinishPageImpl.COLUMN_SIZE_BUFFER)));
+				.setMaximumSize((long) 100);
 		oneExpected.setName("a column name");
 		ColumnModel twoExpected = new ColumnModel();
 		twoExpected.setColumnType(ColumnType.STRING);

@@ -131,4 +131,8 @@ public interface QueryResultEditorView extends IsWidget {
 	 */
 	void hideEditor();
 	
+	void showErrorDialog(String message);
+	
+	void showMessage(String title, String message);
+	
 }

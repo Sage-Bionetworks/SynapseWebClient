@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -622,5 +625,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var v = parser.pathname; // for example, "/resources/images/" 
 		parser = null; 
 		return v;
+	}-*/;
+	
+	@Override
+	public void copyToClipboard() {
+		try {
+			_copyToClipboard();
+			Notify.hideAll();
+			NotifySettings settings = DisplayUtils.getDefaultSettings();
+			settings.setType(NotifyType.INFO);
+			Notify.notify("Copied to clipboard", settings);
+		} catch (Throwable t) {
+			consoleError(t.getMessage());
+		}
+	}
+
+	private final static native String _copyToClipboard() /*-{
+		$doc.execCommand('copy');
 	}-*/;
 }
