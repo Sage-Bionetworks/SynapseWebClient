@@ -5,14 +5,19 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
@@ -145,38 +150,67 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	 * 
 	 * @param table
 	 */
-	public void applyCSVToTable(final TableEntity table, final List<ColumnModel> schema) {
+	public void applyCSVToTable(final TableEntity table, List<ColumnModel> schema) {
 		// Get the preview request.
 		this.uploadtoTableRequest.setTableId(table.getId());
-		
-		List<String> columnIds = new ArrayList<String>(schema.size());
-		for (ColumnModel cm : schema) {
-			columnIds.add(cm.getId());
-		}
-		this.uploadtoTableRequest.setColumnIds(columnIds);
-		
 		this.view.setTrackerVisible(true);
-		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
-				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
-				new AsynchronousProgressHandler() {
-
-					@Override
-					public void onCancel() {
-						presenter.onCancel();
-					}
-
-					@Override
-					public void onComplete(AsynchronousResponseBody response) {
-						// At this point the table should be created with CSV
-						// applied.
-						presenter.onFinished();
-					}
-
-					@Override
-					public void onFailure(Throwable failure) {
-						presenter.setErrorMessage(failure.getMessage());
-					}
-				});
+		
+		TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
+		transactionRequest.setEntityId(uploadtoTableRequest.getTableId());
+		List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
+		changes.add(uploadtoTableRequest);
+		TableSchemaChangeRequest changeRequest = new TableSchemaChangeRequest();
+		List<ColumnChange> columnChanges = new ArrayList<ColumnChange>(schema.size());
+		for (ColumnModel cm : schema) {
+			ColumnChange cc = new ColumnChange();
+			cc.setOldColumnId(null);
+			cc.setNewColumnId(cm.getId());
+			columnChanges.add(cc);
+		}
+		changeRequest.setChanges(columnChanges);
+		changes.add(changeRequest);
+		transactionRequest.setChanges(changes);
+		
+		
+		this.jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+			
+			@Override
+			public void onFailure(Throwable failure) {
+				presenter.setErrorMessage(failure.getMessage());
+			}
+			
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				presenter.onFinished();
+			}
+			
+			@Override
+			public void onCancel() {
+				presenter.onCancel();
+			}
+		});
+		
+//		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
+//				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
+//				new AsynchronousProgressHandler() {
+//
+//					@Override
+//					public void onCancel() {
+//						presenter.onCancel();
+//					}
+//
+//					@Override
+//					public void onComplete(AsynchronousResponseBody response) {
+//						// At this point the table should be created with CSV
+//						// applied.
+//						presenter.onFinished();
+//					}
+//
+//					@Override
+//					public void onFailure(Throwable failure) {
+//						presenter.setErrorMessage(failure.getMessage());
+//					}
+//				});
 	}
 
 	/**
