@@ -119,14 +119,9 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		}
 	}
 
-	public void createTable(List<ColumnModel> schema) {
+	public void createTable(final List<ColumnModel> schema) {
 		// Get the column model ids.
-		List<String> columnIds = new ArrayList<String>(schema.size());
-		for (ColumnModel cm : schema) {
-			columnIds.add(cm.getId());
-		}
 		TableEntity table = new TableEntity();
-		table.setColumnIds(columnIds);
 		table.setParentId(this.parentId);
 		table.setName(this.view.getTableName());
 		// Create the table
@@ -135,7 +130,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 
 					@Override
 					public void onSuccess(Entity result) {
-						applyCSVToTable((TableEntity) result);
+						applyCSVToTable((TableEntity) result, schema);
 					}
 
 					@Override
@@ -150,9 +145,16 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	 * 
 	 * @param table
 	 */
-	public void applyCSVToTable(final TableEntity table) {
+	public void applyCSVToTable(final TableEntity table, final List<ColumnModel> schema) {
 		// Get the preview request.
 		this.uploadtoTableRequest.setTableId(table.getId());
+		
+		List<String> columnIds = new ArrayList<String>(schema.size());
+		for (ColumnModel cm : schema) {
+			columnIds.add(cm.getId());
+		}
+		this.uploadtoTableRequest.setColumnIds(columnIds);
+		
 		this.view.setTrackerVisible(true);
 		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
 				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
