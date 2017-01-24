@@ -158,7 +158,6 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
 		transactionRequest.setEntityId(uploadtoTableRequest.getTableId());
 		List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
-		changes.add(uploadtoTableRequest);
 		TableSchemaChangeRequest changeRequest = new TableSchemaChangeRequest();
 		List<ColumnChange> columnChanges = new ArrayList<ColumnChange>(schema.size());
 		for (ColumnModel cm : schema) {
@@ -169,6 +168,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		}
 		changeRequest.setChanges(columnChanges);
 		changes.add(changeRequest);
+		changes.add(uploadtoTableRequest);
 		transactionRequest.setChanges(changes);
 		
 		
@@ -189,28 +189,6 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 				presenter.onCancel();
 			}
 		});
-		
-//		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
-//				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
-//				new AsynchronousProgressHandler() {
-//
-//					@Override
-//					public void onCancel() {
-//						presenter.onCancel();
-//					}
-//
-//					@Override
-//					public void onComplete(AsynchronousResponseBody response) {
-//						// At this point the table should be created with CSV
-//						// applied.
-//						presenter.onFinished();
-//					}
-//
-//					@Override
-//					public void onFailure(Throwable failure) {
-//						presenter.setErrorMessage(failure.getMessage());
-//					}
-//				});
 	}
 
 	/**
