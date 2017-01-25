@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
@@ -94,6 +95,9 @@ public class TablePageWidgetTest {
 	FacetColumnResult mockFacetColumnResult;
 	@Mock
 	FileViewDefaultColumns mockFileViewDefaultColumns;
+	@Mock
+	ClientCache mockClientCache;
+	
 	List<ColumnModel> defaultColumnModels;
 
 	List<FacetColumnResult> facets;
@@ -152,7 +156,7 @@ public class TablePageWidgetTest {
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
 		AsyncMockStubber.callSuccessWith(defaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
-		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
+		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget, mockClientCache);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
 		headers = TableModelTestUtils.buildSelectColumns(schema);

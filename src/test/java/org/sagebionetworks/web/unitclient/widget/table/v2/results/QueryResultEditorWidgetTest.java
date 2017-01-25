@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -81,6 +82,8 @@ public class QueryResultEditorWidgetTest {
 	TableSchemaChangeResponse mockTableSchemaChangeResponse;
 	@Mock
 	EntityUpdateResult mockEntityUpdateResult;
+	@Mock
+	ClientCache mockClientCache;
 	List<TableUpdateResponse> tableUpdateResults;
 	boolean isView;
 	@Before
@@ -91,7 +94,7 @@ public class QueryResultEditorWidgetTest {
 		jobTrackingStub = new JobTrackingWidgetStub();
 		mockGlobalState = Mockito.mock(GlobalApplicationState.class);
 		mockCallback = Mockito.mock(Callback.class);
-		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState);
+		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState,mockClientCache);
 
 		schema = TableModelTestUtils.createColumsWithNames("one", "two");
 		headers = TableModelTestUtils.buildSelectColumns(schema);
