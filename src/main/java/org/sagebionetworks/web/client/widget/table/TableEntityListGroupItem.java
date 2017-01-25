@@ -58,9 +58,10 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		hiddenOnXs.add(createdByUserBadge);
 		createdByUserBadge.asWidget().addStyleName("movedown-9 margin-right-10");
 		
-		hiddenOnXs.add(new Text(MODIFIED_ON+DATE_FORMAT.format(header.getModifiedOn())+BY));
-		hiddenOnXs.add(modifiedByUserBadge);
-		modifiedByUserBadge.asWidget().addStyleName("movedown-9");
+		// Uncomment when PLFM-3054/PLFM-4220 have been fixed.
+//		hiddenOnXs.add(new Text(MODIFIED_ON+DATE_FORMAT.format(header.getModifiedOn())+BY));
+//		hiddenOnXs.add(modifiedByUserBadge);
+//		modifiedByUserBadge.asWidget().addStyleName("movedown-9");
 		
 		anchor = new Anchor("#!Synapse:"+header.getId());
 		anchor.setTarget("_blank");
