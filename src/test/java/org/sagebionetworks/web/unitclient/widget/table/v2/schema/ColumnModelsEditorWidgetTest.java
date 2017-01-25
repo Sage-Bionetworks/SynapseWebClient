@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,10 +26,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -58,7 +59,7 @@ public class ColumnModelsEditorWidgetTest {
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	FileViewDefaultColumns mockFileViewDefaultColumns;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
 	
@@ -91,8 +92,8 @@ public class ColumnModelsEditorWidgetTest {
 		nonEditableColumn.setColumnType(ColumnType.STRING);
 		nonEditableColumn.setName("non-editable default column");
 		nonEditableColumns.add(nonEditableColumn);
-		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockSynapseClient).getDefaultColumnsForView(any(org.sagebionetworks.repo.model.table.ViewType.class), any(AsyncCallback.class));
-		widget = new ColumnModelsEditorWidget(mockGinInjector, mockSynapseClient, adapterFactory);
+		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
+		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(schema);
 	}

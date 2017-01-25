@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,6 +45,7 @@ public class QueryResultEditorWidget implements
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
+	boolean isView;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -71,15 +71,18 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(QueryResultBundle bundle, Callback callback) {
+	public void showEditor(QueryResultBundle bundle, boolean isView, Callback callback) {
 		this.callback = callback;
 		this.startingBundle = bundle;
+		this.isView = isView;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, null, true, false, this, null, null);
+		pageWidget.configure(bundle, null, null, true, isView, this, null, null);
 		setJobRunning(false);
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);
+		view.setAddRowButtonVisible(!isView);
+		view.setButtonToolbarVisible(!isView);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
 	}

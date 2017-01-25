@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,7 +20,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateFailureCode;
@@ -33,7 +34,6 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -43,8 +43,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for QueryResultEditorWidget.
@@ -84,7 +82,7 @@ public class QueryResultEditorWidgetTest {
 	@Mock
 	EntityUpdateResult mockEntityUpdateResult;
 	List<TableUpdateResponse> tableUpdateResults;
-	
+	boolean isView;
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -120,6 +118,8 @@ public class QueryResultEditorWidgetTest {
 		when(mockPageWidget.extractRowSet()).thenReturn(updates);
 		tableUpdateResults = new ArrayList<TableUpdateResponse>();
 		when(mockTableUpdateTransactionResponse.getResults()).thenReturn(tableUpdateResults);
+		// by default, edit Table results (not a view)
+		isView = false;
 	}
 	
 	@Test
@@ -163,18 +163,29 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEdit(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
+		verify(mockView).setAddRowButtonVisible(true);
+		verify(mockView).setButtonToolbarVisible(true);
 		verify(mockView, times(2)).showEditor();
 		verify(mockGlobalState).setIsEditing(true);
 		verify(mockGlobalState, never()).setIsEditing(false);
 	}
 	
 	@Test
+	public void testOnEditView(){
+		isView = true;
+		widget.showEditor(bundle, isView, mockCallback);
+		verify(mockView).setAddRowButtonVisible(false);
+		verify(mockView).setButtonToolbarVisible(false);
+	}
+
+	
+	@Test
 	public void testOnCancelNoChanges(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// No changes
@@ -185,7 +196,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmOkay(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -201,7 +212,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmCanceld(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -217,7 +228,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveNoChanges(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -234,7 +245,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesNotValid(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -257,7 +268,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChangesValidJobSuccessful(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -290,7 +301,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -325,7 +336,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobCanceled(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
