@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
@@ -55,6 +56,7 @@ public class UploadCSVFinalPageImplTest {
 	UploadToTableRequest request;
 	List<ColumnModel> schema;
 	UploadCSVFinishPageImpl page;
+	AsynchronousResponseBody mockAsynchResponseBody;
 
 	@Before
 	public void before() {
@@ -65,6 +67,7 @@ public class UploadCSVFinalPageImplTest {
 				.mock(KeyboardNavigationHandler.class);
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockPresenter = Mockito.mock(ModalPresenter.class);
+		mockAsynchResponseBody = Mockito.mock(AsynchronousResponseBody.class);
 		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient,
 				mockPortalGinInjector, jobTrackingWidgetStub,
 				mockKeyboardNavigationHandler);
@@ -127,7 +130,7 @@ public class UploadCSVFinalPageImplTest {
 		page.setModalPresenter(mockPresenter);
 		reset(mockView);
 		reset(mockPresenter);
-		jobTrackingWidgetStub.setResponse(new UploadToTableResult());
+		jobTrackingWidgetStub.setResponse(mockAsynchResponseBody);
 		// the test call
 		page.onPrimary();
 		verify(mockPresenter).setLoading(true);
