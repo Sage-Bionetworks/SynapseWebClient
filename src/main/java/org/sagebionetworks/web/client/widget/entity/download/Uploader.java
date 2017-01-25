@@ -520,7 +520,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				String fileName = fileNames[currIndex];
 				String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
 				contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, fileName);
-				GWT.debugger();
 				if (isUpdating) {
 					//existing entity
 					updateExternalFileEntity(entityId, path, fileName, fileSize, contentType, hexValue, storageLocationId);
