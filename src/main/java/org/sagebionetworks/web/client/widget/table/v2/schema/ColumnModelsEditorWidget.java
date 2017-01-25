@@ -19,9 +19,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.*;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -110,7 +110,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	private ColumnModelTableRowViewer createColumnModelViewerWidget(ColumnModel cm) {
 		ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
 		ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
-		rowViewer.setSelectable(false);
+		rowViewer.setSelectable(!ETAG_COLUMN_NAME.equals(cm.getName()));
 		rowViewer.setSelectionPresenter(this);
 		editor.addColumn(rowViewer);
 		this.editorRows.add(rowViewer);
@@ -153,7 +153,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 	
 	public void addColumnsAfterInit(List<ColumnModel> models, List<ColumnModel> nonEditableColumns) {
-		GWT.debugger();
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
 		newColumns.addAll(models);
 		List<ColumnModel> existingColumns = getEditedColumnModels();

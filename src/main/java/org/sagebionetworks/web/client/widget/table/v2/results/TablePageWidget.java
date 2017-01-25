@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -18,6 +16,7 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -46,20 +45,26 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	String tableId;
 	boolean isView;
 	FacetsWidget facetsWidget;
-	
+	ClientCache clientCache;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget, FacetsWidget facetsWidget){
+	public TablePageWidget(TablePageView view, 
+			PortalGinInjector ginInjector, 
+			DetailedPaginationWidget paginationWidget, 
+			FacetsWidget facetsWidget,
+			ClientCache clientCache){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
+		this.clientCache = clientCache;
 		view.setFacetsWidget(facetsWidget.asWidget());
+		view.setPresenter(this);
 	}
 	
 	/**
@@ -149,6 +154,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
+		String isRecentlyModifiedView = clientCache.get(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+		view.setViewRecentlyModifiedAlertvisible(isRecentlyModifiedView != null);
+	}
+	
+	@Override
+	public void viewRecentlyModifiedAlertDismissed() {
+		clientCache.remove(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
 	}
 
 	/**

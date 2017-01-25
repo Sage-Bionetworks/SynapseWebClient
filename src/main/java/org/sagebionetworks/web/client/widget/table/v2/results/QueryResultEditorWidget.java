@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -14,6 +15,7 @@ import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -32,15 +34,19 @@ import com.google.inject.Inject;
 public class QueryResultEditorWidget implements
 		QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
 
-	public static final String CHANGES_SUBMITTED_MESSAGE = "It may take a few minutes these changes to propagate through the system.";
+	public static final String CHANGES_SUBMITTED_MESSAGE = "It may take a few minutes for these changes to propagate through the system.";
 	public static final String CHANGES_SUBMITTED_TITLE = "Your changes have been successfully submitted.";
+	public static final String VIEW_RECENTLY_CHANGED_KEY = "_view_recently_changed";
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 
+	public static final long MESSAGE_EXPIRE_TIME = 1000*60*2;  //2 minutes
+	
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
 	QueryResultBundle startingBundle;
+	ClientCache clientCache;
 	JobTrackingWidget editJobTrackingWidget;
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
@@ -51,7 +57,8 @@ public class QueryResultEditorWidget implements
 	public QueryResultEditorWidget(QueryResultEditorView view,
 			TablePageWidget pageWidget,
 			JobTrackingWidget editJobTrackingWidget,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState, 
+			ClientCache clientCache) {
 		this.view = view;
 		this.pageWidget = pageWidget;
 		this.editJobTrackingWidget = editJobTrackingWidget;
@@ -59,6 +66,7 @@ public class QueryResultEditorWidget implements
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(editJobTrackingWidget);
 		this.globalApplicationState = globalApplicationState;
+		this.clientCache = clientCache;
 	}
 
 	@Override
@@ -254,6 +262,8 @@ public class QueryResultEditorWidget implements
 							view.showErrorDialog(errors);
 						}
 						view.showMessage(CHANGES_SUBMITTED_TITLE, CHANGES_SUBMITTED_MESSAGE);
+						Date now = new Date();
+						clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, "true", now.getTime() + MESSAGE_EXPIRE_TIME);
 						doHideEditor();
 						callback.invoke();
 					}

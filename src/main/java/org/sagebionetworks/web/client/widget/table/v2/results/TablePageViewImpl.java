@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.shared.event.AlertCloseEvent;
+import org.gwtbootstrap3.client.shared.event.AlertCloseHandler;
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
@@ -39,12 +42,25 @@ public class TablePageViewImpl implements TablePageView {
 	ScrollPanel facetsWidgetContainer;
 	@UiField
 	Div tablePanel;
-	
+	@UiField
+	Alert viewModifiedRecentlyAlert;
 	Widget widget;
+	Presenter presenter;
 	
 	@Inject
 	public TablePageViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
+		viewModifiedRecentlyAlert.addCloseHandler(new AlertCloseHandler() {
+			@Override
+			public void onClose(AlertCloseEvent evt) {
+				presenter.viewRecentlyModifiedAlertDismissed();
+			}
+		});
+	}
+	
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 	
 	@Override
@@ -97,5 +113,10 @@ public class TablePageViewImpl implements TablePageView {
 	@Override
 	public void setFacetsVisible(boolean visible) {
 		facetsWidgetContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void setViewRecentlyModifiedAlertvisible(boolean visible) {
+		viewModifiedRecentlyAlert.setVisible(visible);
 	}
 }
