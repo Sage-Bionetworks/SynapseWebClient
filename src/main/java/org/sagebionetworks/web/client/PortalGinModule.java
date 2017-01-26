@@ -134,6 +134,8 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItem
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.FollowersWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.FollowersWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetView;
@@ -1388,5 +1390,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
 		
 		bind(FileViewDefaultColumns.class).in(Singleton.class);
+		bind(FollowersWidgetView.class).to(FollowersWidgetViewImpl.class);
 	}
 }

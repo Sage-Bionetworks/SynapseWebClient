@@ -16,6 +16,8 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
+import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -87,4 +89,6 @@ public interface DiscussionForumClient extends RemoteService {
 	void restoreThread(String threadId) throws RestServiceException;
 
 	PaginatedIds getModerators(String forumId, Long limit, Long offset) throws RestServiceException;
+
+	SubscriberPagedResults getSubscribers(Topic topic, String nextPageToken) throws RestServiceException;
 }
