@@ -88,4 +88,6 @@ public interface DiscussionForumClientAsync{
 	void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback);
 
 	void getSubscribers(Topic topic, String nextPageToken, AsyncCallback<SubscriberPagedResults> callback);
+
+	void getSubscribersCount(Topic topic, AsyncCallback<Integer> asyncCallback);
 }

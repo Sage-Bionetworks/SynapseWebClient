@@ -91,4 +91,6 @@ public interface DiscussionForumClient extends RemoteService {
 	PaginatedIds getModerators(String forumId, Long limit, Long offset) throws RestServiceException;
 
 	SubscriberPagedResults getSubscribers(Topic topic, String nextPageToken) throws RestServiceException;
+
+	Integer getSubscribersCount(Topic topic);
 }

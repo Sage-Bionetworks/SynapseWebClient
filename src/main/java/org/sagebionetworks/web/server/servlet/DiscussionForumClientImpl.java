@@ -314,4 +314,14 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public Integer getSubscribersCount(Topic topic) {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getSubscriberCount(topic);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 }
