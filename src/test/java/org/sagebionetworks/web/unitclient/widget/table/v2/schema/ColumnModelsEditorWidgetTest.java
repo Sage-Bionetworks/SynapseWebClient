@@ -9,6 +9,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,10 @@ public class ColumnModelsEditorWidgetTest {
 	FileViewDefaultColumns mockFileViewDefaultColumns;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
-	
+	@Mock
+	ColumnModelTableRowViewer mockColumnModelTableRowViewer1;
+	@Mock
+	ColumnModelTableRowViewer mockColumnModelTableRowViewer2;
 	ColumnModel nonEditableColumn;
 	List<ColumnModel> nonEditableColumns;
 	@Before
@@ -92,6 +96,12 @@ public class ColumnModelsEditorWidgetTest {
 		nonEditableColumn.setColumnType(ColumnType.STRING);
 		nonEditableColumn.setName("non-editable default column");
 		nonEditableColumns.add(nonEditableColumn);
+		
+		nonEditableColumn = new ColumnModel();
+		nonEditableColumn.setColumnType(ColumnType.STRING);
+		nonEditableColumn.setName(ETAG_COLUMN_NAME);
+		nonEditableColumns.add(nonEditableColumn);
+		
 		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
@@ -100,6 +110,8 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testConfigure(){
+		when(mockGinInjector.createNewColumnModelTableRowViewer()).thenReturn(mockColumnModelTableRowViewer1, mockColumnModelTableRowViewer2);
+		
 		verify(mockEditor).configure(ViewType.EDITOR, true);
 		// All rows should be added to the editor
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
@@ -123,6 +135,10 @@ public class ColumnModelsEditorWidgetTest {
 		//try to add non-editable column
 		widget.addColumns(nonEditableColumns);
 		verify(mockGinInjector, times(nonEditableColumns.size())).createNewColumnModelTableRowViewer();
+		
+		//verify etag column selection is not enabled
+		mockColumnModelTableRowViewer1.setSelectVisible(true);
+		mockColumnModelTableRowViewer2.setSelectVisible(false);
 	}
 	
 	@Test
