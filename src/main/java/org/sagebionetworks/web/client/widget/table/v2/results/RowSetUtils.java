@@ -24,6 +24,9 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
  */
 public class RowSetUtils {
 
+	public static final String ETAG_COLUMN_NAME = "etag";
+
+
 	/**
 	 * Given an original RowSet and an updated RowSet, build a delta composed of
 	 * the changes. This can include new rows, deleted rows and updated rows.
@@ -113,7 +116,7 @@ public class RowSetUtils {
 				if(original == null){
 					map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 				}else{
-					if(isValueChanged(original.getValues().get(i), updateValue) || "etag".equals(header.getName())){
+					if(isValueChanged(original.getValues().get(i), updateValue) || ETAG_COLUMN_NAME.equals(header.getName())){
 						map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 					}
 				}

@@ -53,7 +53,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	 */
 	public void configure(final String tableId, final List<ColumnModel> types, final boolean isEditor, final boolean isView, final Row row, RowSelectionListener rowSelectionListener){
 		this.rowSelectionListener = rowSelectionListener;
-		this.view.setSelectVisible(rowSelectionListener != null);
+		this.view.setSelectVisible(rowSelectionListener != null && !isView);
 		this.rowId = row.getRowId();
 		this.rowVersion = row.getVersionNumber();
 		this.cells = new ArrayList<Cell>(types.size());

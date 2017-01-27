@@ -119,6 +119,15 @@ public class RowWidgetTest {
 	}
 	
 	@Test
+	public void testViewSelectNotVisible(){
+		boolean isEditor = true;
+		isView = true;
+		rowWidget.configure(tableId, types, isEditor, isView, aRow, mockListner);
+		// selection must be shown when given a listener.
+		verify(mockView).setSelectVisible(false);
+	}
+	
+	@Test
 	public void testIsValid(){
 		boolean isEditor = true;
 		rowWidget.configure(tableId, types, isEditor, isView, aRow, mockListner);
