@@ -3,12 +3,13 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,6 +87,7 @@ public class QueryResultEditorWidgetTest {
 	ClientCache mockClientCache;
 	List<TableUpdateResponse> tableUpdateResults;
 	boolean isView;
+	public static final String ENTITY_ID = "syn999";
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -106,7 +108,7 @@ public class QueryResultEditorWidgetTest {
 		rowTwo.setValues(Arrays.asList("2,1","2,2"));
 		
 		rowSet = new RowSet();
-		rowSet.setTableId("syn999");
+		rowSet.setTableId(ENTITY_ID);
 		rowSet.setRows(Arrays.asList(rowOne, rowTwo));
 		updates = TableModelTestUtils.cloneObject(rowSet.getRows(), Row.class);
 		
@@ -300,7 +302,47 @@ public class QueryResultEditorWidgetTest {
 		
 		// The callback should be invoked
 		verify(mockCallback).invoke();
+		
+		verify(mockClientCache, never()).put(anyString(), anyString(), anyLong());
 	}
+	
+
+	@Test
+	public void testOnSaveWithChangesValidJobSuccessfulIsView(){
+		isView = true;
+		widget.showEditor(bundle, isView, mockCallback);
+		reset(mockView);
+		reset(mockGlobalState);
+		// make changes
+		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		// not valid
+		when(mockPageWidget.isValid()).thenReturn(true);
+		// setup successful job
+		TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
+		List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
+		results.add(new RowReferenceSetResults());
+		response.setResults(results);
+		jobTrackingStub.setResponse(response);
+		// the call
+		widget.onSave();
+		verify(mockView).setSaveButtonLoading(true);
+		verify(mockView, never()).setErrorMessageVisible(true);
+		verify(mockView, never()).showErrorMessage(anyString());
+		// while the job is running the editor should not be visible
+		verify(mockView, times(2)).hideEditor();
+		// progress should be visible while the job runs.
+		verify(mockView).showProgress();
+		
+		// The editor should be hidden and the callback invoked
+		// end false
+		verify(mockGlobalState).setIsEditing(false);
+		
+		// The callback should be invoked
+		verify(mockCallback).invoke();
+		
+		verify(mockClientCache).put(eq(ENTITY_ID + VIEW_RECENTLY_CHANGED_KEY), anyString(), anyLong());
+	}
+	
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){

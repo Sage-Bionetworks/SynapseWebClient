@@ -262,8 +262,10 @@ public class QueryResultEditorWidget implements
 							view.showErrorDialog(errors);
 						}
 						view.showMessage(CHANGES_SUBMITTED_TITLE, CHANGES_SUBMITTED_MESSAGE);
-						Date now = new Date();
-						clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, "true", now.getTime() + MESSAGE_EXPIRE_TIME);
+						if (isView) {
+							Date now = new Date();
+							clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, "true", now.getTime() + MESSAGE_EXPIRE_TIME);	
+						}
 						doHideEditor();
 						callback.invoke();
 					}
