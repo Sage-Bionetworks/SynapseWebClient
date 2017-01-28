@@ -24,7 +24,7 @@ public class CreateTableViewWizard {
 	}
 	private String parentId;
 	private TableType type;
-	public static final String VIEW_HELP = "A file view is a view of all files within one or more Project or Folders.";
+	public static final String VIEW_HELP = "Synapse File Views are views of all files within one or more Projects or Folders.";
 	public static final String VIEW_URL = WebConstants.DOCS_URL + "fileviews.html";
 	
 	@Inject
