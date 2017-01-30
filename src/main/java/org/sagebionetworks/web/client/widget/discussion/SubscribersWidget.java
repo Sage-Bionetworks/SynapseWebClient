@@ -2,14 +2,14 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,23 +18,23 @@ import com.google.inject.Inject;
 
 public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWidget {
 
-	UserBadgeList userBadgeList;
 	SubscribersWidgetView view;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	Topic topic;
 	LoadMoreWidgetContainer loadMoreWidgetContainer;
 	String nextPageToken;
+	PortalGinInjector ginInjector;
 	@Inject
 	public SubscribersWidget(
 			SubscribersWidgetView view,
-			UserBadgeList userBadgeList,
+			PortalGinInjector ginInjector,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			DiscussionForumClientAsync discussionForumClientAsync
 			) {
 		this.view = view;
-		this.userBadgeList = userBadgeList;
+		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
 		this.discussionForumClientAsync = discussionForumClientAsync;
@@ -75,7 +75,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	@Override
 	public void onClickSubscribersLink() {
 		// show the dialog and start getting the subscribers
-		userBadgeList.clear();
+		loadMoreWidgetContainer.clear();
 		nextPageToken = null;
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
@@ -88,6 +88,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	}
 	
 	public void loadMoreSubscribers() {
+		synAlert.clear();
 		discussionForumClientAsync.getSubscribers(topic, nextPageToken, new AsyncCallback<SubscriberPagedResults>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -100,7 +101,10 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 				nextPageToken = results.getNextPageToken();
 				List<String> subscribers = results.getSubscribers();
 				for (String userId : subscribers) {
-					userBadgeList.addUserBadge(userId);
+					UserBadge userBadge = ginInjector.getUserBadgeWidget();
+					userBadge.setStyleNames("userBadgeTable");
+					userBadge.configure(userId);
+					loadMoreWidgetContainer.add(userBadge.asWidget());
 				}
 				loadMoreWidgetContainer.setIsMore(nextPageToken != null);
 			}

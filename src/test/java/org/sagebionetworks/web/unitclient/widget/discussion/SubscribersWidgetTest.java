@@ -18,11 +18,13 @@ import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,7 +34,7 @@ public class SubscribersWidgetTest {
 	@Mock
 	SubscribersWidgetView mockView;
 	@Mock
-	UserBadgeList mockUserBadgeList;
+	PortalGinInjector mockGinInjector;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -45,6 +47,8 @@ public class SubscribersWidgetTest {
 	SubscriberPagedResults mockSubscriberPagedResults;
 	@Mock
 	Topic mockTopic;
+	@Mock
+	UserBadge mockUserBadge;
 	
 	SubscribersWidget widget;
 	public static final Long TEST_SUBSCRIBER_COUNT = 44L;
@@ -56,13 +60,14 @@ public class SubscribersWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubscribersWidget(mockView, mockUserBadgeList, mockSynAlert, mockLoadMoreWidgetContainer, mockDiscussionForumClientAsync);
+		widget = new SubscribersWidget(mockView, mockGinInjector, mockSynAlert, mockLoadMoreWidgetContainer, mockDiscussionForumClientAsync);
 		AsyncMockStubber.callSuccessWith(mockSubscriberPagedResults).when(mockDiscussionForumClientAsync).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(TEST_SUBSCRIBER_COUNT).when(mockDiscussionForumClientAsync).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
 		when(mockTopic.getObjectType()).thenReturn(SubscriptionObjectType.FORUM);
 		when(mockTopic.getObjectId()).thenReturn(TEST_OBJECT_ID);
 		subscribers = new ArrayList<String>();
 		when(mockSubscriberPagedResults.getSubscribers()).thenReturn(subscribers);
+		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 	}
 
 	@Test
@@ -119,9 +124,12 @@ public class SubscribersWidgetTest {
 		subscribers.add(subscriberId);
 		
 		widget.onClickSubscribersLink();
-		verify(mockUserBadgeList).clear();
+		verify(mockGinInjector).getUserBadgeWidget();
+		verify(mockUserBadge).configure(subscriberId);
+		verify(mockSynAlert).clear();
+		verify(mockLoadMoreWidgetContainer).clear();
 		verify(mockView).showDialog();
-		verify(mockUserBadgeList).addUserBadge(subscriberId);
+		verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
 		verify(mockLoadMoreWidgetContainer).setIsMore(true);
 	}
 	
@@ -130,8 +138,8 @@ public class SubscribersWidgetTest {
 		when(mockSubscriberPagedResults.getNextPageToken()).thenReturn(null);
 		
 		widget.loadMoreSubscribers();
-		verify(mockUserBadgeList, never()).clear();
-		verify(mockUserBadgeList, never()).addUserBadge(anyString());
+		verify(mockLoadMoreWidgetContainer, never()).clear();
+		verify(mockGinInjector, never()).getUserBadgeWidget();
 		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
 

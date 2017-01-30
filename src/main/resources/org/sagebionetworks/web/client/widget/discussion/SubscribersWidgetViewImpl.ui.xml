@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:Anchor ui:field="followersLink" />
-		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" title="Followers">
 			<b:ModalBody>
 				<bh:Div ui:field="userListContainer" />
 				<bh:Div ui:field="synAlertContainer" />
