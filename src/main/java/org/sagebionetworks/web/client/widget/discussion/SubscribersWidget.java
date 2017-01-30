@@ -47,7 +47,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 		this.topic = topic;
 		synAlert.clear();
 		// get the count
-		view.clearFollowerCount();
+		view.clearSubscriberCount();
 		view.setSubscribersLinkVisible(false);
 		discussionForumClientAsync.getSubscribersCount(topic, new AsyncCallback<Long>(){
 			@Override
@@ -69,21 +69,21 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	}
 
 	@Override
-	public void onClickFollowersLink() {
+	public void onClickSubscribersLink() {
 		// show the dialog and start getting the subscribers
 		userBadgeList.clear();
 		nextPageToken = null;
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
-				loadMoreFollowers();
+				loadMoreSubscribers();
 			}
 		});
-		loadMoreFollowers();
+		loadMoreSubscribers();
 		view.showDialog();
 	}
 	
-	public void loadMoreFollowers() {
+	public void loadMoreSubscribers() {
 		discussionForumClientAsync.getSubscribers(topic, nextPageToken, new AsyncCallback<SubscriberPagedResults>(){
 			@Override
 			public void onFailure(Throwable caught) {

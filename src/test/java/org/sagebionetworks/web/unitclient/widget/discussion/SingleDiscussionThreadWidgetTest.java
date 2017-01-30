@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.widget.discussion.NewReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -117,6 +118,8 @@ public class SingleDiscussionThreadWidgetTest {
 	NewReplyWidget mockNewReplyWidget;
 	@Mock
 	private DiscussionReplyBundle mockDiscussionReplyBundle;
+	@Mock
+	SubscribersWidget mockSubscribersWidget;
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -136,7 +139,7 @@ public class SingleDiscussionThreadWidgetTest {
 				mockJsniUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
-				mockNewReplyWidget);
+				mockNewReplyWidget, mockSubscribersWidget);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();

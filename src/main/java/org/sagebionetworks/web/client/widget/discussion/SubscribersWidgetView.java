@@ -6,11 +6,11 @@ import com.google.gwt.user.client.ui.Widget;
 public interface SubscribersWidgetView extends IsWidget {
 
 	public interface Presenter {
-		void onClickFollowersLink();
+		void onClickSubscribersLink();
 	}
 
 	void setPresenter(SubscribersWidget presenter);
-	void clearFollowerCount();
+	void clearSubscriberCount();
 	void setSubscriberCount(Long count);
 	void setSubscribersLinkVisible(boolean visible);
 	void setSynapseAlert(Widget w);

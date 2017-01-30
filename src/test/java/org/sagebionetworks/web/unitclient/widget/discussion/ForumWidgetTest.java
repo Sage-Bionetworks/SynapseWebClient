@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -83,6 +84,8 @@ public class ForumWidgetTest {
 	CallbackP<ParameterizedToken> mockParamChangeCallback;
 	@Mock
 	Callback mockCallback;
+	@Mock
+	SubscribersWidget mockSubscribersWidget;
 	
 	ForumWidget forumWidget;
 	private boolean canModerate = false;
@@ -103,7 +106,7 @@ public class ForumWidgetTest {
 		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget,mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
-				mockSubscribeButtonWidget, mockDefaultThreadWidget);
+				mockSubscribeButtonWidget, mockDefaultThreadWidget, mockSubscribersWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		moderatorIds = new HashSet<String>();
@@ -203,7 +206,7 @@ public class ForumWidgetTest {
 		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
-				mockSubscribeButtonWidget, mockDefaultThreadWidget);
+				mockSubscribeButtonWidget, mockDefaultThreadWidget, mockSubscribersWidget);
 		verify(mockDiscussionForumClient, never()).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 	}
 

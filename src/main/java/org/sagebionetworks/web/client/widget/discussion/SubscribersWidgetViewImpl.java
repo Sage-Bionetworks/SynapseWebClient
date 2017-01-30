@@ -44,7 +44,7 @@ public class SubscribersWidgetViewImpl implements SubscribersWidgetView {
 		followersLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onClickFollowersLink();
+				presenter.onClickSubscribersLink();
 			}
 		});
 	}
@@ -65,7 +65,7 @@ public class SubscribersWidgetViewImpl implements SubscribersWidgetView {
 	}
 	
 	@Override
-	public void clearFollowerCount() {
+	public void clearSubscriberCount() {
 		followersLink.setText(FOLLOWERS);
 	}
 	
