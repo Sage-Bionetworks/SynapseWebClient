@@ -25,6 +25,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -32,6 +33,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -120,6 +122,9 @@ public class SingleDiscussionThreadWidgetTest {
 	private DiscussionReplyBundle mockDiscussionReplyBundle;
 	@Mock
 	SubscribersWidget mockSubscribersWidget;
+	@Captor
+	ArgumentCaptor<Topic> topicCaptor;
+
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -152,6 +157,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setAuthor(any(Widget.class));
 		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
+		verify(mockView).setSubscribersWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
 		verify(mockRepliesContainer).configure(any(Callback.class));
 		verify(mockView).setNewReplyContainer(any(Widget.class));
@@ -185,6 +191,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRefreshAlert).configure(threadId);
 		verify(mockView).setDeletedThreadVisible(false);
 		verify(mockView).setReplyContainersVisible(true);
+		verify(mockView).setSubscribersWidgetContainerVisible(true);
 		verify(mockView).setCommandsVisible(true);
 		verify(mockView).setRestoreIconVisible(false);
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
@@ -197,6 +204,9 @@ public class SingleDiscussionThreadWidgetTest {
 		reset(mockDiscussionForumClientAsync);
 		captured.get(1).invoke();
 		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockSubscribersWidget).configure(topicCaptor.capture());
+		assertEquals(threadId, topicCaptor.getValue().getObjectId());
+		assertEquals(SubscriptionObjectType.THREAD, topicCaptor.getValue().getObjectType());
 	}
 
 	@Test
@@ -246,6 +256,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
+		verify(mockView).setSubscribersWidgetContainerVisible(false);
 	}
 
 	@Test
