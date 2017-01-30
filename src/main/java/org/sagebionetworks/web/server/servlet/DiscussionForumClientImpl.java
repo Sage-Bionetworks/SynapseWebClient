@@ -316,10 +316,10 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public Integer getSubscribersCount(Topic topic) {
+	public Long getSubscribersCount(Topic topic) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getSubscriberCount(topic);
+			return synapseClient.getSubscriberCount(topic).getCount();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

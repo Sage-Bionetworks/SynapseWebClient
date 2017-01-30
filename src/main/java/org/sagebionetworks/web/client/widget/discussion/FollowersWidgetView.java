@@ -11,7 +11,7 @@ public interface FollowersWidgetView extends IsWidget {
 
 	void setPresenter(FollowersWidget presenter);
 	void clearFollowerCount();
-	void setFollowerCount(int count);
+	void setFollowerCount(Long count);
 	void setFollowersLinkVisible(boolean visible);
 	void setSynapseAlert(Widget w);
 	void setUserListContainer(Widget w);

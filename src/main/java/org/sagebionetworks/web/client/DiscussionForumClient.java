@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
+import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -92,5 +93,5 @@ public interface DiscussionForumClient extends RemoteService {
 
 	SubscriberPagedResults getSubscribers(Topic topic, String nextPageToken) throws RestServiceException;
 
-	Integer getSubscribersCount(Topic topic);
+	Long getSubscribersCount(Topic topic) throws RestServiceException;
 }

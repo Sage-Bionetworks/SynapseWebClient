@@ -1,32 +1,16 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import java.util.List;
-import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
-import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TopicUtils;
-import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -65,7 +49,7 @@ public class FollowersWidget implements FollowersWidgetView.Presenter, IsWidget 
 		// get the count
 		view.clearFollowerCount();
 		view.setFollowersLinkVisible(false);
-		discussionForumClientAsync.getSubscribersCount(topic, new AsyncCallback<Integer>(){
+		discussionForumClientAsync.getSubscribersCount(topic, new AsyncCallback<Long>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				// unable to get the count, ignore
@@ -73,9 +57,13 @@ public class FollowersWidget implements FollowersWidgetView.Presenter, IsWidget 
 			}
 
 			@Override
-			public void onSuccess(Integer count) {
-				view.setFollowerCount(count);
-				view.setFollowersLinkVisible(count > 0);
+			public void onSuccess(Long count) {
+				if (count != null) {
+					view.setFollowerCount(count);
+					view.setFollowersLinkVisible(count > 0);
+				} else {
+					view.setFollowersLinkVisible(true);	
+				}
 			}
 		});
 	}

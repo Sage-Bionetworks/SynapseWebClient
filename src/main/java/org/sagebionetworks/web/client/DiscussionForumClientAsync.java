@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
+import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -89,5 +90,5 @@ public interface DiscussionForumClientAsync{
 
 	void getSubscribers(Topic topic, String nextPageToken, AsyncCallback<SubscriberPagedResults> callback);
 
-	void getSubscribersCount(Topic topic, AsyncCallback<Integer> asyncCallback);
+	void getSubscribersCount(Topic topic, AsyncCallback<Long> asyncCallback);
 }

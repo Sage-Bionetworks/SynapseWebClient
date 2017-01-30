@@ -75,7 +75,7 @@ public class FollowersWidgetViewImpl implements FollowersWidgetView {
 	}
 	
 	@Override
-	public void setFollowerCount(int count) {
+	public void setFollowerCount(Long count) {
 		followersLink.setText(FOLLOWERS + "(" + count + ")");
 	}
 	
