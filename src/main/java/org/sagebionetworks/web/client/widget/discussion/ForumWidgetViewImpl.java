@@ -44,6 +44,8 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Div deleteThreadsArea;
 	@UiField
 	Div mainContainer;
+	@UiField
+	Span followersContainer;
 	
 	Timer newThreadTooltipHider = new Timer() { 
 	    public void run() {
@@ -147,6 +149,17 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setDefaultThreadWidgetVisible(boolean visible) {
 		defaultThreadContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void setFollowersWidget(Widget w) {
+		followersContainer.clear();
+		followersContainer.add(w);
+	}
+
+	@Override
+	public void setFollowersWidgetVisible(boolean visible) {
+		followersContainer.setVisible(visible);
 	}
 	
 	@Override
