@@ -121,7 +121,6 @@ public class TableListWidgetTest {
 	
 	@Test
 	public void testConfigureCanEdit(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		EntityQueryResults results = new EntityQueryResults();
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
