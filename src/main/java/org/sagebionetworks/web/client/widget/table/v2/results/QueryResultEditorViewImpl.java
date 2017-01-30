@@ -170,6 +170,16 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void setErrorMessageVisible(boolean visible) {
 		errorAlert.setVisible(visible);
 	}
+	
+	@Override
+	public void setAddRowButtonVisible(boolean visible) {
+		addRowButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setButtonToolbarVisible(boolean visible) {
+		buttonToolbar.setVisible(visible);
+	}
 
 	@Override
 	public void setProgressWidget(IsWidget progress) {

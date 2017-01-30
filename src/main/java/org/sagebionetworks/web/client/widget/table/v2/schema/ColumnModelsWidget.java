@@ -109,7 +109,6 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
-		org.sagebionetworks.repo.model.table.ViewType type = ((EntityView)bundle.getEntity()).getType();
 		boolean isClearIds = true;
 		fileViewDefaultColumns.getDefaultColumns(isClearIds, new AsyncCallback<List<ColumnModel>>() {
 			@Override

@@ -1798,7 +1798,7 @@ ol.lowerroman {
 	position: relative;
 	top: -10px;
 }
-.moveup-8 {
+.moveup-8, #rootPanel .moveup-8 {
 	position: relative;
 	top: -8px;
 }

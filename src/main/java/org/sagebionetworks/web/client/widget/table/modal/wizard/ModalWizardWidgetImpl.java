@@ -105,5 +105,10 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	public void configure(ModalPage firstPage) {
 		this.firstPage = firstPage;
 	}
+	
+	@Override
+	public void setHelp(String helpMarkdown, String helpUrl) {
+		view.setHelp(helpMarkdown, helpUrl);
+	}
 
 }
