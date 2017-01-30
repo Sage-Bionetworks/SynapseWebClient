@@ -12,9 +12,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FollowersWidgetViewImpl implements FollowersWidgetView {
+public class SubscribersWidgetViewImpl implements SubscribersWidgetView {
 
-	public interface Binder extends UiBinder<Widget, FollowersWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, SubscribersWidgetViewImpl> {}
 
 	@UiField
 	Div synAlertContainer;
@@ -30,10 +30,10 @@ public class FollowersWidgetViewImpl implements FollowersWidgetView {
 	public static final String FOLLOWERS = "Followers";
 	
 	private Widget widget;
-	private FollowersWidget presenter;
+	private SubscribersWidget presenter;
 	
 	@Inject
-	public FollowersWidgetViewImpl (Binder binder) {
+	public SubscribersWidgetViewImpl (Binder binder) {
 		widget = binder.createAndBindUi(this);
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -55,7 +55,7 @@ public class FollowersWidgetViewImpl implements FollowersWidgetView {
 	}
 
 	@Override
-	public void setPresenter(FollowersWidget presenter) {
+	public void setPresenter(SubscribersWidget presenter) {
 		this.presenter = presenter;
 	}
 
@@ -70,12 +70,12 @@ public class FollowersWidgetViewImpl implements FollowersWidgetView {
 	}
 	
 	@Override
-	public void setFollowersLinkVisible(boolean visible) {
+	public void setSubscribersLinkVisible(boolean visible) {
 		followersLink.setVisible(visible);
 	}
 	
 	@Override
-	public void setFollowerCount(Long count) {
+	public void setSubscriberCount(Long count) {
 		followersLink.setText(FOLLOWERS + "(" + count + ")");
 	}
 	

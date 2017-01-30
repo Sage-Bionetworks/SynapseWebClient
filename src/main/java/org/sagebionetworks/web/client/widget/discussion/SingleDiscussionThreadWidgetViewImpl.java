@@ -76,7 +76,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Div deletedThread;
 	@UiField
-	Span followersContainer;
+	Span subscribersContainer;
 	
 	String threadLinkHref;
 	private Widget widget;
@@ -303,8 +303,12 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 	
 	@Override
-	public void setFollowersWidget(Widget widget) {
-		followersContainer.clear();
-		followersContainer.add(widget);
+	public void setSubscribersWidget(Widget widget) {
+		subscribersContainer.clear();
+		subscribersContainer.add(widget);
+	}
+	@Override
+	public void setSubscribersWidgetContainerVisible(boolean visible) {
+		subscribersContainer.setVisible(visible);
 	}
 }

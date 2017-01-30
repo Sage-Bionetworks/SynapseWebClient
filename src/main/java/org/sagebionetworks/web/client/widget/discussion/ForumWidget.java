@@ -61,7 +61,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
 	public static DiscussionThreadBundle defaultThreadBundle;
 	public SingleDiscussionThreadWidget defaultThreadWidget;
-	public FollowersWidget forumFollowersWidget;
+	public SubscribersWidget forumSubscribersWidget;
 	
 	boolean isForumConfigured;
 	@Inject
@@ -77,7 +77,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			SingleDiscussionThreadWidget singleThreadWidget,
 			SubscribeButtonWidget subscribeToForumButton,
 			SingleDiscussionThreadWidget defaultThreadWidget,
-			FollowersWidget forumFollowersWidget
+			SubscribersWidget forumSubscribersWidget
 			) {
 		this.view = view;
 		this.stuAlert = stuAlert;
@@ -90,7 +90,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.subscribeToForumButton = subscribeToForumButton;
 		this.defaultThreadWidget = defaultThreadWidget;
 		this.deletedThreadListWidget = deletedThreadListWidget;
-		this.forumFollowersWidget = forumFollowersWidget;
+		this.forumSubscribersWidget = forumSubscribersWidget;
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
@@ -99,7 +99,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setSubscribeButton(subscribeToForumButton.asWidget());
 		view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
 		view.setDeletedThreadList(deletedThreadListWidget.asWidget());
-		view.setFollowersWidget(forumFollowersWidget.asWidget());
+		view.setSubscribersWidget(forumSubscribersWidget.asWidget());
 		String defaultThreadId = globalApplicationState.getSynapseProperty(DEFAULT_THREAD_ID_KEY);
 		forumTopic.setObjectType(SubscriptionObjectType.FORUM);
 		initDefaultThread(defaultThreadId);
@@ -304,7 +304,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setDefaultThreadWidgetVisible(false);
 		view.setDeletedThreadListVisible(false);
 		view.setDeletedThreadButtonVisible(false);
-		view.setFollowersWidgetVisible(false);
+		view.setSubscribersWidgetVisible(false);
 	}
 
 	public void showThread(String threadId, final String replyId) {
@@ -357,14 +357,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setNewThreadButtonVisible(true);
 		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		view.setMainContainerVisible(true);
-		view.setFollowersWidgetVisible(true);
+		view.setSubscribersWidgetVisible(true);
 		if (!isForumConfigured) {
 			isForumConfigured = true;
 			threadListWidget.clear();
 			threadListWidget.configure(forumId, isCurrentUserModerator,
 					moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			forumTopic.setObjectId(forumId);
-			forumFollowersWidget.configure(forumTopic);
+			forumSubscribersWidget.configure(forumTopic);
 		}
 	}
 

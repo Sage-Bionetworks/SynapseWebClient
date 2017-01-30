@@ -16,18 +16,18 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FollowersWidget implements FollowersWidgetView.Presenter, IsWidget {
+public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWidget {
 
 	UserBadgeList userBadgeList;
-	FollowersWidgetView view;
+	SubscribersWidgetView view;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	Topic topic;
 	LoadMoreWidgetContainer loadMoreWidgetContainer;
 	String nextPageToken;
 	@Inject
-	public FollowersWidget(
-			FollowersWidgetView view,
+	public SubscribersWidget(
+			SubscribersWidgetView view,
 			UserBadgeList userBadgeList,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
@@ -48,21 +48,21 @@ public class FollowersWidget implements FollowersWidgetView.Presenter, IsWidget 
 		synAlert.clear();
 		// get the count
 		view.clearFollowerCount();
-		view.setFollowersLinkVisible(false);
+		view.setSubscribersLinkVisible(false);
 		discussionForumClientAsync.getSubscribersCount(topic, new AsyncCallback<Long>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				// unable to get the count, ignore
-				view.setFollowersLinkVisible(true);
+				view.setSubscribersLinkVisible(true);
 			}
 
 			@Override
 			public void onSuccess(Long count) {
 				if (count != null) {
-					view.setFollowerCount(count);
-					view.setFollowersLinkVisible(count > 0);
+					view.setSubscriberCount(count);
+					view.setSubscribersLinkVisible(count > 0);
 				} else {
-					view.setFollowersLinkVisible(true);	
+					view.setSubscribersLinkVisible(true);	
 				}
 			}
 		});
