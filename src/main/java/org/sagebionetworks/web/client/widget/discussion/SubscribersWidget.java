@@ -47,13 +47,17 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 		this.topic = topic;
 		synAlert.clear();
 		// get the count
-		view.clearSubscriberCount();
 		view.setSubscribersLinkVisible(false);
 		discussionForumClientAsync.getSubscribersCount(topic, new AsyncCallback<Long>(){
+			private void countIsUnavailable() {
+				view.clearSubscriberCount();
+				view.setSubscribersLinkVisible(true);
+			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				// unable to get the count, ignore
-				view.setSubscribersLinkVisible(true);
+				countIsUnavailable();
 			}
 
 			@Override
@@ -62,7 +66,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 					view.setSubscriberCount(count);
 					view.setSubscribersLinkVisible(count > 0);
 				} else {
-					view.setSubscribersLinkVisible(true);	
+					countIsUnavailable();	
 				}
 			}
 		});
@@ -106,6 +110,14 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	/**
+	 * for testing purposes only
+	 * @return
+	 */
+	public String getNextPageToken() {
+		return nextPageToken;
 	}
 	
 }
