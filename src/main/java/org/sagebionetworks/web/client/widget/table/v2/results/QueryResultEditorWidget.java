@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
@@ -36,7 +40,7 @@ public class QueryResultEditorWidget implements
 
 	public static final String CHANGES_SUBMITTED_MESSAGE = "It may take a few minutes for these changes to propagate through the system.";
 	public static final String CHANGES_SUBMITTED_TITLE = "Your changes have been successfully submitted.";
-	public static final String VIEW_RECENTLY_CHANGED_KEY = "_view_recently_changed";
+	public static final String VIEW_RECENTLY_CHANGED_KEY = "_view_recently_changed_etag";
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
@@ -218,13 +222,40 @@ public class QueryResultEditorWidget implements
 		return sb.toString();
 	}
 	
+	/**
+	 * @param response
+	 * @return first index in EntityUpdateResult list that does not contain a failure code.  -1 if not found
+	 */
+	public static int getFirstIndexOfEntityUpdateResultSuccess(AsynchronousResponseBody response) {
+		EntityUpdateResults results = getEntityUpdateResults(response);
+		if (results != null) {
+			List<EntityUpdateResult> resultList = results.getUpdateResults();
+			for (int i = 0; i < resultList.size(); i++) {
+				if (resultList.get(i).getFailureCode() == null) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	public String getEtagColumnId() {
+		List<ColumnModel> columnModels = pageWidget.extractHeaders();
+		for (ColumnModel columnModel : columnModels) {
+			if (ETAG_COLUMN_NAME.equals(columnModel.getName())) {
+				return columnModel.getId();
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public void onSave() {
 		view.setErrorMessageVisible(false);
 		view.setSaveButtonLoading(true);
 
 		// Are there any changes?
-		PartialRowSet prs = extractDelta();
+		final PartialRowSet prs = extractDelta();
 		if (!hasUnsavedChanges(prs)) {
 			// There is nothing to save so hide the editor
 			doHideEditor();
@@ -263,8 +294,13 @@ public class QueryResultEditorWidget implements
 						}
 						view.showMessage(CHANGES_SUBMITTED_TITLE, CHANGES_SUBMITTED_MESSAGE);
 						if (isView) {
-							Date now = new Date();
-							clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, "true", now.getTime() + MESSAGE_EXPIRE_TIME);	
+							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
+							if (successIndex > -1) {
+								Map<String, String> values = prs.getRows().get(successIndex).getValues();
+								String etag = values.get(getEtagColumnId());
+								Date now = new Date();
+								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
+							}
 						}
 						doHideEditor();
 						callback.invoke();
@@ -279,7 +315,7 @@ public class QueryResultEditorWidget implements
 					}
 				});
 	}
-
+	
 	@Override
 	public void onCancel() {
 		// Are there changes?

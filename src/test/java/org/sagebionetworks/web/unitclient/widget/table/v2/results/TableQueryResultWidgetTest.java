@@ -29,8 +29,10 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -73,6 +75,11 @@ public class TableQueryResultWidgetTest {
 	FacetColumnRequest mockFacetColumnRequest2;
 	@Mock
 	FacetColumnRequest mockFacetColumnRequest3;
+	@Mock
+	ClientCache mockClientCache;
+	@Mock
+	GWTWrapper mockGWT;
+	public static final String ENTITY_ID = "syn123";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -87,9 +94,9 @@ public class TableQueryResultWidgetTest {
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(jobTrackingStub);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT);
 		query = new Query();
-		query.setSql("select * from syn123");
+		query.setSql("select * from " + ENTITY_ID);
 		row = new Row();
 		row.setRowId(123L);
 		select = new SelectColumn();
@@ -117,6 +124,8 @@ public class TableQueryResultWidgetTest {
 		
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 		isView = false;
+		
+		when(mockClientCache.get(ENTITY_ID + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY)).thenReturn("true");
 	}
 	
 	@Test

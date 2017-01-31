@@ -39,7 +39,6 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
@@ -47,7 +46,6 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingListener;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
@@ -96,8 +94,6 @@ public class TablePageWidgetTest {
 	FacetColumnResult mockFacetColumnResult;
 	@Mock
 	FileViewDefaultColumns mockFileViewDefaultColumns;
-	@Mock
-	ClientCache mockClientCache;
 	
 	List<ColumnModel> defaultColumnModels;
 	public static final String ENTITY_ID = "syn123";
@@ -157,7 +153,7 @@ public class TablePageWidgetTest {
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
 		AsyncMockStubber.callSuccessWith(defaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
-		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget, mockClientCache);
+		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
 		headers = TableModelTestUtils.buildSelectColumns(schema);
@@ -211,9 +207,6 @@ public class TablePageWidgetTest {
 		assertEquals(expected, headers);
 		// are the rows registered?
 		verify(mockKeyboardNavigationHandler, times(extracted.size())).bindRow(any(RowOfWidgets.class));
-		
-		verify(mockClientCache).get(ENTITY_ID + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-		verify(mockView).setViewRecentlyModifiedAlertvisible(false);
 	}
 	
 	@Test
@@ -228,7 +221,6 @@ public class TablePageWidgetTest {
 	
 	@Test
 	public void testConfigureEditable(){
-		when(mockClientCache.get(ENTITY_ID + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY)).thenReturn("true");
 		boolean isEditable = true;
 		// Static headers should be used for edits
 		assertTrue(staticHeader.isEmpty());
@@ -238,10 +230,6 @@ public class TablePageWidgetTest {
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(true);
 		assertEquals(bundle.getColumnModels().size()+1, staticHeader.size());
-		
-		verify(mockClientCache).get(ENTITY_ID + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-		verify(mockView).setViewRecentlyModifiedAlertvisible(true);
-
 	}
 	
 	@Test
