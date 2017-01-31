@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,8 +37,6 @@ import com.google.inject.Inject;
 public class QueryResultEditorWidget implements
 		QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
 
-	public static final String CHANGES_SUBMITTED_MESSAGE = "It may take a few minutes for these changes to propagate through the system.";
-	public static final String CHANGES_SUBMITTED_TITLE = "Your changes have been successfully submitted.";
 	public static final String VIEW_RECENTLY_CHANGED_KEY = "_view_recently_changed_etag";
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
@@ -291,7 +287,6 @@ public class QueryResultEditorWidget implements
 						if (!errors.isEmpty()){
 							view.showErrorDialog(errors);
 						}
-						view.showMessage(CHANGES_SUBMITTED_TITLE, CHANGES_SUBMITTED_MESSAGE);
 						if (isView) {
 							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
 							if (successIndex > -1) {
