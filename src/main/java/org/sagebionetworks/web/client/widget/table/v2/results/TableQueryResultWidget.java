@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -111,9 +112,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
 		final String tableId = QueryBundleUtils.getTableId(this.startingQuery);
-		
 		String viewEtag = clientCache.get(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-		if (viewEtag != null) {
+		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
 			qbr.setPartMask(ALL_PARTS_MASK);
@@ -167,6 +167,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 					} else {
 						// clear cache value and run the actual query
 						clientCache.remove(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+						runQuery();
 					}
 				}
 				

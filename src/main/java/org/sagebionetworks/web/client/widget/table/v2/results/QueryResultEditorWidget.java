@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,8 +45,6 @@ public class QueryResultEditorWidget implements
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
-
-	public static final long MESSAGE_EXPIRE_TIME = 1000*60*2;  //2 minutes
 	
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
@@ -298,8 +297,7 @@ public class QueryResultEditorWidget implements
 							if (successIndex > -1) {
 								Map<String, String> values = prs.getRows().get(successIndex).getValues();
 								String etag = values.get(getEtagColumnId());
-								Date now = new Date();
-								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
+								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag);
 							}
 						}
 						doHideEditor();

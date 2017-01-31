@@ -123,6 +123,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 		for(Cell cell: cells){
 			values.add(cell.getValue());
 		}
+		
 		// Create the row.
 		Row row = new Row();
 		row.setRowId(this.rowId);
