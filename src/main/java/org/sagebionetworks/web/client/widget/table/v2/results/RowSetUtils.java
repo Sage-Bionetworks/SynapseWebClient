@@ -109,7 +109,6 @@ public class RowSetUtils {
 					"Row.values.size() does not match row.headers.size()");
 		}
 		HashMap<String, String> map = new HashMap<String, String>(toUpdate.getValues().size());
-		boolean isIncludingEtag = false;
 		for (int i = 0; i < toUpdate.getValues().size(); i++) {
 			ColumnModel header = headers.get(i);
 			// aggregate rows can have null headers so skip them.
@@ -118,17 +117,13 @@ public class RowSetUtils {
 				if(original == null){
 					map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 				}else{
-					boolean isEtagColumn = ETAG_COLUMN_NAME.equals(header.getName());
-					if (isEtagColumn) {
-						isIncludingEtag = true;
-					}
-					if(isValueChanged(original.getValues().get(i), updateValue) || isEtagColumn){
+					if(isValueChanged(original.getValues().get(i), updateValue) || ETAG_COLUMN_NAME.equals(header.getName())){
 						map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 					}
 				}
 			}
 		}
-		if(map.isEmpty() || (isIncludingEtag && map.size() == 1)){
+		if(map.isEmpty()){
 			// There was no change
 			return null;
 		}else{

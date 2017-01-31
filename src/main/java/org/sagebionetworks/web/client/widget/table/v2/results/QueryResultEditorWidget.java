@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
+import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
@@ -24,6 +25,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -205,12 +207,15 @@ public class QueryResultEditorWidget implements
 		if (results != null) {
 			for (EntityUpdateResult result : results.getUpdateResults()) {
 				if (result.getFailureCode() != null) {
+					sb.append("<p>");
 					sb.append(result.getEntityId());
 					sb.append(" (");
 					sb.append(result.getFailureCode());
 					sb.append("): ");
-					sb.append(result.getFailureMessage());
-					sb.append("\n");
+					if (result.getFailureMessage() != null) {
+						sb.append(result.getFailureMessage());	
+					}
+					sb.append("</p>");
 				}
 			}
 		}
@@ -244,6 +249,16 @@ public class QueryResultEditorWidget implements
 		return null;
 	}
 	
+	public void removeEtagOnlyRows(String etagColumnId, PartialRowSet prs) {
+		List<PartialRow> changes = new ArrayList<PartialRow>();
+		for (PartialRow pr : prs.getRows()) {
+			if (pr.getValues().size() > 1 || !pr.getValues().containsKey(etagColumnId)) {
+				changes.add(pr);
+			}
+		}
+		prs.setRows(changes);
+	}
+	
 	@Override
 	public void onSave() {
 		view.setErrorMessageVisible(false);
@@ -251,6 +266,10 @@ public class QueryResultEditorWidget implements
 
 		// Are there any changes?
 		final PartialRowSet prs = extractDelta();
+		final String etagColumnId = getEtagColumnId();
+		if (isView) {
+			removeEtagOnlyRows(etagColumnId, prs);
+		}
 		if (!hasUnsavedChanges(prs)) {
 			// There is nothing to save so hide the editor
 			doHideEditor();
@@ -285,13 +304,13 @@ public class QueryResultEditorWidget implements
 					public void onComplete(AsynchronousResponseBody response) {
 						String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
 						if (!errors.isEmpty()){
-							view.showErrorDialog(errors);
+							view.showErrorDialog("<h4>Unable to update the following files</h4>" + errors);
 						}
 						if (isView) {
 							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
 							if (successIndex > -1) {
 								Map<String, String> values = prs.getRows().get(successIndex).getValues();
-								String etag = values.get(getEtagColumnId());
+								String etag = values.get(etagColumnId);
 								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag);
 							}
 						}
