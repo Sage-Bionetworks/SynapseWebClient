@@ -109,7 +109,11 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		checkSelectionState();
 	}
 	
-
+	public void clear() {
+		changeAllSelection(true);
+		deleteSelected();
+	}
+	
 	/**
 	 * The current selection state determines which buttons are enabled.
 	 */
