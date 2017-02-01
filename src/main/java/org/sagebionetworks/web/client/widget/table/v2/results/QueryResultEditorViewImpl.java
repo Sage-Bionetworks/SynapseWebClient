@@ -228,7 +228,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	
 	@Override
 	public void showErrorDialog(String message) {
-		DisplayUtils.showErrorMessage(message);
+		Bootbox.alert(message);
 	}
 	@Override
 	public void showMessage(String title, String message) {

@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -45,7 +44,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	String tableId;
 	boolean isView;
 	FacetsWidget facetsWidget;
-	ClientCache clientCache;
+	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -55,14 +54,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	public TablePageWidget(TablePageView view, 
 			PortalGinInjector ginInjector, 
 			DetailedPaginationWidget paginationWidget, 
-			FacetsWidget facetsWidget,
-			ClientCache clientCache){
+			FacetsWidget facetsWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
-		this.clientCache = clientCache;
 		view.setFacetsWidget(facetsWidget.asWidget());
 		view.setPresenter(this);
 	}
@@ -154,15 +151,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
-		String isRecentlyModifiedView = clientCache.get(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-		view.setViewRecentlyModifiedAlertvisible(isRecentlyModifiedView != null);
 	}
 	
-	@Override
-	public void viewRecentlyModifiedAlertDismissed() {
-		clientCache.remove(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-	}
-
 	/**
 	 * @param types
 	 * @param isSelectable

@@ -1,20 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.*;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY;
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +23,8 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateFailureCode;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
+import org.sagebionetworks.repo.model.table.PartialRow;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
@@ -82,7 +81,9 @@ public class QueryResultEditorWidgetTest {
 	@Mock
 	TableSchemaChangeResponse mockTableSchemaChangeResponse;
 	@Mock
-	EntityUpdateResult mockEntityUpdateResult;
+	EntityUpdateResult mockEntityUpdateResult1;
+	@Mock
+	EntityUpdateResult mockEntityUpdateResult2;
 	@Mock
 	ClientCache mockClientCache;
 	List<TableUpdateResponse> tableUpdateResults;
@@ -320,7 +321,10 @@ public class QueryResultEditorWidgetTest {
 		// setup successful job
 		TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
 		List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
-		results.add(new RowReferenceSetResults());
+		EntityUpdateResult entityUpdateResult = new EntityUpdateResult();
+		EntityUpdateResults entityUpdateResults = new EntityUpdateResults();
+		entityUpdateResults.setUpdateResults(Collections.singletonList(entityUpdateResult));
+		results.add(entityUpdateResults);
 		response.setResults(results);
 		jobTrackingStub.setResponse(response);
 		// the call
@@ -431,23 +435,89 @@ public class QueryResultEditorWidgetTest {
 	}
 	
 	@Test
-	public void testGetEntityUpdateResultsFailure() {
+	public void testGetEntityUpdateResultsFailureSuccessIndex() {
 		EntityUpdateResults results = new EntityUpdateResults();
-		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult));
+		List<EntityUpdateResult> updateResults = new ArrayList<EntityUpdateResult>();
+		updateResults.add(mockEntityUpdateResult1);
+		updateResults.add(mockEntityUpdateResult2);
+		results.setUpdateResults(updateResults);
 		tableUpdateResults.add(results);
-		when(mockEntityUpdateResult.getFailureCode()).thenReturn(EntityUpdateFailureCode.NOT_FOUND);
-		when(mockEntityUpdateResult.getEntityId()).thenReturn("syn29292");
-		when(mockEntityUpdateResult.getFailureMessage()).thenReturn("Not there, buddy");
-		assertEquals("syn29292 (NOT_FOUND): Not there, buddy\n", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+		when(mockEntityUpdateResult1.getFailureCode()).thenReturn(EntityUpdateFailureCode.NOT_FOUND);
+		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
+		when(mockEntityUpdateResult1.getFailureMessage()).thenReturn("Not there, buddy");
+		assertEquals("<p>syn29292 (NOT_FOUND): Not there, buddy</p>", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+		assertEquals(1, QueryResultEditorWidget.getFirstIndexOfEntityUpdateResultSuccess(mockTableUpdateTransactionResponse));
 	}
 	
 	@Test
 	public void testGetEntityUpdateResultsNoFailures() {
 		EntityUpdateResults results = new EntityUpdateResults();
-		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult));
+		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult1));
 		tableUpdateResults.add(results);
-		when(mockEntityUpdateResult.getFailureCode()).thenReturn(null);
-		when(mockEntityUpdateResult.getEntityId()).thenReturn("syn29292");
+		when(mockEntityUpdateResult1.getFailureCode()).thenReturn(null);
+		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
 		assertEquals("", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsNoSuccess() {
+		EntityUpdateResults results = new EntityUpdateResults();
+		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult1));
+		tableUpdateResults.add(results);
+		when(mockEntityUpdateResult1.getFailureCode()).thenReturn(EntityUpdateFailureCode.UNAUTHORIZED);
+		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
+		assertEquals(-1, QueryResultEditorWidget.getFirstIndexOfEntityUpdateResultSuccess(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEtagColumnIdNotFound() {
+		// in the before we don't 
+		assertNull(widget.getEtagColumnId());
+	}
+	
+	@Test
+	public void testGetEtagColumnIdFound() {
+		schema = TableModelTestUtils.createColumsWithNames("one", ETAG_COLUMN_NAME);
+		headers = TableModelTestUtils.buildSelectColumns(schema);
+		when(mockPageWidget.extractHeaders()).thenReturn(schema);
+		
+		//ID set to index in createColumsWithNames
+		assertEquals("1", widget.getEtagColumnId());
+	}
+	
+	@Test
+	public void testEtagOnlyRows() {
+		PartialRowSet rowSet = new PartialRowSet();
+		List<PartialRow> changes = new ArrayList<PartialRow>();
+		rowSet.setRows(changes);
+		String etagColumnId = "222";
+		
+		//no op
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		assertTrue(rowSet.getRows().isEmpty());
+		
+		//add a single column cell change, verify it is not filtered out (since it is not the etag column id)
+		rowSet.setRows(changes);
+		PartialRow pr = new PartialRow();
+		changes.add(pr);
+		Map<String, String> values = new HashMap<String, String>();
+		pr.setValues(values);
+		values.put("not_etag_column_id", "new value");
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		assertEquals(1, rowSet.getRows().size());
+
+		// add another column cell change (the etag column is included), verify that it's still not filtered out
+		rowSet.setRows(changes);
+		values.put(etagColumnId, "existing-etag");
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		assertEquals(1, rowSet.getRows().size());
+		
+		// add a single column cell change for the etag column, verify that it's filtered out
+		rowSet.setRows(changes);
+		values.clear();
+		values.put(etagColumnId, "existing-etag");
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		//filtered out
+		assertTrue(rowSet.getRows().isEmpty());
 	}
 }
