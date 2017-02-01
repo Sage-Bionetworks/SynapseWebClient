@@ -24,6 +24,7 @@ public interface EntityFinderView extends SynapseView {
 	void initFinderComponents(EntityFilter filter);
 	void setBrowseAreaVisible();
 	void setSynapseIdAreaVisible();
+	void setSynapseMultiIdAreaVisible();
 	void setSearchAreaVisible();
 	boolean isShowing();
 	void show();
@@ -51,5 +52,6 @@ public interface EntityFinderView extends SynapseView {
 		Widget asWidget();
 	}
 	Widget asWidget();
+
 
 }
