@@ -36,6 +36,9 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
+	public static final int ETAG_CHECK_DELAY_MS = 5000;
+	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
+	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -121,7 +124,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			qbr.setPartMask(ALL_PARTS_MASK);
 			qbr.setQuery(this.startingQuery);
 			qbr.setEntityId(entityId);
-			this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+			this.progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 				
 				@Override
 				public void onFailure(Throwable failure) {
@@ -160,7 +163,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		query.setIsConsistent(true);
 		qbr.setQuery(query);
 		qbr.setEntityId(fileViewEntityId);
-		this.progressWidget.startAndTrackJob("Verifying that the recent changes have propagated through the system...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+		this.progressWidget.startAndTrackJob(VERIFYING_ETAG_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				showError(failure);
@@ -176,7 +179,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 						public void invoke() {
 							runQuery();
 						}
-					}, 5000);
+					}, ETAG_CHECK_DELAY_MS);
 				} else {
 					// clear cache value and run the actual query
 					clientCache.remove(fileViewEntityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
