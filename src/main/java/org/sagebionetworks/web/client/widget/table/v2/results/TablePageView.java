@@ -18,7 +18,6 @@ import com.google.gwt.user.client.ui.Widget;
 public interface TablePageView extends IsWidget {
 	
 	public interface Presenter {
-		void viewRecentlyModifiedAlertDismissed();
 	}
 	
 	/**
@@ -65,5 +64,4 @@ public interface TablePageView extends IsWidget {
 	void setFacetsVisible(boolean visible);
 
 	void setPresenter(Presenter presenter);
-	void setViewRecentlyModifiedAlertvisible(boolean visible);
 }

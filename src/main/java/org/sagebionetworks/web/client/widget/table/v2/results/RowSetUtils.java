@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.SelectColumn;
 
 /**
  * Functional utilities for the complex operations on RowSets.
@@ -123,7 +122,7 @@ public class RowSetUtils {
 			}
 		}
 		if(map.isEmpty()){
-			// There was no chang.e
+			// There was no change
 			return null;
 		}else{
 			PartialRow pr = new PartialRow();
