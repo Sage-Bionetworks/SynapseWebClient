@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_LIMIT;
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
+
 import java.util.ArrayList;
 import java.util.List;
-import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.*;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.Query;
@@ -21,7 +24,6 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -111,14 +113,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		fireStartEvent();
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
-		final String tableId = QueryBundleUtils.getTableId(this.startingQuery);
-		String viewEtag = clientCache.get(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+		String entityId = QueryBundleUtils.getTableId(this.startingQuery);
+		String viewEtag = clientCache.get(entityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
 		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
 			qbr.setPartMask(ALL_PARTS_MASK);
 			qbr.setQuery(this.startingQuery);
-			qbr.setEntityId(tableId);
+			qbr.setEntityId(entityId);
 			this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 				
 				@Override
@@ -137,48 +139,57 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				}
 			});
 		} else {
-			//check to see if etag exists in view
-			QueryBundleRequest qbr = new QueryBundleRequest();
-			qbr.setPartMask(ALL_PARTS_MASK);
-			Query query = new Query();
-			query.setSql("select etag from " + tableId + " where etag='"+viewEtag+"'");
-			query.setOffset(DEFAULT_OFFSET);
-			query.setLimit(DEFAULT_LIMIT);
-			query.setIsConsistent(true);
-			qbr.setQuery(query);
-			qbr.setEntityId(tableId);
-			this.progressWidget.startAndTrackJob("Verifying that the recent changes have propagated through the system...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
-				@Override
-				public void onFailure(Throwable failure) {
-					showError(failure);
-				}
-				
-				@Override
-				public void onComplete(AsynchronousResponseBody response) {
-					QueryResultBundle resultBundle = (QueryResultBundle) response;
-					if (resultBundle.getQueryCount() > 0) {
-						// retry after waiting a few seconds
-						gwt.scheduleExecution(new Callback() {
-							@Override
-							public void invoke() {
-								runQuery();
-							}
-						}, 5000);
-					} else {
-						// clear cache value and run the actual query
-						clientCache.remove(tableId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-						runQuery();
-					}
-				}
-				
-				@Override
-				public void onCancel() {
-					showError(QUERY_CANCELED);
-				}
-			});
+			verifyOldEtagIsNotInView(entityId, viewEtag);
 		}
 	}
-		
+	
+	/**
+	 * Look for the given etag in the given file view.  If it is still there, wait a few seconds and try again.  
+	 * If the etag is not in the view, then remove the clientCache key and run the query (since this indicates that the user change was propagated to the replicated layer)
+	 * @param fileViewEntityId
+	 * @param oldEtag
+	 */
+	public void verifyOldEtagIsNotInView(final String fileViewEntityId, String oldEtag) {
+		//check to see if etag exists in view
+		QueryBundleRequest qbr = new QueryBundleRequest();
+		qbr.setPartMask(ALL_PARTS_MASK);
+		Query query = new Query();
+		query.setSql("select etag from " + fileViewEntityId + " where etag='"+oldEtag+"'");
+		query.setOffset(DEFAULT_OFFSET);
+		query.setLimit(DEFAULT_LIMIT);
+		query.setIsConsistent(true);
+		qbr.setQuery(query);
+		qbr.setEntityId(fileViewEntityId);
+		this.progressWidget.startAndTrackJob("Verifying that the recent changes have propagated through the system...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+			@Override
+			public void onFailure(Throwable failure) {
+				showError(failure);
+			}
+			
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				QueryResultBundle resultBundle = (QueryResultBundle) response;
+				if (resultBundle.getQueryCount() > 0) {
+					// retry after waiting a few seconds
+					gwt.scheduleExecution(new Callback() {
+						@Override
+						public void invoke() {
+							runQuery();
+						}
+					}, 5000);
+				} else {
+					// clear cache value and run the actual query
+					clientCache.remove(fileViewEntityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+					runQuery();
+				}
+			}
+			
+			@Override
+			public void onCancel() {
+				showError(QUERY_CANCELED);
+			}
+		});
+	}
 	/**
 	 * Called after a successful query.
 	 * @param bundle

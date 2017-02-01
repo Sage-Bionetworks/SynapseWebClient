@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,7 +43,7 @@ public class QueryResultEditorWidget implements
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
-	
+	public static final long MESSAGE_EXPIRE_TIME = 1000*60*10;  //10 minutes
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
 	QueryResultBundle startingBundle;
@@ -53,6 +53,7 @@ public class QueryResultEditorWidget implements
 	Callback callback;
 	String tableId;
 	boolean isView;
+	String etagColumnId;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -94,6 +95,7 @@ public class QueryResultEditorWidget implements
 		view.setButtonToolbarVisible(!isView);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
+		this.etagColumnId = getEtagColumnId();
 	}
 
 	@Override
@@ -266,7 +268,6 @@ public class QueryResultEditorWidget implements
 
 		// Are there any changes?
 		final PartialRowSet prs = extractDelta();
-		final String etagColumnId = getEtagColumnId();
 		if (isView) {
 			removeEtagOnlyRows(etagColumnId, prs);
 		}
@@ -311,7 +312,8 @@ public class QueryResultEditorWidget implements
 							if (successIndex > -1) {
 								Map<String, String> values = prs.getRows().get(successIndex).getValues();
 								String etag = values.get(etagColumnId);
-								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag);
+								Date now = new Date();
+								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
 							}
 						}
 						doHideEditor();

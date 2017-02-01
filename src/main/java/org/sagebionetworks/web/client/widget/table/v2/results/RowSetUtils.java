@@ -15,8 +15,6 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 
-import com.google.gwt.core.shared.GWT;
-
 /**
  * Functional utilities for the complex operations on RowSets.
  * 
