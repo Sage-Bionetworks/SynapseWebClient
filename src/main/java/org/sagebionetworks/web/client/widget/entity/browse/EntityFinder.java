@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -26,10 +30,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
 	private Reference selectedEntity;
+	private ReferenceList selectedMultiEntity;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	ClientCache cache;
 	private SelectedHandler<Reference> selectedHandler;
+	private SelectedHandler<List<Reference>> selectedMultiHandler;
 	private EntityFilter filter;
 	private SynapseAlert synAlert;
 	@Inject
@@ -58,6 +64,13 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		configure(EntityFilter.ALL, showVersions, handler);
 	}
 	
+	public void configureMultiSelect(boolean showVersions, SelectedHandler<List<Reference>> handler) {
+		this.filter = EntityFilter.ALL;
+		this.showVersions = showVersions;
+		this.selectedMultiHandler = handler;
+		this.selectedMultiEntity = new ReferenceList();
+		view.setMultiVisible(true);
+	}
 
 	public void configure(EntityFilter filter, boolean showVersions, SelectedHandler<Reference> handler) {
 		this.filter = filter;
@@ -74,6 +87,14 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void okClicked() {
 		synAlert.clear();
+		if (selectedMultiHandler == null) {
+			singleSelectionOkClicked();
+		} else if (selectedHandler == null) {
+			multiSelectionOkClicked();
+		}
+	}
+	
+	private void singleSelectionOkClicked() {
 		//check for valid selection
 		if (selectedEntity == null || selectedEntity.getTargetId() == null) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
@@ -95,6 +116,29 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		}
 	}
 	
+	private void multiSelectionOkClicked() {
+		//check for valid selection
+		if (selectedMultiEntity.getReferences().isEmpty()) {
+			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
+		} else {
+			
+			// fetch the entity for a type check
+			lookupEntities(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				public void onSuccess(PaginatedResults<EntityHeader> result) {
+//					if (validateEntityTypeAgainstFilter(result)) {
+//						if (selectedHandler != null) {
+//							selectedHandler.onSelected(selectedEntity);
+//						}
+//					}
+				};
+			});
+		}
+	}
+
 	public boolean validateEntityTypeAgainstFilter(Entity entity) {
 		boolean isCorrectType = true;
 		synAlert.clear();
@@ -140,6 +184,22 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			}
 		});
 	}
+	
+	private void lookupEntities(ReferenceList referenceList, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
+		synAlert.clear();
+		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			@Override
+			public void onSuccess(PaginatedResults<EntityHeader> result) {
+				callback.onSuccess(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				callback.onFailure(caught);
+			}
+		});
+		
+	}
 
 	@Override
 	public void loadVersions(String entityId) {
@@ -180,6 +240,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			case SYNAPSE_ID:
 				view.setSynapseIdAreaVisible();
 				break;
+			case MULTI:
+				view.setSynapseMultiIdAreaVisible();
+				break;
 			case BROWSE:
 			default:
 				view.setBrowseAreaVisible();
@@ -206,5 +269,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public void setMultiVisible(boolean b) {
+		view.setMultiVisible(b);
 	}
 }

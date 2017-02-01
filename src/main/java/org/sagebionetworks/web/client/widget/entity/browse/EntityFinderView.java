@@ -53,5 +53,7 @@ public interface EntityFinderView extends SynapseView {
 	}
 	Widget asWidget();
 
+	public void setMultiVisible(boolean b);
+
 
 }

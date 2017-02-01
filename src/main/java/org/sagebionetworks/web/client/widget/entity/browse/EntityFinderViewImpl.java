@@ -153,8 +153,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			isFinderComponentsInitialized = true;
 			createMyEntityBrowserWidget();		
 			createSearchBoxWidget();			
-			createEnterIdWidget();			
-			createEnterMultiIdWidget();
+			createEnterIdWidget();
 			myEntitiesBrowser.setEntityFilter(filter);
 		}
 	}
@@ -470,6 +469,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void setSynAlert(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void setMultiVisible(boolean b) {
+		createEnterMultiIdWidget();
 	}
 }
 
