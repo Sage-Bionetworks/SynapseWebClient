@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -82,6 +83,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
 		selectedEntity = selected;
+	}
+	
+	@Override
+	public void setSelectedMultiEntity(ReferenceList selected) {
+		synAlert.clear();
+		selectedMultiEntity = selected;
 	}
 	
 	@Override
@@ -185,6 +192,23 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		});
 	}
 	
+	@Override
+	public void lookupMultiEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback) {
+		List<Reference> rList = new ArrayList<Reference>();
+		String[] entities = entityId.split(",");
+		for (String s : entities) {
+			Reference r = new Reference();
+			String[] parts = s.split(".");
+			r.setTargetId(parts[0]);
+			if (parts.length > 1) {
+				r.setTargetVersionNumber(Long.getLong(parts[1]));
+			}
+			rList.add(r);
+		}
+		selectedMultiEntity.setReferences(rList);
+		lookupEntities(selectedMultiEntity, callback);
+	}
+	
 	private void lookupEntities(ReferenceList referenceList, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		synAlert.clear();
 		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
@@ -274,4 +298,5 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	public void setMultiVisible(boolean b) {
 		view.setMultiVisible(b);
 	}
+
 }
