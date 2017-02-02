@@ -86,9 +86,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void setSelectedMultiEntity(ReferenceList selected) {
+	public void setSelectedMultiEntity(Reference selected) {
 		synAlert.clear();
-		selectedMultiEntity = selected;
+		selectedMultiEntity.getReferences().add(selected);
 	}
 	
 	@Override
@@ -136,11 +136,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 					synAlert.handleException(caught);
 				}
 				public void onSuccess(PaginatedResults<EntityHeader> result) {
-//					if (validateEntityTypeAgainstFilter(result)) {
-//						if (selectedHandler != null) {
-//							selectedHandler.onSelected(selectedEntity);
-//						}
-//					}
+					selectedMultiHandler.onSelected(selectedMultiEntity.getReferences());
 				};
 			});
 		}
@@ -221,8 +217,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				callback.onFailure(caught);
+				synAlert.showError("Here is the problem.");
+//				synAlert.handleException(caught);
+//				callback.onFailure(caught);
 			}
 		});
 		

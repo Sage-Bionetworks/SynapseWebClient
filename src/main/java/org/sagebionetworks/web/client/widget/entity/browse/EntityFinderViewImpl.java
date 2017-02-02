@@ -451,12 +451,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		// clear out selection and set new id
 		selectedRef.setTargetId(entityId);
 		selectedRef.setTargetVersionNumber(null);
-		presenter.setSelectedEntity(selectedRef);
+		presenter.setSelectedMultiEntity(selectedRef);
 	}
 	
 	private void setSelectedMultiVersion(Long versionNumber) {
 		selectedRef.setTargetVersionNumber(versionNumber);
-		presenter.setSelectedEntity(selectedRef);
+		presenter.setSelectedMultiEntity(selectedRef);
 	}
 	
 	@Override
