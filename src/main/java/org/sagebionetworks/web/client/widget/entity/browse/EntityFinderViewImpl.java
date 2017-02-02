@@ -320,7 +320,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	private void createEnterMultiIdWidget() {
-		synapseIdTextBox.addKeyDownHandler(new KeyDownHandler() {
+		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
@@ -339,8 +339,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 					@Override
 					public void onSuccess(PaginatedResults<EntityHeader> result) {
-						// TODO Auto-generated method stub
-						
+						setSelectedId(result.getResults().get(0).getId());
+						updateSelectedView();											
+						// if versionable, create and show versions
+						createVersionChooser(result.getResults().get(0).getId());
 					}
 				});
 			}
