@@ -196,15 +196,18 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	public void lookupMultiEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		List<Reference> rList = new ArrayList<Reference>();
 		String[] entities = entityId.split(",");
-		for (String s : entities) {
-			Reference r = new Reference();
+		for (int i = 0; i < entities.length; i++) {
+			String s = entities[i];
 			String[] parts = s.split(".");
+			Reference r = new Reference();
 			r.setTargetId(parts[0]);
-			if (parts.length > 1) {
-				r.setTargetVersionNumber(Long.getLong(parts[1]));
-			}
+			//this is causing an error for some reason...
+//			if (parts.length > 1) {
+//				r.setTargetVersionNumber(Long.getLong(parts[1]));
+//			}
 			rList.add(r);
 		}
+		selectedMultiEntity = new ReferenceList();
 		selectedMultiEntity.setReferences(rList);
 		lookupEntities(selectedMultiEntity, callback);
 	}
