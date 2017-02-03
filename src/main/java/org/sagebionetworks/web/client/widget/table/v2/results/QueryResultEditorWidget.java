@@ -137,9 +137,13 @@ public class QueryResultEditorWidget implements
 	 * @return
 	 */
 	private PartialRowSet extractDelta() {
-		return RowSetUtils.buildDelta(startingBundle.getQueryResult()
+		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult()
 				.getQueryResults(), pageWidget.extractRowSet(), pageWidget
 				.extractHeaders());
+		if (isView) {
+			removeEtagOnlyRows(etagColumnId, prs);
+		}
+		return prs;
 	}
 
 	/**
@@ -268,9 +272,6 @@ public class QueryResultEditorWidget implements
 
 		// Are there any changes?
 		final PartialRowSet prs = extractDelta();
-		if (isView) {
-			removeEtagOnlyRows(etagColumnId, prs);
-		}
 		if (!hasUnsavedChanges(prs)) {
 			// There is nothing to save so hide the editor
 			doHideEditor();
