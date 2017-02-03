@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.web.client.StringUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -16,11 +17,13 @@ public class EnumCellEditorImpl implements EnumCellEditor {
 	public static final String NOTHING_SELECTED = "nothing selected";
 
 	ListCellEdtiorView view;
+	SynapseJSNIUtils jsniUtils;
 	ArrayList<String> items;
 
 	@Inject
-	public EnumCellEditorImpl(ListCellEdtiorView view) {
+	public EnumCellEditorImpl(ListCellEdtiorView view, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
+		this.jsniUtils = jsniUtils;
 	}
 
 	@Override
@@ -52,8 +55,11 @@ public class EnumCellEditorImpl implements EnumCellEditor {
 				return;
 			}
 		}
-		// If here we did not match a value
-		throw new IllegalArgumentException("Unknown value: " + value);
+		
+		// we did not match a value, invalid value given
+		view.setValue(0);
+		jsniUtils.consoleError("Unknown value: " + value);
+		return;
 	}
 
 	@Override
