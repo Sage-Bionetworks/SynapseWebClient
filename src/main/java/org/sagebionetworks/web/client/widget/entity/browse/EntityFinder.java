@@ -86,9 +86,23 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void setSelectedMultiEntity(Reference selected) {
+	public void setSelectedMultiEntity(String entityList) {
 		synAlert.clear();
-		selectedMultiEntity.getReferences().add(selected);
+		List<Reference> rList = new ArrayList<Reference>();
+		String[] entities = entityList.split(",");
+		for (int i = 0; i < entities.length; i++) {
+			String s = entities[i];
+			String[] parts = s.split(".");
+			Reference r = new Reference();
+			r.setTargetId(parts[0]);
+			//this is causing an error for some reason...
+//			if (parts.length > 1) {
+//				r.setTargetVersionNumber(Long.getLong(parts[1]));
+//			}
+			rList.add(r);
+		}
+		selectedMultiEntity = new ReferenceList();
+		selectedMultiEntity.setReferences(rList);
 	}
 	
 	@Override
@@ -210,6 +224,13 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	private void lookupEntities(ReferenceList referenceList, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		synAlert.clear();
+//		ReferenceList rl = new ReferenceList();
+//		List<Reference> ar = new ArrayList<Reference>();
+//		Reference ref = new Reference();
+//		ref.setTargetId("syn7989904");
+//		ref.setTargetVersionNumber(null);
+//		ar.add(ref);
+//		rl.setReferences(ar);
 		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 			@Override
 			public void onSuccess(PaginatedResults<EntityHeader> result) {
@@ -217,9 +238,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.showError("Here is the problem.");
-//				synAlert.handleException(caught);
-//				callback.onFailure(caught);
+//				synAlert.showError("Here is the problem.");
+				synAlert.handleException(caught);
+				callback.onFailure(caught);
 			}
 		});
 		

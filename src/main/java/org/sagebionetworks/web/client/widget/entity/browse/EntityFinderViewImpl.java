@@ -320,14 +320,14 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	private void createEnterMultiIdWidget() {
-		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					lookupSynapseMultiIdButton.click();
-				}
-			}
-		});
+//		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
+//			@Override
+//			public void onKeyDown(KeyDownEvent event) {
+//				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+//					lookupSynapseMultiIdButton.click();
+//				}
+//			}
+//		});
 		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -339,7 +339,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 					@Override
 					public void onSuccess(PaginatedResults<EntityHeader> result) {
-						setSelectedId(result.getResults().get(0).getId());
+						setSelectedMultiId(result.getResults().get(0).getId());
 						updateSelectedView();											
 						// if versionable, create and show versions
 						createVersionChooser(result.getResults().get(0).getId());
@@ -451,12 +451,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		// clear out selection and set new id
 		selectedRef.setTargetId(entityId);
 		selectedRef.setTargetVersionNumber(null);
-		presenter.setSelectedMultiEntity(selectedRef);
+		presenter.setSelectedMultiEntity(entityId);
 	}
 	
 	private void setSelectedMultiVersion(Long versionNumber) {
 		selectedRef.setTargetVersionNumber(versionNumber);
-		presenter.setSelectedMultiEntity(selectedRef);
+//		presenter.setSelectedMultiEntity(selectedRef);
 	}
 	
 	@Override
