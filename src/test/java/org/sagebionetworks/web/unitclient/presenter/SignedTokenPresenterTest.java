@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -49,6 +50,8 @@ public class SignedTokenPresenterTest {
 	AccessRequirement mockAccessRequirement;
 	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	AuthenticationController mockAuthenticationController;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -58,7 +61,7 @@ public class SignedTokenPresenterTest {
 		mockSynapseAlert = mock(SynapseAlert.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockUserBadge = mock(UserBadge.class);
-		presenter = new SignedTokenPresenter(mockView, mockSynapseClient, mockGWTWrapper, mockSynapseAlert, mockGlobalApplicationState, mockUserBadge);
+		presenter = new SignedTokenPresenter(mockView, mockSynapseClient, mockGWTWrapper, mockSynapseAlert, mockGlobalApplicationState, mockUserBadge, mockAuthenticationController);
 		verify(mockView).setPresenter(presenter);
 		
 		testPlace = mock(SignedToken.class);
