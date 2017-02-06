@@ -8,12 +8,15 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -52,6 +55,9 @@ public class SignedTokenPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Captor
+	ArgumentCaptor<AsyncCallback> asyncCaptor;
+	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -126,6 +132,46 @@ public class SignedTokenPresenterTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
+		verify(mockSynapseAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testJoinTeamExpiredSessionToken() {
+		reset(mockSynapseClient);
+		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		presenter.setPlace(testPlace);
+		
+		// verify rpc attempt, and simulate an UnauthorizedException		
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+		Exception ex = new UnauthorizedException("bad session");
+		asyncCaptor.getValue().onFailure(ex);
+		verify(mockAuthenticationController).logoutUser();
+		verify(mockSynapseAlert, never()).handleException(ex);
+		
+		//verify that it tried to call rpc again
+		verify(mockSynapseClient, times(2)).getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+		//if the second attempt is successful, then it should try to handle the signed token.
+		asyncCaptor.getAllValues().get(1).onSuccess(accessRequirements);
+		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testJoinTeamExpiredSessionTokenMultipleErrors() {
+		reset(mockSynapseClient);
+		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		presenter.setPlace(testPlace);
+		
+		// verify rpc attempt, and simulate an UnauthorizedException		
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+		Exception ex = new UnauthorizedException("bad session");
+		asyncCaptor.getValue().onFailure(ex);
+		verify(mockAuthenticationController).logoutUser();
+		verify(mockSynapseAlert, never()).handleException(ex);
+		
+		//verify that it tried to call rpc again
+		verify(mockSynapseClient, times(2)).getTeamAccessRequirements(anyString(), asyncCaptor.capture());
+		//if it runs into another error (even if it's an UnauthorizedException) it should not try again.
+		asyncCaptor.getAllValues().get(1).onFailure(ex);
 		verify(mockSynapseAlert).handleException(ex);
 	}
 	
