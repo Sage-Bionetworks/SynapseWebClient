@@ -41,6 +41,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 				onAddProject(selected.getTargetId());
 			}
 		});
+		finder.setMultiVisible(true);
 	}
 	
 	public void configure(List<String> entityContainerIds, boolean canEdit) {
