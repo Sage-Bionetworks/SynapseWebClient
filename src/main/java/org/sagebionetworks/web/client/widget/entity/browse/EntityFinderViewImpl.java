@@ -98,8 +98,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@UiField
 	Button lookupSynapseIdButton;
 	@UiField
-	Button lookupSynapseMultiIdButton;
-	@UiField
 	Div synAlertContainer;
 	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
@@ -320,34 +318,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	private void createEnterMultiIdWidget() {
-//		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
-//			@Override
-//			public void onKeyDown(KeyDownEvent event) {
-//				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-//					lookupSynapseMultiIdButton.click();
-//				}
-//			}
-//		});
-		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.lookupMultiEntity(synapseMultiIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
-					
-					@Override
-					public void onFailure(Throwable caught) {
-					}
 
-					@Override
-					public void onSuccess(PaginatedResults<EntityHeader> result) {
-						setSelectedMultiId(result.getResults().get(0).getId());
-						updateSelectedView();											
-						// if versionable, create and show versions
-						createVersionChooser(result.getResults().get(0).getId());
-					}
-				});
-			}
-		});
-		
 		// list entry		
 		final Widget entry = createNewLeftEntry("Enter List of Synapse IDs", new ClickHandler(){
 	        @Override
@@ -357,6 +328,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	    });
 		enterSynapseMultiIdContainer.clear();
 		enterSynapseMultiIdContainer.setWidget(entry);
+	}
+	
+	public String getMultiEntityText() {
+		return synapseMultiIdTextBox.getText();
 	}
 				
 	private Widget createNewLeftEntry(String name, ClickHandler handler) {

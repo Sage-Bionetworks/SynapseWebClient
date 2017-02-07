@@ -54,9 +54,6 @@
 									<b:InputGroup>
 										<b:TextBox ui:field="synapseMultiIdTextBox" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456, syn789')"
 											autoComplete="false" />
-										<b:InputGroupButton>
-											<b:Button ui:field="lookupSynapseMultiIdButton" text="Lookup" />
-										</b:InputGroupButton>
 									</b:InputGroup>
 								</g:FlowPanel>
 

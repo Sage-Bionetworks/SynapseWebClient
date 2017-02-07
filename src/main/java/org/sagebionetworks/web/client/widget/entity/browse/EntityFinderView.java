@@ -61,5 +61,7 @@ public interface EntityFinderView extends SynapseView {
 
 	public void setMultiVisible(boolean b);
 
+	public String getMultiEntityText();
+
 
 }

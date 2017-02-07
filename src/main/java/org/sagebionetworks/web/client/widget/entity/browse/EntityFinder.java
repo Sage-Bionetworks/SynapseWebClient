@@ -139,12 +139,11 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	private void multiSelectionOkClicked() {
 		//check for valid selection
-		if (selectedMultiEntity.getReferences().isEmpty()) {
+		if (view.getMultiEntityText().isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			
 			// fetch the entity for a type check
-			lookupEntities(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			lookupMultiEntity(view.getMultiEntityText(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -203,35 +202,36 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void lookupMultiEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback) {
-		List<Reference> rList = new ArrayList<Reference>();
-		String[] entities = entityId.split(",");
-		for (int i = 0; i < entities.length; i++) {
-			String s = entities[i];
-			String[] parts = s.split(".");
-			Reference r = new Reference();
-			r.setTargetId(parts[0]);
-			//this is causing an error for some reason...
-//			if (parts.length > 1) {
-//				r.setTargetVersionNumber(Long.getLong(parts[1]));
-//			}
-			rList.add(r);
-		}
-		selectedMultiEntity = new ReferenceList();
-		selectedMultiEntity.setReferences(rList);
-		lookupEntities(selectedMultiEntity, callback);
-	}
-	
-	private void lookupEntities(ReferenceList referenceList, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
+	public void lookupMultiEntity(String entityIds, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		synAlert.clear();
-//		ReferenceList rl = new ReferenceList();
-//		List<Reference> ar = new ArrayList<Reference>();
-//		Reference ref = new Reference();
-//		ref.setTargetId("syn7989904");
-//		ref.setTargetVersionNumber(null);
-//		ar.add(ref);
-//		rl.setReferences(ar);
-		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+//		List<Reference> rList = new ArrayList<Reference>();
+//		String[] entities = entityIds.split(",");
+//		for (int i = 0; i < entities.length; i++) {
+//			String s = entities[i];
+//			String[] parts = s.split(".");
+//			Reference r = new Reference();
+//			r.setTargetId(parts[0]);
+//			//this is causing an error for some reason...
+////			if (parts.length > 1) {
+////				r.setTargetVersionNumber(Long.getLong(parts[1]));
+////			}
+//			rList.add(r);
+//		}
+
+		//TODO: why does commenting out these lines make it work?
+		ReferenceList rl = new ReferenceList();
+		List<Reference> ar = new ArrayList<Reference>();
+		Reference ref = new Reference();
+		ref.setTargetId("syn7989904");
+		ref.setTargetVersionNumber(null);
+		ar.add(ref);
+		Reference ref2 = new Reference();
+		ref2.setTargetId("syn7357085");
+		ref2.setTargetVersionNumber(null);
+		ar.add(ref2);
+		rl.setReferences(ar);
+		rl.setReferences(ar);
+		synapseClient.getEntityHeaderBatch(rl, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 			@Override
 			public void onSuccess(PaginatedResults<EntityHeader> result) {
 				callback.onSuccess(result);
@@ -243,7 +243,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				callback.onFailure(caught);
 			}
 		});
-		
 	}
 
 	@Override
