@@ -8,13 +8,16 @@ import jsinterop.annotations.JsType;
 public class XYData {
 	
 	@JsProperty
-	int x[];
+	String x[];
 	
 	@JsProperty
-	int y[];
+	double y[];
 	
 	@JsProperty
 	String type;
+	
+	@JsProperty
+	String name;
 	
 	@JsIgnore
 	public void setType(GraphType type) {
@@ -22,12 +25,17 @@ public class XYData {
 	}
 	
 	@JsIgnore
-	public void setX(int[] x) {
+	public void setX(String[] x) {
 		this.x = x;
 	}
 	
 	@JsIgnore
-	public void setY(int[] y) {
+	public void setY(double[] y) {
 		this.y = y;
+	}
+	
+	@JsIgnore
+	public void setName(String name) {
+		this.name = name;
 	}
 }

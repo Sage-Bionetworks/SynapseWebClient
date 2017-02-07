@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.registration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -49,53 +48,53 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
 			presenter = ginInjector.getBookmarkConfigEditor();
-		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
+		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.VIMEO_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVimeoConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.JOIN_TEAM_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinTeamConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageLinkConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(TABBED_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getTabbedTableConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseQueryConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.LEADERBOARD_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {
 			presenter = ginInjector.getLeaderboardConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getAttachmentConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.ENTITYLIST_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(ENTITYLIST_CONTENT_TYPE)) {
 			presenter = ginInjector.getEntityListConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(SHINYSITE_CONTENT_TYPE)) {
 			presenter = ginInjector.getShinySiteConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserTeamConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(PROJECT_BACKGROUND_CONTENT_TYPE)) {
 			presenter = ginInjector.getProjectBackgroundConfigEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewConfigEditor();
-		} else if(contentTypeKey.equals(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE)) {
+		} else if(contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {
 			presenter = ginInjector.getBiodallianceEditor();
-		} else if (contentTypeKey.equals(WidgetConstants.CYTOSCAPE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
 			presenter = ginInjector.getCytoscapeConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
@@ -117,70 +116,72 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public IsWidget getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
-		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
 			presenter = ginInjector.getBookmarkRenderer();
-		} else if(contentTypeKey.equals(WidgetConstants.REFERENCE_CONTENT_TYPE)) {
+		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.VIMEO_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVimeoRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE) ||
-				contentTypeKey.equals(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE) ||
+				contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
 			presenter = ginInjector.getImageRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE) || 
-				contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE) ||
-				contentTypeKey.equals(WidgetConstants.LEADERBOARD_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE) || 
+				contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE) ||
+				contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(TOC_CONTENT_TYPE)) {
 			presenter = ginInjector.getTableOfContentsRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getWikiFilesPreviewRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getAttachmentPreviewRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.ENTITYLIST_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(ENTITYLIST_CONTENT_TYPE)) {
 			presenter = ginInjector.getEntityListRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.SHINYSITE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(SHINYSITE_CONTENT_TYPE)) {
 			presenter = ginInjector.getShinySiteRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.USERBADGE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(USERBADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserBadgeWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserTeamBadgeWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.JOIN_TEAM_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinTeamWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
 			presenter = ginInjector.getEvaluationSubmissionWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(TUTORIAL_WIZARD_CONTENT_TYPE)) {
 			presenter = ginInjector.getTutorialWidgetRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.NO_AUTO_WIKI_SUBPAGES)) {
+		} else if (contentTypeKey.equals(WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(NO_AUTO_WIKI_SUBPAGES)) {
 			presenter = ginInjector.getEmptyWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.REGISTER_CHALLENGE_TEAM_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(REGISTER_CHALLENGE_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getRegisterChallengeTeamWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(CHALLENGE_TEAMS_CONTENT_TYPE)) {
 			presenter = ginInjector.getChallengeTeamsWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
 			presenter = ginInjector.getChallengeParticipantsWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {
 			presenter = ginInjector.getBiodallianceRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.CYTOSCAPE_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
 			presenter = ginInjector.getCytoscapeRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableFormWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(TEAM_MEMBERS_CONTENT_TYPE)) {
 			presenter = ginInjector.getTeamMembersWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(TEAM_MEMBER_COUNT_CONTENT_TYPE)) {
 			presenter = ginInjector.getTeamMemberCountWidget();
-		}	
+		} else if (contentTypeKey.equals(GRAPH_CONTENT_TYPE)) {
+			presenter = ginInjector.getPlotlyWidget();
+		}
 		
 		//TODO: add other widget descriptors to this mapping as they become available
 		
@@ -252,37 +253,37 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	private void initWithKnownWidgets() {
-		registerWidget(WidgetConstants.BOOKMARK_CONTENT_TYPE, WidgetConstants.BOOKMARK_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.REFERENCE_CONTENT_TYPE, WidgetConstants.REFERENCE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.VIMEO_CONTENT_TYPE, WidgetConstants.VIMEO_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, WidgetConstants.IMAGE_LINK_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.LINK_CONTENT_TYPE, WidgetConstants.LINK_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE, WidgetConstants.TABBED_TABLE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.API_TABLE_CONTENT_TYPE, WidgetConstants.API_TABLE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, WidgetConstants.QUERY_TABLE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.LEADERBOARD_CONTENT_TYPE, WidgetConstants.LEADERBOARD_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.ENTITYLIST_CONTENT_TYPE, WidgetConstants.ENTITYLIST_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE, WidgetConstants.SYNAPSE_TABLE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.PREVIEW_CONTENT_TYPE, WidgetConstants.PREVIEW_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE, WidgetConstants.JOIN_TEAM_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE, WidgetConstants.BIODALLIANCE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.CYTOSCAPE_CONTENT_TYPE, WidgetConstants.CYTOSCAPE_FRIENDLY_NAME);
-		registerWidget(WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE, WidgetConstants.SYNAPSE_FORM_FRIENDLY_NAME);
+		registerWidget(BOOKMARK_CONTENT_TYPE, BOOKMARK_FRIENDLY_NAME);
+		registerWidget(REFERENCE_CONTENT_TYPE, REFERENCE_FRIENDLY_NAME);
+		registerWidget(YOUTUBE_CONTENT_TYPE, YOUTUBE_FRIENDLY_NAME);
+		registerWidget(VIMEO_CONTENT_TYPE, VIMEO_FRIENDLY_NAME);
+		registerWidget(PROVENANCE_CONTENT_TYPE, PROVENANCE_FRIENDLY_NAME);
+		registerWidget(IMAGE_CONTENT_TYPE, IMAGE_FRIENDLY_NAME);
+		registerWidget(IMAGE_LINK_EDITOR_CONTENT_TYPE, IMAGE_LINK_FRIENDLY_NAME);
+		registerWidget(ATTACHMENT_PREVIEW_CONTENT_TYPE, ATTACHMENT_PREVIEW_FRIENDLY_NAME);
+		registerWidget(LINK_CONTENT_TYPE, LINK_FRIENDLY_NAME);
+		registerWidget(TABBED_TABLE_CONTENT_TYPE, TABBED_TABLE_FRIENDLY_NAME);
+		registerWidget(API_TABLE_CONTENT_TYPE, API_TABLE_FRIENDLY_NAME);
+		registerWidget(QUERY_TABLE_CONTENT_TYPE, QUERY_TABLE_FRIENDLY_NAME);
+		registerWidget(LEADERBOARD_CONTENT_TYPE, LEADERBOARD_FRIENDLY_NAME);
+		registerWidget(ENTITYLIST_CONTENT_TYPE, ENTITYLIST_FRIENDLY_NAME);
+		registerWidget(SHINYSITE_CONTENT_TYPE, SHINYSITE_FRIENDLY_NAME);
+		registerWidget(SYNAPSE_TABLE_CONTENT_TYPE, SYNAPSE_TABLE_FRIENDLY_NAME);
+		registerWidget(TUTORIAL_WIZARD_CONTENT_TYPE, TUTORIAL_WIZARD_FRIENDLY_NAME);
+		registerWidget(USER_TEAM_BADGE_CONTENT_TYPE, USER_TEAM_BADGE_FRIENDLY_NAME);
+		registerWidget(VIDEO_CONTENT_TYPE, VIDEO_FRIENDLY_NAME);
+		registerWidget(PREVIEW_CONTENT_TYPE, PREVIEW_FRIENDLY_NAME);
+		registerWidget(JOIN_TEAM_CONTENT_TYPE, JOIN_TEAM_FRIENDLY_NAME);
+		registerWidget(BIODALLIANCE13_CONTENT_TYPE, BIODALLIANCE_FRIENDLY_NAME);
+		registerWidget(CYTOSCAPE_CONTENT_TYPE, CYTOSCAPE_FRIENDLY_NAME);
+		registerWidget(SYNAPSE_FORM_CONTENT_TYPE, SYNAPSE_FORM_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
 		StringBuilder sb = new StringBuilder();
-		sb.append(WidgetConstants.WIDGET_START_MARKDOWN);
+		sb.append(WIDGET_START_MARKDOWN);
 		sb.append(widgetRegistrar.getMDRepresentation(contentType, widgetDescriptor));
-		sb.append(WidgetConstants.WIDGET_END_MARKDOWN);
+		sb.append(WIDGET_END_MARKDOWN);
 		return sb.toString();
 	}
 

@@ -72,8 +72,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			public void onAttachOrDetach(AttachEvent event) {
 				if (event.isAttached()) {
 					XYData xyData = new XYData();
-					xyData.setX(new int[]{1, 2, 3, 4, 5});
-					xyData.setY(new int[]{1, 2, 4, 8, 16});
+					xyData.setX(new String[]{"1", "2", "3", "4", "5"});
+					xyData.setY(new double[]{1, 2, 4, 8, 16});
 					xyData.setType(GraphType.BAR);
 					showChart(chart.getElement(), xyData);
 				}
