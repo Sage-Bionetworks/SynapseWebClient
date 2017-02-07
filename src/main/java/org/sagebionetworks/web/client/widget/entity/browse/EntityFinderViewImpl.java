@@ -422,18 +422,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		presenter.setSelectedEntity(selectedRef);
 	}
 	
-	private void setSelectedMultiId(String entityId) {
-		// clear out selection and set new id
-		selectedRef.setTargetId(entityId);
-		selectedRef.setTargetVersionNumber(null);
-		presenter.setSelectedMultiEntity(entityId);
-	}
-	
-	private void setSelectedMultiVersion(Long versionNumber) {
-		selectedRef.setTargetVersionNumber(versionNumber);
-//		presenter.setSelectedMultiEntity(selectedRef);
-	}
-	
 	@Override
 	public void show() {
 		//show modal

@@ -51,10 +51,8 @@
 									<b:Heading size="H4">
 										<bh:Text>Enter List of Synapse IDs</bh:Text>
 									</b:Heading>
-									<b:InputGroup>
-										<b:TextBox ui:field="synapseMultiIdTextBox" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456, syn789')"
-											autoComplete="false" />
-									</b:InputGroup>
+									<b:TextBox ui:field="synapseMultiIdTextBox" placeholder="Enter Synapse IDs (i.e. 'syn123.4, syn567, syn789.0')"
+										autoComplete="false" />
 								</g:FlowPanel>
 
 								<g:FlowPanel ui:field="versionUI" addStyleNames="margin-top-10">
