@@ -200,6 +200,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		myEntitiesBrowser.clearState();
 		myEntitiesBrowser.refresh();
 		synapseIdTextBox.clear();
+		synapseMultiIdTextBox.clear();
 		entitySearchBox.clearSelection();
 	}
 

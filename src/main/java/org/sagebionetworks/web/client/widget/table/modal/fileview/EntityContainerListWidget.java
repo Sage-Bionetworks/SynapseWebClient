@@ -50,7 +50,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 				}
 			}
 		});
-		//finder.setMultiVisible(true);
 	}
 	
 	public void configure(List<String> entityContainerIds, boolean canEdit) {
