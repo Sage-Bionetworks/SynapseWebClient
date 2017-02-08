@@ -78,36 +78,40 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 				PaginatedResults<V2WikiHistorySnapshot> paginatedHistory = result;
 				// paginatedHistory.getTotalNumberOfResults() should return total!
 				List<V2WikiHistorySnapshot> historyAsListOfHeaders = paginatedHistory.getResults();
-				// Update/append to history data structure
-				view.updateHistoryList(historyAsListOfHeaders);
-				// Prepare ids that are not mapped to a display name in the map
-				final ArrayList<String> idsToSearch = new ArrayList<String>();
-				for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
-					String modifiedById = historyAsListOfHeaders.get(i).getModifiedBy();
-					// Only add unique ids to the list being built
-					if(mapIdToName != null && !idsToSearch.contains(modifiedById) && !modifiedById.trim().isEmpty()) {
-						idsToSearch.add(modifiedById);
-					}
-				}
-				// Call to get user headers from the list of needed ids
-				synapseClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<UserGroupHeaderResponsePage>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
-					}
-					@Override
-					public void onSuccess(UserGroupHeaderResponsePage response) {
-						// Store display names along with the associated id in the map
-						List<UserGroupHeader> headers = response.getChildren();
-						for(int i = 0; i < headers.size(); i++) {
-							mapIdToName.put(idsToSearch.get(i), DisplayUtils.getDisplayName(headers.get(i)));
+				if (historyAsListOfHeaders == null || historyAsListOfHeaders.isEmpty()) {
+					view.hideLoadMoreButton();
+				} else {
+					// Update/append to history data structure
+					view.updateHistoryList(historyAsListOfHeaders);
+					// Prepare ids that are not mapped to a display name in the map
+					final ArrayList<String> idsToSearch = new ArrayList<String>();
+					for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
+						String modifiedById = historyAsListOfHeaders.get(i).getModifiedBy();
+						// Only add unique ids to the list being built
+						if(mapIdToName != null && !idsToSearch.contains(modifiedById) && !modifiedById.trim().isEmpty()) {
+							idsToSearch.add(modifiedById);
 						}
-						// Now we're ready to build the history widget
-						view.buildHistoryWidget();
 					}
-					
-				});
+					// Call to get user headers from the list of needed ids
+					synapseClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<UserGroupHeaderResponsePage>() {
+	
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
+						}
+						@Override
+						public void onSuccess(UserGroupHeaderResponsePage response) {
+							// Store display names along with the associated id in the map
+							List<UserGroupHeader> headers = response.getChildren();
+							for(int i = 0; i < headers.size(); i++) {
+								mapIdToName.put(idsToSearch.get(i), DisplayUtils.getDisplayName(headers.get(i)));
+							}
+							// Now we're ready to build the history widget
+							view.buildHistoryWidget();
+						}
+						
+					});
+				}
 			}
 		});
 	}

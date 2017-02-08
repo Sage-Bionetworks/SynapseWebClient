@@ -113,6 +113,18 @@ public class WikiHistoryWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureNextPageEmptyResults() {
+		PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
+		paginatedHistory.setTotalNumberOfResults(0);
+		paginatedHistory.setResults(new ArrayList<JSONEntity>());
+		AsyncMockStubber.callSuccessWith(paginatedHistory)
+			.when(mockSynapseClient).getV2WikiHistory(any(WikiPageKey.class), any(Long.class), any(Long.class), any(AsyncCallback.class));
+		presenter.configureNextPage(new Long(10), new Long(10));
+		verify(mockView).hideLoadMoreButton();
+	}
+
+	
+	@Test
 	public void testConfigureNextPageFailure2() {
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
