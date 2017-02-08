@@ -12,9 +12,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -31,19 +33,23 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	private GlobalApplicationState globalApplicationState;
 	SignedTokenInterface signedToken;
 	UserBadge unsubscribingUserBadge;
+	AuthenticationController authController;
+	boolean isFirstTry;
 	@Inject
 	public SignedTokenPresenter(SignedTokenView view, 
 			SynapseClientAsync synapseClient, 
 			GWTWrapper gwt, 
 			SynapseAlert synapseAlert,
 			GlobalApplicationState globalApplicationState, 
-			UserBadge unsubscribingUserBadge){
+			UserBadge unsubscribingUserBadge,
+			AuthenticationController authController){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synapseAlert = synapseAlert;
 		this.gwt = gwt;
 		this.globalApplicationState = globalApplicationState;
 		this.unsubscribingUserBadge = unsubscribingUserBadge;
+		this.authController = authController;
 		view.setPresenter(this);
 		view.setSynapseAlert(synapseAlert.asWidget());
 		view.setUnsubscribingUserBadge(unsubscribingUserBadge.asWidget());
@@ -77,6 +83,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 				if (result instanceof NotificationSettingsSignedToken) {
 					handleSettingsToken();
 				} else if (result instanceof JoinTeamSignedToken) {
+					isFirstTry = true;
 					handleJoinTeamToken();
 				} else {
 					handleSignedToken();
@@ -115,8 +122,15 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
-				synapseAlert.handleException(caught);
+				if (caught instanceof UnauthorizedException && isFirstTry) {
+					// invalid session token.  get rid of it and try again.
+					isFirstTry = false;
+					authController.logoutUser();
+					handleJoinTeamToken();
+				} else {
+					view.setLoadingVisible(false);
+					synapseAlert.handleException(caught);	
+				}
 			}
 		});
 	}
