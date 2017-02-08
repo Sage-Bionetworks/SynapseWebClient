@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,6 +25,7 @@ import com.google.inject.Inject;
 
 public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	SynapseWidgetPresenter, IsWidget {
+	public static final String NO_HISTORY_IS_FOUND_FOR_A_WIKI = "No history is found for a wiki";
 	private GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	private WikiHistoryWidgetView view;
@@ -60,21 +62,24 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	}
 	
 	@Override
-	public void configureNextPage(Long offset, Long limit) {
+	public void configureNextPage(final Long offset, final Long limit) {
 		synapseClient.getV2WikiHistory(wikiKey, limit, offset, new AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+				if (caught.getMessage() != null && caught.getMessage().contains(NO_HISTORY_IS_FOUND_FOR_A_WIKI)) {
+					// exception should be something more reasonable (like a 404).
+					view.hideLoadMoreButton();
+				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(PaginatedResults<V2WikiHistorySnapshot> result) {
 				PaginatedResults<V2WikiHistorySnapshot> paginatedHistory = result;
+				// paginatedHistory.getTotalNumberOfResults() should return total!
 				List<V2WikiHistorySnapshot> historyAsListOfHeaders = paginatedHistory.getResults();
 				// Update/append to history data structure
 				view.updateHistoryList(historyAsListOfHeaders);
-				
 				// Prepare ids that are not mapped to a display name in the map
 				final ArrayList<String> idsToSearch = new ArrayList<String>();
 				for(int i = 0; i < historyAsListOfHeaders.size(); i++) {

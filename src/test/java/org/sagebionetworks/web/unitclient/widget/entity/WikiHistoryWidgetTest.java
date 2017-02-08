@@ -105,6 +105,14 @@ public class WikiHistoryWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureNextPageUnavailableFailure() {
+		AsyncMockStubber.callFailureWith(new Exception(WikiHistoryWidget.NO_HISTORY_IS_FOUND_FOR_A_WIKI + " page id: 1298923"))
+			.when(mockSynapseClient).getV2WikiHistory(any(WikiPageKey.class), any(Long.class), any(Long.class), any(AsyncCallback.class));
+		presenter.configureNextPage(new Long(0), new Long(10));
+		verify(mockView).hideLoadMoreButton();
+	}
+	
+	@Test
 	public void testConfigureNextPageFailure2() {
 		AsyncMockStubber.callFailureWith(new Exception())
 			.when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
