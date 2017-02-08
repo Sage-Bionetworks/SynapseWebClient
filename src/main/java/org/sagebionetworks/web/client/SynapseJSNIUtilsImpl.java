@@ -555,6 +555,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
+	public String sanitizeHtml(String html) {
+		return _sanitizeHtml(html);
+	}
+
+	private final static native String _sanitizeHtml(String html) /*-{
+		try {
+			return $wnd.filterXSS(html, {
+				  stripIgnoreTagBody: ['script'] // the script tag is a special case, we need
+				});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
 	public String getCurrentURL() {
 		return Location.getHref();
 	}
