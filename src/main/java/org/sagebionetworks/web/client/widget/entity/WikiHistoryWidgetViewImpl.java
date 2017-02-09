@@ -40,7 +40,6 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private boolean isFirstGetHistory;
 	private int offset;
 	private int resultSize;
-	private boolean hasReachedEndOfHistory;
 
 	@Inject
 	public WikiHistoryWidgetViewImpl() {
@@ -63,7 +62,6 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		this.canEdit = canEdit;
 		this.actionHandler = actionHandler;
 		this.isFirstGetHistory = true;
-		this.hasReachedEndOfHistory = false;
 		this.offset = 0;
 		// Reset history
 		historyList = new ArrayList<V2WikiHistorySnapshot>();
@@ -96,10 +94,6 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		    historyTable.setVisibleRange(0, historyEntries.size());
 		    // Push in data
 		    historyTable.setRowData(0, historyEntries);
-		    // Disable button if no more history exists
-		    if(hasReachedEndOfHistory) {
-				hideLoadMoreButton();
-			}
 		}
 	}
 	
@@ -115,11 +109,6 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 				}
 				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedByName, snapshot.getModifiedOn());
 				historyEntries.add(entry);
-			}
-			// Check if we've reached the end of the history from this recent call
-			V2WikiHistorySnapshot lastSnapshot = historyList.get(historyList.size() - 1);
-			if(lastSnapshot.getVersion().equals("0")) {
-				hasReachedEndOfHistory = true;
 			}
 		}
 	}
@@ -143,9 +132,6 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 			}
 			
 		});
-		if(hasReachedEndOfHistory) {
-			hideLoadMoreButton();
-		}
 		
 	    // Restore if edit permissions granted
 	    if(canEdit) {
@@ -251,7 +237,8 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		}
 	}
 	
-	private void hideLoadMoreButton() {
+	@Override
+	public void hideLoadMoreButton() {
 		loadMoreHistoryButton.setVisible(false);
 	}
 	

@@ -135,6 +135,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setNewReplyContainer(newReplyWidget.asWidget());
 		view.setSecondNewReplyContainer(secondNewReplyWidget.asWidget());
 		view.setSubscribersWidget(threadSubscribersWidget.asWidget());
+		Callback refreshSubscribersCallback = new Callback() {
+			@Override
+			public void invoke() {
+				SingleDiscussionThreadWidget.this.threadSubscribersWidget.configure(threadTopic);
+			}
+		};
+		
+		subscribeButtonWidget.setOnUnsubscribeCallback(refreshSubscribersCallback);
+		subscribeButtonWidget.setOnSubscribeCallback(refreshSubscribersCallback);
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
