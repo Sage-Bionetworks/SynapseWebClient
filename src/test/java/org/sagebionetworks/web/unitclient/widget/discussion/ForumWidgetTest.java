@@ -90,6 +90,8 @@ public class ForumWidgetTest {
 	SubscribersWidget mockSubscribersWidget;
 	@Captor
 	ArgumentCaptor<Topic> topicCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	ForumWidget forumWidget;
 	private boolean canModerate = false;
@@ -186,6 +188,22 @@ public class ForumWidgetTest {
 
 		verify(mockAvailableThreadListWidget).setThreadIdClickedCallback(any(CallbackP.class));
 		verify(mockDeletedThreadListWidget).setThreadIdClickedCallback(any(CallbackP.class));
+	}
+	
+	@Test
+	public void testSubscribeCallback() {
+		verify(mockSubscribeButtonWidget).setOnSubscribeCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockSubscribersWidget).configure(any(Topic.class));
+	}
+	
+	@Test
+	public void testUnsubscribeCallback() {
+		verify(mockSubscribeButtonWidget).setOnUnsubscribeCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockSubscribersWidget).configure(any(Topic.class));
 	}
 	
 	@Test
