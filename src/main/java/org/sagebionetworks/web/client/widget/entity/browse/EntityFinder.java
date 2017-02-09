@@ -118,11 +118,13 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	private void multiSelectionOkClicked() {
+		synAlert.clear();
 		//check for valid selection
-		if (view.getMultiEntityText().isEmpty()) {
+		if (view.getMultiEntityText().isEmpty() && (selectedEntity == null || selectedEntity.getTargetId() == null)) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			lookupMultiEntity(view.getMultiEntityText(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			setReferences();
+			synapseClient.getEntityHeaderBatch(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -132,6 +134,23 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				};
 			});
 		}
+	}
+	
+	private void setReferences() {
+		selectedMultiEntity = new ReferenceList();
+		List<Reference> rList = new ArrayList<Reference>();
+		if (selectedEntity != null && selectedEntity.getTargetId() != null) {
+			rList.add(selectedEntity);
+		} else {
+			String[] entities = view.getMultiEntityText().replace(" ","").split(",");
+			for (int i = 0; i < entities.length; i++) {
+				String s = entities[i];
+				Reference r = new Reference();
+				r.setTargetId(s);
+				rList.add(r);
+			}				
+		}
+		selectedMultiEntity.setReferences(rList);
 	}
 
 	public boolean validateEntityTypeAgainstFilter(Entity entity) {
@@ -170,32 +189,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
-				callback.onSuccess(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				callback.onFailure(caught);
-			}
-		});
-	}
-	
-	@Override
-	public void lookupMultiEntity(String entityIds, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
-		synAlert.clear();
-		selectedMultiEntity = new ReferenceList();
-		List<Reference> rList = new ArrayList<Reference>();
-		String[] entities = entityIds.replace(" ","").split(",");
-		for (int i = 0; i < entities.length; i++) {
-			String s = entities[i];
-			Reference r = new Reference();
-			r.setTargetId(s);
-			rList.add(r);
-		}
-		selectedMultiEntity.setReferences(rList);
-		synapseClient.getEntityHeaderBatch(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
-			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> result) {
 				callback.onSuccess(result);
 			}
 			@Override

@@ -42,7 +42,6 @@ public interface EntityFinderView extends SynapseView {
 		void setSelectedEntity(Reference selected);
 
 		void lookupEntity(String entityId, AsyncCallback<Entity> callback);
-		void lookupMultiEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
 		void loadVersions(String entityId);
 		
