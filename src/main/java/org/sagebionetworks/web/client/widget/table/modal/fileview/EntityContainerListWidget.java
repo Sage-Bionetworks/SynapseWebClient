@@ -35,13 +35,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		view.setPresenter(this);
 		boolean showVersions = false;
 		entityIds = new ArrayList<String>();
-//		finder.configure(EntityFilter.CONTAINER, showVersions, new SelectedHandler<Reference>() {
-//			@Override
-//			public void onSelected(Reference selected) {
-//				onAddProject(selected.getTargetId());
-//			}
-//		});
-		finder.configureMultiSelect(showVersions, new SelectedHandler<List<Reference>> () {
+		finder.configureMultiSelect(EntityFilter.CONTAINER, new SelectedHandler<List<Reference>> () {
 
 			@Override
 			public void onSelected(List<Reference> selected) {

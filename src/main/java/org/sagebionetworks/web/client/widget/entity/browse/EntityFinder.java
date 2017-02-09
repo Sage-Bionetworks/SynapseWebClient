@@ -65,9 +65,8 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		configure(EntityFilter.ALL, showVersions, handler);
 	}
 	
-	public void configureMultiSelect(boolean showVersions, SelectedHandler<List<Reference>> handler) {
-		this.filter = EntityFilter.ALL;
-		this.showVersions = showVersions;
+	public void configureMultiSelect(EntityFilter filter, SelectedHandler<List<Reference>> handler) {
+		this.filter = filter;
 		this.selectedMultiHandler = handler;
 		this.selectedMultiEntity = new ReferenceList();
 		view.setMultiVisible(true);
