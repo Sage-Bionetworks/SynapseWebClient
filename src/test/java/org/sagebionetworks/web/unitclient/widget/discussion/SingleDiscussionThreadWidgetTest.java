@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -124,7 +125,9 @@ public class SingleDiscussionThreadWidgetTest {
 	SubscribersWidget mockSubscribersWidget;
 	@Captor
 	ArgumentCaptor<Topic> topicCaptor;
-
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
+	
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -162,6 +165,20 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockRepliesContainer).configure(any(Callback.class));
 		verify(mockView).setNewReplyContainer(any(Widget.class));
 		verify(mockView).setSecondNewReplyContainer(any(Widget.class));
+	}
+
+	@Test
+	public void testSubscribeCallback() {
+		verify(mockSubscribeButtonWidget).setOnSubscribeCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockSubscribersWidget).configure(any(Topic.class));
+	}
+	
+	@Test
+	public void testUnsubscribeCallback() {
+		verify(mockSubscribeButtonWidget).setOnUnsubscribeCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockSubscribersWidget).configure(any(Topic.class));
 	}
 
 	@Test
