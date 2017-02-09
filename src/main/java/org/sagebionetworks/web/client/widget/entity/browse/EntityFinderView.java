@@ -40,8 +40,10 @@ public interface EntityFinderView extends SynapseView {
 	public interface Presenter {
 
 		void setSelectedEntity(Reference selected);
+		void setSelectedEntities(List<Reference> selectedRefs);
 
 		void lookupEntity(String entityId, AsyncCallback<Entity> callback);
+		void lookupEntities(String value, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
 
 		void loadVersions(String entityId);
 		
@@ -53,6 +55,7 @@ public interface EntityFinderView extends SynapseView {
 		void hide();
 
 		Widget asWidget();
+
 		
 	}
 	Widget asWidget();

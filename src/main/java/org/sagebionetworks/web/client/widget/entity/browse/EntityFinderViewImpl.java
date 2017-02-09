@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
@@ -98,9 +99,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@UiField
 	Button lookupSynapseIdButton;
 	@UiField
+	Button lookupSynapseMultiIdButton;
+	@UiField
 	Div synAlertContainer;
 	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
+	private List<Reference> selectedRefs; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private Long maxVersion = 0L;
 	boolean isFinderComponentsInitialized;
 	@Inject
@@ -113,6 +117,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
 		selectedRef = new Reference();
+		selectedRefs = new ArrayList<Reference>();
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -196,6 +201,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void clear() {
 		selectedRef = new Reference();
 		presenter.setSelectedEntity(selectedRef);
+		selectedRefs.clear();
 		updateSelectedView();
 		myEntitiesBrowser.clearState();
 		myEntitiesBrowser.refresh();
@@ -320,15 +326,55 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	private void createEnterMultiIdWidget() {
 
+		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					lookupSynapseMultiIdButton.click();
+				}
+			}
+		});
+		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.lookupEntities(synapseMultiIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+					@Override
+					public void onSuccess(PaginatedResults<EntityHeader> entities) {
+						setSelectedIds(entities);
+						updateSelectedView();											
+						// if versionable, create and show versions
+//						createVersionChooser(entity.getId());
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+				});
+			}
+		});
+		
 		// list entry		
-		final Widget entry = createNewLeftEntry("Enter List of Synapse IDs", new ClickHandler(){
+		final Widget entry = createNewLeftEntry("Enter List of Synapse Ids", new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
 	        	setSynapseMultiIdAreaVisible();
 	        }
 	    });
+		
+		
 		enterSynapseMultiIdContainer.clear();
 		enterSynapseMultiIdContainer.setWidget(entry);
+	}
+	
+	private void setSelectedIds(PaginatedResults<EntityHeader> entities) {
+		List<EntityHeader> list = entities.getResults();
+		selectedRefs.clear();
+		for (EntityHeader eh : list) {
+			selectedRef = new Reference();
+			selectedRef.setTargetId(eh.getId());
+			selectedRef.setTargetVersionNumber(eh.getVersionNumber());
+			selectedRefs.add(selectedRef);
+		}
+		presenter.setSelectedEntities(selectedRefs);
 	}
 	
 	public String getMultiEntityText() {
@@ -347,6 +393,13 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	private void updateSelectedView() {
 		selectedText.setText(DisplayUtils.createEntityVersionString(selectedRef));
+		if (!selectedRefs.isEmpty()) {
+			String text = "";
+			for (Reference r : selectedRefs) {
+				text += DisplayUtils.createEntityVersionString(r) + ", ";
+			}
+			selectedText.setText(text.substring(0, text.length() - 2));			
+		}
 	}
 
 	private void createVersionChooser(String entityId) {

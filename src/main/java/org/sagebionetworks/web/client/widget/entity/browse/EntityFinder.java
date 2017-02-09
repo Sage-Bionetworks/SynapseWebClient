@@ -76,12 +76,22 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
+		this.selectedMultiEntity = new ReferenceList();
 	}
 	
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
 		selectedEntity = selected;
+		List<Reference> list = new ArrayList<Reference>();
+		list.add(selected);
+		setSelectedEntities(list);
+	}
+	
+	@Override
+	public void setSelectedEntities(List<Reference> selectedIds) {
+		synAlert.clear();
+		selectedMultiEntity.setReferences(selectedIds);
 	}
 	
 	@Override
@@ -115,14 +125,47 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			});
 		}
 	}
+
+	@Override
+	public void lookupEntity(String entityId, final AsyncCallback<Entity> callback) {
+		synAlert.clear();
+		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
+			@Override
+			public void onSuccess(Entity result) {
+				callback.onSuccess(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				callback.onFailure(caught);
+			}
+		});
+	}
+	
+	@Override
+	public void lookupEntities(String value, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
+		synAlert.clear();
+		List<Reference> list = getReferences(value);
+		this.selectedMultiEntity.setReferences(list);
+		synapseClient.getEntityHeaderBatch(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				callback.onFailure(caught);
+			}
+			public void onSuccess(PaginatedResults<EntityHeader> result) {
+				callback.onSuccess(result);
+			};
+		});
+	}
 	
 	private void multiSelectionOkClicked() {
 		synAlert.clear();
 		//check for valid selection
-		if (view.getMultiEntityText().isEmpty() && (selectedEntity == null || selectedEntity.getTargetId() == null)) {
+		if (selectedMultiEntity.getReferences().isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			setReferences();
+			//setReferences();
 			synapseClient.getEntityHeaderBatch(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -135,21 +178,22 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		}
 	}
 	
-	private void setReferences() {
-		selectedMultiEntity = new ReferenceList();
+	private List<Reference> getReferences(String refs) {
 		List<Reference> rList = new ArrayList<Reference>();
-		if (selectedEntity != null && selectedEntity.getTargetId() != null) {
-			rList.add(selectedEntity);
-		} else {
-			String[] entities = view.getMultiEntityText().replace(" ","").split(",");
-			for (int i = 0; i < entities.length; i++) {
-				String s = entities[i];
-				Reference r = new Reference();
-				r.setTargetId(s);
-				rList.add(r);
-			}				
+		String[] entities = refs.split(",");
+		for (int i = 0; i < entities.length; i++) {
+			String s = entities[i].trim();
+			Reference r = new Reference();
+			if (s.contains(".")) {
+				String[] parts = s.split(".");
+				r.setTargetId(parts[0]);
+				r.setTargetVersionNumber(Long.getLong(parts[1]));
+			} else {
+				r.setTargetId(s);				
+			}
+			rList.add(r);
 		}
-		selectedMultiEntity.setReferences(rList);
+		return rList;
 	}
 
 	public boolean validateEntityTypeAgainstFilter(Entity entity) {
@@ -176,26 +220,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			synAlert.showError("Please select a " + filter.toString().toLowerCase());
 		}
 		return isCorrectType;
-	}
-	
-	public Reference getSelectedEntity() {
-		return selectedEntity;
-	}
-
-	@Override
-	public void lookupEntity(String entityId, final AsyncCallback<Entity> callback) {
-		synAlert.clear();
-		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				callback.onSuccess(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				callback.onFailure(caught);
-			}
-		});
 	}
 
 	@Override
