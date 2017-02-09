@@ -116,6 +116,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		Callback refreshThreadsCallback = new Callback() {
 			@Override
 			public void invoke() {
+				ForumWidget.this.forumSubscribersWidget.configure(forumTopic);
 				refreshThreads();
 			}
 		};
