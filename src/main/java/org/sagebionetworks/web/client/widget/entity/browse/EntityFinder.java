@@ -30,7 +30,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private EntityFinderView view;
 	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
-	private Reference selectedEntity;
 	private ReferenceList selectedMultiEntity;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
@@ -82,7 +81,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
-		selectedEntity = selected;
 		List<Reference> list = new ArrayList<Reference>();
 		list.add(selected);
 		setSelectedEntities(list);
@@ -97,30 +95,22 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void okClicked() {
 		synAlert.clear();
-		if (selectedMultiHandler == null) {
-			singleSelectionOkClicked();
-		} else if (selectedHandler == null) {
-			multiSelectionOkClicked();
-		}
-	}
-	
-	private void singleSelectionOkClicked() {
-		//check for valid selection
-		if (selectedEntity == null || selectedEntity.getTargetId() == null) {
+		if (selectedMultiEntity.getReferences().isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			// fetch the entity for a type check
-			lookupEntity(selectedEntity.getTargetId(), new AsyncCallback<Entity>() {
+			synapseClient.getEntityHeaderBatch(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
 				}
-				public void onSuccess(Entity result) {
-					if (validateEntityTypeAgainstFilter(result)) {
+				public void onSuccess(PaginatedResults<EntityHeader> result) {
+					//if (validateEntityTypeAgainstFilter(null)) {
 						if (selectedHandler != null) {
-							selectedHandler.onSelected(selectedEntity);
+							selectedHandler.onSelected(selectedMultiEntity.getReferences().get(0));
+						} else if (selectedMultiHandler != null) {
+							selectedMultiHandler.onSelected(selectedMultiEntity.getReferences());
 						}
-					}
+					//}
 				};
 			});
 		}
@@ -157,25 +147,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				callback.onSuccess(result);
 			};
 		});
-	}
-	
-	private void multiSelectionOkClicked() {
-		synAlert.clear();
-		//check for valid selection
-		if (selectedMultiEntity.getReferences().isEmpty()) {
-			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
-		} else {
-			//setReferences();
-			synapseClient.getEntityHeaderBatch(selectedMultiEntity, new AsyncCallback<PaginatedResults<EntityHeader>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-				public void onSuccess(PaginatedResults<EntityHeader> result) {
-					selectedMultiHandler.onSelected(selectedMultiEntity.getReferences());
-				};
-			});
-		}
 	}
 	
 	private List<Reference> getReferences(String refs) {
