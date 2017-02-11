@@ -73,6 +73,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
+	
 		if (previewHandle == null && originalFileHandle != null) {
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null && DisplayUtils.isRecognizedImageContentType(contentType)) {
@@ -178,12 +179,34 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		}
 	}
 	
+	private void renderHTML(String modifiedBy, final String url) {
+		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synapseAlert.showError("Unable to load html preview");
+			}
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result) {
+					view.setHTML(url);
+				} else {
+					synapseAlert.showError("Unable to load html preview - requires collaboration");
+				}
+			}
+		});
+	}
+	
 	private void renderFilePreview(EntityBundle bundle) {
 		PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
 		String xsrfToken = authController.getCurrentXsrfToken();
-		if (previewType != PreviewFileType.NONE) {
+		if (originalFileHandle != null && 
+				(originalFileHandle.getContentType().equalsIgnoreCase("text/html") 
+				|| originalFileHandle.getFileName().toLowerCase().endsWith(".html"))) {
+			FileEntity fileEntity = (FileEntity)bundle.getEntity();
+			renderHTML(fileEntity.getModifiedBy(), DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken));
+		} else if (previewType != PreviewFileType.NONE) {
 			FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)

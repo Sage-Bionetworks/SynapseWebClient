@@ -15,6 +15,7 @@ import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -155,6 +156,14 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		wrapper.setHeight("200px");
 		wrapper.addStyleName("margin-left-20");
 		add(wrapper);
+	}
+	
+	@Override
+	public void setHTML(String url) {
+		clear();
+		Frame frame = new Frame();
+		frame.setUrl(url);
+		add(frame);
 	}
 	@Override
 	public void addSynapseAlertWidget(Widget w) {

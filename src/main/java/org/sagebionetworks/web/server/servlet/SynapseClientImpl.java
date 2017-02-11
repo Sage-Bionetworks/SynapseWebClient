@@ -144,7 +144,6 @@ import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
@@ -177,6 +176,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
@@ -184,6 +185,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	private static final Integer ZERO_OFFSET = 0;
 
 	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
+	public static final String HTML_TEAM_ID_PROPERTY_KEY = "org.sagebionetworks.portal.html_team_id";
+	
 	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
@@ -192,6 +195,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/plain", MESSAGE_CHARSET);
 
+	private static final long LIMIT_100 = 100;
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
 	private static StackTraceDeobfuscator deobfuscator = null;
@@ -219,6 +223,36 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					}
 				}
 			});
+	
+    private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
+
+    public Set<String> getHtmlTeamMembers() {
+        return htmlTeamMembersCache.get();
+    }
+
+    private Supplier<Set<String>> teamMembersSupplier() {
+        return new Supplier<Set<String>>() {
+            public Set<String> get() {
+            	Set<String> userIdSet = new HashSet<String>();
+				try {
+					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+					long currentOffset = 0;
+					List<TeamMember> teamMembers = null;
+					do {
+						org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults = synapseClient.getTeamMembers(htmlTeamId, null, LIMIT_100, currentOffset);
+						teamMembers = teamMembersPaginatedResults.getResults();
+						for (TeamMember teamMember : teamMembers) {
+							userIdSet.add(teamMember.getMember().getOwnerId());
+						}	
+					} while (teamMembers != null && !teamMembers.isEmpty());
+				} catch (SynapseException e) {
+					logError(e.getMessage());
+					
+				}
+				return userIdSet;
+            }
+        };
+    }
 
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
@@ -391,7 +425,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void logError(String message) throws RestServiceException {
+	public void logError(String message) {
 		log.error(message);
 	}
 
@@ -2336,6 +2370,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	public static Long defaultStorageLocation = Long.parseLong(PortalPropertiesHolder.getProperty(DEFAULT_STORAGE_ID_PROPERTY_KEY));
+	public static String htmlTeamId = PortalPropertiesHolder.getProperty(HTML_TEAM_ID_PROPERTY_KEY);
+	
 	
 	@Override
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
@@ -3099,5 +3135,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException {
+		return getHtmlTeamMembers().contains(userId);
 	}
 }
