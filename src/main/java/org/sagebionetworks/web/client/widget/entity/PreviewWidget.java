@@ -244,6 +244,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		//must be a text type of some kind
 		//try to load the text of the preview, if available
 		//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
+		view.showLoading();
 		boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
 		requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, true, xsrfToken));
 		try {

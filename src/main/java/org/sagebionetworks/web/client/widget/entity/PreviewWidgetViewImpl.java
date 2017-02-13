@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
@@ -33,11 +34,13 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private Dialog previewDialog;
 	private boolean isCode;
 	private Widget currentPopupPreviewWidget;
+	private SageImageBundle sageImageBundle;
 	
 	@Inject
-	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, Dialog dialog) {
+	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Dialog dialog) {
 		this.synapseJSNIUtils = synapseJsniUtils;
 		this.previewDialog = dialog;
+		this.sageImageBundle = sageImageBundle;
 		dialog.addStyleName("modal-fullscreen");
 		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
 		fullScreenAnchor.addStyleName("position-absolute");
@@ -97,6 +100,11 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		currentPopupPreviewWidget.addStyleName("maxWidth100 maxHeight100");
 	}
 	
+	@Override
+	public void showLoading() {
+		clear();
+		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+	}
 	@Override
 	public void setPreviewWidget(Widget w) {
 		clear();
