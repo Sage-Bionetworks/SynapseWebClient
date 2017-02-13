@@ -907,7 +907,6 @@ public class DisplayUtils {
 		return contentType != null && contentType.toLowerCase().startsWith("text/html");
 	}
 	
-
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)
 	 * @param bundle

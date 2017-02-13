@@ -74,7 +74,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
-	
 		if (previewHandle == null && originalFileHandle != null) {
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null) {
@@ -92,7 +91,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 				else if (DisplayUtils.isTextType(contentType)) {
 					//some kind of text
-					if (DisplayUtils.isHTML(contentType)) {
+					if (DisplayUtils.isHTML(originalFileHandle.getContentType())) {
 						 previewFileType = PreviewFileType.HTML;
 					}
 					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){

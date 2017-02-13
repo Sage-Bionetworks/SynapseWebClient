@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,18 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityGroupRecord;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
@@ -40,14 +38,11 @@ import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
-import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
+import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
@@ -160,8 +155,8 @@ public class PreviewWidgetTest {
 	public void testPreviewHtmlContentType(){
 		PreviewFileHandle fh = new PreviewFileHandle();
 		fh.setId("previewFileId");
-		fh.setContentType("text/html");
-		
+		fh.setContentType("text/plain");
+		mainFileHandle.setContentType("text/html");
 		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(fh, mainFileHandle));
 	}
 	
