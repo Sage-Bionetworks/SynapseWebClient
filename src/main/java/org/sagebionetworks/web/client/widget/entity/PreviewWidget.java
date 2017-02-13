@@ -77,10 +77,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 		if (previewHandle == null && originalFileHandle != null) {
 			String contentType = originalFileHandle.getContentType();
-			if (contentType != null && DisplayUtils.isRecognizedImageContentType(contentType)) {
-				previewFileType = PreviewFileType.IMAGE;
-			} else if (isHtml(originalFileHandle)) {
-				previewFileType = PreviewFileType.HTML;
+			if (contentType != null) {
+				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
+					previewFileType = PreviewFileType.IMAGE;	
+				} else if (DisplayUtils.isHTML(contentType)) {
+					previewFileType = PreviewFileType.HTML;	
+				}
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
@@ -90,7 +92,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 				else if (DisplayUtils.isTextType(contentType)) {
 					//some kind of text
-					if (isHtml(originalFileHandle)) {
+					if (DisplayUtils.isHTML(contentType)) {
 						 previewFileType = PreviewFileType.HTML;
 					}
 					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
@@ -186,7 +188,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		}
 	}
 	
-	private void renderHTML(String modifiedBy, final String content) {
+	public void renderHTML(String modifiedBy, final String content) {
 		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -208,17 +210,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 			}
 		});
-	}
-	
-	public boolean isHtml(FileHandle fileHandle) {
-		if (fileHandle != null) {
-			if (fileHandle.getFileName() != null && fileHandle.getFileName().toLowerCase().endsWith(".html")) {
-				return true;
-			} else if (fileHandle.getContentType() != null && fileHandle.getContentType().toLowerCase().equals("text/html")) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	private void renderFilePreview(EntityBundle bundle) {
@@ -249,8 +240,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		//try to load the text of the preview, if available
 		//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
 		view.showLoading();
+		// if HTML, get the full file contents
 		boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
-		requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, true, xsrfToken));
+		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, true, xsrfToken));
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
 				public void onError(final Request request, final Throwable e) {

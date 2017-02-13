@@ -1,21 +1,8 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
@@ -1070,6 +1057,33 @@ public class SynapseClientImplTest {
 		verify(mockSynapse, Mockito.times(1)).getWikiPageForVersion(
 				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
 				any(Long.class));
+	}
+	
+	
+	@Test
+	public void testHtmlTeamMembersCache() throws Exception {
+		PaginatedResults<TeamMember> teamMembersPage1 = new PaginatedResults<TeamMember>();
+		String trustedUserId = "876543";
+		UserGroupHeader mockHeader = mock(UserGroupHeader.class);
+		when(mockHeader.getOwnerId()).thenReturn(trustedUserId);
+		TeamMember mockTeamMember = mock(TeamMember.class);
+		when(mockTeamMember.getMember()).thenReturn(mockHeader);
+		teamMembersPage1.setResults(Collections.singletonList(mockTeamMember));
+		PaginatedResults<TeamMember> teamMembersPage2 = new PaginatedResults<TeamMember>();
+		teamMembersPage2.setResults(new ArrayList());
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyInt(), anyInt()))
+				.thenReturn(teamMembersPage1, teamMembersPage2);
+		
+		assertFalse(synapseClient.isUserAllowedToRenderHTML("untrustedId"));
+		
+		//get both pages
+		verify(mockSynapse, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
+		
+		// the cache should be ready, it should not ask for the team members from the synapse client again for an hour
+		assertTrue(synapseClient.isUserAllowedToRenderHTML(trustedUserId));
+		
+		//only the original 2 calls
+		verify(mockSynapse, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
 	}
 
 	private void resetUpdateExternalFileHandleMocks(String testId,

@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
+import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
@@ -51,6 +52,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -84,6 +86,8 @@ public class PreviewWidgetTest {
 	VideoWidget mockVideoWidget;
 	@Mock
 	EntityBundle linkBundle;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
@@ -150,6 +154,21 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString(), anyString());
+	}
+	
+	@Test
+	public void testPreviewHtmlContentType(){
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("text/html");
+		
+		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(fh, mainFileHandle));
+	}
+	
+	@Test
+	public void testHtmlContentType(){
+		mainFileHandle.setContentType("text/html");
+		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(null, mainFileHandle));
 	}
 	
 	@Test
@@ -224,7 +243,7 @@ public class PreviewWidgetTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockView).setTextPreview(captor.capture());
 		String textSentToView = captor.getValue();
-		Assert.assertEquals(PreviewWidget.MAX_LENGTH + "...".length(), textSentToView.length());
+		assertEquals(PreviewWidget.MAX_LENGTH + "...".length(), textSentToView.length());
 	}
 	
 	@Test
@@ -337,4 +356,74 @@ public class PreviewWidgetTest {
 		verify(mockView).addSynapseAlertWidget(any(Widget.class));
 		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
+	
+	@Test
+	public void testGetPreviewFileContents() {
+		previewWidget.getFileContentsForPreview(testEntity, PreviewFileType.IMAGE, "xsrftoken");
+		
+		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
+		assertTrue(stringCaptor.getValue().contains("preview=true"));
+		verify(mockView).showLoading();
+	}
+	
+	@Test
+	public void testGetFileContents() {
+		previewWidget.getFileContentsForPreview(testEntity, PreviewFileType.HTML, "xsrftoken");
+		
+		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
+		assertTrue(stringCaptor.getValue().contains("preview=false"));
+		verify(mockView).showLoading();
+		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testRenderHTMLBlocked() {
+		boolean isUserAllowedToRenderHTML = false;
+		String userId = "56765";
+		String html = "<html><script></script></html>";
+		String sanitizedHtml = "<html></html>";
+		when(mockSynapseJSNIUtils.sanitizeHtml(anyString())).thenReturn(sanitizedHtml);
+		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+		
+		previewWidget.renderHTML(userId, html);
+		
+		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
+		//attempts to sanitize the html and compare
+		verify(mockSynapseJSNIUtils).sanitizeHtml(html);
+		//html not set, showing text instead
+		verify(mockView).setTextPreview(anyString());
+	}
+	
+
+	@Test
+	public void testRenderSimpleHTMLAllowed() {
+		boolean isUserAllowedToRenderHTML = false;
+		String userId = "56765";
+		String html = "<html></html>";
+		String sanitizedHtml = "<html></html>";
+		when(mockSynapseJSNIUtils.sanitizeHtml(anyString())).thenReturn(sanitizedHtml);
+		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+		
+		previewWidget.renderHTML(userId, html);
+		
+		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
+		verify(mockSynapseJSNIUtils).sanitizeHtml(html);
+		verify(mockView).setHTML(html);
+	}
+	
+
+	@Test
+	public void testRenderDangerousHTML() {
+		boolean isUserAllowedToRenderHTML = true;
+		String userId = "56765";
+		String html = "<html><script></script></html>";
+		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+		
+		previewWidget.renderHTML(userId, html);
+		
+		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
+		verify(mockSynapseJSNIUtils, never()).sanitizeHtml(anyString());
+		verify(mockView).setHTML(html);
+	}
+
 }
