@@ -195,7 +195,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/plain", MESSAGE_CHARSET);
 
-	private static final long LIMIT_100 = 100;
+	private static final long LIMIT_50 = 50;
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
 	private static StackTraceDeobfuscator deobfuscator = null;
@@ -239,11 +239,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					long currentOffset = 0;
 					List<TeamMember> teamMembers = null;
 					do {
-						org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults = synapseClient.getTeamMembers(htmlTeamId, null, LIMIT_100, currentOffset);
+						org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults = synapseClient.getTeamMembers(htmlTeamId, null, LIMIT_50, currentOffset);
 						teamMembers = teamMembersPaginatedResults.getResults();
 						for (TeamMember teamMember : teamMembers) {
 							userIdSet.add(teamMember.getMember().getOwnerId());
-						}	
+						}
+						currentOffset += LIMIT_50;
 					} while (teamMembers != null && !teamMembers.isEmpty());
 				} catch (SynapseException e) {
 					logError(e.getMessage());

@@ -5,13 +5,16 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -159,12 +162,38 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setHTML(String url) {
+	public void setHTML(String htmlContent) {
 		clear();
-		Frame frame = new Frame();
-		frame.setUrl(url);
+		final Frame frame = new Frame("about:blank");
+		frame.getElement().setAttribute("sandbox", "allow-scripts allow-same-origin allow-top-navigation");
+		frame.getElement().setAttribute("frameborder", "0");
+		frame.setWidth("100%");
+		frame.addLoadHandler(new LoadHandler() {
+			@Override
+			public void onLoad(LoadEvent event) {
+				_autoAdjustFrameHeight(frame.getElement());
+			}
+		});
 		add(frame);
+		_setFrameContent(frame.getElement(), htmlContent);
 	}
+	
+	private static native void _autoAdjustFrameHeight(Element iframe) /*-{
+		if(iframe) {
+			iframe.height = "";
+			iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
+		}
+	}-*/;
+	
+	private static native void _setFrameContent(Element iframe, String htmlContent) /*-{
+		if(iframe) {
+			iframe.contentWindow.document.open('text/htmlreplace'); 
+			iframe.contentWindow.document.write(htmlContent);
+			iframe.contentWindow.document.close();
+		}
+	}-*/;
+
+  
 	@Override
 	public void addSynapseAlertWidget(Widget w) {
 		clear();

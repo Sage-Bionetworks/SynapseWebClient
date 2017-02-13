@@ -16,7 +16,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setTextPreview(String text);
 	public void setPreviewWidget(Widget w);
 	void addStyleName(String style);
-	public void setHTML(String url);
+	public void setHTML(String html);
 	
 	/**
 	 * text must not be escaped (a regular expression will be used to split it into cells)

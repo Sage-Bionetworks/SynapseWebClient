@@ -4,10 +4,11 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import java.util.Map;
-import org.sagebionetworks.repo.model.Reference;
+
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -42,7 +44,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML
 	}
 
 	
@@ -53,7 +55,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	SynapseClientAsync synapseClient;
 	AuthenticationController authController;
 	VideoWidget videoWidget;
-	
+	EntityBundle bundle;
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
@@ -78,6 +80,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null && DisplayUtils.isRecognizedImageContentType(contentType)) {
 				previewFileType = PreviewFileType.IMAGE;
+			} else if (isHtml(originalFileHandle)) {
+				previewFileType = PreviewFileType.HTML;
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
@@ -87,7 +91,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 				else if (DisplayUtils.isTextType(contentType)) {
 					//some kind of text
-					if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
+					if (isHtml(originalFileHandle)) {
+						 previewFileType = PreviewFileType.HTML;
+					}
+					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
 						previewFileType = PreviewFileType.CODE;
 					}
 					else if (DisplayUtils.isCSV(contentType)) {
@@ -155,6 +162,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	}
 	
 	public void configure(EntityBundle bundle) {
+		this.bundle = bundle;
 		view.clear();
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
 		if (!synapseAlert.isUserLoggedIn()) {
@@ -179,21 +187,34 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		}
 	}
 	
-	private void renderHTML(String modifiedBy, final String url) {
+	private void renderHTML(String modifiedBy, final String content) {
 		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				synapseAlert.showError("Unable to load html preview");
+				view.addSynapseAlertWidget(synapseAlert.asWidget());
+				synapseAlert.showError("HTML preview unavailable for \"" + bundle.getEntity().getName() + "\" ("+bundle.getEntity().getId()+")");
 			}
+			
 			@Override
-			public void onSuccess(Boolean result) {
-				if (result) {
-					view.setHTML(url);
+			public void onSuccess(Boolean trustedUser) {
+				if (trustedUser) {
+					view.setHTML(content);
 				} else {
-					synapseAlert.showError("Unable to load html preview - requires collaboration");
+					onFailure(new Exception());
 				}
 			}
 		});
+	}
+	
+	public boolean isHtml(FileHandle fileHandle) {
+		if (fileHandle != null) {
+			if (fileHandle.getFileName() != null && fileHandle.getFileName().toLowerCase().endsWith(".html")) {
+				return true;
+			} else if (fileHandle.getContentType() != null && fileHandle.getContentType().toLowerCase().equals("text/html")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void renderFilePreview(EntityBundle bundle) {
@@ -201,12 +222,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
 		String xsrfToken = authController.getCurrentXsrfToken();
-		if (originalFileHandle != null && 
-				(originalFileHandle.getContentType().equalsIgnoreCase("text/html") 
-				|| originalFileHandle.getFileName().toLowerCase().endsWith(".html"))) {
-			FileEntity fileEntity = (FileEntity)bundle.getEntity();
-			renderHTML(fileEntity.getModifiedBy(), DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken));
-		} else if (previewType != PreviewFileType.NONE) {
+		if (previewType != PreviewFileType.NONE) {
 			FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
@@ -214,50 +230,59 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				boolean hasPreviewFileHandle = handle != null;
 				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
 									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
-			}
-			else { //must be a text type of some kind
-				//try to load the text of the preview, if available
-				//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
-				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true, xsrfToken));
-				try {
-					requestBuilder.sendRequest(null, new RequestCallback() {
-						public void onError(final Request request, final Throwable e) {
-							view.addSynapseAlertWidget(synapseAlert.asWidget());
-							synapseAlert.handleException(e);
-						}
-						public void onResponseReceived(final Request request, final Response response) {
-							//add the response text
-						int statusCode = response.getStatusCode();
-							if (statusCode == Response.SC_OK) {
-								String responseText = response.getText();
-								if (responseText != null && responseText.length() > 0) {
-									if (responseText.length() > MAX_LENGTH) {
-										responseText = responseText.substring(0, MAX_LENGTH) + "...";
-									}
-									
-									if (PreviewFileType.CODE == previewType) {
-										view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-									} 
-									else if (PreviewFileType.CSV == previewType)
-										view.setTablePreview(responseText, ",");
-									else if (PreviewFileType.TAB == previewType)
-										view.setTablePreview(responseText, "\\t");
-									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
-										view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-									}
-								}
-							}
-						}
-					});
-				} catch (final Exception e) {
-					view.addSynapseAlertWidget(synapseAlert.asWidget());
-					synapseAlert.handleException(e);
-				}
+			} else { 
+				getFileContentsForPreview(fileEntity, previewType, xsrfToken);
 			}
 		} 
 		else if (originalFileHandle != null && VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
 			videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
 			view.setPreviewWidget(videoWidget.asWidget());
+		}
+	}
+	
+	public void getFileContentsForPreview(final FileEntity fileEntity, final PreviewFileType previewType, String xsrfToken) {
+		//must be a text type of some kind
+		//try to load the text of the preview, if available
+		//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
+		boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
+		requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, true, xsrfToken));
+		try {
+			requestBuilder.sendRequest(null, new RequestCallback() {
+				public void onError(final Request request, final Throwable e) {
+					view.addSynapseAlertWidget(synapseAlert.asWidget());
+					synapseAlert.handleException(e);
+				}
+				public void onResponseReceived(final Request request, final Response response) {
+					//add the response text
+				int statusCode = response.getStatusCode();
+					if (statusCode == Response.SC_OK) {
+						String responseText = response.getText();
+						if (responseText != null && responseText.length() > 0) {
+							if (previewType == PreviewFileType.HTML) {
+								renderHTML(fileEntity.getModifiedBy(), responseText);
+							} else {
+								if (responseText.length() > MAX_LENGTH) {
+									responseText = responseText.substring(0, MAX_LENGTH) + "...";
+								}
+								
+								if (PreviewFileType.CODE == previewType) {
+									view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+								} 
+								else if (PreviewFileType.CSV == previewType)
+									view.setTablePreview(responseText, ",");
+								else if (PreviewFileType.TAB == previewType)
+									view.setTablePreview(responseText, "\\t");
+								else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
+									view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+								}
+							}
+						}
+					}
+				}
+			});
+		} catch (final Exception e) {
+			view.addSynapseAlertWidget(synapseAlert.asWidget());
+			synapseAlert.handleException(e);
 		}
 	}
 	
