@@ -18,6 +18,7 @@
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="header" />
+		<bh:Div ui:field="htmlContainer"/>
 		<g:FlowPanel addStyleNames="margin-bottom-60 margin-top-100">
 			<w:HelpWidget text="Optional help link text" helpMarkdown="This contains basic help." href="http://link/to/more/help" placement="BOTTOM" />
 			<w:HelpWidget helpMarkdown="This contains **very basic** markdown, perhaps with a [link](http://www.jayhodgson.com)."/>

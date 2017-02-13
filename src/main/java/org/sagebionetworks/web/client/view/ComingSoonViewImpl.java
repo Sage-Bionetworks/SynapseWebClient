@@ -31,7 +31,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	SimplePanel footer;
 	@UiField
 	Div widgetContainer;
-	
+	@UiField
+	Div htmlContainer;
 	private Presenter presenter;
 	
 	private Header headerWidget;
@@ -62,6 +63,12 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.add(footerWidget.asWidget());
 		widgetContainer.add(map.asWidget());
 		map.configure();
+		String html = "<strong>hello world</strong><br>"
+				+ "<img src='http://www.w3schools.com/css/trolltunga.jpg' onerror=alert('img') /><br>"
+				+ "<script>alert('hello script')</script><br>"
+				+ "console.log('hello world')<br>";
+		String newHtml = synapseJSNIUtils.sanitizeHtml(html);
+		htmlContainer.getElement().setInnerHTML(newHtml);
 	}
 	
 	@Override
