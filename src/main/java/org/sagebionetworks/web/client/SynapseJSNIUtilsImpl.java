@@ -554,16 +554,102 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		
 	}-*/;
 	
+	boolean isFilterXssInitialized = false;
+	
 	@Override
 	public String sanitizeHtml(String html) {
+		if (!isFilterXssInitialized) {
+			//init
+			initFilterXss();
+			isFilterXssInitialized = true;
+		}
 		return _sanitizeHtml(html);
 	}
 
+	private final static native void initFilterXss() /*-{
+		var options = {
+				whiteList: {
+				    a:      ['target', 'href', 'title'],
+				    abbr:   ['title'],
+				    address: [],
+				    area:   ['shape', 'coords', 'href', 'alt'],
+				    article: [],
+				    aside:  [],
+				    audio:  ['autoplay', 'controls', 'loop', 'preload', 'src'],
+				    b:      [],
+				    bdi:    ['dir'],
+				    bdo:    ['dir'],
+				    big:    [],
+				    blockquote: ['cite'],
+				    body:   [],
+				    br:     [],
+				    caption: [],
+				    center: [],
+				    cite:   [],
+				    code:   [],
+				    col:    ['align', 'valign', 'span', 'width'],
+				    colgroup: ['align', 'valign', 'span', 'width'],
+				    dd:     [],
+				    del:    ['datetime'],
+				    details: ['open'],
+				    div:    [],
+				    dl:     [],
+				    dt:     [],
+				    em:     [],
+				    font:   ['color', 'size', 'face'],
+				    footer: [],
+				    h1:     [],
+				    h2:     [],
+				    h3:     [],
+				    h4:     [],
+				    h5:     [],
+				    h6:     [],
+				    header: [],
+				    hr:     [],
+				    html:   [],
+				    i:      [],
+				    img:    ['src', 'alt', 'title', 'width', 'height'],
+				    ins:    ['datetime'],
+				    li:     [],
+				    mark:   [],
+				    nav:    [],
+				    ol:     [],
+				    p:      [],
+				    pre:    [],
+				    s:      [],
+				    section:[],
+				    small:  [],
+				    span:   [],
+				    sub:    [],
+				    sup:    [],
+				    strong: [],
+				    table:  ['width', 'border', 'align', 'valign'],
+				    tbody:  ['align', 'valign'],
+				    td:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+				    tfoot:  ['align', 'valign'],
+				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+				    thead:  ['align', 'valign'],
+				    tr:     ['rowspan', 'align', 'valign'],
+				    tt:     [],
+				    u:      [],
+				    ul:     [],
+				    video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width']
+				},
+				stripIgnoreTagBody: ['script'],  // the script tag is a special case, we need
+				allowCommentTag: true,
+				onIgnoreTag: function (tag, html, options) {
+					if (tag === '!doctype') {
+				      // do not filter doctype
+				      return html;
+				    }
+				}
+			};
+			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
+	}-*/;
+	
 	private final static native String _sanitizeHtml(String html) /*-{
 		try {
-			return $wnd.filterXSS(html, {
-				  stripIgnoreTagBody: ['script'] // the script tag is a special case, we need
-				});
+			return $wnd.xss.process(html);
 		} catch (err) {
 			console.error(err);
 		}

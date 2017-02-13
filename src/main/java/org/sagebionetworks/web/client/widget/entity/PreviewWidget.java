@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -191,8 +190,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.addSynapseAlertWidget(synapseAlert.asWidget());
-				synapseAlert.showError("HTML preview unavailable for \"" + bundle.getEntity().getName() + "\" ("+bundle.getEntity().getId()+")");
+				view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(content));
 			}
 			
 			@Override
@@ -200,7 +198,13 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				if (trustedUser) {
 					view.setHTML(content);
 				} else {
-					onFailure(new Exception());
+					// is the sanitized version the same as the original??
+					String newHtml = synapseJSNIUtils.sanitizeHtml(content);
+					if (content.equals(newHtml)) {
+						view.setHTML(content);
+					} else {
+						onFailure(new Exception());	
+					}
 				}
 			}
 		});
@@ -230,7 +234,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				boolean hasPreviewFileHandle = handle != null;
 				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
 									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
-			} else { 
+			} else {
 				getFileContentsForPreview(fileEntity, previewType, xsrfToken);
 			}
 		} 
