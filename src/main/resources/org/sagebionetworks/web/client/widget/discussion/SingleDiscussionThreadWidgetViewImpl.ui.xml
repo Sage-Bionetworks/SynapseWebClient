@@ -12,7 +12,7 @@
 			<bh:Div ui:field="deletedThread" visible="false">
 				<bh:Span addStyleNames="highlight-title">Deleted Thread</bh:Span>
 			</bh:Div>
-			<bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%" pull="RIGHT" >
+			<bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%"  >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
 					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg moveup-10 margin-left-5"/>
@@ -62,14 +62,14 @@
 					</b:Container>
 				</bh:Div>
 			</bh:Div>
-			<bh:Div ui:field="newReplyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT"/>
+			<bh:Div ui:field="newReplyContainer" addStyleNames="margin-top-10 margin-left-30" />
 			<bh:Div ui:field="replyDetails">
-				<bh:Div addStyleNames="margin-top-10" width="98%" pull="RIGHT">
+				<bh:Div addStyleNames="margin-top-10 margin-left-10">
 					<b:Button ui:field="showAllRepliesButton" type="DEFAULT" size="EXTRA_SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10" visible="false">Show all replies</b:Button>
 				</bh:Div>
-				<bh:Div ui:field="replyListContainer" width="100%" pull="RIGHT" addStyleNames="margin-top-10"></bh:Div>
+				<bh:Div ui:field="replyListContainer" width="100%" addStyleNames="margin-top-10"></bh:Div>
 			</bh:Div>
-			<bh:Div ui:field="secondNewReplyContainer" addStyleNames="margin-top-10" width="98%" pull="RIGHT" visible="false"/>
+			<bh:Div ui:field="secondNewReplyContainer" addStyleNames="margin-top-10 margin-left-30 margin-bottom-10" visible="false"/>
 		</bh:Div>
 		<g:SimplePanel ui:field="editThreadModalContainer"/>
 		<bh:Div ui:field="synAlertContainer"></bh:Div>
