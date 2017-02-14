@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -179,6 +180,14 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 			@Override
 			public void onLoad(LoadEvent event) {
 				_autoAdjustFrameHeight(frame.getElement());
+				Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
+					@Override
+					public boolean execute() {
+						_autoAdjustFrameHeight(frame.getElement());
+						// keep executing as long as frame is attached
+						return frame.isAttached();
+					}
+				}, 100);
 			}
 		});
 		
@@ -193,9 +202,16 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	private static native void _autoAdjustFrameHeight(Element iframe) /*-{
-		if(iframe) {
-			iframe.height = "";
-			iframe.height = (iframe.contentWindow.document.body.scrollHeight+20) + "px";
+		if(iframe && iframe.contentWindow) {
+			var newHeightPx = iframe.contentWindow.document.body.scrollHeight;
+			if (newHeightPx < 450) {
+				newHeightPx = 450;
+			}
+			var newHeightValue = newHeightPx + "px";
+			if (newHeightValue != iframe.height) {
+				iframe.height = "";
+				iframe.height = (newHeightPx + 50) + "px";
+			}
 		}
 	}-*/;
 	
