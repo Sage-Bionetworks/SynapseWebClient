@@ -24,9 +24,11 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -217,7 +219,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
 		String xsrfToken = authController.getCurrentXsrfToken();
 		if (previewType != PreviewFileType.NONE) {
-			FileEntity fileEntity = (FileEntity)bundle.getEntity();
+			final FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
@@ -225,7 +227,55 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
 									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
 			} else {
-				getFileContentsForPreview(fileEntity, previewType, xsrfToken);
+				// if HTML, get the full file contents
+				view.showLoading();
+				boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
+				String contentType = isGetPreviewFile ? handle.getContentType() : originalFileHandle.getContentType();
+				
+				//must be a text type of some kind
+				//try to load the text of the preview, if available
+				requestBuilder.configure(RequestBuilder.GET, 
+						DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, false, xsrfToken));
+				requestBuilder.setHeader(WebConstants.CONTENT_TYPE, contentType);
+				
+				try {
+					requestBuilder.sendRequest(null, new RequestCallback() {
+						public void onError(final Request request, final Throwable e) {
+							view.addSynapseAlertWidget(synapseAlert.asWidget());
+							synapseAlert.handleException(e);
+						}
+						public void onResponseReceived(final Request request, final Response response) {
+							//add the response text
+						int statusCode = response.getStatusCode();
+							if (statusCode == Response.SC_OK) {
+								String responseText = response.getText();
+								if (responseText != null && responseText.length() > 0) {
+									if (previewType == PreviewFileType.HTML) {
+										renderHTML(fileEntity.getModifiedBy(), responseText);
+									} else {
+										if (responseText.length() > MAX_LENGTH) {
+											responseText = responseText.substring(0, MAX_LENGTH) + "...";
+										}
+										
+										if (PreviewFileType.CODE == previewType) {
+											view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+										} 
+										else if (PreviewFileType.CSV == previewType)
+											view.setTablePreview(responseText, ",");
+										else if (PreviewFileType.TAB == previewType)
+											view.setTablePreview(responseText, "\\t");
+										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
+											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+										}
+									}
+								}
+							}
+						}
+					});
+				} catch (final Exception e) {
+					view.addSynapseAlertWidget(synapseAlert.asWidget());
+					synapseAlert.handleException(e);
+				}
 			}
 		} 
 		else if (originalFileHandle != null && VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
@@ -234,53 +284,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		}
 	}
 	
-	public void getFileContentsForPreview(final FileEntity fileEntity, final PreviewFileType previewType, String xsrfToken) {
-		//must be a text type of some kind
-		//try to load the text of the preview, if available
-		//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
-		view.showLoading();
-		// if HTML, get the full file contents
-		boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
-		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, true, xsrfToken));
-		try {
-			requestBuilder.sendRequest(null, new RequestCallback() {
-				public void onError(final Request request, final Throwable e) {
-					view.addSynapseAlertWidget(synapseAlert.asWidget());
-					synapseAlert.handleException(e);
-				}
-				public void onResponseReceived(final Request request, final Response response) {
-					//add the response text
-				int statusCode = response.getStatusCode();
-					if (statusCode == Response.SC_OK) {
-						String responseText = response.getText();
-						if (responseText != null && responseText.length() > 0) {
-							if (previewType == PreviewFileType.HTML) {
-								renderHTML(fileEntity.getModifiedBy(), responseText);
-							} else {
-								if (responseText.length() > MAX_LENGTH) {
-									responseText = responseText.substring(0, MAX_LENGTH) + "...";
-								}
-								
-								if (PreviewFileType.CODE == previewType) {
-									view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-								} 
-								else if (PreviewFileType.CSV == previewType)
-									view.setTablePreview(responseText, ",");
-								else if (PreviewFileType.TAB == previewType)
-									view.setTablePreview(responseText, "\\t");
-								else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
-									view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-								}
-							}
-						}
-					}
-				}
-			});
-		} catch (final Exception e) {
-			view.addSynapseAlertWidget(synapseAlert.asWidget());
-			synapseAlert.handleException(e);
-		}
-	}
 	
 	
 	public Widget asWidget() {

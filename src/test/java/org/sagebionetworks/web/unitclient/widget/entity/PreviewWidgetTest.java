@@ -354,7 +354,15 @@ public class PreviewWidgetTest {
 	
 	@Test
 	public void testGetPreviewFileContents() {
-		previewWidget.getFileContentsForPreview(testEntity, PreviewFileType.IMAGE, "xsrftoken");
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("text/plain");
+		testFileHandleList.add(fh);
+		
+		mainFileHandle.setContentType("text/plain");
+		mainFileHandle.setFileName("test.txt");
+		
+		previewWidget.configure(testBundle);
 		
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
 		assertTrue(stringCaptor.getValue().contains("preview=true"));
@@ -363,7 +371,9 @@ public class PreviewWidgetTest {
 	
 	@Test
 	public void testGetFileContents() {
-		previewWidget.getFileContentsForPreview(testEntity, PreviewFileType.HTML, "xsrftoken");
+		mainFileHandle.setContentType("text/html");
+		mainFileHandle.setFileName("test.html");
+		previewWidget.configure(testBundle);
 		
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
 		assertTrue(stringCaptor.getValue().contains("preview=false"));

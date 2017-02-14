@@ -195,7 +195,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private static native void _setFrameContent(Element iframe, String htmlContent) /*-{
 		if(iframe) {
 			try {
-				iframe.contentWindow.document.open('text/htmlreplace'); 
+				iframe.contentWindow.document.open('text/html', 'replace'); 
 				iframe.contentWindow.document.write(htmlContent);
 				iframe.contentWindow.document.close();	
 			} catch (err) {
