@@ -109,4 +109,6 @@ public interface SynapseJSNIUtils {
 	void copyToClipboard();
 
 	String sanitizeHtml(String html);
+
+	boolean elementSupportsAttribute(Element el, String attribute);
 }

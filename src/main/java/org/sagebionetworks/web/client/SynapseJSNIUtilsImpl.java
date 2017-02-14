@@ -554,6 +554,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		
 	}-*/;
 	
+	@Override
+	public boolean elementSupportsAttribute(Element el, String attribute) {
+		return _elementSupportsAttribute(el, attribute);
+	}
+	
+	private final static native boolean _elementSupportsAttribute(Element el, String attribute) /*-{
+	    return attribute in $doc.createElement(element);
+	}-*/;
+	
 	boolean isFilterXssInitialized = false;
 	
 	@Override
