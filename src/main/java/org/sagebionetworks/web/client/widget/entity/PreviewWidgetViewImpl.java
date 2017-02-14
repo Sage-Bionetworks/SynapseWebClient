@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -172,7 +173,6 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	public void setHTML(String htmlContent) {
 		clear();
 		final Frame frame = new Frame("about:blank");
-		frame.getElement().setAttribute("sandbox", "allow-scripts allow-same-origin allow-top-navigation");
 		frame.getElement().setAttribute("frameborder", "0");
 		frame.setWidth("100%");
 		frame.addLoadHandler(new LoadHandler() {
@@ -181,8 +181,10 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 				_autoAdjustFrameHeight(frame.getElement());
 			}
 		});
+		
 		add(frame);
 		
+		// use html5 srcdoc if available
 		if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
 			frame.getElement().setAttribute("srcdoc", htmlContent);	
 		} else {
