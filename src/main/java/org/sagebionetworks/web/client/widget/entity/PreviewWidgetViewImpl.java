@@ -195,11 +195,13 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		frame.addAttachHandler(new AttachEvent.Handler() {
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
-				// use html5 srcdoc if available
-				if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
-					frame.getElement().setAttribute("srcdoc", htmlContent);	
-				} else {
-					_setFrameContent(frame.getElement(), htmlContent);	
+				if (event.isAttached()) {
+					// use html5 srcdoc if available
+					if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
+						frame.getElement().setAttribute("srcdoc", htmlContent);	
+					} else {
+						_setFrameContent(frame.getElement(), htmlContent);	
+					}
 				}
 			}
 		});
