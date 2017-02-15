@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -171,7 +172,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setHTML(String htmlContent) {
+	public void setHTML(final String htmlContent) {
 		clear();
 		final Frame frame = new Frame("about:blank");
 		frame.getElement().setAttribute("frameborder", "0");
@@ -191,14 +192,19 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 			}
 		});
 		
-		add(frame);
+		frame.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				// use html5 srcdoc if available
+				if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
+					frame.getElement().setAttribute("srcdoc", htmlContent);	
+				} else {
+					_setFrameContent(frame.getElement(), htmlContent);	
+				}
+			}
+		});
 		
-		// use html5 srcdoc if available
-		if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
-			frame.getElement().setAttribute("srcdoc", htmlContent);	
-		} else {
-			_setFrameContent(frame.getElement(), htmlContent);	
-		}
+		add(frame);
 	}
 	
 	private static native void _autoAdjustFrameHeight(Element iframe) /*-{
