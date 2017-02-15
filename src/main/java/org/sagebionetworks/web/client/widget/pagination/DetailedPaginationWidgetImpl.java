@@ -105,6 +105,6 @@ public class DetailedPaginationWidgetImpl implements DetailedPaginationWidget, D
 	private void setMessage(long limit, long offset, long count){
 		long start = offset+1L;
 		long end = Math.min(limit+offset, count);
-		view.setMessage(start+" - "+end+" of "+count);
+		view.setMessage(start+" - "+end);
 	}
 }

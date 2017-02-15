@@ -9,8 +9,6 @@
 		<b:Button icon="ANGLE_LEFT" ui:field="previousButton"/>
 		<bh:Text>&nbsp;</bh:Text>
 		<b:Badge ui:field="currentPage" />
-		<bh:Text>&nbsp; of &nbsp;</bh:Text>
-		<b:Badge ui:field="totalPages" />
 		<bh:Text>&nbsp;</bh:Text>
 		<b:Button icon="ANGLE_RIGHT" ui:field="nextButton"/>
 	</bh:Div>

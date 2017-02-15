@@ -180,6 +180,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		Long nResults = trashList.getTotalNumberOfResults();
 		if(nResults == null)
 			return null;
+		//broken
 		return PaginationUtil.getPagination(nResults.intValue(), offset, nPerPage, nPagesToShow);
 	}
 	

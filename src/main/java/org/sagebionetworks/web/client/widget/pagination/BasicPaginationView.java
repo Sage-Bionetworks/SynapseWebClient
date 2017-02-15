@@ -45,8 +45,7 @@ public interface BasicPaginationView extends IsWidget{
 	/**
 	 * Set the page numbers.
 	 * @param currentPageNumber
-	 * @param totalNumberOfPages
 	 */
-	public void setPageNumbers(long currentPageNumber, long totalNumberOfPages);
+	public void setCurrentPage(long currentPageNumber);
 
 }

@@ -1996,6 +1996,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> allMembers = synapseClient
 					.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
+			// get's total member count, can we get rid of this now?
 			long memberCount = allMembers.getTotalNumberOfResults();
 			boolean isAdmin = false;
 			Team team = synapseClient.getTeam(teamId);
@@ -2055,9 +2056,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			// must be an admin to the team open requests. To get admin status,
 			// must be a member
+			// get's membership request count
 			if (isTeamAdmin(currentUserId, teamId, synapseClient)) {
 				org.sagebionetworks.reflection.model.PaginatedResults<MembershipRequest> requests = synapseClient
 						.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
+				// need open request count.
 				return requests.getTotalNumberOfResults();
 			} else {
 				return null;

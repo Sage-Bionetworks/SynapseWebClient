@@ -107,6 +107,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 					view.addRow(w.asWidget());
 					w.show();
 				}
+				//broken
 				List<PaginationEntry> entries = PaginationUtil.getPagination(results.getTotalNumberOfResults().intValue(), offset.intValue(), ACTPresenter.LIMIT.intValue(), 10);
 				view.updatePagination(entries);
 			}
