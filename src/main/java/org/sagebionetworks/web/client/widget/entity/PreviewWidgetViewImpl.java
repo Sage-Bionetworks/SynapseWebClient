@@ -4,17 +4,24 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -29,11 +36,13 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private Dialog previewDialog;
 	private boolean isCode;
 	private Widget currentPopupPreviewWidget;
+	private SageImageBundle sageImageBundle;
 	
 	@Inject
-	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, Dialog dialog) {
+	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Dialog dialog) {
 		this.synapseJSNIUtils = synapseJsniUtils;
 		this.previewDialog = dialog;
+		this.sageImageBundle = sageImageBundle;
 		dialog.addStyleName("modal-fullscreen");
 		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
 		fullScreenAnchor.addStyleName("position-absolute");
@@ -93,6 +102,11 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		currentPopupPreviewWidget.addStyleName("maxWidth100 maxHeight100");
 	}
 	
+	@Override
+	public void showLoading() {
+		clear();
+		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+	}
 	@Override
 	public void setPreviewWidget(Widget w) {
 		clear();
@@ -156,6 +170,72 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		wrapper.addStyleName("margin-left-20");
 		add(wrapper);
 	}
+	
+	@Override
+	public void setHTML(final String htmlContent) {
+		clear();
+		final Frame frame = new Frame("about:blank");
+		frame.getElement().setAttribute("frameborder", "0");
+		frame.setWidth("100%");
+		frame.addLoadHandler(new LoadHandler() {
+			@Override
+			public void onLoad(LoadEvent event) {
+				_autoAdjustFrameHeight(frame.getElement());
+				Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
+					@Override
+					public boolean execute() {
+						_autoAdjustFrameHeight(frame.getElement());
+						// keep executing as long as frame is attached
+						return frame.isAttached();
+					}
+				}, 100);
+			}
+		});
+		
+		frame.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					// use html5 srcdoc if available
+					if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
+						frame.getElement().setAttribute("srcdoc", htmlContent);	
+					} else {
+						_setFrameContent(frame.getElement(), htmlContent);	
+					}
+				}
+			}
+		});
+		
+		add(frame);
+	}
+	
+	private static native void _autoAdjustFrameHeight(Element iframe) /*-{
+		if(iframe && iframe.contentWindow) {
+			var newHeightPx = iframe.contentWindow.document.body.scrollHeight;
+			if (newHeightPx < 450) {
+				newHeightPx = 450;
+			}
+			var newHeightValue = newHeightPx + "px";
+			if (newHeightValue != iframe.height) {
+				iframe.height = "";
+				iframe.height = (newHeightPx + 50) + "px";
+			}
+		}
+	}-*/;
+	
+	private static native void _setFrameContent(Element iframe, String htmlContent) /*-{
+		if(iframe) {
+			try {
+				iframe.contentWindow.document.open('text/html', 'replace'); 
+				iframe.contentWindow.document.write(htmlContent);
+				iframe.contentWindow.document.close();	
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	}-*/;
+
+  
 	@Override
 	public void addSynapseAlertWidget(Widget w) {
 		clear();

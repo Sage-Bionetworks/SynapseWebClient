@@ -467,4 +467,6 @@ public interface SynapseClientAsync {
 
 	void getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken,
 			AsyncCallback<ColumnModelPage> callback);
+
+	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 }

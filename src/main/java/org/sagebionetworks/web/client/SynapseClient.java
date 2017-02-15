@@ -551,4 +551,6 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	ColumnModelPage getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken)
 			throws RestServiceException;
+
+	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
 }
