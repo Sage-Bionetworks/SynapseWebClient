@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -278,16 +280,25 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		lookupSynapseIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<Entity>() {
-					@Override
-					public void onSuccess(Entity entity) {
-						setSelectedId(entity.getId());
-						updateSelectedView();											
-						// if versionable, create and show versions
-						createVersionChooser(entity.getId());
-					}
+				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+//					@Override
+//					public void onSuccess(Entity entity) {
+//						setSelectedId(entity.getId());
+//						updateSelectedView();											
+//						// if versionable, create and show versions
+//						createVersionChooser(entity.getId());
+//					}
 					@Override
 					public void onFailure(Throwable caught) {
+						
+					}
+					@Override
+					public void onSuccess(PaginatedResults<EntityHeader> result) {
+						String entityId = result.getResults().get(0).getId();
+						setSelectedId(entityId);
+						updateSelectedView();
+						createVersionChooser(entityId);
+						
 					}
 				});
 			}

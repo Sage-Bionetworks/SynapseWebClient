@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -86,46 +88,61 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
 			// fetch the entity for a type check
-			lookupEntity(selectedEntity.get(0).getTargetId(), new AsyncCallback<Entity>() {
+			lookupEntity(selectedEntity.get(0).getTargetId(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
 				}
-				public void onSuccess(Entity result) {
-					if (validateEntityTypeAgainstFilter(result)) {
+//				public void onSuccess(Entity result) {
+//					if (validateEntityTypeAgainstFilter(result)) {
+//						if (selectedHandler != null) {
+//							selectedHandler.onSelected(selectedEntity.get(0));
+//						}
+//					}
+//				};
+
+				@Override
+				public void onSuccess(PaginatedResults<EntityHeader> result) {
+					if (validateEntityTypeAgainstFilter(result.getResults())) {
 						if (selectedHandler != null) {
 							selectedHandler.onSelected(selectedEntity.get(0));
 						}
 					}
-				};
+				}
 			});
 		}
 	}
 	
-	public boolean validateEntityTypeAgainstFilter(Entity entity) {
-		boolean isCorrectType = true;
-		synAlert.clear();
-		switch (filter) {
-			case CONTAINER:
-				isCorrectType = entity instanceof Project || entity instanceof Folder;
-				break;
-			case PROJECT:
-				isCorrectType = entity instanceof Project;
-				break;
-			case FOLDER:
-				isCorrectType = entity instanceof Folder;
-				break;
-			case FILE:
-				isCorrectType = entity instanceof FileEntity;
-				break;
-			case ALL:
-			default:
-				break;
-		}
-		if (!isCorrectType) {
+	public boolean validateEntityTypeAgainstFilter(List<EntityHeader> list) {
+		boolean flag = selectedEntity.size() == filter.filterForBrowsing(list).size();
+		if (!flag) {
 			synAlert.showError("Please select a " + filter.toString().toLowerCase());
 		}
-		return isCorrectType;
+		return flag;
+//		
+//		boolean isCorrectType = true;
+//		synAlert.clear();
+//		switch (filter) {
+//			case CONTAINER:
+//				isCorrectType = list instanceof Project || list instanceof Folder;
+//				break;
+//			case PROJECT:
+//				isCorrectType = list instanceof Project;
+//				break;
+//			case FOLDER:
+//				isCorrectType = list instanceof Folder;
+//				break;
+//			case FILE:
+//				isCorrectType = list instanceof FileEntity;
+//				break;
+//			case ALL:
+//			default:
+//				break;
+//		}
+//		if (!isCorrectType) {
+//			synAlert.showError("Please select a " + filter.toString().toLowerCase());
+//		}
+//		return isCorrectType;
 	}
 	
 	public Reference getSelectedEntity() {
@@ -133,19 +150,37 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 
 	@Override
-	public void lookupEntity(String entityId, final AsyncCallback<Entity> callback) {
+	public void lookupEntity(String entityId, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		synAlert.clear();
-		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				callback.onSuccess(result);
-			}
+		ReferenceList rl = new ReferenceList();
+		selectedEntity.get(0).setTargetId(entityId);
+		rl.setReferences(selectedEntity);
+		synapseClient.getEntityHeaderBatch(rl, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				callback.onFailure(caught);
 			}
+
+			@Override
+			public void onSuccess(PaginatedResults<EntityHeader> result) {
+				callback.onSuccess(result);
+				
+			}
+			
 		});
+//		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
+//			@Override
+//			public void onSuccess(Entity result) {
+//				callback.onSuccess(result);
+//			}
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				synAlert.handleException(caught);
+//				callback.onFailure(caught);
+//			}
+//		});
 	}
 
 	@Override

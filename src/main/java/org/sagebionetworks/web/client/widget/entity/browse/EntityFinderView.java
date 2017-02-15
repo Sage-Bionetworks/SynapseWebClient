@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,7 +39,7 @@ public interface EntityFinderView extends SynapseView {
 
 		void setSelectedEntity(Reference selected);
 
-		void lookupEntity(String entityId, AsyncCallback<Entity> callback);
+		//void lookupEntity(String entityId, AsyncCallback<Entity> callback);
 
 		void loadVersions(String entityId);
 		
@@ -49,6 +51,8 @@ public interface EntityFinderView extends SynapseView {
 		void hide();
 
 		Widget asWidget();
+
+		void lookupEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback);
 	}
 	Widget asWidget();
 
