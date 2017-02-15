@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -25,7 +28,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private EntityFinderView view;
 	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
-	private Reference selectedEntity;
+	private List<Reference> selectedEntity;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	ClientCache cache;
@@ -63,23 +66,27 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
+		this.selectedEntity = new ArrayList<Reference>();
 	}
 	
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
-		selectedEntity = selected;
+		if (selectedEntity.isEmpty()) {
+			selectedEntity.add(selected);			
+		}
+		selectedEntity.set(0, selected);
 	}
 	
 	@Override
 	public void okClicked() {
 		synAlert.clear();
 		//check for valid selection
-		if (selectedEntity == null || selectedEntity.getTargetId() == null) {
+		if (selectedEntity == null || selectedEntity.get(0).getTargetId() == null) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
 			// fetch the entity for a type check
-			lookupEntity(selectedEntity.getTargetId(), new AsyncCallback<Entity>() {
+			lookupEntity(selectedEntity.get(0).getTargetId(), new AsyncCallback<Entity>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -87,7 +94,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				public void onSuccess(Entity result) {
 					if (validateEntityTypeAgainstFilter(result)) {
 						if (selectedHandler != null) {
-							selectedHandler.onSelected(selectedEntity);
+							selectedHandler.onSelected(selectedEntity.get(0));
 						}
 					}
 				};
@@ -122,7 +129,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	public Reference getSelectedEntity() {
-		return selectedEntity;
+		return selectedEntity.get(0);
 	}
 
 	@Override
