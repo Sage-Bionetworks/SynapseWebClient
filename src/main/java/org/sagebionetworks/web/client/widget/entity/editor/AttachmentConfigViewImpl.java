@@ -23,15 +23,13 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 	@UiField
 	SimplePanel wikiAttachmentsContainer;
 	@UiField
-	TabListItem uploadTabListItem;
-	@UiField
-	TabListItem existingAttachmentListItem;
-	@UiField
 	FlowPanel uploadSuccessUI;
 	@UiField
 	FlowPanel uploadFailureUI;
 	@UiField
 	Text uploadErrorText;
+	@UiField
+	Text fileNameText;
 	
 	private Widget widget;
 	
@@ -44,12 +42,6 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 	public void initView() {
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
-		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-			@Override
-			public void execute() {
-				uploadTabListItem.showTab();
-			}
-		});
 	}
 	
 	@Override
@@ -65,9 +57,10 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 	}
 	
 	@Override
-	public void showUploadSuccessUI() {
+	public void showUploadSuccessUI(String fileName) {
 		fileInputWidgetContainer.setVisible(false);
 		uploadFailureUI.setVisible(false);
+		fileNameText.setText(fileName);
 		uploadSuccessUI.setVisible(true);
 	}
 	
@@ -81,6 +74,11 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 	public void setWikiAttachmentsWidget(Widget wikiAttachmentWidget) {
 		wikiAttachmentsContainer.clear();
 		wikiAttachmentsContainer.setWidget(wikiAttachmentWidget);
+	}
+	
+	@Override
+	public void setWikiAttachmentsWidgetVisible(boolean visible) {
+		wikiAttachmentsContainer.setVisible(visible);
 	}
 	
 	@Override
@@ -113,16 +111,6 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 	
 	@Override
 	public void clear() {
-	}
-	
-	@Override
-	public boolean isNewAttachment() {
-		return uploadTabListItem.isActive();
-	}
-	
-	@Override
-	public boolean isFromAttachments() {
-		return existingAttachmentListItem.isActive();
 	}
 	
 	/*
