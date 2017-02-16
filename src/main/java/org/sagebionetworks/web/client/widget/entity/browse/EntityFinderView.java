@@ -27,6 +27,7 @@ public interface EntityFinderView extends SynapseView {
 	void setBrowseAreaVisible();
 	void setSynapseIdAreaVisible();
 	void setSearchAreaVisible();
+	void setSynapseMultiIdAreaVisible();
 	boolean isShowing();
 	void show();
 	void hide();
@@ -39,7 +40,7 @@ public interface EntityFinderView extends SynapseView {
 
 		void setSelectedEntity(Reference selected);
 
-		//void lookupEntity(String entityId, AsyncCallback<Entity> callback);
+		void lookupEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
 		void loadVersions(String entityId);
 		
@@ -52,7 +53,6 @@ public interface EntityFinderView extends SynapseView {
 
 		Widget asWidget();
 
-		void lookupEntity(String entityId, AsyncCallback<PaginatedResults<EntityHeader>> callback);
 	}
 	Widget asWidget();
 

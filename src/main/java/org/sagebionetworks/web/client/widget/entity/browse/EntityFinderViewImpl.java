@@ -64,6 +64,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@UiField
 	SimplePanel enterSynapseIdContainer;
 	@UiField
+	SimplePanel enterSynapseMultiIdContainer;
+	@UiField
 	SimplePanel myEntitiesBrowserContainer;
 	@UiField
 	FlowPanel entitySearchWidgetContainer;
@@ -72,6 +74,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	@UiField
 	FlowPanel enterIdWidgetContainer;
+	@UiField
+	FlowPanel enterMultiIdWidgetContainer;
 	@UiField
 	FlowPanel versionUI;
 	@UiField
@@ -92,6 +96,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	TextBox synapseIdTextBox;
 	@UiField
 	Button lookupSynapseIdButton;
+	@UiField
+	TextBox synapseMultiIdTextBox;
+	@UiField
+	Button lookupSynapseMultiIdButton;
 	@UiField
 	Div synAlertContainer;
 	
@@ -150,6 +158,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			createMyEntityBrowserWidget();		
 			createSearchBoxWidget();			
 			createEnterIdWidget();
+			createEnterMultiIdWidget();
 			myEntitiesBrowser.setEntityFilter(filter);
 		}
 	}
@@ -158,6 +167,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		myEntitiesBrowserContainer.setVisible(false);
 		entitySearchWidgetContainer.setVisible(false);
 		enterIdWidgetContainer.setVisible(false);
+		enterMultiIdWidgetContainer.setVisible(false);
 	}
 	
 	private void showTopRightContainer(Widget container, EntityFinderArea newArea) {
@@ -196,6 +206,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		myEntitiesBrowser.refresh();
 		synapseIdTextBox.clear();
 		entitySearchBox.clearSelection();
+		synapseMultiIdTextBox.clear();
 	}
 
 	/*
@@ -244,6 +255,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		showTopRightContainer(enterIdWidgetContainer, EntityFinderArea.SYNAPSE_ID);
 	}
 	@Override
+	public void setSynapseMultiIdAreaVisible() {
+		showTopRightContainer(enterMultiIdWidgetContainer, EntityFinderArea.SYNAPSE_MULTI_ID);
+	}
+	@Override
 	public EntityFinderArea getCurrentArea() {
 		return currentArea;
 	}
@@ -283,13 +298,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
-//					@Override
-//					public void onSuccess(Entity entity) {
-//						setSelectedId(entity.getId());
-//						updateSelectedView();											
-//						// if versionable, create and show versions
-//						createVersionChooser(entity.getId());
-//					}
 					@Override
 					public void onFailure(Throwable caught) {
 						
@@ -315,6 +323,45 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	    });
 		enterSynapseIdContainer.clear();
 		enterSynapseIdContainer.setWidget(entry);
+	}
+	
+	private void createEnterMultiIdWidget() {
+//		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
+//			@Override
+//			public void onKeyDown(KeyDownEvent event) {
+//				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+//					lookupSynapseMultiIdButton.click();
+//				}
+//			}
+//		});
+//		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				presenter.lookupEntities(synapseMultiIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+//					@Override
+//					public void onSuccess(PaginatedResults<EntityHeader> entities) {
+//						setSelectedIds(entities);
+//						updateSelectedView();											      
+//						// if versionable, create and show versions
+////						createVersionChooser(entity.getId());
+//					}
+//					@Override
+//					public void onFailure(Throwable caught) {
+//					}
+//				});
+//			}
+//		});
+		
+		// list entry		
+		final Widget entry = createNewLeftEntry("Enter List of Synapse Ids", new ClickHandler(){
+	        @Override
+	        public void onClick(ClickEvent event) {
+	        	setSynapseMultiIdAreaVisible();
+	        }
+	    });
+		
+		enterSynapseMultiIdContainer.clear();
+		enterSynapseMultiIdContainer.setWidget(entry);
 	}
 				
 	private Widget createNewLeftEntry(String name, ClickHandler handler) {
@@ -441,6 +488,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void setSynAlert(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+
+	public void setMultiVisible(boolean b) {
+		createEnterMultiIdWidget();
 	}
 }
 
