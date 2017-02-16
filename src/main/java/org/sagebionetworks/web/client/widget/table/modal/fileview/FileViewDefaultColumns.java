@@ -93,6 +93,7 @@ public class FileViewDefaultColumns {
 						cmCopy.setId(null);
 						defaultColumnsWithoutIds.add(cmCopy);
 					}
+					callback.onSuccess(defaultColumnsWithoutIds);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
