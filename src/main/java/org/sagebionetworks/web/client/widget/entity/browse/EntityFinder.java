@@ -35,6 +35,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	AuthenticationController authenticationController;
 	ClientCache cache;
 	private SelectedHandler<Reference> selectedHandler;
+	private SelectedHandler<List<Reference>> selectedMultiHandler;
 	private EntityFilter filter;
 	private SynapseAlert synAlert;
 	@Inject
@@ -71,6 +72,18 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.selectedEntity = new ArrayList<Reference>();
 	}
 	
+	public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
+		configureMulti(EntityFilter.ALL, showVersions, handler);
+	}
+	
+
+	public void configureMulti(EntityFilter filter, boolean showVersions, SelectedHandler<List<Reference>> handler) {
+		this.filter = filter;
+		this.showVersions = showVersions;
+		this.selectedMultiHandler = handler;
+		this.selectedEntity = new ArrayList<Reference>();
+	}
+	
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
@@ -99,6 +112,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 					if (validateEntityTypeAgainstFilter(result.getResults())) {
 						if (selectedHandler != null) {
 							selectedHandler.onSelected(selectedEntity.get(0));
+						}
+						if (selectedMultiHandler != null) {
+							selectedMultiHandler.onSelected(selectedEntity);
 						}
 					}
 				}
@@ -145,7 +161,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		selectedEntity.clear();
 		for (int i = 0; i < entities.length; i++) {
 			Reference r = new Reference();
-			r.setTargetId(entities[i]);
+			r.setTargetId(entities[i].trim());
 			selectedEntity.add(r);
 		}		
 	}
