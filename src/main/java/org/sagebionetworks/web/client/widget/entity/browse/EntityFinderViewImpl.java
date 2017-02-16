@@ -348,7 +348,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 						setSelectedId(entityId, false);
 						updateSelectedView();
 						createVersionChooser(entityId);
-						
 					}
 				});
 			}

@@ -121,8 +121,8 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void lookupEntity(String entityId, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
 		synAlert.clear();
+		processEntities(entityId);
 		ReferenceList rl = new ReferenceList();
-		selectedEntity.get(0).setTargetId(entityId);
 		rl.setReferences(selectedEntity);
 		synapseClient.getEntityHeaderBatch(rl, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 
@@ -135,10 +135,19 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			@Override
 			public void onSuccess(PaginatedResults<EntityHeader> result) {
 				callback.onSuccess(result);
-				
 			}
 			
 		});
+	}
+
+	private void processEntities(String entityId) {
+		String[] entities = entityId.split(",");
+		selectedEntity.clear();
+		for (int i = 0; i < entities.length; i++) {
+			Reference r = new Reference();
+			r.setTargetId(entities[i]);
+			selectedEntity.add(r);
+		}		
 	}
 
 	@Override
