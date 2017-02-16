@@ -224,7 +224,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 			@Override
 			public void onSelection(String selectedEntityId) {
-				setSelectedId(selectedEntityId, false);
+				setSelectedId(selectedEntityId);
 				updateSelectedView();
 				createVersionChooser(selectedEntityId);
 			}
@@ -267,7 +267,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		entitySearchBox.setEntitySelectedHandler(new EntitySearchBox.EntitySelectedHandler() {			
 			@Override
 			public void onSelected(String entityId, String name, List<VersionInfo> versions) {
-				setSelectedId(entityId, false);
+				setSelectedId(entityId);
 				updateSelectedView();
 				createVersionChooser(entityId);
 			}
@@ -297,15 +297,15 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		lookupSynapseIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<List<EntityHeader>>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						
 					}
 					@Override
-					public void onSuccess(PaginatedResults<EntityHeader> result) {
-						String entityId = result.getResults().get(0).getId();
-						setSelectedId(entityId, false);
+					public void onSuccess(List<EntityHeader> result) {
+						String entityId = result.get(0).getId();
+						setSelectedId(entityId);
 						updateSelectedView();
 						createVersionChooser(entityId);
 						
@@ -337,17 +337,15 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.lookupEntity(synapseMultiIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+				presenter.lookupEntity(synapseMultiIdTextBox.getValue(), new AsyncCallback<List<EntityHeader>>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						
 					}
 					@Override
-					public void onSuccess(PaginatedResults<EntityHeader> result) {
-						String entityId = result.getResults().get(0).getId();
-						setSelectedId(entityId, false);
+					public void onSuccess(List<EntityHeader> result) {
+						setSelectedId(result);
 						updateSelectedView();
-						createVersionChooser(entityId);
 					}
 				});
 			}
@@ -445,17 +443,24 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		}
 	}
 
-	private void setSelectedId(String entityId, boolean multi) {
-		if (multi) {
-			//break up entityId in some way into multiple Reference objects
-		} else {
-			// clear out selection and set new id
+	private void setSelectedId(String entityId) {
+		// clear out selection and set new id
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);
+		ref.setTargetVersionNumber(null);
+		selectedRef.set(0, ref);
+		presenter.setSelectedEntity(ref);	
+	}
+	
+	private void setSelectedId(List<EntityHeader> result) {
+		selectedRef.clear();
+		for (EntityHeader eh : result) {
 			Reference ref = new Reference();
-			ref.setTargetId(entityId);
+			ref.setTargetId(eh.getId());
 			ref.setTargetVersionNumber(null);
-			selectedRef.set(0, ref);
-			presenter.setSelectedEntity(ref);	
+			selectedRef.add(ref);
 		}
+		presenter.setSelectedEntity(selectedRef);
 	}
 	
 	private void setSelectedVersion(Long versionNumber) {

@@ -94,6 +94,15 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	@Override
+	public void setSelectedEntity(List<Reference> selected) {
+		synAlert.clear();
+		if (selected.size() > 0) {
+			selectedEntity.clear();
+			selectedEntity.addAll(selected);			
+		}
+	}
+	
+	@Override
 	public void okClicked() {
 		synAlert.clear();
 		//check for valid selection
@@ -101,15 +110,15 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
 			// fetch the entity for a type check
-			lookupEntity(selectedEntity.get(0).getTargetId(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			lookupEntity(selectedEntity.get(0).getTargetId(), new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
 				}
 
 				@Override
-				public void onSuccess(PaginatedResults<EntityHeader> result) {
-					if (validateEntityTypeAgainstFilter(result.getResults())) {
+				public void onSuccess(List<EntityHeader> result) {
+					if (validateEntityTypeAgainstFilter(result)) {
 						if (selectedHandler != null) {
 							selectedHandler.onSelected(selectedEntity.get(0));
 						}
@@ -135,7 +144,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 
 	@Override
-	public void lookupEntity(String entityId, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
+	public void lookupEntity(String entityId, final AsyncCallback<List<EntityHeader>> callback) {
 		synAlert.clear();
 		processEntities(entityId);
 		ReferenceList rl = new ReferenceList();
@@ -150,7 +159,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 
 			@Override
 			public void onSuccess(PaginatedResults<EntityHeader> result) {
-				callback.onSuccess(result);
+				callback.onSuccess(result.getResults());
 			}
 			
 		});
