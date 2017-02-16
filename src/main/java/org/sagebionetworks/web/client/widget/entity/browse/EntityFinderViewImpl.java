@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
@@ -94,7 +95,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@UiField
 	Div synAlertContainer;
 	
-	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
+	private List<Reference> selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private Long maxVersion = 0L;
 	boolean isFinderComponentsInitialized;
 	@Inject
@@ -106,7 +107,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		this.modal = (Modal)binder.createAndBindUi(this);
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
-		selectedRef = new Reference();
+		selectedRef = new ArrayList<Reference>();
+		selectedRef.add(new Reference());
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -187,8 +189,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 	@Override
 	public void clear() {
-		selectedRef = new Reference();
-		presenter.setSelectedEntity(selectedRef);
+		Reference ref = new Reference();
+		presenter.setSelectedEntity(ref);
 		updateSelectedView();
 		myEntitiesBrowser.clearState();
 		myEntitiesBrowser.refresh();
@@ -211,7 +213,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 			@Override
 			public void onSelection(String selectedEntityId) {
-				setSelectedId(selectedEntityId);
+				setSelectedId(selectedEntityId, false);
 				updateSelectedView();
 				createVersionChooser(selectedEntityId);
 			}
@@ -250,7 +252,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		entitySearchBox.setEntitySelectedHandler(new EntitySearchBox.EntitySelectedHandler() {			
 			@Override
 			public void onSelected(String entityId, String name, List<VersionInfo> versions) {
-				setSelectedId(entityId);
+				setSelectedId(entityId, false);
 				updateSelectedView();
 				createVersionChooser(entityId);
 			}
@@ -295,7 +297,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 					@Override
 					public void onSuccess(PaginatedResults<EntityHeader> result) {
 						String entityId = result.getResults().get(0).getId();
-						setSelectedId(entityId);
+						setSelectedId(entityId, false);
 						updateSelectedView();
 						createVersionChooser(entityId);
 						
@@ -326,7 +328,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	private void updateSelectedView() {
-		selectedText.setText(DisplayUtils.createEntityVersionString(selectedRef));
+		String display = "";
+		for (Reference ref : selectedRef) {
+			display += DisplayUtils.createEntityVersionString(ref) + ";";
+		}
+		selectedText.setText(display.substring(0, display.length() - 1));
 	}
 
 	private void createVersionChooser(String entityId) {
@@ -391,16 +397,22 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		}
 	}
 
-	private void setSelectedId(String entityId) {
-		// clear out selection and set new id
-		selectedRef.setTargetId(entityId);
-		selectedRef.setTargetVersionNumber(null);
-		presenter.setSelectedEntity(selectedRef);
+	private void setSelectedId(String entityId, boolean multi) {
+		if (multi) {
+			//break up entityId in some way into multiple Reference objects
+		} else {
+			// clear out selection and set new id
+			Reference ref = new Reference();
+			ref.setTargetId(entityId);
+			ref.setTargetVersionNumber(null);
+			selectedRef.set(0, ref);
+			presenter.setSelectedEntity(ref);	
+		}
 	}
 	
 	private void setSelectedVersion(Long versionNumber) {
-		selectedRef.setTargetVersionNumber(versionNumber);
-		presenter.setSelectedEntity(selectedRef);
+		selectedRef.get(0).setTargetVersionNumber(versionNumber);
+		presenter.setSelectedEntity(selectedRef.get(0));
 	}
 	
 	

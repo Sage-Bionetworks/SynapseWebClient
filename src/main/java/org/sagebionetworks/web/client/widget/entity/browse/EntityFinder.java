@@ -93,13 +93,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
 				}
-//				public void onSuccess(Entity result) {
-//					if (validateEntityTypeAgainstFilter(result)) {
-//						if (selectedHandler != null) {
-//							selectedHandler.onSelected(selectedEntity.get(0));
-//						}
-//					}
-//				};
 
 				@Override
 				public void onSuccess(PaginatedResults<EntityHeader> result) {
@@ -119,34 +112,10 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			synAlert.showError("Please select a " + filter.toString().toLowerCase());
 		}
 		return flag;
-//		
-//		boolean isCorrectType = true;
-//		synAlert.clear();
-//		switch (filter) {
-//			case CONTAINER:
-//				isCorrectType = list instanceof Project || list instanceof Folder;
-//				break;
-//			case PROJECT:
-//				isCorrectType = list instanceof Project;
-//				break;
-//			case FOLDER:
-//				isCorrectType = list instanceof Folder;
-//				break;
-//			case FILE:
-//				isCorrectType = list instanceof FileEntity;
-//				break;
-//			case ALL:
-//			default:
-//				break;
-//		}
-//		if (!isCorrectType) {
-//			synAlert.showError("Please select a " + filter.toString().toLowerCase());
-//		}
-//		return isCorrectType;
 	}
 	
-	public Reference getSelectedEntity() {
-		return selectedEntity.get(0);
+	public List<Reference> getSelectedEntity() {
+		return selectedEntity;
 	}
 
 	@Override
@@ -170,17 +139,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			}
 			
 		});
-//		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
-//			@Override
-//			public void onSuccess(Entity result) {
-//				callback.onSuccess(result);
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				synAlert.handleException(caught);
-//				callback.onFailure(caught);
-//			}
-//		});
 	}
 
 	@Override
