@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,14 +14,12 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
-import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.*;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,11 +40,14 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	Callback onAddDefaultViewColumnsCallback, onAddAnnotationColumnsCallback;
 	Set<String> columnModelIds;
 	CookieProvider cookies;
+	Set<String> defaultColumnNames;
+	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
 	FileViewDefaultColumns fileViewDefaultColumns;
+	TableType tableType;
 	
 	public AdapterFactory adapterFactory;
 	@Inject
@@ -61,9 +64,10 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		cookies = ginInjector.getCookieProvider();
 	}
 	
-	public void configure(List<ColumnModel> startingModels) {
+	public void configure(TableType tableType, List<ColumnModel> startingModels) {
 		this.changingSelection = false;
 		this.startingModels = startingModels;
+		this.tableType = tableType;
 		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
 		resetEditor();
 	}
@@ -100,22 +104,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		if(this.keyboardNavigationHandler != null){
 			this.keyboardNavigationHandler.bindRow(rowEditor);
 		}
+		if (TableType.view.equals(tableType)) {
+			rowEditor.setSelectVisible(!ETAG_COLUMN_NAME.equals(cm.getName()));
+			if (defaultColumnNames.contains(cm.getName())) {
+				rowEditor.setToBeDefaultFileViewColumn();
+			}
+		}
 		editor.addColumn(rowEditor);
 		this.editorRows.add(rowEditor);
 		rowEditor.configure(cm, this);
 		checkSelectionState();
 		return rowEditor;
-	}
-	
-	private ColumnModelTableRowViewer createColumnModelViewerWidget(ColumnModel cm) {
-		ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
-		ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
-		rowViewer.setSelectable(!ETAG_COLUMN_NAME.equals(cm.getName()));
-		rowViewer.setSelectionPresenter(this);
-		editor.addColumn(rowViewer);
-		this.editorRows.add(rowViewer);
-		checkSelectionState();
-		return rowViewer;
 	}
 	
 	/**
@@ -131,28 +130,24 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 	
 	public void addColumns(final List<ColumnModel> models) {
-		getNonEditableColumns(new CallbackP<List<ColumnModel>>() {
-			@Override
-			public void invoke(List<ColumnModel> nonEditableColumns) {
-				addColumnsAfterInit(models, nonEditableColumns);					
-			}
-		});
+		if (TableType.view.equals(tableType)) {
+			fileViewDefaultColumns.getDefaultColumnNames(new AsyncCallback<Set<String>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					editor.showErrorMessage(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(Set<String> defaultColumnNames) {
+					ColumnModelsEditorWidget.this.defaultColumnNames = defaultColumnNames;
+					addColumnsAfterInit(models);
+				}
+			});
+		} else {
+			addColumnsAfterInit(models);
+		}
 	}
 	
-	public void getNonEditableColumns(final CallbackP<List<ColumnModel>> callback) {
-		fileViewDefaultColumns.getDefaultColumns(true, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				editor.showErrorMessage(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(List<ColumnModel> columns) {
-				callback.invoke(columns);
-			}
-		});
-	}
-	
-	public void addColumnsAfterInit(List<ColumnModel> models, List<ColumnModel> nonEditableColumns) {
+	public void addColumnsAfterInit(List<ColumnModel> models) {
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
 		newColumns.addAll(models);
 		List<ColumnModel> existingColumns = getEditedColumnModels();
@@ -173,29 +168,13 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		for(ColumnModel cm: newColumns){
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
-				// default column model ids are cleared on the servlet.
-				ColumnModel cmCopy = copyColumnModel(cm);
-				cmCopy.setId(null);
-				if (!nonEditableColumns.contains(cmCopy)) {
-					createColumnModelEditorWidget(cm);	
-				} else {
-					createColumnModelViewerWidget(cm);
-				}
+				createColumnModelEditorWidget(cm);	
 				columnModelIds.add(columnModelId);
 			}
 		}
 		checkSelectionState();
 	}
 	
-	private ColumnModel copyColumnModel(ColumnModel cm) {
-		try {
-			return new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
-		} catch (JSONObjectAdapterException e) {
-			editor.showErrorMessage(e.getMessage());
-			return null;
-		}
-	}
-
 	@Override
 	public void toggleSelect() {
 		changeAllSelection(!anyRowsSelected());

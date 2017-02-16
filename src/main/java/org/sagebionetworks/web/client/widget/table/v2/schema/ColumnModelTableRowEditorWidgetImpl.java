@@ -371,5 +371,10 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		}
 		return isValid;
 	}
+	
+	@Override
+	public void setToBeDefaultFileViewColumn() {
+		view.setToBeDefaultFileViewColumn();
+	}
 
 }

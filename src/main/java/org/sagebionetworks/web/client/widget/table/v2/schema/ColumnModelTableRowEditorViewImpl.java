@@ -247,4 +247,11 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 			facet.addItem(item);
 		}
 	}
+	
+	@Override
+	public void setToBeDefaultFileViewColumn() {
+		name.setEnabled(false);
+		type.setEnabled(false);
+		maxSize.setEnabled(false);
+	}
 }

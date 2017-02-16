@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -105,7 +106,7 @@ public class ColumnModelsEditorWidgetTest {
 		AsyncMockStubber.callSuccessWith(nonEditableColumns).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(schema);
+		widget.configure(TableType.table, schema);
 	}
 	
 	@Test

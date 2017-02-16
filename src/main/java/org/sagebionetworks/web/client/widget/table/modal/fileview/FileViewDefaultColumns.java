@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -13,6 +15,8 @@ public class FileViewDefaultColumns {
 	private SynapseClientAsync synapseClient;
 	private List<ColumnModel> defaultColumns;
 	private List<ColumnModel> defaultColumnsWithoutIds;
+	
+	private Set<String> defaultColumnNames;
 	
 	@Inject
 	public FileViewDefaultColumns(SynapseClientAsync synapseClient){
@@ -32,6 +36,26 @@ public class FileViewDefaultColumns {
 			} else {
 				callback.onSuccess(defaultColumns);
 			}
+		}
+	}
+	
+	public void getDefaultColumnNames(final AsyncCallback<Set<String>> callback) {
+		if (defaultColumnNames == null) {
+			initDefaultColumnsWithIds(new AsyncCallback<List<ColumnModel>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+				@Override
+				public void onSuccess(List<ColumnModel> columns) {
+					defaultColumnNames = new HashSet<String>();
+					for (ColumnModel cm : columns) {
+						defaultColumnNames.add(cm.getName());	
+					}
+				}
+			});
+		} else {
+			callback.onSuccess(defaultColumnNames);
 		}
 	}
 	
