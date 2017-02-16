@@ -326,31 +326,33 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	private void createEnterMultiIdWidget() {
-//		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
-//			@Override
-//			public void onKeyDown(KeyDownEvent event) {
-//				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-//					lookupSynapseMultiIdButton.click();
-//				}
-//			}
-//		});
-//		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				presenter.lookupEntities(synapseMultiIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
-//					@Override
-//					public void onSuccess(PaginatedResults<EntityHeader> entities) {
-//						setSelectedIds(entities);
-//						updateSelectedView();											      
-//						// if versionable, create and show versions
-////						createVersionChooser(entity.getId());
-//					}
-//					@Override
-//					public void onFailure(Throwable caught) {
-//					}
-//				});
-//			}
-//		});
+		synapseMultiIdTextBox.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					lookupSynapseIdButton.click();
+				}
+			}
+		});
+		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.lookupEntity(synapseMultiIdTextBox.getValue(), new AsyncCallback<PaginatedResults<EntityHeader>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						
+					}
+					@Override
+					public void onSuccess(PaginatedResults<EntityHeader> result) {
+						String entityId = result.getResults().get(0).getId();
+						setSelectedId(entityId, false);
+						updateSelectedView();
+						createVersionChooser(entityId);
+						
+					}
+				});
+			}
+		});
 		
 		// list entry		
 		final Widget entry = createNewLeftEntry("Enter List of Synapse Ids", new ClickHandler(){
