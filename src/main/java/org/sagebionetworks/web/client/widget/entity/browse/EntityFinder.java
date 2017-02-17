@@ -3,11 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -87,19 +83,16 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
-		if (selectedEntity.isEmpty()) {
-			selectedEntity.add(selected);			
-		}
-		selectedEntity.set(0, selected);
+		selectedEntity.clear();
+		selectedEntity.add(selected);
 	}
 	
 	@Override
 	public void setSelectedEntity(List<Reference> selected) {
 		synAlert.clear();
-		if (selected.size() > 0) {
-			selectedEntity.clear();
-			selectedEntity.addAll(selected);			
-		}
+		selectedEntity.clear();
+		selectedEntity.addAll(selected);			
+		
 	}
 	
 	@Override
@@ -110,7 +103,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
 			// fetch the entity for a type check
-			lookupEntity(selectedEntity.get(0).getTargetId(), new AsyncCallback<List<EntityHeader>>() {
+			ReferenceList rl = new ReferenceList();
+			rl.setReferences(selectedEntity);
+			lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -130,7 +125,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			});
 		}
 	}
-	
+
 	public boolean validateEntityTypeAgainstFilter(List<EntityHeader> list) {
 		boolean flag = selectedEntity.size() == filter.filterForBrowsing(list).size();
 		if (!flag) {
@@ -142,13 +137,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	public List<Reference> getSelectedEntity() {
 		return selectedEntity;
 	}
-
+	
 	@Override
-	public void lookupEntity(String entityId, final AsyncCallback<List<EntityHeader>> callback) {
-		synAlert.clear();
-		processEntities(entityId);
-		ReferenceList rl = new ReferenceList();
-		rl.setReferences(selectedEntity);
+	public void lookupEntity(ReferenceList rl, final AsyncCallback<List<EntityHeader>> callback) {
 		synapseClient.getEntityHeaderBatch(rl, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 
 			@Override
@@ -163,6 +154,16 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			}
 			
 		});
+		
+	}
+
+	@Override
+	public void lookupEntity(String entityId, final AsyncCallback<List<EntityHeader>> callback) {
+		synAlert.clear();
+		processEntities(entityId);
+		ReferenceList rl = new ReferenceList();
+		rl.setReferences(selectedEntity);
+		lookupEntity(rl, callback);
 	}
 
 	private void processEntities(String entityId) {
@@ -213,6 +214,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				break;
 			case SYNAPSE_ID:
 				view.setSynapseIdAreaVisible();
+				break;
+			case SYNAPSE_MULTI_ID:
+				view.setSynapseMultiIdAreaVisible();
 				break;
 			case BROWSE:
 			default:

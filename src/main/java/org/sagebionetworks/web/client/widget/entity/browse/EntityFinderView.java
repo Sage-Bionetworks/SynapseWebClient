@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -41,6 +42,7 @@ public interface EntityFinderView extends SynapseView {
 		void setSelectedEntity(Reference selected);
 
 		void lookupEntity(String entityId, AsyncCallback<List<EntityHeader>> asyncCallback);
+		void lookupEntity(ReferenceList rl, AsyncCallback<List<EntityHeader>> callback);
 
 		void loadVersions(String entityId);
 		

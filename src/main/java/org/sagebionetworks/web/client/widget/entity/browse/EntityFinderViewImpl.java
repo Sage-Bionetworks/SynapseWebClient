@@ -202,6 +202,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		Reference ref = new Reference();
 		presenter.setSelectedEntity(ref);
 		updateSelectedView();
+		selectedRef.clear();
 		myEntitiesBrowser.clearState();
 		myEntitiesBrowser.refresh();
 		synapseIdTextBox.clear();
@@ -445,10 +446,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 	private void setSelectedId(String entityId) {
 		// clear out selection and set new id
+		selectedRef.clear();
 		Reference ref = new Reference();
 		ref.setTargetId(entityId);
 		ref.setTargetVersionNumber(null);
-		selectedRef.set(0, ref);
+		selectedRef.add(ref);
 		presenter.setSelectedEntity(ref);	
 	}
 	
