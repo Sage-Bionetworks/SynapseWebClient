@@ -1461,9 +1461,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isMore = true;
+			long limit = 50L;
+			long offset = 0L;
 			org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> results = new org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader>();
 			while (isMore) {
-				org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> headerTreePage = synapseClient.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
+				org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> headerTreePage = synapseClient.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType), limit, offset);
 				if (results.getResults() == null) {
 					results.setResults(headerTreePage.getResults());
 				} else {
@@ -1472,6 +1474,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				if (headerTreePage.getResults().isEmpty() || headerTreePage.getTotalNumberOfResults() <= headerTreePage.getResults().size()) {
 					isMore = false;
 				}
+				offset += limit;
 			}
 			results.setTotalNumberOfResults(results.getResults().size());
 			return convertPaginated(results);
