@@ -5,8 +5,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -15,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -40,13 +43,20 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	EntityBundle bundle;
 	EntityUpdatedHandler updateHandler;
 	JobTrackingWidget jobTrackingWidget;
+	FileViewDefaultColumns fileViewDefaultColumns;
+	
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	/**
 	 * New presenter with its view.
 	 * @param view
 	 */
 	@Inject
-	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, ColumnModelsEditorWidget editor, JobTrackingWidget jobTrackingWidget){
+	public ColumnModelsWidget(ColumnModelsViewBase baseView, 
+			PortalGinInjector ginInjector, 
+			SynapseClientAsync synapseClient, 
+			ColumnModelsEditorWidget editor, 
+			JobTrackingWidget jobTrackingWidget,
+			FileViewDefaultColumns fileViewDefaultColumns){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
@@ -62,10 +72,18 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.baseView.setJobTrackingWidget(jobTrackingWidget);
 		this.baseView.setJobTrackingWidgetVisible(false);
 		this.synapseClient = synapseClient;
+		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override
 			public void invoke() {
 				getDefaultColumnsForView();
+			}
+		});
+		
+		editor.setOnAddAnnotationColumnsCallback(new Callback() {
+			@Override
+			public void invoke() {
+				getPossibleColumnModelsForViewScope(null);
 			}
 		});
 	}
@@ -77,7 +95,9 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
-		editor.setAddDefaultViewColumnsButtonVisible(isEditable && bundle.getEntity() instanceof EntityView);
+		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
+		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
+		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
 		for(ColumnModel cm: startingModels){
 			// Create a viewer
 			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
@@ -89,8 +109,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
-		org.sagebionetworks.repo.model.table.ViewType type = ((EntityView)bundle.getEntity()).getType(); 
-		synapseClient.getDefaultColumnsForView(type, new AsyncCallback<List<ColumnModel>>() {
+		boolean isClearIds = true;
+		fileViewDefaultColumns.getDefaultColumns(isClearIds, new AsyncCallback<List<ColumnModel>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				baseView.showError(caught.getMessage());
@@ -98,6 +118,25 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			@Override
 			public void onSuccess(List<ColumnModel> columns) {
 				editor.addColumns(columns);
+			}
+		});
+	}
+	
+	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+		baseView.hideErrors();
+		ViewScope scope = new ViewScope();
+		scope.setScope(((EntityView)bundle.getEntity()).getScopeIds());
+		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				baseView.showError(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(ColumnModelPage columnPage) {
+				editor.addColumns(columnPage.getResults());
+				if (columnPage.getNextPageToken() != null) {
+					getPossibleColumnModelsForViewScope(columnPage.getNextPageToken());
+				}
 			}
 		});
 	}

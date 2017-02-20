@@ -17,6 +17,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -36,6 +38,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -83,6 +86,12 @@ public class ForumWidgetTest {
 	CallbackP<ParameterizedToken> mockParamChangeCallback;
 	@Mock
 	Callback mockCallback;
+	@Mock
+	SubscribersWidget mockSubscribersWidget;
+	@Captor
+	ArgumentCaptor<Topic> topicCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	ForumWidget forumWidget;
 	private boolean canModerate = false;
@@ -103,7 +112,7 @@ public class ForumWidgetTest {
 		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget,mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
-				mockSubscribeButtonWidget, mockDefaultThreadWidget);
+				mockSubscribeButtonWidget, mockDefaultThreadWidget, mockSubscribersWidget);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		moderatorIds = new HashSet<String>();
@@ -130,6 +139,7 @@ public class ForumWidgetTest {
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setSingleThread(any(Widget.class));
 		verify(mockView).setSubscribeButton(any(Widget.class));
+		verify(mockView).setSubscribersWidget(any(Widget.class));
 		
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockSubscribeButtonWidget).setOnSubscribeCallback(captor.capture());
@@ -181,6 +191,22 @@ public class ForumWidgetTest {
 	}
 	
 	@Test
+	public void testSubscribeCallback() {
+		verify(mockSubscribeButtonWidget).setOnSubscribeCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockSubscribersWidget).configure(any(Topic.class));
+	}
+	
+	@Test
+	public void testUnsubscribeCallback() {
+		verify(mockSubscribeButtonWidget).setOnUnsubscribeCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockAvailableThreadListWidget).configure(anyString(), anyBoolean(), anySet(), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		verify(mockSubscribersWidget).configure(any(Topic.class));
+	}
+	
+	@Test
 	public void testDefaultBundleInit() {
 		ForumWidget.defaultThreadBundle = null;
 		forumWidget.initDefaultThread(DEFAULT_THREAD_ID);
@@ -203,7 +229,7 @@ public class ForumWidgetTest {
 		forumWidget = new ForumWidget(mockView, mockStuAlert, mockDiscussionForumClient,
 				mockAvailableThreadListWidget, mockDeletedThreadListWidget, mockNewDiscussionThreadModal,
 				mockAuthController, mockGlobalApplicationState, mockDiscussionThreadWidget,
-				mockSubscribeButtonWidget, mockDefaultThreadWidget);
+				mockSubscribeButtonWidget, mockDefaultThreadWidget, mockSubscribersWidget);
 		verify(mockDiscussionForumClient, never()).getThread(eq(DEFAULT_THREAD_ID), any(AsyncCallback.class));
 	}
 
@@ -218,7 +244,6 @@ public class ForumWidgetTest {
 		verify(mockSubscribeButtonWidget).clear();
 		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.FORUM, forumId);
 		verify(mockStuAlert, atLeastOnce()).clear();
-
 		InOrder inOrder = inOrder(mockView);
 		inOrder.verify(mockView).setMainContainerVisible(false);
 		inOrder.verify(mockView).setSingleThreadUIVisible(false);
@@ -228,15 +253,22 @@ public class ForumWidgetTest {
 		inOrder.verify(mockView).setDefaultThreadWidgetVisible(false);
 		inOrder.verify(mockView).setDeletedThreadListVisible(false);
 		inOrder.verify(mockView).setDeletedThreadButtonVisible(false);
+		inOrder.verify(mockView).setSubscribersWidgetVisible(false);
 		inOrder.verify(mockView).setThreadListUIVisible(true);
 		inOrder.verify(mockView).setNewThreadButtonVisible(true);
 		inOrder.verify(mockView).setDeletedThreadButtonVisible(canModerate);
 		inOrder.verify(mockView).setMainContainerVisible(true);
+		inOrder.verify(mockView).setSubscribersWidgetVisible(true);
 		
 		verify(mockDiscussionForumClient).getForumByProjectId(anyString(), any(AsyncCallback.class));
 		verify(mockNewDiscussionThreadModal).configure(anyString(), any(Callback.class));
 		verify(mockAvailableThreadListWidget).clear();
 		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), eq(DiscussionFilter.EXCLUDE_DELETED));
+		
+		verify(mockSubscribersWidget).configure(topicCaptor.capture());
+		assertEquals(forumId, topicCaptor.getValue().getObjectId());
+		assertEquals(SubscriptionObjectType.FORUM, topicCaptor.getValue().getObjectType());
+		
 		ArgumentCaptor<ParameterizedToken> captorToken = ArgumentCaptor.forClass(ParameterizedToken.class);
 		verify(mockParamChangeCallback).invoke(captorToken.capture());
 		assertEquals(ParameterizedToken.DEFAULT_TOKEN, captorToken.getValue().toString());

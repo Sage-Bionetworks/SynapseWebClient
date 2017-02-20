@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.ui.Widget;
 
 public interface NewReplyWidgetView {
@@ -35,4 +37,6 @@ public interface NewReplyWidgetView {
 	Widget asWidget();
 
 	void showErrorMessage(String error);
+
+	void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback, Callback noCallback);
 }

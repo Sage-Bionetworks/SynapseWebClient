@@ -1,21 +1,8 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
@@ -154,6 +141,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.NotificationTokenType;
@@ -259,6 +247,8 @@ public class SynapseClientImplTest {
 	MessageToUser mockMessageToUser;
 	@Mock
 	JSONObjectAdapter mockJSONObjAd;
+	@Mock
+	ExternalFileHandle mockExternalFileHandle;
 	List<FileHandleCopyResult> batchCopyResultsList;
 	
 	
@@ -1068,6 +1058,33 @@ public class SynapseClientImplTest {
 				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
 				any(Long.class));
 	}
+	
+	
+	@Test
+	public void testHtmlTeamMembersCache() throws Exception {
+		PaginatedResults<TeamMember> teamMembersPage1 = new PaginatedResults<TeamMember>();
+		String trustedUserId = "876543";
+		UserGroupHeader mockHeader = mock(UserGroupHeader.class);
+		when(mockHeader.getOwnerId()).thenReturn(trustedUserId);
+		TeamMember mockTeamMember = mock(TeamMember.class);
+		when(mockTeamMember.getMember()).thenReturn(mockHeader);
+		teamMembersPage1.setResults(Collections.singletonList(mockTeamMember));
+		PaginatedResults<TeamMember> teamMembersPage2 = new PaginatedResults<TeamMember>();
+		teamMembersPage2.setResults(new ArrayList());
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyInt(), anyInt()))
+				.thenReturn(teamMembersPage1, teamMembersPage2);
+		
+		assertFalse(synapseClient.isUserAllowedToRenderHTML("untrustedId"));
+		
+		//get both pages
+		verify(mockSynapse, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
+		
+		// the cache should be ready, it should not ask for the team members from the synapse client again for an hour
+		assertTrue(synapseClient.isUserAllowedToRenderHTML(trustedUserId));
+		
+		//only the original 2 calls
+		verify(mockSynapse, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
+	}
 
 	private void resetUpdateExternalFileHandleMocks(String testId,
 			FileEntity file, ExternalFileHandle handle)
@@ -1092,6 +1109,7 @@ public class SynapseClientImplTest {
 		Long fileSize=2048L;
 		FileEntity file = new FileEntity();
 		String originalFileEntityName = "syn1223";
+		String contentType = "text/plain";
 		file.setName(originalFileEntityName);
 		file.setId(testId);
 		file.setDataFileHandleId("handle1");
@@ -1099,7 +1117,7 @@ public class SynapseClientImplTest {
 		handle.setExternalURL(testUrl);
 
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		synapseClient.updateExternalFile(testId, testUrl, fileSize, md5, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, md5, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
 		
@@ -1108,6 +1126,8 @@ public class SynapseClientImplTest {
 		ExternalFileHandle capturedValue = captor.getValue();
 		assertEquals(testUrl.trim(), capturedValue.getExternalURL());
 		assertEquals(md5, capturedValue.getContentMd5());
+		assertEquals(contentType, capturedValue.getContentType());
+		assertEquals(myFileName, capturedValue.getFileName());
 //		assertEquals(fileSize, capturedValue.getContentSize());
 		
 		verify(mockSynapse).putEntity(any(FileEntity.class));
@@ -1122,7 +1142,7 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, fileSize, md5, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, md5, storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
@@ -1138,6 +1158,7 @@ public class SynapseClientImplTest {
 		String externalUrl = "  sftp://foobar.edu/b/test.txt";
 		String fileName = "testing.txt";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		String contentType = "text/plain";
 		Long fileSize = 1024L;
 		when(
 				mockSynapse
@@ -1145,7 +1166,7 @@ public class SynapseClientImplTest {
 				.thenReturn(new ExternalFileHandle());
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, fileSize, md5, storageLocationId);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1166,14 +1187,15 @@ public class SynapseClientImplTest {
 		String expectedAutoFilename = "test.txt";
 		String fileName = null;
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		String contentType = "text/plain";
 		Long fileSize = 1024L;
+		when(mockExternalFileHandle.getFileName()).thenReturn(expectedAutoFilename);
 		when(
-				mockSynapse
-						.createExternalFileHandle(any(ExternalFileHandle.class)))
-				.thenReturn(new ExternalFileHandle());
+			mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class)))
+				.thenReturn(mockExternalFileHandle);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, fileSize, md5, storageLocationId);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1182,6 +1204,7 @@ public class SynapseClientImplTest {
 		assertEquals(expectedAutoFilename, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
 		assertEquals(storageLocationId, handle.getStorageLocationId());
+		assertEquals(contentType, handle.getContentType());
 		assertEquals(md5, handle.getContentMd5());
 		
 		//also check the entity name
@@ -1611,10 +1634,10 @@ public class SynapseClientImplTest {
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		String entityId = "syn98765";
-		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(messageBody))).thenReturn(mockMessageToUser);
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), eq(entityId), eq(messageBody))).thenReturn(mockMessageToUser);
 		when(mockMessageToUser.writeToJSONObject(any(JSONObjectAdapter.class))).thenReturn(mockJSONObjAd);
 		synapseClient.sendMessageToEntityOwner(entityId, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(entityId), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
@@ -2183,6 +2206,24 @@ public class SynapseClientImplTest {
 		assertEquals(new Long(2), locations.get(0));
 	}
 	
+	@Test
+	public void testSetDefaultStorageLocationSetting() throws SynapseException, RestServiceException {
+		setupGetMyLocationSettings();
+		
+		UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
+		projectSetting.setLocations(Collections.EMPTY_LIST);
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(projectSetting);
+		
+		synapseClient.createStorageLocationSetting(entityId, null);
+		// do not try to create a new storage location setting
+		verify(mockSynapse, Mockito.never()).createStorageLocationSetting(any(StorageLocationSetting.class));
+		//verify updates project setting, and the new location list is a single value (id of existing storage location)
+		ArgumentCaptor<ProjectSetting> captor = ArgumentCaptor.forClass(ProjectSetting.class);
+		verify(mockSynapse).updateProjectSetting(captor.capture());
+		UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting)captor.getValue();
+		List<Long> locations = updatedProjectSetting.getLocations();
+		assertEquals(SynapseClientImpl.defaultStorageLocation, locations.get(0));
+	}
 
 	@Test
 	public void testCreateStorageLocationSettingNewStorageAndProjectSetting() throws SynapseException, RestServiceException {
@@ -2410,8 +2451,8 @@ public class SynapseClientImplTest {
 		List<ColumnModel> returnedColumns = synapseClient.getDefaultColumnsForView(ViewType.file);
 		
 		assertEquals(2, returnedColumns.size());
-		assertNull(returnedColumns.get(0).getId());
-		assertNull(returnedColumns.get(1).getId());
+		assertEquals("1", returnedColumns.get(0).getId());
+		assertEquals("2", returnedColumns.get(1).getId());
 	}
 	
 
@@ -2476,4 +2517,13 @@ public class SynapseClientImplTest {
 		assertEquals("SELECT * FROM syn123 WHERE ( ( col1 = 'a' ) )", newSql);
 	}
 
+	@Test
+	public void testGetFileNameFromLocationPath() {
+		String name = "filename.txt";
+		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name));
+		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
+		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("/root/" + name));
+		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://google.com/" + name));
+	}
+	
 }

@@ -160,7 +160,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 		//Must have edit and showAddTables for the buttons to be visible.
 		view.setAddTableVisible(this.canEdit);
 		view.setUploadTableVisible(this.canEdit);
-		view.setAddFileViewVisible(this.canEdit && DisplayUtils.isInTestWebsite(cookies));
+		view.setAddFileViewVisible(this.canEdit);
 	}
     
 	@Override

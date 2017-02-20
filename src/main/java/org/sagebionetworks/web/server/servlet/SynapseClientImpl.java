@@ -114,6 +114,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
@@ -122,6 +123,7 @@ import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -142,7 +144,6 @@ import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
@@ -175,6 +176,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
@@ -182,6 +185,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	private static final Integer ZERO_OFFSET = 0;
 
 	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
+	public static final String HTML_TEAM_ID_PROPERTY_KEY = "org.sagebionetworks.portal.html_team_id";
+	
 	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
@@ -190,6 +195,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/plain", MESSAGE_CHARSET);
 
+	private static final long LIMIT_50 = 50;
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
 	private static StackTraceDeobfuscator deobfuscator = null;
@@ -217,6 +223,37 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					}
 				}
 			});
+	
+    private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
+
+    public Set<String> getHtmlTeamMembers() {
+        return htmlTeamMembersCache.get();
+    }
+
+    private Supplier<Set<String>> teamMembersSupplier() {
+        return new Supplier<Set<String>>() {
+            public Set<String> get() {
+            	Set<String> userIdSet = new HashSet<String>();
+				try {
+					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+					long currentOffset = 0;
+					List<TeamMember> teamMembers = null;
+					do {
+						org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults = synapseClient.getTeamMembers(htmlTeamId, null, LIMIT_50, currentOffset);
+						teamMembers = teamMembersPaginatedResults.getResults();
+						for (TeamMember teamMember : teamMembers) {
+							userIdSet.add(teamMember.getMember().getOwnerId());
+						}
+						currentOffset += LIMIT_50;
+					} while (teamMembers != null && !teamMembers.isEmpty());
+				} catch (SynapseException e) {
+					logError(e.getMessage());
+					
+				}
+				return userIdSet;
+            }
+        };
+    }
 
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
@@ -389,7 +426,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void logError(String message) throws RestServiceException {
+	public void logError(String message) {
 		log.error(message);
 	}
 
@@ -1079,7 +1116,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Entity updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
+	public Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Entity entity = synapseClient.getEntityById(entityId);
@@ -1087,14 +1124,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				throw new RuntimeException("Upload failed. Entity id: "
 						+ entity.getId() + " is not a File.");
 			}
-
-			ExternalFileHandle efh = new ExternalFileHandle();
-			efh.setExternalURL(externalUrl.trim());
-			efh.setContentMd5(md5);
-			efh.setContentSize(fileSize);
-			efh.setStorageLocationId(storageLocationId);
-			ExternalFileHandle clone = synapseClient
-					.createExternalFileHandle(efh);
+			ExternalFileHandle clone = createExternalFileHandle(externalUrl, name, contentType, fileSize, md5, storageLocationId, synapseClient);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
 			Entity updatedEntity = synapseClient.putEntity(entity);
 			return updatedEntity;
@@ -1107,30 +1137,59 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return name != null && name.trim().length() > 0;
 	}
 
+	public static String getFileNameFromExternalUrl(String path){
+		//grab the text between the last '/' and following '?'
+		String fileName = "";
+		if (path != null) {
+			int lastSlash = path.lastIndexOf("/");
+			if (lastSlash > -1) {
+				int firstQuestionMark = path.indexOf("?", lastSlash);
+				if (firstQuestionMark > -1) {
+					fileName = path.substring(lastSlash+1, firstQuestionMark);
+				} else {
+					fileName = path.substring(lastSlash+1);
+				}
+			}
+		}
+		return fileName;
+	}
+	
+	private ExternalFileHandle createExternalFileHandle(
+			String externalUrl,
+			String name, 
+			String contentType,
+			Long fileSize, 
+			String md5, 
+			Long storageLocationId,
+			org.sagebionetworks.client.SynapseClient synapseClient
+			) throws SynapseException {
+		boolean isManuallySettingName = isManuallySettingExternalName(name);
+		ExternalFileHandle efh = new ExternalFileHandle();
+		efh.setExternalURL(externalUrl.trim());
+		efh.setContentMd5(md5);
+		efh.setContentSize(fileSize);
+		efh.setContentType(contentType);
+		String fileName;
+		if (isManuallySettingName) {
+			fileName = name;
+		} else {
+			fileName = getFileNameFromExternalUrl(externalUrl);
+		}
+		efh.setFileName(fileName);
+		efh.setStorageLocationId(storageLocationId);
+		return synapseClient.createExternalFileHandle(efh);
+	}
+
 	@Override
 	public Entity createExternalFile(String parentEntityId, String externalUrl,
-			String name, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
+			String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			FileEntity newEntity = new FileEntity();
-			ExternalFileHandle efh = new ExternalFileHandle();
-			efh.setExternalURL(externalUrl.trim());
-			efh.setContentMd5(md5);
-			efh.setContentSize(fileSize);
-			String fileName;
-			if (isManuallySettingName) {
-				fileName = name;
-			} else {
-				fileName = DisplayUtils.getFileNameFromExternalUrl(externalUrl);
-			}
-			efh.setFileName(fileName);
-			efh.setStorageLocationId(storageLocationId);
-			ExternalFileHandle clone = synapseClient
-					.createExternalFileHandle(efh);
+			ExternalFileHandle clone = createExternalFileHandle(externalUrl, name, contentType, fileSize, md5, storageLocationId, synapseClient);
 			newEntity.setDataFileHandleId(clone.getId());
 			newEntity.setParentId(parentEntityId);
-			newEntity.setName(fileName);
+			newEntity.setName(clone.getFileName());
 			return synapseClient.createEntity(newEntity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2312,6 +2371,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	public static Long defaultStorageLocation = Long.parseLong(PortalPropertiesHolder.getProperty(DEFAULT_STORAGE_ID_PROPERTY_KEY));
+	public static String htmlTeamId = PortalPropertiesHolder.getProperty(HTML_TEAM_ID_PROPERTY_KEY);
+	
 	
 	@Override
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
@@ -2429,10 +2490,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			List<ColumnModel> defaultColumns = synapseClient.getDefaultColumnsForView(type);
-			// SWC-3264: in order for these to look like new columns in the TableUpdateTransactionRequest change set, set column ids to null
-			for (ColumnModel cm : defaultColumns) {
-				cm.setId(null);
-			}
 			return defaultColumns;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2477,7 +2534,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
-			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, entityId, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -2740,7 +2797,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
-		}catch (SynapseException e) {
+		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
@@ -2985,6 +3042,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					//not found, create a new one
 					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId();
 				}
+			} else {
+				locationId = defaultStorageLocation;
 			}
 			
 			ArrayList<Long> locationIds = new ArrayList<Long>();
@@ -3067,5 +3126,20 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (Exception e) {
 			throw new BadRequestException(e.getMessage());
 		}
+	}
+	
+	@Override
+	public ColumnModelPage getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException {
+		return getHtmlTeamMembers().contains(userId);
 	}
 }

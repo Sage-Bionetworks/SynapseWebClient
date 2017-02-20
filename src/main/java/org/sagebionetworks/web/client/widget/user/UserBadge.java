@@ -319,6 +319,9 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		return view.asWidget();
 	}
 
+	public void setStyleNames(String style) {
+		view.setStyleNames(style);
+	}
 	@Override
 	public void onImageLoadError() {
 		if (useCachedImage) {

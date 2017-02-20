@@ -147,23 +147,6 @@ public class DisplayUtils {
         return df.format(size) + " bytes";
     }
 	
-	public static String getFileNameFromExternalUrl(String path){
-		//grab the text between the last '/' and following '?'
-		String fileName = "";
-		if (path != null) {
-			int lastSlash = path.lastIndexOf("/");
-			if (lastSlash > -1) {
-				int firstQuestionMark = path.indexOf("?", lastSlash);
-				if (firstQuestionMark > -1) {
-					fileName = path.substring(lastSlash+1, firstQuestionMark);
-				} else {
-					fileName = path.substring(lastSlash+1);
-				}
-			}
-		}
-		return fileName;
-	}
-	
 	/**
 	 * Handles the exception. Returns true if the user has been alerted to the exception already
 	 * @param ex
@@ -920,7 +903,10 @@ public class DisplayUtils {
 		return contentType != null && contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
 	}
 	
-
+	public static boolean isHTML(String contentType) {
+		return contentType != null && contentType.toLowerCase().startsWith("text/html");
+	}
+	
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)
 	 * @param bundle

@@ -20,6 +20,8 @@ public class TablesTabViewImpl implements TablesTabView {
 
 	@UiField
 	Button tableLearnMoreButton;
+	@UiField
+	Button viewLearnMoreButton;
 	
 	@UiField
 	SimplePanel tableTitlebarContainer;
@@ -57,6 +59,13 @@ public class TablesTabViewImpl implements TablesTabView {
 				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
 			}
 		});
+		viewLearnMoreButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "fileviews.html", "", "");
+			}
+		});
+	
 	}
 	
 	@Override

@@ -260,4 +260,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		externalS3BannerDropdownButton.setVisible(isVisible);
 		sftpBannerDropdownButton.setVisible(isVisible);
 	}
+	@Override
+	public void setSFTPVisible(boolean visible) {
+		sftpButton.setVisible(visible);
+	}
 }

@@ -65,13 +65,17 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	CallbackP<Boolean> showProjectInfoCallack;
 	TableEntityWidget v2TableWidget;
+	
+	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
+	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
+	
 	@Inject
 	public TablesTab(Tab tab,
 			PortalGinInjector ginInjector
 			) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Tables", "Build structured queryable data that can be described by a schema using the Tables.", WebConstants.DOCS_URL + "tables.html");
+		tab.configure("Tables", TABLES_HELP, TABLES_HELP_URL);
 	}
 	
 	public void lazyInject() {

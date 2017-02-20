@@ -1,13 +1,21 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.EntityUpdateResults;
+import org.sagebionetworks.repo.model.table.TableUpdateRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateResponse;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -49,7 +57,12 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 		presenter.setLoading(true);
 		view.setTrackingWidgetVisible(true);
 		// Start the job.
-		this.jobTrackingWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableCSVUpload, this.request, new AsynchronousProgressHandler() {
+		TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
+		transactionRequest.setEntityId(request.getTableId());
+		List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
+		changes.add(request);
+		transactionRequest.setChanges(changes);
+		this.jobTrackingWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {
@@ -58,6 +71,10 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
+				if (!errors.isEmpty()){
+					view.showErrorDialog(errors);
+				}
 				presenter.onFinished();
 			}
 			

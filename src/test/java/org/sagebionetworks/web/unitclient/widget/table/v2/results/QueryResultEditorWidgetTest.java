@@ -1,27 +1,42 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY;
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.EntityUpdateFailureCode;
+import org.sagebionetworks.repo.model.table.EntityUpdateResult;
+import org.sagebionetworks.repo.model.table.EntityUpdateResults;
+import org.sagebionetworks.repo.model.table.PartialRow;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReferenceSetResults;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.repo.model.table.TableSchemaChangeResponse;
+import org.sagebionetworks.repo.model.table.TableUpdateResponse;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -57,16 +72,32 @@ public class QueryResultEditorWidgetTest {
 	List<SelectColumn> headers;
 	List<Row> updates;
 	QueryResultBundle bundle;
-	
-	
+	@Mock
+	TableUpdateTransactionResponse mockTableUpdateTransactionResponse;
+	@Mock
+	BulkFileDownloadResponse mockWrongType;
+	@Mock
+	EntityUpdateResults mockEntityUpdateResults;
+	@Mock
+	TableSchemaChangeResponse mockTableSchemaChangeResponse;
+	@Mock
+	EntityUpdateResult mockEntityUpdateResult1;
+	@Mock
+	EntityUpdateResult mockEntityUpdateResult2;
+	@Mock
+	ClientCache mockClientCache;
+	List<TableUpdateResponse> tableUpdateResults;
+	boolean isView;
+	public static final String ENTITY_ID = "syn999";
 	@Before
 	public void before() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(QueryResultEditorView.class);
 		mockPageWidget = Mockito.mock(TablePageWidget.class);
 		jobTrackingStub = new JobTrackingWidgetStub();
 		mockGlobalState = Mockito.mock(GlobalApplicationState.class);
 		mockCallback = Mockito.mock(Callback.class);
-		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState);
+		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState,mockClientCache);
 
 		schema = TableModelTestUtils.createColumsWithNames("one", "two");
 		headers = TableModelTestUtils.buildSelectColumns(schema);
@@ -78,7 +109,7 @@ public class QueryResultEditorWidgetTest {
 		rowTwo.setValues(Arrays.asList("2,1","2,2"));
 		
 		rowSet = new RowSet();
-		rowSet.setTableId("syn999");
+		rowSet.setTableId(ENTITY_ID);
 		rowSet.setRows(Arrays.asList(rowOne, rowTwo));
 		updates = TableModelTestUtils.cloneObject(rowSet.getRows(), Row.class);
 		
@@ -91,6 +122,10 @@ public class QueryResultEditorWidgetTest {
 		// By default the view returns a copy of the data.
 		when(mockPageWidget.extractHeaders()).thenReturn(schema);
 		when(mockPageWidget.extractRowSet()).thenReturn(updates);
+		tableUpdateResults = new ArrayList<TableUpdateResponse>();
+		when(mockTableUpdateTransactionResponse.getResults()).thenReturn(tableUpdateResults);
+		// by default, edit Table results (not a view)
+		isView = false;
 	}
 	
 	@Test
@@ -134,18 +169,29 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEdit(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
+		verify(mockView).setAddRowButtonVisible(true);
+		verify(mockView).setButtonToolbarVisible(true);
 		verify(mockView, times(2)).showEditor();
 		verify(mockGlobalState).setIsEditing(true);
 		verify(mockGlobalState, never()).setIsEditing(false);
 	}
 	
 	@Test
+	public void testOnEditView(){
+		isView = true;
+		widget.showEditor(bundle, isView, mockCallback);
+		verify(mockView).setAddRowButtonVisible(false);
+		verify(mockView).setButtonToolbarVisible(false);
+	}
+
+	
+	@Test
 	public void testOnCancelNoChanges(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// No changes
@@ -156,7 +202,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmOkay(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -172,7 +218,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmCanceld(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -188,7 +234,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveNoChanges(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -205,7 +251,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesNotValid(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -227,8 +273,8 @@ public class QueryResultEditorWidgetTest {
 	}
 	
 	@Test
-	public void testOnSaveWithChagnesValidJobSuccessful(){
-		widget.showEditor(bundle, mockCallback);
+	public void testOnSaveWithChangesValidJobSuccessful(){
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -236,7 +282,11 @@ public class QueryResultEditorWidgetTest {
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(true);
 		// setup successful job
-		jobTrackingStub.setResponse(new RowReferenceSetResults());
+		TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
+		List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
+		results.add(new RowReferenceSetResults());
+		response.setResults(results);
+		jobTrackingStub.setResponse(response);
 		// the call
 		widget.onSave();
 		verify(mockView).setSaveButtonLoading(true);
@@ -253,11 +303,54 @@ public class QueryResultEditorWidgetTest {
 		
 		// The callback should be invoked
 		verify(mockCallback).invoke();
+		
+		verify(mockClientCache, never()).put(anyString(), anyString(), anyLong());
 	}
+	
+
+	@Test
+	public void testOnSaveWithChangesValidJobSuccessfulIsView(){
+		isView = true;
+		widget.showEditor(bundle, isView, mockCallback);
+		reset(mockView);
+		reset(mockGlobalState);
+		// make changes
+		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		// not valid
+		when(mockPageWidget.isValid()).thenReturn(true);
+		// setup successful job
+		TableUpdateTransactionResponse response = new TableUpdateTransactionResponse();
+		List<TableUpdateResponse> results = new ArrayList<TableUpdateResponse>();
+		EntityUpdateResult entityUpdateResult = new EntityUpdateResult();
+		EntityUpdateResults entityUpdateResults = new EntityUpdateResults();
+		entityUpdateResults.setUpdateResults(Collections.singletonList(entityUpdateResult));
+		results.add(entityUpdateResults);
+		response.setResults(results);
+		jobTrackingStub.setResponse(response);
+		// the call
+		widget.onSave();
+		verify(mockView).setSaveButtonLoading(true);
+		verify(mockView, never()).setErrorMessageVisible(true);
+		verify(mockView, never()).showErrorMessage(anyString());
+		// while the job is running the editor should not be visible
+		verify(mockView, times(2)).hideEditor();
+		// progress should be visible while the job runs.
+		verify(mockView).showProgress();
+		
+		// The editor should be hidden and the callback invoked
+		// end false
+		verify(mockGlobalState).setIsEditing(false);
+		
+		// The callback should be invoked
+		verify(mockCallback).invoke();
+		
+		verify(mockClientCache).put(eq(ENTITY_ID + VIEW_RECENTLY_CHANGED_KEY), anyString(), anyLong());
+	}
+	
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -292,7 +385,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobCanceled(){
-		widget.showEditor(bundle, mockCallback);
+		widget.showEditor(bundle, isView, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -318,4 +411,113 @@ public class QueryResultEditorWidgetTest {
 		verify(mockCallback).invoke();
 	}
 	
+	@Test
+	public void testGetEntityUpdateResultsEmpty() {
+		assertNull(QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsWrongType() {
+		assertNull(QueryResultEditorWidget.getEntityUpdateResults(mockWrongType));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsSingleValue() {
+		tableUpdateResults.add(mockEntityUpdateResults);
+		assertEquals(mockEntityUpdateResults, QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsMultipleValues() {
+		tableUpdateResults.add(mockTableSchemaChangeResponse);
+		tableUpdateResults.add(mockEntityUpdateResults);
+		assertEquals(mockEntityUpdateResults, QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsFailureSuccessIndex() {
+		EntityUpdateResults results = new EntityUpdateResults();
+		List<EntityUpdateResult> updateResults = new ArrayList<EntityUpdateResult>();
+		updateResults.add(mockEntityUpdateResult1);
+		updateResults.add(mockEntityUpdateResult2);
+		results.setUpdateResults(updateResults);
+		tableUpdateResults.add(results);
+		when(mockEntityUpdateResult1.getFailureCode()).thenReturn(EntityUpdateFailureCode.NOT_FOUND);
+		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
+		when(mockEntityUpdateResult1.getFailureMessage()).thenReturn("Not there, buddy");
+		assertEquals("<p>syn29292 (NOT_FOUND): Not there, buddy</p>", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+		assertEquals(1, QueryResultEditorWidget.getFirstIndexOfEntityUpdateResultSuccess(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsNoFailures() {
+		EntityUpdateResults results = new EntityUpdateResults();
+		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult1));
+		tableUpdateResults.add(results);
+		when(mockEntityUpdateResult1.getFailureCode()).thenReturn(null);
+		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
+		assertEquals("", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEntityUpdateResultsNoSuccess() {
+		EntityUpdateResults results = new EntityUpdateResults();
+		results.setUpdateResults(Collections.singletonList(mockEntityUpdateResult1));
+		tableUpdateResults.add(results);
+		when(mockEntityUpdateResult1.getFailureCode()).thenReturn(EntityUpdateFailureCode.UNAUTHORIZED);
+		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
+		assertEquals(-1, QueryResultEditorWidget.getFirstIndexOfEntityUpdateResultSuccess(mockTableUpdateTransactionResponse));
+	}
+	
+	@Test
+	public void testGetEtagColumnIdNotFound() {
+		// in the before we don't 
+		assertNull(widget.getEtagColumnId());
+	}
+	
+	@Test
+	public void testGetEtagColumnIdFound() {
+		schema = TableModelTestUtils.createColumsWithNames("one", ETAG_COLUMN_NAME);
+		headers = TableModelTestUtils.buildSelectColumns(schema);
+		when(mockPageWidget.extractHeaders()).thenReturn(schema);
+		
+		//ID set to index in createColumsWithNames
+		assertEquals("1", widget.getEtagColumnId());
+	}
+	
+	@Test
+	public void testEtagOnlyRows() {
+		PartialRowSet rowSet = new PartialRowSet();
+		List<PartialRow> changes = new ArrayList<PartialRow>();
+		rowSet.setRows(changes);
+		String etagColumnId = "222";
+		
+		//no op
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		assertTrue(rowSet.getRows().isEmpty());
+		
+		//add a single column cell change, verify it is not filtered out (since it is not the etag column id)
+		rowSet.setRows(changes);
+		PartialRow pr = new PartialRow();
+		changes.add(pr);
+		Map<String, String> values = new HashMap<String, String>();
+		pr.setValues(values);
+		values.put("not_etag_column_id", "new value");
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		assertEquals(1, rowSet.getRows().size());
+
+		// add another column cell change (the etag column is included), verify that it's still not filtered out
+		rowSet.setRows(changes);
+		values.put(etagColumnId, "existing-etag");
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		assertEquals(1, rowSet.getRows().size());
+		
+		// add a single column cell change for the etag column, verify that it's filtered out
+		rowSet.setRows(changes);
+		values.clear();
+		values.put(etagColumnId, "existing-etag");
+		widget.removeEtagOnlyRows(etagColumnId, rowSet);
+		//filtered out
+		assertTrue(rowSet.getRows().isEmpty());
+	}
 }

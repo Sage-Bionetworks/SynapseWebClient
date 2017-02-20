@@ -19,10 +19,8 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	void setFileInputWidget(Widget fileInputWidget);
 	void setWikiAttachmentsWidget(Widget widget);
 	void showUploadFailureUI(String error);
-	void showUploadSuccessUI();
-	boolean isNewAttachment();
-	boolean isFromAttachments();
-	
+	void showUploadSuccessUI(String fileName);
+	void setWikiAttachmentsWidgetVisible(boolean visible);
 	/**
 	 * Presenter interface
 	 */

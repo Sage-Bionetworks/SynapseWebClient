@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,7 +39,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 			synapseClient.getTeam(teamId, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team team) {
-						configure(team);
+					configure(team);
 				}
 				@Override
 				public void onFailure(Throwable caught) {

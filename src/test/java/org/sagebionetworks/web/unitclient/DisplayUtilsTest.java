@@ -54,17 +54,7 @@ public class DisplayUtilsTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
-	
-	@Test
-	public void testGetFileNameFromLocationPath() {
-		String name = "filename.txt";
-		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name));
-		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
-		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("/root/" + name));
-		assertEquals(name, DisplayUtils.getFileNameFromExternalUrl("http://google.com/" + name));
-		
-	}
-	
+
 	@Test
 	public void testWidgetNotSelectedState() {
 		WidgetSelectionState state = new WidgetSelectionState();

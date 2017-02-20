@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -26,7 +25,6 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	private List<String> fileHandleIds;
 	private FileHandleUploadWidget fileInputWidget;
 	private FileUpload uploadedFile;
-	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
 	
 	
@@ -44,19 +42,20 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
 		view.initView();
 		descriptor = widgetDescriptor;
-		this.dialogCallback = dialogCallback;
 		fileHandleIds = new ArrayList<String>();
 		fileInputWidget.reset();
 		view.clear();
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		uploadedFile = null;
+		view.setWikiAttachmentsWidgetVisible(true);
 		this.fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload uploadFile) {
-				view.showUploadSuccessUI();
+				view.setWikiAttachmentsWidgetVisible(false);
 				//enable the ok button
 				uploadedFile = uploadFile;
+				view.showUploadSuccessUI(getFileName());
 				dialogCallback.setPrimaryEnabled(true);
 				addFileHandleId(uploadFile.getFileHandleId());
 			}			
@@ -75,12 +74,9 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	@Override
 	public void updateDescriptorFromView() {
 		view.checkParams();
-		if (view.isNewAttachment()) {
-			if (fileHandleIds.isEmpty()) {
-				throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
-			}
+		if (!fileHandleIds.isEmpty()) {
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, getFileName());
-		} else if (view.isFromAttachments()) {
+		} else {
 			if (!wikiAttachments.isValid())
 				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_ATTACHMENT_MESSAGE);
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
@@ -112,7 +108,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	
 	@Override
 	public List<String> getDeletedFileHandleIds() {
-		if (view.isFromAttachments()) {
+		if (fileHandleIds.isEmpty()) {
 			return wikiAttachments.getFilesHandlesToDelete();
 		} else {
 			return null;

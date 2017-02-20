@@ -28,6 +28,7 @@ import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
+import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -131,6 +132,11 @@ public class PortalServletModule extends ServletModule {
 		// FileHandleAssociation download
 		bind(FileHandleAssociationServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET).with(FileHandleAssociationServlet.class);
+		
+		// Slack handler
+		bind(SlackServlet.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.SLACK_SERVLET).with(SlackServlet.class);
+
 
 		// Multipart file upload
 		bind(MultipartFileUploadClientImpl.class).in(Singleton.class);

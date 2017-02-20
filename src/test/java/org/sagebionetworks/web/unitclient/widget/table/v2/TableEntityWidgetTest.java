@@ -213,13 +213,12 @@ public class TableEntityWidgetTest {
 		
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		
-		// SWC-3125: block edit and upload (until feature available on the backend)
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		
-		verify(mockActionMenu).setBasicDivderVisible(false);
+		verify(mockActionMenu).setBasicDivderVisible(true);
 	}
 	@Test
 	public void testConfigureViewNoEdit(){
@@ -303,9 +302,7 @@ public class TableEntityWidgetTest {
 		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
-		
-		// SWC-3125: block edit (until feature available on the backend)
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 	
@@ -381,8 +378,7 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
-		boolean expectedCanEditResults = false;
-		verify(mockQueryResultsWidget).configure(startQuery, expectedCanEditResults, isView, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, isView, widget);
 	}
 	
 	@Test
@@ -479,8 +475,7 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		
-		boolean expectedCanEditResults = false;
-		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget, expectedCanEditResults);
+		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget, canEdit);
 	}
 	
 	

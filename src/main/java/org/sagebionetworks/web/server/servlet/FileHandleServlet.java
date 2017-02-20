@@ -181,7 +181,7 @@ public class FileHandleServlet extends HttpServlet {
 				} catch (SynapseException e1) { 
 					throw new ServletException(e);
 				}				
-			}			
+			}
 		} catch (SynapseException e) {
 			//redirect to error place with an entry
 			LogEntry entry = new LogEntry();
@@ -294,6 +294,7 @@ public class FileHandleServlet extends HttpServlet {
 					HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
 					if (responseEntity != null) {
 						responseEntity.writeTo(response.getOutputStream());
+						response.setContentType(responseEntity.getContentType().getValue());
 					}
 				} finally {
 					client.close();

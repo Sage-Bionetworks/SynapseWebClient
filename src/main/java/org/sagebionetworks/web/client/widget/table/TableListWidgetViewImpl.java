@@ -9,13 +9,17 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -63,10 +67,14 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 	HTMLPanel panel;
 	Presenter presenter;
+	PortalGinInjector ginInjector;
 	
 	@Inject
-	public TableListWidgetViewImpl(Binder binder) {
+	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		this.panel = binder.createAndBindUi(this);
+		this.ginInjector = ginInjector;
+		HTML html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add File View" + DisplayConstants.BETA_BADGE_HTML);
+		addFileView.add(html);
 		createdOnDesc.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -102,7 +110,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
 		for(final EntityQueryResult header: tables){
-			tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, new ClickHandler() {
+			UserBadge createdByUserBadge = ginInjector.getUserBadgeWidget();
+			createdByUserBadge.configure(header.getCreatedByPrincipalId().toString());
+			UserBadge modifiedByUserBadge = ginInjector.getUserBadgeWidget();
+			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
+			tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, createdByUserBadge, modifiedByUserBadge, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.onTableClicked(header.getId());

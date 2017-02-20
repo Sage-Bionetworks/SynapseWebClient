@@ -118,8 +118,7 @@ public class TableEntityWidget implements IsWidget,
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
-		// SWC-3125: Editing EntityView query results is currently blocked.
-		this.canEditResults = table instanceof TableEntity && canEdit;
+		this.canEditResults = canEdit;
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
 		this.uploadTableModalWidget.configure(table.getParentId(), tableId);

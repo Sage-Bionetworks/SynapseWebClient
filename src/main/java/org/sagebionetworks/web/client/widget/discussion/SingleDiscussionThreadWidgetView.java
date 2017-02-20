@@ -81,4 +81,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setSecondNewReplyContainer(Widget widget);
 
 	void setSecondNewReplyContainerVisible(boolean visible);
+	
+	void setSubscribersWidget(Widget widget);
+	void setSubscribersWidgetContainerVisible(boolean visible);
 }

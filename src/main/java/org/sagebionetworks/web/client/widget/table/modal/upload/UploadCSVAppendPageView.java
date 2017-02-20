@@ -21,4 +21,5 @@ public interface UploadCSVAppendPageView extends IsWidget {
 	 */
 	void setTrackingWidgetVisible(boolean visible);
 
+	void showErrorDialog(String message);
 }

@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThrea
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -55,11 +55,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	SubscribeButtonWidget subscribeToForumButton;
 	Set<String> moderatorIds = new HashSet<String>();
 	ParameterizedToken params;
+	Topic forumTopic = new Topic();
 	
 	// From portal.properties, what thread should we show if no threads are available?
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
 	public static DiscussionThreadBundle defaultThreadBundle;
 	public SingleDiscussionThreadWidget defaultThreadWidget;
+	public SubscribersWidget forumSubscribersWidget;
+	
 	boolean isForumConfigured;
 	@Inject
 	public ForumWidget(
@@ -73,7 +76,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			GlobalApplicationState globalApplicationState,
 			SingleDiscussionThreadWidget singleThreadWidget,
 			SubscribeButtonWidget subscribeToForumButton,
-			SingleDiscussionThreadWidget defaultThreadWidget
+			SingleDiscussionThreadWidget defaultThreadWidget,
+			SubscribersWidget forumSubscribersWidget
 			) {
 		this.view = view;
 		this.stuAlert = stuAlert;
@@ -86,6 +90,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.subscribeToForumButton = subscribeToForumButton;
 		this.defaultThreadWidget = defaultThreadWidget;
 		this.deletedThreadListWidget = deletedThreadListWidget;
+		this.forumSubscribersWidget = forumSubscribersWidget;
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
@@ -94,7 +99,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setSubscribeButton(subscribeToForumButton.asWidget());
 		view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
 		view.setDeletedThreadList(deletedThreadListWidget.asWidget());
+		view.setSubscribersWidget(forumSubscribersWidget.asWidget());
 		String defaultThreadId = globalApplicationState.getSynapseProperty(DEFAULT_THREAD_ID_KEY);
+		forumTopic.setObjectType(SubscriptionObjectType.FORUM);
 		initDefaultThread(defaultThreadId);
 		emptyListCallback = new CallbackP<Boolean>(){
 			@Override
@@ -109,6 +116,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		Callback refreshThreadsCallback = new Callback() {
 			@Override
 			public void invoke() {
+				ForumWidget.this.forumSubscribersWidget.configure(forumTopic);
 				refreshThreads();
 			}
 		};
@@ -297,6 +305,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setDefaultThreadWidgetVisible(false);
 		view.setDeletedThreadListVisible(false);
 		view.setDeletedThreadButtonVisible(false);
+		view.setSubscribersWidgetVisible(false);
 	}
 
 	public void showThread(String threadId, final String replyId) {
@@ -349,11 +358,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setNewThreadButtonVisible(true);
 		view.setDeletedThreadButtonVisible(isCurrentUserModerator);
 		view.setMainContainerVisible(true);
+		view.setSubscribersWidgetVisible(true);
 		if (!isForumConfigured) {
 			isForumConfigured = true;
 			threadListWidget.clear();
 			threadListWidget.configure(forumId, isCurrentUserModerator,
 					moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+			forumTopic.setObjectId(forumId);
+			forumSubscribersWidget.configure(forumTopic);
 		}
 	}
 

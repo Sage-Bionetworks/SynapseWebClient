@@ -58,6 +58,8 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
+import org.sagebionetworks.web.client.view.MapView;
+import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
@@ -134,6 +136,8 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItem
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetView;
@@ -513,6 +517,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
@@ -1192,10 +1197,12 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TeamSearchViewImpl.class).in(Singleton.class);
 		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
 		
+		bind(MapView.class).to(MapViewImpl.class);
+		
 		// People Search Page
 		bind(PeopleSearchViewImpl.class).in(Singleton.class);
 		bind(PeopleSearchView.class).to(PeopleSearchViewImpl.class);
-
+		
 		/*
 		 * Teams Widgets
 		 */
@@ -1385,5 +1392,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FacetColumnResultSliderRangeView.class).to(FacetColumnResultSliderRangeViewImpl.class);
 		bind(FacetColumnResultRangeView.class).to(FacetColumnResultRangeViewImpl.class);
 		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
+		
+		bind(FileViewDefaultColumns.class).in(Singleton.class);
+		bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
 	}
 }

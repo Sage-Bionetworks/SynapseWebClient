@@ -37,7 +37,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		heading.addStyleName("displayInline");
 
 		LinkedGroupItemText text = new LinkedGroupItemText();
-		text.setText(LAST_UPDATED+DATE_FORMAT.format(entity.getCreatedOn()));
+		text.setText(LAST_UPDATED+DATE_FORMAT.format(entity.getModifiedOn()));
 		anchor = new Anchor("#!Synapse:"+entity.getId());
 		anchor.setTarget("_blank");
 		anchor.setIcon(IconType.ANGLE_RIGHT);

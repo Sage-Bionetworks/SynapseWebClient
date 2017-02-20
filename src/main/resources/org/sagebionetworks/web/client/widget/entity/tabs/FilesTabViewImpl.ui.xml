@@ -35,7 +35,9 @@
 			    			<w:HelpWidget helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and has satisfied all conditions for use." 
 								href="http://docs.synapse.org/articles/access_controls.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			    		</bh:Div>
-			    		<bh:Div ui:field="filePreviewContainerHighlightBox" />
+			    		<g:ScrollPanel height="210px">
+			    			<bh:Div ui:field="filePreviewContainerHighlightBox" />
+			    		</g:ScrollPanel>
 			    	</g:FlowPanel>
 				</b:Column>
 				<b:Column size="MD_6" ui:field="fileProvenanceContainer">
