@@ -918,7 +918,7 @@ public class SynapseClientImplTest {
 		assertEquals(results.getResults().size(), 1);
 		assertEquals(results.getTotalNumberOfResults(), 1);
 		assertEquals(results.getResults().get(0), new V2WikiHeader());
-		verify(mockSynapse, times(2)).getV2WikiHeaderTree(anyString(), any(ObjectType.class));
+		verify(mockSynapse, Mockito.times(2)).getV2WikiHeaderTree(anyString(), any(ObjectType.class));
 	}
 
 	@Test
