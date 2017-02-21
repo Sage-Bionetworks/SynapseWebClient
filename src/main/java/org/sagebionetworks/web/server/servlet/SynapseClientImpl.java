@@ -1464,13 +1464,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			long limit = 50L;
 			long offset = 0L;
 			org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> results = new org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader>();
+			results.setResults(new LinkedList<V2WikiHeader>());
 			while (isMore) {
 				org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> headerTreePage = synapseClient.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType), limit, offset);
-				if (results.getResults() == null) {
-					results.setResults(headerTreePage.getResults());
-				} else {
-					results.getResults().addAll(headerTreePage.getResults());
-				}
+				results.getResults().addAll(headerTreePage.getResults());
 				if (headerTreePage.getResults().isEmpty() || headerTreePage.getTotalNumberOfResults() <= headerTreePage.getResults().size()) {
 					isMore = false;
 				}
