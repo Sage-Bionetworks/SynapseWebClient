@@ -1460,8 +1460,21 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return convertPaginated(synapseClient
-					.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType)));
+			boolean isMore = true;
+			long limit = 50L;
+			long offset = 0L;
+			org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> results = new org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader>();
+			results.setResults(new LinkedList<V2WikiHeader>());
+			while (isMore) {
+				org.sagebionetworks.reflection.model.PaginatedResults<V2WikiHeader> headerTreePage = synapseClient.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType), limit, offset);
+				results.getResults().addAll(headerTreePage.getResults());
+				if (headerTreePage.getResults().isEmpty() || headerTreePage.getTotalNumberOfResults() <= headerTreePage.getResults().size()) {
+					isMore = false;
+				}
+				offset += limit;
+			}
+			results.setTotalNumberOfResults(results.getResults().size());
+			return convertPaginated(results);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
