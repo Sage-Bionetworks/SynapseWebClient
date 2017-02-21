@@ -30,7 +30,6 @@
 					</div>
 					<g:SimplePanel ui:field="synAlertPanel"/>
 					<g:SimplePanel ui:field="resultsPanel" styleName="margin-top-10"/>
-					<g:SimplePanel ui:field="paginationPanel" />
 				</div>
 				<g:HTMLPanel ui:field="narrowResultsPanel" addStyleNames="col-md-3 col-md-pull-9">
 					<div class="well">

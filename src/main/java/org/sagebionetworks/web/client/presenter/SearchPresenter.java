@@ -20,11 +20,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -37,7 +36,6 @@ import com.google.inject.Inject;
 public class SearchPresenter extends AbstractActivity implements SearchView.Presenter, Presenter<Search> {
 	
 	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
-	
 	private Search place;
 	private SearchView view;
 	private GlobalApplicationState globalApplicationState;
@@ -51,20 +49,31 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private Date searchStartTime;
 	
+	LoadMoreWidgetContainer loadMoreWidgetContainer;
+	
 	@Inject
 	public SearchPresenter(SearchView view,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			LoadMoreWidgetContainer loadMoreWidgetContainer) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
+		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
 		currentSearch = getBaseSearchQuery();
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
+		loadMoreWidgetContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				executeSearch();
+			}
+		});
+		view.setLoadingMoreContainerWidget(loadMoreWidgetContainer.asWidget());
 	}
 
 	@Override
@@ -165,7 +174,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		}
 		
 		// set to first page
-		currentResult.setStart(new Long(0));
+		currentSearch.setStart(0L);
 		executeNewSearch();
 	}
 
@@ -205,17 +214,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public Date getSearchStartTime() {
 		if(searchStartTime == null) searchStartTime = new Date();
 		return searchStartTime;		
-	}
-
-	@Override
-	public List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow) {
-		if(currentResult == null) return null;		
-		Long nResults = currentResult.getFound();
-		Long start = currentResult.getStart();
-		if(nResults == null || start == null)
-			return null;
-		// broken
-		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);		
 	}
 
 	@Override
@@ -274,26 +272,32 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	
 	private void executeSearch() { 	
 		synAlert.clear();
-		view.showLoading();
 		// Is there a search defined? If not, display empty result.
 		if (isEmptyQuery()) {
 			currentResult = new SearchResults();
 			currentResult.setFound(new Long(0));
 			view.setSearchResults(currentResult, "", newQuery);
 			newQuery = false;
+			loadMoreWidgetContainer.setIsMore(false);
 			return;
 		}
 		AsyncCallback<SearchResults> callback = new AsyncCallback<SearchResults>() {			
 			@Override
 			public void onSuccess(SearchResults result) {
 				currentResult = result;
-				view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
+				String searchTerm = join(currentSearch.getQueryTerm(), " ");
+				view.setSearchResults(currentResult, searchTerm, newQuery);
 				newQuery = false;
+				Long limit = currentSearch.getSize() == null ? 10L : currentSearch.getSize();
+				currentSearch.setStart(currentResult.getStart() + limit);
+				loadMoreWidgetContainer.add(view.getResults(currentResult, searchTerm));
+				loadMoreWidgetContainer.setIsMore(currentResult.getStart() < result.getFound());
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.clear();
+				loadMoreWidgetContainer.setIsMore(false);
 				synAlert.handleException(caught);
 			}
 		};
