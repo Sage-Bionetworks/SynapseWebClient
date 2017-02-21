@@ -12,6 +12,7 @@ public class LoginPlace extends Place {
 	
 	public static final String LOGOUT_TOKEN = "logout";
 	public static final String CHANGE_USERNAME = "username";
+	public static final String SHOW_TOU = "SynapseAwarenessEthicsPledge";
 	public static final String LOGIN_TOKEN = ClientProperties.DEFAULT_PLACE_TOKEN;
 	
 	public LoginPlace(String token) {
