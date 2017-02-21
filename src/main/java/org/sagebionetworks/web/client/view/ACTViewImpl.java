@@ -8,17 +8,14 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,8 +42,6 @@ public class ACTViewImpl implements ACTView {
 	Button clearStateFilter;
 	@UiField
 	Button clearUserFilter;
-	@UiField
-	Div paginationContainer;
 	@UiField
 	Span currentState;
 	@UiField
@@ -152,48 +147,13 @@ public class ACTViewImpl implements ACTView {
 		userSelectContainer.add(w);
 	}
 	@Override
-	public void addRow(Widget w) {
-		tableData.add(w);
-	}
-	@Override
-	public void clearRows() {
+	public void setLoadMoreContainer(Widget w) {
 		tableData.clear();
+		tableData.add(w);
 	}
 	@Override
 	public void setSynAlert(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
-	}
-	
-	@Override
-	public void updatePagination(List<PaginationEntry> entries) {
-		paginationContainer.clear();
-		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.setStyleName("pagination pagination-lg");
-		
-		if(entries != null) {
-			for(PaginationEntry pe : entries) {
-				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "active");
-				else
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
-			}
-		}
-		
-		if (entries.size() > 1) {
-			paginationContainer.add(ul);
-		}
-	}
-	
-	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
-		Anchor a = new Anchor();
-		a.setHTML(anchorName);
-		a.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.loadData((long)newStart);
-			}
-		});
-		return a;
 	}
 }
