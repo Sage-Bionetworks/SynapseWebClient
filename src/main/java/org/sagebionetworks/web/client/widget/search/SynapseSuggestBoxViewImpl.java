@@ -112,8 +112,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		nextBtn.setEnabled(moreResults);
 		
 		String resultsLabel = "Displaying " + (offset + 1) + " - "
-								+ (moreResults ? offset + SynapseSuggestBox.PAGE_SIZE : numResults)
-								+ " of " + numResults;
+								+ (moreResults ? offset + SynapseSuggestBox.PAGE_SIZE : numResults);
 		resultsLbl.setText(resultsLabel);
 	}
 	

@@ -32,7 +32,7 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, Pag
 		this.listener = listener;
 		if(count == null || limit == null || offset == null || count < 1 || limit < 1){
 			setLoading();
-			view.setPageNumbers(1l, 1l);
+			view.setCurrentPage(1l);
 		}else{
 			this.limit = limit;
 			this.offset = offset;
@@ -44,7 +44,7 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, Pag
 			long currentPageNumber = offset/limit + 1;
 			view.setNextEnabled(currentPageNumber < totalNumberOfPages);
 			view.setPreviousEnabled(currentPageNumber > 1);
-			view.setPageNumbers(currentPageNumber, totalNumberOfPages);
+			view.setCurrentPage(currentPageNumber);
 		}
 	}
 

@@ -111,6 +111,7 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 		Long nResults = teamList.getTotalNumberOfResults();
 		if(nResults == null)
 			return null;
+		// broken
 		return PaginationUtil.getPagination(nResults.intValue(), offset, nPerPage, nPagesToShow);
 	}
 	

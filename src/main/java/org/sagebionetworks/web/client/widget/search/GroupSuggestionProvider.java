@@ -35,6 +35,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 				for (Team team: result.getResults()) {
 					suggestions.add(new GroupSuggestion(team, prefix));
 				}
+				// need to follow up (total number of results)
 				SynapseSuggestionBundle suggestionBundle = new SynapseSuggestionBundle(suggestions, result.getTotalNumberOfResults());
 				callback.onSuccess(suggestionBundle);
 			}

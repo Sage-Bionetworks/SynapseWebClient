@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.List;
-
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.PeopleSearch;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.search.PaginationUtil;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -21,31 +22,39 @@ import com.google.inject.Inject;
 
 public class PeopleSearchPresenter extends AbstractActivity implements PeopleSearchView.Presenter, Presenter<PeopleSearch> {
 	
-	public static final int SEARCH_PEOPLE_LIMIT = 10;
+	public static final int SEARCH_PEOPLE_LIMIT = 30;
 	
 	private PeopleSearch place;
 	private PeopleSearchView view;
-	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private SynapseAlert synAlert;
-	
+	private LoadMoreWidgetContainer loadMoreWidgetContainer;
+	PortalGinInjector ginInjector;
 	private int offset;
 	private String searchTerm;
-	private UserGroupHeaderResponsePage peopleList;
 	
 	@Inject
 	public PeopleSearchPresenter(PeopleSearchView view,
 			SynapseClientAsync synapseClient,
-			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			LoadMoreWidgetContainer loadMoreWidgetContainer,
+			PortalGinInjector ginInjector) {
 		this.view = view;
-		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
+		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
+		loadMoreWidgetContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
+		view.setLoadMoreContainer(loadMoreWidgetContainer.asWidget());
 	}
 	
 	@Override
@@ -58,9 +67,12 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 	public void setPlace(PeopleSearch place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		this.view.clear();
+		loadMoreWidgetContainer.clear();
 		view.setSynAlertWidget(synAlert.asWidget());
-		showView(place);
+		searchTerm = place.getSearchTerm();
+		view.setSearchTerm(searchTerm);
+		offset = 0;
+		loadMore();
 	}
 	
 	@Override
@@ -68,27 +80,29 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	@Override
-	public void search(final String searchTerm, Integer offset) {
+	public void loadMore() {
 		this.synAlert.clear();
-		this.searchTerm = searchTerm;
-		if (offset == null)
-			this.offset = 0;
-		else
-			this.offset = offset;
+		
 		//execute search, and update view with the results
 		AsyncCallback<UserGroupHeaderResponsePage> callback = 
 				new AsyncCallback<UserGroupHeaderResponsePage>() {
 
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
-				peopleList = result;
-				view.configure(peopleList.getChildren(), searchTerm);
+				for (UserGroupHeader header : result.getChildren()) {
+					UserBadge badge = ginInjector.getUserBadgeWidget();
+					badge.configure(header.getOwnerId(), true);
+					badge.setSize(BadgeSize.LARGE);
+					badge.setStyleNames("userBadgeTable");
+					loadMoreWidgetContainer.add(badge.asWidget());
+				}
+				offset += SEARCH_PEOPLE_LIMIT;
+				loadMoreWidgetContainer.setIsMore(offset < result.getTotalNumberOfResults());
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.clear();
+				loadMoreWidgetContainer.setIsMore(false);
 				view.setSynAlertWidgetVisible(true);
 				synAlert.handleException(caught);
 			}
@@ -96,30 +110,4 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 		};
 		synapseClient.getUserGroupHeadersByPrefix(searchTerm, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, callback);
 	}
-	
-	@Override
-	public List<PaginationEntry> getPaginationEntries(int nPerPage,
-			int nPagesToShow) {
-		Long nResults = peopleList.getTotalNumberOfResults();
-		if(nResults == null)
-			return null;
-		return PaginationUtil.getPagination(nResults.intValue(), offset, nPerPage, nPagesToShow);
-	}
-	
-	@Override
-	public int getOffset() {
-		return offset;
-	}
-	
-	
-	/*
-	 * Private Methods
-	 */
-	
-	private void showView(PeopleSearch place) {
-		String searchTerm = place.getSearchTerm();
-		Integer offset = place.getStart();
-		search(searchTerm, offset);
-	}
-
 }

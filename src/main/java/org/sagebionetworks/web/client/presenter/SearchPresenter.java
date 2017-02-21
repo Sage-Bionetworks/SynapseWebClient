@@ -214,6 +214,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		Long start = currentResult.getStart();
 		if(nResults == null || start == null)
 			return null;
+		// broken
 		return PaginationUtil.getPagination(nResults.intValue(), start.intValue(), nPerPage, nPagesToShow);		
 	}
 
