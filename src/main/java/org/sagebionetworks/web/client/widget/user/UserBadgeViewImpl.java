@@ -208,6 +208,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void setStyleNames(String style) {
 		userBadgeTable.setStyleName(style);
 	}
+	@Override
+	public void setHeight(String height) {
+		widget.setHeight(height);
+	}
 	/*
 	 * Private Methods
 	 */

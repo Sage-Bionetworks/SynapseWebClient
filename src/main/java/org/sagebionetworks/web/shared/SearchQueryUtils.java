@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 
 public class SearchQueryUtils {
 
+	public static final Long LIMIT = 30L;
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = getBaseSearchQueryNoFacets();
 		
@@ -22,6 +23,7 @@ public class SearchQueryUtils {
 		query.setBooleanQuery(bq);
 		
 		query.setFacet(FACETS_DISPLAY_ORDER);
+		query.setSize(LIMIT);
 		
 		return query;
 	}

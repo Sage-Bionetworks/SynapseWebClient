@@ -77,7 +77,6 @@
 					</t:TableRow>
 				</t:Table>
 				<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
-				<bh:Div ui:field="paginationContainer" addStyleNames="margin-left-10 margin-right-10" />
 		</bh:Div>
 		<bh:Div addStyleNames="clear" />
 		<g:SimplePanel ui:field="footer" />

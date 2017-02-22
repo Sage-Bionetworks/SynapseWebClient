@@ -1,31 +1,20 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -34,8 +23,6 @@ import com.google.inject.Inject;
 
 public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	public interface TeamSearchViewImplUiBinder extends UiBinder<Widget, TeamSearchViewImpl> {}
-	
-	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	
 	@UiField
 	SimplePanel header;
@@ -54,24 +41,18 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	
 	private Header headerWidget;
 	private Footer footerWidget;
-	private SageImageBundle sageImageBundle;
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
-	private TeamListWidget teamListWidget;
 	
 	@Inject
 	public TeamSearchViewImpl(TeamSearchViewImplUiBinder binder,
 			Header headerWidget, 
 			Footer footerWidget, 
-			SageImageBundle sageImageBundle,
-			SynapseJSNIUtils synapseJsniUtils,
-			TeamListWidget teamListWidget) {
+			SynapseJSNIUtils synapseJsniUtils) {
 		initWidget(binder.createAndBindUi(this));
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.teamListWidget = teamListWidget;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -79,29 +60,9 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	}
 	
 	@Override
-	public void clear() {
-	}
-	
-	@Override
-	public void setMainContainerVisible(boolean isVisible) {
-		mainContainer.setVisible(isVisible);
-	}
-	
-	@Override
-	public void showLoading() {
+	public void setLoadMoreContainer(Widget w) {
 		mainContainer.clear();
-		mainContainer.add(DisplayUtils.getLoadingWidget(sageImageBundle));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-
+		mainContainer.add(w);
 	}
 	
 	@Override
@@ -117,26 +78,10 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	}
 	
 	@Override
-	public void configure(List<Team> teams, String searchTerm) {
-		mainContainer.clear();
+	public void setSearchTerm(String searchTerm) {
 		searchField.setValue(searchTerm);
-		teamListWidget.clear();
-		teamListWidget.configure(true);
-		for (Team team: teams) {
-			teamListWidget.addTeam(team, null);
-		}
-		
-		int start = presenter.getOffset();
-		String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : ""; 
 		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? " '"+searchTerm + "' " : "";
-		synapseJsniUtils.setPageTitle("Team Search" + pageTitleSearchTerm + pageTitleStartNumber);
-		mainContainer.add(teamListWidget.asWidget());
-		createPagination(searchTerm);
-	}
-	
-	@Override
-	public void showEmptyTeams() {
-		teamListWidget.showEmpty();
+		synapseJsniUtils.setPageTitle("Team Search" + pageTitleSearchTerm);
 	}
 	
 	private void configureSearchBox() {
@@ -155,32 +100,6 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	            }					
 			}
 		});				
-	}
-	
-	private void createPagination(String searchTerm) {
-		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.setStyleName("pagination pagination-lg");
-		
-		List<PaginationEntry> entries = presenter.getPaginationEntries(TeamSearchPresenter.SEARCH_TEAM_LIMIT, MAX_PAGES_IN_PAGINATION);
-		if(entries != null) {
-			for(PaginationEntry pe : entries) {
-				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()), "active");
-				else
-					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()));
-			}
-		}
-		
-		paginationPanel.clear();
-		if (entries.size() > 1)
-			paginationPanel.add(ul);
-	}
-	
-	private Anchor createPaginationAnchor(String anchorName, String searchTerm, final int newStart) {
-		Anchor a = new Anchor();
-		a.setHTML(SafeHtmlUtils.htmlEscape(anchorName));
-		a.setHref(DisplayUtils.getTeamSearchHistoryToken(searchTerm, newStart));
-		return a;
 	}
 
 	@Override
