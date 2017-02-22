@@ -291,7 +291,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				Long limit = currentSearch.getSize() == null ? 10L : currentSearch.getSize();
 				currentSearch.setStart(currentResult.getStart() + limit);
 				loadMoreWidgetContainer.add(view.getResults(currentResult, searchTerm));
-				loadMoreWidgetContainer.setIsMore(currentResult.getStart() < result.getFound());
+				loadMoreWidgetContainer.setIsMore(!currentResult.getHits().isEmpty());
 			}
 			
 			@Override

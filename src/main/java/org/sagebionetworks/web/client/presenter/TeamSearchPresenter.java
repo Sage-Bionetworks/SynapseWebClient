@@ -3,20 +3,22 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamSearchView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
+import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,32 +26,41 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class TeamSearchPresenter extends AbstractActivity implements TeamSearchView.Presenter, Presenter<TeamSearch> {
-	public static int SEARCH_TEAM_LIMIT = 10;
+	public static int SEARCH_TEAM_LIMIT = 30;
 	
 	private TeamSearch place;
 	private TeamSearchView view;
 	private SynapseClientAsync synapseClient;
-	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private int offset;
 	private String searchTerm;
-	private PaginatedResults<Team> teamList;
+	private int offset;
 	private SynapseAlert synAlert;
+	private LoadMoreWidgetContainer loadMoreWidgetContainer;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public TeamSearchPresenter(TeamSearchView view,
-			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			CookieProvider cookieProvider,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			LoadMoreWidgetContainer loadMoreWidgetContainer,
+			PortalGinInjector ginInjector) {
 		this.view = view;
-		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
+		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
+		this.ginInjector = ginInjector;
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
+		loadMoreWidgetContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
+		view.setLoadMoreContainer(loadMoreWidgetContainer.asWidget());
 	}
 
 	@Override
@@ -62,13 +73,15 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	public void setPlace(TeamSearch place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		this.view.clear();
-		showView(place);
+		searchTerm = place.getSearchTerm();
+		view.setSearchTerm(searchTerm);
+		offset = place.getStart() == null ? 0 : place.getStart();
+		loadMoreWidgetContainer.clear();
+		loadMore();
 	}
 	
 	@Override
     public String mayStop() {
-        view.clear();
         return null;
     }
 	
@@ -78,54 +91,31 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	@Override
-	public void search(final String searchTerm, final Integer offset) {
+	public void loadMore() {
 		synAlert.clear();
-		view.setMainContainerVisible(true);
-		this.searchTerm = searchTerm;
-		if (offset == null)
-			this.offset = 0;
-		else
-			this.offset = offset;
 		//execute search, and update view with the results
 		AsyncCallback<PaginatedResults<Team>> callback = new AsyncCallback<PaginatedResults<Team>>() {
 			@Override
 			public void onSuccess(PaginatedResults<Team> result) {
-				teamList = result;
-				view.configure(teamList.getResults(), searchTerm);
-				if (teamList.getResults().isEmpty()) {
-					view.showEmptyTeams();
+				for (Team team : result.getResults()) {
+					BigTeamBadge teamBadge = ginInjector.getBigTeamBadgeWidget();
+					teamBadge.configure(team, team.getDescription());
+					teamBadge.addStyleName("col-sm-12 col-md-6");
+					teamBadge.setHeight("120px");
+					loadMoreWidgetContainer.add(teamBadge.asWidget());
 				}
+				offset += SEARCH_TEAM_LIMIT;
+				loadMoreWidgetContainer.setIsMore(!result.getResults().isEmpty());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setMainContainerVisible(false);
+				loadMoreWidgetContainer.setIsMore(false);
 				synAlert.handleException(caught);
 			}
 		};
 		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, callback);
 	}
 	
-	@Override
-	public List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow) {
-		Long nResults = teamList.getTotalNumberOfResults();
-		if(nResults == null)
-			return null;
-		// broken
-		return PaginationUtil.getPagination(nResults.intValue(), offset, nPerPage, nPagesToShow);
-	}
-	
-	@Override
-	public int getOffset() {
-		return offset;
-	}
-	
-	private void showView(TeamSearch place) {
-		String searchTerm = place.getSearchTerm();
-		Integer offset = place.getStart();
-		search(searchTerm, offset);
-	}
-
 	public static boolean getCanPublicJoin(Team team) {
 		return team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 	}

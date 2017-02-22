@@ -111,7 +111,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 			@Override
 			public void onSuccess(VerificationPagedResults results) {
 				currentOffset += LIMIT;
-				loadMoreContainer.setIsMore(currentOffset < results.getTotalNumberOfResults());
+				loadMoreContainer.setIsMore(!results.getResults().isEmpty());
 				boolean isACT = true;
 				boolean isModal = false;
 				for (VerificationSubmission submission : results.getResults()) {

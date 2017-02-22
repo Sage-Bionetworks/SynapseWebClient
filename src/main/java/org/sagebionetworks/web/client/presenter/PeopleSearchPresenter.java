@@ -97,7 +97,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 					loadMoreWidgetContainer.add(badge.asWidget());
 				}
 				offset += SEARCH_PEOPLE_LIMIT;
-				loadMoreWidgetContainer.setIsMore(offset < result.getTotalNumberOfResults());
+				loadMoreWidgetContainer.setIsMore(!result.getChildren().isEmpty());
 			}
 			
 			@Override
