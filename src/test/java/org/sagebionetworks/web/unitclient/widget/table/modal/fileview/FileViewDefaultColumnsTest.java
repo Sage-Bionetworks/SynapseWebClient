@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
-
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -26,8 +28,7 @@ public class FileViewDefaultColumnsTest {
 	
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
-	ColumnModel mockColumn;
+	ColumnModel columnModel;
 	List<ColumnModel> columns;
 	@Mock
 	AsyncCallback<List<ColumnModel>> mockCallback;
@@ -36,14 +37,16 @@ public class FileViewDefaultColumnsTest {
 	FileViewDefaultColumns fileViewDefaultColumns;
 	@Mock
 	Exception mockException;
+	AdapterFactoryImpl adapterFactory;
 	@Captor
-	ArgumentCaptor<Set<String>> setCaptor;
-	
-	@Before
+	ArgumentCaptor<Set<String>> setCaptor;	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		columns = Collections.singletonList(mockColumn);
-		fileViewDefaultColumns = new FileViewDefaultColumns(mockSynapseClient);
+		columnModel = new ColumnModel();
+		columnModel.setId("not null");
+		adapterFactory = new AdapterFactoryImpl();
+		columns = Collections.singletonList(columnModel);
+		fileViewDefaultColumns = new FileViewDefaultColumns(mockSynapseClient, adapterFactory);
 		AsyncMockStubber.callSuccessWith(columns).when(mockSynapseClient).getDefaultColumnsForView(eq(ViewType.file), any(AsyncCallback.class));
 	}
 
@@ -59,14 +62,12 @@ public class FileViewDefaultColumnsTest {
 		fileViewDefaultColumns.getDefaultColumns(isClearIds, mockCallback);
 		verifyNoMoreInteractions(mockSynapseClient);
 		verify(mockCallback, times(2)).onSuccess(columns);
-		
-		verifyZeroInteractions(mockColumn);
 	}
 	
 	@Test
 	public void testGetDefaultColumnNames() {
 		String colName = "default column name";
-		when(mockColumn.getName()).thenReturn(colName);
+		columnModel.setName(colName);
 		fileViewDefaultColumns.getDefaultColumnNames(mockSetCallback);
 		
 		verify(mockSynapseClient).getDefaultColumnsForView(eq(ViewType.file), any(AsyncCallback.class));
@@ -105,9 +106,10 @@ public class FileViewDefaultColumnsTest {
 		fileViewDefaultColumns.getDefaultColumns(isClearIds, mockCallback);
 		
 		verify(mockSynapseClient).getDefaultColumnsForView(eq(ViewType.file), any(AsyncCallback.class));
-		verify(mockCallback).onSuccess(columns);
 		
-		verify(mockColumn).setId(null);
+		//verify column id is cleared in the callback
+		columnModel.setId(null);
+		verify(mockCallback).onSuccess(columns);
 		
 		//verify results are cached
 		fileViewDefaultColumns.getDefaultColumns(isClearIds, mockCallback);
