@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -49,14 +50,18 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			public void onSuccess(UserSessionData userSessionData) {
 				clear();
 				try {
-					fireUserChange(userSessionData);
+					if (!userSessionData.getSession().getAcceptsTermsOfUse()) {
+						globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+					} else {
+						fireUserChange(userSessionData);	
+					}
 				} catch (Exception ex) {
 					onFailure(ex);
 				}
 			}
 
 			@Override
-			public void onFailure(Throwable caught) {				
+			public void onFailure(Throwable caught) {
 				view.clear();
 				if(caught instanceof ReadOnlyModeException) {
 					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
