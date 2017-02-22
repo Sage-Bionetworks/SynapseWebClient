@@ -6,9 +6,12 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -28,9 +31,13 @@ public class FileViewDefaultColumnsTest {
 	List<ColumnModel> columns;
 	@Mock
 	AsyncCallback<List<ColumnModel>> mockCallback;
+	@Mock
+	AsyncCallback<Set<String>> mockSetCallback;
 	FileViewDefaultColumns fileViewDefaultColumns;
 	@Mock
 	Exception mockException;
+	@Captor
+	ArgumentCaptor<Set<String>> setCaptor;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -54,6 +61,31 @@ public class FileViewDefaultColumnsTest {
 		verify(mockCallback, times(2)).onSuccess(columns);
 		
 		verifyZeroInteractions(mockColumn);
+	}
+	
+	@Test
+	public void testGetDefaultColumnNames() {
+		String colName = "default column name";
+		when(mockColumn.getName()).thenReturn(colName);
+		fileViewDefaultColumns.getDefaultColumnNames(mockSetCallback);
+		
+		verify(mockSynapseClient).getDefaultColumnsForView(eq(ViewType.file), any(AsyncCallback.class));
+		verify(mockSetCallback).onSuccess(setCaptor.capture());
+		assertTrue(setCaptor.getValue().contains(colName));
+		
+		//verify results are cached
+		fileViewDefaultColumns.getDefaultColumnNames(mockSetCallback);
+		verifyNoMoreInteractions(mockSynapseClient);
+		verify(mockSetCallback, times(2)).onSuccess(anySet());
+	}
+	
+	@Test
+	public void testGetDefaultColumnNamesFailure() {
+		AsyncMockStubber.callFailureWith(mockException).when(mockSynapseClient).getDefaultColumnsForView(eq(ViewType.file), any(AsyncCallback.class));
+		fileViewDefaultColumns.getDefaultColumnNames(mockSetCallback);
+		
+		verify(mockSynapseClient).getDefaultColumnsForView(eq(ViewType.file), any(AsyncCallback.class));
+		verify(mockSetCallback).onFailure(mockException);
 	}
 	
 	@Test

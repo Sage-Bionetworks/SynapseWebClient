@@ -52,6 +52,7 @@ public class FileViewDefaultColumns {
 					for (ColumnModel cm : columns) {
 						defaultColumnNames.add(cm.getName());	
 					}
+					callback.onSuccess(defaultColumnNames);
 				}
 			});
 		} else {
