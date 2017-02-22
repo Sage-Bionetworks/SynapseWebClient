@@ -230,7 +230,7 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 				// return true if any of these have a submission
 				org.sagebionetworks.reflection.model.PaginatedResults<Submission> res = synapseClient
 						.getMySubmissions(evaluation.getId(), 0, 1);
-				if (!res.getResults().isEmpty()) {
+				if (res.getResults() != null && !res.getResults().isEmpty()) {
 					return true;
 				}
 			}
