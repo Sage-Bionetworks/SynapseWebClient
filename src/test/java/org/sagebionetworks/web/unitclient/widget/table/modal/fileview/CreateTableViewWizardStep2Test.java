@@ -103,7 +103,7 @@ public class CreateTableViewWizardStep2Test {
 		widget.configure(tableEntity, TableType.table);
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(false);
-		verify(mockEditor).configure(new ArrayList<ColumnModel>());
+		verify(mockEditor).configure(TableType.table, new ArrayList<ColumnModel>());
 	}
 	
 	@Test
@@ -112,7 +112,7 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockView).setEditor(any(Widget.class));
 		
 		widget.configure(viewEntity, TableType.view);
-		verify(mockEditor).configure(new ArrayList<ColumnModel>());
+		verify(mockEditor).configure(TableType.view, new ArrayList<ColumnModel>());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultColumnModels);

@@ -9,12 +9,14 @@
 		</t:TableData>
 
 		<t:TableData>
+			<b:FormControlStatic ui:field="nameStatic" visible="false"/>
 			<b:FormGroup ui:field="nameGroup">
 				<b:TextBox ui:field="name" placeholder="Column Name" />
 				<b:HelpBlock ui:field="nameHelp" />
 			</b:FormGroup>
 		</t:TableData>
 		<t:TableData>
+			<b:FormControlStatic ui:field="typeStatic" width="100px" visible="false"/>
 			<g:ListBox ui:field="type" width="100px">
 			  <g:item>String</g:item>
 			  <g:item>Boolean</g:item>
@@ -29,6 +31,7 @@
 			</g:ListBox>
 		</t:TableData>
 		<t:TableData>
+			<b:FormControlStatic ui:field="maxSizeStatic" width="75px" visible="false"/>
 			<b:FormGroup ui:field="sizeGroup">
 				<b:TextBox ui:field="maxSize" placeholder="Size" width="75px" />
 				<b:HelpBlock ui:field="sizeHelp" />

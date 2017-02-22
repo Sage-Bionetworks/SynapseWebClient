@@ -249,7 +249,7 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		// show the editor
 		widget.onEditColumns();
-		verify(mockEditor).configure(schema);
+		verify(mockEditor).configure(TableType.table, schema);
 		verify(mockBaseView).showEditor();
 	}
 	

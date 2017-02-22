@@ -92,5 +92,6 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	
 	public void setFacetValues(String...items);
 	
+	void setToBeDefaultFileViewColumn();
 	
 }
