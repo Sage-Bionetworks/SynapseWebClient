@@ -6,11 +6,10 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
@@ -41,8 +40,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private Trash place;
 	private TrashView view;
 	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalAppState;
-	private AuthenticationController authController;
 	private PaginatedResults<TrashedEntity> trashList;
 	private int offset;
 	private SynapseAlert synAlert;
@@ -50,13 +47,9 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	@Inject
 	public TrashPresenter(TrashView view,
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalAppState,
-			AuthenticationController authController,
 			SynapseAlert synAlert){
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.globalAppState = globalAppState;
-		this.authController = authController;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
 		this.view.setSynAlertWidget(synAlert.asWidget());

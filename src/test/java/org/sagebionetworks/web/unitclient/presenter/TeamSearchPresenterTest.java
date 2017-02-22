@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
@@ -14,10 +14,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -25,40 +28,56 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TeamSearchView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class TeamSearchPresenterTest {
 	
 	TeamSearchPresenter presenter;
+	
+	@Mock
 	TeamSearchView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	UserAccountServiceAsync mockUserAccountServiceAsync;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	SynapseClientAsync mockSynapse;
+	@Mock
 	CookieProvider mockCookies;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	TeamSearch mockPlace;
+	@Mock
+	BigTeamBadge mockTeamBadge;
 	PaginatedResults<Team> teamList = getTestTeams();
+	String searchTerm = "test";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
-		mockView = mock(TeamSearchView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapse = mock(SynapseClientAsync.class);
-		mockCookies = mock(CookieProvider.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		presenter = new TeamSearchPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapse, mockCookies, mockSynAlert);
+		MockitoAnnotations.initMocks(this);
+		presenter = new TeamSearchPresenter(mockView, mockGlobalApplicationState, mockSynapse, mockCookies, mockSynAlert, mockLoadMoreWidgetContainer, mockPortalGinInjector);
 		
 		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapse).getTeamsBySearch(
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 
 		verify(mockView).setPresenter(presenter);
+		when(mockPlace.getSearchTerm()).thenReturn(searchTerm);
+		when(mockPortalGinInjector.getBigTeamBadgeWidget()).thenReturn(mockTeamBadge);
 	}	
 	
 	private static PaginatedResults<Team> getTestTeams() {
@@ -81,15 +100,12 @@ public class TeamSearchPresenterTest {
 	}
 	
 	@Test
-	public void testSetPlace() {
-		TeamSearch place = Mockito.mock(TeamSearch.class);
-		presenter.setPlace(place);
-	}
-	
-	@Test
 	public void testSearch() throws RestServiceException {
-		presenter.search("test", null);
-		verify(mockView).configure(anyList(), anyString());
+		presenter.setPlace(mockPlace);
+		verify(mockView).setSearchTerm(searchTerm);
+		//add both test teams
+		verify(mockPortalGinInjector, times(2)).getBigTeamBadgeWidget();
+		verify(mockLoadMoreWidgetContainer, times(2)).add(any(Widget.class));
 	}
 	
 	@Test
@@ -97,7 +113,7 @@ public class TeamSearchPresenterTest {
 		Exception caught = new Exception("unhandled exception");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).getTeamsBySearch(
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		presenter.search("test", null);
+		presenter.setPlace(mockPlace);
 		verify(mockSynAlert).handleException(caught);
 	}
 	
@@ -120,8 +136,7 @@ public class TeamSearchPresenterTest {
 		teams.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(teams).when(mockSynapse).getTeamsBySearch(
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		presenter.search("test", null);
+		presenter.setPlace(mockPlace);
 		verify(mockSynapse).getTeamsBySearch(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).showEmptyTeams();
 	}
 }

@@ -83,7 +83,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private Map<TrashedEntity, Integer> trash2Row;
 	private Set<TrashedEntity> selectedTrash;
@@ -92,12 +91,10 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Inject
 	public TrashViewImpl(TrashViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.sageImageBundle = sageImageBundle;
 		this.synapseJsniUtils = synapseJsniUtils;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
