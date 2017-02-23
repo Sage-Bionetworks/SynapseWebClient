@@ -908,10 +908,12 @@ public class SynapseClientImplTest {
 			page1Results.add(Mockito.mock(V2WikiHeader.class));
 		}
 		when(headerTreePage1.getResults()).thenReturn(page1Results);
-		when(headerTreePage2.getResults()).thenReturn(new LinkedList<V2WikiHeader>());
+		//second page has a single page
+		V2WikiHeader singleHeader = Mockito.mock(V2WikiHeader.class);
+		when(headerTreePage2.getResults()).thenReturn(Collections.singletonList(singleHeader));
 		List<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
-		//1 full page of results
-		assertEquals(SynapseClientImpl.LIMIT_50, results.size());
+		//1 full page of results, and 1 result on second page
+		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.size());
 		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
 		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
 	}
@@ -1821,11 +1823,13 @@ public class SynapseClientImplTest {
 			page1Results.add(Mockito.mock(AccessRequirement.class));
 		}
 		when(page1.getResults()).thenReturn(page1Results);
-		when(page2.getResults()).thenReturn(new LinkedList<AccessRequirement>());
+		// second page has a single result
+		AccessRequirement singleAccessRequirement = Mockito.mock(AccessRequirement.class);
+		when(page2.getResults()).thenReturn(Collections.singletonList(singleAccessRequirement));
 		boolean unmetOnly = true;
 		org.sagebionetworks.web.shared.PaginatedResults<AccessRequirement> results = synapseClient.getEntityAccessRequirements(entityId, unmetOnly, null);
 		//1 full page of results
-		assertEquals(SynapseClientImpl.LIMIT_50, results.getResults().size());
+		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.getResults().size());
 		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
 		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
 	}
