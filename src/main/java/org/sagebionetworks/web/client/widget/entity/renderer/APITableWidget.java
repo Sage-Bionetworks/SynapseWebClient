@@ -323,7 +323,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		boolean isNodeQueryService = isNodeQueryService(uri);
 		if (isSubmissionQueryService || isNodeQueryService) {
 			//the node query service's first element is at index 1! (submission query service first element is at index 0)
-			Long firstIndex = isSubmissionQueryService ? ServiceConstants.DEFAULT_PAGINATION_OFFSET : ServiceConstants.DEFAULT_PAGINATION_OFFSET_NO_OFFSET_EQUALS_ONE;
+			Long firstIndex =  ServiceConstants.DEFAULT_PAGINATION_OFFSET;
 			return uri + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+firstIndex);
 		} else {
 			String firstCharacter = uri.contains("?") ? "&" : "?";
