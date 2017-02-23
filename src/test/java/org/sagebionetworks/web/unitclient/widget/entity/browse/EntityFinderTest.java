@@ -213,9 +213,9 @@ public class EntityFinderTest {
 		entityFinder.setSelectedEntity(mockReference);
 		
 		when(mockHeader.getType()).thenReturn(Folder.class.getName());
-		verifyCorrectEntityTypeSelected(pr, mockHandler);
+		verifyWrongEntityTypeSelected(pr, mockHandler);
 		when(mockHeader.getType()).thenReturn(Project.class.getName());
-		verifyCorrectEntityTypeSelected(pr, mockHandler);
+		verifyWrongEntityTypeSelected(pr, mockHandler);
 		when(mockHeader.getType()).thenReturn(FileEntity.class.getName());
 		verifyCorrectEntityTypeSelected(pr, mockHandler);
 	}
