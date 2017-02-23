@@ -180,7 +180,6 @@ public class EntityFinderTest {
 	public void testSelectionHandlerAnyType() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
-		entityFinder.setSelectedEntity(new Reference());
 		
 		//then the view calls okClicked if the user has clicked ok in the entity finder
 		
