@@ -171,7 +171,14 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		selectedEntity.clear();
 		for (int i = 0; i < entities.length; i++) {
 			Reference r = new Reference();
-			r.setTargetId(entities[i].trim());
+			String target = entities[i].trim();
+			if (target.contains(".")) {
+				String[] parts = target.split("[.]");
+				r.setTargetId(parts[0]);
+				r.setTargetVersionNumber(Long.parseLong(parts[1]));
+			} else {
+				r.setTargetId(target);				
+			}
 			selectedEntity.add(r);
 		}		
 	}

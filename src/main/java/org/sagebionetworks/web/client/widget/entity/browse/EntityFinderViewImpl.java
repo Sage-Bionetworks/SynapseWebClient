@@ -377,9 +377,9 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	private void updateSelectedView() {
 		String display = "";
 		for (Reference ref : selectedRef) {
-			display += DisplayUtils.createEntityVersionString(ref) + ";";
+			display += DisplayUtils.createEntityVersionString(ref) + ", ";
 		}
-		selectedText.setText(display.substring(0, display.length() - 1));
+		selectedText.setText(display.substring(0, display.length() - 2));
 	}
 
 	private void createVersionChooser(String entityId) {
@@ -459,7 +459,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		for (EntityHeader eh : result) {
 			Reference ref = new Reference();
 			ref.setTargetId(eh.getId());
-			ref.setTargetVersionNumber(null);
+			ref.setTargetVersionNumber(eh.getVersionNumber());
 			selectedRef.add(ref);
 		}
 		presenter.setSelectedEntity(selectedRef);
