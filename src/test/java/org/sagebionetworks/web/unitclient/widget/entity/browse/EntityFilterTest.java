@@ -97,7 +97,7 @@ public class EntityFilterTest {
 	
 	@Test
 	public void testFilterFolders() {
-		EntityFilter filter = EntityFilter.FOLDER;
+		EntityFilter filter = EntityFilter.CONTAINER;
 		String[] queryValues = filter.getEntityQueryValues();
 		Set<String> queryValuesSet = new HashSet<String>();
 		Collections.addAll(queryValuesSet, queryValues);
@@ -116,7 +116,7 @@ public class EntityFilterTest {
 
 	@Test
 	public void testFilterFiles() {
-		EntityFilter filter = EntityFilter.FILE;
+		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
 		String[] queryValues = filter.getEntityQueryValues();
 		Set<String> queryValuesSet = new HashSet<String>();
 		Collections.addAll(queryValuesSet, queryValues);

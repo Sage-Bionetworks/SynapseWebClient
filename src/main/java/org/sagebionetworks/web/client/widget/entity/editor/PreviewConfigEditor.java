@@ -33,7 +33,7 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	}		
 
 	private void configureEntityFinder() {
-		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				view.setEntityId(selected.getTargetId());

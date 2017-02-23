@@ -51,7 +51,7 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(EntityFilter.FILE, false, new SelectedHandler<Reference>() {					
+				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						textBox.setValue(selected.getTargetId());
