@@ -33,9 +33,7 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -63,7 +61,6 @@ public class JoinTeamWidgetTest {
 	JoinTeamWidget joinWidget;
 	AuthenticationController mockAuthenticationController;
 	Callback mockTeamUpdatedCallback;
-	JSONObjectAdapter jsonObjectAdapter;
 	GWTWrapper mockGwt;
 	PlaceChanger mockPlaceChanger;
 	List<AccessRequirement> ars;
@@ -85,7 +82,6 @@ public class JoinTeamWidgetTest {
         mockAuthenticationController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 
-		jsonObjectAdapter = new JSONObjectAdapterImpl();
         UserSessionData currentUser = new UserSessionData();                
         currentUserProfile = new UserProfile();
         ars = new ArrayList<AccessRequirement>();
@@ -99,7 +95,7 @@ public class JoinTeamWidgetTest {
         AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter, mockGwt, mockWikiPageWidget, mockWizardProgress);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGwt, mockWikiPageWidget, mockWizardProgress);
 		status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);

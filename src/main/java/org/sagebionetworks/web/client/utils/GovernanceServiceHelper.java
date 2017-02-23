@@ -10,8 +10,6 @@ import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.SelfSignAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -20,8 +18,7 @@ public class GovernanceServiceHelper {
 	
 	public static AccessApproval getAccessApproval(
 			String principalId, 
-			AccessRequirement ar, 
-			JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException {
+			AccessRequirement ar) {
 		SelfSignAccessApproval approval;
 		
 		if (ar instanceof TermsOfUseAccessRequirement) {
@@ -42,28 +39,12 @@ public class GovernanceServiceHelper {
 	public static void signTermsOfUse(
 			final String principalId,
 			final AccessRequirement ar,
-			final Callback onSuccess,
-			final CallbackP<Throwable> onFailure,
 			final SynapseClientAsync synapseClient,
-			final JSONObjectAdapter jsonObjectAdapter
+			AsyncCallback<AccessApproval> callback
 			) {
 		AccessApproval ew;
-		try {
-			ew = getAccessApproval(principalId, ar, jsonObjectAdapter);
-		} catch (JSONObjectAdapterException e) {
-			onFailure.invoke(e);
-			return;
-		}
-		synapseClient.createAccessApproval(ew, new AsyncCallback<AccessApproval>(){
-			@Override
-			public void onSuccess(AccessApproval result) {
-				onSuccess.invoke();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				onFailure.invoke(caught);
-			}			
-		});
+		ew = getAccessApproval(principalId, ar);
+		synapseClient.createAccessApproval(ew, callback);
 	}
 	
 	/**
