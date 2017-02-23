@@ -108,7 +108,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(EntityFilter.FILE, false, new SelectedHandler<Reference>() {					
+				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						entityField.setValue(DisplayUtils.createEntityVersionString(selected));

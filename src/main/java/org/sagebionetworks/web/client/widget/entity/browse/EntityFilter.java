@@ -13,8 +13,9 @@ public enum EntityFilter {
 	ALL(EntityType.project, EntityType.folder, EntityType.file, EntityType.link),
 	CONTAINER(EntityType.project, EntityType.folder),
 	PROJECT(EntityType.project),
-	FOLDER(EntityType.project, EntityType.folder),
-	FILE(EntityType.project, EntityType.folder, EntityType.file);
+	FOLDER(EntityType.folder),
+	FILE(EntityType.file),
+	ALL_BUT_LINK(EntityType.project, EntityType.folder, EntityType.file);
 	
 	// when browsing (in the entity tree browser), only these types should be shown.
 	private String[] entityQueryValues;
