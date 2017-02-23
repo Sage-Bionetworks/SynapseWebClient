@@ -441,6 +441,7 @@ public class SynapseClientImplTest {
 				mockSynapse.getUnmetAccessRequirements(
 						any(RestrictableObjectDescriptor.class),
 						any(ACCESS_TYPE.class), anyLong(), anyLong())).thenReturn(ars);
+
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -883,14 +884,15 @@ public class SynapseClientImplTest {
 				any(ObjectType.class), any(String.class), anyLong());
 	}
 	@Test
-	public void testGetV2WikiHeaderTreeOnePage() throws Exception {
-		PaginatedResults<V2WikiHeader> headerTreeResults = Mockito.mock(PaginatedResults.class);
-		when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class), anyLong(), anyLong()))
-				.thenReturn(headerTreeResults);
-		when(headerTreeResults.getTotalNumberOfResults()).thenReturn(0L);
-		when(headerTreeResults.getResults()).thenReturn(new LinkedList<V2WikiHeader>());
-		synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
-		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), anyLong(), anyLong());
+	public void testGetV2WikiHeaderTree() throws Exception {
+		PaginatedResults<V2WikiHeader> headerTreeResults = new PaginatedResults<V2WikiHeader>();
+		when(
+				mockSynapse.getV2WikiHeaderTree(anyString(),
+						any(ObjectType.class))).thenReturn(headerTreeResults);
+		synapseClient.getV2WikiHeaderTree("testId",
+				ObjectType.ENTITY.toString());
+		verify(mockSynapse).getV2WikiHeaderTree(anyString(),
+				any(ObjectType.class));
 	}
 
 	@Test
@@ -2535,5 +2537,5 @@ public class SynapseClientImplTest {
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("/root/" + name));
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://google.com/" + name));
 	}
-	
+
 }
