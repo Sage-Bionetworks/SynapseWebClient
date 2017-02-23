@@ -151,6 +151,7 @@ public class EntityFinderTest {
 	public void testSelectionHandlerAnyType() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
+		entityFinder.setSelectedEntity(new Reference());
 		
 		//then the view calls okClicked if the user has clicked ok in the entity finder
 		
@@ -162,8 +163,9 @@ public class EntityFinderTest {
 		//now with selection
 		Reference mockReference = mock(Reference.class);
 		when(mockReference.getTargetId()).thenReturn("syn99");
-		Entity entity = new Folder();
-		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		when(mockHeader.getType()).thenReturn(Folder.class.getName());
+		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		//AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		//the view usually sets the selected entity in the presenter
 		entityFinder.setSelectedEntity(mockReference);
 		entityFinder.okClicked();
