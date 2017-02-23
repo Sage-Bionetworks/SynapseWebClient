@@ -83,41 +83,34 @@ public class EntityFinderTest {
 		
 		String name = "name";
 		String id = "syn456";
-		Entity entity = new Folder();
-		entity.setId(id);
-		entity.setName(name);
-		Reference r = new Reference();
-		r.setTargetId(id);
-		ReferenceList refList = new ReferenceList();
-		List<Reference> rList = new ArrayList<Reference>();
-		refList.setReferences(rList);
-		List<EntityHeader> headerList = new ArrayList<EntityHeader>();
-		EntityHeader eh = new EntityHeader();
-		eh.setId(id);
-		eh.setName(name);
-		eh.setType(Folder.class.getName());
-		headerList.add(eh);
 		
-		AsyncMockStubber.callSuccessWith(headerList).when(mockSynapseClient).getEntityHeaderBatch(eq(refList), any(AsyncCallback.class));		
+		when(mockHeader.getId()).thenReturn(id);
+		when(mockHeader.getName()).thenReturn(name);
+		when(mockHeader.getType()).thenReturn(Folder.class.getName());
+		
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(headerList).when(mockCallback).onSuccess(headerList);
+		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
 		entityFinder.lookupEntity(id, mockCallback);
 		
-		verify(mockCallback).onSuccess(headerList);
+		verify(mockCallback).onSuccess(pr.getResults());
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadEntityFail() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configure(true, mockHandler);
+		
 		String name = "name";
 		String id = "syn456";
-		Entity entity = new Folder();
-		entity.setId(id);
-		entity.setName(name);
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		
+		when(mockHeader.getId()).thenReturn(id);
+		when(mockHeader.getName()).thenReturn(name);
+		when(mockHeader.getType()).thenReturn(Folder.class.getName());
+		
+		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		Exception ex = new NotFoundException();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));			
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));			
 		entityFinder.lookupEntity(id, mockCallback);		
 		verify(mockCallback).onFailure(any(Throwable.class));
 		verify(mockSynAlert).handleException(ex);		
