@@ -56,6 +56,8 @@ public class EntityFinderTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	EntityHeader mockHeader;
+	@Mock
+	EntityHeader mockHeader2;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -91,6 +93,33 @@ public class EntityFinderTest {
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
 		entityFinder.lookupEntity(id, mockCallback);
+		
+		verify(mockCallback).onSuccess(pr.getResults());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadMultiEntity() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configureMulti(true, mockHandler);
+		
+		String name = "name";
+		String id = "syn456";
+		String searchId = id + ", " + id;
+		
+		when(mockHeader.getId()).thenReturn(id);
+		when(mockHeader.getName()).thenReturn(name);
+		when(mockHeader.getType()).thenReturn(Folder.class.getName());
+		
+		when(mockHeader2.getId()).thenReturn(id);
+		when(mockHeader2.getName()).thenReturn(name);
+		when(mockHeader2.getType()).thenReturn(Folder.class.getName());
+		
+		pr.getResults().add(mockHeader2);
+		
+		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
+		entityFinder.lookupEntity(searchId, mockCallback);
 		
 		verify(mockCallback).onSuccess(pr.getResults());
 	}
@@ -265,6 +294,14 @@ public class EntityFinderTest {
 		entityFinder.show();
 		verify(mockView).clear();
 		verify(mockView).setSynapseIdAreaVisible();
+		verify(mockView).show();
+	}
+	@Test
+	public void testShowMultiSynIdArea() {
+		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SYNAPSE_MULTI_ID.toString());
+		entityFinder.show();
+		verify(mockView).clear();
+		verify(mockView).setSynapseMultiIdAreaVisible();
 		verify(mockView).show();
 	}
 	@Test
