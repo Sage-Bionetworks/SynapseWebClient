@@ -194,7 +194,6 @@ public class EntityFinderTest {
 		when(mockReference.getTargetId()).thenReturn("syn99");
 		when(mockHeader.getType()).thenReturn(Folder.class.getName());
 		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		//AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		//the view usually sets the selected entity in the presenter
 		entityFinder.setSelectedEntity(mockReference);
 		entityFinder.okClicked();
