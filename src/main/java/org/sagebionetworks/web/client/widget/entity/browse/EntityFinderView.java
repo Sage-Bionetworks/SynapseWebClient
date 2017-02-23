@@ -55,7 +55,9 @@ public interface EntityFinderView extends SynapseView {
 
 		Widget asWidget();
 
-		void setSelectedEntity(List<Reference> selected);
+		void setSelectedEntities(List<Reference> selected);
+
+		void clearSelectedEntities();
 
 	}
 	Widget asWidget();

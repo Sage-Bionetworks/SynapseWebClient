@@ -116,7 +116,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
 		selectedRef = new ArrayList<Reference>();
-		selectedRef.add(new Reference());
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -199,8 +198,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 	@Override
 	public void clear() {
-		Reference ref = new Reference();
-		presenter.setSelectedEntity(ref);
+		presenter.clearSelectedEntities();
 		updateSelectedView();
 		selectedRef.clear();
 		myEntitiesBrowser.clearState();
@@ -462,7 +460,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			ref.setTargetVersionNumber(eh.getVersionNumber());
 			selectedRef.add(ref);
 		}
-		presenter.setSelectedEntity(selectedRef);
+		presenter.setSelectedEntities(selectedRef);
 	}
 	
 	private void setSelectedVersion(Long versionNumber) {

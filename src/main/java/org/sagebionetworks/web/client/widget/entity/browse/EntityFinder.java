@@ -26,7 +26,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private EntityFinderView view;
 	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
-	private List<Reference> selectedEntity;
+	private List<Reference> selectedEntities;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	ClientCache cache;
@@ -65,7 +65,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
-		this.selectedEntity = new ArrayList<Reference>();
+		this.selectedEntities = new ArrayList<Reference>();
 	}
 	
 	public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
@@ -77,34 +77,39 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedMultiHandler = handler;
-		this.selectedEntity = new ArrayList<Reference>();
+		this.selectedEntities = new ArrayList<Reference>();
 	}
 	
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		synAlert.clear();
-		selectedEntity.clear();
-		selectedEntity.add(selected);
+		selectedEntities.clear();
+		selectedEntities.add(selected);
 	}
 	
 	@Override
-	public void setSelectedEntity(List<Reference> selected) {
+	public void setSelectedEntities(List<Reference> selected) {
 		synAlert.clear();
-		selectedEntity.clear();
-		selectedEntity.addAll(selected);			
-		
+		selectedEntities.clear();
+		selectedEntities.addAll(selected);
+	}
+	
+	@Override
+	public void clearSelectedEntities() {
+		synAlert.clear();
+		selectedEntities.clear();
 	}
 	
 	@Override
 	public void okClicked() {
 		synAlert.clear();
 		//check for valid selection
-		if (selectedEntity == null || selectedEntity.get(0).getTargetId() == null) {
+		if (selectedEntities == null || selectedEntities.isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
 			// fetch the entity for a type check
 			ReferenceList rl = new ReferenceList();
-			rl.setReferences(selectedEntity);
+			rl.setReferences(selectedEntities);
 			lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -115,10 +120,10 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				public void onSuccess(List<EntityHeader> result) {
 					if (validateEntityTypeAgainstFilter(result)) {
 						if (selectedHandler != null) {
-							selectedHandler.onSelected(selectedEntity.get(0));
+							selectedHandler.onSelected(selectedEntities.get(0));
 						}
 						if (selectedMultiHandler != null) {
-							selectedMultiHandler.onSelected(selectedEntity);
+							selectedMultiHandler.onSelected(selectedEntities);
 						}
 					}
 				}
@@ -127,7 +132,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 
 	public boolean validateEntityTypeAgainstFilter(List<EntityHeader> list) {
-		boolean flag = selectedEntity.size() == filter.filterForBrowsing(list).size();
+		boolean flag = selectedEntities.size() == filter.filterForBrowsing(list).size();
 		if (!flag) {
 			synAlert.showError("Please select a " + filter.toString().toLowerCase());
 		}
@@ -135,7 +140,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	public List<Reference> getSelectedEntity() {
-		return selectedEntity;
+		return selectedEntities;
 	}
 	
 	@Override
@@ -162,13 +167,13 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		synAlert.clear();
 		processEntities(entityId);
 		ReferenceList rl = new ReferenceList();
-		rl.setReferences(selectedEntity);
+		rl.setReferences(selectedEntities);
 		lookupEntity(rl, callback);
 	}
 
 	private void processEntities(String entityId) {
 		String[] entities = entityId.split(",");
-		selectedEntity.clear();
+		selectedEntities.clear();
 		for (int i = 0; i < entities.length; i++) {
 			Reference r = new Reference();
 			String target = entities[i].trim();
@@ -179,7 +184,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			} else {
 				r.setTargetId(target);				
 			}
-			selectedEntity.add(r);
+			selectedEntities.add(r);
 		}		
 	}
 
