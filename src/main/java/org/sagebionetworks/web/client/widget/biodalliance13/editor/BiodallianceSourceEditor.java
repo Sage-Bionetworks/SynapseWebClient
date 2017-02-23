@@ -48,14 +48,14 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		this.source = source;
 		
 		view.setPresenter(this);
-		entityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
+		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				entitySelected(selected);
 			}
 		});
 		
-		indexEntityFinder.configure(EntityFilter.FILE, true, new SelectedHandler<Reference>() {					
+		indexEntityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				indexEntitySelected(selected);
