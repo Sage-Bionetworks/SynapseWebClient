@@ -886,13 +886,15 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetV2WikiHeaderTree() throws Exception {
 		PaginatedResults<V2WikiHeader> headerTreeResults = new PaginatedResults<V2WikiHeader>();
+		headerTreeResults.setResults(new ArrayList<V2WikiHeader>());
 		when(
 				mockSynapse.getV2WikiHeaderTree(anyString(),
-						any(ObjectType.class))).thenReturn(headerTreeResults);
+						any(ObjectType.class),
+						anyLong(), anyLong())).thenReturn(headerTreeResults);
 		synapseClient.getV2WikiHeaderTree("testId",
 				ObjectType.ENTITY.toString());
 		verify(mockSynapse).getV2WikiHeaderTree(anyString(),
-				any(ObjectType.class));
+				any(ObjectType.class),anyLong(), anyLong());
 	}
 
 	@Test
