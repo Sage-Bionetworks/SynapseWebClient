@@ -28,7 +28,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -45,7 +44,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
 	}
 
 	
@@ -81,8 +80,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			if (contentType != null) {
 				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
 					previewFileType = PreviewFileType.IMAGE;	
-				} else if (DisplayUtils.isHTML(contentType)) {
-					previewFileType = PreviewFileType.HTML;	
 				}
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
@@ -93,10 +90,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 				else if (DisplayUtils.isTextType(contentType)) {
 					//some kind of text
-					if (DisplayUtils.isHTML(originalFileHandle.getContentType())) {
-						 previewFileType = PreviewFileType.HTML;
-					}
-					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
+					if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
 						previewFileType = PreviewFileType.CODE;
 					}
 					else if (DisplayUtils.isCSV(contentType)) {
@@ -189,6 +183,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		}
 	}
 	
+	//TODO: SWC-1376: move HTML rendering logic to it's own wiki widget.
 	public void renderHTML(String modifiedBy, final String content) {
 		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
 			@Override
@@ -227,9 +222,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
 									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
 			} else {
-				// if HTML, get the full file contents
 				view.showLoading();
-				boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
+				boolean isGetPreviewFile = true;
 				String contentType = isGetPreviewFile ? handle.getContentType() : originalFileHandle.getContentType();
 				
 				//must be a text type of some kind
@@ -250,23 +244,19 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 							if (statusCode == Response.SC_OK) {
 								String responseText = response.getText();
 								if (responseText != null && responseText.length() > 0) {
-									if (previewType == PreviewFileType.HTML) {
-										renderHTML(fileEntity.getModifiedBy(), responseText);
-									} else {
-										if (responseText.length() > MAX_LENGTH) {
-											responseText = responseText.substring(0, MAX_LENGTH) + "...";
-										}
-										
-										if (PreviewFileType.CODE == previewType) {
-											view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-										} 
-										else if (PreviewFileType.CSV == previewType)
-											view.setTablePreview(responseText, ",");
-										else if (PreviewFileType.TAB == previewType)
-											view.setTablePreview(responseText, "\\t");
-										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
-											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-										}
+									if (responseText.length() > MAX_LENGTH) {
+										responseText = responseText.substring(0, MAX_LENGTH) + "...";
+									}
+									
+									if (PreviewFileType.CODE == previewType) {
+										view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+									} 
+									else if (PreviewFileType.CSV == previewType)
+										view.setTablePreview(responseText, ",");
+									else if (PreviewFileType.TAB == previewType)
+										view.setTablePreview(responseText, "\\t");
+									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
+										view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 									}
 								}
 							}
