@@ -152,6 +152,21 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testPreviewHtmlContentType(){
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("text/plain");
+		mainFileHandle.setContentType("text/html");
+		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(fh, mainFileHandle));
+	}
+	
+	@Test
+	public void testHtmlContentType(){
+		mainFileHandle.setContentType("text/html");
+		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(null, mainFileHandle));
+	}
+	
+	@Test
 	public void testPreviewSvgImageContentType(){
 		// images that do not have a preview file handle will use the original
 		mainFileHandle.setContentType("image/svg+xml");
@@ -352,6 +367,18 @@ public class PreviewWidgetTest {
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
 		assertTrue(stringCaptor.getValue().contains("preview=true"));
 		verify(mockView).showLoading();
+	}
+	
+	@Test
+	public void testGetFileContents() {
+		mainFileHandle.setContentType("text/html");
+		mainFileHandle.setFileName("test.html");
+		previewWidget.configure(testBundle);
+		
+		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
+		assertTrue(stringCaptor.getValue().contains("preview=false"));
+		verify(mockView).showLoading();
+		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
