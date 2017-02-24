@@ -66,7 +66,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -297,9 +296,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public String getJSONEntity(String repoUri) throws RestServiceException;
 	
 	public String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
-	//wiki crud
-	public PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
-	
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
@@ -309,7 +305,7 @@ public interface SynapseClient extends XsrfProtectedService {
     public V2WikiPage updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag) throws RestServiceException;
     public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
-    public PaginatedResults<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+    public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	public V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
 	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
     public FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
@@ -544,7 +540,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 	
 	void deleteAccessApproval(Long approvalId) throws RestServiceException;
-	PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) throws RestServiceException;
 	void deleteAccessApprovals(String accessRequirement, String accessorId) throws RestServiceException;
 
 	String generateSqlWithFacets(String basicSql, List<org.sagebionetworks.repo.model.table.FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException;

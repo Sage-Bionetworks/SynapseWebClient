@@ -435,12 +435,13 @@ public class SynapseClientImplTest {
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(
 				mockSynapse
-						.getAccessRequirements(any(RestrictableObjectDescriptor.class)))
+						.getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong()))
 				.thenReturn(ars);
 		when(
 				mockSynapse.getUnmetAccessRequirements(
 						any(RestrictableObjectDescriptor.class),
-						any(ACCESS_TYPE.class))).thenReturn(ars);
+						any(ACCESS_TYPE.class), anyLong(), anyLong())).thenReturn(ars);
+
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -815,16 +816,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetWikiHeaderTree() throws Exception {
-		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
-		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class)))
-				.thenReturn(headerTreeResults);
-		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
-		verify(mockSynapse).getWikiHeaderTree(anyString(),
-				eq(ObjectType.ENTITY));
-	}
-	
-	@Test
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();
 		Mockito.when(
@@ -892,19 +883,40 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).restoreV2WikiPage(anyString(),
 				any(ObjectType.class), any(String.class), anyLong());
 	}
-
 	@Test
 	public void testGetV2WikiHeaderTree() throws Exception {
 		PaginatedResults<V2WikiHeader> headerTreeResults = new PaginatedResults<V2WikiHeader>();
+		headerTreeResults.setResults(new ArrayList<V2WikiHeader>());
 		when(
 				mockSynapse.getV2WikiHeaderTree(anyString(),
-						any(ObjectType.class))).thenReturn(headerTreeResults);
+						any(ObjectType.class),
+						anyLong(), anyLong())).thenReturn(headerTreeResults);
 		synapseClient.getV2WikiHeaderTree("testId",
 				ObjectType.ENTITY.toString());
 		verify(mockSynapse).getV2WikiHeaderTree(anyString(),
-				any(ObjectType.class));
+				any(ObjectType.class),anyLong(), anyLong());
 	}
 
+	@Test
+	public void testGetV2WikiHeaderTreeTwoPage() throws Exception {
+		PaginatedResults<V2WikiHeader> headerTreePage1 = Mockito.mock(PaginatedResults.class);
+		PaginatedResults<V2WikiHeader> headerTreePage2 = Mockito.mock(PaginatedResults.class);
+		when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class), anyLong(), anyLong()))
+				.thenReturn(headerTreePage1, headerTreePage2);
+		List<V2WikiHeader> page1Results = new ArrayList<V2WikiHeader>();
+		for (int i = 0; i < SynapseClientImpl.LIMIT_50; i++) {
+			page1Results.add(Mockito.mock(V2WikiHeader.class));
+		}
+		when(headerTreePage1.getResults()).thenReturn(page1Results);
+		//second page has a single page
+		V2WikiHeader singleHeader = Mockito.mock(V2WikiHeader.class);
+		when(headerTreePage2.getResults()).thenReturn(Collections.singletonList(singleHeader));
+		List<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
+		//1 full page of results, and 1 result on second page
+		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.size());
+		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
+		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
+	}
 	@Test
 	public void testGetV2WikiOrderHint() throws Exception {
 		V2WikiOrderHint orderHint = new V2WikiOrderHint();
@@ -1785,7 +1797,9 @@ public class SynapseClientImplTest {
 		verify(mockSynapse)
 				.getUnmetAccessRequirements(
 						any(RestrictableObjectDescriptor.class),
-						any(ACCESS_TYPE.class));
+						any(ACCESS_TYPE.class),
+						anyLong(),
+						anyLong());
 	}
 
 	@Test
@@ -1793,9 +1807,33 @@ public class SynapseClientImplTest {
 		// verify it calls getAccessRequirements when unmet is false
 		synapseClient.getEntityAccessRequirements(entityId, false, null);
 		verify(mockSynapse).getAccessRequirements(
-				any(RestrictableObjectDescriptor.class));
+				any(RestrictableObjectDescriptor.class),
+				anyLong(),
+				anyLong());
 	}
 
+	@Test
+	public void testGetAllEntityAccessRequirementsTwoPage() throws Exception {
+		PaginatedResults<AccessRequirement> page1 = Mockito.mock(PaginatedResults.class);
+		PaginatedResults<AccessRequirement> page2 = Mockito.mock(PaginatedResults.class);
+		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), anyLong(), anyLong()))
+				.thenReturn(page1, page2);
+		List<AccessRequirement> page1Results = new ArrayList<AccessRequirement>();
+		for (int i = 0; i < SynapseClientImpl.LIMIT_50; i++) {
+			page1Results.add(Mockito.mock(AccessRequirement.class));
+		}
+		when(page1.getResults()).thenReturn(page1Results);
+		// second page has a single result
+		AccessRequirement singleAccessRequirement = Mockito.mock(AccessRequirement.class);
+		when(page2.getResults()).thenReturn(Collections.singletonList(singleAccessRequirement));
+		boolean unmetOnly = true;
+		org.sagebionetworks.web.shared.PaginatedResults<AccessRequirement> results = synapseClient.getEntityAccessRequirements(entityId, unmetOnly, null);
+		//1 full page of results
+		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.getResults().size());
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
+	}
+	
 	// pass through tests for email validation
 
 	@Test
@@ -2525,5 +2563,5 @@ public class SynapseClientImplTest {
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("/root/" + name));
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://google.com/" + name));
 	}
-	
+
 }
