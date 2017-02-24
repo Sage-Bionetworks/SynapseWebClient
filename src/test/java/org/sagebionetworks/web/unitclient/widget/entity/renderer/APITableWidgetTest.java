@@ -244,7 +244,7 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testQueryServicePagingURINodeSearch() throws JSONObjectAdapterException {
-		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM;
+		String expectedOffset = "1";
 		widget.configure(testWikiKey, descriptor, null, null);
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		String pagedURI = widget.getPagedURI(testServiceCall);
