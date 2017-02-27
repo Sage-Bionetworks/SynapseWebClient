@@ -461,10 +461,6 @@ public class PreviewWidgetTest {
 		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
 		previewWidget.configure(null, descriptor, null, null);
 		verify(mockView).setHTMLFull(anyString());
-		
-		previewWidget.renderHTML(userId, html);
-		
-		
 	}
 
 }
