@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.ACTPlace;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -228,6 +229,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					} else if (place instanceof ACTPlace) {
 						ACTPresenter presenter = ginjector.getACTPresenter();
 						presenter.setPlace((ACTPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof AccessRequirementsPlace) {
+						AccessRequirementsPresenter presenter = ginjector.getAccessRequirementsPresenter();
+						presenter.setPlace((AccessRequirementsPlace) place);
 						presenter.start(panel, eventBus);
 					} else if (place instanceof SynapseForumPlace) {
 						SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();

@@ -30,6 +30,8 @@ import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.view.ACTViewImpl;
+import org.sagebionetworks.web.client.view.PlaceView;
+import org.sagebionetworks.web.client.view.PlaceViewImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
@@ -136,8 +138,6 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItem
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetView;
-import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetView;
@@ -146,6 +146,8 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetView;
+import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
@@ -229,7 +231,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListView;
@@ -1395,5 +1396,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FileViewDefaultColumns.class).in(Singleton.class);
 		bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
+		bind(PlaceView.class).to(PlaceViewImpl.class);
 	}
 }

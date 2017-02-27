@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
+import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
@@ -296,6 +297,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public EntityActionController createEntityActionController();
 	public ACTPresenter getACTPresenter();
+	public AccessRequirementsPresenter getAccessRequirementsPresenter();
 	public SynapseForumPresenter getSynapseForumPresenter();
 	public SubscriptionPresenter getSubscriptionPresenter();
 	
