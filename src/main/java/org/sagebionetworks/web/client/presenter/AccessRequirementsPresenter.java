@@ -14,12 +14,13 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -124,13 +125,13 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 					//TODO: create a new row for each access requirement.
 					// need state of approval/submission.
 					if( ar instanceof ACTAccessRequirement) {
-//						ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-//						w.configure(ar, state); 
-//						view.add(w.asWidget());
+						ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
+						w.configure((ACTAccessRequirement)ar); 
+						view.add(w.asWidget());
 					} else if (ar instanceof TermsOfUseAccessRequirement) {
-//						TermsOfUseAccessRequirementWidget w = ginInjector.TermsOfUseAccessRequirementWidget();
-//						w.configure(ar, state);
-//						view.add(w.asWidget());						
+						TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
+						w.configure((TermsOfUseAccessRequirement)ar);
+						view.add(w.asWidget());						
 					} else {
 						synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
 					}

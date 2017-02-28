@@ -24,6 +24,12 @@
 		    </bh:Paragraph>
 		</b:BlockQuote>
 		<bh:Div>
+		    <bh:Text>For more information on use conditions, please read the </bh:Text>
+		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="http://docs.synapse.org/articles/governance.html" target="_blank" />
+		    <bh:Text>.</bh:Text>
+		    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org </bh:Text>
+		</bh:Div>
+		<bh:Div>
 			<bh:Span ui:field="requestSubmittedMessage" text="A request has been submitted" addStyleNames="right text-primary" visible="false"/>
 			<bh:Span ui:field="requestApprovedMessage" text="Your request has been approved" addStyleNames="right text-success" visible="false"/>
 			<bh:Span ui:field="requestRejectedMessage" text="Updated information required" addStyleNames="right text-warning" visible="false"/>
