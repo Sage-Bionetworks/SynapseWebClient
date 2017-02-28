@@ -5,7 +5,8 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
-		<bh:Div ui:field="above" addStyleNames="margin-top-30 margin-left-35 margin-right-10"/>
+		<b:Heading ui:field="title" size="H2" addStyleNames="margin-top-30 margin-left-35 margin-right-10" />
+		<bh:Div ui:field="above" />
 		<bh:Div ui:field="body" />
 		<bh:Div ui:field="below" addStyleNames="margin-bottom-20" />
 		<bh:Div addStyleNames="clear" />

@@ -11,4 +11,6 @@ public interface PlaceView extends IsWidget {
 	void addAboveBody(Widget w);
 	void addBelowBody(Widget w);
 	void initHeaderAndFooter();
+	void addTitle(String text);
+	void addTitle(Widget w);
 }

@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -26,7 +28,8 @@ public class PlaceViewImpl implements PlaceView {
 	Div below;
 	@UiField
 	Div body;
-	
+	@UiField
+	Heading title;
 	private Header headerWidget;
 	private Footer footerWidget;
 	
@@ -66,7 +69,23 @@ public class PlaceViewImpl implements PlaceView {
 	}
 	
 	@Override
-	public void clear() {
+	public void addTitle(String text) {
+		title.add(new Text(text));
+	}
+	@Override
+	public void addTitle(Widget w) {
+		title.add(w);
+	}
+	@Override
+	public void clearAboveBody() {
+		above.clear();
+	}
+	@Override
+	public void clearBelowBody() {
+		below.clear();
+	}
+	@Override
+	public void clearBody() {
 		body.clear();
 	}
 	

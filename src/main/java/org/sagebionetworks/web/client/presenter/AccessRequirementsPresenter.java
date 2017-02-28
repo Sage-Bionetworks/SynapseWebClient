@@ -1,17 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -22,9 +14,8 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -44,7 +35,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public static Long LIMIT = 30L;
 	Long currentOffset;
 	RestrictableObjectDescriptor subject;
-	EntityIdCellRenderer entityIdRenderer; 
+	EntityIdCellRendererImpl entityIdRenderer; 
 	TeamBadge teamBadge;
 	
 	@Inject
@@ -54,7 +45,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer, 
-			EntityIdCellRenderer entityIdRenderer, 
+			EntityIdCellRendererImpl entityIdRenderer, 
 			TeamBadge teamBadge) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -66,6 +57,10 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.teamBadge = teamBadge;
 		view.add(loadMoreContainer.asWidget());
 		view.addBelowBody(synAlert.asWidget());
+		view.addTitle("Conditions for use ");
+		view.addTitle(entityIdRenderer.asWidget());
+		view.addTitle(teamBadge.asWidget());
+		
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -90,12 +85,16 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		subject = new RestrictableObjectDescriptor();
 		view.clearAboveBody();
 		if (entityId != null) {
+			teamBadge.setVisible(false);
+			entityIdRenderer.setVisible(true);
 			subject.setId(entityId);
 			subject.setType(RestrictableObjectType.ENTITY);
 			view.addAboveBody(entityIdRenderer.asWidget());
 			entityIdRenderer.setValue(entityId);
 			loadData();
 		} else if (teamId != null) {
+			teamBadge.setVisible(true);
+			entityIdRenderer.setVisible(false);
 			subject.setId(teamId);
 			subject.setType(RestrictableObjectType.TEAM);
 			view.addAboveBody(teamBadge.asWidget());
@@ -112,7 +111,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		loadMore();
 	}
 
-
 	public void loadMore() {
 		synAlert.clear();
 		synapseClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
@@ -125,14 +123,15 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			public void onSuccess(List<AccessRequirement> accessRequirements) {
 				currentOffset += LIMIT;
 				for (AccessRequirement ar : accessRequirements) {
-					//TODO: create a new row for each access requirement
+					//TODO: create a new row for each access requirement.
+					// need state of approval/submission.
 					if( ar instanceof ACTAccessRequirement) {
 //						ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-//						w.configure(ar, isUnmet);
+//						w.configure(ar, state); 
 //						view.add(w.asWidget());
 					} else if (ar instanceof TermsOfUseAccessRequirement) {
 //						TermsOfUseAccessRequirementWidget w = ginInjector.TermsOfUseAccessRequirementWidget();
-//						w.configure(ar, isUnmet);
+//						w.configure(ar, state);
 //						view.add(w.asWidget());						
 					} else {
 						synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
@@ -141,13 +140,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			};
 		});
 	}
-	public void initBreadcrumbs(EntityPath entityPath) {
-		List<EntityHeader> path = entityPath.getPath();
-		EntityHeader lastHeader = new EntityHeader();
-		lastHeader.setName("Conditions for use");
-		path.add(lastHeader);
-		breadcrumbs.configure(entityPath, null);
-	}
+	
 	public AccessRequirementsPlace getPlace() {
 		return place;
 	}
