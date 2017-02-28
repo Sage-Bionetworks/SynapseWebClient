@@ -12,14 +12,20 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -34,8 +40,12 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	private SynapseAlert synAlert;
 	private GlobalApplicationState globalAppState;
 	private SynapseClientAsync synapseClient;
-	Breadcrumb breadcrumbs;
-	EntityBundle bundle;
+	LoadMoreWidgetContainer loadMoreContainer;
+	public static Long LIMIT = 30L;
+	Long currentOffset;
+	RestrictableObjectDescriptor subject;
+	EntityIdCellRenderer entityIdRenderer; 
+	TeamBadge teamBadge;
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -43,14 +53,25 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
-			Breadcrumb breadcrumbs) {
+			LoadMoreWidgetContainer loadMoreContainer, 
+			EntityIdCellRenderer entityIdRenderer, 
+			TeamBadge teamBadge) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.globalAppState = globalAppState;
 		this.synapseClient = synapseClient;
-		view.addAboveBody(breadcrumbs.asWidget());
+		this.loadMoreContainer = loadMoreContainer;
+		this.entityIdRenderer = entityIdRenderer;
+		this.teamBadge = teamBadge;
+		view.add(loadMoreContainer.asWidget());
 		view.addBelowBody(synAlert.asWidget());
+		loadMoreContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
 	}
 
 	@Override
@@ -64,32 +85,46 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.place = place;
 		view.initHeaderAndFooter();
 		String entityId = place.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM);
+		String teamId = place.getParam(AccessRequirementsPlace.TEAM_ID_PARAM);
 		synAlert.clear();
+		subject = new RestrictableObjectDescriptor();
+		view.clearAboveBody();
 		if (entityId != null) {
-			getEntityBundle(entityId);
+			subject.setId(entityId);
+			subject.setType(RestrictableObjectType.ENTITY);
+			view.addAboveBody(entityIdRenderer.asWidget());
+			entityIdRenderer.setValue(entityId);
+			loadData();
+		} else if (teamId != null) {
+			subject.setId(teamId);
+			subject.setType(RestrictableObjectType.TEAM);
+			view.addAboveBody(teamBadge.asWidget());
+			teamBadge.configure(teamId);
+			loadData();
 		} else {
 			synAlert.showError("Synapse id not found in parameters.");
 		}
 	}
+	
+	public void loadData() {
+		loadMoreContainer.clear();
+		currentOffset = 0L;
+		loadMore();
+	}
 
-	public void getEntityBundle(String entityId) {
-		int partsMask = ENTITY | ENTITY_PATH | UNMET_ACCESS_REQUIREMENTS | ACCESS_REQUIREMENTS;
+
+	public void loadMore() {
 		synAlert.clear();
-		view.clear();
-		synapseClient.getEntityBundle(entityId, partsMask, new AsyncCallback<EntityBundle>() {
+		synapseClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 			
-			public void onSuccess(EntityBundle bundle) {
-				AccessRequirementsPresenter.this.bundle = bundle;
-				initBreadcrumbs(bundle.getPath());
-				List<AccessRequirement> unmetArs = bundle.getUnmetAccessRequirements();
-				List<AccessRequirement> accessRequirements = bundle.getAccessRequirements();
+			public void onSuccess(List<AccessRequirement> accessRequirements) {
+				currentOffset += LIMIT;
 				for (AccessRequirement ar : accessRequirements) {
-					boolean isUnmet = unmetArs.contains(ar);
 					//TODO: create a new row for each access requirement
 					if( ar instanceof ACTAccessRequirement) {
 //						ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();

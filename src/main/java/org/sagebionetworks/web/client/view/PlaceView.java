@@ -5,7 +5,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface PlaceView extends IsWidget {
 	void add(Widget w);
-	void clear();
+	void clearBody();
+	void clearAboveBody();
+	void clearBelowBody();
 	void addAboveBody(Widget w);
 	void addBelowBody(Widget w);
 	void initHeaderAndFooter();
