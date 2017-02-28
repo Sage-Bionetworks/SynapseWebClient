@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -83,13 +84,11 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		String teamId = place.getParam(AccessRequirementsPlace.TEAM_ID_PARAM);
 		synAlert.clear();
 		subject = new RestrictableObjectDescriptor();
-		view.clearAboveBody();
 		if (entityId != null) {
 			teamBadge.setVisible(false);
 			entityIdRenderer.setVisible(true);
 			subject.setId(entityId);
 			subject.setType(RestrictableObjectType.ENTITY);
-			view.addAboveBody(entityIdRenderer.asWidget());
 			entityIdRenderer.setValue(entityId);
 			loadData();
 		} else if (teamId != null) {
@@ -97,7 +96,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			entityIdRenderer.setVisible(false);
 			subject.setId(teamId);
 			subject.setType(RestrictableObjectType.TEAM);
-			view.addAboveBody(teamBadge.asWidget());
 			teamBadge.configure(teamId);
 			loadData();
 		} else {
