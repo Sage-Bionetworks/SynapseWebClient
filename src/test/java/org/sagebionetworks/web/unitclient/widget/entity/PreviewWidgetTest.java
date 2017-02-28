@@ -149,6 +149,27 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString(), anyString());
+		
+		verify(mockView, never()).setImagePreviewFull(anyString());
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		verify(mockView).setImagePreviewFull(anyString());
+	}
+	
+	
+	@Test
+	public void testPreviewHtmlContentType(){
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("text/plain");
+		mainFileHandle.setContentType("text/html");
+		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(fh, mainFileHandle));
+	}
+	
+	@Test
+	public void testHtmlContentType(){
+		mainFileHandle.setContentType("text/html");
+		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(null, mainFileHandle));
 	}
 	
 	@Test
@@ -159,6 +180,8 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString(), anyString());
+		
+		
 	}
 	
 	@Test
@@ -182,6 +205,12 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setCodePreview(anyString());
+		
+		verify(mockView, never()).setCodePreviewFull(anyString());
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		verify(mockView).setCodePreviewFull(anyString());
+
 	}
 
 	@Test
@@ -194,6 +223,11 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setTextPreview(anyString());
+		
+		verify(mockView, never()).setTextPreviewFull(anyString());
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		verify(mockView).setTextPreviewFull(anyString());
 	}
 	
 	@Test
@@ -206,6 +240,11 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setTextPreview(anyString());
+		
+		verify(mockView, never()).setTextPreviewFull(anyString());
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		verify(mockView).setTextPreviewFull(anyString());
 	}
 	
 	@Test
@@ -355,6 +394,19 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testGetFullFileContents() {
+		mainFileHandle.setContentType("text/html");
+		mainFileHandle.setFileName("test.html");
+		previewWidget.configure(testBundle);
+		
+		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
+		assertTrue(stringCaptor.getValue().contains("preview=false"));
+		verify(mockView).showLoading();
+		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+	}
+	
+	
+	@Test
 	public void testRenderHTMLBlocked() {
 		boolean isUserAllowedToRenderHTML = false;
 		String userId = "56765";
@@ -394,14 +446,21 @@ public class PreviewWidgetTest {
 	public void testRenderDangerousHTML() {
 		boolean isUserAllowedToRenderHTML = true;
 		String userId = "56765";
+		testEntity.setModifiedBy(userId);
 		String html = "<html><script></script></html>";
 		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-		
-		previewWidget.renderHTML(userId, html);
-		
+		when(mockResponse.getText()).thenReturn(html);
+		mainFileHandle.setContentType("text/html");
+		mainFileHandle.setFileName("index.html");
+		previewWidget.configure(testBundle);
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
 		verify(mockSynapseJSNIUtils, never()).sanitizeHtml(anyString());
 		verify(mockView).setHTML(html);
+		
+		verify(mockView, never()).setHTMLFull(anyString());
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		verify(mockView).setHTMLFull(anyString());
 	}
 
 }
