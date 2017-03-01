@@ -135,6 +135,9 @@ public class FileHistoryWidgetTest {
 		
 		//verify current version is set when offset is 0
 		assertEquals(CURRENT_FILE_VERSION, fileHistoryWidget.getVersionNumber());
+		
+		int zeroOffset = 0;
+		verify(mockSynapseClient).getEntityVersions(anyString(), eq(zeroOffset), anyInt(), any(AsyncCallback.class));
 	}
 
 	@Test
