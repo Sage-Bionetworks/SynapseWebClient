@@ -11,11 +11,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.place.ACTPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -40,8 +40,10 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	private VerificationStateEnum stateFilter;
 	private Long submitterIdFilter;
 	private UserBadge selectedUserBadge;
-	public static Long LIMIT = 100L;
+	public static Long LIMIT = 30L;
 	List<String> states;
+	LoadMoreWidgetContainer loadMoreContainer;
+	Long currentOffset;
 	
 	@Inject
 	public ACTPresenter(ACTView view,
@@ -51,7 +53,8 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 			UserGroupSuggestionProvider provider,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
-			UserBadge selectedUserBadge) {
+			UserBadge selectedUserBadge,
+			LoadMoreWidgetContainer loadMoreContainer) {
 		this.view = view;
 		this.userProfileClient = userProfileClient;
 		this.synAlert = synAlert;
@@ -59,9 +62,11 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		this.ginInjector = ginInjector;
 		this.globalAppState = globalAppState;
 		this.selectedUserBadge = selectedUserBadge;
+		this.loadMoreContainer = loadMoreContainer;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		
 		view.setPresenter(this);
+		view.setLoadMoreContainer(loadMoreContainer.asWidget());
 		view.setSynAlert(synAlert.asWidget());
 		states = new ArrayList<String>();
 		for (VerificationStateEnum state : VerificationStateEnum.values()) {
@@ -77,6 +82,12 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 				onUserSelected((UserGroupSuggestion)suggestion);
 			}
 		});
+		loadMoreContainer.configure(new Callback() {
+			@Override
+			public void invoke() {
+				loadMore();
+			}
+		});
 	}
 
 	@Override
@@ -88,30 +99,31 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	}
 	
 	public void loadData() {
-		loadData(0L);
+		loadMoreContainer.clear();
+		currentOffset = 0L;
+		loadMore();
 	}
 	
-	@Override
-	public void loadData(final Long offset) {
-		view.clearRows();
+	public void loadMore() {
 		synAlert.clear();
 		globalAppState.pushCurrentPlace(place);
-		userProfileClient.listVerificationSubmissions(stateFilter, submitterIdFilter, LIMIT, offset, new AsyncCallback<VerificationPagedResults>() {
+		userProfileClient.listVerificationSubmissions(stateFilter, submitterIdFilter, LIMIT, currentOffset, new AsyncCallback<VerificationPagedResults>() {
 			@Override
 			public void onSuccess(VerificationPagedResults results) {
+				currentOffset += LIMIT;
+				loadMoreContainer.setIsMore(!results.getResults().isEmpty());
 				boolean isACT = true;
 				boolean isModal = false;
 				for (VerificationSubmission submission : results.getResults()) {
 					VerificationSubmissionWidget w = ginInjector.getVerificationSubmissionWidget();
 					w.configure(submission, isACT, isModal);
-					view.addRow(w.asWidget());
+					loadMoreContainer.add(w.asWidget());
 					w.show();
 				}
-				List<PaginationEntry> entries = PaginationUtil.getPagination(results.getTotalNumberOfResults().intValue(), offset.intValue(), ACTPresenter.LIMIT.intValue(), 10);
-				view.updatePagination(entries);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				loadMoreContainer.setIsMore(false);
 				synAlert.handleException(caught);
 			}
 		});

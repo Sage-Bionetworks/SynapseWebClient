@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -44,6 +45,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	EntityUpdatedHandler updateHandler;
 	JobTrackingWidget jobTrackingWidget;
 	FileViewDefaultColumns fileViewDefaultColumns;
+	TableType tableType;
 	
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	/**
@@ -96,6 +98,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
+		tableType = bundle.getEntity() instanceof EntityView ? TableType.view : TableType.table; 
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
 		for(ColumnModel cm: startingModels){
@@ -151,7 +154,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		if(!this.isEditable){
 			throw new IllegalStateException("Cannot call onEditColumns() for a read-only widget");
 		}
-		editor.configure(bundle.getTableBundle().getColumnModels());
+		editor.configure(tableType, bundle.getTableBundle().getColumnModels());
 		// Pass this to the base
 		baseView.showEditor();
 	}

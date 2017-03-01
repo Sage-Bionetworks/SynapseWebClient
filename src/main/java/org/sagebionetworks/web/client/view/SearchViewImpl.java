@@ -27,12 +27,9 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -94,20 +91,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@UiField
 	SimplePanel currentFacetsPanel;
 	@UiField
-	SimplePanel paginationPanel;
-	@UiField
 	SimplePanel synAlertPanel;
 	@UiField
 	HTMLPanel narrowResultsPanel;
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
 	@UiField
 	TextBox searchField;
 	@UiField
 	Button searchButton;
-	private boolean loadShowing;
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Footer footerWidget;
@@ -116,11 +109,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
 			Footer footerWidget,
-			SageImageBundle sageImageBundle, 
 			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		initWidget(binder.createAndBindUi(this));
 		
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -128,7 +119,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		loadShowing = false;
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
@@ -164,7 +154,24 @@ public class SearchViewImpl extends Composite implements SearchView {
 		// set searchTerm into search box
 		searchField.setText(searchTerm);
 		facetButtons = new ArrayList<Button>();
-		
+		// show existing facets			
+		String facetNames = createShownFacets(searchResults);
+		Long start = presenter.getStart();
+		String pageTitleStartNumber = start != null && start > 0 ? " (from result " + (start+1) + ")" : ""; 
+		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
+		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames + pageTitleStartNumber);
+		narrowResultsPanel.setVisible(true);
+		currentFacetsPanel.setVisible(true);
+	}
+	
+	@Override
+	public void setLoadingMoreContainerWidget(Widget w) {
+		resultsPanel.clear();
+		resultsPanel.add(w);
+	}
+	
+	@Override
+	public Widget getResults(SearchResults searchResults, String searchTerm) {
 		// create search result list
 		List<Hit> hits = searchResults.getHits();
 		Panel searchResultsPanel;				
@@ -173,54 +180,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 			// create facet widgets
 			createFacetWidgets(searchResults);			
-											
-			// create pagination
-			createPagination(searchResults);
 			
-		} else {
+		} else if (searchResults.getStart() == 0) {
 			searchResultsPanel = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
 			.appendEscaped(searchTerm)
 			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml());
+		} else { 
+			searchResultsPanel = new SimplePanel();
 		}
-
-		// show existing facets			
-		String facetNames = createShownFacets(searchResults);
-		Long start = presenter.getStart();
-		String pageTitleStartNumber = start != null && start > 0 ? " (from result " + (start+1) + ")" : ""; 
-		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
-		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames + pageTitleStartNumber);
-
-		resultsPanel.clear();
-		resultsPanel.add(searchResultsPanel);
-		loadShowing = false;
-		narrowResultsPanel.setVisible(true);
-		currentFacetsPanel.setVisible(true);
-		// scroll user to top of page
-		Window.scrollTo(0, 0);
+		return searchResultsPanel;
 	}
-
-	private void createPagination(SearchResults searchResults) {
-		SimplePanel lc = new SimplePanel();
-		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.setStyleName("pagination pagination-lg");
-				
-		List<PaginationEntry> entries = presenter.getPaginationEntries(MAX_RESULTS_PER_PAGE, MAX_PAGES_IN_PAGINATION);
-		String currentSearchJSON = presenter.getCurrentSearchJSON();
-		if(entries != null) {
-			for(PaginationEntry pe : entries) {
-				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), currentSearchJSON, pe.getStart()), "current");
-				else
-					ul.add(createPaginationAnchor(pe.getLabel(), currentSearchJSON, pe.getStart()));
-			}
-		}
-		
-		lc.add(ul);
-		paginationPanel.clear();
-		paginationPanel.add(lc);
-	}
-
-
+	
 	private String createShownFacets(SearchResults searchResults) {
 		StringBuilder facetNames = new StringBuilder();
 		FlowPanel currentFacets = new FlowPanel();
@@ -343,20 +313,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void showErrorMessage(String message) {
-		if(loadShowing) {
-			resultsPanel.clear();
-			loadShowing = false;
-		}
 		DisplayUtils.showErrorMessage(message);
 		
 	}
 
 	@Override
 	public void showLoading() {
-		resultsPanel.clear();
-		paginationPanel.clear();
-		resultsPanel.add(new HTMLPanel(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading..."));
-		loadShowing = true;
 	}
 
 	@Override
@@ -367,7 +329,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void clear() {
 		resultsPanel.clear();
-		paginationPanel.clear();
 		narrowResultsPanel.setVisible(false);
 		currentFacetsPanel.setVisible(false);
 	}
@@ -588,13 +549,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private String formatFacetName(String name) {
 		return DisplayUtils.uppercaseFirstLetter(name.replace("_", " "));
-	}
-
-	private Anchor createPaginationAnchor(String anchorName, String currentSearchJSON, final long newStart) {
-		Anchor a = new Anchor();
-		a.setHTML(SafeHtmlUtils.htmlEscape(anchorName));
-		a.setHref(DisplayUtils.getSearchHistoryToken(currentSearchJSON, newStart));
-		return a;
 	}
 
 	@Override

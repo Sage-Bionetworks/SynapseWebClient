@@ -22,10 +22,8 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -50,7 +48,6 @@ public class AccessRequirementDialogTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	AccessRequirementDialogView mockView;
-	JSONObjectAdapter jsonObjectAdapter;
 	JiraURLHelper mockJiraURLHelper;
 	AccessRequirementDialog widget;
 	String entityId = "syn123";
@@ -73,7 +70,6 @@ public class AccessRequirementDialogTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(AccessRequirementDialogView.class);
-		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
 		UserSessionData usd = new UserSessionData();
@@ -87,7 +83,7 @@ public class AccessRequirementDialogTest {
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		
-		widget = new AccessRequirementDialog(mockView, mockSynapseClient, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockJiraURLHelper, mockWikiPageWidget);
+		widget = new AccessRequirementDialog(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockWikiPageWidget);
 
 		touAR = new TermsOfUseAccessRequirement();
 		touAR.setId(touAccessRequirementId);

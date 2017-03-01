@@ -62,7 +62,7 @@ public class EntityContainerListWidgetTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		boolean showVersions = false;
-		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
 	}
 	
 	@Test

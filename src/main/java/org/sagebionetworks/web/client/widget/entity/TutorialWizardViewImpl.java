@@ -10,7 +10,7 @@ import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -29,7 +29,7 @@ public class TutorialWizardViewImpl implements TutorialWizardView {
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 	private List<MarkdownWidget> pageContents;
-	private List<WikiHeader> wikiHeaders;
+	private List<V2WikiHeader> wikiHeaders;
 	private int currentPageIndex;
 	@Inject
 	public TutorialWizardViewImpl(PortalGinInjector ginInjector) {
@@ -42,7 +42,7 @@ public class TutorialWizardViewImpl implements TutorialWizardView {
 	}
 	
 	@Override
-	public void showWizard(String ownerObjectId, List<WikiHeader> headers) {
+	public void showWizard(String ownerObjectId, List<V2WikiHeader> headers) {
 		this.wikiHeaders = headers;
 		final Modal dialog = new Modal();
 		dialog.setSize(ModalSize.LARGE);
@@ -122,8 +122,8 @@ public class TutorialWizardViewImpl implements TutorialWizardView {
  		dialog.setTitle(wikiHeaders.get(currentPageIndex).getTitle());
 	}
 	
-	public void loadAllPageContents(String ownerObjectId, List<WikiHeader> headers){
-		for (WikiHeader header : headers) {
+	public void loadAllPageContents(String ownerObjectId, List<V2WikiHeader> headers){
+		for (V2WikiHeader header : headers) {
 			MarkdownWidget step = ginInjector.getMarkdownWidget();
 			step.loadMarkdownFromWikiPage(new WikiPageKey(ownerObjectId, ObjectType.ENTITY.toString(), header.getId()), false);
 			pageContents.add(step);

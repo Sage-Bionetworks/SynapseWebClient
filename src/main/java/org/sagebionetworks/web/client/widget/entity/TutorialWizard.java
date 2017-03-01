@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -68,15 +68,13 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	 */
 	public void configure(final String entityId, Callback callback) {
 		this.callback = callback;
-		synapseClient.getWikiHeaderTree(entityId, ObjectType.ENTITY.toString(), new AsyncCallback<PaginatedResults<WikiHeader>>() {
+		synapseClient.getV2WikiHeaderTree(entityId, ObjectType.ENTITY.toString(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<WikiHeader> results) {
-				PaginatedResults<WikiHeader> wikiHeaders = results;
+			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
 				
 				//sort them so that they are always in a predictable order for the wizard.
-				List<WikiHeader> sortedHeaders= new ArrayList<WikiHeader>();
-				for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-					WikiHeader header = (WikiHeader) headerEntity;
+				List<V2WikiHeader> sortedHeaders= new ArrayList<V2WikiHeader>();
+				for (V2WikiHeader header : wikiHeaders) {
 					//ignore root page to simplify setup
 					if (header.getParentId() != null)
 						sortedHeaders.add(header);
@@ -85,9 +83,9 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 					onFailure(new NotFoundException("Wiki subpages not found for tutorial: " + entityId));
 					return;
 				}
-				Collections.sort(sortedHeaders, new Comparator<WikiHeader>() {
+				Collections.sort(sortedHeaders, new Comparator<V2WikiHeader>() {
 				    @Override
-			        public int compare(WikiHeader o1, WikiHeader o2) {
+			        public int compare(V2WikiHeader o1, V2WikiHeader o2) {
 			        	return o1.getTitle().compareTo(o2.getTitle());
 			        }
 				});

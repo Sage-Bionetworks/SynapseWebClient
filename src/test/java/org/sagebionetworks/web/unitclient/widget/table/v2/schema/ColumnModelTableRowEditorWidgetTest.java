@@ -263,7 +263,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 	@Test
 	public void testConfigureFacetsForTypeString() {
 		editor.configureFacetsForType(ColumnTypeViewEnum.String);
-		verify(mockView).setFacetValues(None.toString(), Values.toString(), Range.toString());
+		verify(mockView).setFacetValues(None.toString(), Values.toString());
 		verify(mockView).setFacetVisible(true);
 	}
 	

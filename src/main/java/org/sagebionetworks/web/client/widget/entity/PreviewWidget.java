@@ -28,7 +28,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -57,6 +56,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	AuthenticationController authController;
 	VideoWidget videoWidget;
 	EntityBundle bundle;
+	boolean isFullSize = false;
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
@@ -129,6 +129,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		isFullSize = true;
 		configure(entityId, version);
 	}
 	
@@ -193,18 +194,32 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(content));
+				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(content);
+				if (isFullSize) {
+					view.setTextPreviewFull(escapedContent);
+				} else {
+					view.setTextPreview(escapedContent);
+				}
 			}
 			
 			@Override
 			public void onSuccess(Boolean trustedUser) {
 				if (trustedUser) {
-					view.setHTML(content);
+					if (isFullSize) {
+						view.setHTMLFull(content);
+					} else {
+						view.setHTML(content);
+					}
 				} else {
 					// is the sanitized version the same as the original??
 					String newHtml = synapseJSNIUtils.sanitizeHtml(content);
 					if (content.equals(newHtml)) {
-						view.setHTML(content);
+						if (isFullSize) {
+							view.setHTMLFull(content);	
+						} else {
+							view.setHTML(content);
+						}
+						
 					} else {
 						onFailure(new Exception());	
 					}
@@ -224,8 +239,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
 				boolean hasPreviewFileHandle = handle != null;
-				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
-									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
+				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken);
+				String previewFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken);
+				if (isFullSize) {
+					view.setImagePreviewFull(fullFileUrl);
+				} else {
+					view.setImagePreview(fullFileUrl, previewFileUrl);	
+				}
+				
 			} else {
 				// if HTML, get the full file contents
 				view.showLoading();
@@ -258,14 +279,35 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 										}
 										
 										if (PreviewFileType.CODE == previewType) {
-											view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+											String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
+											if (isFullSize) {
+												view.setCodePreviewFull(codePreview);	
+											} else {
+												view.setCodePreview(codePreview);
+											}
 										} 
-										else if (PreviewFileType.CSV == previewType)
-											view.setTablePreview(responseText, ",");
-										else if (PreviewFileType.TAB == previewType)
-											view.setTablePreview(responseText, "\\t");
-										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
-											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+										else if (PreviewFileType.CSV == previewType) {
+											if (isFullSize) {
+												view.setTablePreviewFull(responseText, ",");	
+											} else {
+												view.setTablePreview(responseText, ",");
+											}
+										}
+											
+										else if (PreviewFileType.TAB == previewType) {
+											if (isFullSize) {
+												view.setTablePreviewFull(responseText, "\\t");
+											} else {
+												view.setTablePreview(responseText, "\\t");
+											}
+										}
+											
+										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType) {
+											if (isFullSize) {
+												view.setTextPreviewFull(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));	
+											} else {
+												view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+											}
 										}
 									}
 								}

@@ -67,7 +67,7 @@ public class DetailedPaginationWidgetImplTest {
 		// call under test
 		widget.configure(limit, offset, count, mockListener);
 		verify(mockView).setPagerVisible(false);
-		verify(mockView).setMessage("1 - 1 of 1");
+		verify(mockView).setMessage("1 - 1");
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(0L, "1", true);
 		verify(mockView).addButton(limit, "2", false);
 		verify(mockView).addButton(limit, NEXT, false);
-		verify(mockView).setMessage("1 - 10 of 20");
+		verify(mockView).setMessage("1 - 10");
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(0L, PREVIOUS, false);
 		verify(mockView).addButton(0L, "1", false);
 		verify(mockView).addButton(limit, "2", true);
-		verify(mockView).setMessage("11 - 20 of 20");
+		verify(mockView).setMessage("11 - 20");
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(limit, "2", true);
 		verify(mockView).addButton(limit * 2, "3", false);
 		verify(mockView).addButton(limit * 2, NEXT, false);
-		verify(mockView).setMessage("11 - 20 of 30");
+		verify(mockView).setMessage("11 - 20");
 	}
 	
 	@Test
@@ -128,7 +128,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(limit, "2", true);
 		verify(mockView).addButton(limit * 2, "3", false);
 		verify(mockView).addButton(limit * 2, NEXT, false);
-		verify(mockView).setMessage("11 - 20 of 1000");
+		verify(mockView).setMessage("11 - 20");
 	}
 	
 	@Test
@@ -143,7 +143,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(limit, "2", false);
 		verify(mockView).addButton(limit * 2, "3", false);
 		verify(mockView).addButton(limit, NEXT, false);
-		verify(mockView).setMessage("1 - 10 of 1000");
+		verify(mockView).setMessage("1 - 10");
 	}
 	
 	@Test
@@ -159,7 +159,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(limit*7, "8", false);
 		verify(mockView).addButton(limit*8, "9", false);
 		verify(mockView).addButton(limit*9, "10", true);
-		verify(mockView).setMessage("226 - 250 of 250");
+		verify(mockView).setMessage("226 - 250");
 	}
 	
 	@Test
@@ -176,7 +176,7 @@ public class DetailedPaginationWidgetImplTest {
 		verify(mockView).addButton(limit*8, "9", true);
 		verify(mockView).addButton(limit*9, "10", false);
 		verify(mockView).addButton(limit*9, NEXT, false);
-		verify(mockView).setMessage("201 - 225 of 250");
+		verify(mockView).setMessage("201 - 225");
 	}
 	
 	@Test

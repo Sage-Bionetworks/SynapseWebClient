@@ -26,8 +26,6 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 	@UiField
 	Badge currentPage;
 	@UiField
-	Badge totalPages;
-	@UiField
 	Button nextButton;
 	Widget widget;
 	
@@ -64,9 +62,8 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 	}
 
 	@Override
-	public void setPageNumbers(long currentPageNumber, long totalNumberOfPages) {
+	public void setCurrentPage(long currentPageNumber) {
 		this.currentPage.setText(""+currentPageNumber);
-		this.totalPages.setText(""+totalNumberOfPages);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -49,6 +50,12 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	TextBox restrictValues;
 	@UiField
 	ListBox facet;
+	@UiField
+	FormControlStatic nameStatic;
+	@UiField
+	FormControlStatic typeStatic;
+	@UiField
+	FormControlStatic maxSizeStatic;
 	
 	String id;
 	TypePresenter presenter;
@@ -126,6 +133,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		int index = 0;
 		String targetName = type.toString();
+		typeStatic.setText(targetName);
 		for (int i = 0; i < this.facet.getItemCount(); i++) {
 			if (this.facet.getValue(i).equals(targetName)){
 				index = i;
@@ -137,11 +145,13 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public void setColumnName(String name) {
+		nameStatic.setText(name);
 		this.name.setText(name);
 	}
 
 	@Override
 	public void setMaxSize(String maxSize) {
+		maxSizeStatic.setText(maxSize);
 		this.maxSize.setText(maxSize);
 	}
 
@@ -246,5 +256,16 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		for (String item : items) {
 			facet.addItem(item);
 		}
+	}
+	
+	@Override
+	public void setToBeDefaultFileViewColumn() {
+		nameGroup.setVisible(false);
+		sizeGroup.setVisible(false);
+		type.setVisible(false);
+		
+		nameStatic.setVisible(true);
+		typeStatic.setVisible(true);
+		maxSizeStatic.setVisible(true);
 	}
 }

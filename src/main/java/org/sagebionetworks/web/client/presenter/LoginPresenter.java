@@ -37,6 +37,63 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.setPresenter(this);
 	} 
 
+	private AcceptTermsOfUseCallback getAcceptTermsOfUseCallback() {
+		return new AcceptTermsOfUseCallback() {
+			public void accepted() {
+				view.showLoggingInLoader();
+				authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage("An error occurred. Please try logging in again.");
+						view.showLogin();
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						// Have to get the UserSessionData again, 
+						// since it won't contain the UserProfile if the terms haven't been signed
+						authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserSessionData>() {
+
+							@Override
+							public void onFailure(
+									Throwable caught) {
+								view.showErrorMessage("An error occurred. Please try logging in again.");
+								view.showLogin();
+							}
+
+							@Override
+							public void onSuccess(UserSessionData result) {
+								// Signed ToU. Check for temp username, passing record, and then forward
+								userAuthenticated();
+							}	
+							
+						});
+					}
+					
+				});
+			}
+
+			@Override
+			public void rejected() {
+				authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage("An error occurred. Please try logging in again.");
+						view.showLogin();
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						authenticationController.logoutUser();
+						goToLastPlace();
+					}
+					
+				});
+			}
+		};
+	}
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(this.view.asWidget());
@@ -66,6 +123,12 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
 			//go to the change username page
 			gotoChangeUsernamePlace();
+		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.isLoggedIn()) {
+			if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
+				showTermsOfUse(getAcceptTermsOfUseCallback());	
+			} else {
+				globalApplicationState.gotoLastPlace();
+			}
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
@@ -160,61 +223,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				@Override
 				public void onSuccess(UserSessionData result) {
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-						showTermsOfUse(new AcceptTermsOfUseCallback() {
-								public void accepted() {
-									view.showLoggingInLoader();
-									authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											view.showErrorMessage("An error occurred. Please try logging in again.");
-											view.showLogin();
-										}
-
-										@Override
-										public void onSuccess(Void result) {
-											// Have to get the UserSessionData again, 
-											// since it won't contain the UserProfile if the terms haven't been signed
-											authenticationController.revalidateSession(sessionToken, new AsyncCallback<UserSessionData>() {
-
-												@Override
-												public void onFailure(
-														Throwable caught) {
-													view.showErrorMessage("An error occurred. Please try logging in again.");
-													view.showLogin();
-												}
-
-												@Override
-												public void onSuccess(UserSessionData result) {
-													// Signed ToU. Check for temp username, passing record, and then forward
-													userAuthenticated();
-												}	
-												
-											});
-										}
-										
-									});
-								}
-
-								@Override
-								public void rejected() {
-									authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											view.showErrorMessage("An error occurred. Please try logging in again.");
-											view.showLogin();
-										}
-
-										@Override
-										public void onSuccess(Void result) {
-											authenticationController.logoutUser();
-											goToLastPlace();
-										}
-										
-									});
-								}
-							});		
+						showTermsOfUse(getAcceptTermsOfUseCallback());		
 					} else {
 						// user is logged in. forward to destination after checking for username
 						userAuthenticated();

@@ -104,25 +104,24 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	public void refreshTableOfContents() {
 		view.clear();
 		
-		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<PaginatedResults<V2WikiHeader>>() {
+		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<V2WikiHeader> results) {
-				final PaginatedResults<V2WikiHeader> wikiHeaders = results;
+			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
 				
 				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 					@Override
 					public void onSuccess(V2WikiOrderHint result) {
 						// "Sort" stuff'
 						subpageOrderHint = result;
-						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders.getResults(), subpageOrderHint);
-						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
+						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
-						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
 						view.setEditOrderButtonVisible(canEdit);
 					}

@@ -31,7 +31,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setPreviousEnabled(false);
 		long currentPageNumber = 1;
 		long totalNumberOfPages = 1;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -43,8 +43,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setNextEnabled(false);
 		verify(mockView).setPreviousEnabled(false);
 		long currentPageNumber = 1;
-		long totalNumberOfPages = 1;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -56,8 +55,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setNextEnabled(true);
 		verify(mockView).setPreviousEnabled(false);
 		long currentPageNumber = 1;
-		long totalNumberOfPages = 3;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 
 	@Test
@@ -69,8 +67,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setNextEnabled(true);
 		verify(mockView).setPreviousEnabled(true);
 		long currentPageNumber = 2;
-		long totalNumberOfPages = 3;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -82,8 +79,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setNextEnabled(false);
 		verify(mockView).setPreviousEnabled(true);
 		long currentPageNumber = 3;
-		long totalNumberOfPages = 3;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test

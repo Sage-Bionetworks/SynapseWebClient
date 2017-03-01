@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditorWidget {
 
 	private boolean isValid = true;
-	
+	private boolean isSetToBeDefaultFileViewColumn=false;
 	@Override
 	public IsWidget getWidget(int index) {
 		// TODO Auto-generated method stub
@@ -47,5 +47,12 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 		this.isValid = isValid;
 	}
 
+	@Override
+	public void setToBeDefaultFileViewColumn() {
+		isSetToBeDefaultFileViewColumn = true;
+	}
 
+	public boolean isSetToBeDefaultFileViewColumn() {
+		return isSetToBeDefaultFileViewColumn;
+	}
 }
