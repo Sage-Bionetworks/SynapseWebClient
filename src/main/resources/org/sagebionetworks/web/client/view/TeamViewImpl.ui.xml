@@ -39,9 +39,8 @@
 	        <g:SimplePanel ui:field="synAlertPanel"/>
 	    	<div class="row">
 		    	<g:HTMLPanel ui:field="mainContainer" styleName="col-md-12">
-		    	    <bh:Span addStyleNames="boldText margin-right-5">Total members: </bh:Span>
-		    	    <bh:Span ui:field="totalMemberCountField"/>
-		    	    <br/>
+		    	    <bh:Span addStyleNames="boldText margin-right-5" visible="false">Total members: </bh:Span>
+		    	    <bh:Span ui:field="totalMemberCountField" visible="false"/>
 		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
 		    	    <g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	    <b:Anchor ui:field="showMapLink" text="Show map" icon="MAP_MARKER" visible="false"/>

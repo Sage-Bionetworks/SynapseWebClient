@@ -1505,14 +1505,8 @@ public class SynapseClientImplTest {
 	public void testGetTeamBundle() throws SynapseException,
 			RestServiceException, MalformedURLException,
 			JSONObjectAdapterException {
-		// set team member count
-		Long testMemberCount = 111L;
-		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
-		allMembers.setTotalNumberOfResults(testMemberCount);
-		when(
-				mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(),
-						anyLong())).thenReturn(allMembers);
-
+		//TODO: test team member count
+		
 		// set team
 		Team team = new Team();
 		team.setId("test team id");
@@ -1539,7 +1533,6 @@ public class SynapseClientImplTest {
 		assertEquals(team, bundle.getTeam());
 		assertEquals(membershipStatus, bundle.getTeamMembershipStatus());
 		assertEquals(isAdmin, bundle.isUserAdmin());
-		assertEquals(testMemberCount, bundle.getTotalMemberCount());
 	}
 
 	@Test
