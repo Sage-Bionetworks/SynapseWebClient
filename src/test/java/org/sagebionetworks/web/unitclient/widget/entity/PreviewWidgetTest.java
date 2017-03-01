@@ -446,7 +446,7 @@ public class PreviewWidgetTest {
 	public void testRenderDangerousHTML() {
 		boolean isUserAllowedToRenderHTML = true;
 		String userId = "56765";
-		testEntity.setModifiedBy(userId);
+		mainFileHandle.setCreatedBy(userId);
 		String html = "<html><script></script></html>";
 		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		when(mockResponse.getText()).thenReturn(html);
