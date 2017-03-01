@@ -90,12 +90,14 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
 				for (UserGroupHeader header : result.getChildren()) {
-					UserBadge badge = ginInjector.getUserBadgeWidget();
-					badge.configure(header.getOwnerId(), true);
-					badge.setSize(BadgeSize.LARGE);
-					badge.setStyleNames("displayInlineBlock userBadgeTable col-sm-12 col-md-6 margin-top-15");
-					badge.setHeight("80px");
-					loadMoreWidgetContainer.add(badge.asWidget());
+					if (header.getIsIndividual()) {
+						UserBadge badge = ginInjector.getUserBadgeWidget();
+						badge.configure(header.getOwnerId(), true);
+						badge.setSize(BadgeSize.LARGE);
+						badge.setStyleNames("displayInlineBlock userBadgeTable col-sm-12 col-md-6 margin-top-15");
+						badge.setHeight("80px");
+						loadMoreWidgetContainer.add(badge.asWidget());
+					}
 				}
 				offset += SEARCH_PEOPLE_LIMIT;
 				loadMoreWidgetContainer.setIsMore(!result.getChildren().isEmpty());
