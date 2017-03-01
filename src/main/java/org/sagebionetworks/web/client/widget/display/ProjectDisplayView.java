@@ -28,5 +28,7 @@ public interface ProjectDisplayView {
 
 	void onSave();
 
+	void configure();
+
 	
 }

@@ -64,6 +64,11 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	}
 	
 	@Override
+	public void configure() {
+		
+	}
+	
+	@Override
 	public Widget asWidget() {
 		return widget;
 	}
