@@ -195,6 +195,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			@Override
 			public void onFailure(Throwable caught) {
 				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(content);
+				if (escapedContent.length() > 500000) {
+					escapedContent = escapedContent.substring(0, 500000) + "\n...";
+				}
 				if (isFullSize) {
 					view.setTextPreviewFull(escapedContent);
 				} else {
