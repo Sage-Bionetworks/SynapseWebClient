@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -39,6 +41,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	RestrictableObjectDescriptor subject;
 	EntityIdCellRendererImpl entityIdRenderer; 
 	TeamBadge teamBadge;
+	List<AccessRequirement> allArs;
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -59,10 +62,9 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.teamBadge = teamBadge;
 		view.add(loadMoreContainer.asWidget());
 		view.addBelowBody(synAlert.asWidget());
-		view.addTitle("Conditions for use ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
-		
+//		view.addTitle(": Conditions for use");
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -107,6 +109,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public void loadData() {
 		loadMoreContainer.clear();
 		currentOffset = 0L;
+		allArs = new ArrayList<AccessRequirement>();
 		loadMore();
 	}
 
@@ -117,25 +120,32 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				loadMoreContainer.setIsMore(false);
 			}
 			
 			public void onSuccess(List<AccessRequirement> accessRequirements) {
 				currentOffset += LIMIT;
+				boolean isNewAr = false;
 				for (AccessRequirement ar : accessRequirements) {
-					//TODO: create a new row for each access requirement.
-					// need state of approval/submission.
-					if( ar instanceof ACTAccessRequirement) {
-						ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-						w.configure((ACTAccessRequirement)ar); 
-						view.add(w.asWidget());
-					} else if (ar instanceof TermsOfUseAccessRequirement) {
-						TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
-						w.configure((TermsOfUseAccessRequirement)ar);
-						view.add(w.asWidget());						
-					} else {
-						synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
+					if (!allArs.contains(ar)) {
+						isNewAr = true;
+						allArs.add(ar);
+						// create a new row for each access requirement.
+						// need state of approval/submission.
+						if( ar instanceof ACTAccessRequirement) {
+							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
+							w.configure((ACTAccessRequirement)ar); 
+							loadMoreContainer.add(w.asWidget());
+						} else if (ar instanceof TermsOfUseAccessRequirement) {
+							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
+							w.configure((TermsOfUseAccessRequirement)ar);
+							loadMoreContainer.add(w.asWidget());						
+						} else {
+							synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
+						}
 					}
 				}
+				loadMoreContainer.setIsMore(isNewAr);
 			};
 		});
 	}

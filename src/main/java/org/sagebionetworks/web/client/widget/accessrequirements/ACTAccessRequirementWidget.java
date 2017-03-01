@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,8 +38,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	public void configure(ACTAccessRequirement ar) {
 		//TODO:  set up view based on DataAccessSubmission state
-		
-		
 		if (!DisplayUtils.isDefined(ar.getActContactInfo())) {
  			//get wiki terms
  			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
