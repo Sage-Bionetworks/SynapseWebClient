@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -19,7 +18,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
-	
+	ACTAccessRequirement ar;
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
@@ -36,8 +35,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	}
 	
 	
-	public void configure(ACTAccessRequirement ar) {
-		//TODO:  set up view based on DataAccessSubmission state
+	public void setRequirement(ACTAccessRequirement ar) {
+		this.ar = ar;
 		if (!DisplayUtils.isDefined(ar.getActContactInfo())) {
  			//get wiki terms
  			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
@@ -47,6 +46,12 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
  			view.setTerms(ar.getActContactInfo());
  			view.showTermsUI();
  		}
+	}
+	
+	public void setState() {
+		//TODO:  set up view based on DataAccessSubmission state
+		view.resetState();
+		
 	}
 	
 	@Override

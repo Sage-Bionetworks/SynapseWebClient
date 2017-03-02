@@ -88,4 +88,11 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	public void showSignTermsButton() {
 		signTermsButton.setVisible(true);
 	}
+	
+	@Override
+	public void resetState() {
+		approvedHeading.setVisible(false);
+		unapprovedHeading.setVisible(false);
+		signTermsButton.setVisible(false);	
+	}
 }

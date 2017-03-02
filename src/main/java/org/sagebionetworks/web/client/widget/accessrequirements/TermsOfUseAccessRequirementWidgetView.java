@@ -18,6 +18,7 @@ public interface TermsOfUseAccessRequirementWidgetView extends IsWidget {
 	void showApprovedHeading();
 	void showUnapprovedHeading();
 	void showSignTermsButton();
+	void resetState();
 	/**
 	 * Presenter interface
 	 */

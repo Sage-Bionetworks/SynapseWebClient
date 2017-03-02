@@ -41,12 +41,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	}
 	
 	
-	public void configure(TermsOfUseAccessRequirement ar) {
-		//TODO:  set up view based on DataAccessSubmission state
+	public void setRequirement(TermsOfUseAccessRequirement ar) {
 		this.ar = ar;
-		//if not approved
-		view.showUnapprovedHeading();
-		view.showSignTermsButton();
 		if (!DisplayUtils.isDefined(ar.getTermsOfUse())) {
  			//get wiki terms
  			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
@@ -58,6 +54,20 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
  		}
 	}
 	
+	public void setState() {
+		//TODO:  set up view based on DataAccessSubmission state
+		view.resetState();
+		//if (not approved) {
+		view.showUnapprovedHeading();
+		view.showSignTermsButton();
+//		}
+//		else {
+		// if approved
+		view.showApprovedHeading();
+//		}
+		
+
+	}
 	@Override
 	public void onSignTerms() {
 		// create the self-signed access approval, then update this object
@@ -69,7 +79,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessApproval result) {
-				
+				//TODO: set state to approved.
 			}
 		};
 		TermsOfUseAccessApproval approval = new TermsOfUseAccessApproval();

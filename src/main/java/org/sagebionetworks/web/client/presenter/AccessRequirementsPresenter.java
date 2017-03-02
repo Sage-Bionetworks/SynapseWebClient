@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -115,6 +114,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 
 	public void loadMore() {
 		synAlert.clear();
+		// TODO: call should also return the user state (approved, pending, ...) for each access requirement
 		synapseClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
 			
 			@Override
@@ -134,11 +134,11 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 						// need state of approval/submission.
 						if( ar instanceof ACTAccessRequirement) {
 							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-							w.configure((ACTAccessRequirement)ar); 
+							w.setRequirement((ACTAccessRequirement)ar); 
 							loadMoreContainer.add(w.asWidget());
 						} else if (ar instanceof TermsOfUseAccessRequirement) {
 							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
-							w.configure((TermsOfUseAccessRequirement)ar);
+							w.setRequirement((TermsOfUseAccessRequirement)ar);
 							loadMoreContainer.add(w.asWidget());						
 						} else {
 							synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());

@@ -23,6 +23,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget {
 	void showCancelRequestButton();
 	void showUpdateRequestButton();
 	void showRequestAccessButton();
+	void resetState();
 	/**
 	 * Presenter interface
 	 */

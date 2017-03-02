@@ -131,4 +131,16 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public void showUpdateRequestButton() {
 		updateRequestButton.setVisible(true);
 	}
+	
+	@Override
+	public void resetState() {
+		approvedHeading.setVisible(false);
+		unapprovedHeading.setVisible(false);
+		requestSubmittedMessage.setVisible(false);
+		requestApprovedMessage.setVisible(false);
+		requestRejectedMessage.setVisible(false);
+		cancelRequestButton.setVisible(false);
+		updateRequestButton.setVisible(false);
+		requestAccessButton.setVisible(false);
+	}
 }
