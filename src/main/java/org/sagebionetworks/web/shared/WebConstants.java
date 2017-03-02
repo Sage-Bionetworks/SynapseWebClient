@@ -295,4 +295,6 @@ public class WebConstants {
 	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
 
 	public static final String CONTENT_TYPE = "Content-Type";
+
+	public static final Long ZERO_OFFSET = 0L;
 }
