@@ -34,6 +34,8 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	CheckBox challengeButton;
 	@UiField
 	CheckBox discussionButton;
+	@UiField
+	CheckBox dockerButton;
 	
 	@UiField
 	Button saveButton;
