@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -85,7 +86,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 		if(handler != null) {
 			List<VersionInfo> versions = null;
 			if(retrieveVersions) {
-				synapseClient.getEntityVersions(entityId, 1, 20, new AsyncCallback<PaginatedResults<VersionInfo>>() {
+				synapseClient.getEntityVersions(entityId, WebConstants.ZERO_OFFSET.intValue(), 20, new AsyncCallback<PaginatedResults<VersionInfo>>() {
 					@Override
 					public void onSuccess(PaginatedResults<VersionInfo> result) {
 						PaginatedResults<VersionInfo> versions;

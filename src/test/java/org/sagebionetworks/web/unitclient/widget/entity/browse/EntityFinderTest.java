@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -157,7 +158,7 @@ public class EntityFinderTest {
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);	
 		
 		entityFinder.loadVersions(id);
-		
+		verify(mockSynapseClient).getEntityVersions(eq(id), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVersions(results);
 	}	
 	
