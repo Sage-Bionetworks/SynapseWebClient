@@ -5,26 +5,35 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<!-- xmlns:b3="urn:import:org.gwtbootstrap3.extras.toggleswitch.client.ui" -->
 	<g:HTMLPanel>
 	    <b:Modal ui:field="modal" closable="true"
 			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 			<b:ModalHeader>
-				<b:Heading size="H4" text="Project Display Update" addStyleNames="displayInline" />
+				<b:Heading size="H4" text="Project Display Options" addStyleNames="displayInline" />
 			</b:ModalHeader>
 			<b:ModalBody>
-			     <b:FormGroup>
-			     	<b:Radio ui:field="wikiButton" name="displayRadio" text="Wiki" addStyleNames="font-size-18"/>
-			     	<b:Radio ui:field="filesButton" name="displayRadio" text="Files" addStyleNames="font-size-18" />
-			     	<b:Radio ui:field="tablesButton" name="displayRadio" text="Tables" addStyleNames="font-size-18" />
-			     	<b:Radio ui:field="challengeButton" name="displayRadio" text="Challenge" addStyleNames="font-size-18" />
-			     	<b:Radio ui:field="discussionButton" name="displayRadio" text="Discussion" addStyleNames="font-size-18" />
-			     	<!-- <b3:ToggleSwitch ui:field="dockerButton" name="displayRadio" text="Docker" addStyleNames="font-size-18" /> -->
-			    </b:FormGroup>
+				<bh:Div addStyleNames="margin-left-10">
+					<b:Heading size="H5" text="Select which features you want to include." addStyleNames="margin-bottom-20"/>
+			   	</bh:Div> 
+		     	<b:CheckBox ui:field="wikiButton" text="Wiki" addStyleNames="font-size-18"/>
+		     	<bh:Paragraph addStyleNames="margin-left-20">Build narrative to describe your project in the Wiki.</bh:Paragraph>
+		     	<b:CheckBox ui:field="filesButton" text="Files" addStyleNames="font-size-18" />
+		     	<bh:Paragraph addStyleNames="margin-left-20">Organize your data by uploading files into a directory structure built in the Files section.</bh:Paragraph>
+		     	<b:CheckBox ui:field="tablesButton" text="Tables" addStyleNames="font-size-18" />
+		     	<bh:Paragraph addStyleNames="margin-left-20">Build structured queryable data that can be described by a schema using the Tables.</bh:Paragraph>
+		     	<b:CheckBox ui:field="challengeButton" text="Challenge" addStyleNames="font-size-18" />
+		     	<bh:Paragraph addStyleNames="margin-left-20">Challenges are computational contests organized through the Dream Challenges.</bh:Paragraph>
+		     	<b:CheckBox ui:field="discussionButton" text="Discussion" addStyleNames="font-size-18" />
+		     	<bh:Paragraph addStyleNames="margin-left-20">Engage your collaborators in project specific Discussions.</bh:Paragraph>
+		     	<b:CheckBox ui:field="dockerButton" text="Docker" addStyleNames="font-size-18" />
+		     	<bh:Paragraph addStyleNames="margin-left-20">A Docker container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.</bh:Paragraph>
 			   <g:SimplePanel ui:field="synAlertPanel"/>
+			   <bh:Div addStyleNames="margin-left-10">
+					<b:Heading size="H5" text="These features can be added at any time by selecting 'Display Options' in the Tools menu." addStyleNames="margin-top-20"/>
+			   </bh:Div> 
 			</b:ModalBody>
 			<b:ModalFooter>
-			    <b:Button ui:field="saveButton" text="Save" type="PRIMARY"/>
+				<b:Button ui:field="saveButton" text="Save" type="PRIMARY"/>
 			    <b:Button text="Cancel" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
 			</b:ModalFooter>
 		</b:Modal>

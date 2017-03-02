@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.display;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.Radio;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,15 +25,15 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	SimplePanel synAlertPanel;
 	
 	@UiField
-	Radio wikiButton;
+	CheckBox wikiButton;
 	@UiField
-	Radio filesButton;
+	CheckBox filesButton;
 	@UiField
-	Radio tablesButton;
+	CheckBox tablesButton;
 	@UiField
-	Radio challengeButton;
+	CheckBox challengeButton;
 	@UiField
-	Radio discussionButton;
+	CheckBox discussionButton;
 	
 	@UiField
 	Button saveButton;
