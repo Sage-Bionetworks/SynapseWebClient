@@ -172,7 +172,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 
 	private void processEntities(String entityId) {
-		String[] entities = entityId.split(",");
+		String[] entities = entityId.split("[,\\s]\\s*");
 		selectedEntities.clear();
 		for (int i = 0; i < entities.length; i++) {
 			Reference r = new Reference();
