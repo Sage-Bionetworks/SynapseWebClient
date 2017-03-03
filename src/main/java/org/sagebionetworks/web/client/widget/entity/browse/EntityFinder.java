@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -172,7 +173,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 
 	private void processEntities(String entityId) {
-		String[] entities = entityId.split(",");
+		String[] entities = entityId.split("[,\\s]\\s*");
 		selectedEntities.clear();
 		for (int i = 0; i < entities.length; i++) {
 			Reference r = new Reference();
@@ -191,7 +192,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void loadVersions(String entityId) {
 		synAlert.clear();
-		synapseClient.getEntityVersions(entityId, 1, 200, new AsyncCallback<PaginatedResults<VersionInfo>>() {
+		synapseClient.getEntityVersions(entityId, WebConstants.ZERO_OFFSET.intValue(), 200, new AsyncCallback<PaginatedResults<VersionInfo>>() {
 			@Override
 			public void onSuccess(PaginatedResults<VersionInfo> result) {
 				PaginatedResults<VersionInfo> versions = result;

@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -75,18 +74,25 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
+	public void setImagePreviewFull(String fullFileUrl) {
+		clear();
+		add(new Image(fullFileUrl));
+	}
+	@Override
 	public void setImagePreview(final String fullFileUrl, String previewUrl) {
 		clear();
+		Image fullImage = new Image(fullFileUrl);
+		fullImage.addStyleName("maxWidth100 maxHeight100");
+		Image previewImage = new Image();
 		add(fullScreenAnchor);
-		final Image image = new Image();
-		image.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
-		image.addClickHandler(new ClickHandler() {
+		previewImage.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
+		previewImage.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				showPopup();
 			}
 		});
-		image.addErrorHandler(new ErrorHandler() {
+		previewImage.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
 				presenter.imagePreviewLoadFailed(event);
@@ -94,12 +100,10 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		});
 		Div div = new Div();
 		div.setHeight("200px");
-		div.add(image);
+		div.add(previewImage);
 		add(div);
-		image.setUrl(previewUrl);
-		
-		currentPopupPreviewWidget = new Image(previewUrl);
-		currentPopupPreviewWidget.addStyleName("maxWidth100 maxHeight100");
+		previewImage.setUrl(previewUrl);
+		currentPopupPreviewWidget = fullImage;
 	}
 	
 	@Override
@@ -114,30 +118,62 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setCodePreview(String code) {
+	public void setCodePreviewFull(String text) {
 		clear();
-		StringBuilder sb = new StringBuilder();
-		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
-		sb.append(code);
-		sb.append("</code></pre>");
-		setPreview(sb.toString());
+		add(new HTMLPanel(getCodeHtml(text)));
 		synapseJSNIUtils.highlightCodeBlocks();
 		isCode = true;
 	}
 	
 	@Override
+	public void setCodePreview(String code) {
+		clear();
+		setExpandablePreview(getCodeHtml(code));
+		synapseJSNIUtils.highlightCodeBlocks();
+		isCode = true;
+	}
+	
+	private String getCodeHtml(String code) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
+		sb.append(code);
+		sb.append("</code></pre>");
+		return sb.toString();
+	}
+	
+	@Override
+	public void setTextPreviewFull(String text) {
+		clear();
+		add(new HTMLPanel(getTextPreviewHtml(text)));
+	}
+	
+	@Override
 	public void setTextPreview(String text) {
 		clear();
+		setExpandablePreview(getTextPreviewHtml(text));
+	}
+	
+	private String getTextPreviewHtml(String text) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<pre style=\"overflow:auto;white-space:pre;\">");
 		sb.append(text);
 		sb.append("</pre>");
-		setPreview(sb.toString());
+		return sb.toString();
+	}
+	
+	@Override
+	public void setTablePreviewFull(String text, String delimiter) {
+		clear();
+		add(new HTMLPanel(getTableHtml(text, delimiter)));
 	}
 	
 	@Override
 	public void setTablePreview(String text, String delimiter) {
 		clear();
+		setExpandablePreview(getTableHtml(text, delimiter));
+	}
+	
+	private String getTableHtml(String text, String delimiter) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table class=\"previewtable\" style=\"overflow:auto;display:block\">");
 		String[] lines = text.split("[\r\n]");
@@ -152,7 +188,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 			sb.append("</tr>");
 		}
 		sb.append("</table>");
-		setPreview(sb.toString());
+		return sb.toString();
 	}
 	
 	@Override
@@ -162,7 +198,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		super.clear();
 	}
 	
-	private void setPreview(String html) {
+	private void setExpandablePreview(String html) {
 		add(fullScreenAnchor);
 		currentPopupPreviewWidget = new HTMLPanel(html);
 		ScrollPanel wrapper= new ScrollPanel(new HTMLPanel(html));
@@ -172,8 +208,22 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
+	public void setHTMLFull(final String htmlContent) {
+		clear();
+		add(getFrame(htmlContent));
+	}
+	@Override
 	public void setHTML(final String htmlContent) {
 		clear();
+		add(fullScreenAnchor);
+		currentPopupPreviewWidget = getFrame(htmlContent);
+		ScrollPanel wrapper= new ScrollPanel(getFrame(htmlContent));
+		wrapper.setHeight("200px");
+		wrapper.addStyleName("margin-left-20");
+		add(wrapper);
+	}
+	
+	private Frame getFrame(final String htmlContent) {
 		final Frame frame = new Frame("about:blank");
 		frame.getElement().setAttribute("frameborder", "0");
 		frame.setWidth("100%");
@@ -205,12 +255,11 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 				}
 			}
 		});
-		
-		add(frame);
+		return frame;
 	}
 	
 	private static native void _autoAdjustFrameHeight(Element iframe) /*-{
-		if(iframe && iframe.contentWindow) {
+		if(iframe && iframe.contentWindow && iframe.contentWindow.document.body) {
 			var newHeightPx = iframe.contentWindow.document.body.scrollHeight;
 			if (newHeightPx < 450) {
 				newHeightPx = 450;

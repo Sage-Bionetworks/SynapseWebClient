@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -66,7 +67,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
 		
 		//initialize versions
-		onPageChange(0L);
+		onPageChange(WebConstants.ZERO_OFFSET);
 	}
 
 	@Override
@@ -147,9 +148,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	@Override
 	public void onPageChange(final Long newOffset) {
 		view.clearVersions();
-		// TODO: If we ever change the offset api to actually take 0 as a valid
-		// offset, then we need to remove "+1"
-		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue() + 1, VERSION_LIMIT,
+		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue(), VERSION_LIMIT,
 			new AsyncCallback<PaginatedResults<VersionInfo>>() {
 				@Override
 				public void onSuccess(PaginatedResults<VersionInfo> result) {

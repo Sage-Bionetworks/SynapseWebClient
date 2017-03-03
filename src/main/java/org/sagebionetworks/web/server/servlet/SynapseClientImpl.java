@@ -1988,10 +1988,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			boolean isLoggedIn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> allMembers = synapseClient
-					.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
-			// get's total member count, can we get rid of this now?
-			long memberCount = allMembers.getTotalNumberOfResults();
+//			TODO:  SWC-3503: do service call to get the team member count (when available)
+//			long memberCount = allMembers.getTotalNumberOfResults();
+			long memberCount = -1;
 			boolean isAdmin = false;
 			Team team = synapseClient.getTeam(teamId);
 			TeamMembershipStatus membershipStatus = null;

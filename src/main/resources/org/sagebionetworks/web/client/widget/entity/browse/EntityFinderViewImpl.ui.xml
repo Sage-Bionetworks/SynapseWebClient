@@ -52,7 +52,7 @@
 										<bh:Text>Enter List of Synapse Ids</bh:Text>
 									</b:Heading>
 									<b:InputGroup>
-										<b:TextBox ui:field="synapseMultiIdTextBox" placeholder="Enter Synapse IDs (i.e. 'syn123.4, syn567, syn789.1')"
+										<b:TextBox ui:field="synapseMultiIdTextBox" placeholder="Enter Synapse IDs (i.e. 'syn123.4 syn567, syn789.1')"
 											autoComplete="false" />
 										<b:InputGroupButton>
 											<b:Button ui:field="lookupSynapseMultiIdButton" text="Lookup" />
