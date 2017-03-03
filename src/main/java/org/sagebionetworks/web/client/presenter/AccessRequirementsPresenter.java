@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -14,6 +15,8 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -37,6 +40,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	RestrictableObjectDescriptor subject;
 	EntityIdCellRendererImpl entityIdRenderer; 
 	TeamBadge teamBadge;
+	List<AccessRequirement> allArs;
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -57,10 +61,9 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.teamBadge = teamBadge;
 		view.add(loadMoreContainer.asWidget());
 		view.addBelowBody(synAlert.asWidget());
-		view.addTitle("Conditions for use ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
-		
+//		view.addTitle(": Conditions for use");
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -83,13 +86,11 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		String teamId = place.getParam(AccessRequirementsPlace.TEAM_ID_PARAM);
 		synAlert.clear();
 		subject = new RestrictableObjectDescriptor();
-		view.clearAboveBody();
 		if (entityId != null) {
 			teamBadge.setVisible(false);
 			entityIdRenderer.setVisible(true);
 			subject.setId(entityId);
 			subject.setType(RestrictableObjectType.ENTITY);
-			view.addAboveBody(entityIdRenderer.asWidget());
 			entityIdRenderer.setValue(entityId);
 			loadData();
 		} else if (teamId != null) {
@@ -97,7 +98,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			entityIdRenderer.setVisible(false);
 			subject.setId(teamId);
 			subject.setType(RestrictableObjectType.TEAM);
-			view.addAboveBody(teamBadge.asWidget());
 			teamBadge.configure(teamId);
 			loadData();
 		} else {
@@ -108,35 +108,44 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public void loadData() {
 		loadMoreContainer.clear();
 		currentOffset = 0L;
+		allArs = new ArrayList<AccessRequirement>();
 		loadMore();
 	}
 
 	public void loadMore() {
 		synAlert.clear();
+		// TODO: call should also return the user state (approved, pending, ...) for each access requirement
 		synapseClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				loadMoreContainer.setIsMore(false);
 			}
 			
 			public void onSuccess(List<AccessRequirement> accessRequirements) {
 				currentOffset += LIMIT;
+				boolean isNewAr = false;
 				for (AccessRequirement ar : accessRequirements) {
-					//TODO: create a new row for each access requirement.
-					// need state of approval/submission.
-					if( ar instanceof ACTAccessRequirement) {
-//						ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-//						w.configure(ar, state); 
-//						view.add(w.asWidget());
-					} else if (ar instanceof TermsOfUseAccessRequirement) {
-//						TermsOfUseAccessRequirementWidget w = ginInjector.TermsOfUseAccessRequirementWidget();
-//						w.configure(ar, state);
-//						view.add(w.asWidget());						
-					} else {
-						synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
+					if (!allArs.contains(ar)) {
+						isNewAr = true;
+						allArs.add(ar);
+						// create a new row for each access requirement.
+						// need state of approval/submission.
+						if( ar instanceof ACTAccessRequirement) {
+							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
+							w.setRequirement((ACTAccessRequirement)ar); 
+							loadMoreContainer.add(w.asWidget());
+						} else if (ar instanceof TermsOfUseAccessRequirement) {
+							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
+							w.setRequirement((TermsOfUseAccessRequirement)ar);
+							loadMoreContainer.add(w.asWidget());						
+						} else {
+							synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
+						}
 					}
 				}
+				loadMoreContainer.setIsMore(isNewAr);
 			};
 		});
 	}
