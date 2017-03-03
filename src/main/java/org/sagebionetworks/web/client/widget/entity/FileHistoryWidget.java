@@ -147,9 +147,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	@Override
 	public void onPageChange(final Long newOffset) {
 		view.clearVersions();
-		// TODO: If we ever change the offset api to actually take 0 as a valid
-		// offset, then we need to remove "+1"
-		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue() + 1, VERSION_LIMIT,
+		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue(), VERSION_LIMIT,
 			new AsyncCallback<PaginatedResults<VersionInfo>>() {
 				@Override
 				public void onSuccess(PaginatedResults<VersionInfo> result) {
