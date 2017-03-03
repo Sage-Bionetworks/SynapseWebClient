@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -66,7 +67,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
 		
 		//initialize versions
-		onPageChange(0L);
+		onPageChange(WebConstants.ZERO_OFFSET);
 	}
 
 	@Override
