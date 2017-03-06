@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -17,7 +18,7 @@ import com.google.inject.Inject;
  */
 public class CreateResearchProjectStep1 implements ModalPage {
 	CreateResearchProjectWizardStep1View view;
-	SynapseClientAsync synapseClient;
+	DataAccessClientAsync client;
 	ACTAccessRequirement ar;
 	ModalPresenter modalPresenter;
 	CreateDataAccessSubmissionStep2 step2;
@@ -25,12 +26,12 @@ public class CreateResearchProjectStep1 implements ModalPage {
 	@Inject
 	public CreateResearchProjectStep1(
 			CreateResearchProjectWizardStep1View view,
-			SynapseClientAsync synapseClient, 
+			DataAccessClientAsync client, 
 			CreateDataAccessSubmissionStep2 step2) {
 		super();
 		this.view = view;
 		this.step2 = step2;
-		this.synapseClient = synapseClient;
+		this.client = client;
 	}
 	
 	/**
