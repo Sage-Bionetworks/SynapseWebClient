@@ -61,7 +61,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	@Override
 	public void onRequestAccess() {
-		//TODO: pop up DataAccessSubmission dialog
+		//TODO: pop up DataAccessRequest dialog
 	}
 	
 	@Override
