@@ -43,8 +43,6 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -55,16 +53,18 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
+import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -196,9 +196,9 @@ public interface SynapseClientAsync {
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 	
-	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
@@ -209,8 +209,6 @@ public interface SynapseClientAsync {
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 	
 	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
-	void getWikiHeaderTree(String ownerId, String ownerType,
-			AsyncCallback<PaginatedResults<WikiHeader>> callback);
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
@@ -225,7 +223,7 @@ public interface SynapseClientAsync {
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
     void getV2WikiHeaderTree(String ownerId, String ownerType,
-			AsyncCallback<PaginatedResults<V2WikiHeader>> callback);
+			AsyncCallback<List<V2WikiHeader>> callback);
     public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
     public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
     void getV2WikiAttachmentHandles(WikiPageKey key,
@@ -455,7 +453,14 @@ public interface SynapseClientAsync {
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 	
 	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
-	void getEntityAccessApproval(String entityId, AsyncCallback<PaginatedResults<AccessApproval>> callback);
 
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);
+
+	void generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema,
+			AsyncCallback<String> callback);
+
+	void getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken,
+			AsyncCallback<ColumnModelPage> callback);
+
+	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 }

@@ -23,12 +23,18 @@
 		
 		<b:Alert ui:field="tableMessage" type="INFO" />
 
-		<g:SimplePanel ui:field="queryInputPanel" />
+		<bh:Div>
+			<b:Anchor ui:field="showSimpleSearch" text="Show simple search"/>
+		</bh:Div>
+		<bh:Div>
+			<g:SimplePanel ui:field="queryInputPanel" addStyleNames="displayInline" />
+			<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" pull="LEFT" addStyleNames="moveup-18"/>
+		</bh:Div>
 		
-		<bh:Div styleName="margin-top-15" />
+		
+		<bh:Div styleName="margin-top-5" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
 		
-		<g:SimplePanel ui:field="downloadResultsPanel" />
-		<g:SimplePanel ui:field="uploadResultsPanel" />
+		<bh:Div ui:field="modalContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>

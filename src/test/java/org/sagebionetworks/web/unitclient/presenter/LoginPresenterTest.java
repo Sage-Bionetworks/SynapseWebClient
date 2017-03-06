@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -125,6 +124,31 @@ public class LoginPresenterTest {
 		loginPresenter.setPlace(place);
 		verify(mockView).showErrorMessage(anyString());
 		verify(mockView).showLogin();
+	}
+	
+	@Test 
+	public void testSetPlaceShowToU() {
+		LoginPlace place = new LoginPlace(LoginPlace.SHOW_TOU);
+		
+		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
+		usd.getSession().setAcceptsTermsOfUse(false);
+		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
+		
+		loginPresenter.setPlace(place);
+		verify(mockView).showTermsOfUse(anyString(), any(AcceptTermsOfUseCallback.class));
+	}
+
+	@Test 
+	public void testSetPlaceShowTouUserAlreadyAccepted() {
+		LoginPlace place = new LoginPlace(LoginPlace.SHOW_TOU);
+		
+		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
+		usd.getSession().setAcceptsTermsOfUse(true);
+		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
+		
+		loginPresenter.setPlace(place);
+		verify(mockView, never()).showTermsOfUse(anyString(), any(AcceptTermsOfUseCallback.class));
+		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 	
 	@Test 

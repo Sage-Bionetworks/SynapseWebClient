@@ -24,6 +24,13 @@ public interface SearchView extends IsWidget, SynapseView {
 	public void setSearchResults(SearchResults searchResults, String searchTerm, boolean newQuery);
 	
 	/**
+	 * Get widget representing search result hits
+	 * @param searchResults
+	 * @return
+	 */
+	Widget getResults(SearchResults searchResults, String searchTerm);
+	
+	/**
 	 * Set this view's presenter
 	 * @param presenter
 	 */
@@ -51,16 +58,15 @@ public interface SearchView extends IsWidget, SynapseView {
 		String getDisplayForTimeFacet(String facetName, String facetValue);
 		
 		Date getSearchStartTime();
-		
-		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 
 		IconType getIconForHit(Hit hit);
 		
 		String getCurrentSearchJSON();
-		
 		Long getStart();
 	}
 
 	public void setSynAlertWidget(Widget asWidget);
+	
+	public void setLoadingMoreContainerWidget(Widget w);
 
 }

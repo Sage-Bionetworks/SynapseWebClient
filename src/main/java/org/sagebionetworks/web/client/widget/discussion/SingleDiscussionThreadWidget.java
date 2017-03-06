@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -87,6 +88,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private Callback refreshCallback;
 	private Set<String> moderatorIds;
 	private boolean isThreadDeleted;
+	private SubscribersWidget threadSubscribersWidget;
+	Topic threadTopic = new Topic();
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -104,7 +107,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			SubscribeButtonWidget subscribeButtonWidget,
 			NewReplyWidget newReplyWidget,
-			NewReplyWidget secondNewReplyWidget
+			NewReplyWidget secondNewReplyWidget,
+			SubscribersWidget threadSubscribersWidget
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -121,6 +125,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.subscribeButtonWidget = subscribeButtonWidget;
 		this.newReplyWidget = newReplyWidget;
 		this.secondNewReplyWidget = secondNewReplyWidget;
+		this.threadSubscribersWidget = threadSubscribersWidget;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
@@ -129,7 +134,16 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		view.setNewReplyContainer(newReplyWidget.asWidget());
 		view.setSecondNewReplyContainer(secondNewReplyWidget.asWidget());
+		view.setSubscribersWidget(threadSubscribersWidget.asWidget());
+		Callback refreshSubscribersCallback = new Callback() {
+			@Override
+			public void invoke() {
+				SingleDiscussionThreadWidget.this.threadSubscribersWidget.configure(threadTopic);
+			}
+		};
 		
+		subscribeButtonWidget.setOnUnsubscribeCallback(refreshSubscribersCallback);
+		subscribeButtonWidget.setOnSubscribeCallback(refreshSubscribersCallback);
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -144,6 +158,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				reconfigureThread();
 			}
 		};
+		threadTopic.setObjectType(SubscriptionObjectType.THREAD);
 	}
 
 	@Override
@@ -167,11 +182,14 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		authorWidget.configure(bundle.getCreatedBy());
 		configureMessage();
 		if (!bundle.getId().equals(globalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
+			view.setSubscribersWidgetContainerVisible(true);
 			if (replyId != null) {
 				configureReply(replyId);
 			} else {
 				configureReplies();
 			}
+		} else {
+			view.setSubscribersWidgetContainerVisible(false);
 		}
 
 		newReplyWidget.configure(threadId, getNewReplyCallback());
@@ -209,6 +227,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setReplyContainersVisible(!isDeleted);
 		view.setCommandsVisible(!isDeleted);
 		view.setRestoreIconVisible(isDeleted);
+		threadTopic.setObjectId(bundle.getId());
+		threadSubscribersWidget.configure(threadTopic);
 		if (!isDeleted) {
 			view.setDeleteIconVisible(isCurrentUserModerator);
 

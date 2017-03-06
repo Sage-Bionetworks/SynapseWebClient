@@ -263,7 +263,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 	@Test
 	public void testConfigureFacetsForTypeString() {
 		editor.configureFacetsForType(ColumnTypeViewEnum.String);
-		verify(mockView).setFacetValues(None.toString(), Values.toString(), Range.toString());
+		verify(mockView).setFacetValues(None.toString(), Values.toString());
 		verify(mockView).setFacetVisible(true);
 	}
 	
@@ -316,6 +316,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Boolean));
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Double));
 		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Date));
+		assertTrue(editor.canHaveFacet(ColumnTypeViewEnum.Entity));
 		
 		//other
 		assertFalse(editor.canHaveFacet(ColumnTypeViewEnum.LargeText));

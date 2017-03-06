@@ -124,11 +124,11 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	 */
 	public void configureFacetsForType(ColumnTypeViewEnum type){
 		switch(type){
-			case String:
 			case Integer:
 				view.setFacetValues(None.toString(), Values.toString(), Range.toString());
 				view.setFacetVisible(true);
 				break;
+			case String:
 			case Boolean:
 			case User:
 			case Entity:
@@ -153,6 +153,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case Double:
 			case Date:
 			case User:
+			case Entity:
 				return true;
 			default:
 				return false;
@@ -369,6 +370,11 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			view.clearSizeError();
 		}
 		return isValid;
+	}
+	
+	@Override
+	public void setToBeDefaultFileViewColumn() {
+		view.setToBeDefaultFileViewColumn();
 	}
 
 }

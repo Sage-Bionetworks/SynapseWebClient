@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -53,13 +51,17 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget, FacetsWidget facetsWidget){
+	public TablePageWidget(TablePageView view, 
+			PortalGinInjector ginInjector, 
+			DetailedPaginationWidget paginationWidget, 
+			FacetsWidget facetsWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
 		view.setFacetsWidget(facetsWidget.asWidget());
+		view.setPresenter(this);
 	}
 	
 	/**
@@ -132,14 +134,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 		List<FacetColumnResult> facets = bundle.getFacets();
 		
-		boolean isFacetsWidgetVisible = !isEditable && 
+		boolean isFacetsSupported = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty();
 		
-		if (isFacetsWidgetVisible) {
+		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
-			view.setFacetsVisible(facetsWidget.isShowingFacets());
 		} else {
 			view.setFacetsVisible(false);	
 		}
@@ -151,7 +152,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			addRow(row, isEditable);
 		}
 	}
-
+	
 	/**
 	 * @param types
 	 * @param isSelectable
@@ -301,5 +302,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			}
 		}
 		return isValid;
+	}
+	
+	public void setFacetsVisible(boolean visible) {
+		view.setFacetsVisible(visible);
 	}
 }

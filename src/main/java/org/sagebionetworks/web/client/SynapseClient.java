@@ -2,7 +2,6 @@
 package org.sagebionetworks.web.client;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,13 +43,9 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
-import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -60,18 +55,18 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
@@ -88,7 +83,6 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
@@ -302,9 +296,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public String getJSONEntity(String repoUri) throws RestServiceException;
 	
 	public String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
-	//wiki crud
-	public PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
-	
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
@@ -314,7 +305,7 @@ public interface SynapseClient extends XsrfProtectedService {
     public V2WikiPage updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag) throws RestServiceException;
     public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
-    public PaginatedResults<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+    public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	public V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
 	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
     public FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
@@ -509,9 +500,9 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
-	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
+	Entity createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
 	void putActivity(Activity update) throws RestServiceException;
 
@@ -549,6 +540,12 @@ public interface SynapseClient extends XsrfProtectedService {
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 	
 	void deleteAccessApproval(Long approvalId) throws RestServiceException;
-	PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) throws RestServiceException;
 	void deleteAccessApprovals(String accessRequirement, String accessorId) throws RestServiceException;
+
+	String generateSqlWithFacets(String basicSql, List<org.sagebionetworks.repo.model.table.FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException;
+
+	ColumnModelPage getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken)
+			throws RestServiceException;
+
+	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
 }

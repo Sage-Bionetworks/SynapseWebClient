@@ -79,8 +79,7 @@ public class WikiSubpagesTest {
 		bundle.setEntity(new Project());
 		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		PaginatedResults<V2WikiHeader> wikiHeaders = new PaginatedResults<V2WikiHeader>();
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		wikiHeadersList = new ArrayList<V2WikiHeader>();
 		testRootHeader = new V2WikiHeader();
 		testRootHeader.setId("123");
@@ -88,10 +87,9 @@ public class WikiSubpagesTest {
 		testRootHeader.setTitle("my test root wiki header (page)");
 		wikiHeadersList.add(testRootHeader);
 
-		wikiHeaders.setResults(wikiHeadersList);
 		mockV2WikiOrderHint = mock(V2WikiOrderHint.class);
 		when(mockV2WikiOrderHint.getIdList()).thenReturn(null);
-		AsyncMockStubber.callSuccessWith(wikiHeaders).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(wikiHeadersList).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockV2WikiOrderHint).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		reset(mockView);
 	}

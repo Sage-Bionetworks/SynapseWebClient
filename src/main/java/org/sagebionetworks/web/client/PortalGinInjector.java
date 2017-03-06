@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ErrorPresenter;
+import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -155,6 +156,7 @@ import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsLis
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
@@ -259,6 +261,8 @@ public interface PortalGinInjector extends Ginjector {
 	public DownPresenter getDownPresenter();
 	
 	public TeamPresenter getTeamPresenter();
+	
+	public MapPresenter getMapPresenter();
 	
 	public QuizPresenter getQuizPresenter();
 	

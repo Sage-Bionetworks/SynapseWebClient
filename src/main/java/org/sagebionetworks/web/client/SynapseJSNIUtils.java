@@ -107,4 +107,8 @@ public interface SynapseJSNIUtils {
 	String getPathname(String url);
 	
 	void copyToClipboard();
+
+	String sanitizeHtml(String html);
+
+	boolean elementSupportsAttribute(Element el, String attribute);
 }

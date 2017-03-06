@@ -330,7 +330,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onSuccess(PaginatedResults<EntityHeader> headers) {
-					if (headers.getTotalNumberOfResults() == 1) {
+					if (headers.getResults() != null && !headers.getResults().isEmpty()) {
 						EntityHeader theHeader = headers.getResults().get(0);
 						String ownerObjectName = theHeader.getName();
 						callback.invoke(ownerObjectName);

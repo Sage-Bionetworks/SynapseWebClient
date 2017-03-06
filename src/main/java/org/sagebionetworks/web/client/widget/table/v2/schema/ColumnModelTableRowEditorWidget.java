@@ -16,5 +16,6 @@ public interface ColumnModelTableRowEditorWidget extends RowOfWidgets, ColumnMod
 	 * @return
 	 */
 	public boolean validate();
-
+	
+	public void setToBeDefaultFileViewColumn();
 }

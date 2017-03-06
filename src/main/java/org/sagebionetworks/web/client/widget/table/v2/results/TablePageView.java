@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import java.util.List;
 
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView.Presenter;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,7 +18,6 @@ import com.google.gwt.user.client.ui.Widget;
 public interface TablePageView extends IsWidget {
 	
 	public interface Presenter {
-		
 	}
 	
 	/**
@@ -62,4 +62,6 @@ public interface TablePageView extends IsWidget {
 	
 	void setFacetsWidget(Widget w);
 	void setFacetsVisible(boolean visible);
+
+	void setPresenter(Presenter presenter);
 }

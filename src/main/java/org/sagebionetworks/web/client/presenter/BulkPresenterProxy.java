@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.ErrorPlace;
+import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
@@ -174,6 +176,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					} else if (place instanceof Team) {
 						TeamPresenter presenter = ginjector.getTeamPresenter();
 						presenter.setPlace((Team) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof MapPlace) {
+						MapPresenter presenter = ginjector.getMapPresenter();
+						presenter.setPlace((MapPlace) place);
 						presenter.start(panel, eventBus);
 					} else if (place instanceof TeamSearch) {
 						TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();

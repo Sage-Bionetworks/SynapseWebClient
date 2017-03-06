@@ -21,7 +21,7 @@
 				<b:ButtonToolBar>
 					<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
 					<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
-					<b:Button ui:field="addFileView" icon="PLUS" visible="false">Add View</b:Button>
+					<b:Button ui:field="addFileView" visible="false" />
 			</b:ButtonToolBar>
 			</b:Column>
 		</b:Row>

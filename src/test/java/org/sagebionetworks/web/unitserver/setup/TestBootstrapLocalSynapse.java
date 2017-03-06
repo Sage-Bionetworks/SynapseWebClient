@@ -66,7 +66,7 @@ public class TestBootstrapLocalSynapse {
 		adminClient.setAuthEndpoint(StackConfiguration.getAuthenticationServicePrivateEndpoint());
 		adminClient.setRepositoryEndpoint(StackConfiguration.getRepositoryServiceEndpoint());
 		adminClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-		adminClient.setUserName(StackConfiguration.getMigrationAdminUsername());
+		adminClient.setUsername(StackConfiguration.getMigrationAdminUsername());
 		adminClient.setApiKey(StackConfiguration.getMigrationAdminAPIKey());
 		SynapseVersionInfo info = adminClient.getVersionInfo();
 		System.out.println(info);
@@ -140,7 +140,7 @@ public class TestBootstrapLocalSynapse {
 		RestrictableObjectDescriptor rod = new RestrictableObjectDescriptor();
 		rod.setId(entityId);
 		rod.setType(RestrictableObjectType.ENTITY);
-		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> vcpr = synapseClient.getAccessRequirements(rod);
+		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> vcpr = synapseClient.getAccessRequirements(rod, 50L, 0L);
 		if(vcpr != null && vcpr.getTotalNumberOfResults() > 0){
 			for(AccessRequirement ar: vcpr.getResults()){
 				if(ar.getAccessType().equals(type)){

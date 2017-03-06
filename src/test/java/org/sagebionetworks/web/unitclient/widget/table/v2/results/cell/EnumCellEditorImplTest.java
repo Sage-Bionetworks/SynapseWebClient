@@ -10,7 +10,10 @@ import javax.annotation.meta.When;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 
@@ -18,11 +21,13 @@ public class EnumCellEditorImplTest {
 	
 	ListCellEdtiorView mockView;
 	EnumCellEditorImpl editor;
-	
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Before
 	public void before(){
+		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(ListCellEdtiorView.class);
-		editor = new EnumCellEditorImpl(mockView);
+		editor = new EnumCellEditorImpl(mockView, mockSynapseJSNIUtils);
 	}
 
 	@Test
@@ -56,6 +61,16 @@ public class EnumCellEditorImplTest {
 		// second value (first is 'nothing selected')
 		verify(mockView).setValue(1);
 	}
+	
+	@Test
+	public void testSetInvalidValue(){
+		List<String> values = Arrays.asList("one", "two");
+		editor.configure(values);
+		editor.setValue("three");
+		verify(mockView).setValue(0);
+		verify(mockSynapseJSNIUtils).consoleError(anyString());
+	}
+
 	
 	@Test
 	public void testGetNull(){

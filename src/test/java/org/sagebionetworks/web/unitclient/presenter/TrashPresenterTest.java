@@ -57,7 +57,7 @@ public class TrashPresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapse = mock(SynapseClientAsync.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		presenter = new TrashPresenter(mockView, mockSynapse, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert);
+		presenter = new TrashPresenter(mockView, mockSynapse, mockSynAlert);
 		trashList = getTestTrash();
 		
 //		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(trashList);

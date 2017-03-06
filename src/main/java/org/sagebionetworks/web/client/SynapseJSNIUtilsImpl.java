@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
+import org.gwtbootstrap3.extras.notify.client.ui.Notify;
+import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -552,6 +555,116 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
+	public boolean elementSupportsAttribute(Element el, String attribute) {
+		return _elementSupportsAttribute(el.getTagName(), attribute);
+	}
+	
+	private final static native boolean _elementSupportsAttribute(String tagName, String attribute) /*-{
+	    return attribute in $doc.createElement(tagName);
+	}-*/;
+	
+	boolean isFilterXssInitialized = false;
+	
+	@Override
+	public String sanitizeHtml(String html) {
+		if (!isFilterXssInitialized) {
+			//init
+			initFilterXss();
+			isFilterXssInitialized = true;
+		}
+		return _sanitizeHtml(html);
+	}
+
+	private final static native void initFilterXss() /*-{
+		var options = {
+				whiteList: {
+				    a:      ['target', 'href', 'title'],
+				    abbr:   ['title'],
+				    address: [],
+				    area:   ['shape', 'coords', 'href', 'alt'],
+				    article: [],
+				    aside:  [],
+				    audio:  ['autoplay', 'controls', 'loop', 'preload', 'src'],
+				    b:      [],
+				    bdi:    ['dir'],
+				    bdo:    ['dir'],
+				    big:    [],
+				    blockquote: ['cite'],
+				    body:   [],
+				    br:     [],
+				    caption: [],
+				    center: [],
+				    cite:   [],
+				    code:   [],
+				    col:    ['align', 'valign', 'span', 'width'],
+				    colgroup: ['align', 'valign', 'span', 'width'],
+				    dd:     [],
+				    del:    ['datetime'],
+				    details: ['open'],
+				    div:    [],
+				    dl:     [],
+				    dt:     [],
+				    em:     [],
+				    font:   ['color', 'size', 'face'],
+				    footer: [],
+				    h1:     [],
+				    h2:     [],
+				    h3:     [],
+				    h4:     [],
+				    h5:     [],
+				    h6:     [],
+				    header: [],
+				    hr:     [],
+				    html:   [],
+				    i:      [],
+				    img:    ['src', 'alt', 'title', 'width', 'height'],
+				    ins:    ['datetime'],
+				    li:     [],
+				    mark:   [],
+				    nav:    [],
+				    ol:     [],
+				    p:      [],
+				    pre:    [],
+				    s:      [],
+				    section:[],
+				    small:  [],
+				    span:   [],
+				    sub:    [],
+				    sup:    [],
+				    strong: [],
+				    table:  ['width', 'border', 'align', 'valign'],
+				    tbody:  ['align', 'valign'],
+				    td:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+				    tfoot:  ['align', 'valign'],
+				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+				    thead:  ['align', 'valign'],
+				    tr:     ['rowspan', 'align', 'valign'],
+				    tt:     [],
+				    u:      [],
+				    ul:     [],
+				    video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width']
+				},
+				stripIgnoreTagBody: ['script'],  // the script tag is a special case, we need
+				allowCommentTag: true,
+				onIgnoreTag: function (tag, html, options) {
+					if (tag === '!doctype') {
+				      // do not filter doctype
+				      return html;
+				    }
+				}
+			};
+			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
+	}-*/;
+	
+	private final static native String _sanitizeHtml(String html) /*-{
+		try {
+			return $wnd.xss.process(html);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
 	public String getCurrentURL() {
 		return Location.getHref();
 	}
@@ -628,8 +741,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void copyToClipboard() {
 		try {
 			_copyToClipboard();
-			_deselect();
-			DisplayUtils.showInfo("Copied to clipboard", "");
+			Notify.hideAll();
+			NotifySettings settings = DisplayUtils.getDefaultSettings();
+			settings.setType(NotifyType.INFO);
+			Notify.notify("Copied to clipboard", settings);
 		} catch (Throwable t) {
 			consoleError(t.getMessage());
 		}
@@ -637,21 +752,5 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private final static native String _copyToClipboard() /*-{
 		$doc.execCommand('copy');
-	}-*/;
-
-	private final static native String _deselect() /*-{
-		if ($wnd.getSelection) {
-			if ($wnd.getSelection().empty) {
-				// Chrome
-				$wnd.getSelection().empty();
-			} else if ($wnd.getSelection().removeAllRanges) {
-				// Firefox
-				$wnd.getSelection().removeAllRanges();
-			}
-		} else if ($doc.selection && $doc.selection.empty) {
-			// IE/Edge?
-			$doc.selection.empty();
-		}
-		$doc.activeElement.blur();
 	}-*/;
 }

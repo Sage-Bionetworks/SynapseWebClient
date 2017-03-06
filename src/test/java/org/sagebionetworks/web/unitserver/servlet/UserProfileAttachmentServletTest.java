@@ -93,6 +93,7 @@ public class UserProfileAttachmentServletTest {
 	public void testGetUserProfile() throws ServletException, IOException{
 		preview = "false";
 		// setup the parameters
+		servlet.setPreviewTimeoutMs(1);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
@@ -110,6 +111,7 @@ public class UserProfileAttachmentServletTest {
 		String errorMessage = "a custom error";
 		when(mockClient.getUserProfilePictureUrl(Matchers.anyString())).thenThrow(new SynapseServerException(statusCode, errorMessage));
 		preview = "false";
+		servlet.setPreviewTimeoutMs(1);
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);

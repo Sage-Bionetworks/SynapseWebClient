@@ -56,7 +56,6 @@ public class AttachmentConfigEditorTest {
 		editor = new AttachmentConfigEditor(mockView,mockFileInputWidget, mockAttachments);
 		mockMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType(), fileSize)};
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(mockMetadata);
-		when(mockView.isNewAttachment()).thenReturn(true);
 		when(mockAttachments.isValid()).thenReturn(true);
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockMetadata[0]);
@@ -88,7 +87,7 @@ public class AttachmentConfigEditorTest {
 		mockFinishedCallback.invoke(mockFileUpload);
 		
 		verify(mockView).initView();		
-		verify(mockView).showUploadSuccessUI();
+		verify(mockView).showUploadSuccessUI(anyString());
 		verify(mockCallback).setPrimaryEnabled(true);
 		verify(mockAttachments).configure(wikiKey);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));
@@ -110,17 +109,13 @@ public class AttachmentConfigEditorTest {
 		editor.addFileHandleId("123");
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
-		verify(mockView).isNewAttachment();
 		assertEquals(testFileName, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
 	}
 	
 	@Test
 	public void testIsFromAttachments() {
-		when(mockView.isNewAttachment()).thenReturn(false);
-		when(mockView.isFromAttachments()).thenReturn(true);
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
-		editor.addFileHandleId("123");
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
 		verify(mockAttachments).isValid();
@@ -130,21 +125,12 @@ public class AttachmentConfigEditorTest {
 
 	@Test (expected=IllegalArgumentException.class)
 	public void testIsFromAttachmentsFailure() {
-		when(mockView.isNewAttachment()).thenReturn(false);
-		when(mockView.isFromAttachments()).thenReturn(true);
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
-		editor.addFileHandleId("123");
 		when(mockAttachments.isValid()).thenReturn(false);
 		editor.updateDescriptorFromView();
 	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testConfigureFileNotUploaded() {
-		editor.configure(wikiKey, new HashMap<String, String>(), mockCallback);
-		editor.updateDescriptorFromView();
-	}
-	
+		
 	@Test
 	public void testTextToInsert() {
 		String textToInsert = editor.getTextToInsert();

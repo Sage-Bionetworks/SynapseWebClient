@@ -67,6 +67,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
 		fha.setFileHandleId(fileHandle.getId());
 		copyRequest.setOriginalFile(fha);
+		fileEntity.setFileNameOverride(null);
 		synapseClient.updateFileEntity(fileEntity, copyRequest, entityUpdatedCallback);
 	}
 	

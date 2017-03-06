@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -31,7 +30,6 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	AuthenticationController authenticationController;
 	GlobalApplicationState globalApplicationState;
 	SynapseClientAsync synapseClient;
-	JSONObjectAdapter jsonObjectAdapter;
 	JiraURLHelper jiraURLHelper;
 	String entityId;
 	Callback finishedCallback;
@@ -43,7 +41,6 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			AccessRequirementDialogView view,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
 			JiraURLHelper jiraURLHelper,
 			WikiPageWidget wikiPageWidget
@@ -52,7 +49,6 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraURLHelper = jiraURLHelper;
 		this.wikiPageWidget = wikiPageWidget;
 		wikiPageWidget.setModifiedCreatedByVisible(false);
@@ -251,25 +247,22 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			throw new IllegalStateException("not a 'User Agreement' requirement type");
 		// create the self-signed access approval, then update this object
 		String principalId = getUserProfile().getOwnerId();
-		Callback onSuccess = new Callback() {
+		AsyncCallback<AccessApproval> callback = new AsyncCallback<AccessApproval>() {
 			@Override
-			public void invoke() {
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+			@Override
+			public void onSuccess(AccessApproval result) {
 				finished();
 			}
 		};
-		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
-			@Override
-			public void invoke(Throwable t) {
-				view.showErrorMessage(t.getMessage());
-			}
-		};
+		
 		GovernanceServiceHelper.signTermsOfUse(
 				principalId, 
 				ar, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
+				synapseClient,
+				callback);
 	}
 
 	public void finished() {

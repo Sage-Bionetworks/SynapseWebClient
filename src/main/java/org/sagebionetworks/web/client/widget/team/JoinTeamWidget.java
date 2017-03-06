@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
@@ -14,7 +15,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -49,7 +49,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private String teamId;
 	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
 	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
 	private Integer requestExpiresInXDays;
@@ -69,8 +68,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public JoinTeamWidget(JoinTeamWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController, 
-			JSONObjectAdapter jsonObjectAdapter,
+			AuthenticationController authenticationController,
 			GWTWrapper gwt,
 			MarkdownWidget wikiPage, 
 			WizardProgressWidget progressWidget
@@ -80,7 +78,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
 		this.wikiPage = wikiPage;
 		this.progressWidget = progressWidget;
@@ -388,31 +385,26 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 
 	
 	public void setLicenseAccepted(AccessRequirement ar) {	
-		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
+		AsyncCallback<AccessApproval> callback = new AsyncCallback<AccessApproval>() {
 			@Override
-			public void invoke(Throwable t) {
-				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + t.getMessage());
-			}
-		};
-		
-		Callback onSuccess = new Callback() {
-			@Override
-			public void invoke() {
+			public void onSuccess(AccessApproval result) {
 				//ToU signed, now try to register for the challenge (will check for other access restrictions before join)
 				sendJoinRequestStep2();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + t.getMessage());
 			}
 		};
 		if (ar instanceof ACTAccessRequirement) {
 			//no need to sign, just continue
-			onSuccess.invoke();
+			callback.onSuccess(null);
 		} else {
 			GovernanceServiceHelper.signTermsOfUse(
 					authenticationController.getCurrentUserPrincipalId(), 
 					ar, 
-					onSuccess, 
-					onFailure, 
-					synapseClient, 
-					jsonObjectAdapter);
+					synapseClient,
+					callback);
 		}
 	}
 	

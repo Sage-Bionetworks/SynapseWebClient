@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,18 +15,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -45,7 +39,6 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.common.io.Files;
 import com.google.gwt.user.client.rpc.RpcTokenException;
 import com.google.gwt.util.tools.shared.Md5Utils;
 import com.google.gwt.util.tools.shared.StringUtils;
@@ -188,7 +181,7 @@ public class FileHandleServlet extends HttpServlet {
 				} catch (SynapseException e1) { 
 					throw new ServletException(e);
 				}				
-			}			
+			}
 		} catch (SynapseException e) {
 			//redirect to error place with an entry
 			LogEntry entry = new LogEntry();
@@ -287,18 +280,24 @@ public class FileHandleServlet extends HttpServlet {
 			throws ClientProtocolException, IOException {
 		if (resolvedUrl != null){
 			if (isProxy) {
-				//do the get
-				HttpGet httpGet = new HttpGet(resolvedUrl.toString());
-				//copy headers
-				Enumeration<?> headerValues = request.getHeaders("Cookie");
-				while (headerValues.hasMoreElements()) {
-					String headerValue = (String) headerValues.nextElement();
-					httpGet.addHeader("Cookie", headerValue);
-				}
-				HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
-				HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
-				if (responseEntity != null) {
-					responseEntity.writeTo(response.getOutputStream());
+				CloseableHttpClient client = HttpClients.createDefault();
+				try {
+					// do the get
+					HttpGet httpGet = new HttpGet(resolvedUrl.toString());
+					//copy headers
+					Enumeration<?> headerValues = request.getHeaders("Cookie");
+					while (headerValues.hasMoreElements()) {
+						String headerValue = (String) headerValues.nextElement();
+						httpGet.addHeader("Cookie", headerValue);
+					}
+					HttpResponse newResponse = client.execute(httpGet);
+					HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
+					if (responseEntity != null) {
+						responseEntity.writeTo(response.getOutputStream());
+						response.setContentType(responseEntity.getContentType().getValue());
+					}
+				} finally {
+					client.close();
 				}
 			}else
 				response.sendRedirect(resolvedUrl.toString());	

@@ -83,6 +83,37 @@ public class RowSetUtilsTest {
 	}
 	
 	@Test
+	public void testUpdateNoChangeIncludeEtag() throws JSONObjectAdapterException {
+		// etag values are always added to changeset (if present)
+		schema = TableModelTestUtils.createColumsWithNames("one", "etag");
+		headers = TableModelTestUtils.buildSelectColumns(schema);
+		RowSet original = new RowSet();
+		rowOne.setRowId(123L);
+		rowTwo.setRowId(456L);
+		original.setRows(Arrays.asList(rowOne, rowTwo));
+		// Clone the data.
+		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
+		List<PartialRow> delta = prs.getRows();
+		assertNotNull(delta);
+		assertEquals(2, delta.size());
+		
+		// one
+		PartialRow pr = delta.get(0);
+		assertNotNull(pr.getValues());
+		assertEquals(1, pr.getValues().size());
+		assertEquals(rowOne.getRowId(), pr.getRowId());
+		assertEquals("1,2", pr.getValues().get(headers.get(1).getId()));
+		// two
+		pr = delta.get(1);
+		assertNotNull(pr.getValues());
+		assertEquals(1, pr.getValues().size());
+		assertEquals(rowTwo.getRowId(), pr.getRowId());
+		assertEquals("2,2", pr.getValues().get(headers.get(1).getId()));
+	}
+
+	
+	@Test
 	public void testUpdateWithChanges() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		rowOne.setRowId(123L);
