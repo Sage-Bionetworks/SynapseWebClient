@@ -7,21 +7,39 @@
 
 	<bh:Div>
 		<bh:Div>
-		    <bh:Strong text="Please tell us about your project" />
+		    <bh:Strong text="Please provide the information below" />
 		</bh:Div>
 		<bh:Div>
 			<b:FormGroup>
-				<b:FormLabel>Project Lead</b:FormLabel>
-				<b:TextBox ui:field="projectLeadField" />
+				<b:FormLabel>Accessors</b:FormLabel>
+				<bh:Div ui:field="accessorsContainer" />
 			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Institution</b:FormLabel>
-				<b:TextBox ui:field="institutionField" />
+			<bh:Div ui:field="ducUI">
+				<b:FormGroup>
+					<b:FormLabel>DUC template</b:FormLabel>
+					<bh:Div ui:field="ducTemplateContainer" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel>Upload DUC</b:FormLabel>
+					<bh:Div ui:field="ducUploadContainer" />
+				</b:FormGroup>
+			</bh:Div>
+			
+			<b:FormGroup ui:field="irbUI">
+				<b:FormLabel>Upload IRB approval</b:FormLabel>
+				<bh:Div ui:field="irbUploadContainer" />
 			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Intended Data Use Statement</b:FormLabel>
-				<bh:Italic ui:field="visibleToPublicNote" visible="false" text=" - this will be visible to the public" />
-				<b:TextArea ui:field="intendedDataUseStatementField" />
+			<b:FormGroup ui:field="otherUploadUI">
+				<b:FormLabel>Upload other required documents</b:FormLabel>
+				<bh:Div ui:field="otherUploadContainer" />
+			</b:FormGroup>
+			<b:FormGroup ui:field="publicationsUI" visible="false">
+				<b:FormLabel>Publication(s)</b:FormLabel>
+				<b:TextArea ui:field="publicationsField" />
+			</b:FormGroup>
+			<b:FormGroup ui:field="summaryOfUseUI" visible="false">
+				<b:FormLabel>Summary of use</b:FormLabel>
+				<b:TextArea ui:field="summaryOfUseField" />
 			</b:FormGroup>
 		</bh:Div>
 	</bh:Div>
