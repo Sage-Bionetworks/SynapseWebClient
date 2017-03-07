@@ -233,6 +233,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
+		hideTabs();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {

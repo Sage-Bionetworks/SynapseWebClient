@@ -61,7 +61,7 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				modal.hide();
+				presenter.cancel();
 			}
 		});
 		

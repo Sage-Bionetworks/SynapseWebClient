@@ -94,6 +94,13 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	@Override
 	public void onSave() {
 		synAlert.clear();
+		storage.setItem("discussion", "true");
+		hide();
+	}
+	
+	@Override
+	public void cancel() {
+		synAlert.clear();
 		hide();
 	}
 

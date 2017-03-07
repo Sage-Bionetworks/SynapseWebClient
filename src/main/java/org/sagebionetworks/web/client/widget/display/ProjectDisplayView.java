@@ -16,6 +16,8 @@ public interface ProjectDisplayView {
 		void clear();
 
 		void configure(Entity entity, String userId, Callback callback);
+
+		void cancel();
 		
 	}
 
