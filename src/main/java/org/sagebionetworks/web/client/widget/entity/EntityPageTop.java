@@ -17,8 +17,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -75,7 +73,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private boolean annotationsShown;
 	private CookieProvider cookies;
 	private SessionStorage storage;
-	private JSONObjectAdapter jsonObjectAdapter;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -91,8 +88,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
 			CookieProvider cookies,
-			SessionStorage storage,
-			JSONObjectAdapter jsonObjectAdapter) {
+			SessionStorage storage) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -107,7 +103,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.actionMenu = actionMenu;
 		this.cookies = cookies;
 		this.storage = storage;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -128,6 +123,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		});
 	}
 	private void initTabs() {
+		hideTabs();
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab.asTab());
@@ -245,7 +241,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 				configureCurrentAreaTab();
-				hideTabs();
 			}
 			
 			
@@ -260,8 +255,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
     
     private void hideTabs() {
-		// TODO Auto-generated method stub
-    	synapseClient.getCountsForTabs(entity, new AsyncCallback<ProjectDisplayBundle>() {
+		synapseClient.getCountsForTabs(entity, new AsyncCallback<ProjectDisplayBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -271,11 +265,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
-				wikiTab.asTab().setTabListItemVisible(result.wikiHasContent());
-				filesTab.asTab().setTabListItemVisible(result.filesHasContent());
-				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent());
-				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent());
-				dockerTab.asTab().setTabListItemVisible(result.dockerHasContent());
+				boolean wiki = Boolean.parseBoolean(storage.getItem("wiki"));
+				wikiTab.asTab().setTabListItemVisible(result.wikiHasContent() || wiki);
+				boolean files = Boolean.parseBoolean(storage.getItem("files"));
+				filesTab.asTab().setTabListItemVisible(result.filesHasContent() || files);
+				boolean tables = Boolean.parseBoolean(storage.getItem("tables"));
+				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent() || tables);
+				boolean discussion = Boolean.parseBoolean(storage.getItem("discussion"));
+				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent() || discussion);
+				boolean docker = Boolean.parseBoolean(storage.getItem("docker"));
+				dockerTab.asTab().setTabListItemVisible(result.dockerHasContent() || docker);
 			}
 			
 		});
