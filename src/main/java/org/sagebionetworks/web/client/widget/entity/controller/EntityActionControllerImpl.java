@@ -321,8 +321,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProjectDisplay() {
-		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, true);
-		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, true);	
+		if (permissions.getCanEdit()) {
+			actionMenu.setActionVisible(Action.PROJECT_DISPLAY, true);
+			actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, true);	
+		} else {
+			actionMenu.setActionVisible(Action.PROJECT_DISPLAY, false);
+			actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, false);
+		}
 		actionMenu.setActionListener(Action.PROJECT_DISPLAY, this);
 	}
 	
