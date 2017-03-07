@@ -137,7 +137,7 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	}
 	
 	@Override
-	public void openWindow(String url) {
-		DisplayUtils.newWindow(url, "_self", "");
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message, "");
 	}
 }

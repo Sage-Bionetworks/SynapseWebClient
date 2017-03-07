@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequest;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -15,11 +17,14 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,7 +44,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	FileHandleUploadWidget ducUploader, irbUploader, otherUploader;
 	SynapseJSNIUtils jsniUtils;
 	AuthenticationController authController;
-	DataAccessRequest dataAccessRequest;
+	DataAccessRequestInterface dataAccessRequest;
+	UserBadgeList accessorsList;
 	
 	@Inject
 	public CreateDataAccessSubmissionStep2(
@@ -51,7 +57,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			FileHandleUploadWidget otherDocumentUploader,
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authController,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			UserBadgeList accessorsList) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -59,9 +66,12 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 		this.authController = authController;
+		this.accessorsList = accessorsList;
+		view.setAccessorListWidget(accessorsList);
 		view.setDUCTemplateFileWidget(templateFileRenderer.asWidget());
 		view.setDUCUploadWidget(ducUploader.asWidget());
 		view.setIRBUploadWidget(irbUploader.asWidget());
+		accessorsList.setCanDelete(true);
 		ducUploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
@@ -109,18 +119,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.addOtherDocumentUploaded(fileHandleWidget);
 	}
 	
-	public void getDataAccessRequestFileHandleUrlAndOpen(String fileHandleId) {
-		String xsrfToken = authController.getCurrentXsrfToken();
-		//TODO: change FileHandleAssociateType to the correct type
-		String url = jsniUtils.getFileHandleAssociationUrl(dataAccessRequest.getId(), FileHandleAssociateType.SubmissionAttachment, fileHandleId, xsrfToken);
-		view.openWindow(url);
-	}
-	
-	public void getRawFileHandleUrlAndOpen(String fileHandleId) {
-		String url = jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + fileHandleId;
-		view.openWindow(url);
-	}
-	
 	/**
 	 * Configure this widget before use.
 	 */
@@ -130,6 +128,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setIRBVisible(ar.getIsIRBApprovalRequired());
 		view.setDUCVisible(ar.getIsDUCRequired());
 		view.clearOtherDocumentsUploaded();
+		view.setPublicationsVisible(false);
+		view.setSummaryOfUseVisible(false);
 		view.setOtherDocumentUploadVisible(ar.getAreOtherAttachmentsRequired());
 		if (ar.getDucTemplateFileHandleId() != null) {
 			FileHandleAssociation fha = new FileHandleAssociation();
@@ -140,23 +140,90 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			templateFileRenderer.configure(fha);
 		}
 
-		// TODO: retrieve a suitable request object to start with, /accessRequirement/{id}/dataAccessRequestForUpdate
-		
+		// retrieve a suitable request object to start with
+		client.getDataAccessRequest(ar.getId(), new AsyncCallback<DataAccessRequestInterface>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				modalPresenter.setErrorMessage(caught.getMessage());
+			}
+			
+			@Override
+			public void onSuccess(DataAccessRequestInterface dataAccessRequest) {
+				CreateDataAccessSubmissionStep2.this.dataAccessRequest = dataAccessRequest;
+				boolean isRenewal = dataAccessRequest instanceof DataAccessRenewal;
+				view.setPublicationsVisible(isRenewal);
+				view.setSummaryOfUseVisible(isRenewal);
+				if (isRenewal) {
+					view.setPublications(((DataAccessRenewal)dataAccessRequest).getPublication());
+					view.setSummaryOfUse(((DataAccessRenewal)dataAccessRequest).getSummaryOfUse());
+				}
+				if (dataAccessRequest.getDucFileHandleId() != null) {
+					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getDucFileHandleId());
+					view.setDUCUploadedFileWidget(fileHandleWidget);
+				}
+				if (dataAccessRequest.getIrbFileHandleId() != null) {
+					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getIrbFileHandleId());
+					view.setIRBUploadedFileWidget(fileHandleWidget);
+				}
+				
+				initAttachments();
+				initAccessors();
+			}
+		});
 	}
 	
-	private void createDataAccessSubmission() {
+	public FileHandleWidget getFileHandleWidget(String fileHandleId) {
+		FileHandleWidget fileHandleWidget = ginInjector.getFileHandleWidget();
+		FileHandleAssociation fha = new FileHandleAssociation();
+		//TODO: set to new FileHandleAssociateType (data access request)
+		fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
+		fha.setAssociateObjectId(ar.getId().toString());
+		fha.setFileHandleId(fileHandleId);
+		fileHandleWidget.configure(fha);
+		return fileHandleWidget;
+	}
+	
+	
+	public void initAttachments() {
+		view.clearOtherDocumentsUploaded();
+		for (String fileHandleId : dataAccessRequest.getAttachments()) {
+			FileHandleWidget fileHandleWidget = getFileHandleWidget(fileHandleId);
+			view.addOtherDocumentUploaded(fileHandleWidget);
+		}
+	}
+	
+	public void initAccessors() {
+		accessorsList.clear();
+		for (String userId : dataAccessRequest.getAccessors()) {
+			accessorsList.addUserBadge(userId);
+		}
+	}
+	
+	private void updateDataAccessRequest(final boolean isSubmit) {
 		modalPresenter.setLoading(true);
-		//TODO: support accessor user list
-//		dataAccessRequest.setAccessors(accessors);
-		dataAccessRequest.setResearchProjectId(researchProject.getId());
+		dataAccessRequest.setAccessors(accessorsList.getUserIds());
 		
-		//TODO: create data access submission
+		client.updateDataAccessRequest(dataAccessRequest, isSubmit, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				modalPresenter.setErrorMessage(caught.getMessage());
+			}
+			
+			@Override
+			public void onSuccess(Void result) {
+				if (isSubmit) {
+					view.showInfo("Your data access request has been successfully submitted for review.");
+				} else {
+					view.showInfo("Saved your progress...");
+				}
+			}
+		});
 	}
 
 	@Override
 	public void onPrimary() {
 		// TODO: validate values from the view
-		createDataAccessSubmission();
+		updateDataAccessRequest(true);
 	}
 
 	@Override
@@ -180,6 +247,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				//TODO: need to check to see if the user would like to discard changes.
 				// if Discard recent changes, then do nothing.
 				// if Save, then update the DataAccessRequest/DataAccessRenewal
+				updateDataAccessRequest(false);
 			}
 		});
 	}
