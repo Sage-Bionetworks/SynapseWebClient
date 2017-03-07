@@ -82,7 +82,7 @@ public class ProjectDisplay implements ProjectDisplayView {
 	
 	public void hide() {
 		view.hide();
-		callback.i
+		callback.invoke();
 	}
 	
 	@Override
