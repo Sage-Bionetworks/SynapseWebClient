@@ -17,8 +17,11 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -38,6 +41,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -70,6 +74,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
 	private CookieProvider cookies;
+	private SessionStorage storage;
+	private JSONObjectAdapter jsonObjectAdapter;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -84,7 +90,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			DockerTab dockerTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			SessionStorage storage,
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -98,6 +106,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.controller = controller;
 		this.actionMenu = actionMenu;
 		this.cookies = cookies;
+		this.storage = storage;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -168,6 +178,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureDockerTab();
 			};
 		});
+		
 	}
 	
     /**
@@ -234,8 +245,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 				configureCurrentAreaTab();
+				hideTabs();
 			}
 			
+			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				projectBundleLoadError = caught;
@@ -244,6 +258,28 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
+    
+    private void hideTabs() {
+		// TODO Auto-generated method stub
+    	synapseClient.getCountsForTabs(entity, new AsyncCallback<ProjectDisplayBundle>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage("BOOO");
+				
+			}
+
+			@Override
+			public void onSuccess(ProjectDisplayBundle result) {
+				wikiTab.asTab().setTabListItemVisible(result.wikiHasContent());
+				filesTab.asTab().setTabListItemVisible(result.filesHasContent());
+				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent());
+				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent());
+				dockerTab.asTab().setTabListItemVisible(result.dockerHasContent());
+			}
+			
+		});
+	}
 
 	public void configureCurrentAreaTab() {
 		// set all content stale
