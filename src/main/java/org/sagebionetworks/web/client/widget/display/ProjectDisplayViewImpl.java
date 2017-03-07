@@ -98,18 +98,6 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	}
 
 	@Override
-	public void onSave() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void configure(Entity entity, String userId, Callback callback) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void setWiki(boolean value) {
 		wikiButton.setValue(value);
 	}

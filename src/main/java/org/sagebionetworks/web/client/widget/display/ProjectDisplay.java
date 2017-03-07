@@ -11,11 +11,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProjectDisplay implements ProjectDisplayView {
+public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	ProjectDisplayView view;
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
@@ -39,6 +38,7 @@ public class ProjectDisplay implements ProjectDisplayView {
 		this.cookies = cookies;
 		this.storage = storage;
 		view.setSynAlertWidget(synAlert);
+		view.setPresenter(this);
 	}
 
 	@Override
@@ -97,17 +97,4 @@ public class ProjectDisplay implements ProjectDisplayView {
 		hide();
 	}
 
-
-	@Override
-	public void setSynAlertWidget(IsWidget asWidget) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		// TODO Auto-generated method stub
-		
-	}
 }

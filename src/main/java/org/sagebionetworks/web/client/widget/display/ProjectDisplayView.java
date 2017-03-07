@@ -14,6 +14,8 @@ public interface ProjectDisplayView {
 		void onSave();
 
 		void clear();
+
+		void configure(Entity entity, String userId, Callback callback);
 		
 	}
 
@@ -28,10 +30,6 @@ public interface ProjectDisplayView {
 	void hide();
 
 	void show();
-
-	void onSave();
-
-	void configure(Entity entity, String userId, Callback callback);
 
 	void setWiki(boolean value);
 	void setFiles(boolean value);
