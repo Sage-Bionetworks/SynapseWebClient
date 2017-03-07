@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.display;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -66,11 +68,6 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	}
 	
 	@Override
-	public void configure() {
-		
-	}
-	
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}
@@ -104,6 +101,37 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	public void onSave() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void configure(Entity entity, String userId, Callback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setWiki(boolean value) {
+		wikiButton.setValue(value);
+	}
+	@Override
+	public void setFiles(boolean value) {
+		filesButton.setValue(value);
+	}
+	@Override
+	public void setTables(boolean value) {
+		tablesButton.setValue(value);
+	}
+	@Override
+	public void setChallenge(boolean value) {
+		challengeButton.setValue(value);
+	}
+	@Override
+	public void setDiscussion(boolean value) {
+		discussionButton.setValue(value);
+	}
+	@Override
+	public void setDocker(boolean value) {
+		dockerButton.setValue(value);
 	}
 }
 

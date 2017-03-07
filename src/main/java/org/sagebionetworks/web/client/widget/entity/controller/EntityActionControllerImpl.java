@@ -799,7 +799,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onProjectDisplay() {
-		getProjectDisplayModal().configure();
+		getProjectDisplayModal().configure(entity, authenticationController.getCurrentUserPrincipalId(), new Callback() {
+			@Override
+			public void invoke() {
+				getGlobalApplicationState().refreshPage();
+			}
+		});
 		getProjectDisplayModal().show();
 		
 	}
