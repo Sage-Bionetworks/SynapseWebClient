@@ -18,6 +18,8 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setIRBUploadedFileWidget(IsWidget w);
 	void setOtherDocumentUploadVisible(boolean visible);
 	void setOtherDocumentUploadWidget(IsWidget w);
+	void clearOtherDocumentsUploaded();
+	void addOtherDocumentUploaded(IsWidget w);
 	void setAccessorListWidget(IsWidget w);
 	
 	void setPublicationsVisible(boolean visible);
@@ -27,4 +29,5 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setSummaryOfUseVisible(boolean visible);
 	void setSummaryOfUse(String text);
 	String getSummaryOfUse();
+	void openWindow(String url);
 }

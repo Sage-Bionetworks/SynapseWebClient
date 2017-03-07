@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -22,9 +23,16 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@UiField
 	Div ducUploadContainer;
 	@UiField
+	Div ducUploadedContainer;
+	@UiField
 	Div irbUploadContainer;
 	@UiField
+	Div irbUploadedContainer;
+	@UiField
 	Div otherUploadContainer;
+	@UiField
+	Div otherUploadedContainer;
+
 	@UiField
 	FormGroup publicationsUI;
 	@UiField
@@ -84,6 +92,14 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 		otherUploadContainer.add(w);
 	}
 	@Override
+	public void clearOtherDocumentsUploaded() {
+		otherUploadedContainer.clear();	
+	}
+	@Override
+	public void addOtherDocumentUploaded(IsWidget w) {
+		otherUploadedContainer.add(w);
+	}
+	@Override
 	public void setPublicationsVisible(boolean visible) {
 		publicationsUI.setVisible(visible);
 	}
@@ -107,5 +123,21 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	public void setPublications(String text) {
 		publicationsField.setText(text);
 	}
+
+	@Override
+	public void setDUCUploadedFileWidget(IsWidget w) {
+		ducUploadedContainer.clear();
+		ducUploadedContainer.add(w);
+	}
 	
+	@Override
+	public void setIRBUploadedFileWidget(IsWidget w) {
+		irbUploadedContainer.clear();
+		irbUploadedContainer.add(w);
+	}
+	
+	@Override
+	public void openWindow(String url) {
+		DisplayUtils.newWindow(url, "_self", "");
+	}
 }

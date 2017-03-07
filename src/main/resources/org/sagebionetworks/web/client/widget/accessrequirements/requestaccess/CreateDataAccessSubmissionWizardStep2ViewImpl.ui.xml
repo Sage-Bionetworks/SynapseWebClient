@@ -21,16 +21,19 @@
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>Upload DUC</b:FormLabel>
+					<bh:Div ui:field="ducUploadedContainer" />
 					<bh:Div ui:field="ducUploadContainer" />
 				</b:FormGroup>
 			</bh:Div>
 			
 			<b:FormGroup ui:field="irbUI">
 				<b:FormLabel>Upload IRB approval</b:FormLabel>
+				<bh:Div ui:field="irbUploadedContainer" />
 				<bh:Div ui:field="irbUploadContainer" />
 			</b:FormGroup>
 			<b:FormGroup ui:field="otherUploadUI">
 				<b:FormLabel>Upload other required documents</b:FormLabel>
+				<bh:Div ui:field="otherUploadedContainer" />
 				<bh:Div ui:field="otherUploadContainer" />
 			</b:FormGroup>
 			<b:FormGroup ui:field="publicationsUI" visible="false">
