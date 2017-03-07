@@ -52,7 +52,7 @@ public class TeamMemberCountWidgetTest {
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
 		
-		AsyncMockStubber.callSuccessWith(getTestUserProfilePagedResults()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(getTestUserProfilePagedResults()).when(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
 	}
 
 	public TeamMemberPagedResults getTestUserProfilePagedResults() {
@@ -77,27 +77,27 @@ public class TeamMemberCountWidgetTest {
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynAlert).clear();
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
 		verify(mockView).setCount(TOTAL_COUNT.toString());
 	}
 	
 
 	@Test
 	public void testHappyCaseNoParticipants() throws Exception {
-		AsyncMockStubber.callSuccessWith(getEmptyUserProfilePagedResults()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(getEmptyUserProfilePagedResults()).when(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynAlert).clear();
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
 		verify(mockView).setCount("0");
 	}
 	
 	@Test
 	public void testGetChallengeTeamsFailure() throws Exception {
 		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynAlert).clear();
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamMemberCount(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}
 	
