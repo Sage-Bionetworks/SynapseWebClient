@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -67,6 +68,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private DockerTab dockerTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
+	private AuthenticationController authenticationController;
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
@@ -77,6 +79,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
+			AuthenticationController authenticationController,
 			Tabs tabs,
 			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
@@ -91,6 +94,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			SessionStorage storage) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.authenticationController = authenticationController;
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;
@@ -266,15 +270,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
-				boolean wiki = Boolean.parseBoolean(storage.getItem("wiki"));
+				String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
+				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + "wiki"));
 				wikiTab.asTab().setTabListItemVisible(result.wikiHasContent() || wiki);
-				boolean files = Boolean.parseBoolean(storage.getItem("files"));
+				boolean files = Boolean.parseBoolean(storage.getItem(tag + "files"));
 				filesTab.asTab().setTabListItemVisible(result.filesHasContent() || files);
-				boolean tables = Boolean.parseBoolean(storage.getItem("tables"));
+				boolean tables = Boolean.parseBoolean(storage.getItem(tag + "tables"));
 				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent() || tables);
-				boolean discussion = Boolean.parseBoolean(storage.getItem("discussion"));
+				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + "discussion"));
 				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent() || discussion);
-				boolean docker = Boolean.parseBoolean(storage.getItem("docker"));
+				boolean docker = Boolean.parseBoolean(storage.getItem(tag + "docker"));
 				dockerTab.asTab().setTabListItemVisible(result.dockerHasContent() || docker);
 			}
 			

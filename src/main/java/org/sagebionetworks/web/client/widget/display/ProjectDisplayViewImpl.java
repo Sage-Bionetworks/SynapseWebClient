@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -84,7 +85,12 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	
 	@Override
 	public void clear() {
-		
+		setWiki(false);
+		setFiles(false);
+		setTables(false);
+		setChallenge(false);
+		setDiscussion(false);
+		setDocker(false);
 	}
 	
 	@Override
@@ -120,6 +126,31 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	@Override
 	public void setDocker(boolean value) {
 		dockerButton.setValue(value);
+	}
+	
+	@Override
+	public boolean getWiki() {
+		return wikiButton.getValue();
+	}
+	@Override
+	public boolean getFiles() {
+		return filesButton.getValue();
+	}
+	@Override
+	public boolean getTables() {
+		return tablesButton.getValue();
+	}
+	@Override
+	public boolean getChallenge() {
+		return challengeButton.getValue();
+	}
+	@Override
+	public boolean getDiscussion() {
+		return discussionButton.getValue();
+	}
+	@Override
+	public boolean getDocker() {
+		return dockerButton.getValue();
 	}
 }
 
