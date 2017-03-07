@@ -24,12 +24,12 @@ public interface ACTAccessRequirementWidgetView extends IsWidget {
 	void showUpdateRequestButton();
 	void showRequestAccessButton();
 	void resetState();
+	void setDataAccessRequestWizard(IsWidget w);
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onCancelRequest();
-		void onUpdateRequest();
 		void onRequestAccess();
 	}
 

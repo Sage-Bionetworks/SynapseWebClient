@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,7 +39,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Button updateRequestButton;
 	@UiField
 	Button requestAccessButton;
-	
+	@UiField
+	Div requestDataAccessWizardContainer;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
 	
@@ -57,7 +59,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		updateRequestButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onUpdateRequest();
+				presenter.onRequestAccess();
 			}
 		});
 		requestAccessButton.addClickHandler(new ClickHandler() {
@@ -132,6 +134,11 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		updateRequestButton.setVisible(true);
 	}
 	
+	@Override
+	public void setDataAccessRequestWizard(IsWidget w) {
+		requestDataAccessWizardContainer.clear();
+		requestDataAccessWizardContainer.add(w);
+	}
 	@Override
 	public void resetState() {
 		approvedHeading.setVisible(false);

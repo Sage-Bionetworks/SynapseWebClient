@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.ModalSize;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,7 +17,7 @@ import com.google.inject.Inject;
  */
 public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardView.Presenter, ModalPage.ModalPresenter, IsWidget {
 
-	WizardCallback callback;
+	List<WizardCallback> callbacks;
 	ModalPage currentPage;
 	ModalPage firstPage;
 	ModalWizardView view;
@@ -23,6 +26,7 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	public ModalWizardWidgetImpl(ModalWizardView view){
 		this.view = view;
 		this.view.setPresenter(this);
+		callbacks = new ArrayList<WizardCallback>();
 	}
 	
 	@Override
@@ -38,8 +42,10 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 
 	@Override
 	public void onCancel() {
-		if(this.callback != null){
-			this.callback.onCanceled();
+		if(!callbacks.isEmpty()){
+			for (WizardCallback callback : callbacks) {
+				callback.onCanceled();
+			}
 		}
 		this.view.hideModal();
 	}
@@ -78,8 +84,8 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 
 	@Override
 	public void onFinished() {
-		if(callback != null){
-			this.callback.onFinished();
+		for (WizardCallback callback : callbacks) {
+			callback.onFinished();
 		}
 		this.view.hideModal();
 	}
@@ -97,13 +103,21 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	@Override
 	public void showModal(WizardCallback callback) {
 		setNextActivePage(this.firstPage);
-		this.callback = callback;
+		addCallback(callback);
 		this.view.showModal();
 	}
 
 	@Override
+	public void addCallback(WizardCallback callback) {
+		if (callback != null) {
+			callbacks.add(callback);	
+		}
+	}
+	
+	@Override
 	public void configure(ModalPage firstPage) {
 		this.firstPage = firstPage;
+		callbacks.clear();
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -139,5 +140,13 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message, "");
+	}
+	@Override
+	public void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback
+			) {
+		DisplayUtils.showConfirmDialog(title, message, yesCallback);
 	}
 }

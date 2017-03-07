@@ -3,9 +3,12 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -19,15 +22,18 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
 	ACTAccessRequirement ar;
+	PortalGinInjector ginInjector;
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
 			WikiPageWidget wikiPageWidget,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
+		this.ginInjector = ginInjector;
 		wikiPageWidget.setModifiedCreatedByVisible(false);
 		wikiPageWidget.showWikiHistory(false);
 		view.setPresenter(this);
@@ -48,7 +54,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
  		}
 	}
 	
-	public void setState() {
+	public void refresh() {
 		//TODO:  set up view based on DataAccessSubmission state
 		view.resetState();
 		
@@ -61,12 +67,23 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	@Override
 	public void onRequestAccess() {
-		//TODO: pop up DataAccessRequest dialog
-	}
-	
-	@Override
-	public void onUpdateRequest() {
-		//TODO: pop up DataAccessSubmission dialog (with existing submission)
+		//pop up DataAccessRequest dialog
+		CreateDataAccessRequestWizard wizard = ginInjector.getCreateDataAccessRequestWizard();
+		view.setDataAccessRequestWizard(wizard);
+		wizard.configure(ar);
+		wizard.showModal(new WizardCallback() {
+			//In any case, the state may have changed, so refresh this AR
+			
+			@Override
+			public void onFinished() {
+				refresh();
+			}
+			
+			@Override
+			public void onCanceled() {
+				refresh();
+			}
+		});
 	}
 	
 	public void addStyleNames(String styleNames) {

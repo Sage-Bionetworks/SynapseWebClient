@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessRequest;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
@@ -15,9 +14,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
@@ -235,8 +234,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	public void setModalPresenter(ModalPresenter modalPresenter) {
 		this.modalPresenter = modalPresenter;
 		modalPresenter.setPrimaryButtonText(DisplayConstants.SUBMIT);
-		((ModalWizardWidget)modalPresenter).configure(this);
-		((ModalWizardWidget)modalPresenter).showModal(new ModalWizardWidget.WizardCallback() {
+		((ModalWizardWidget)modalPresenter).addCallback(new ModalWizardWidget.WizardCallback() {
 			
 			@Override
 			public void onFinished() {
@@ -244,10 +242,14 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			
 			@Override
 			public void onCanceled() {
-				//TODO: need to check to see if the user would like to discard changes.
-				// if Discard recent changes, then do nothing.
-				// if Save, then update the DataAccessRequest/DataAccessRenewal
-				updateDataAccessRequest(false);
+				// check to see if the user would like to discard changes.
+				// if saving, then update the DataAccessRequest/DataAccessRenewal (but do not submit)
+				view.showConfirmDialog("Save?","Would you want to save your recent changes?", new Callback() {
+					@Override
+					public void invoke() {
+						updateDataAccessRequest(false);
+					}
+				});
 			}
 		});
 	}
