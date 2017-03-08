@@ -6,13 +6,14 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<bh:Div>
-		    <bh:Strong text="Please provide the information below" />
-		</bh:Div>
+		<b:FieldSet>
+			<b:Legend text="Please provide the information below"></b:Legend>
+		</b:FieldSet>
 		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel>Accessors</b:FormLabel>
 				<bh:Div ui:field="accessorsContainer" />
+				<bh:Div ui:field="peopleSuggestContainer" />
 			</b:FormGroup>
 			<bh:Div ui:field="ducUI">
 				<b:FormGroup>

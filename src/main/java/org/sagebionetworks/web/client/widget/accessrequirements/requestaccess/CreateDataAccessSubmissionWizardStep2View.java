@@ -27,6 +27,7 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setPublicationsVisible(boolean visible);
 	void setPublications(String text);
 	String getPublications();
+	void setPeopleSuggestWidget(IsWidget w);
 	
 	void setSummaryOfUseVisible(boolean visible);
 	void setSummaryOfUse(String text);

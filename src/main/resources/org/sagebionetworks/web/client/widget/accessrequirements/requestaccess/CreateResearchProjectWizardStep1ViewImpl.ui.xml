@@ -6,9 +6,9 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<bh:Div>
-		    <bh:Strong text="Please tell us about your project" />
-		</bh:Div>
+		<b:FieldSet>
+			<b:Legend text="Please tell us about your project"></b:Legend>
+		</b:FieldSet>
 		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel>Project Lead</b:FormLabel>

@@ -20,6 +20,8 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@UiField
 	Div accessorsContainer;
 	@UiField
+	Div peopleSuggestContainer;
+	@UiField
 	Div ducTemplateContainer;
 	@UiField
 	Div ducUploadContainer;
@@ -46,7 +48,8 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	Div ducUI;
 	@UiField
 	FormGroup irbUI;
-	
+	@UiField
+	FormGroup otherUploadUI;
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -70,7 +73,7 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	}
 	@Override
 	public void setOtherDocumentUploadVisible(boolean visible) {
-		otherUploadContainer.setVisible(visible);
+		otherUploadUI.setVisible(visible);
 	}
 	@Override
 	public void setAccessorListWidget(IsWidget w) {
@@ -148,5 +151,10 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 			Callback yesCallback
 			) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
+	}
+	@Override
+	public void setPeopleSuggestWidget(IsWidget w) {
+		peopleSuggestContainer.clear();
+		peopleSuggestContainer.add(w);
 	}
 }

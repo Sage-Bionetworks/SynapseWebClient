@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
@@ -13,11 +15,15 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -45,6 +51,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	AuthenticationController authController;
 	DataAccessRequestInterface dataAccessRequest;
 	UserBadgeList accessorsList;
+	private SynapseSuggestBox peopleSuggestWidget;
 	
 	@Inject
 	public CreateDataAccessSubmissionStep2(
@@ -57,7 +64,9 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authController,
 			PortalGinInjector ginInjector,
-			UserBadgeList accessorsList) {
+			final UserBadgeList accessorsList,
+			SynapseSuggestBox peopleSuggestBox,
+			UserGroupSuggestionProvider provider) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -70,6 +79,10 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setDUCTemplateFileWidget(templateFileRenderer.asWidget());
 		view.setDUCUploadWidget(ducUploader.asWidget());
 		view.setIRBUploadWidget(irbUploader.asWidget());
+		view.setPeopleSuggestWidget(peopleSuggestBox.asWidget());
+		this.peopleSuggestWidget = peopleSuggestBox;
+		peopleSuggestWidget.setSuggestionProvider(provider);
+		peopleSuggestWidget.setPlaceholderText("Enter the user name if there are other accessors...");
 		accessorsList.setCanDelete(true);
 		ducUploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
@@ -90,6 +103,12 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			public void invoke(FileUpload fileUpload) {
 				addOtherDocumentFileHandle(fileUpload.getFileMeta().getFileName(), fileUpload.getFileHandleId());
 			}
+		});
+		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+			public void invoke(SynapseSuggestion suggestion) {
+				peopleSuggestWidget.clear();
+				accessorsList.addUserBadge(suggestion.getId());
+			};
 		});
 	}
 	
@@ -124,12 +143,13 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	public void configure(ResearchProject researchProject, ACTAccessRequirement ar) {
 		this.ar = ar;
 		this.researchProject = researchProject;
-		view.setIRBVisible(ar.getIsIRBApprovalRequired());
-		view.setDUCVisible(ar.getIsDUCRequired());
+		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));
+		view.setDUCVisible(ValidationUtils.isTrue(ar.getIsDUCRequired()));
 		view.clearOtherDocumentsUploaded();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
-		view.setOtherDocumentUploadVisible(ar.getAreOtherAttachmentsRequired());
+		peopleSuggestWidget.clear();
+		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		if (ar.getDucTemplateFileHandleId() != null) {
 			FileHandleAssociation fha = new FileHandleAssociation();
 			//TODO: set to new FileHandleAssociateType (Access Requirement)
@@ -185,15 +205,22 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	
 	public void initAttachments() {
 		view.clearOtherDocumentsUploaded();
-		for (String fileHandleId : dataAccessRequest.getAttachments()) {
-			FileHandleWidget fileHandleWidget = getFileHandleWidget(fileHandleId);
-			view.addOtherDocumentUploaded(fileHandleWidget);
+		if (dataAccessRequest.getAttachments() != null) {
+			for (String fileHandleId : dataAccessRequest.getAttachments()) {
+				FileHandleWidget fileHandleWidget = getFileHandleWidget(fileHandleId);
+				view.addOtherDocumentUploaded(fileHandleWidget);
+			}
 		}
 	}
 	
 	public void initAccessors() {
 		accessorsList.clear();
-		for (String userId : dataAccessRequest.getAccessors()) {
+		Set<String> uniqueAccessors = new HashSet<String>();
+		uniqueAccessors.add(authController.getCurrentUserPrincipalId());
+		if (dataAccessRequest.getAccessors() != null) {
+			uniqueAccessors.addAll(dataAccessRequest.getAccessors());
+		}
+		for (String userId : uniqueAccessors) {
 			accessorsList.addUserBadge(userId);
 		}
 	}
