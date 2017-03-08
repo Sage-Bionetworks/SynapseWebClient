@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -72,6 +73,7 @@ public class FileHandleWidget implements IsWidget {
 	}
 	
 	public String createAnchorHref(String rawFileHandleId) {
-		return	jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + rawFileHandleId;
+		String xsrfToken = authController.getCurrentXsrfToken();
+		return	jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + rawFileHandleId + "&" + WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
 }

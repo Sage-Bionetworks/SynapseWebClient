@@ -15,6 +15,7 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setDUCUploadWidget(IsWidget w);
 	void setDUCUploadedFileWidget(IsWidget w);
 	void setDUCTemplateFileWidget(IsWidget w);
+	void setDUCTemplateVisible(boolean visible);
 	void setIRBVisible(boolean visible);
 	void setIRBUploadWidget(IsWidget w);
 	void setIRBUploadedFileWidget(IsWidget w);

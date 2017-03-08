@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -32,7 +31,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	private PlaceView view;
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
-	private GlobalApplicationState globalAppState;
 	private SynapseClientAsync synapseClient;
 	LoadMoreWidgetContainer loadMoreContainer;
 	public static Long LIMIT = 30L;
@@ -47,14 +45,12 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer, 
 			EntityIdCellRendererImpl entityIdRenderer, 
 			TeamBadge teamBadge) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		this.globalAppState = globalAppState;
 		this.synapseClient = synapseClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.entityIdRenderer = entityIdRenderer;

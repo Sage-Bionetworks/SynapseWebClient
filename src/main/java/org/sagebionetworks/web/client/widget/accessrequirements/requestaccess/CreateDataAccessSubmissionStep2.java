@@ -80,10 +80,11 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setDUCTemplateFileWidget(templateFileRenderer.asWidget());
 		view.setDUCUploadWidget(ducUploader.asWidget());
 		view.setIRBUploadWidget(irbUploader.asWidget());
+		view.setOtherDocumentUploadWidget(otherDocumentUploader.asWidget());
 		view.setPeopleSuggestWidget(peopleSuggestBox.asWidget());
 		this.peopleSuggestWidget = peopleSuggestBox;
 		peopleSuggestWidget.setSuggestionProvider(provider);
-		peopleSuggestWidget.setPlaceholderText("Enter the user name if there are other accessors...");
+		peopleSuggestWidget.setPlaceholderText("Enter the user name of other accessors...");
 		accessorsList.setCanDelete(true);
 		ducUploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
@@ -151,7 +152,9 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setSummaryOfUseVisible(false);
 		peopleSuggestWidget.clear();
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
-		if (ar.getDucTemplateFileHandleId() != null) {
+		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
+		view.setDUCTemplateVisible(isDucTemplate);
+		if (isDucTemplate) {
 			FileHandleAssociation fha = new FileHandleAssociation();
 			//TODO: set to new FileHandleAssociateType (Access Requirement)
 			fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);

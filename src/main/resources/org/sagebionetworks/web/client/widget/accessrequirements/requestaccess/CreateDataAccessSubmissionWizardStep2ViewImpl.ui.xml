@@ -12,30 +12,38 @@
 		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel>Accessors</b:FormLabel>
-				<bh:Div ui:field="accessorsContainer" />
-				<bh:Div ui:field="peopleSuggestContainer" />
+				<b:Panel>
+					<b:PanelBody>
+						<bh:Div ui:field="accessorsContainer" />
+						<bh:Div ui:field="peopleSuggestContainer" />
+					</b:PanelBody>
+				</b:Panel>
 			</b:FormGroup>
 			<bh:Div ui:field="ducUI">
-				<b:FormGroup>
+				<b:FormGroup ui:field="ducTemplateUI">
 					<b:FormLabel>DUC template</b:FormLabel>
-					<bh:Div ui:field="ducTemplateContainer" />
+					<bh:Div ui:field="ducTemplateContainer"/>
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>Upload DUC</b:FormLabel>
-					<bh:Div ui:field="ducUploadedContainer" />
-					<bh:Div ui:field="ducUploadContainer" />
+					<bh:Div ui:field="ducUploadedContainer" addStyleNames="margin-left-15"/>
+					<bh:Div ui:field="ducUploadContainer" addStyleNames="margin-left-15"/>
 				</b:FormGroup>
 			</bh:Div>
 			
 			<b:FormGroup ui:field="irbUI">
 				<b:FormLabel>Upload IRB approval</b:FormLabel>
-				<bh:Div ui:field="irbUploadedContainer" />
-				<bh:Div ui:field="irbUploadContainer" />
+				<bh:Div ui:field="irbUploadedContainer" addStyleNames="margin-left-15"/>
+				<bh:Div ui:field="irbUploadContainer" addStyleNames="margin-left-15"/>
 			</b:FormGroup>
 			<b:FormGroup ui:field="otherUploadUI">
 				<b:FormLabel>Upload other required documents</b:FormLabel>
-				<bh:Div ui:field="otherUploadedContainer" />
-				<bh:Div ui:field="otherUploadContainer" />
+				<b:Panel>
+					<b:PanelBody>
+						<bh:Div ui:field="otherUploadedContainer" />
+						<bh:Div ui:field="otherUploadContainer" />
+					</b:PanelBody>
+				</b:Panel>
 			</b:FormGroup>
 			<b:FormGroup ui:field="publicationsUI" visible="false">
 				<b:FormLabel>Publication(s)</b:FormLabel>

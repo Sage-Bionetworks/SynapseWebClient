@@ -50,6 +50,8 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	FormGroup irbUI;
 	@UiField
 	FormGroup otherUploadUI;
+	@UiField
+	FormGroup ducTemplateUI;
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -156,5 +158,9 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	public void setPeopleSuggestWidget(IsWidget w) {
 		peopleSuggestContainer.clear();
 		peopleSuggestContainer.add(w);
+	}
+	@Override
+	public void setDUCTemplateVisible(boolean visible) {
+		ducTemplateUI.setVisible(visible);
 	}
 }
