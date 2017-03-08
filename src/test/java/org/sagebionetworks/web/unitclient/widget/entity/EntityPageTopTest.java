@@ -53,8 +53,10 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.atlassian.httpclient.api.EntityBuilder.Entity;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -120,6 +122,8 @@ public class EntityPageTopTest {
 	CookieProvider mockCookies;
 	@Mock
 	SessionStorage mockStorage;
+	@Mock
+	ProjectDisplayBundle mockDisplayBundle;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
@@ -153,6 +157,14 @@ public class EntityPageTopTest {
 		when(mockPermissions.getCanModerate()).thenReturn(canModerate);
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
+		
+		AsyncMockStubber.callSuccessWith(mockDisplayBundle).when(mockSynapseClientAsync).getCountsForTabs(any(org.sagebionetworks.repo.model.Entity.class), any(AsyncCallback.class));
+		when(mockDisplayBundle.wikiHasContent()).thenReturn(true);
+		when(mockDisplayBundle.filesHasContent()).thenReturn(true);
+		when(mockDisplayBundle.tablesHasContent()).thenReturn(true);
+		when(mockDisplayBundle.challengeHasContent()).thenReturn(true);
+		when(mockDisplayBundle.discussionHasContent()).thenReturn(true);
+		when(mockDisplayBundle.dockerHasContent()).thenReturn(true);
 		
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
 		when(mockFilesInnerTab.isContentStale()).thenReturn(true);
@@ -446,6 +458,84 @@ public class EntityPageTopTest {
 		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
+	}
+	
+	@Test
+	public void testContentMultipleTabsShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(true);
+	}
+	
+	@Test
+	public void testContentMixtureOfTabsShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
+		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
+		when(mockDisplayBundle.discussionHasContent()).thenReturn(false);
+		when(mockDisplayBundle.dockerHasContent()).thenReturn(false);
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+	}
+	
+	@Test
+	public void testContentOneTabShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockDisplayBundle.filesHasContent()).thenReturn(false);
+		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
+		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
+		when(mockDisplayBundle.discussionHasContent()).thenReturn(false);
+		when(mockDisplayBundle.dockerHasContent()).thenReturn(false);
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		//should hide all tabs when only one will be shown
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+	}
+
+	@Test
+	public void testCachedTabShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		String userId = "1234567";
+		String storageKey = userId + "_" + projectEntityId + "_" + "files";
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
+		when(mockDisplayBundle.filesHasContent()).thenReturn(false);
+		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
+		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
+		when(mockDisplayBundle.discussionHasContent()).thenReturn(false);
+		when(mockDisplayBundle.dockerHasContent()).thenReturn(false);
+		when(mockStorage.getItem(storageKey)).thenReturn("true");
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
 	}
 	
 }
