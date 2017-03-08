@@ -29,11 +29,13 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -75,6 +77,8 @@ public class EntityPageTopTest {
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
 	Tabs mockTabs;
 	@Mock
 	EntityMetadata mockEntityMetadata;
@@ -114,6 +118,8 @@ public class EntityPageTopTest {
 	AccessControlList mockACL;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	SessionStorage mockStorage;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
@@ -132,9 +138,9 @@ public class EntityPageTopTest {
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
-		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
+		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockAuthController, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab,
-				mockEntityActionController, mockActionMenuWidget, mockCookies);
+				mockEntityActionController, mockActionMenuWidget, mockCookies, mockStorage);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
