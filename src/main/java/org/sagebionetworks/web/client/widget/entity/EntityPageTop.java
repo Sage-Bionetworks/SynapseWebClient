@@ -11,6 +11,8 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.*;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -271,15 +273,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
 				String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
-				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + "wiki"));
+				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI));
 				wikiTab.asTab().setTabListItemVisible(result.wikiHasContent() || wiki);
-				boolean files = Boolean.parseBoolean(storage.getItem(tag + "files"));
+				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES));
 				filesTab.asTab().setTabListItemVisible(result.filesHasContent() || files);
-				boolean tables = Boolean.parseBoolean(storage.getItem(tag + "tables"));
+				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES));
 				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent() || tables);
-				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + "discussion"));
+				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION));
 				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent() || discussion);
-				boolean docker = Boolean.parseBoolean(storage.getItem(tag + "docker"));
+				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER));
 				dockerTab.asTab().setTabListItemVisible(result.dockerHasContent() || docker);
 			}
 			

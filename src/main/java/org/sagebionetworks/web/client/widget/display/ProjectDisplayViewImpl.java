@@ -3,9 +3,6 @@ package org.sagebionetworks.web.client.widget.display;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

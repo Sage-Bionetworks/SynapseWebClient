@@ -29,6 +29,13 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	private Callback callback;
 	private ProjectDisplayBundle result;
 	
+	public static final String WIKI = "wiki";
+	public static final String FILES = "files";
+	public static final String TABLES = "tables";
+	public static final String CHALLENGE = "challenge";
+	public static final String DISCUSSION = "discussion";
+	public static final String DOCKER = "docker";
+	
 	@Inject
 	public ProjectDisplay(ProjectDisplayView view,
 			SynapseClientAsync synapseClient, 
@@ -72,15 +79,15 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 			public void onSuccess(ProjectDisplayBundle result) {
 				//hide loading gif
 				ProjectDisplay.this.result = result;
-				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + "wiki")) || result.wikiHasContent();
+				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI)) || result.wikiHasContent();
 				view.setWiki(wiki);
-				boolean files = Boolean.parseBoolean(storage.getItem(tag + "files")) || result.filesHasContent();
+				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES)) || result.filesHasContent();
 				view.setFiles(files);
-				boolean tables = Boolean.parseBoolean(storage.getItem(tag + "tables")) || result.tablesHasContent();
+				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES)) || result.tablesHasContent();
 				view.setTables(tables);
-				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + "discussion")) || result.discussionHasContent();
+				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION)) || result.discussionHasContent();
 				view.setDiscussion(discussion);
-				boolean docker = Boolean.parseBoolean(storage.getItem(tag + "docker")) || result.dockerHasContent();
+				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER)) || result.dockerHasContent();
 				view.setDocker(docker);
 				view.show();
 			}
@@ -104,52 +111,52 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	public void onSave() {
 		synAlert.clear();
 		if (view.getWiki() && !result.wikiHasContent()) {
-			storage.setItem(tag + "wiki", "true");
+			storage.setItem(tag + WIKI, "true");
 		} else if (!view.getWiki() && result.wikiHasContent()) {
 			synAlert.showError("Error: Wiki contains content. Content must be deleted to hide tab.");
 			return;
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + "wiki");
+			storage.removeItem(tag + WIKI);
 		}
 		if (view.getFiles() && !result.filesHasContent()) {
-			storage.setItem(tag + "files", "true");
+			storage.setItem(tag + FILES, "true");
 		} else if (!view.getFiles() && result.filesHasContent()) {
 			synAlert.showError("Error: Files contains content. Content must be deleted to hide tab.");
 			return;
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + "files");
+			storage.removeItem(tag + FILES);
 		}
 		if (view.getTables() && !result.tablesHasContent()) {
-			storage.setItem(tag + "tables", "true");
+			storage.setItem(tag + TABLES, "true");
 		} else if (!view.getTables() && result.tablesHasContent()) {
 			synAlert.showError("Error: Tables contains content. Content must be deleted to hide tab.");
 			return;
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + "tables");
+			storage.removeItem(tag + TABLES);
 		}
 		if (view.getChallenge() && !result.challengeHasContent()) {
-			storage.setItem(tag + "challenge", "true");
+			storage.setItem(tag + CHALLENGE, "true");
 		} else if (!view.getChallenge() && result.challengeHasContent()) {
 			synAlert.showError("Error: Challenge contains content. Content must be deleted to hide tab.");
 			return;
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + "challenge");
+			storage.removeItem(tag + CHALLENGE);
 		}
 		if (view.getDiscussion() && !result.discussionHasContent()) {
-			storage.setItem(tag + "discussion", "true");
+			storage.setItem(tag + DISCUSSION, "true");
 		} else if (!view.getDiscussion() && result.discussionHasContent()) {
 			synAlert.showError("Error: Discussion contains content. Content must be deleted to hide tab.");
 			return;
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + "discussion");
+			storage.removeItem(tag + DISCUSSION);
 		}
 		if (view.getDocker() && !result.dockerHasContent()) {
-			storage.setItem(tag + "docker", "true");
+			storage.setItem(tag + DOCKER, "true");
 		} else if (!view.getDocker() && result.dockerHasContent()) {
 			synAlert.showError("Error: Docker contains content. Content must be deleted to hide tab.");
 			return;
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + "docker");
+			storage.removeItem(tag + DOCKER);
 		}
 		hide();
 	}

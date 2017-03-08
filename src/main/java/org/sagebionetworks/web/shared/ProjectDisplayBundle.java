@@ -46,9 +46,12 @@ public class ProjectDisplayBundle implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-//		result = prime * result + ((wiki == false) ? 0 : wiki.hashCode());
-//		result = prime * result
-//				+ ((userProfile == null) ? 0 : userProfile.hashCode());
+		result = prime * result + (!wiki ? 0 : 7);
+		result = prime * result + (!files ? 0 : 11);
+		result = prime * result + (!tables ? 0 : 13);
+		result = prime * result + (!challenge ? 0 : 17);
+		result = prime * result + (!discussion ? 0 : 19);
+		result = prime * result + (!docker ? 0 : 23);
 		return result;
 	}
 	@Override
@@ -60,8 +63,8 @@ public class ProjectDisplayBundle implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ProjectDisplayBundle other = (ProjectDisplayBundle) obj;
-		return !((this.wiki ^ other.wiki) || (this.files ^ other.files) || (this.tables ^ other.tables) 
-				|| (this.challenge ^ other.challenge) || (this.discussion ^ other.discussion) || (this.docker ^ other.docker));
+		return ((this.wiki == other.wiki) && (this.files == other.files) && (this.tables == other.tables) 
+				&& (this.challenge == other.challenge) && (this.discussion == other.discussion) && (this.docker == other.docker));
 	}
 	
 }
