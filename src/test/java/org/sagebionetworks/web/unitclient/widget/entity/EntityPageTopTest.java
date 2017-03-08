@@ -131,6 +131,7 @@ public class EntityPageTopTest {
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
 	String projectWikiId = "31415926666";
+	String userId = "1234567";
 	boolean canEdit = true;
 	boolean canModerate = false;
 	@Before
@@ -165,6 +166,7 @@ public class EntityPageTopTest {
 		when(mockDisplayBundle.challengeHasContent()).thenReturn(true);
 		when(mockDisplayBundle.discussionHasContent()).thenReturn(true);
 		when(mockDisplayBundle.dockerHasContent()).thenReturn(true);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
 		
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
 		when(mockFilesInnerTab.isContentStale()).thenReturn(true);
@@ -519,9 +521,7 @@ public class EntityPageTopTest {
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
-		String userId = "1234567";
 		String storageKey = userId + "_" + projectEntityId + "_" + "files";
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
 		when(mockDisplayBundle.filesHasContent()).thenReturn(false);
 		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
 		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
