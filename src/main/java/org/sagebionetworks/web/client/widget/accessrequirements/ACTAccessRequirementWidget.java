@@ -52,6 +52,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
  			view.setTerms(ar.getActContactInfo());
  			view.showTermsUI();
  		}
+		view.showRequestAccessButton();
 	}
 	
 	public void refresh() {
