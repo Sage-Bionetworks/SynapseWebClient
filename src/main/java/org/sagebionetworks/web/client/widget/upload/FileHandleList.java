@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -19,7 +20,6 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	FileHandleListView view;
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection;
-	CallbackP<String> fileHandleClickedCallback;
 	Callback selectionChangedCallback;
 	CallbackP<FileUpload> fileUploadedCallback;
 	List<FileHandleLink> links;
@@ -53,15 +53,12 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	
 	/**
 	 * - canUpload if true then show upload
-	 * - On file click handler callback.  When file handle is clicked, then this will be called and given the file handle id clicked.
 	 */
-	public FileHandleList configure(
-			CallbackP<String> fileHandleClickedCallback){
+	public FileHandleList configure(){
 		links = new ArrayList<FileHandleLink>();
 		this.isToolbarVisible = false;
 		view.setToolbarVisible(false);
 		view.setUploadWidgetVisible(false);
-		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		uploadWidget.reset();
 		uploadWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, fileUploadedCallback);
 		uploadWidget.allowMultipleFileUpload(true);
@@ -93,11 +90,19 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	}
 	
 	public void addFileLink(String fileHandleId, String fileName) {
+		createNewLink().configure(fileName, fileHandleId);
+	}
+	
+	public void addFileLink(FileHandleAssociation fha) {
+		createNewLink().configure(fha);
+	}
+	
+	private FileHandleLink createNewLink() {
 		FileHandleLink link = ginInjector.getFileHandleLink();
-		link.configure(fileHandleId, fileName, fileHandleClickedCallback)
-		.setFileSelectCallback(selectionChangedCallback)
-		.setSelectVisible(isToolbarVisible);
+		link.setFileSelectCallback(selectionChangedCallback)
+			.setSelectVisible(isToolbarVisible);
 		links.add(link);
+		return link;
 	}
 	
 	public void refreshLinkUI() {

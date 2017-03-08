@@ -19,6 +19,7 @@ public class FileHandleWidget implements IsWidget {
 	AuthenticationController authController;
 	FileHandleAsyncHandler fileHandleAsynHandler;
 	SynapseJSNIUtils jsniUtils;
+	String fileHandleId;
 	
 	@Inject
 	public FileHandleWidget(FileHandleWidgetView view, 
@@ -37,6 +38,7 @@ public class FileHandleWidget implements IsWidget {
 	}
 
 	public void configure(final FileHandleAssociation fha) {
+		fileHandleId = fha.getFileHandleId();
 		view.setLoadingVisible(true);
 		fileHandleAsynHandler.getFileHandle(fha, new AsyncCallback<FileResult>() {
 			@Override
@@ -68,6 +70,7 @@ public class FileHandleWidget implements IsWidget {
 	}
 	
 	public void configure(String fileName, String rawFileHandleId) {
+		fileHandleId = rawFileHandleId;
 		view.setLoadingVisible(false);
 		view.setAnchor(fileName, createAnchorHref(rawFileHandleId));
 	}
@@ -76,4 +79,9 @@ public class FileHandleWidget implements IsWidget {
 		String xsrfToken = authController.getCurrentXsrfToken();
 		return	jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + rawFileHandleId + "&" + WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
 	}
+	
+	public String getFileHandleId() {
+		return fileHandleId;
+	}
+	
 }

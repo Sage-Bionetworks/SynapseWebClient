@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -34,8 +35,6 @@ public class FileHandleListTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	CallbackP<String> mockFileClickedCallback;
-	@Mock
 	FileUpload mockFileUpload;
 	@Mock
 	FileMetadata mockFileMetadata;
@@ -49,7 +48,8 @@ public class FileHandleListTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getFileHandleLink()).thenReturn(mockFileHandleLink);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
-		when(mockFileHandleLink.configure(anyString(), anyString(), any(CallbackP.class))).thenReturn(mockFileHandleLink);
+		when(mockFileHandleLink.configure(anyString(), anyString())).thenReturn(mockFileHandleLink);
+		when(mockFileHandleLink.configure(any(FileHandleAssociation.class))).thenReturn(mockFileHandleLink);
 		when(mockFileHandleLink.setFileSelectCallback(any(Callback.class))).thenReturn(mockFileHandleLink);
 		
 		widget = new FileHandleList(mockView, mockUploadWidget, mockGinInjector);
@@ -63,7 +63,7 @@ public class FileHandleListTest {
 	
 	@Test
 	public void testConfigure() {
-		FileHandleList returnWidget = widget.configure(mockFileClickedCallback);
+		FileHandleList returnWidget = widget.configure();
 		
 		//verify fluent interface api
 		assertEquals(widget, returnWidget);
@@ -105,9 +105,9 @@ public class FileHandleListTest {
 		String fileName = "proof.pdf";
 		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
 		when(mockFileMetadata.getFileName()).thenReturn(fileName);
-		widget.configure(mockFileClickedCallback)
+		widget.configure()
 			.addFileLink(mockFileUpload);
-		verify(mockFileHandleLink).configure(fileHandleId, fileName, mockFileClickedCallback);
+		verify(mockFileHandleLink).configure(fileName, fileHandleId);
 		verify(mockFileHandleLink).setFileSelectCallback(any(Callback.class));
 		verify(mockFileHandleLink).setSelectVisible(false);
 	}
@@ -116,9 +116,9 @@ public class FileHandleListTest {
 	public void testAddFileLinkFileHandleIdAndFileName() {
 		String fileHandleId = "88888888";
 		String fileName = "proof.pdf";
-		widget.configure(mockFileClickedCallback)
+		widget.configure()
 			.addFileLink(fileHandleId, fileName);
-		verify(mockFileHandleLink).configure(fileHandleId, fileName, mockFileClickedCallback);
+		verify(mockFileHandleLink).configure(fileName, fileHandleId);
 		verify(mockFileHandleLink).setFileSelectCallback(any(Callback.class));
 		verify(mockFileHandleLink).setSelectVisible(false);
 	}
@@ -126,7 +126,7 @@ public class FileHandleListTest {
 	@Test
 	public void testRefreshLinkUI() {
 		when(mockFileHandleLink.isSelected()).thenReturn(true);
-		widget.configure(mockFileClickedCallback)
+		widget.configure()
 			.setCanDelete(true);
 		
 		//add a single file
@@ -146,7 +146,7 @@ public class FileHandleListTest {
 	public void testDeleteSelected() {
 		//set up a single file that is selected, then tell it to delete the selected files
 		when(mockFileHandleLink.isSelected()).thenReturn(true);
-		widget.configure(mockFileClickedCallback)
+		widget.configure()
 			.setCanDelete(true);
 	
 		//add a single file
@@ -162,7 +162,7 @@ public class FileHandleListTest {
 	public void testCheckSelectionState() {
 		//simulate that there's a single file, but it is not selected
 		when(mockFileHandleLink.isSelected()).thenReturn(false);
-		widget.configure(mockFileClickedCallback)
+		widget.configure()
 			.setCanDelete(true);
 	
 		//add the single file
@@ -176,7 +176,7 @@ public class FileHandleListTest {
 
 	@Test
 	public void testSelectAll() {
-		widget.configure(mockFileClickedCallback);
+		widget.configure();
 		//add 2 files
 		widget.addFileLink("123", "f1");
 		widget.addFileLink("456", "f2");
@@ -188,7 +188,7 @@ public class FileHandleListTest {
 
 	@Test
 	public void testSelectNone() {
-		widget.configure(mockFileClickedCallback);
+		widget.configure();
 		//add 2 files
 		widget.addFileLink("123", "f1");
 		widget.addFileLink("456", "f2");
@@ -201,7 +201,7 @@ public class FileHandleListTest {
 
 	@Test
 	public void testGetFileHandleIds() {
-		widget.configure(mockFileClickedCallback);
+		widget.configure();
 		String fileHandleId = "1977";
 		when(mockFileHandleLink.getFileHandleId()).thenReturn(fileHandleId);
 		widget.addFileLink(fileHandleId, "f1");
