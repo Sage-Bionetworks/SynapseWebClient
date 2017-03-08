@@ -32,8 +32,6 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@UiField
 	Div irbUploadedContainer;
 	@UiField
-	Div otherUploadContainer;
-	@UiField
 	Div otherUploadedContainer;
 
 	@UiField
@@ -93,16 +91,8 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 		irbUploadContainer.add(w);
 	}
 	@Override
-	public void setOtherDocumentUploadWidget(IsWidget w) {
-		otherUploadContainer.clear();
-		otherUploadContainer.add(w);
-	}
-	@Override
-	public void clearOtherDocumentsUploaded() {
-		otherUploadedContainer.clear();	
-	}
-	@Override
-	public void addOtherDocumentUploaded(IsWidget w) {
+	public void setOtherDocumentUploaded(IsWidget w) {
+		otherUploadedContainer.clear();
 		otherUploadedContainer.add(w);
 	}
 	@Override

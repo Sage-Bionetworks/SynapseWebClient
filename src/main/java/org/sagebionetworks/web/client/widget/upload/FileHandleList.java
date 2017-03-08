@@ -85,11 +85,11 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	}
 	
 	public void addFileLink(FileUpload fileUpload) {
-		addFileLink(fileUpload.getFileHandleId(), fileUpload.getFileMeta().getFileName());
+		addFileLink(fileUpload.getFileMeta().getFileName(), fileUpload.getFileHandleId());
 		refreshLinkUI();
 	}
 	
-	public void addFileLink(String fileHandleId, String fileName) {
+	public void addFileLink(String fileName, String fileHandleId) {
 		createNewLink().configure(fileName, fileHandleId);
 	}
 	
@@ -182,6 +182,11 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 			fileHandleIds.add(link.getFileHandleId());
 		}
 		return fileHandleIds;
+	}
+	
+	public void clear() {
+		selectAll();
+		deleteSelected();
 	}
 	
 	@Override

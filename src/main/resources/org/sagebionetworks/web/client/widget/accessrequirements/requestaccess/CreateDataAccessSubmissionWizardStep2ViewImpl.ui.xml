@@ -41,7 +41,6 @@
 				<b:Panel>
 					<b:PanelBody>
 						<bh:Div ui:field="otherUploadedContainer" />
-						<bh:Div ui:field="otherUploadContainer" />
 					</b:PanelBody>
 				</b:Panel>
 			</b:FormGroup>

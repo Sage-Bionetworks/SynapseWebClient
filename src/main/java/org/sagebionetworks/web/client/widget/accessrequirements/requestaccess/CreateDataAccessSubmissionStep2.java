@@ -26,10 +26,10 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
+import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -53,6 +53,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	DataAccessRequestInterface dataAccessRequest;
 	UserBadgeList accessorsList;
 	private SynapseSuggestBox peopleSuggestWidget;
+	FileHandleList otherDocuments;
 	
 	@Inject
 	public CreateDataAccessSubmissionStep2(
@@ -61,13 +62,13 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			FileHandleWidget templateFileRenderer,
 			FileHandleUploadWidget ducUploader,
 			FileHandleUploadWidget irbUploader,
-			FileHandleUploadWidget otherDocumentUploader,
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authController,
 			PortalGinInjector ginInjector,
 			final UserBadgeList accessorsList,
 			SynapseSuggestBox peopleSuggestBox,
-			UserGroupSuggestionProvider provider) {
+			UserGroupSuggestionProvider provider,
+			final FileHandleList otherDocuments) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -76,11 +77,16 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.jsniUtils = jsniUtils;
 		this.authController = authController;
 		this.accessorsList = accessorsList;
+		this.otherDocuments = otherDocuments;
+		otherDocuments.configure()
+			.setUploadButtonText("Browse...")
+			.setCanDelete(true)
+			.setCanUpload(true);
 		view.setAccessorListWidget(accessorsList);
 		view.setDUCTemplateFileWidget(templateFileRenderer.asWidget());
 		view.setDUCUploadWidget(ducUploader.asWidget());
 		view.setIRBUploadWidget(irbUploader.asWidget());
-		view.setOtherDocumentUploadWidget(otherDocumentUploader.asWidget());
+		view.setOtherDocumentUploaded(otherDocuments.asWidget());
 		view.setPeopleSuggestWidget(peopleSuggestBox.asWidget());
 		this.peopleSuggestWidget = peopleSuggestBox;
 		peopleSuggestWidget.setSuggestionProvider(provider);
@@ -100,12 +106,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			}
 		});
 		
-		otherDocumentUploader.configure("Browse...", new CallbackP<FileUpload>() {
-			@Override
-			public void invoke(FileUpload fileUpload) {
-				addOtherDocumentFileHandle(fileUpload.getFileMeta().getFileName(), fileUpload.getFileHandleId());
-			}
-		});
 		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			public void invoke(SynapseSuggestion suggestion) {
 				peopleSuggestWidget.clear();
@@ -134,9 +134,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		}
 		List<String> attachments = dataAccessRequest.getAttachments();
 		attachments.add(fileHandleId);
-		FileHandleWidget fileHandleWidget = ginInjector.getFileHandleWidget();
-		fileHandleWidget.configure(fileName, fileHandleId);
-		view.addOtherDocumentUploaded(fileHandleWidget);
+		otherDocuments.addFileLink(fileName, fileHandleId);
 	}
 	
 	/**
@@ -147,7 +145,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.researchProject = researchProject;
 		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));
 		view.setDUCVisible(ValidationUtils.isTrue(ar.getIsDUCRequired()));
-		view.clearOtherDocumentsUploaded();
+		otherDocuments.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
 		peopleSuggestWidget.clear();
@@ -208,11 +206,14 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	
 	
 	public void initAttachments() {
-		view.clearOtherDocumentsUploaded();
 		if (dataAccessRequest.getAttachments() != null) {
 			for (String fileHandleId : dataAccessRequest.getAttachments()) {
-				FileHandleWidget fileHandleWidget = getFileHandleWidget(fileHandleId);
-				view.addOtherDocumentUploaded(fileHandleWidget);
+				FileHandleAssociation fha = new FileHandleAssociation();
+				//TODO: set to new FileHandleAssociateType (data access request)
+				fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
+				fha.setAssociateObjectId(ar.getId().toString());
+				fha.setFileHandleId(fileHandleId);
+				otherDocuments.addFileLink(fha);
 			}
 		}
 	}
@@ -232,7 +233,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	private void updateDataAccessRequest(final boolean isSubmit) {
 		modalPresenter.setLoading(true);
 		dataAccessRequest.setAccessors(accessorsList.getUserIds());
-		
+		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		client.updateDataAccessRequest(dataAccessRequest, isSubmit, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {

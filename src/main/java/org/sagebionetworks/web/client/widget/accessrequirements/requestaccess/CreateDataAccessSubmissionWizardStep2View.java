@@ -20,9 +20,7 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setIRBUploadWidget(IsWidget w);
 	void setIRBUploadedFileWidget(IsWidget w);
 	void setOtherDocumentUploadVisible(boolean visible);
-	void setOtherDocumentUploadWidget(IsWidget w);
-	void clearOtherDocumentsUploaded();
-	void addOtherDocumentUploaded(IsWidget w);
+	void setOtherDocumentUploaded(IsWidget w);
 	void setAccessorListWidget(IsWidget w);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
 	void setPublicationsVisible(boolean visible);

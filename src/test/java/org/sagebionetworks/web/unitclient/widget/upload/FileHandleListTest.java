@@ -117,7 +117,7 @@ public class FileHandleListTest {
 		String fileHandleId = "88888888";
 		String fileName = "proof.pdf";
 		widget.configure()
-			.addFileLink(fileHandleId, fileName);
+			.addFileLink(fileName, fileHandleId);
 		verify(mockFileHandleLink).configure(fileName, fileHandleId);
 		verify(mockFileHandleLink).setFileSelectCallback(any(Callback.class));
 		verify(mockFileHandleLink).setSelectVisible(false);
@@ -130,7 +130,7 @@ public class FileHandleListTest {
 			.setCanDelete(true);
 		
 		//add a single file
-		widget.addFileLink("123", "f1");
+		widget.addFileLink("f1", "123");
 		reset(mockView);
 		widget.refreshLinkUI();
 		
@@ -150,7 +150,7 @@ public class FileHandleListTest {
 			.setCanDelete(true);
 	
 		//add a single file
-		widget.addFileLink("123", "f1");
+		widget.addFileLink("f1", "123");
 		reset(mockView);
 		widget.deleteSelected();
 		//no files left.  do not add a file widget to the view, and hide the toolbar
@@ -166,7 +166,7 @@ public class FileHandleListTest {
 			.setCanDelete(true);
 	
 		//add the single file
-		widget.addFileLink("123", "f1");
+		widget.addFileLink("f1", "123");
 		reset(mockView);
 		
 		widget.checkSelectionState();
@@ -178,8 +178,8 @@ public class FileHandleListTest {
 	public void testSelectAll() {
 		widget.configure();
 		//add 2 files
-		widget.addFileLink("123", "f1");
-		widget.addFileLink("456", "f2");
+		widget.addFileLink("f1", "123");
+		widget.addFileLink("f2", "456");
 		
 		//select all
 		widget.selectAll();
@@ -190,8 +190,8 @@ public class FileHandleListTest {
 	public void testSelectNone() {
 		widget.configure();
 		//add 2 files
-		widget.addFileLink("123", "f1");
-		widget.addFileLink("456", "f2");
+		widget.addFileLink("f1", "123");
+		widget.addFileLink("f2", "456");
 		
 		//select none
 		widget.selectNone();
@@ -204,7 +204,7 @@ public class FileHandleListTest {
 		widget.configure();
 		String fileHandleId = "1977";
 		when(mockFileHandleLink.getFileHandleId()).thenReturn(fileHandleId);
-		widget.addFileLink(fileHandleId, "f1");
+		widget.addFileLink("f1", fileHandleId);
 		
 		assertEquals(Collections.singletonList(fileHandleId), widget.getFileHandleIds());
 	}

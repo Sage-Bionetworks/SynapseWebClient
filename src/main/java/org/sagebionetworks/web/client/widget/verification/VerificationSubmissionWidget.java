@@ -214,7 +214,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public void initAttachments() {
 		if (submission == null) {
 			for (AttachmentMetadata metadata : existingAttachments) {
-				fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
+				fileHandleList.addFileLink(metadata.getFileName(), metadata.getId());
 			}
 		} else {
 			for (AttachmentMetadata metadata : existingAttachments) {
