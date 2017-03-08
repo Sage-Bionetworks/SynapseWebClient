@@ -3134,7 +3134,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		
 //		try {
 			//org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return new ProjectDisplayBundle(true, true, false, false, false, false);
+			return new ProjectDisplayBundle(false, true, false, false, false, false);
 //		} catch (SynapseException e) {
 //			throw ExceptionUtil.convertSynapseException(e);
 //		}

@@ -129,7 +129,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		});
 	}
 	private void initTabs() {
-		hideTabs();
+		showSelectedTabs();
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab.asTab());
@@ -247,7 +247,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 				configureCurrentAreaTab();
-				hideTabs();
+				showSelectedTabs();
 			}
 			
 			
@@ -256,40 +256,60 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void onFailure(Throwable caught) {
 				projectBundleLoadError = caught;
 				configureCurrentAreaTab();
-				hideTabs();
+				showSelectedTabs();
 			}
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
-    private void hideTabs() {
+    private void showSelectedTabs() {
 		synapseClient.getCountsForTabs(entity, new AsyncCallback<ProjectDisplayBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("BOOO");
-				
+				view.showErrorMessage(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
 				String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
-				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI));
-				wikiTab.asTab().setTabListItemVisible(result.wikiHasContent() || wiki);
-				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES));
-				filesTab.asTab().setTabListItemVisible(result.filesHasContent() || files);
-				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES));
-				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent() || tables);
-				boolean challenge = Boolean.parseBoolean(storage.getItem(tag + CHALLENGE));
-				adminTab.asTab().setTabListItemVisible(result.challengeHasContent() || challenge);
-				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION));
-				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent() || discussion);
-				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER));
-				dockerTab.asTab().setTabListItemVisible(result.dockerHasContent() || docker);
+				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI)) || result.wikiHasContent();
+				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES)) || result.filesHasContent();
+				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES)) || result.tablesHasContent();
+				boolean challenge = Boolean.parseBoolean(storage.getItem(tag + CHALLENGE)) || result.challengeHasContent();
+				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION)) || result.discussionHasContent();
+				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER)) || result.dockerHasContent();
+				
+				wikiTab.asTab().setTabListItemVisible(wiki);
+				filesTab.asTab().setTabListItemVisible(files);
+				tablesTab.asTab().setTabListItemVisible(tables);
+				adminTab.asTab().setTabListItemVisible(challenge);
+				discussionTab.asTab().setTabListItemVisible(discussion);
+				dockerTab.asTab().setTabListItemVisible(docker);
+				hideTabsIfOneShown(wiki, files, tables, challenge, discussion, docker);
 			}
 			
 		});
 	}
+    
+    private void hideTabsIfOneShown(boolean wiki, boolean files, boolean tables, boolean challenge, boolean discussion, boolean docker) {
+		int count = 0;
+		count += wiki ? 1 : 0;
+		count += files ? 1 : 0;
+		count += tables ? 1 : 0;
+		count += challenge ? 1 : 0;
+		count += discussion ? 1 : 0;
+		count += docker ? 1 : 0;
+		if (count == 1) {
+			wikiTab.asTab().setTabListItemVisible(false);
+			filesTab.asTab().setTabListItemVisible(false);
+			tablesTab.asTab().setTabListItemVisible(false);
+			adminTab.asTab().setTabListItemVisible(false);
+			discussionTab.asTab().setTabListItemVisible(false);
+			dockerTab.asTab().setTabListItemVisible(false);
+		}
+    }
+    
 
 	public void configureCurrentAreaTab() {
 		// set all content stale
