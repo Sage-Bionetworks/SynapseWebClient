@@ -239,7 +239,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
-		hideTabs();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -248,6 +247,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 				configureCurrentAreaTab();
+				hideTabs();
 			}
 			
 			
@@ -256,6 +256,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void onFailure(Throwable caught) {
 				projectBundleLoadError = caught;
 				configureCurrentAreaTab();
+				hideTabs();
 			}
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
@@ -279,6 +280,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				filesTab.asTab().setTabListItemVisible(result.filesHasContent() || files);
 				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES));
 				tablesTab.asTab().setTabListItemVisible(result.tablesHasContent() || tables);
+				boolean challenge = Boolean.parseBoolean(storage.getItem(tag + CHALLENGE));
+				adminTab.asTab().setTabListItemVisible(result.challengeHasContent() || challenge);
 				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION));
 				discussionTab.asTab().setTabListItemVisible(result.discussionHasContent() || discussion);
 				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER));

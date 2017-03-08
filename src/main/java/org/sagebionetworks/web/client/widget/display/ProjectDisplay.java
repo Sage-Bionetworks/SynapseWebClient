@@ -18,9 +18,6 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	ProjectDisplayView view;
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
-	EntityUpdatedHandler entityUpdatedHandler;
-	EntityBundle entityBundle;
-	CookieProvider cookies;
 	SessionStorage storage;
 	
 	private Entity entity;
@@ -39,13 +36,11 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	@Inject
 	public ProjectDisplay(ProjectDisplayView view,
 			SynapseClientAsync synapseClient, 
-			SynapseAlert synAlert, 
-			CookieProvider cookies,
+			SynapseAlert synAlert,
 			SessionStorage storage) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
-		this.cookies = cookies;
 		this.storage = storage;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
@@ -85,6 +80,8 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 				view.setFiles(files);
 				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES)) || result.tablesHasContent();
 				view.setTables(tables);
+				boolean challenge = Boolean.parseBoolean(storage.getItem(tag + CHALLENGE)) || result.challengeHasContent();
+				view.setChallenge(challenge);
 				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION)) || result.discussionHasContent();
 				view.setDiscussion(discussion);
 				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER)) || result.dockerHasContent();
