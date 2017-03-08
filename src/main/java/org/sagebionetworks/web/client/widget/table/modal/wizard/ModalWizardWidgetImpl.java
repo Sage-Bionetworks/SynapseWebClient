@@ -110,7 +110,7 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	@Override
 	public void addCallback(WizardCallback callback) {
 		if (callback != null) {
-			callbacks.add(callback);	
+			callbacks.add(callback);
 		}
 	}
 	
