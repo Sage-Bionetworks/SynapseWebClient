@@ -56,19 +56,15 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	}
 	
 	public void show() {
-		//show loading gif
 		synapseClient.getCountsForTabs(projectId, new AsyncCallback<ProjectDisplayBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				//hide loading gif
-				view.clear();
-				view.show();
+				view.showErrorMessage(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
-				//hide loading gif
 				ProjectDisplay.this.result = result;
 				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI)) || result.wikiHasContent();
 				view.setWiki(wiki);

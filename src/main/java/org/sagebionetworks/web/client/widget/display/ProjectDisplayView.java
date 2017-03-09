@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.display;
 
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface ProjectDisplayView {
+public interface ProjectDisplayView extends IsWidget, SynapseView {
 	public interface Presenter {
 
 		Widget asWidget();
@@ -20,13 +21,9 @@ public interface ProjectDisplayView {
 		
 	}
 
-	Widget asWidget();
-
 	void setSynAlertWidget(IsWidget asWidget);
 	
 	void setPresenter(Presenter presenter);
-
-	void clear();
 
 	void hide();
 

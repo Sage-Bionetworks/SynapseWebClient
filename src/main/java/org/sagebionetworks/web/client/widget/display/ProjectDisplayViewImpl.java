@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.display;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -148,6 +149,21 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	@Override
 	public boolean getDocker() {
 		return dockerButton.getValue();
+	}
+
+	@Override
+	public void showLoading() {
+		
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }
 
