@@ -26,12 +26,12 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	private Callback callback;
 	private ProjectDisplayBundle result;
 	
-	public static final String WIKI = "wiki";
-	public static final String FILES = "files";
-	public static final String TABLES = "tables";
-	public static final String CHALLENGE = "challenge";
-	public static final String DISCUSSION = "discussion";
-	public static final String DOCKER = "docker";
+	public static final String WIKI = "Wiki";
+	public static final String FILES = "Files";
+	public static final String TABLES = "Tables";
+	public static final String CHALLENGE = "Challenge";
+	public static final String DISCUSSION = "Discussion";
+	public static final String DOCKER = "Docker";
 	
 	@Inject
 	public ProjectDisplay(ProjectDisplayView view,
@@ -107,55 +107,28 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		if (view.getWiki() && !result.wikiHasContent()) {
-			storage.setItem(tag + WIKI, "true");
-		} else if (!view.getWiki() && result.wikiHasContent()) {
-			synAlert.showError("Error: Wiki contains content. Content must be deleted to hide tab.");
+		try {
+			updateCache(view.getWiki(), result.wikiHasContent(), WIKI);
+			updateCache(view.getFiles(), result.filesHasContent(), FILES);
+			updateCache(view.getTables(), result.tablesHasContent(), TABLES);
+			updateCache(view.getChallenge(), result.challengeHasContent(), CHALLENGE);
+			updateCache(view.getDiscussion(), result.discussionHasContent(), DISCUSSION);
+			updateCache(view.getDocker(), result.dockerHasContent(), DOCKER);
+		} catch (IllegalArgumentException e) {
+			synAlert.showError(e.getMessage());
 			return;
-		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + WIKI);
-		}
-		if (view.getFiles() && !result.filesHasContent()) {
-			storage.setItem(tag + FILES, "true");
-		} else if (!view.getFiles() && result.filesHasContent()) {
-			synAlert.showError("Error: Files contains content. Content must be deleted to hide tab.");
-			return;
-		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + FILES);
-		}
-		if (view.getTables() && !result.tablesHasContent()) {
-			storage.setItem(tag + TABLES, "true");
-		} else if (!view.getTables() && result.tablesHasContent()) {
-			synAlert.showError("Error: Tables contains content. Content must be deleted to hide tab.");
-			return;
-		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + TABLES);
-		}
-		if (view.getChallenge() && !result.challengeHasContent()) {
-			storage.setItem(tag + CHALLENGE, "true");
-		} else if (!view.getChallenge() && result.challengeHasContent()) {
-			synAlert.showError("Error: Challenge contains content. Content must be deleted to hide tab.");
-			return;
-		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + CHALLENGE);
-		}
-		if (view.getDiscussion() && !result.discussionHasContent()) {
-			storage.setItem(tag + DISCUSSION, "true");
-		} else if (!view.getDiscussion() && result.discussionHasContent()) {
-			synAlert.showError("Error: Discussion contains content. Content must be deleted to hide tab.");
-			return;
-		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + DISCUSSION);
-		}
-		if (view.getDocker() && !result.dockerHasContent()) {
-			storage.setItem(tag + DOCKER, "true");
-		} else if (!view.getDocker() && result.dockerHasContent()) {
-			synAlert.showError("Error: Docker contains content. Content must be deleted to hide tab.");
-			return;
-		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
-			storage.removeItem(tag + DOCKER);
 		}
 		hide();
+	}
+	
+	private void updateCache(boolean isChecked, boolean hasContent, String key) {
+		if (isChecked && !hasContent) {
+			storage.setItem(tag + key, "true");
+		} else if (!isChecked && hasContent) {
+			throw new IllegalArgumentException(key + " tab contains content. Content must be deleted to hide tab.");
+		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache
+			storage.removeItem(tag + key);
+		}
 	}
 	
 	@Override
