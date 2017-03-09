@@ -52,13 +52,15 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
  			view.setTerms(ar.getActContactInfo());
  			view.showTermsUI();
  		}
-		view.showRequestAccessButton();
+		
+		refreshApprovalState();
 	}
 	
-	public void refresh() {
+	public void refreshApprovalState() {
 		//TODO:  set up view based on DataAccessSubmission state
 		view.resetState();
-		
+		// (for testing)
+		view.showRequestAccessButton();		
 	}
 	
 	@Override
@@ -77,12 +79,12 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			
 			@Override
 			public void onFinished() {
-				refresh();
+				refreshApprovalState();
 			}
 			
 			@Override
 			public void onCanceled() {
-				refresh();
+				refreshApprovalState();
 			}
 		});
 	}

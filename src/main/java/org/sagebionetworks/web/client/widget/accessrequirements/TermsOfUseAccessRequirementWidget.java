@@ -54,7 +54,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
  		}
 	}
 	
-	public void setState() {
+	public void refreshApprovalState() {
 		//TODO:  set up view based on DataAccessSubmission state
 		view.resetState();
 		//if (not approved) {
@@ -79,7 +79,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessApproval result) {
-				//TODO: set state to approved.
+				refreshApprovalState();
 			}
 		};
 		TermsOfUseAccessApproval approval = new TermsOfUseAccessApproval();

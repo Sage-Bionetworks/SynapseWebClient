@@ -5,10 +5,8 @@ import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -67,7 +65,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 		researchProject.setInstitution(view.getInstitution());
 		researchProject.setIntendedDataUseStatement(view.getIntendedDataUseStatement());
 		researchProject.setProjectLead(view.getProjectLead());
-		//TODO: create research project
+		//create/update research project
 		client.updateResearchProject(researchProject, new AsyncCallback<ResearchProject>() {
 			@Override
 			public void onFailure(Throwable caught) {
