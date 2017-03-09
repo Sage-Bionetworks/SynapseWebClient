@@ -62,7 +62,7 @@ public class SynapseClientBaseTest {
 	@Test
 	public void testCreateSynapseClient() {
 		String sessionToken = "fakeSessionToken";
-		SynapseClient createdClient = synapseClientBase.createSynapseClient("fakeSessionToken");
+		SynapseClient createdClient = synapseClientBase.createSynapseClient(sessionToken);
 		assertEquals(mockSynapseClient, createdClient);
 		verify(mockSynapseClient).setSessionToken(sessionToken);
 		verify(mockSynapseClient).setRepositoryEndpoint(repositoryServiceUrl);
@@ -72,6 +72,14 @@ public class SynapseClientBaseTest {
 		verify(mockSynapseClient).appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
 		verify(mockSynapseClient).setUserIpAddress(userIp);
 		
+	}
+	
+	@Test
+	public void testNullThreadLocalRequest() {
+		when(mockThreadLocal.get()).thenReturn(null);
+		String sessionToken = "fakeSessionToken";
+		SynapseClient createdClient = synapseClientBase.createSynapseClient(sessionToken);
+		verify(mockSynapseClient, never()).setUserIpAddress(userIp);
 	}
 
 }
