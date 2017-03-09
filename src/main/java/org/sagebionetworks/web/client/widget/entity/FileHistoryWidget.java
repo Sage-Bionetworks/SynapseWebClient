@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -39,13 +39,13 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
 	
-	private DetailedPaginationWidget paginationWidget;
+	private BasicPaginationWidget paginationWidget;
 	private boolean canEdit;
 	private Long versionNumber;
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view,
 			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
-			 DetailedPaginationWidget paginationWidget,
+			 BasicPaginationWidget paginationWidget,
 			 PreflightController preflightController) {
 		super();
 		this.synapseClient = synapseClient;
