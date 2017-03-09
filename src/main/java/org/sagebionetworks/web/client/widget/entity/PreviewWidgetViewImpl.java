@@ -264,8 +264,8 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 			if (newHeightPx < 450) {
 				newHeightPx = 450;
 			}
-			var newHeightValue = newHeightPx + "px";
-			if (newHeightValue != iframe.height) {
+			var frameHeight = parseInt(iframe.height);
+			if (!frameHeight || (newHeightPx != frameHeight && newHeightPx > frameHeight)) {
 				iframe.height = "";
 				iframe.height = (newHeightPx + 50) + "px";
 			}
