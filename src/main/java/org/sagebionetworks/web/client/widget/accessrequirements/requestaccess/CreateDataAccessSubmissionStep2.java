@@ -57,7 +57,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	
 	@Inject
 	public CreateDataAccessSubmissionStep2(
-			final CreateDataAccessSubmissionWizardStep2View view,
+			CreateDataAccessSubmissionWizardStep2View view,
 			DataAccessClientAsync client,
 			FileHandleWidget templateFileRenderer,
 			FileHandleUploadWidget ducUploader,
@@ -65,10 +65,10 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authController,
 			PortalGinInjector ginInjector,
-			final UserBadgeList accessorsList,
+			UserBadgeList accessorsList,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			final FileHandleList otherDocuments) {
+			FileHandleList otherDocuments) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -109,7 +109,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			public void invoke(SynapseSuggestion suggestion) {
 				peopleSuggestWidget.clear();
-				accessorsList.addUserBadge(suggestion.getId());
+				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(suggestion.getId());
 			};
 		});
 	}
