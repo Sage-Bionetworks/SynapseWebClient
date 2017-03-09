@@ -52,9 +52,15 @@ public class CreateResearchProjectStep1 implements ModalPage {
 			@Override
 			public void onSuccess(ResearchProject researchProject) {
 				CreateResearchProjectStep1.this.researchProject = researchProject;
-				view.setInstitution(researchProject.getInstitution());
-				view.setIntendedDataUseStatement(researchProject.getIntendedDataUseStatement());
-				view.setProjectLead(researchProject.getProjectLead());
+				if (researchProject.getInstitution() != null) {
+					view.setInstitution(researchProject.getInstitution());	
+				}
+				if (researchProject.getIntendedDataUseStatement() != null) {
+					view.setIntendedDataUseStatement(researchProject.getIntendedDataUseStatement());
+				}
+				if (researchProject.getProjectLead() != null) {
+					view.setProjectLead(researchProject.getProjectLead());
+				}
 			}
 		});
 	}
