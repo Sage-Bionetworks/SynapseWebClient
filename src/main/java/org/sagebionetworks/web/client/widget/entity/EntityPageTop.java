@@ -129,7 +129,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		});
 	}
 	private void initTabs() {
-		showSelectedTabs();
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab.asTab());
@@ -263,7 +262,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
     
     private void showSelectedTabs() {
-		synapseClient.getCountsForTabs(entity, new AsyncCallback<ProjectDisplayBundle>() {
+		synapseClient.getCountsForTabs(projectHeader.getId(), new AsyncCallback<ProjectDisplayBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

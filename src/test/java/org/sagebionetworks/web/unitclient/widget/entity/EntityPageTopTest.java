@@ -159,7 +159,7 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
 		
-		AsyncMockStubber.callSuccessWith(mockDisplayBundle).when(mockSynapseClientAsync).getCountsForTabs(any(org.sagebionetworks.repo.model.Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDisplayBundle).when(mockSynapseClientAsync).getCountsForTabs(anyString(), any(AsyncCallback.class));
 		when(mockDisplayBundle.wikiHasContent()).thenReturn(true);
 		when(mockDisplayBundle.filesHasContent()).thenReturn(true);
 		when(mockDisplayBundle.tablesHasContent()).thenReturn(true);

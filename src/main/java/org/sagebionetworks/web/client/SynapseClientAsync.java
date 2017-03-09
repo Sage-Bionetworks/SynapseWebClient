@@ -465,5 +465,5 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void getCountsForTabs(Entity entity, AsyncCallback<ProjectDisplayBundle> calback);
+	void getCountsForTabs(String projectId, AsyncCallback<ProjectDisplayBundle> calback);
 }

@@ -550,5 +550,5 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
 
-	ProjectDisplayBundle getCountsForTabs(Entity entity) throws RestServiceException;
+	ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException;
 }

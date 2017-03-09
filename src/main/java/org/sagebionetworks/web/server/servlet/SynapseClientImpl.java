@@ -3130,7 +3130,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public ProjectDisplayBundle getCountsForTabs(Entity entity) throws RestServiceException {
+	public ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException {
 		
 //		try {
 			//org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

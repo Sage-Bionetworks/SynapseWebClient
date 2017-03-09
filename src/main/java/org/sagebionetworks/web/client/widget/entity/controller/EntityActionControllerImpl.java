@@ -321,8 +321,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProjectDisplay() {
-		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, permissions.getCanEdit());
-		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, permissions.getCanEdit());	
+		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);
+		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);	
 		actionMenu.setActionListener(Action.PROJECT_DISPLAY, this);
 	}
 	
@@ -794,7 +794,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void onProjectDisplay() {
-		getProjectDisplayModal().configure(entity, authenticationController.getCurrentUserPrincipalId(), new Callback() {
+		//guaranteed entity in bundle is project; otherwise option would not be shown in dropdown menu
+		getProjectDisplayModal().configure(entity.getId(), authenticationController.getCurrentUserPrincipalId(), new Callback() {
 			@Override
 			public void invoke() {
 				getGlobalApplicationState().refreshPage();

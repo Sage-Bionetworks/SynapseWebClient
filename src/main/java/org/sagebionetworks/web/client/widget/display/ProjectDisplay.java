@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.widget.display;
 
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
@@ -20,7 +16,7 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	SynapseAlert synAlert;
 	SessionStorage storage;
 	
-	private Entity entity;
+	private String projectId;
 	private String userId;
 	private String tag;
 	private Callback callback;
@@ -47,11 +43,11 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	}
 
 	@Override
-	public void configure(Entity entity, String userId, Callback callback) {
-		this.entity = entity;
+	public void configure(String projectId, String userId, Callback callback) {
+		this.projectId = projectId;
 		this.userId = userId;
 		this.callback = callback;
-		this.tag = this.userId + "_" + this.entity.getId() + "_";
+		this.tag = this.userId + "_" + this.projectId + "_";
 	}
 	
 	@Override
@@ -61,7 +57,7 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	
 	public void show() {
 		//show loading gif
-		synapseClient.getCountsForTabs(entity, new AsyncCallback<ProjectDisplayBundle>() {
+		synapseClient.getCountsForTabs(projectId, new AsyncCallback<ProjectDisplayBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
