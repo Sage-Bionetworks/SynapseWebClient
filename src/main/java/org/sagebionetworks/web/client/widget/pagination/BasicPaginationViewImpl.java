@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.pagination;
 
-import org.gwtbootstrap3.client.ui.Badge;
-import org.gwtbootstrap3.client.ui.Button;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
+import org.gwtbootstrap3.client.ui.Anchor;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,11 +20,9 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 	public interface Binder extends UiBinder<Widget, BasicPaginationViewImpl> {}
 	
 	@UiField
-	Button previousButton;
+	Anchor previousButton;
 	@UiField
-	Badge currentPage;
-	@UiField
-	Button nextButton;
+	Anchor nextButton;
 	Widget widget;
 	
 	@Inject
@@ -63,7 +59,7 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 
 	@Override
 	public void setCurrentPage(long currentPageNumber) {
-		this.currentPage.setText(""+currentPageNumber);
+//		this.currentPage.setText(""+currentPageNumber);
 	}
 
 	@Override

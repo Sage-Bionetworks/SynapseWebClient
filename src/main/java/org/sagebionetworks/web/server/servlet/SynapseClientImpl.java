@@ -1745,6 +1745,16 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
+	public long getTeamMemberCount(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.countTeamMembers(teamId, null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1988,9 +1998,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			boolean isLoggedIn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-//			TODO:  SWC-3503: do service call to get the team member count (when available)
-//			long memberCount = allMembers.getTotalNumberOfResults();
-			long memberCount = -1;
+			long memberCount = synapseClient.countTeamMembers(teamId, null);
 			boolean isAdmin = false;
 			Team team = synapseClient.getTeam(teamId);
 			TeamMembershipStatus membershipStatus = null;

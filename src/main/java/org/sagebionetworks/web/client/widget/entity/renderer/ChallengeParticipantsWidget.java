@@ -4,10 +4,9 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -25,13 +24,13 @@ public class ChallengeParticipantsWidget implements UserListView.Presenter, Widg
 	private String challengeId;
 	private boolean isInTeam;
 	private Callback widgetRefreshRequired;
-	private DetailedPaginationWidget paginationWidget;
+	private BasicPaginationWidget paginationWidget;
 	public static final Long DEFAULT_PARTICIPANT_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
 	
 	@Inject
 	public ChallengeParticipantsWidget(UserListView view, 
-			DetailedPaginationWidget paginationWidget, 
+			BasicPaginationWidget paginationWidget, 
 			ChallengeClientAsync synapseClient) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
