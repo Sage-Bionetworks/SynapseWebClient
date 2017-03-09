@@ -216,6 +216,16 @@ public class CreateDataAccessSubmissionStep2Test {
 	}
 	
 	@Test
+	public void testConfigureFailure() {
+		String error = "error getting data access request";
+		Exception ex = new Exception(error);
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		verify(mockModalPresenter).setErrorMessage(error);
+	}
+	
+	@Test
 	public void testConfigureWithDuc() {
 		when(mockDataAccessRequest.getDucFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(true);
@@ -318,6 +328,19 @@ public class CreateDataAccessSubmissionStep2Test {
 		order.verify(mockModalPresenter).setLoading(true);
 		order.verify(mockModalPresenter).setLoading(false);
 		verify(mockModalPresenter).onFinished();
+	}
+	
+
+	@Test
+	public void testSubmitFailure() {
+		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		String error = "error submitting data access request";
+		Exception ex = new Exception(error);
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), anyBoolean(), any(AsyncCallback.class));
+		widget.onPrimary();
+		boolean isSubmit = true;
+		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), eq(isSubmit), any(AsyncCallback.class));
+		verify(mockModalPresenter).setErrorMessage(error);
 	}
 	
 	@Test
