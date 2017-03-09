@@ -23,7 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -38,7 +38,7 @@ public class TeamMembersWidgetTest {
 	@Mock
 	UserListView mockView;
 	@Mock
-	DetailedPaginationWidget mockPaginationWidget;
+	BasicPaginationWidget mockPaginationWidget;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	
@@ -52,7 +52,6 @@ public class TeamMembersWidgetTest {
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(UserListView.class);
-		mockPaginationWidget = mock(DetailedPaginationWidget.class);
 		widget = new TeamMembersWidget(mockView, mockPaginationWidget, mockSynapseClient);
 		verify(mockView).setPresenter(widget);
 		descriptor = new HashMap<String, String>();
