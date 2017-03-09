@@ -549,5 +549,5 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
 
-	long getTeamMemberCount(String teamId);
+	long getTeamMemberCount(String teamId) throws RestServiceException;
 }

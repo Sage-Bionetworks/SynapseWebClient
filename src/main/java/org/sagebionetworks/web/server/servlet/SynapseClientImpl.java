@@ -1735,15 +1735,13 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public long getTeamMemberCount(String teamId) {
+	public long getTeamMemberCount(String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			Long count = synapseClient.getTeamMemberCount(teamId);
-			Long count = 100L;
-			return count;
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
+		try {
+			return synapseClient.countTeamMembers(teamId, null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -1990,8 +1988,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			boolean isLoggedIn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-//			long memberCount = synapseClient.getTeamMemberCount(teamId);
-			long memberCount = -1;
+			long memberCount = synapseClient.countTeamMembers(teamId, null);
 			boolean isAdmin = false;
 			Team team = synapseClient.getTeam(teamId);
 			TeamMembershipStatus membershipStatus = null;
