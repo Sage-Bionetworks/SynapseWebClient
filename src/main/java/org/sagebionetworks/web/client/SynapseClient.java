@@ -552,4 +552,6 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset)
 			throws RestServiceException;
+
+	long getTeamMemberCount(String teamId) throws RestServiceException;
 }

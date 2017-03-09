@@ -40,6 +40,9 @@ import com.google.inject.Inject;
  *
  */
 public class CreateDataAccessSubmissionStep2 implements ModalPage {
+	public static final String SAVED_PROGRESS_MESSAGE = "Saved your progress...";
+	public static final String SAVE_CHANGES_MESSAGE = "Would you want to save your recent changes?";
+	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your data access request has been successfully submitted for review.";
 	CreateDataAccessSubmissionWizardStep2View view;
 	PortalGinInjector ginInjector;
 	DataAccessClientAsync client;
@@ -125,7 +128,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		dataAccessRequest.setIrbFileHandleId(irbFileHandleId);
 		FileHandleWidget fileHandleWidget = ginInjector.getFileHandleWidget();
 		fileHandleWidget.configure(fileName, irbFileHandleId);
-		view.setDUCUploadedFileWidget(fileHandleWidget);
+		view.setIRBUploadedFileWidget(fileHandleWidget);
 	}
 	
 	public void addOtherDocumentFileHandle(String fileName, String fileHandleId) {
@@ -146,6 +149,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));
 		view.setDUCVisible(ValidationUtils.isTrue(ar.getIsDUCRequired()));
 		otherDocuments.clear();
+		accessorsList.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
 		peopleSuggestWidget.clear();
@@ -179,11 +183,13 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 					view.setSummaryOfUse(((DataAccessRenewal)dataAccessRequest).getSummaryOfUse());
 				}
 				if (dataAccessRequest.getDucFileHandleId() != null) {
-					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getDucFileHandleId());
+					//TODO: set to new FileHandleAssociateType (data access request)
+					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.FileEntity, dataAccessRequest.getDucFileHandleId());
 					view.setDUCUploadedFileWidget(fileHandleWidget);
 				}
 				if (dataAccessRequest.getIrbFileHandleId() != null) {
-					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getIrbFileHandleId());
+					//TODO: set to new FileHandleAssociateType (data access request)
+					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.FileEntity, dataAccessRequest.getIrbFileHandleId());
 					view.setIRBUploadedFileWidget(fileHandleWidget);
 				}
 				
@@ -193,25 +199,23 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		});
 	}
 	
-	public FileHandleWidget getFileHandleWidget(String fileHandleId) {
+	public FileHandleWidget getFileHandleWidget(String id, FileHandleAssociateType type, String fileHandleId) {
 		FileHandleWidget fileHandleWidget = ginInjector.getFileHandleWidget();
 		FileHandleAssociation fha = new FileHandleAssociation();
-		//TODO: set to new FileHandleAssociateType (data access request)
-		fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
-		fha.setAssociateObjectId(ar.getId().toString());
+		fha.setAssociateObjectType(type);
+		fha.setAssociateObjectId(id);
 		fha.setFileHandleId(fileHandleId);
 		fileHandleWidget.configure(fha);
 		return fileHandleWidget;
 	}
-	
 	
 	public void initAttachments() {
 		if (dataAccessRequest.getAttachments() != null) {
 			for (String fileHandleId : dataAccessRequest.getAttachments()) {
 				FileHandleAssociation fha = new FileHandleAssociation();
 				//TODO: set to new FileHandleAssociateType (data access request)
-				fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
-				fha.setAssociateObjectId(ar.getId().toString());
+				fha.setAssociateObjectType(FileHandleAssociateType.MessageAttachment);
+				fha.setAssociateObjectId(dataAccessRequest.getId());
 				fha.setFileHandleId(fileHandleId);
 				otherDocuments.addFileLink(fha);
 			}
@@ -219,7 +223,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	}
 	
 	public void initAccessors() {
-		accessorsList.clear();
 		Set<String> uniqueAccessors = new HashSet<String>();
 		uniqueAccessors.add(authController.getCurrentUserPrincipalId());
 		if (dataAccessRequest.getAccessors() != null) {
@@ -237,16 +240,22 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		client.updateDataAccessRequest(dataAccessRequest, isSubmit, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				modalPresenter.setErrorMessage(caught.getMessage());
+				if (isSubmit) {
+					modalPresenter.setErrorMessage(caught.getMessage());
+				} else {
+					view.showInfo(caught.getMessage());
+				}
 			}
 			
 			@Override
 			public void onSuccess(Void result) {
 				if (isSubmit) {
-					view.showInfo("Your data access request has been successfully submitted for review.");
+					view.showInfo(SUCCESSFULLY_SUBMITTED_MESSAGE);
 				} else {
-					view.showInfo("Saved your progress...");
+					view.showInfo(SAVED_PROGRESS_MESSAGE);
 				}
+				modalPresenter.setLoading(false);
+				modalPresenter.onFinished();
 			}
 		});
 	}
@@ -276,7 +285,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			public void onCanceled() {
 				// check to see if the user would like to discard changes.
 				// if saving, then update the DataAccessRequest/DataAccessRenewal (but do not submit)
-				view.showConfirmDialog("Save?","Would you want to save your recent changes?", new Callback() {
+				view.showConfirmDialog("Save?",SAVE_CHANGES_MESSAGE, new Callback() {
 					@Override
 					public void invoke() {
 						updateDataAccessRequest(false);
@@ -285,6 +294,4 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			}
 		});
 	}
-
-
 }
