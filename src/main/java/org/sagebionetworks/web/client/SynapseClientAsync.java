@@ -73,6 +73,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -463,4 +464,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<ColumnModelPage> callback);
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
+	
+	void getCountsForTabs(String projectId, AsyncCallback<ProjectDisplayBundle> calback);
 }
