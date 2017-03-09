@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.repo.model.file.FileResultFailureCode;
@@ -46,6 +47,7 @@ public class FileHandleWidgetTest {
 	public static final String FILE_NAME = "test.png";
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		when(mockAuthController.getCurrentXsrfToken()).thenReturn(XSRF_TOKEN);
 		when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
