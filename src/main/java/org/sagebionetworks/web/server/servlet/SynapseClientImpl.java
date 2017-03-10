@@ -3138,7 +3138,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			WikiPageKey wikiPageKey = new WikiPageKey();
 			wikiPageKey.setOwnerObjectId(projectId);
 			wikiPageKey.setOwnerObjectType(ObjectType.ENTITY);
-			wikiPageKey.setWikiPageId(""/*wikiPageId*/);
+			wikiPageKey.setWikiPageId(getRootWikiId(synapseClient, projectId, ObjectType.ENTITY));
 			V2WikiPage wiki = synapseClient.getV2WikiPage(wikiPageKey);
 			if (wiki.getCreatedOn() != null) {
 				wikiFlag = true;
@@ -3146,8 +3146,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			
 			return new ProjectDisplayBundle(wikiFlag, true, false, false, false, false);
 		} catch (SynapseException e) {
-			throw new RestServiceException("error with wiki ");
-			//throw ExceptionUtil.convertSynapseException(e);
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 		
 	}
