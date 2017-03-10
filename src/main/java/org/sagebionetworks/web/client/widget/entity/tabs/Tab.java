@@ -62,6 +62,10 @@ public class Tab implements TabView.Presenter {
 		view.setTabListItemVisible(visible);
 	}
 	
+	public boolean isTabListItemVisible() {
+		return view.isTabListItemVisible();
+	}
+	
 	public TabPane getTabPane() {
 		return view.getTabPane();
 	}

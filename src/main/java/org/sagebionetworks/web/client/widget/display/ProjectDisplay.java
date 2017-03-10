@@ -99,6 +99,13 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	@Override
 	public void onSave() {
 		synAlert.clear();
+		
+		//validate that at least one is selected
+		if (! (view.getWiki() || view.getFiles() || view.getTables() || view.getChallenge() || view.getDiscussion() || view.getDocker())) {
+			synAlert.showError("Please select at least one feature.");
+			return;
+		}
+		
 		try {
 			updateCache(view.getWiki(), result.wikiHasContent(), WIKI);
 			updateCache(view.getFiles(), result.filesHasContent(), FILES);
