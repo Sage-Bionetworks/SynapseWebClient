@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,6 +22,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	@UiField
 	Div tabsUI;
+	@UiField
+	HTMLPanel loadingUI;
 	
 	private Presenter presenter;
 	
@@ -83,5 +86,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setProjectInformationVisible(boolean isVisible) {
 		projectMetaContainer.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
 }

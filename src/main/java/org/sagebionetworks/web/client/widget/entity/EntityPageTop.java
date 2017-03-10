@@ -208,6 +208,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
     
     public void configureProject() {
+    	view.setLoadingVisible(true);
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
@@ -237,11 +238,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				view.showErrorMessage(caught.getMessage());
 			}
 
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
+				view.setLoadingVisible(false);
 				boolean wiki = isShowingTab(WIKI, result.wikiHasContent(), EntityArea.WIKI);
 				boolean files = isShowingTab(FILES, result.filesHasContent(), EntityArea.FILES);
 				boolean tables = isShowingTab(TABLES, result.tablesHasContent(), EntityArea.TABLES);
