@@ -152,16 +152,6 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 	}
 
 	@Override
-	public void showLoading() {
-		
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		
-	}
-
-	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}

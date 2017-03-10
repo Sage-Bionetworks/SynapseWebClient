@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface ProjectDisplayView extends IsWidget, SynapseView {
+public interface ProjectDisplayView extends IsWidget {
 	public interface Presenter {
 		void onSave();
 		void cancel();
@@ -33,6 +33,7 @@ public interface ProjectDisplayView extends IsWidget, SynapseView {
 	boolean getChallenge();
 	boolean getDiscussion();
 	boolean getDocker();
-
+	void clear();
+	void showErrorMessage(String errorMessage);
 	
 }
