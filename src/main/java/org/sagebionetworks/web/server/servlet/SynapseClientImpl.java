@@ -153,6 +153,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -3134,5 +3135,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException {
 		return getHtmlTeamMembers().contains(userId);
+	}
+	
+	@Override
+	public ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException {
+		
+//		try {
+			//org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return new ProjectDisplayBundle(false, true, false, false, false, false);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
+		
 	}
 }

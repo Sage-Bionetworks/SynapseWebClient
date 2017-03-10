@@ -74,6 +74,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -548,6 +549,9 @@ public interface SynapseClient extends XsrfProtectedService {
 			throws RestServiceException;
 
 	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
-
+	
 	long getTeamMemberCount(String teamId) throws RestServiceException;
+	
+	ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException;
+
 }

@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplay;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -123,8 +124,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
+	ProjectDisplay projectDisplay;
 	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
+
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -146,6 +149,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			approveUserAccessModal = ginInjector.getApproveUserAccessModal();
 		}
 		return approveUserAccessModal;
+	}
+	private ProjectDisplay getProjectDisplayModal() {
+		if (projectDisplay == null) {
+			projectDisplay = ginInjector.getProjectDisplay();
+		}
+		return projectDisplay;
 	}
 	private SelectTeamModal getSelectTeamModal() {
 		if (selectTeamModal == null) {
@@ -307,9 +316,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureAddEvaluationAction();
 			configureCreateChallenge();
 			configureApproveUserAccess();
+			configureProjectDisplay();
 		}
 	}
 	
+	private void configureProjectDisplay() {
+		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);
+		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);	
+		actionMenu.setActionListener(Action.PROJECT_DISPLAY, this);
+	}
 	
 	private void configureApproveUserAccess() {
 		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
@@ -769,12 +784,27 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case APPROVE_USER_ACCESS:
 			onApproveUserAccess();
 			break;
+		case PROJECT_DISPLAY:
+			onProjectDisplay();
+			break;
 		default:
 			break;
 		}
 	}
 
 	
+	private void onProjectDisplay() {
+		//guaranteed entity in bundle is project; otherwise option would not be shown in dropdown menu
+		getProjectDisplayModal().configure(entity.getId(), authenticationController.getCurrentUserPrincipalId(), new Callback() {
+			@Override
+			public void invoke() {
+				getGlobalApplicationState().refreshPage();
+			}
+		});
+		getProjectDisplayModal().show();
+		
+	}
+
 	private void onApproveUserAccess() {
 		getApproveUserAccessModal().configure(actRequirements, entityBundle);
 		getApproveUserAccessModal().show();
