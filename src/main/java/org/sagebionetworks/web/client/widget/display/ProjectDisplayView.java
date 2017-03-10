@@ -13,7 +13,7 @@ public interface ProjectDisplayView extends IsWidget, SynapseView {
 
 		void onSave();
 
-		void clear();
+		void onClear();
 
 		void cancel();
 

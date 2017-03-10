@@ -91,7 +91,7 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	}
 	
 	@Override
-	public void clear() {
+	public void onClear() {
 		synAlert.clear();
 		view.clear();
 	}
