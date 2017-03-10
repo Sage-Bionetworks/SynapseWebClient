@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
+import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
@@ -36,8 +37,12 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -296,6 +301,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public EntityActionController createEntityActionController();
 	public ACTPresenter getACTPresenter();
+	public AccessRequirementsPresenter getAccessRequirementsPresenter();
 	public SynapseForumPresenter getSynapseForumPresenter();
 	public SubscriptionPresenter getSubscriptionPresenter();
 	
@@ -509,4 +515,9 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();
 	public EntityIdCellRendererImpl getEntityIdCellRenderer();
+	
+	public CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
+	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
+	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
+	public FileHandleWidget getFileHandleWidget();
 }

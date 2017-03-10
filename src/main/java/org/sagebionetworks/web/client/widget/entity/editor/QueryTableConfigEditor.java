@@ -96,7 +96,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 				JSONObjectAdapter adapter;
 				try {
 					adapter = jsonObjectAdapter.createNew(result);
-
+					
 					updateDescriptorFromView();
 					APITableConfig tableConfig = new APITableConfig(descriptor);
 					///////////////////

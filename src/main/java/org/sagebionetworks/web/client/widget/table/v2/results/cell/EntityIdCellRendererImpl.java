@@ -86,4 +86,8 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 		return entityId;
 	}
 
+
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
+	}
 }

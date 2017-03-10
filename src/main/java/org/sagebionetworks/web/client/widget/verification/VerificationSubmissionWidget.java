@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -15,11 +16,8 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -45,14 +43,10 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private String orcId;
 	private List<AttachmentMetadata> existingAttachments;
 	private VerificationSubmissionWidgetView view;
-	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
-	private AuthenticationController authController;
-	CallbackP<String> fileHandleClickedCallback;
-	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
 	private VerificationStateEnum actRejectState;
 	private boolean isACTMember;
@@ -67,11 +61,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
-			SynapseJSNIUtils jsniUtils,
 			PromptModalView promptModalView,
 			GlobalApplicationState globalAppState,
-			GWTWrapper gwt,
-			AuthenticationController authController
+			GWTWrapper gwt
 			) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
@@ -79,11 +71,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
-		this.jsniUtils = jsniUtils;
 		this.promptModal = promptModalView;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
-		this.authController = authController;
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -91,19 +81,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 				updateVerificationState(actRejectState, promptModal.getValue());
 			}
 		});
-		fileHandleClickedCallback = new CallbackP<String>(){
-			@Override
-			public void invoke(String fileHandleId) {
-				getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-			}
-		};
-		
-		rawFileHandleClickedCallback = new CallbackP<String>(){
-			@Override
-			public void invoke(String fileHandleId) {
-				getRawFileHandleUrlAndOpen(fileHandleId);
-			}
-		};
 	}
 	
 	public void initView(boolean isModal) {
@@ -161,17 +138,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		return this;
 	}
 	
-	public void getVerificationSubmissionHandleUrlAndOpen(String fileHandleId) {
-		String xsrfToken = authController.getCurrentXsrfToken();
-		String url = jsniUtils.getFileHandleAssociationUrl(submission.getId(), FileHandleAssociateType.VerificationSubmission, fileHandleId, xsrfToken);
-		view.openWindow(url);
-	}
-	
-	public void getRawFileHandleUrlAndOpen(String fileHandleId) {
-		String url = jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + fileHandleId;
-		view.openWindow(url);
-	}
-	
 	public void show() {
 		view.clear();
 		synAlert.clear();
@@ -188,7 +154,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			loadWikiHelpContent();
 			view.setCancelButtonVisible(true);
 			view.setSubmitButtonVisible(true);
-			fileHandleList.configure(rawFileHandleClickedCallback)
+			fileHandleList.configure()
 				.setUploadButtonText("Upload...")
 				.setCanDelete(true)
 				.setCanUpload(true);
@@ -238,7 +204,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setResubmitButtonVisible(true);
 			view.setCloseButtonVisible(true);
 		}
-		fileHandleList.configure(fileHandleClickedCallback)
+		fileHandleList.configure()
 			.setCanDelete(false)
 			.setCanUpload(false);
 		initAttachments();
@@ -246,8 +212,18 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	public void initAttachments() {
-		for (AttachmentMetadata metadata : existingAttachments) {
-			fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
+		if (submission == null) {
+			for (AttachmentMetadata metadata : existingAttachments) {
+				fileHandleList.addFileLink(metadata.getFileName(), metadata.getId());
+			}
+		} else {
+			for (AttachmentMetadata metadata : existingAttachments) {
+				FileHandleAssociation fha = new FileHandleAssociation();
+				fha.setAssociateObjectId(submission.getId());
+				fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
+				fha.setFileHandleId(metadata.getId());
+				fileHandleList.addFileLink(fha);
+			}			
 		}
 		fileHandleList.refreshLinkUI();
 	}

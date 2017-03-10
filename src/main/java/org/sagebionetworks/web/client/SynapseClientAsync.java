@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -464,4 +465,7 @@ public interface SynapseClientAsync {
 			AsyncCallback<ColumnModelPage> callback);
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
+
+	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
+			AsyncCallback<List<AccessRequirement>> callback);
 }
