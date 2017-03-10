@@ -8,17 +8,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface ProjectDisplayView extends IsWidget, SynapseView {
 	public interface Presenter {
-
-		Widget asWidget();
-
 		void onSave();
-
-		void clear();
-
 		void cancel();
-
-		void configure(String projectId, String userId, Callback callback);
-		
 	}
 
 	void setSynAlertWidget(IsWidget asWidget);

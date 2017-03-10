@@ -146,7 +146,6 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		for (Evaluation eval : allEvaluations.getResults()) {
 			// evaluation is associated to entity id. can I change
 			// permissions?
-			
 			UserEvaluationPermissions uep = synapseClient
 					.getUserEvaluationPermissions(eval.getId());
 			

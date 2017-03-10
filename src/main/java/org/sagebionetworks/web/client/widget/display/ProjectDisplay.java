@@ -1,25 +1,26 @@
 package org.sagebionetworks.web.client.widget.display;
 
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProjectDisplay implements ProjectDisplayView.Presenter {
+public class ProjectDisplay implements ProjectDisplayView.Presenter, IsWidget {
 	ProjectDisplayView view;
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
 	SessionStorage storage;
+	GlobalApplicationState globalAppState;
 	
 	private String projectId;
 	private String userId;
 	private String tag;
-	private Callback callback;
 	private ProjectDisplayBundle result;
 	
 	public static final String WIKI = "Wiki";
@@ -33,31 +34,29 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	public ProjectDisplay(ProjectDisplayView view,
 			SynapseClientAsync synapseClient, 
 			SynapseAlert synAlert,
-			SessionStorage storage) {
+			SessionStorage storage, 
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.storage = storage;
+		this.globalAppState = globalAppState;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
 
-	@Override
-	public void configure(String projectId, String userId, Callback callback) {
+	public void configure(String projectId, String userId) {
 		this.projectId = projectId;
 		this.userId = userId;
-		this.callback = callback;
 		this.tag = this.userId + "_" + this.projectId + "_";
 	}
 	
-	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 	
 	public void show() {
 		synapseClient.getCountsForTabs(projectId, new AsyncCallback<ProjectDisplayBundle>() {
-
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
@@ -87,10 +86,9 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter {
 	
 	public void hide() {
 		view.hide();
-		callback.invoke();
+		globalAppState.refreshPage();
 	}
 	
-	@Override
 	public void clear() {
 		synAlert.clear();
 		view.clear();

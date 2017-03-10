@@ -795,14 +795,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public void onProjectDisplay() {
 		//guaranteed entity in bundle is project; otherwise option would not be shown in dropdown menu
-		getProjectDisplayModal().configure(entity.getId(), authenticationController.getCurrentUserPrincipalId(), new Callback() {
-			@Override
-			public void invoke() {
-				getGlobalApplicationState().refreshPage();
-			}
-		});
+		getProjectDisplayModal().configure(entity.getId(), authenticationController.getCurrentUserPrincipalId());
 		getProjectDisplayModal().show();
-		
 	}
 
 	private void onApproveUserAccess() {
