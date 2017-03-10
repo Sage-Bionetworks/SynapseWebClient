@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
@@ -128,29 +129,34 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			if (entityId == null || entityId.trim().length() == 0) {
 				throw new BadRequestException("Entity ID must be given");
 			}
-			// look up the available evaluations
-			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
-					.getEvaluationByContentSource(entityId,
-							EVALUATION_PAGINATION_OFFSET,
-							EVALUATION_PAGINATION_LIMIT);
-			List<Evaluation> mySharableEvalauations = new ArrayList<Evaluation>();
-			
-			for (Evaluation eval : allEvaluations.getResults()) {
-				// evaluation is associated to entity id. can I change
-				// permissions?
-				
-				UserEvaluationPermissions uep = synapseClient
-						.getUserEvaluationPermissions(eval.getId());
-				
-				if (uep.getCanChangePermissions()) {
-					mySharableEvalauations.add(eval);
-				}
-			}
-			return mySharableEvalauations;
+			return getShareableEvaluations(entityId, synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	public static List<Evaluation> getShareableEvaluations(String entityId, SynapseClient synapseClient) throws SynapseException {
+		// look up the available evaluations
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
+				.getEvaluationByContentSource(entityId,
+						EVALUATION_PAGINATION_OFFSET,
+						EVALUATION_PAGINATION_LIMIT);
+		List<Evaluation> mySharableEvalauations = new ArrayList<Evaluation>();
+		
+		for (Evaluation eval : allEvaluations.getResults()) {
+			// evaluation is associated to entity id. can I change
+			// permissions?
+			
+			UserEvaluationPermissions uep = synapseClient
+					.getUserEvaluationPermissions(eval.getId());
+			
+			if (uep.getCanChangePermissions()) {
+				mySharableEvalauations.add(eval);
+			}
+		}
+		return mySharableEvalauations;
+	}
+	
 
 	public Submission createTeamSubmission(Submission submission, String etag, String memberStateHash, String hostPageBaseURL)
 			throws RestServiceException {

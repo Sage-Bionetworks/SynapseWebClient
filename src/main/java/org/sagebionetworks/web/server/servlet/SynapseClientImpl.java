@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -49,6 +50,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -79,9 +81,16 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
+import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -3140,12 +3149,76 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException {
 		
-//		try {
-			//org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return new ProjectDisplayBundle(false, true, false, false, false, false);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
-		
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			boolean isWiki = isWiki(projectId, synapseClient);
+			boolean isChallenge = isChallenge(projectId, synapseClient);
+			boolean isFile = isFileOrFolder(projectId, synapseClient);
+			boolean isTable = isTable(projectId, synapseClient);
+			boolean isDocker = isDocker(projectId, synapseClient);
+			boolean isForum = isForum(projectId, synapseClient);
+			return new ProjectDisplayBundle(isWiki, isFile, isTable, isChallenge, isForum, isDocker);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	
+	private boolean isForum(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		Forum forum = synapseClient.getForumByProjectId(projectId);
+		return synapseClient.getThreadCountForForum(forum.getId(), DiscussionFilter.NO_FILTER).getCount() > 0;
+	}
+	
+	private boolean isDocker(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		EntityQuery query = getQuery(projectId, new String[] {EntityType.dockerrepo.toString()});
+		EntityQueryResults results = synapseClient.entityQuery(query);
+		return results.getEntities().size() > 0;
+	}
+	
+	private boolean isFileOrFolder(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		EntityQuery query = getQuery(projectId, new String[] {EntityType.file.toString(), EntityType.folder.toString()});
+		EntityQueryResults results = synapseClient.entityQuery(query);
+		return results.getEntities().size() > 0;
+	}
+	private boolean isTable(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		EntityQuery query = getQuery(projectId, new String[] {EntityType.table.toString()});
+		EntityQueryResults results = synapseClient.entityQuery(query);
+		return results.getEntities().size() > 0;
+	}
+	
+	private EntityQuery getQuery(String parentId, String[] entityTypes) {
+		EntityQuery newQuery = new EntityQuery();
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
+		newQuery.setSort(sort);
+		Condition parentCondition = EntityQueryUtils.buildCondition(
+				EntityFieldName.parentId, Operator.EQUALS, parentId);
+		Condition typeCondition = EntityQueryUtils.buildCondition(
+				EntityFieldName.nodeType, Operator.IN, entityTypes);
+		newQuery.setConditions(Arrays.asList(parentCondition, typeCondition));
+		newQuery.setLimit(1L);
+		newQuery.setOffset(0L);
+		return newQuery;
+	}
+	
+	private boolean isWiki(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws RestServiceException {
+		try {
+			getRootWikiId(synapseClient, projectId, ObjectType.ENTITY); 
+			return true;
+		} catch (NotFoundException ex) {
+			return false;
+		}
+	}
+	
+	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		try {
+			synapseClient.getChallengeForProject(projectId);
+			// there's a challenge, return true
+			return true;
+		} catch (SynapseNotFoundException ex) {
+			// no challenge, are there any evaluations that the current user can edit?
+			return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
+		}
 	}
 }
