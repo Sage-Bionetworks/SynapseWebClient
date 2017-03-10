@@ -208,6 +208,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
     
     public void configureProject() {
+    	hideTabs();
     	view.setLoadingVisible(true);
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
 		projectBundle = null;
@@ -233,7 +234,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
     
     private void showSelectedTabs() {
-    	hideTabs();
 		synapseClient.getCountsForTabs(projectHeader.getId(), new AsyncCallback<ProjectDisplayBundle>() {
 
 			@Override
