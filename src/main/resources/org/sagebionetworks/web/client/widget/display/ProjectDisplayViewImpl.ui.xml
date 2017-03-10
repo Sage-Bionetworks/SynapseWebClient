@@ -9,7 +9,7 @@
 	    <b:Modal ui:field="modal" closable="true"
 			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 			<b:ModalHeader>
-				<b:Heading size="H4" text="Project Display Options" addStyleNames="displayInline" />
+				<b:Heading size="H4" text="Project Display Settings" />
 			</b:ModalHeader>
 			<b:ModalBody>
 				<bh:Div addStyleNames="margin-left-10">
