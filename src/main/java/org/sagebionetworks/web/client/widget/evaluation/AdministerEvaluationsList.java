@@ -20,7 +20,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	private EvaluationAccessControlListModalWidget aclEditor;
 	private SynapseAlert synAlert;
 	private String entityId;
-	private Callback isChallengeCallback;
 	private EvaluationEditorModal evalEditor;
 	
 	@Inject
@@ -46,9 +45,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	 * @param evaluations List of evaluations to display
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
-	public void configure(String entityId, final Callback isChallengeCallback) {
+	public void configure(String entityId) {
 		this.entityId = entityId;
-		this.isChallengeCallback = isChallengeCallback;
 		view.clearRows();
 		synAlert.clear();
 		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
@@ -57,9 +55,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 				for (Evaluation evaluation : evaluations) {
 					view.addRow(evaluation);
 				}
-				if (isChallengeCallback != null && evaluations.size() > 0)
-					isChallengeCallback.invoke();
-				
 			}
 			
 			@Override
@@ -70,7 +65,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	}
 	
 	public void refresh() {
-		configure(entityId, isChallengeCallback);
+		configure(entityId);
 	}
 	
 	@Override

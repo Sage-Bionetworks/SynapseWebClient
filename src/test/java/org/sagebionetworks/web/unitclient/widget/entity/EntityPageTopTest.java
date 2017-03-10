@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplay;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -242,7 +243,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab, never()).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab, never()).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, areaToken, canModerate);
 		verify(mockDockerTab, never()).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 		
@@ -252,7 +253,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate);
 		verify(mockDockerTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 	}
@@ -313,7 +314,7 @@ public class EntityPageTopTest {
 		verify(mockWikiTab, never()).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab, never()).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, null, canModerate);
 		verify(mockDockerTab, never()).configure(mockFileEntity, mockEntityUpdatedHandler, null);
 	}
@@ -338,7 +339,7 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq((String)null), eq(false), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, false);
 		verify(mockDockerTab).configure(mockFileEntity, mockEntityUpdatedHandler, null);
 	}
@@ -355,12 +356,12 @@ public class EntityPageTopTest {
 		
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		
 		clickAllTabs();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockTableEntity, mockEntityUpdatedHandler, versionNumber);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
 		verify(mockDockerTab).configure(mockTableEntity, mockEntityUpdatedHandler, null);
 	}
@@ -376,7 +377,6 @@ public class EntityPageTopTest {
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
 		verify(mockDockerTab).configure(mockDockerEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		
 		clickAllTabs();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
@@ -384,7 +384,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).configure(mockDockerEntity, mockEntityUpdatedHandler, versionNumber);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockDockerEntity, mockEntityUpdatedHandler, null);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
 	}
 
@@ -521,7 +521,7 @@ public class EntityPageTopTest {
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
-		String storageKey = userId + "_" + projectEntityId + "_" + "files";
+		String storageKey = userId + "_" + projectEntityId + "_" + ProjectDisplay.FILES;
 		when(mockDisplayBundle.filesHasContent()).thenReturn(false);
 		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
 		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);

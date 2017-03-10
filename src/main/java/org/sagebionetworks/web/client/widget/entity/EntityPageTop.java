@@ -248,8 +248,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureCurrentAreaTab();
 				showSelectedTabs();
 			}
-			
-			
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -272,12 +270,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
 				String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
-				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI)) || result.wikiHasContent();
-				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES)) || result.filesHasContent();
-				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES)) || result.tablesHasContent();
-				boolean challenge = Boolean.parseBoolean(storage.getItem(tag + CHALLENGE)) || result.challengeHasContent();
-				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION)) || result.discussionHasContent();
-				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER)) || result.dockerHasContent();
+				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI)) || result.wikiHasContent() || area.equals(EntityArea.WIKI);
+				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES)) || result.filesHasContent() || area.equals(EntityArea.FILES);
+				boolean tables = Boolean.parseBoolean(storage.getItem(tag + TABLES)) || result.tablesHasContent() || area.equals(EntityArea.TABLES);
+				boolean challenge = Boolean.parseBoolean(storage.getItem(tag + CHALLENGE)) || result.challengeHasContent() || area.equals(EntityArea.ADMIN);
+				boolean discussion = Boolean.parseBoolean(storage.getItem(tag + DISCUSSION)) || result.discussionHasContent() || area.equals(EntityArea.DISCUSSION);
+				boolean docker = Boolean.parseBoolean(storage.getItem(tag + DOCKER)) || result.dockerHasContent() || area.equals(EntityArea.DOCKER);
 				
 				wikiTab.asTab().setTabListItemVisible(wiki);
 				filesTab.asTab().setTabListItemVisible(files);
@@ -318,8 +316,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		adminTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
-		//configure the challenge tab regardless
-		configureAdminTab();
 		switch (area) {
 			case FILES:
 				configureFilesTab();
@@ -334,6 +330,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				break;
 			case ADMIN:
+				configureAdminTab();
 				tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				break;
 			case DISCUSSION:
