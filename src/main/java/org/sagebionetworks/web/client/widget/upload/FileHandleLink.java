@@ -2,8 +2,11 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,25 +29,17 @@ public class FileHandleLink implements IsWidget, SelectableListItem {
 	@UiField
 	CheckBox select;
 	@UiField
-	Anchor fileHandleLink;
+	Span fileHandleWidgetContainer;
 	
 	Widget widget;
 	
-	String fileHandleId;
-	CallbackP<String> fileClickedCallback;
+	FileHandleWidget fileHandleWidget;
 	Callback selectionChangedCallback;
 	@Inject
-	public FileHandleLink(FileHandleLinkUiBinder binder) {
+	public FileHandleLink(FileHandleLinkUiBinder binder, FileHandleWidget fileHandleWidget) {
 		widget = binder.createAndBindUi(this);
-		
-		fileHandleLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (fileClickedCallback != null) {
-					fileClickedCallback.invoke(fileHandleId);	
-				}
-			}
-		});
+		this.fileHandleWidget = fileHandleWidget;
+		fileHandleWidgetContainer.add(fileHandleWidget);
 		select.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -55,15 +50,13 @@ public class FileHandleLink implements IsWidget, SelectableListItem {
 		});
 	}
 	
-	public FileHandleLink configure(String fileHandleId, String fileName, CallbackP<String> fileClickedCallback) {
-		this.fileClickedCallback = fileClickedCallback;
-		this.fileHandleId = fileHandleId;
-		fileHandleLink.setText(fileName);
+	public FileHandleLink configure(String fileName, String rawFileHandleId) {
+		fileHandleWidget.configure(fileName, rawFileHandleId);
 		return this;
 	}
 	
-	public FileHandleLink setFileClickedCallback(CallbackP<String> fileClickedCallback) {
-		this.fileClickedCallback = fileClickedCallback;
+	public FileHandleLink configure(FileHandleAssociation fha) {
+		fileHandleWidget.configure(fha);
 		return this;
 	}
 	
@@ -89,6 +82,6 @@ public class FileHandleLink implements IsWidget, SelectableListItem {
 	}
 	
 	public String getFileHandleId() {
-		return fileHandleId;
+		return fileHandleWidget.getFileHandleId();
 	}
 }

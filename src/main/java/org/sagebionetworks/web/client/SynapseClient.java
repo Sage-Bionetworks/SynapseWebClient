@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -549,9 +550,14 @@ public interface SynapseClient extends XsrfProtectedService {
 			throws RestServiceException;
 
 	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
-	
+
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
 	ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException;
 
+
+	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset)
+			throws RestServiceException;
+
+	long getTeamMemberCount(String teamId) throws RestServiceException;
 }

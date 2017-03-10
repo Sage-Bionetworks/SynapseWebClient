@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.DockerClientImpl;
@@ -89,6 +90,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
+		
+		// Setup the Challenge service
+		bind(DataAccessClientImpl.class).in(Singleton.class);
+		serve("/Portal/dataaccessclient").with(DataAccessClientImpl.class);
 		
 		// Subscription service
 		bind(SubscriptionClientImpl.class).in(Singleton.class);
