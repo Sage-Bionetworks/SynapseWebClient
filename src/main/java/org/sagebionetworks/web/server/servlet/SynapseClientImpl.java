@@ -3132,12 +3132,23 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException {
 		
-//		try {
-			//org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return new ProjectDisplayBundle(false, true, false, false, false, false);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			boolean wikiFlag = false;
+			WikiPageKey wikiPageKey = new WikiPageKey();
+			wikiPageKey.setOwnerObjectId(projectId);
+			wikiPageKey.setOwnerObjectType(ObjectType.ENTITY);
+			wikiPageKey.setWikiPageId(""/*wikiPageId*/);
+			V2WikiPage wiki = synapseClient.getV2WikiPage(wikiPageKey);
+			if (wiki.getCreatedOn() != null) {
+				wikiFlag = true;
+			}
+			
+			return new ProjectDisplayBundle(wikiFlag, true, false, false, false, false);
+		} catch (SynapseException e) {
+			throw new RestServiceException("error with wiki ");
+			//throw ExceptionUtil.convertSynapseException(e);
+		}
 		
 	}
 }
