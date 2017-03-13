@@ -63,4 +63,8 @@ public class Tabs implements IsWidget {
 	public int getTabCount() {
 		return allTabs.size();
 	}
+	
+	public void setNavTabsVisible(boolean visible) {
+		view.setNavTabsVisible(visible);
+	}
 }

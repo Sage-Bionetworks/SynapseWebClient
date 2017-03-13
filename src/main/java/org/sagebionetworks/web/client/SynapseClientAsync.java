@@ -470,17 +470,17 @@ public interface SynapseClientAsync {
 	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
 			AsyncCallback<List<AccessRequirement>> callback);
 
-	void isWiki(String id, AsyncCallback<Boolean> tabVisibilityCallback);
+	void isWiki(String id, AsyncCallback<Boolean> callback);
 
-	void isFileOrFolder(String id, AsyncCallback<Boolean> tabVisibilityCallback);
+	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
 
-	void isTable(String id, AsyncCallback<Boolean> tabVisibilityCallback);
+	void isTable(String id, AsyncCallback<Boolean> callback);
 
-	void isForum(String id, AsyncCallback<Boolean> tabVisibilityCallback);
+	void isForum(String id, AsyncCallback<Boolean> callback);
 
-	void isDocker(String id, AsyncCallback<Boolean> tabVisibilityCallback);
+	void isDocker(String id, AsyncCallback<Boolean> callback);
 
-	void isChallenge(String id, AsyncCallback<Boolean> tabVisibilityCallback);
+	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void getCountsForTabs(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
 }

@@ -75,7 +75,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-	private int tabVisibilityInitCount;
+	// how many tabs have we determined the visibility state for?
+	private int tabVisibilityInitializedCount;
+	// how many tabs have been marked as visible
+	private int visibleTabCount;
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
@@ -235,7 +238,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     
     public void showSelectedTabs() {
     	// after all tab visilibity has been determined, then move on to configure the currently selected tab
-    	tabVisibilityInitCount = 0;
+    	tabVisibilityInitializedCount = 0;
+    	visibleTabCount = 0;
     	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
     	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
     	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
@@ -254,8 +258,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			@Override
 			public void onSuccess(Boolean isContent) {
 				view.setLoadingVisible(false);
-				tabVisibilityInitCount++;
+				tabVisibilityInitializedCount++;
 				boolean isShowingTab = isShowingTab(displayArea, isContent, entityArea);
+				if (isShowingTab) {
+					visibleTabCount++;
+				}
+				if (visibleTabCount > 1) {
+					tabs.setNavTabsVisible(true);
+				}
+				
 				tab.setTabListItemVisible(isShowingTab);
 				configureCurrentAreaTabAfterComplete();
 			}
@@ -263,8 +274,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
     
     public void configureCurrentAreaTabAfterComplete() {
-    	if (tabVisibilityInitCount == tabs.getTabCount()) {
-    		hideTabsIfOneShown();
+    	if (tabVisibilityInitializedCount == tabs.getTabCount()) {
+    		openProjectDisplayIfNoVisibleTabs();
     		configureCurrentAreaTab();
     	}
     }
@@ -281,24 +292,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	return false;
     }
     
-    private void hideTabsIfOneShown() {
-    	int count = 0;
-		count += wikiTab.asTab().isTabListItemVisible() ? 1 : 0;
-		count += filesTab.asTab().isTabListItemVisible() ? 1 : 0;
-		count += tablesTab.asTab().isTabListItemVisible() ? 1 : 0;
-		count += adminTab.asTab().isTabListItemVisible() ? 1 : 0;
-		count += discussionTab.asTab().isTabListItemVisible() ? 1 : 0;
-		count += dockerTab.asTab().isTabListItemVisible() ? 1 : 0;
-		if (count <= 1) {
-			hideTabs();
-			if (count == 0 && projectBundle.getPermissions().getCanEdit()) {
-				// pop up display options automatically (if the user has rights to change)
-				controller.onProjectDisplay();
-			}
-		}
+    private void openProjectDisplayIfNoVisibleTabs() {
+    	if (visibleTabCount == 0 && projectBundle.getPermissions().getCanEdit()) {
+    		// pop up display options automatically (if the user has rights to change)
+			controller.onProjectDisplay();
+    	}
     }
     
     public void hideTabs() {
+    	tabs.setNavTabsVisible(false);
     	wikiTab.asTab().setTabListItemVisible(false);
 		filesTab.asTab().setTabListItemVisible(false);
 		tablesTab.asTab().setTabListItemVisible(false);

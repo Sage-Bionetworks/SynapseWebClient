@@ -33,7 +33,7 @@
 						<b:Divider ui:field="basicDivider" visible="false" />
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit Metadata</a:ActionMenuItem>
-						<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
+						<a:ActionMenuItem icon="TELEVISION" iconFixedWidth="true" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Metadata</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_NEW_FILE">Upload A New Version Of The File</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki</a:ActionMenuItem>
