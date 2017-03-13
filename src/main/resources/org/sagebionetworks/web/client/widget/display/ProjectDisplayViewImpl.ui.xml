@@ -11,9 +11,9 @@
 			<b:ModalHeader>
 				<b:Heading size="H4" text="Project Display Settings" />
 			</b:ModalHeader>
-			<b:ModalBody>
-				<bh:Div addStyleNames="margin-left-10">
-					<b:Heading size="H5" text="Select which features you want to include." addStyleNames="margin-bottom-20"/>
+			<b:ModalBody addStyleNames="margin-left-10">
+				<bh:Div>
+					<b:Heading size="H5" text="Select which features you would like to use:" addStyleNames="margin-bottom-20"/>
 			   	</bh:Div> 
 		     	<b:CheckBox ui:field="wikiButton" text="Wiki" addStyleNames="font-size-18"/>
 		     	<bh:Paragraph addStyleNames="margin-left-20">Build narrative to describe your project in the Wiki.</bh:Paragraph>

@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -123,8 +123,6 @@ public class EntityPageTopTest {
 	CookieProvider mockCookies;
 	@Mock
 	SessionStorage mockStorage;
-	@Mock
-	ProjectDisplayBundle mockDisplayBundle;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
@@ -160,13 +158,20 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
 		
-		AsyncMockStubber.callSuccessWith(mockDisplayBundle).when(mockSynapseClientAsync).getCountsForTabs(anyString(), any(AsyncCallback.class));
-		when(mockDisplayBundle.wikiHasContent()).thenReturn(true);
-		when(mockDisplayBundle.filesHasContent()).thenReturn(true);
-		when(mockDisplayBundle.tablesHasContent()).thenReturn(true);
-		when(mockDisplayBundle.challengeHasContent()).thenReturn(true);
-		when(mockDisplayBundle.discussionHasContent()).thenReturn(true);
-		when(mockDisplayBundle.dockerHasContent()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockTablesInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockChallengeInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockDiscussionInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(true);
+		
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
 		
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
@@ -175,6 +180,7 @@ public class EntityPageTopTest {
 		when(mockDiscussionInnerTab.isContentStale()).thenReturn(true);
 		when(mockDockerInnerTab.isContentStale()).thenReturn(true);
 		when(mockChallengeInnerTab.isContentStale()).thenReturn(true);
+		when(mockTabs.getTabCount()).thenReturn(6);
 	}
 	
 	@Test
@@ -445,19 +451,18 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testConfigureProjectNoWiki() {
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(false);
 		// we are asking for an invalid wiki id for a project that contains no wiki.
 		Synapse.EntityArea area = null;
 		String invalidWikiId = "1234";
 		Long versionNumber = null;
 		when(mockProjectBundle.getRootWikiId()).thenReturn(null);
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, invalidWikiId);
-		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(invalidWikiId), eq(canEdit), wikiCallbackCaptor.capture());
+		verify(mockWikiTab, never()).configure(anyString(), anyString(), anyString(), anyBoolean(), any(WikiPageWidget.Callback.class));
 		
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
-		//simulate not found
-		wikiCallbackCaptor.getValue().noWikiFound();
 		//since the project does not have a root wiki id, it should go to the files tab
-		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
 	}
@@ -481,10 +486,11 @@ public class EntityPageTopTest {
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
-		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
-		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
-		when(mockDisplayBundle.discussionHasContent()).thenReturn(false);
-		when(mockDisplayBundle.dockerHasContent()).thenReturn(false);
+		
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
@@ -500,11 +506,11 @@ public class EntityPageTopTest {
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
-		when(mockDisplayBundle.filesHasContent()).thenReturn(false);
-		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
-		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
-		when(mockDisplayBundle.discussionHasContent()).thenReturn(false);
-		when(mockDisplayBundle.dockerHasContent()).thenReturn(false);
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		//should hide all tabs when only one will be shown
@@ -522,11 +528,12 @@ public class EntityPageTopTest {
 		String areaToken = null;
 		Long versionNumber = null;
 		String storageKey = userId + "_" + projectEntityId + "_" + ProjectDisplay.FILES;
-		when(mockDisplayBundle.filesHasContent()).thenReturn(false);
-		when(mockDisplayBundle.tablesHasContent()).thenReturn(false);
-		when(mockDisplayBundle.challengeHasContent()).thenReturn(false);
-		when(mockDisplayBundle.discussionHasContent()).thenReturn(false);
-		when(mockDisplayBundle.dockerHasContent()).thenReturn(false);
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+
 		when(mockStorage.getItem(storageKey)).thenReturn("true");
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.display;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
@@ -86,7 +87,7 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter, IsWidget {
 	
 	public void hide() {
 		view.hide();
-		globalAppState.refreshPage();
+		globalAppState.getPlaceChanger().goTo(new Synapse(projectId));
 	}
 	
 	public void clear() {

@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplay;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplayView;
@@ -37,6 +39,8 @@ public class ProjectDisplayTest {
 	SessionStorage mockStorage;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 	
 	String userId = "1234567";
 	String projectId = "syn123";
@@ -45,6 +49,7 @@ public class ProjectDisplayTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		modal = new ProjectDisplay(mockView, mockSynapseClient, mockSynAlert, mockStorage, mockGlobalApplicationState);
 		modal.configure(projectId, userId);
 	}
@@ -76,7 +81,7 @@ public class ProjectDisplayTest {
 	public void testHideDialog() {
 		modal.hide();
 		verify(mockView).hide();
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockPlaceChanger).goTo(new Synapse(projectId));
 	}
 	
 	@Test
@@ -96,7 +101,7 @@ public class ProjectDisplayTest {
 		modal.cancel();
 		verify(mockSynAlert).clear();
 		verify(mockView).hide();
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockPlaceChanger).goTo(new Synapse(projectId));
 	}
 	
 	@Test
@@ -114,7 +119,7 @@ public class ProjectDisplayTest {
 		verify(mockSynAlert).clear();
 		verify(mockStorage, times(2)).setItem(anyString(), anyString());
 		verify(mockStorage, times(4)).removeItem(anyString());
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockPlaceChanger).goTo(new Synapse(projectId));
 	}
 	
 	@Test

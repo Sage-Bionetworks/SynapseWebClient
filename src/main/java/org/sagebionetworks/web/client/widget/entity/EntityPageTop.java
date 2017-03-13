@@ -46,7 +46,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -234,7 +233,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
-    private void showSelectedTabs() {
+    public void showSelectedTabs() {
     	// after all tab visilibity has been determined, then move on to configure the currently selected tab
     	tabVisibilityInitCount = 0;
     	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
@@ -335,6 +334,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
 
 	public void configureCurrentAreaTab() {
+		if (entity instanceof Project) {
+			view.setProjectInformationVisible(true);
+		}
+		
 		//set area, if undefined
 		if (area == null) {
 			if (entity instanceof Project) {
