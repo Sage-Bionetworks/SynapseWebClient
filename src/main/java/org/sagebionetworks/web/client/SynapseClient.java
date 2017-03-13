@@ -553,9 +553,20 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
-	ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException;
-
-
 	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset)
 			throws RestServiceException;
+
+	boolean isWiki(String projectId) throws RestServiceException;
+
+	boolean isFileOrFolder(String projectId) throws RestServiceException;
+
+	boolean isTable(String projectId) throws RestServiceException;
+
+	boolean isForum(String projectId) throws RestServiceException;
+
+	boolean isDocker(String projectId) throws RestServiceException;
+
+	boolean isChallenge(String projectId) throws RestServiceException;
+
+	ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException;
 }

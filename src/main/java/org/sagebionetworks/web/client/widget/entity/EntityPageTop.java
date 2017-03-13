@@ -76,6 +76,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
+	private int tabVisibilityInitCount;
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
@@ -208,9 +209,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
     
     public void configureProject() {
-    	hideTabs();
     	view.setLoadingVisible(true);
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
+    	hideTabs();
+    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
@@ -234,37 +235,40 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
     
     private void showSelectedTabs() {
-		synapseClient.getCountsForTabs(projectHeader.getId(), new AsyncCallback<ProjectDisplayBundle>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
-				view.showErrorMessage(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(ProjectDisplayBundle result) {
-				view.setLoadingVisible(false);
-				boolean wiki = isShowingTab(WIKI, result.wikiHasContent(), EntityArea.WIKI);
-				boolean files = isShowingTab(FILES, result.filesHasContent(), EntityArea.FILES);
-				boolean tables = isShowingTab(TABLES, result.tablesHasContent(), EntityArea.TABLES);
-				boolean challenge = isShowingTab(CHALLENGE, result.challengeHasContent(), EntityArea.ADMIN);
-				boolean discussion = isShowingTab(DISCUSSION, result.discussionHasContent(), EntityArea.DISCUSSION);
-				boolean docker = isShowingTab(DOCKER, result.dockerHasContent(), EntityArea.DOCKER);
-				
-				wikiTab.asTab().setTabListItemVisible(wiki);
-				filesTab.asTab().setTabListItemVisible(files);
-				tablesTab.asTab().setTabListItemVisible(tables);
-				adminTab.asTab().setTabListItemVisible(challenge);
-				discussionTab.asTab().setTabListItemVisible(discussion);
-				dockerTab.asTab().setTabListItemVisible(docker);
-				hideTabsIfOneShown(wiki, files, tables, challenge, discussion, docker);
-				
-				configureCurrentAreaTab();
-			}
-			
-		});
+    	// after all tab visilibity has been determined, then move on to configure the currently selected tab
+    	tabVisibilityInitCount = 0;
+    	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
+    	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
+    	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
+    	synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(CHALLENGE, EntityArea.ADMIN, adminTab.asTab()));
+    	synapseClient.isForum(projectHeader.getId(), getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()));
+    	synapseClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()));
 	}
+    
+    public AsyncCallback<Boolean> getTabVisibilityCallback(final String displayArea, final EntityArea entityArea, final Tab tab) {
+    	return new AsyncCallback<Boolean>() {
+	    	@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+				view.setLoadingVisible(false);
+			}
+			@Override
+			public void onSuccess(Boolean isContent) {
+				view.setLoadingVisible(false);
+				tabVisibilityInitCount++;
+				boolean isShowingTab = isShowingTab(displayArea, isContent, entityArea);
+				tab.setTabListItemVisible(isShowingTab);
+				configureCurrentAreaTabAfterComplete();
+			}
+		};
+    }
+    
+    public void configureCurrentAreaTabAfterComplete() {
+    	if (tabVisibilityInitCount == tabs.getTabCount()) {
+    		hideTabsIfOneShown();
+    		configureCurrentAreaTab();
+    	}
+    }
     
     public boolean isShowingTab(String displayArea, boolean areaHasContent, EntityArea associatedArea) {
     	String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
@@ -278,14 +282,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	return false;
     }
     
-    private void hideTabsIfOneShown(boolean wiki, boolean files, boolean tables, boolean challenge, boolean discussion, boolean docker) {
-		int count = 0;
-		count += wiki ? 1 : 0;
-		count += files ? 1 : 0;
-		count += tables ? 1 : 0;
-		count += challenge ? 1 : 0;
-		count += discussion ? 1 : 0;
-		count += docker ? 1 : 0;
+    private void hideTabsIfOneShown() {
+    	int count = 0;
+		count += wikiTab.asTab().isTabListItemVisible() ? 1 : 0;
+		count += filesTab.asTab().isTabListItemVisible() ? 1 : 0;
+		count += tablesTab.asTab().isTabListItemVisible() ? 1 : 0;
+		count += adminTab.asTab().isTabListItemVisible() ? 1 : 0;
+		count += discussionTab.asTab().isTabListItemVisible() ? 1 : 0;
+		count += dockerTab.asTab().isTabListItemVisible() ? 1 : 0;
 		if (count <= 1) {
 			hideTabs();
 			if (count == 0 && projectBundle.getPermissions().getCanEdit()) {

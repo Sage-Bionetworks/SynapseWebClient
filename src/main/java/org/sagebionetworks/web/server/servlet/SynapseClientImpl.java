@@ -3158,7 +3158,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	
 	@Override
 	public ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException {
-		
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			boolean isWiki = isWiki(projectId, synapseClient);
@@ -3173,6 +3172,61 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
+	@Override
+	public boolean isChallenge(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isChallenge(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isForum(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isForum(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isDocker(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isDocker(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isFileOrFolder(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isFileOrFolder(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isTable(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isTable(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isWiki(String projectId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		return isWiki(projectId, synapseClient);
+	}
 	
 	private boolean isForum(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		Forum forum = synapseClient.getForumByProjectId(projectId);
