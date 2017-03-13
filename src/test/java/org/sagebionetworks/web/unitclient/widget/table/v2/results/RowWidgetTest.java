@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -157,5 +157,25 @@ public class RowWidgetTest {
 		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(0), aRow.getRowId(), aRow.getVersionNumber(), isView));
 		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(1), aRow.getRowId(), aRow.getVersionNumber(), isView));
 	}
-
+	@Test
+	public void testEditDefaultColumnModelsIsView(){
+		defaultColumnModels.addAll(types);
+		isView = true;
+		boolean isEditor = true;
+		rowWidget.configure(tableId, types, isEditor, isView, aRow, mockListner);
+		verify(mockCellFactory, times(types.size())).createRenderer(any(ColumnModel.class));
+		verify(mockCellFactory, never()).createEditor(any(ColumnModel.class));
+	}
+	
+	@Test
+	public void testEditDefaultColumnModelsIsTable(){
+		defaultColumnModels.addAll(types);
+		isView = false;
+		boolean isEditor = true;
+		rowWidget.configure(tableId, types, isEditor, isView, aRow, mockListner);
+		verify(mockCellFactory, never()).createRenderer(any(ColumnModel.class));
+		verify(mockCellFactory, times(types.size())).createEditor(any(ColumnModel.class));
+	}
+	
+	
 }

@@ -77,7 +77,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 		for(ColumnModel type: types){
 			// Create each cell
 			Cell cell = null;
-			if(isEditor && !defaultColumns.contains(type)){
+			if(isEditor && (!isView || !defaultColumns.contains(type))){
 				cell = cellFactory.createEditor(type);
 			}else{
 				cell = cellFactory.createRenderer(type);
