@@ -3276,13 +3276,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		try {
-			synapseClient.getChallengeForProject(projectId);
-			// there's a challenge, return true
-			return true;
-		} catch (SynapseNotFoundException ex) {
-			// no challenge, are there any evaluations that the current user can edit?
-			return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
-		}
+		// are there any evaluations that the current user can edit?
+		return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
 	}
 }
