@@ -568,5 +568,5 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	boolean isChallenge(String projectId) throws RestServiceException;
 
-	ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException;
+	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
 }

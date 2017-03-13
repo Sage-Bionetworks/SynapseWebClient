@@ -57,7 +57,7 @@ public class ProjectDisplayTest {
 	@Test
 	public void testShowDialog() {
 		ProjectDisplayBundle result = new ProjectDisplayBundle(false, false, false, false, false, false);
-		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getCountsForTabs(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
 		modal.show();
 		verify(mockView).setWiki(false);
 		verify(mockView).setFiles(false);
@@ -70,7 +70,7 @@ public class ProjectDisplayTest {
 	@Test
 	public void testShowDialogError() {
 		ProjectDisplayBundle result = new ProjectDisplayBundle(false, false, false, false, false, false);
-		AsyncMockStubber.callFailureWith(new Throwable("error")).when(mockSynapseClient).getCountsForTabs(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable("error")).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
 		modal.show();
 		verify(mockView).showErrorMessage("error");
 		verify(mockView, never()).show();
@@ -107,7 +107,7 @@ public class ProjectDisplayTest {
 	@Test
 	public void testOnSave() {
 		ProjectDisplayBundle result = new ProjectDisplayBundle(false, false, false, false, false, false);
-		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getCountsForTabs(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
 		when(mockView.getWiki()).thenReturn(true);
 		when(mockView.getFiles()).thenReturn(true);
 		when(mockView.getTables()).thenReturn(false);
@@ -125,7 +125,7 @@ public class ProjectDisplayTest {
 	@Test
 	public void testOnSaveIllegal() {
 		ProjectDisplayBundle result = new ProjectDisplayBundle(true, false, false, false, false, false);
-		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getCountsForTabs(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
 		when(mockView.getWiki()).thenReturn(false);
 		when(mockView.getFiles()).thenReturn(false);
 		when(mockView.getTables()).thenReturn(false);

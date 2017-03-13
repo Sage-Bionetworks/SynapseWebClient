@@ -482,5 +482,5 @@ public interface SynapseClientAsync {
 
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
-	void getCountsForTabs(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
+	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
 }

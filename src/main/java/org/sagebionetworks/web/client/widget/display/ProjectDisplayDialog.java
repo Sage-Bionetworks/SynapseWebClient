@@ -57,7 +57,7 @@ public class ProjectDisplayDialog implements ProjectDisplayView.Presenter, IsWid
 	}
 	
 	public void show() {
-		synapseClient.getCountsForTabs(projectId, new AsyncCallback<ProjectDisplayBundle>() {
+		synapseClient.getProjectDisplay(projectId, new AsyncCallback<ProjectDisplayBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());

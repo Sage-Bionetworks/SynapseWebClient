@@ -3157,7 +3157,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public ProjectDisplayBundle getCountsForTabs(String projectId) throws RestServiceException {
+	public ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			boolean isWiki = isWiki(projectId, synapseClient);
