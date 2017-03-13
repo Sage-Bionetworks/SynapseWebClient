@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProjectDisplay implements ProjectDisplayView.Presenter, IsWidget {
+public class ProjectDisplayDialog implements ProjectDisplayView.Presenter, IsWidget {
 	ProjectDisplayView view;
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
@@ -32,7 +32,7 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter, IsWidget {
 	public static final String DOCKER = "Docker";
 	
 	@Inject
-	public ProjectDisplay(ProjectDisplayView view,
+	public ProjectDisplayDialog(ProjectDisplayView view,
 			SynapseClientAsync synapseClient, 
 			SynapseAlert synAlert,
 			SessionStorage storage, 
@@ -65,7 +65,7 @@ public class ProjectDisplay implements ProjectDisplayView.Presenter, IsWidget {
 
 			@Override
 			public void onSuccess(ProjectDisplayBundle result) {
-				ProjectDisplay.this.result = result;
+				ProjectDisplayDialog.this.result = result;
 				boolean wiki = Boolean.parseBoolean(storage.getItem(tag + WIKI)) || result.wikiHasContent();
 				view.setWiki(wiki);
 				boolean files = Boolean.parseBoolean(storage.getItem(tag + FILES)) || result.filesHasContent();

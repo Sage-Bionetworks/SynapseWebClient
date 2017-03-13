@@ -3230,6 +3230,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	
 	private boolean isForum(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		Forum forum = synapseClient.getForumByProjectId(projectId);
+		if (forum == null) {
+			return false;
+		}
 		return synapseClient.getThreadCountForForum(forum.getId(), DiscussionFilter.NO_FILTER).getCount() > 0;
 	}
 	

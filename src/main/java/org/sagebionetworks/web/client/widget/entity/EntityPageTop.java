@@ -10,12 +10,12 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.CHALLENGE;
-import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.DISCUSSION;
-import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.DOCKER;
-import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.FILES;
-import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.TABLES;
-import static org.sagebionetworks.web.client.widget.display.ProjectDisplay.WIKI;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.CHALLENGE;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.DISCUSSION;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.DOCKER;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.FILES;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.TABLES;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.WIKI;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;

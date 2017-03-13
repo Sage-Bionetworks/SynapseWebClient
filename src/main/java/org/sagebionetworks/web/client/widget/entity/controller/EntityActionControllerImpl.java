@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplay;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -124,7 +124,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
-	ProjectDisplay projectDisplay;
+	ProjectDisplayDialog projectDisplay;
 	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 
@@ -150,9 +150,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		return approveUserAccessModal;
 	}
-	private ProjectDisplay getProjectDisplayModal() {
+	private ProjectDisplayDialog getProjectDisplayModal() {
 		if (projectDisplay == null) {
-			projectDisplay = ginInjector.getProjectDisplay();
+			projectDisplay = ginInjector.getProjectDisplayDialog();
 		}
 		return projectDisplay;
 	}

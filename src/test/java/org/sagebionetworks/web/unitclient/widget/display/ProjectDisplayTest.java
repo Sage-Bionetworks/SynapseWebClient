@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplay;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplayView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
@@ -44,13 +44,13 @@ public class ProjectDisplayTest {
 	
 	String userId = "1234567";
 	String projectId = "syn123";
-	ProjectDisplay modal;
+	ProjectDisplayDialog modal;
 	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		modal = new ProjectDisplay(mockView, mockSynapseClient, mockSynAlert, mockStorage, mockGlobalApplicationState);
+		modal = new ProjectDisplayDialog(mockView, mockSynapseClient, mockSynAlert, mockStorage, mockGlobalApplicationState);
 		modal.configure(projectId, userId);
 	}
 	
