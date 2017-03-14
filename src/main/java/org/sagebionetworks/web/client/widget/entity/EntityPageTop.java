@@ -25,7 +25,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -84,7 +84,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
 	private CookieProvider cookies;
-	private SessionStorage storage;
+	private ClientCache storage;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -101,7 +101,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
 			CookieProvider cookies,
-			SessionStorage storage) {
+			ClientCache storage) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
@@ -282,7 +282,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     
     public boolean isShowingTab(String displayArea, boolean areaHasContent, EntityArea associatedArea) {
     	String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
-    	if (Boolean.parseBoolean(storage.getItem(tag + displayArea))) {
+    	if (Boolean.parseBoolean(storage.get(tag + displayArea))) {
     		return true;
     	} else if (areaHasContent) {
     		return true;

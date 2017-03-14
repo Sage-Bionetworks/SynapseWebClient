@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -122,7 +123,7 @@ public class EntityPageTopTest {
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
-	SessionStorage mockStorage;
+	ClientCache mockStorage;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
@@ -534,7 +535,7 @@ public class EntityPageTopTest {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
 
-		when(mockStorage.getItem(storageKey)).thenReturn("true");
+		when(mockStorage.get(storageKey)).thenReturn(Boolean.TRUE.toString());
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);

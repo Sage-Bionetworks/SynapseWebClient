@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.display;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -14,9 +15,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplayView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -36,7 +36,7 @@ public class ProjectDisplayTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	SessionStorage mockStorage;
+	ClientCache mockStorage;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
@@ -117,8 +117,8 @@ public class ProjectDisplayTest {
 		modal.show();
 		modal.onSave();
 		verify(mockSynAlert).clear();
-		verify(mockStorage, times(2)).setItem(anyString(), anyString());
-		verify(mockStorage, times(4)).removeItem(anyString());
+		verify(mockStorage, times(2)).put(anyString(), anyString(), anyLong());
+		verify(mockStorage, times(4)).remove(anyString());
 		verify(mockPlaceChanger).goTo(new Synapse(projectId));
 	}
 	
