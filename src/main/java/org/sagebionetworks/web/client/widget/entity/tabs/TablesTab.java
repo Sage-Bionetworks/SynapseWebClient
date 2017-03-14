@@ -264,7 +264,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void onQueryChange(Query newQuery) {
-		if(newQuery != null) {
+		if(newQuery != null && tab.isTabPaneVisible()) {
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())){
 				areaToken = TABLE_QUERY_PREFIX + token;
