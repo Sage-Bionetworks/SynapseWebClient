@@ -83,6 +83,5 @@
 	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
 	<set-property name="user.agent" value="safari"/>
 	  -->
-	  <set-property name="user.agent" value="safari"/>
 	
 </module>
