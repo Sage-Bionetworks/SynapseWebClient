@@ -27,7 +27,6 @@ public interface CreateACTAccessRequirementStep2View extends IsWidget {
 	boolean isValidatedProfileRequired();
 	
 	void setWikiPageRenderer(IsWidget w);
-	void setWikiPageEditor(IsWidget w);
 	void setDUCTemplateUploadWidget(IsWidget w);
 	void setDUCTemplateWidget(IsWidget w);
 	

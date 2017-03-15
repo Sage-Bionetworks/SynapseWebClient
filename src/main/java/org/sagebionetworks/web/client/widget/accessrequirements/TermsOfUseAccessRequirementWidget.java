@@ -34,8 +34,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;
-		wikiPageWidget.setModifiedCreatedByVisible(false);
-		wikiPageWidget.showWikiHistory(false);
+		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 	}

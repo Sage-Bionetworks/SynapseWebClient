@@ -47,8 +47,7 @@ public class ACTAccessRequirementWidgetTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setWikiTermsWidget(any(Widget.class));
-		verify(mockWikiPageWidget).setModifiedCreatedByVisible(false);
-		verify(mockWikiPageWidget).showWikiHistory(false);
+		verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
 	}
 
 	@Test

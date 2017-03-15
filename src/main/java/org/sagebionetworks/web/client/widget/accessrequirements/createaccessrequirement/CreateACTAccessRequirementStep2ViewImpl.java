@@ -26,8 +26,6 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	@UiField
 	Div wikiPageContainer;
 	@UiField
-	Div wikiEditorContainer;
-	@UiField
 	Button editWikiButton;
 	@UiField
 	CheckBox certifiedCheckbox;
@@ -138,11 +136,6 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	public void setWikiPageRenderer(IsWidget w) {
 		wikiPageContainer.clear();
 		wikiPageContainer.add(w);
-	}
-	@Override
-	public void setWikiPageEditor(IsWidget w) {
-		wikiEditorContainer.clear();
-		wikiEditorContainer.add(w);
 	}
 	@Override
 	public void setDUCTemplateUploadWidget(IsWidget w) {

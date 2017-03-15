@@ -5,6 +5,7 @@ import java.util.Date;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,6 +40,7 @@ public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Pres
 	}
 
 	public void setVisible(boolean isVisible) {
+		GWT.debugger();
 		view.setVisible(isVisible);
 	}
 }

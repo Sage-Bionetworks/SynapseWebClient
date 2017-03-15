@@ -9,10 +9,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
@@ -22,7 +19,6 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.sun.tools.internal.ws.processor.model.ModelProperties;
 
 /**
  * First page of creating an access requirement  
@@ -34,7 +30,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	List<RestrictableObjectDescriptor> subjects;
 	ModalPresenter modalPresenter;
 	CreateACTAccessRequirementStep2 actStep2;
-//	CreateToUAccessRequirement touStep2;
+	CreateTermsOfUseAccessRequirementStep2 touStep2;
 	PortalGinInjector ginInjector;
 	ACCESS_TYPE currentAccessType;
 	AccessRequirement accessRequirement;
@@ -44,13 +40,13 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	public CreateAccessRequirementStep1(
 			CreateAccessRequirementStep1View view,
 			CreateACTAccessRequirementStep2 actStep2,
-//			CreateToUAccessRequirement touStep2,
+			CreateTermsOfUseAccessRequirementStep2 touStep2,
 			PortalGinInjector ginInjector,
 			SynapseClientAsync synapseClient) {
 		super();
 		this.view = view;
 		this.actStep2 = actStep2;
-//		this.touStep2 = touStep2;
+		this.touStep2 = touStep2;
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		view.setPresenter(this);
@@ -150,8 +146,8 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 					actStep2.configure((ACTAccessRequirement)accessRequirement);
 					modalPresenter.setNextActivePage(actStep2);
 				} else {
-//					touStep2.configure((TermsOfUseAccessRequirement)accessRequirement);
-//					modalPresenter.setNextActivePage(touStep2);
+					touStep2.configure((TermsOfUseAccessRequirement)accessRequirement);
+					modalPresenter.setNextActivePage(touStep2);
 				}		
 			}
 		});

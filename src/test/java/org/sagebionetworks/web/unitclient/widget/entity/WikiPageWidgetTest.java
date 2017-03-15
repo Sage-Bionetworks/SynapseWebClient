@@ -219,7 +219,6 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testShowWikiHistory(){
-		presenter.showWikiHistory(false);
 		verify(mockView).setWikiHistoryVisible(false);
 	}
 	

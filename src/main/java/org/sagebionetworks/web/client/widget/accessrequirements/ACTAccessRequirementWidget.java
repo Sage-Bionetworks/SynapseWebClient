@@ -34,8 +34,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.ginInjector = ginInjector;
-		wikiPageWidget.setModifiedCreatedByVisible(false);
-		wikiPageWidget.showWikiHistory(false);
+		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 	}

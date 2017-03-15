@@ -29,9 +29,11 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
+import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -73,6 +75,10 @@ public class AccessRequirementsPresenterTest {
 	ACTAccessRequirementWidget mockACTAccessRequirementWidget;
 	@Mock
 	TermsOfUseAccessRequirementWidget mockTermsOfUseAccessRequirementWidget;
+	@Mock
+	Button mockCreateARButton;
+	@Mock
+	CreateAccessRequirementWizard mockCreateAccessRequirementWizard;
 	public static final String ENTITY_ID = "syn239834";
 	public static final String TEAM_ID = "45678";
 	
@@ -80,7 +86,7 @@ public class AccessRequirementsPresenterTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		presenter = new AccessRequirementsPresenter(mockView, mockSynapseClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge);
+		presenter = new AccessRequirementsPresenter(mockView, mockSynapseClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockCreateAccessRequirementWizard);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);

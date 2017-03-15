@@ -100,6 +100,8 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.Button;
+import org.sagebionetworks.web.client.widget.ButtonImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
@@ -116,6 +118,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequ
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1ViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1View;
@@ -1412,6 +1416,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileHandleWidgetView.class).to(FileHandleWidgetViewImpl.class);
 		bind(CreateAccessRequirementStep1View.class).to(CreateAccessRequirementStep1ViewImpl.class);
 		bind(CreateACTAccessRequirementStep2View.class).to(CreateACTAccessRequirementStep2ViewImpl.class);
-		
+		bind(CreateTermsOfUseAccessRequirementStep2View.class).to(CreateTermsOfUseAccessRequirementStep2ViewImpl.class);
+		bind(Button.class).to(ButtonImpl.class);
 	}
 }

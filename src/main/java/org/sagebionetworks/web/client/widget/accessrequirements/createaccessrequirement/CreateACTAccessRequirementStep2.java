@@ -58,13 +58,11 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 				setDUCFileHandle(fileUpload.getFileMeta().getFileName(), fileUpload.getFileHandleId());
 			}
 		});
-		view.setWikiPageEditor(wikiMarkdownEditor);
 		view.setWikiPageRenderer(wikiPageRenderer.asWidget());
 		view.setDUCTemplateUploadWidget(ducTemplateUploader);
 		view.setDUCTemplateWidget(ducTemplateFileHandleWidget);
 		view.setPresenter(this);
-		wikiPageRenderer.setModifiedCreatedByVisible(false);
-		wikiPageRenderer.showWikiHistory(false);
+		wikiPageRenderer.setModifiedCreatedByHistoryVisible(false);
 	}
 	
 	public void setDUCFileHandle(String fileName, String fileHandleId) {
@@ -122,6 +120,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	@Override
 	public void onPrimary() {
 		// update access requirement from view
+		accessRequirement.setActContactInfo(null);
 		accessRequirement.setAreOtherAttachmentsRequired(view.areOtherAttachmentsRequired());
 		accessRequirement.setIsAnnualReviewRequired(view.isAnnualReviewRequired());
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());

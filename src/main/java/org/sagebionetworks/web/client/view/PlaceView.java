@@ -8,8 +8,8 @@ public interface PlaceView extends IsWidget {
 	void clearBody();
 	void clearAboveBody();
 	void clearBelowBody();
-	void addAboveBody(Widget w);
-	void addBelowBody(Widget w);
+	void addAboveBody(IsWidget w);
+	void addBelowBody(IsWidget w);
 	void initHeaderAndFooter();
 	void addTitle(String text);
 	void addTitle(Widget w);
