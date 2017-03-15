@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -21,9 +22,10 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.sun.tools.internal.ws.processor.model.ModelProperties;
 
 /**
- * First page of data access wizard.  
+ * First page of creating an access requirement  
  * @author Jay
  *
  */
@@ -31,23 +33,26 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	CreateAccessRequirementStep1View view;
 	List<RestrictableObjectDescriptor> subjects;
 	ModalPresenter modalPresenter;
-	CreateACTAccessRequirement actStep2;
-	CreateToUAccessRequirement touStep2;
+	CreateACTAccessRequirementStep2 actStep2;
+//	CreateToUAccessRequirement touStep2;
 	PortalGinInjector ginInjector;
 	ACCESS_TYPE currentAccessType;
 	AccessRequirement accessRequirement;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
 	public CreateAccessRequirementStep1(
 			CreateAccessRequirementStep1View view,
-			CreateACTAccessRequirement actStep2,
-			CreateToUAccessRequirement touStep2,
-			PortalGinInjector ginInjector) {
+			CreateACTAccessRequirementStep2 actStep2,
+//			CreateToUAccessRequirement touStep2,
+			PortalGinInjector ginInjector,
+			SynapseClientAsync synapseClient) {
 		super();
 		this.view = view;
 		this.actStep2 = actStep2;
-		this.touStep2 = touStep2;
+//		this.touStep2 = touStep2;
 		this.ginInjector = ginInjector;
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}
 	
@@ -131,13 +136,26 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		accessRequirement.setAccessType(currentAccessType);
 		accessRequirement.setSubjectIds(subjects);
 		
-		if (accessRequirement instanceof ACTAccessRequirement) {
-			actStep2.configure((ACTAccessRequirement)accessRequirement);
-			modalPresenter.setNextActivePage(actStep2);
-		} else {
-			touStep2.configure((TermsOfUseAccessRequirement)accessRequirement);
-			modalPresenter.setNextActivePage(touStep2);
-		}
+		modalPresenter.setLoading(true);
+		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				modalPresenter.setLoading(false);
+				modalPresenter.setErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(AccessRequirement accessRequirement) {
+				modalPresenter.setLoading(false);
+				if (accessRequirement instanceof ACTAccessRequirement) {
+					actStep2.configure((ACTAccessRequirement)accessRequirement);
+					modalPresenter.setNextActivePage(actStep2);
+				} else {
+//					touStep2.configure((TermsOfUseAccessRequirement)accessRequirement);
+//					modalPresenter.setNextActivePage(touStep2);
+				}		
+			}
+		});
+		
 	}
 
 	@Override

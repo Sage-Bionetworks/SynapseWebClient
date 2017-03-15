@@ -28,5 +28,5 @@ public interface FileHandleWidgetView extends IsWidget {
 	 * @param createAnchorHref
 	 */
 	void setAnchor(String fileName, String createAnchorHref);
-
+	void setVisible(boolean visible);
 }

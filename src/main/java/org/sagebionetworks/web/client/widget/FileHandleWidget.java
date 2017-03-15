@@ -84,4 +84,8 @@ public class FileHandleWidget implements IsWidget {
 		return fileHandleId;
 	}
 	
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
+	}
+	
 }

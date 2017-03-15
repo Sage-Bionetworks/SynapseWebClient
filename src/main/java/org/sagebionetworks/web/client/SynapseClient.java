@@ -278,7 +278,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
-	AccessRequirement createAccessRequirement(AccessRequirement arEW) throws RestServiceException;
+	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
 			throws RestServiceException;
