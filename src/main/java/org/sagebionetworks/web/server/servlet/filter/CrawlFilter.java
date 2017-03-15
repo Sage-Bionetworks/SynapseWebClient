@@ -14,6 +14,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import javax.servlet.Filter;
@@ -70,6 +71,9 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
+
 /**
  * This filter detects ajax crawler (Google).  If so, it takes over the renders the javascript page and handles the response.
  *
@@ -79,7 +83,25 @@ public class CrawlFilter implements Filter {
 	private static final String DISCUSSION_THREAD_ID = "/discussion/threadId=";
 	public static final String ESCAPED_FRAGMENT = "_escaped_fragment_=";
 	ServletContext sc;
-	
+
+	private final Supplier<String> homePageCached = Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
+
+	public String getCachedHomePageHtml() {
+		return homePageCached.get();
+	}
+
+	private Supplier<String> homePageSupplier() {
+		return new Supplier<String>() {
+			public String get() {
+				try {
+					return getHomePageHtml();
+				} catch (JSONObjectAdapterException | RestServiceException e) {
+					return e.getMessage();
+				}
+			}
+		};
+	}
+
 	/**
 	 * Injected with Gin
 	 */
@@ -104,7 +126,7 @@ public class CrawlFilter implements Filter {
 				int port = request.getServerPort();
 				String domain = request.getServerName();
 				String lowerCaseDomain = domain.toLowerCase();
-				if (!lowerCaseDomain.contains("www.synapse.org")) {
+				if (!(lowerCaseDomain.contains("www.synapse.org") || lowerCaseDomain.contains("127.0.0.1"))) {
 					response.setContentType("text/html");
 					HttpServletResponse httpResponse = (HttpServletResponse) response;
 					httpResponse.setStatus(HttpServletResponse.SC_OK);
@@ -118,7 +140,7 @@ public class CrawlFilter implements Filter {
 				String fixedQueryString = uri + rewriteQueryString(queryString);
 				if (fixedQueryString.contains("#!Home")) {
 					//send back info about the site
-					html = getHomePageHtml();
+					html = getCachedHomePageHtml();
 				} else if (fixedQueryString.contains("#!Synapse")) {
 					if (fixedQueryString.contains(DISCUSSION_THREAD_ID)) {
 						String threadId = fixedQueryString.substring(fixedQueryString.indexOf(DISCUSSION_THREAD_ID)+DISCUSSION_THREAD_ID.length());
@@ -263,12 +285,17 @@ public class CrawlFilter implements Filter {
 			Forum forum = discussionForumClient.getForumByProjectId(entity.getId());
 			if (forum != null) {
 				String forumId = forum.getId();
-				//index 100 of the most recent project thread titles
-				PaginatedResults<DiscussionThreadBundle> paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 100L, 0L, DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY, false, DiscussionFilter.EXCLUDE_DELETED);
-				List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
-				for (DiscussionThreadBundle thread : threadList) {
-					html.append("<a href=\"https://www.synapse.org/#!Synapse:"+entity.getId()+DISCUSSION_THREAD_ID+thread.getId()+"\">"+thread.getTitle() + "</a><br />");
-				}
+				long currentOffset = 0;
+				PaginatedResults<DiscussionThreadBundle> paginatedThreads;
+				do {
+					paginatedThreads = discussionForumClient.getThreadsForForum(forumId, 20L, currentOffset, DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY, false, DiscussionFilter.EXCLUDE_DELETED);
+					List<DiscussionThreadBundle> threadList = paginatedThreads.getResults();
+					for (DiscussionThreadBundle thread : threadList) {
+						html.append("<a href=\"https://www.synapse.org/#!Synapse:"+entity.getId()+DISCUSSION_THREAD_ID+thread.getId()+"\">"+thread.getTitle() + "</a><br />");
+					}
+					currentOffset += 20;
+				} while (!paginatedThreads.getResults().isEmpty());
+				
 			}
 		}
 		
@@ -327,7 +354,9 @@ public class CrawlFilter implements Filter {
 		html.append("<!DOCTYPE html><html><head><title>" + team.getName()
 				+ "</title></head><body>");
 		html.append("<h1>" + team.getName() + "</h1>");
-		html.append("<h3>" + team.getDescription() + "</h3>");
+		if (team.getDescription() != null) {
+			html.append("<h3>" + team.getDescription() + "</h3>");	
+		}
 		TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(team.getId(), "", 20, 0);
 		for (TeamMemberBundle teamMember : teamMembers.getResults()) {
 			try {
@@ -351,10 +380,19 @@ public class CrawlFilter implements Filter {
 		if (profile.getSummary() != null) {
 			html.append("<h4>" + profile.getSummary() + "</h4>");	
 		}
-		html.append("<p>" + profile.getLocation() + "</p>");
-		html.append("<p>" + profile.getPosition() + "</p>");
-		html.append("<p>" + profile.getIndustry() + "</p>");
-		html.append("<p>" + profile.getCompany() + "</p>");
+		if (profile.getLocation() != null) {
+			html.append("<p>" + profile.getLocation() + "</p>");	
+		}
+		if (profile.getPosition() != null) {
+			html.append("<p>" + profile.getPosition() + "</p>");	
+		}
+		if (profile.getIndustry() != null) {
+			html.append("<p>" + profile.getIndustry() + "</p>");	
+		}
+		if (profile.getCompany() != null) {
+			html.append("<p>" + profile.getCompany() + "</p>");	
+		}
+		
 		html.append("</body></html>");
 		return html.toString();
 	}
@@ -411,7 +449,7 @@ public class CrawlFilter implements Filter {
 	
 	private String getAllTeamsHtml(String startIndex) throws RestServiceException{
 		int start = Integer.parseInt(startIndex);
-		PaginatedResults<Team> teams = synapseClient.getTeamsBySearch("", 200, start);
+		PaginatedResults<Team> teams = synapseClient.getTeamsBySearch("", 50, start);
 		
 		//append this set to the list
 		StringBuilder html = new StringBuilder();
