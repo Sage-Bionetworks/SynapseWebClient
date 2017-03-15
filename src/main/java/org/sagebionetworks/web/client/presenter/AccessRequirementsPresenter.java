@@ -55,11 +55,12 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.loadMoreContainer = loadMoreContainer;
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
+		view.addAboveBody(synAlert.asWidget());
 		view.add(loadMoreContainer.asWidget());
-		view.addBelowBody(synAlert.asWidget());
+		view.addTitle("Access requirements : ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
-//		view.addTitle(": Conditions for use");
+
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
