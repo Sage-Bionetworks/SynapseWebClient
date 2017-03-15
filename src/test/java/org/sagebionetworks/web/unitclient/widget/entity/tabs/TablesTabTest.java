@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -293,12 +295,26 @@ public class TablesTabTest {
 		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
 		
 		reset(mockTab);
+		when(mockTab.isTabPaneVisible()).thenReturn(true);
 		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
 		tab.onQueryChange(query);
 		
 		Synapse place = getNewPlace(tableName);
 		assertEquals(EntityArea.TABLES, place.getArea());
 		assertTrue(place.getAreaToken().isEmpty());
+	}
+	
+	@Test
+	public void testSetQueryPaneNotVisible() {
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
+		reset(mockTab);
+		when(mockTab.isTabPaneVisible()).thenReturn(false);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
+		tab.onQueryChange(query);
+		
+		verify(mockTab, never()).setEntityNameAndPlace(anyString(), any(Synapse.class));
+		verify(mockTab, never()).showTab(anyBoolean());
 	}
 	
 	@Test
@@ -312,6 +328,7 @@ public class TablesTabTest {
 		tab.configure(mockTableEntity, mockEntityUpdatedHandler, TablesTab.TABLE_QUERY_PREFIX + startToken);
 		
 		reset(mockTab);
+		when(mockTab.isTabPaneVisible()).thenReturn(true);
 		String queryToken = queryTokenProvider.queryToToken(query);
 		tab.onQueryChange(query);
 		

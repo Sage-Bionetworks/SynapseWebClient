@@ -66,6 +66,10 @@ public class Tab implements TabView.Presenter {
 		return view.getTabPane();
 	}
 	
+	public boolean isTabPaneVisible() {
+		return getTabPane().isVisible();
+	}
+	
 	public void setEntityNameAndPlace(String entityName, Synapse place) {
 		this.place = place;
 		this.entityName = entityName;
