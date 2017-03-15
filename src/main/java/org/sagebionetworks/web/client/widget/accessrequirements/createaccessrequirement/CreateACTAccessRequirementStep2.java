@@ -58,7 +58,13 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 				setDUCFileHandle(fileUpload.getFileMeta().getFileName(), fileUpload.getFileHandleId());
 			}
 		});
+		view.setWikiPageEditor(wikiMarkdownEditor);
+		view.setWikiPageRenderer(wikiPageRenderer.asWidget());
+		view.setDUCTemplateUploadWidget(ducTemplateUploader);
+		view.setDUCTemplateWidget(ducTemplateFileHandleWidget);
 		view.setPresenter(this);
+		wikiPageRenderer.setModifiedCreatedByVisible(false);
+		wikiPageRenderer.showWikiHistory(false);
 	}
 	
 	public void setDUCFileHandle(String fileName, String fileHandleId) {

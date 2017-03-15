@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -132,6 +133,26 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	@Override
 	public boolean isValidatedProfileRequired() {
 		return validatedCheckbox.getValue();
+	}
+	@Override
+	public void setWikiPageRenderer(IsWidget w) {
+		wikiPageContainer.clear();
+		wikiPageContainer.add(w);
+	}
+	@Override
+	public void setWikiPageEditor(IsWidget w) {
+		wikiEditorContainer.clear();
+		wikiEditorContainer.add(w);
+	}
+	@Override
+	public void setDUCTemplateUploadWidget(IsWidget w) {
+		ducTemplateFileUploadContainer.clear();
+		ducTemplateFileUploadContainer.add(w);
+	}
+	@Override
+	public void setDUCTemplateWidget(IsWidget w) {
+		ducTemplateFileContainer.clear();
+		ducTemplateFileContainer.add(w);
 	}
 	
 }
