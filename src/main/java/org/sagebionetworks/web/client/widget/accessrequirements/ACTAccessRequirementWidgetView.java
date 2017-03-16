@@ -25,6 +25,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget {
 	void showRequestAccessButton();
 	void resetState();
 	void setDataAccessRequestWizard(IsWidget w);
+	void setEditAccessRequirementWidget(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

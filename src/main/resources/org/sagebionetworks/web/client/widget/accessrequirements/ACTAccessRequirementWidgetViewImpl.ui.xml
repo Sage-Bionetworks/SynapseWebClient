@@ -37,8 +37,10 @@
 				<b:Button ui:field="cancelRequestButton" type="PRIMARY" text="Cancel Request" pull="RIGHT" visible="false"/>
 				<b:Button ui:field="updateRequestButton" type="PRIMARY" text="Update Request" pull="RIGHT" visible="false"/>
 				<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" pull="RIGHT" visible="false"/>
+				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" />
 			</bh:Div>
 			<bh:Div ui:field="requestDataAccessWizardContainer" />
+			
 		</b:PanelBody>
 	</b:Panel>
 </ui:UiBinder>

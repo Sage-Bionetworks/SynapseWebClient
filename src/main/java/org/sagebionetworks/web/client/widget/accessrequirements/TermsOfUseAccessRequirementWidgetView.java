@@ -19,6 +19,7 @@ public interface TermsOfUseAccessRequirementWidgetView extends IsWidget {
 	void showUnapprovedHeading();
 	void showSignTermsButton();
 	void resetState();
+	void setEditAccessRequirementWidget(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

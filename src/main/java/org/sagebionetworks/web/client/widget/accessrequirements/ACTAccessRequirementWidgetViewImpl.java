@@ -41,6 +41,9 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Button requestAccessButton;
 	@UiField
 	Div requestDataAccessWizardContainer;
+	@UiField
+	Div editAccessRequirementContainer;
+	
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
 	
@@ -149,5 +152,11 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		cancelRequestButton.setVisible(false);
 		updateRequestButton.setVisible(false);
 		requestAccessButton.setVisible(false);
+	}
+	
+	@Override
+	public void setEditAccessRequirementWidget(IsWidget w) {
+		editAccessRequirementContainer.clear();
+		editAccessRequirementContainer.add(w);
 	}
 }

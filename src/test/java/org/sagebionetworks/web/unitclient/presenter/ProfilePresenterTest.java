@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
@@ -10,10 +10,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -89,6 +90,7 @@ import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
@@ -151,6 +153,9 @@ public class ProfilePresenterTest {
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -266,6 +271,12 @@ public class ProfilePresenterTest {
 		
 		when(mockInjector.getLoadMoreProjectsWidgetContainer()).thenReturn(mockLoadMoreContainer);
 	}
+	
+	public void verifyAndInvokeACTMember(Boolean isACTMember) {
+		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTMember(callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(isACTMember);
+	}
+	
 	
 	public void setupTestChallengePagedResults() {
 		testChallengePagedResults = new ChallengePagedResults();
@@ -1539,7 +1550,7 @@ public class ProfilePresenterTest {
 		
 		//user bundle reported that target user is not verified, should show badge
 		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null, null);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verifyAndInvokeACTMember(true);
 		verify(mockView).setVerificationRejectedButtonVisible(true);
 		verify(mockView).setResubmitVerificationButtonVisible(false);
 		//since this is ACT, should not see a way to submit a new validation request
@@ -1552,6 +1563,7 @@ public class ProfilePresenterTest {
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
 		//is the owner of the profile
 		viewProfile("123", "123");
+		verifyAndInvokeACTMember(false);
 		verify(mockView).setVerificationRejectedButtonVisible(true);
 		verify(mockView).setResubmitVerificationButtonVisible(true);
 	}
@@ -1562,6 +1574,7 @@ public class ProfilePresenterTest {
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
 		//is the owner of the profile
 		viewProfile("123", "123");
+		verifyAndInvokeACTMember(false);
 		verify(mockView).setVerificationSuspendedButtonVisible(true);
 		verify(mockView).setResubmitVerificationButtonVisible(true);
 	}
@@ -1578,7 +1591,7 @@ public class ProfilePresenterTest {
 		
 		//user bundle reported that target user is not verified
 		verify(mockView, never()).showVerifiedBadge(null, null, null, null, null, null);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verifyAndInvokeACTMember(true);
 		verify(mockView).setVerificationSubmittedButtonVisible(true);
 	}	
 	
@@ -1604,7 +1617,7 @@ public class ProfilePresenterTest {
 		
 		//user bundle reported that target user is verified
 		verify(mockView).showVerifiedBadge(fName, lName, location, company, orcId, friendlyDate);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verifyAndInvokeACTMember(true);
 		verify(mockView).setVerificationDetailsButtonVisible(true);
 	}
 	
@@ -1632,7 +1645,7 @@ public class ProfilePresenterTest {
 
 		verify(mockView).showVerifiedBadge(null, null, null, null, null, null);
 		//no need to check for act membership for anonymous
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
+		verifyAndInvokeACTMember(false);
 		//validation details button is not visible to a person who is not the owner and not part of the ACT
 		verify(mockView, never()).setVerificationDetailsButtonVisible(anyBoolean());
 	}
@@ -1726,6 +1739,7 @@ public class ProfilePresenterTest {
 		viewProfile(currentUserId, currentUserId);
 		profilePresenter.newVerificationSubmissionClicked();
 		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true), eq(attachmentList));
+		verifyAndInvokeACTMember(false);
 		verify(mockVerificationSubmissionModal).show();
 	}
 	
@@ -1737,6 +1751,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		viewProfile(currentUserId, currentUserId);
 		profilePresenter.editVerificationSubmissionClicked();
+		verifyAndInvokeACTMember(false);
 		verify(mockVerificationSubmissionModal).configure(eq(mockVerificationSubmission), anyBoolean(), eq(true));
 		verify(mockVerificationSubmissionModal).setResubmitCallback(any(Callback.class));
 		verify(mockVerificationSubmissionModal).show();

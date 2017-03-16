@@ -23,22 +23,26 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	WikiPageWidget wikiPageWidget;
 	ACTAccessRequirement ar;
 	PortalGinInjector ginInjector;
+	CreateAccessRequirementButton createAccessRequirementButton;
+	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			CreateAccessRequirementButton createAccessRequirementButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.ginInjector = ginInjector;
+		this.createAccessRequirementButton = createAccessRequirementButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
+		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 	}
-	
 	
 	public void setRequirement(ACTAccessRequirement ar) {
 		this.ar = ar;
@@ -51,7 +55,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
  			view.setTerms(ar.getActContactInfo());
  			view.showTermsUI();
  		}
-		
+		createAccessRequirementButton.configure(ar);
 		refreshApprovalState();
 	}
 	

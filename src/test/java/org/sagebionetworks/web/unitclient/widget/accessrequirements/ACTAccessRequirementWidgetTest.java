@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -36,10 +37,12 @@ public class ACTAccessRequirementWidgetTest {
 	CreateDataAccessRequestWizard mockCreateDataAccessRequestWizard;
 	@Mock
 	ACTAccessRequirement mockACTAccessRequirement;
+	@Mock
+	CreateAccessRequirementButton mockCreateAccessRequirementButton;
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector);
+		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockCreateAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 	}
 
@@ -47,6 +50,7 @@ public class ACTAccessRequirementWidgetTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setWikiTermsWidget(any(Widget.class));
+		verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
 		verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
 	}
 
@@ -57,6 +61,7 @@ public class ACTAccessRequirementWidgetTest {
 		widget.setRequirement(mockACTAccessRequirement);
 		verify(mockView).setTerms(tou);
 		verify(mockView).showTermsUI();
+		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {

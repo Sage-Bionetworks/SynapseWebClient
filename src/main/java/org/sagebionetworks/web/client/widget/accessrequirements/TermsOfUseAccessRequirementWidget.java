@@ -23,20 +23,25 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	WikiPageWidget wikiPageWidget;
 	TermsOfUseAccessRequirement ar;
 	AuthenticationController authController;
+	CreateAccessRequirementButton createAccessRequirementButton;
+	
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
 			SynapseClientAsync synapseClient,
 			WikiPageWidget wikiPageWidget,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			CreateAccessRequirementButton createAccessRequirementButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;
+		this.createAccessRequirementButton = createAccessRequirementButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
+		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 	}
 	
 	
@@ -51,6 +56,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
  			view.setTerms(ar.getTermsOfUse());
  			view.showTermsUI();
  		}
+		createAccessRequirementButton.configure(ar);
 	}
 	
 	public void refreshApprovalState() {

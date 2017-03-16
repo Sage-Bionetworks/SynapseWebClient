@@ -21,6 +21,7 @@
 			</b:BlockQuote>
 			<bh:Div>
 				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false"/>
+				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" />
 			</bh:Div>
 		</b:PanelBody>
 	</b:Panel>
