@@ -74,6 +74,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -465,7 +466,21 @@ public interface SynapseClientAsync {
 			AsyncCallback<ColumnModelPage> callback);
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
-
+	
 	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
 			AsyncCallback<List<AccessRequirement>> callback);
+
+	void isWiki(String id, AsyncCallback<Boolean> callback);
+
+	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
+
+	void isTable(String id, AsyncCallback<Boolean> callback);
+
+	void isForum(String id, AsyncCallback<Boolean> callback);
+
+	void isDocker(String id, AsyncCallback<Boolean> callback);
+
+	void isChallenge(String id, AsyncCallback<Boolean> callback);
+
+	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
 }

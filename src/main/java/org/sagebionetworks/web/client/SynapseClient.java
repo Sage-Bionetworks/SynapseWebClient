@@ -75,6 +75,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -550,8 +551,22 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
 
+	long getTeamMemberCount(String teamId) throws RestServiceException;
+	
 	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset)
 			throws RestServiceException;
 
-	long getTeamMemberCount(String teamId) throws RestServiceException;
+	boolean isWiki(String projectId) throws RestServiceException;
+
+	boolean isFileOrFolder(String projectId) throws RestServiceException;
+
+	boolean isTable(String projectId) throws RestServiceException;
+
+	boolean isForum(String projectId) throws RestServiceException;
+
+	boolean isDocker(String projectId) throws RestServiceException;
+
+	boolean isChallenge(String projectId) throws RestServiceException;
+
+	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
 }

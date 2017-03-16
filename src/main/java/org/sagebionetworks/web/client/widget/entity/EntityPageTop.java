@@ -10,6 +10,12 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.CHALLENGE;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.DISCUSSION;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.DOCKER;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.FILES;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.TABLES;
+import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.WIKI;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -19,11 +25,13 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -52,6 +60,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private Entity entity;
 	
 	private Synapse.EntityArea area;
+	private String initialAreaToken;
 	private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken;
 	private Long filesVersionNumber;
 	private EntityHeader projectHeader;
@@ -65,15 +74,22 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private DockerTab dockerTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
+	private AuthenticationController authenticationController;
+	// how many tabs have we determined the visibility state for?
+	private int tabVisibilityInitializedCount;
+	// how many tabs have been marked as visible
+	private int visibleTabCount;
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
 	private CookieProvider cookies;
+	private ClientCache storage;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
+			AuthenticationController authenticationController,
 			Tabs tabs,
 			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
@@ -84,9 +100,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			DockerTab dockerTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			ClientCache storage) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.authenticationController = authenticationController;
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;
@@ -98,6 +116,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.controller = controller;
 		this.actionMenu = actionMenu;
 		this.cookies = cookies;
+		this.storage = storage;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -168,6 +187,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureDockerTab();
 			};
 		});
+		
 	}
 	
     /**
@@ -178,6 +198,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     public void configure(Entity entity, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
     	this.projectHeader = projectHeader;
     	this.area = initArea;
+    	this.initialAreaToken = areaToken;
     	wikiAreaToken = null;
     	tablesAreaToken = null;
     	discussionAreaToken = null;
@@ -185,44 +206,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	filesVersionNumber = versionNumber;
     	this.entity = entity;
 
-    	//set area, if undefined
-		if (area == null) {
-			if (entity instanceof Project) {
-				area = EntityArea.WIKI;
-			} else if (entity instanceof Table) {
-				area = EntityArea.TABLES;
-			} else if (entity instanceof DockerRepository) {
-				area = EntityArea.DOCKER;
-			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
-				area = EntityArea.FILES;
-			}
-		}
-		// set area token
-		
-		switch (area) {
-			case WIKI:
-				wikiAreaToken = areaToken;
-				break;
-			case TABLES:
-				tablesAreaToken = areaToken;
-				break;
-			case DISCUSSION:
-				discussionAreaToken = areaToken;
-				break;
-			case DOCKER:
-				if (DisplayUtils.isInTestWebsite(cookies)) {
-					dockerAreaToken = areaToken;
-				}
-				break;
-			default:
-		}
-
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
     	configureProject();
 	}
     
     public void configureProject() {
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
+    	view.setLoadingVisible(true);
+    	hideTabs();
+    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
@@ -233,19 +224,153 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				projectMetadata.setEntityBundle(projectBundle, null);
 				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
-				configureCurrentAreaTab();
+				showSelectedTabs();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				projectBundleLoadError = caught;
-				configureCurrentAreaTab();
+				showSelectedTabs();
 			}
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
+    
+    public void showSelectedTabs() {
+    	// after all tab visilibity has been determined, then move on to configure the currently selected tab
+    	tabVisibilityInitializedCount = 0;
+    	visibleTabCount = 0;
+    	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
+    	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
+    	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
+    	synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(CHALLENGE, EntityArea.ADMIN, adminTab.asTab()));
+    	synapseClient.isForum(projectHeader.getId(), getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()));
+    	synapseClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()));
+	}
+    
+    public AsyncCallback<Boolean> getTabVisibilityCallback(final String displayArea, final EntityArea entityArea, final Tab tab) {
+    	return new AsyncCallback<Boolean>() {
+	    	@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+				view.setLoadingVisible(false);
+			}
+			@Override
+			public void onSuccess(Boolean isContent) {
+				view.setLoadingVisible(false);
+				tabVisibilityInitializedCount++;
+				boolean isShowingTab = isShowingTab(displayArea, isContent, entityArea);
+				if (isShowingTab) {
+					visibleTabCount++;
+				}
+				if (visibleTabCount > 1) {
+					tabs.setNavTabsVisible(true);
+				}
+				
+				tab.setTabListItemVisible(isShowingTab);
+				configureCurrentAreaTabAfterComplete();
+			}
+		};
+    }
+    
+    public void configureCurrentAreaTabAfterComplete() {
+    	if (tabVisibilityInitializedCount == tabs.getTabCount()) {
+    		openProjectDisplayIfNoVisibleTabs();
+    		configureCurrentAreaTab();
+    	}
+    }
+    
+    public boolean isShowingTab(String displayArea, boolean areaHasContent, EntityArea associatedArea) {
+    	String tag = EntityPageTop.this.authenticationController.getCurrentUserPrincipalId() + "_" + entity.getId() + "_";
+    	if (Boolean.parseBoolean(storage.get(tag + displayArea))) {
+    		return true;
+    	} else if (areaHasContent) {
+    		return true;
+    	} else if (area != null && area.equals(associatedArea)) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    private void openProjectDisplayIfNoVisibleTabs() {
+    	if (visibleTabCount == 0 && projectBundle.getPermissions().getCanEdit()) {
+    		// pop up display options automatically (if the user has rights to change)
+			controller.onProjectDisplay();
+    	}
+    }
+    
+    public void hideTabs() {
+    	tabs.setNavTabsVisible(false);
+    	wikiTab.asTab().setTabListItemVisible(false);
+		filesTab.asTab().setTabListItemVisible(false);
+		tablesTab.asTab().setTabListItemVisible(false);
+		adminTab.asTab().setTabListItemVisible(false);
+		discussionTab.asTab().setTabListItemVisible(false);
+		dockerTab.asTab().setTabListItemVisible(false);
+    }
+    
+    /**
+     * Based on tab visibility, pick the area that should be displayed when no area is given.
+     * @return
+     */
+    public EntityArea getDefaultProjectArea() {
+    	if (wikiTab.asTab().isTabListItemVisible()) {
+			return EntityArea.WIKI;
+    	}
+    	if (filesTab.asTab().isTabListItemVisible()) {
+			return EntityArea.FILES;
+    	}
+    	if (tablesTab.asTab().isTabListItemVisible()) {
+    		return EntityArea.TABLES;
+    	}
+    	if (discussionTab.asTab().isTabListItemVisible()) {
+    		return EntityArea.DISCUSSION;
+    	}
+    	if (adminTab.asTab().isTabListItemVisible()) {
+    		return EntityArea.ADMIN;
+    	}
+    	if (dockerTab.asTab().isTabListItemVisible()) {
+    		return EntityArea.DOCKER;
+    	}
+    	return EntityArea.WIKI;
+    }
 
 	public void configureCurrentAreaTab() {
+		if (entity instanceof Project) {
+			view.setProjectInformationVisible(true);
+		}
+		
+		//set area, if undefined
+		if (area == null) {
+			if (entity instanceof Project) {
+				area = getDefaultProjectArea();
+			} else if (entity instanceof Table) {
+				area = EntityArea.TABLES;
+			} else if (entity instanceof DockerRepository) {
+				area = EntityArea.DOCKER;
+			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
+				area = EntityArea.FILES;
+			}
+		}
+		// set area token
+		switch (area) {
+			case WIKI:
+				wikiAreaToken = initialAreaToken;
+				break;
+			case TABLES:
+				tablesAreaToken = initialAreaToken;
+				break;
+			case DISCUSSION:
+				discussionAreaToken = initialAreaToken;
+				break;
+			case DOCKER:
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					dockerAreaToken = initialAreaToken;
+				}
+				break;
+			default:
+		}
+		
 		// set all content stale
 		filesTab.asTab().setContentStale(true);
 		wikiTab.asTab().setContentStale(true);
@@ -253,8 +378,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		adminTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
-		//configure the challenge tab regardless
-		configureAdminTab();
 		switch (area) {
 			case FILES:
 				configureFilesTab();
@@ -269,6 +392,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				break;
 			case ADMIN:
+				configureAdminTab();
 				tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
 				break;
 			case DISCUSSION:
@@ -332,20 +456,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				@Override
 				public void noWikiFound() {
-					if (isWikiTabShown) {
-						if (projectBundle.getRootWikiId() == null) {
-							// no wiki to load!  configure and show the files tab.
-							// clear out wiki page id token.
-							wikiTab.setEntityNameAndPlace(projectHeader.getId(), projectHeader.getName(), null);
-							configureFilesTab();
-							tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-						} else {
-							// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
-							view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
-							wikiTab.asTab().setContentStale(true);
-							wikiAreaToken = projectBundle.getRootWikiId();
-							configureWikiTab();	
-						}
+					if (isWikiTabShown && projectBundle.getRootWikiId() != null) {
+						// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
+						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
+						wikiTab.asTab().setContentStale(true);
+						wikiAreaToken = projectBundle.getRootWikiId();
+						configureWikiTab();	
 					}
 				}
 			};

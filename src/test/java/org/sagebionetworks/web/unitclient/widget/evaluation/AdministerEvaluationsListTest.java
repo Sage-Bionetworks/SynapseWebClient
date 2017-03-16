@@ -43,8 +43,6 @@ public class AdministerEvaluationsListTest {
 	EvaluationEditorModal mockEvalEditor;
 	@Mock
 	SynapseAlert mockSynAlert;
-	@Mock
-	Callback mockIsChallengeCallback;
 	
 	Evaluation e1, e2;
 	
@@ -67,27 +65,25 @@ public class AdministerEvaluationsListTest {
 	
 	@Test
 	public void testConfigure() {
-		evalList.configure("syn100", mockIsChallengeCallback);
+		evalList.configure("syn100");
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView).addRow(e1);
 		verify(mockView).addRow(e2);
-		verify(mockIsChallengeCallback).invoke();
 	}
 	
 	@Test
 	public void testConfigureZeroResults() {
 		AsyncMockStubber.callSuccessWith(new ArrayList<Evaluation>()).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100", mockIsChallengeCallback);
+		evalList.configure("syn100");
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView, never()).addRow(e1);
-		verify(mockIsChallengeCallback, never()).invoke();;
 	}
 	
 	@Test
 	public void testConfigureFailure() throws Exception {
 		Exception ex = new Exception("bad time");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100", null);
+		evalList.configure("syn100");
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -110,7 +106,7 @@ public class AdministerEvaluationsListTest {
 	@Test
 	public void testOnNewEvaluationClicked() {
 		String entityId = "syn99999";
-		evalList.configure(entityId, mockIsChallengeCallback);
+		evalList.configure(entityId);
 		evalList.onNewEvaluationClicked();
 		verify(mockEvalEditor).configure(eq(entityId), any(Callback.class));
 		verify(mockEvalEditor).show();
