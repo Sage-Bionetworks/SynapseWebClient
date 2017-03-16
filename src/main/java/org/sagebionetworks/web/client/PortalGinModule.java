@@ -133,6 +133,8 @@ import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
@@ -1418,5 +1420,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateACTAccessRequirementStep2View.class).to(CreateACTAccessRequirementStep2ViewImpl.class);
 		bind(CreateTermsOfUseAccessRequirementStep2View.class).to(CreateTermsOfUseAccessRequirementStep2ViewImpl.class);
 		bind(Button.class).to(ButtonImpl.class);
+
+		bind(IsACTMemberAsyncHandlerImpl.class).in(Singleton.class);
+		bind(IsACTMemberAsyncHandler.class).to(IsACTMemberAsyncHandlerImpl.class);
 	}
 }

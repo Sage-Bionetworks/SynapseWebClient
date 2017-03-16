@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -76,9 +77,8 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	TermsOfUseAccessRequirementWidget mockTermsOfUseAccessRequirementWidget;
 	@Mock
-	Button mockCreateARButton;
-	@Mock
-	CreateAccessRequirementWizard mockCreateAccessRequirementWizard;
+	CreateAccessRequirementButton mockCreateARButton;
+	
 	public static final String ENTITY_ID = "syn239834";
 	public static final String TEAM_ID = "45678";
 	
@@ -86,7 +86,7 @@ public class AccessRequirementsPresenterTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		presenter = new AccessRequirementsPresenter(mockView, mockSynapseClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockCreateAccessRequirementWizard);
+		presenter = new AccessRequirementsPresenter(mockView, mockSynapseClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);

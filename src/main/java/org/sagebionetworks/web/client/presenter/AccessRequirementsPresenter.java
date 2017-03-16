@@ -13,18 +13,15 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
-import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -43,6 +40,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	EntityIdCellRendererImpl entityIdRenderer; 
 	TeamBadge teamBadge;
 	List<AccessRequirement> allArs;
+	CreateAccessRequirementButton createAccessRequirementButton;
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -52,8 +50,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			LoadMoreWidgetContainer loadMoreContainer, 
 			EntityIdCellRendererImpl entityIdRenderer, 
 			TeamBadge teamBadge,
-			Button createAccessRequirementButton, 
-			final CreateAccessRequirementWizard createAccessRequirementWizard) {
+			CreateAccessRequirementButton createAccessRequirementButton) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -61,17 +58,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.loadMoreContainer = loadMoreContainer;
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
-//		createAccessRequirementButton.setVisible(false);
-		createAccessRequirementButton.addStyleName("margin-left-10");
-		createAccessRequirementButton.setText("Create New Access Requirement");
-		createAccessRequirementButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				createAccessRequirementWizard.configure(subject);
-				createAccessRequirementWizard.showModal(null);
-			}
-		});
-		
+		this.createAccessRequirementButton = createAccessRequirementButton;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
 		view.add(loadMoreContainer.asWidget());
@@ -121,6 +108,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	}
 	
 	public void loadData() {
+		createAccessRequirementButton.configure(subject);
 		loadMoreContainer.clear();
 		currentOffset = 0L;
 		allArs = new ArrayList<AccessRequirement>();

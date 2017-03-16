@@ -75,6 +75,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -148,6 +149,8 @@ public class ProfilePresenterTest {
 	SettingsPresenter mockSettingsPresenter;
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreContainer;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -171,7 +174,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal);
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockIsACTMemberAsyncHandler);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);

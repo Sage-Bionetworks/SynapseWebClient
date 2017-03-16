@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -41,6 +39,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
@@ -113,11 +112,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert challengeSynAlert;
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
-	public Map<String, Boolean> isACTMemberMap;
 	public Callback resubmitVerificationCallback;
 	public LoadMoreWidgetContainer loadMoreProjectsWidgetContainer;
 	public Callback getMoreProjectsCallback;
 	public Callback refreshTeamsCallback;
+	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -133,7 +132,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal) {
+			VerificationSubmissionWidget verificationModal,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -149,8 +149,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		
-		isACTMemberMap = new HashMap<String, Boolean>();
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -432,27 +432,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
 		if (authenticationController.isLoggedIn()) {
-			//do we know if the current user is an act member?
-			Boolean isActMember = isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId());
-			if (isActMember == null) {
-				//we don't know, find out.
-				int mask = IS_ACT_MEMBER;
-				userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
-					@Override
-					public void onSuccess(UserBundle userBundle) {
-						isACTMemberMap.put(authenticationController.getCurrentUserPrincipalId(), userBundle.getIsACTMember());
-						showVerificationUI(submission, userBundle.getIsACTMember());
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						view.hideLoading();
-						profileSynAlert.handleException(caught);
-					}
-				});	
-			} else {
-				showVerificationUI(submission, isActMember);
-			}
+			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+				@Override
+				public void invoke(Boolean isACTMember) {
+					showVerificationUI(submission, isACTMember);
+				}
+			});
 		}
 	}
 	
@@ -1204,12 +1189,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void editVerificationSubmissionClicked() {
 		//edit the existing submission
-		verificationModal.configure(
-				currentUserBundle.getVerificationSubmission(), 
-				isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId()), 
-				true) //isModal
-			.setResubmitCallback(resubmitVerificationCallback)
-			.show();		
+		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACTMember) {
+				verificationModal.configure(
+						currentUserBundle.getVerificationSubmission(), 
+						isACTMember, 
+						true) //isModal
+					.setResubmitCallback(resubmitVerificationCallback)
+					.show();		
+			}
+		});
 	}
 	
 	@Override

@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
@@ -520,4 +521,5 @@ public interface PortalGinInjector extends Ginjector {
 	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
 	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
 	public FileHandleWidget getFileHandleWidget();
+	public CreateAccessRequirementWizard getCreateAccessRequirementWizard(); 
 }
