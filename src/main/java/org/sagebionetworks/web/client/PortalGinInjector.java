@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItem
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
@@ -513,6 +514,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EvaluationEditorModal getEvaluationEditorModal();
 	public SelectTeamModal getSelectTeamModal();
 	public ApproveUserAccessModal getApproveUserAccessModal();
+	public ProjectDisplayDialog getProjectDisplayDialog();
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();
 	public EntityIdCellRendererImpl getEntityIdCellRenderer();

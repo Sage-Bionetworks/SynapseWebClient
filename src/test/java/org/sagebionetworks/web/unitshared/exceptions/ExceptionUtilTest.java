@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,15 +47,16 @@ public class ExceptionUtilTest {
             		{ TooManyRequestsException.class, new SynapseTooManyRequestsException(message) },
             		{ ConflictException.class, new SynapseServerException(409, "Service Error(409):  FAILURE: Got HTTP status 409 for") },
             		{ ConflictingUpdateException.class, new SynapseConflictingUpdateException(message) },
+            		{ BadRequestException.class, new JSONException(message) }
             		});
     }
 	
 	Class<? extends RestServiceException> restServiceException;
-	SynapseException synapseException;
+	Exception synapseException;
 
 	public ExceptionUtilTest(
 			Class<? extends RestServiceException> restServiceException,
-			SynapseException synapseException) {
+			Exception synapseException) {
 		super();
 		this.restServiceException = restServiceException;
 		this.synapseException = synapseException;
