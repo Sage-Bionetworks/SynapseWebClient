@@ -3,6 +3,7 @@ package org.sagebionetworks.web.shared.exceptions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
+import org.json.JSONException;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseConflictingUpdateException;
@@ -49,6 +50,8 @@ public class ExceptionUtil {
 			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
 				return new SynapseDownException(ex.getMessage());
 			}
+		} else if (ex instanceof JSONException) {
+			return new BadRequestException("The Synapse web client is calling a Synapse backend service that's not available!");
 		}
 		return new UnknownErrorException(ex.getMessage());
 	}
