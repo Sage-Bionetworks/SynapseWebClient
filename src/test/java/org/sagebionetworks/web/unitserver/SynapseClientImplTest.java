@@ -2621,7 +2621,6 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testIsForum() throws RestServiceException, SynapseException {
-		assertFalse(synapseClient.isForum("65"));
 		Forum mockForum = mock(Forum.class);
 		when(mockSynapse.getForumByProjectId(anyString())).thenReturn(mockForum);
 		ThreadCount mockThreadCount = mock(ThreadCount.class);
