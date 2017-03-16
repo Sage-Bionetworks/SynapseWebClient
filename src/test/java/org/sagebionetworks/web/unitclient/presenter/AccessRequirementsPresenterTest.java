@@ -99,7 +99,7 @@ public class AccessRequirementsPresenterTest {
 	public void testConstruction() {
 		verify(mockView).add(any(Widget.class));
 		verify(mockView, atLeastOnce()).addTitle(any(Widget.class));
-		verify(mockView).addBelowBody(any(Widget.class));
+		verify(mockView, atLeastOnce()).addAboveBody(any(Widget.class));
 		verify(mockLoadMoreContainer).configure(any(Callback.class));
 	}
 	
