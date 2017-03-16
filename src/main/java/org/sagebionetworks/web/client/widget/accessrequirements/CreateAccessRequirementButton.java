@@ -31,7 +31,7 @@ public class CreateAccessRequirementButton implements IsWidget {
 		button.setVisible(false);
 		
 		button.addStyleName("margin-left-10");
-		button.setText("Create New Access Requirement");
+		
 		button.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -48,12 +48,14 @@ public class CreateAccessRequirementButton implements IsWidget {
 	}	
 	
 	public void configure(AccessRequirement ar) {
+		button.setText("Edit Access Requirement");
 		this.subject = null;
 		this.ar = ar;
 		showIfACTMember();
 	}
 	
 	public void configure(RestrictableObjectDescriptor subject) {
+		button.setText("Create New Access Requirement");
 		this.subject = subject;
 		this.ar = null;
 		showIfACTMember();
