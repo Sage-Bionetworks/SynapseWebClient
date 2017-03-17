@@ -17,6 +17,9 @@ import com.google.inject.Inject;
  */
 public class CreateAccessRequirementWizard implements IsWidget{
 	
+	public static final String CREATE_ACCESS_REQUIREMENT_TITLE = "Create Access Requirement";
+	public static final String EDIT_ACCESS_REQUIREMENT_TITLE = "Edit Access Requirement";
+	
 	ModalWizardWidget modalWizardWidget;
 	CreateAccessRequirementStep1 step1;
 	@Inject
@@ -24,14 +27,15 @@ public class CreateAccessRequirementWizard implements IsWidget{
 		this.modalWizardWidget = modalWizardWidget;
 		this.modalWizardWidget.setModalSize(ModalSize.LARGE);
 		this.step1 = step1;
-		this.modalWizardWidget.setTitle("Create Access Requirement");
 	}
 
 	public void configure(RestrictableObjectDescriptor subject) {
+		this.modalWizardWidget.setTitle(CREATE_ACCESS_REQUIREMENT_TITLE);
 		this.step1.configure(subject);
 	}
 	
 	public void configure(AccessRequirement accessRequirement) {
+		this.modalWizardWidget.setTitle(EDIT_ACCESS_REQUIREMENT_TITLE);
 		this.step1.configure(accessRequirement);
 	}
 

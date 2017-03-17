@@ -21,7 +21,9 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	@UiField
 	Div unapprovedHeading;
 	@UiField
-	SimplePanel wikiTermsUI;
+	SimplePanel wikiContainer; 
+	@UiField
+	BlockQuote wikiTermsUI;
 	@UiField
 	BlockQuote termsUI;
 	@UiField
@@ -64,7 +66,7 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	}
 	@Override
 	public void setWikiTermsWidget(Widget wikiWidget) {
-		wikiTermsUI.setWidget(wikiWidget);
+		wikiContainer.setWidget(wikiWidget);
 	}
 	@Override
 	public void setTerms(String arText) {

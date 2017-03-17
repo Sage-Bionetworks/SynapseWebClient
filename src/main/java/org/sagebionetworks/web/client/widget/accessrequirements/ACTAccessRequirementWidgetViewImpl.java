@@ -22,7 +22,9 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	Div unapprovedHeading;
 	@UiField
-	SimplePanel wikiTermsUI;
+	BlockQuote wikiTermsUI;
+	@UiField
+	SimplePanel wikiContainer;
 	@UiField
 	BlockQuote termsUI;
 	@UiField
@@ -89,7 +91,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	}
 	@Override
 	public void setWikiTermsWidget(Widget wikiWidget) {
-		wikiTermsUI.setWidget(wikiWidget);
+		wikiContainer.setWidget(wikiWidget);
 	}
 	@Override
 	public void setTerms(String arText) {
