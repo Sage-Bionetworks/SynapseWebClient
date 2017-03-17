@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
@@ -39,6 +40,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	EntityIdCellRendererImpl entityIdRenderer; 
 	TeamBadge teamBadge;
 	List<AccessRequirement> allArs;
+	CreateAccessRequirementButton createAccessRequirementButton;
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -47,7 +49,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			PortalGinInjector ginInjector,
 			LoadMoreWidgetContainer loadMoreContainer, 
 			EntityIdCellRendererImpl entityIdRenderer, 
-			TeamBadge teamBadge) {
+			TeamBadge teamBadge,
+			CreateAccessRequirementButton createAccessRequirementButton) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -55,11 +58,14 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.loadMoreContainer = loadMoreContainer;
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
+		this.createAccessRequirementButton = createAccessRequirementButton;
+		view.addAboveBody(synAlert);
+		view.addAboveBody(createAccessRequirementButton);
 		view.add(loadMoreContainer.asWidget());
-		view.addBelowBody(synAlert.asWidget());
+		view.addTitle("Access requirements : ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
-//		view.addTitle(": Conditions for use");
+
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -102,6 +108,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	}
 	
 	public void loadData() {
+		createAccessRequirementButton.configure(subject);
 		loadMoreContainer.clear();
 		currentOffset = 0L;
 		allArs = new ArrayList<AccessRequirement>();

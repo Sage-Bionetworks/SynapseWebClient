@@ -54,5 +54,9 @@ public class FileHandleWidgetViewImpl implements FileHandleWidgetView {
 		this.anchor.setHref(createAnchorHref);
 		this.anchor.setTarget("_self");
 	}
+	@Override
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
+	}
 
 }

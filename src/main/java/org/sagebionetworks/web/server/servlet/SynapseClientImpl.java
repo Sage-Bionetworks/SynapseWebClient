@@ -972,11 +972,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public AccessRequirement createAccessRequirement(AccessRequirement ar)
+	public AccessRequirement createOrUpdateAccessRequirement(AccessRequirement ar)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createAccessRequirement(ar);
+			if (ar.getId() == null) {
+				return synapseClient.createAccessRequirement(ar);	
+			} else {
+				return synapseClient.updateAccessRequirement(ar);
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

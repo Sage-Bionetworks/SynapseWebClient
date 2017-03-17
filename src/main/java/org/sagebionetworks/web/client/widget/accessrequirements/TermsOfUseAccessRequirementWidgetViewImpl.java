@@ -9,6 +9,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,6 +28,8 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	HTML terms;
 	@UiField
 	Button signTermsButton;
+	@UiField
+	Div editAccessRequirementContainer;
 	
 	public interface Binder extends UiBinder<Widget, TermsOfUseAccessRequirementWidgetViewImpl> {
 	}
@@ -94,5 +97,11 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 		approvedHeading.setVisible(false);
 		unapprovedHeading.setVisible(false);
 		signTermsButton.setVisible(false);	
+	}
+	
+	@Override
+	public void setEditAccessRequirementWidget(IsWidget w) {
+		editAccessRequirementContainer.clear();
+		editAccessRequirementContainer.add(w);
 	}
 }

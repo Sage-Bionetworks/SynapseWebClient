@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -90,11 +91,11 @@ public class PlaceViewImpl implements PlaceView {
 	}
 	
 	@Override
-	public void addAboveBody(Widget w) {
+	public void addAboveBody(IsWidget w) {
 		above.add(w);
 	}
 	@Override
-	public void addBelowBody(Widget w) {
+	public void addBelowBody(IsWidget w) {
 		below.add(w);
 	}
 }

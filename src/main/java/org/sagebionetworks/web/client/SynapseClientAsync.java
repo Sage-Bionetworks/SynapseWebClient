@@ -183,7 +183,7 @@ public interface SynapseClientAsync {
 	
 	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
 	
-	void createAccessRequirement(AccessRequirement arEW,
+	void createOrUpdateAccessRequirement(AccessRequirement arEW,
 			AsyncCallback<AccessRequirement> callback);
 
 	void createLockAccessRequirement(String entityId,

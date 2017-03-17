@@ -219,8 +219,11 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testShowWikiHistory(){
-		presenter.showWikiHistory(false);
-		verify(mockView).setWikiHistoryVisible(false);
+		boolean showSubpages = true;
+		boolean canEdit = true;
+		presenter.setModifiedCreatedByHistoryVisible(false);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
+		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 	
 	@Test

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.shared.WebConstants;
