@@ -34,10 +34,10 @@
 				<bh:Span ui:field="requestSubmittedMessage" text="A request has been submitted" addStyleNames="right text-primary" visible="false"/>
 				<bh:Span ui:field="requestApprovedMessage" text="Your request has been approved" addStyleNames="right text-success" visible="false"/>
 				<bh:Span ui:field="requestRejectedMessage" text="Updated information required" addStyleNames="right text-warning" visible="false"/>
-				<b:Button ui:field="cancelRequestButton" type="PRIMARY" text="Cancel Request" pull="RIGHT" visible="false"/>
-				<b:Button ui:field="updateRequestButton" type="PRIMARY" text="Update Request" pull="RIGHT" visible="false"/>
-				<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" pull="RIGHT" visible="false"/>
-				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" />
+				<b:Button ui:field="cancelRequestButton" type="PRIMARY" text="Cancel Request" pull="RIGHT" visible="false" addStyleNames="margin-right-5" />
+				<b:Button ui:field="updateRequestButton" type="PRIMARY" text="Update Request" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
+				<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
+				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
 			</bh:Div>
 			<bh:Div ui:field="requestDataAccessWizardContainer" />
 			

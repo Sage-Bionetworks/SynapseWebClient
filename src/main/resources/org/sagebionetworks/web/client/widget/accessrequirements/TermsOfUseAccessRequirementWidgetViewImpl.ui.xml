@@ -20,8 +20,8 @@
 			    </bh:Paragraph>
 			</b:BlockQuote>
 			<bh:Div>
-				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false"/>
-				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" />
+				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
+				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5"/>
 			</bh:Div>
 		</b:PanelBody>
 	</b:Panel>
