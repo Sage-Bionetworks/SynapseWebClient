@@ -13,16 +13,20 @@
 			    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:" />
 			</bh:Div>
 			<!-- terms -->
-			<g:SimplePanel ui:field="wikiTermsUI" visible="false"/>
+			<b:BlockQuote ui:field="wikiTermsUI" visible="false">
+				<g:SimplePanel ui:field="wikiContainer" />	
+			</b:BlockQuote>
 			<b:BlockQuote ui:field="termsUI" visible="false">
 			    <bh:Paragraph>
 			    	<g:HTML ui:field="terms" styleName="font-size-14" />
 			    </bh:Paragraph>
 			</b:BlockQuote>
-			<bh:Div>
+			<bh:ClearFix />
+			<bh:Div addStyleNames="margin-top-5">
 				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5"/>
 			</bh:Div>
+			<bh:ClearFix />
 		</b:PanelBody>
 	</b:Panel>
 </ui:UiBinder>

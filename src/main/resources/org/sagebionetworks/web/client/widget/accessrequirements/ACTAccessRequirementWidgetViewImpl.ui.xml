@@ -18,7 +18,10 @@
 			    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
 			</bh:Div>
 			<!-- terms -->
-			<g:SimplePanel ui:field="wikiTermsUI" visible="false"/>
+			<b:BlockQuote ui:field="wikiTermsUI" visible="false">
+				<g:SimplePanel ui:field="wikiContainer" />	
+			</b:BlockQuote>
+			
 			<b:BlockQuote ui:field="termsUI" visible="false">
 			    <bh:Paragraph>
 			    	<g:HTML ui:field="terms" styleName="font-size-14" />
@@ -30,7 +33,8 @@
 			    <bh:Text>.</bh:Text>
 			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org </bh:Text>
 			</bh:Div>
-			<bh:Div>
+			<bh:ClearFix />
+			<bh:Div addStyleNames="margin-top-5">
 				<bh:Span ui:field="requestSubmittedMessage" text="A request has been submitted" addStyleNames="right text-primary" visible="false"/>
 				<bh:Span ui:field="requestApprovedMessage" text="Your request has been approved" addStyleNames="right text-success" visible="false"/>
 				<bh:Span ui:field="requestRejectedMessage" text="Updated information required" addStyleNames="right text-warning" visible="false"/>
@@ -39,6 +43,7 @@
 				<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
 			</bh:Div>
+			<bh:ClearFix />
 			<bh:Div ui:field="requestDataAccessWizardContainer" />
 			
 		</b:PanelBody>
