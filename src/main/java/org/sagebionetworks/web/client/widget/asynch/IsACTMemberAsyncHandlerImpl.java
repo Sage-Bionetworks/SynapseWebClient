@@ -58,6 +58,7 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				// log the error, and tell client that user is not part of the ACT (give the developer something to look at if something goes wrong for an ACT member)
 				jsniUtils.consoleError(caught.getMessage());
 				callback.invoke(false);
 			}
