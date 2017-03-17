@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,7 +28,8 @@ public class CreateAccessRequirementButton implements IsWidget {
 	@Inject
 	public CreateAccessRequirementButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			final PortalGinInjector ginInjector) {
+			final PortalGinInjector ginInjector,
+			final GlobalApplicationState globalAppState) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.ginInjector = ginInjector;
@@ -41,7 +44,16 @@ public class CreateAccessRequirementButton implements IsWidget {
 				} else if (ar != null) {
 					wizard.configure(ar);
 				}
-				wizard.showModal(null);
+				wizard.showModal(new WizardCallback() {
+					@Override
+					public void onFinished() {
+						globalAppState.refreshPage();
+					}
+					
+					@Override
+					public void onCanceled() {
+					}
+				});
 			}
 		});
 	}	

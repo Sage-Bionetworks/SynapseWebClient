@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -49,12 +50,17 @@ public class CreateAccessRequirementButtonTest {
 	AccessRequirement mockAccessRequirement;
 	@Mock
 	RestrictableObjectDescriptor mockSubject;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Captor
+	ArgumentCaptor<ModalWizardWidget.WizardCallback> wizardCallbackCallback;
+	
 	ClickHandler onButtonClickHandler;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockGinInjector);
+		widget = new CreateAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockGinInjector, mockGlobalApplicationState);
 		when(mockGinInjector.getCreateAccessRequirementWizard()).thenReturn(mockCreateAccessRequirementWizard);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
@@ -82,7 +88,9 @@ public class CreateAccessRequirementButtonTest {
 		// configured with an AR, when clicked it should pop up the wizard with the existing AR
 		onButtonClickHandler.onClick(null);
 		verify(mockCreateAccessRequirementWizard).configure(mockAccessRequirement);
-		verify(mockCreateAccessRequirementWizard).showModal(any(ModalWizardWidget.WizardCallback.class));
+		verify(mockCreateAccessRequirementWizard).showModal(wizardCallbackCallback.capture());
+		wizardCallbackCallback.getValue().onFinished();
+		verify(mockGlobalApplicationState).refreshPage();
 	}
 	
 	@Test
