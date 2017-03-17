@@ -154,7 +154,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	@Override
 	public void setModalPresenter(ModalPresenter modalPresenter) {
 		this.modalPresenter = modalPresenter;
-		modalPresenter.setPrimaryButtonText(DisplayConstants.NEXT);
+		modalPresenter.setPrimaryButtonText(DisplayConstants.FINISH);
 	}
 
 

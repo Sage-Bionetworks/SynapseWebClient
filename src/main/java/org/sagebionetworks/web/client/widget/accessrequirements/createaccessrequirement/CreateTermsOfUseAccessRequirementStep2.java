@@ -107,7 +107,7 @@ public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, Create
 	@Override
 	public void setModalPresenter(ModalPresenter modalPresenter) {
 		this.modalPresenter = modalPresenter;
-		modalPresenter.setPrimaryButtonText(DisplayConstants.NEXT);
+		modalPresenter.setPrimaryButtonText(DisplayConstants.FINISH);
 	}
 
 

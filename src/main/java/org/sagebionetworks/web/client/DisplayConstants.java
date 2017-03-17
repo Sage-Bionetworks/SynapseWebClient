@@ -281,6 +281,7 @@ public class DisplayConstants {
 	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
 	public static final String DANGER_BUTTON_STYLE = "btn-danger";
 	public static final int DELAY_UNTIL_IN_VIEW = 1200;
+	public static final String FINISH = "Finish";
 	public static final String NEXT = "Next";
 	public static final String SUBMIT = "Submit";
 }
