@@ -22,6 +22,7 @@ public interface TeamBadgeView extends IsWidget, SynapseView {
 	void setTeamWithoutLink(String name, String teamId);
 
 	void setVisible(boolean visible);
+	void addStyleName(String style); 
 	/**
 	 * Presenter interface
 	 */

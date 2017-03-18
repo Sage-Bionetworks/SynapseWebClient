@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client.widget.accessrequirements.createaccessreq
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Radio;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Italic;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -63,13 +61,9 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	}
 	
 	@Override
-	public void addSubject(IsWidget w) {
-		subjectsContainer.add(w);
-	}
-	
-	@Override
-	public void clearSubjects() {
+	public void setSubjects(IsWidget w) {
 		subjectsContainer.clear();
+		subjectsContainer.add(w);
 	}
 	
 	@Override

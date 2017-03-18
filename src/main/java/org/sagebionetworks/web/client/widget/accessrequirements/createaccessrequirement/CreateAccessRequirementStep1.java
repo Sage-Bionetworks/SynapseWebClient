@@ -10,11 +10,9 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,24 +29,25 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	ModalPresenter modalPresenter;
 	CreateACTAccessRequirementStep2 actStep2;
 	CreateTermsOfUseAccessRequirementStep2 touStep2;
-	PortalGinInjector ginInjector;
 	ACCESS_TYPE currentAccessType;
 	AccessRequirement accessRequirement;
 	SynapseClientAsync synapseClient;
+	SubjectsWidget subjectsWidget;
 	
 	@Inject
 	public CreateAccessRequirementStep1(
 			CreateAccessRequirementStep1View view,
 			CreateACTAccessRequirementStep2 actStep2,
 			CreateTermsOfUseAccessRequirementStep2 touStep2,
-			PortalGinInjector ginInjector,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			SubjectsWidget subjectsWidget) {
 		super();
 		this.view = view;
 		this.actStep2 = actStep2;
 		this.touStep2 = touStep2;
-		this.ginInjector = ginInjector;
+		this.subjectsWidget = subjectsWidget;
 		this.synapseClient = synapseClient;
+		view.setSubjects(subjectsWidget);
 		view.setPresenter(this);
 	}
 	
@@ -102,20 +101,13 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	}
 	
 	private void setSubjects(List<RestrictableObjectDescriptor> initialSubjects) {
-		view.clearSubjects();
 		subjects = initialSubjects;
-		
-		for (RestrictableObjectDescriptor rod : initialSubjects) {
-			if (rod.getType().equals(RestrictableObjectType.ENTITY)) {
+		subjectsWidget.configure(subjects);
+		if (subjects.size() > 0) {
+			if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {
 				currentAccessType = ACCESS_TYPE.DOWNLOAD;
-				EntityIdCellRenderer entityRenderer = ginInjector.createEntityIdCellRenderer();
-				entityRenderer.setValue(rod.getId());
-				view.addSubject(entityRenderer);
-			} else if (rod.getType().equals(RestrictableObjectType.TEAM)) {
+			} else {
 				currentAccessType = ACCESS_TYPE.PARTICIPATE;
-				TeamBadge teamBadge = ginInjector.getTeamBadgeWidget();
-				teamBadge.configure(rod.getId());
-				view.addSubject(teamBadge.asWidget());
 			}
 		}
 	}

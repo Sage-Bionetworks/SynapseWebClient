@@ -84,5 +84,8 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	public void setNotificationValue(String value) {
 		view.setRequestCount(value);
 	}
-
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
 }
