@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -30,11 +31,11 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	HTML terms;
 	@UiField
-	Span requestSubmittedMessage;
+	Alert requestSubmittedMessage;
 	@UiField
-	Span requestApprovedMessage;
+	Alert requestApprovedMessage;
 	@UiField
-	Span requestRejectedMessage;
+	Alert requestRejectedMessage;
 	@UiField
 	Button cancelRequestButton;
 	@UiField
@@ -131,7 +132,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		requestApprovedMessage.setVisible(true);
 	}
 	@Override
-	public void showRequestRejectedMessage() {
+	public void showRequestRejectedMessage(String reason) {
+		requestRejectedMessage.setText("Rejected : " + reason);
 		requestRejectedMessage.setVisible(true);
 	}
 	@Override
