@@ -34,17 +34,20 @@
 			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org </bh:Text>
 			</bh:Div>
 			<bh:ClearFix />
-			<bh:Div addStyleNames="margin-top-5">
-				<bh:Span ui:field="requestSubmittedMessage" text="A request has been submitted" addStyleNames="right text-primary" visible="false"/>
-				<bh:Span ui:field="requestApprovedMessage" text="Your request has been approved" addStyleNames="right text-success" visible="false"/>
-				<bh:Span ui:field="requestRejectedMessage" text="Updated information required" addStyleNames="right text-warning" visible="false"/>
-				<b:Button ui:field="cancelRequestButton" type="PRIMARY" text="Cancel Request" pull="RIGHT" visible="false" addStyleNames="margin-right-5" />
-				<b:Button ui:field="updateRequestButton" type="PRIMARY" text="Update Request" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
-				<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
+			<bh:Div>
 				<b:FormLabel text="Subjects:" pull="LEFT"/>
 				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
-				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
-				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
+			</bh:Div>
+			<bh:ClearFix />
+			<bh:Div addStyleNames="margin-top-5">
+				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
+				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
+				<b:Button ui:field="cancelRequestButton" type="DEFAULT" size="SMALL" text="Cancel Request" pull="RIGHT" visible="false" addStyleNames="margin-right-5 margin-top-5" />
+				<b:Button ui:field="updateRequestButton" type="DEFAULT" size="SMALL" text="Update Request" pull="RIGHT" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+				<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" pull="RIGHT" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+				<b:Alert type="INFO" ui:field="requestSubmittedMessage" text="A request has been submitted" pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
+				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage" text="Your request has been approved" pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
+				<b:Alert type="WARNING" ui:field="requestRejectedMessage" text="" pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div ui:field="requestDataAccessWizardContainer" />

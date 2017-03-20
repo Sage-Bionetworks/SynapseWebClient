@@ -1580,6 +1580,10 @@ ol.lowerroman {
 	font-size: 13px;
 }
 
+.small-alert, #rootPanel .small-alert {
+	padding: 6px 10px;
+	margin-bottom: 5px;
+}
 .padding-0, input[type=text].padding-0 {
 	padding: 0px;
 }

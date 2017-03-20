@@ -73,7 +73,24 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		//TODO:  set up view based on DataAccessSubmission state
 		view.resetState();
 		// (for testing)
-		view.showRequestAccessButton();		
+		// if no request has been submitted:
+//		view.showUnapprovedHeading();
+//		view.showRequestAccessButton();
+		// else if a request has been submitted on your behalf
+//		view.showUnapprovedHeading();
+//		view.showRequestSubmittedMessage();
+		// else if you submitted a request
+//		view.showUnapprovedHeading();
+//		view.showRequestSubmittedMessage();
+//		view.showCancelRequestButton();
+		// else if your request submission has been approved
+//		view.showApprovedHeading();
+//		view.showRequestApprovedMessage();
+//		view.showUpdateRequestButton();
+		// else if your submitted request was rejected
+//		view.showUnapprovedHeading();
+//		view.showRequestRejectedMessage(reason);
+//		view.showUpdateRequestButton();
 	}
 	
 	@Override

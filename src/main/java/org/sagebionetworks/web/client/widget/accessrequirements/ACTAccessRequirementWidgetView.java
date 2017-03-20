@@ -19,7 +19,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget {
 	void showUnapprovedHeading();
 	void showRequestSubmittedMessage();
 	void showRequestApprovedMessage();
-	void showRequestRejectedMessage();
+	void showRequestRejectedMessage(String reason);
 	void showCancelRequestButton();
 	void showUpdateRequestButton();
 	void showRequestAccessButton();
