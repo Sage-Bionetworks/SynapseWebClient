@@ -472,6 +472,8 @@ import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedView;
+import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedViewImpl;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageView;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageViewImpl;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
@@ -1429,5 +1431,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(PopupUtilsViewImpl.class).in(Singleton.class);
 		bind(PopupUtilsView.class).to(PopupUtilsViewImpl.class);
+		bind(ProfileCertifiedValidatedView.class).to(ProfileCertifiedValidatedViewImpl.class);
 	}
 }

@@ -166,6 +166,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
@@ -523,5 +524,6 @@ public interface PortalGinInjector extends Ginjector {
 	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
 	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
 	public FileHandleWidget getFileHandleWidget();
-	public CreateAccessRequirementWizard getCreateAccessRequirementWizard(); 
+	public CreateAccessRequirementWizard getCreateAccessRequirementWizard();
+	public ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
 }
