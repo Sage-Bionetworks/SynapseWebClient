@@ -1426,5 +1426,8 @@ public class PortalGinModule extends AbstractGinModule {
 
 		bind(IsACTMemberAsyncHandlerImpl.class).in(Singleton.class);
 		bind(IsACTMemberAsyncHandler.class).to(IsACTMemberAsyncHandlerImpl.class);
+		
+		bind(PopupUtilsViewImpl.class).in(Singleton.class);
+		bind(PopupUtilsView.class).to(PopupUtilsViewImpl.class);
 	}
 }

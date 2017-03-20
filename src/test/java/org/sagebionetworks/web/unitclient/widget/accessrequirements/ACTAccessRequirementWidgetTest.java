@@ -3,17 +3,21 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -39,11 +43,19 @@ public class ACTAccessRequirementWidgetTest {
 	ACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	CreateAccessRequirementButton mockCreateAccessRequirementButton;
+	@Mock
+	DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
+	@Mock
+	SubjectsWidget mockSubjectsWidget;
+	@Mock
+	List<RestrictableObjectDescriptor> mockSubjectIds;
+	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockCreateAccessRequirementButton);
+		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
+		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 	}
 
 	@Test
@@ -62,6 +74,8 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).setTerms(tou);
 		verify(mockView).showTermsUI();
 		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement);
+		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement);
+		verify(mockSubjectsWidget).configure(mockSubjectIds);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {

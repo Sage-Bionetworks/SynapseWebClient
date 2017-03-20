@@ -5,6 +5,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
@@ -48,8 +50,6 @@ public class CreateAccessRequirementStep1Test {
 	@Mock
 	CreateTermsOfUseAccessRequirementStep2 mockTouStep2;
 	@Mock
-	PortalGinInjector mockGinInjector;
-	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	ModalPresenter mockModalPresenter;
@@ -58,18 +58,17 @@ public class CreateAccessRequirementStep1Test {
 	ACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	TermsOfUseAccessRequirement mockTermsOfUseAccessRequirement;
-	@Mock
-	EntityIdCellRenderer mockEntityIdCellRenderer;
-	@Mock
-	TeamBadge mockTeamBadge;
 	
 	@Mock
 	RestrictableObjectDescriptor mockEntityRestrictableObjectDescriptor;
 	@Mock
 	RestrictableObjectDescriptor mockTeamRestrictableObjectDescriptor;
-	
+	@Mock
+	SubjectsWidget mockSubjectsWidget;
 	@Captor
 	ArgumentCaptor<AccessRequirement> arCaptor;
+	@Captor
+	ArgumentCaptor<List> listCaptor;
 	
 	public static final String VIEW_TEAM_ID1 = "5678";
 	public static final String VIEW_TEAM_ID2 = "8765";
@@ -86,10 +85,8 @@ public class CreateAccessRequirementStep1Test {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateAccessRequirementStep1(mockView, mockActStep2, mockTouStep2, mockGinInjector, mockSynapseClient);
+		widget = new CreateAccessRequirementStep1(mockView, mockActStep2, mockTouStep2, mockSynapseClient, mockSubjectsWidget);
 		widget.setModalPresenter(mockModalPresenter);
-		when(mockGinInjector.createEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
-		when(mockGinInjector.getTeamBadgeWidget()).thenReturn(mockTeamBadge);
 		when(mockView.getTeamIds()).thenReturn(VIEW_TEAM_IDS);
 		when(mockView.getEntityIds()).thenReturn(VIEW_ENTITY_IDS);
 		when(mockEntityRestrictableObjectDescriptor.getType()).thenReturn(RestrictableObjectType.ENTITY);
@@ -106,11 +103,8 @@ public class CreateAccessRequirementStep1Test {
 	@Test
 	public void testConfigureWithEntityRod() {
 		widget.configure(mockEntityRestrictableObjectDescriptor);
-		verify(mockView).clearSubjects();
-		verify(mockGinInjector).createEntityIdCellRenderer();
-		verify(mockEntityIdCellRenderer).setValue(ROD_ENTITY_ID);
-		verify(mockView).addSubject(any(IsWidget.class));
-		
+		verify(mockSubjectsWidget).configure(listCaptor.capture());
+		assertEquals(mockEntityRestrictableObjectDescriptor, listCaptor.getValue().get(0));
 		//go to the next page
 		widget.onPrimary();
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(arCaptor.capture(),  any(AsyncCallback.class));
@@ -128,10 +122,8 @@ public class CreateAccessRequirementStep1Test {
 	@Test
 	public void testConfigureWithTeamRod() {
 		widget.configure(mockTeamRestrictableObjectDescriptor);
-		verify(mockView).clearSubjects();
-		verify(mockGinInjector).getTeamBadgeWidget();
-		verify(mockTeamBadge).configure(ROD_TEAM_ID);
-		verify(mockView).addSubject(any(IsWidget.class));
+		verify(mockSubjectsWidget).configure(listCaptor.capture());
+		assertEquals(mockTeamRestrictableObjectDescriptor, listCaptor.getValue().get(0));
 		
 		when(mockView.isACTAccessRequirementType()).thenReturn(false);
 		AsyncMockStubber.callSuccessWith(mockTermsOfUseAccessRequirement).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class),  any(AsyncCallback.class));
@@ -173,21 +165,5 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockTermsOfUseAccessRequirement).setSubjectIds(anyList());
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockTermsOfUseAccessRequirement),  any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
-	}
-	
-	@Test
-	public void testSetEntitiesFromView() {
-		widget.onSetEntities();
-		verify(mockGinInjector, times(2)).createEntityIdCellRenderer();
-		verify(mockEntityIdCellRenderer).setValue(VIEW_ENTITY_ID1);
-		verify(mockEntityIdCellRenderer).setValue(VIEW_ENTITY_ID2);
-	}
-	
-	@Test
-	public void testSetTeamsFromView() {
-		widget.onSetTeams();
-		verify(mockGinInjector, times(2)).getTeamBadgeWidget();
-		verify(mockTeamBadge).configure(VIEW_TEAM_ID1);
-		verify(mockTeamBadge).configure(VIEW_TEAM_ID2);
 	}
 }

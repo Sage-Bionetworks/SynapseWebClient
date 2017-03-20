@@ -32,6 +32,10 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	Button signTermsButton;
 	@UiField
 	Div editAccessRequirementContainer;
+	@UiField
+	Div deleteAccessRequirementContainer;
+	@UiField
+	Div subjectsWidgetContainer;
 	
 	public interface Binder extends UiBinder<Widget, TermsOfUseAccessRequirementWidgetViewImpl> {
 	}
@@ -106,4 +110,15 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 		editAccessRequirementContainer.clear();
 		editAccessRequirementContainer.add(w);
 	}
+	@Override
+	public void setDeleteAccessRequirementWidget(IsWidget w) {
+		deleteAccessRequirementContainer.clear();
+		deleteAccessRequirementContainer.add(w);
+	}
+	@Override
+	public void setSubjectsWidget(IsWidget w) {
+		subjectsWidgetContainer.clear();
+		subjectsWidgetContainer.add(w);
+	}
+
 }

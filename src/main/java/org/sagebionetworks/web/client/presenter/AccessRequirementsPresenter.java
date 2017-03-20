@@ -62,7 +62,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
 		view.add(loadMoreContainer.asWidget());
-		view.addTitle("Access requirements : ");
+		view.addTitle("All conditions for ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
 

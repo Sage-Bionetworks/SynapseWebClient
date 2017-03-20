@@ -20,6 +20,8 @@ public interface TermsOfUseAccessRequirementWidgetView extends IsWidget {
 	void showSignTermsButton();
 	void resetState();
 	void setEditAccessRequirementWidget(IsWidget w);
+	void setDeleteAccessRequirementWidget(IsWidget w);
+	void setSubjectsWidget(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

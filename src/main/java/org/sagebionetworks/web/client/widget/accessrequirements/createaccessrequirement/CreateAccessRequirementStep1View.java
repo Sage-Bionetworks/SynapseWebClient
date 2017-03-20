@@ -10,8 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface CreateAccessRequirementStep1View extends IsWidget {
 	
-	void clearSubjects();
-	void addSubject(IsWidget w);
+	void setSubjects(IsWidget w);
 	boolean isACTAccessRequirementType(); 
 	boolean isTermsOfUseAccessRequirementType();
 	void setPresenter(Presenter p);
