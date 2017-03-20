@@ -455,8 +455,9 @@ public interface SynapseClientAsync {
 
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 	
+	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
 	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
-
+	
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);
 
 	void generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema,

@@ -24,6 +24,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	TermsOfUseAccessRequirement ar;
 	AuthenticationController authController;
 	CreateAccessRequirementButton createAccessRequirementButton;
+	DeleteAccessRequirementButton deleteAccessRequirementButton;
+	SubjectsWidget subjectsWidget;
 	
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
@@ -31,17 +33,23 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			SynapseClientAsync synapseClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
-			CreateAccessRequirementButton createAccessRequirementButton) {
+			SubjectsWidget subjectsWidget,
+			CreateAccessRequirementButton createAccessRequirementButton,
+			DeleteAccessRequirementButton deleteAccessRequirementButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;
+		this.subjectsWidget = subjectsWidget;
 		this.createAccessRequirementButton = createAccessRequirementButton;
+		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
+		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
+		view.setSubjectsWidget(subjectsWidget);
 	}
 	
 	
@@ -57,6 +65,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
  			view.showTermsUI();
  		}
 		createAccessRequirementButton.configure(ar);
+		deleteAccessRequirementButton.configure(ar);
+		subjectsWidget.configure(ar.getSubjectIds());
 	}
 	
 	public void refreshApprovalState() {

@@ -45,6 +45,10 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div requestDataAccessWizardContainer;
 	@UiField
 	Div editAccessRequirementContainer;
+	@UiField
+	Div deleteAccessRequirementContainer;
+	@UiField
+	Div subjectsWidgetContainer;
 	
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
@@ -160,5 +164,15 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public void setEditAccessRequirementWidget(IsWidget w) {
 		editAccessRequirementContainer.clear();
 		editAccessRequirementContainer.add(w);
+	}
+	@Override
+	public void setDeleteAccessRequirementWidget(IsWidget w) {
+		deleteAccessRequirementContainer.clear();
+		deleteAccessRequirementContainer.add(w);
+	}
+	@Override
+	public void setSubjectsWidget(IsWidget w) {
+		subjectsWidgetContainer.clear();
+		subjectsWidgetContainer.add(w);
 	}
 }

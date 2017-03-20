@@ -569,4 +569,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	boolean isChallenge(String projectId) throws RestServiceException;
 
 	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
+
+	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
 }

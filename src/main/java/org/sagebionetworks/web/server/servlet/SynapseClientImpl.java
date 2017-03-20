@@ -3283,4 +3283,16 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		// are there any evaluations that the current user can edit?
 		return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
 	}
+	
+	@Override
+	public void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.deleteAccessRequirement(accessRequirementId);
+			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
+	}
 }
