@@ -74,8 +74,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.resetState();
 		// (for testing)
 		// if no request has been submitted:
-//		view.showUnapprovedHeading();
-//		view.showRequestAccessButton();
+		view.showUnapprovedHeading();
+		view.showRequestAccessButton();
 		// else if a request has been submitted on your behalf
 //		view.showUnapprovedHeading();
 //		view.showRequestSubmittedMessage();
