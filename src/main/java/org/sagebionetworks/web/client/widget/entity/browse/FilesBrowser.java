@@ -142,6 +142,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setNewFolderDialogVisible(false);
 				view.showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
 			}
 		});
