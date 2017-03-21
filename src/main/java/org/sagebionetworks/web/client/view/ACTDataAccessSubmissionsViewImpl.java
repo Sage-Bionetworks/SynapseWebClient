@@ -9,6 +9,8 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
+import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
+import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -53,6 +55,7 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Button clearStateFilter;
 	@UiField
 	Button clearDateFilter;
+	
 	@UiField
 	Span currentState;
 	@UiField
@@ -88,6 +91,18 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClearDateFilter();
+			}
+		});
+		minDatePicker.addChangeDateHandler(new ChangeDateHandler() {
+			@Override
+			public void onChangeDate(ChangeDateEvent evt) {
+				presenter.onMinDateSelected(minDatePicker.getValue());;
+			}
+		});
+		maxDatePicker.addChangeDateHandler(new ChangeDateHandler() {
+			@Override
+			public void onChangeDate(ChangeDateEvent evt) {
+				presenter.onMaxDateSelected(maxDatePicker.getValue());;
 			}
 		});
 	}

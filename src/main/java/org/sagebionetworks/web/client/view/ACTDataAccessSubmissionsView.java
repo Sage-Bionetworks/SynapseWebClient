@@ -6,7 +6,6 @@ import java.util.List;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setPresenter(Presenter presenter);

@@ -9,15 +9,15 @@
 		<b:Heading ui:field="title" size="H2" text="ACT Access Requirement Data Access Submissions" addStyleNames="margin-top-30 margin-left-35 margin-right-10" />
 		<bh:Div ui:field="synAlertContainer" />
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
-				<bh:Div ui:field="showHideAccessRequirementButtonContainer"/>
-				<bh:Div ui:field="accessRequirementContainer"/>
+				<bh:Div ui:field="showHideAccessRequirementButtonContainer" addStyleNames="margin-left-10 margin-bottom-20"/>
+				<bh:Div ui:field="accessRequirementContainer" />
 				<b:Row>
 					<b:Column size="SM_6">
 						<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 							<b:PanelHeader>
-								<b:Heading size="H3" text="State Filter" />
+								<b:Heading size="H3" text="State filter" />
 								<bh:Span ui:field="currentState"/>
-								<b:Button ui:field="clearStateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
+								<b:Button ui:field="clearStateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
 							</b:PanelHeader>
 							<b:PanelBody>
 								<b:ButtonGroup>
@@ -30,20 +30,20 @@
 					<b:Column size="SM_6">
 						<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 							<b:PanelHeader>
-								<b:Heading size="H3" text="Date Range Filter" />
+								<b:Heading size="H3" text="Date range filter" />
+								<b:Button ui:field="clearDateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
+							</b:PanelHeader>
+							<b:PanelBody>
+								<b:FormLabel>from</b:FormLabel>
 								<bd:DateTimePicker ui:field="minDatePicker"
 									autoClose="true" highlightToday="true" showTodayButton="true"
 									showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
 									hasKeyboardNavigation="false" />
+								<b:FormLabel>to</b:FormLabel>
 								<bd:DateTimePicker ui:field="maxDatePicker"
 									autoClose="true" highlightToday="true" showTodayButton="true"
 									showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
 									hasKeyboardNavigation="false" />
-						
-								<b:Button ui:field="clearDateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
-							</b:PanelHeader>
-							<b:PanelBody>
-								<bh:Div ui:field="userSelectContainer" />
 							</b:PanelBody>
 						</b:Panel>
 					</b:Column>

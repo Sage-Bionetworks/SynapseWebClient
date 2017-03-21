@@ -7,6 +7,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequire
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -33,6 +35,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	private SynapseClientAsync synapseClient;
+	private GlobalApplicationState globalAppState;
 	LoadMoreWidgetContainer loadMoreContainer;
 	public static Long LIMIT = 30L;
 	Long currentOffset;
@@ -43,12 +46,14 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
 	Date fromDate, toDate;
 	ACTAccessRequirement actAccessRequirement;
+	List<String> states;
 	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(ACTDataAccessSubmissionsView view,
 			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
+			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer,
 			final ACTAccessRequirementWidget actAccessRequirementWidget,
 			final Button showHideAccessRequirementButton
@@ -59,9 +64,16 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.synapseClient = synapseClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
+		this.globalAppState = globalAppState;
+		states = new ArrayList<String>();
+		//TODO: replace with correct state filter type when available
+		for (VerificationStateEnum state : VerificationStateEnum.values()) {
+			states.add(state.toString());
+		}
+		view.setStates(states);
 		isAccessRequirementVisible = false;
-		
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
+		actAccessRequirementWidget.setVisible(false);
 		showHideAccessRequirementButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -140,6 +152,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	public void loadMore() {
 		synAlert.clear();
+		globalAppState.pushCurrentPlace(place);
 		// TODO: ask for data access submissions once call is available, and create a widget to render.
 //		synapseClient.getDataAccessSubmissions(accessRequirementId, stateFilter, fromDate, toDate, LIMIT, currentOffset, new AsyncCallback<List<DataAccessSubmission>>() {
 //			@Override
@@ -183,14 +196,14 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	@Override
 	public void onMaxDateSelected(Date date) {
 		toDate = date;
-		place.putParam(ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM, Long.toString(toDate.getTime()));
+		place.putParam(ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM, Long.toString(date.getTime()));
 		loadData();
 	}
 	
 	@Override
 	public void onMinDateSelected(Date date) {
 		fromDate = date;
-		place.putParam(ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM, Long.toString(toDate.getTime()));
+		place.putParam(ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM, Long.toString(date.getTime()));
 		loadData();
 	}
 	
