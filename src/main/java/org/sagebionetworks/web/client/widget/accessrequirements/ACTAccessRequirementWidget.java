@@ -127,4 +127,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
+	}
 }

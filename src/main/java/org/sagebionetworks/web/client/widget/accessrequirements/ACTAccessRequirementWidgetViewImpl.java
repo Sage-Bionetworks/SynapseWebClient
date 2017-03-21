@@ -177,4 +177,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		subjectsWidgetContainer.clear();
 		subjectsWidgetContainer.add(w);
 	}
+	@Override
+	public void setVisible(boolean visible) {
+		w.setVisible(visible);
+	}
 }
