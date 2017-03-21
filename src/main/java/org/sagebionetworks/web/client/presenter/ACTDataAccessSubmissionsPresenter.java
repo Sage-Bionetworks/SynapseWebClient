@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -14,12 +16,12 @@ import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
+import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -46,17 +48,20 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
 	Date fromDate, toDate;
 	ACTAccessRequirement actAccessRequirement;
+	FileHandleWidget ducTemplateFileHandleWidget;
 	List<String> states;
 	
 	@Inject
-	public ACTDataAccessSubmissionsPresenter(ACTDataAccessSubmissionsView view,
+	public ACTDataAccessSubmissionsPresenter(
+			final ACTDataAccessSubmissionsView view,
 			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer,
-			final ACTAccessRequirementWidget actAccessRequirementWidget,
-			final Button showHideAccessRequirementButton
+			ACTAccessRequirementWidget actAccessRequirementWidget,
+			final Button showHideAccessRequirementButton,
+			FileHandleWidget ducTemplateFileHandleWidget
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -65,6 +70,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		this.globalAppState = globalAppState;
+		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		states = new ArrayList<String>();
 		//TODO: replace with correct state filter type when available
 		for (VerificationStateEnum state : VerificationStateEnum.values()) {
@@ -73,14 +79,14 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setStates(states);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
-		actAccessRequirementWidget.setVisible(false);
+		view.setAccessRequirementUIVisible(false);
 		showHideAccessRequirementButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				isAccessRequirementVisible = !isAccessRequirementVisible;
 				String buttonText = isAccessRequirementVisible ? HIDE_AR_TEXT : SHOW_AR_TEXT;
 				showHideAccessRequirementButton.setText(buttonText);
-				actAccessRequirementWidget.setVisible(isAccessRequirementVisible);
+				view.setAccessRequirementUIVisible(isAccessRequirementVisible);
 			}
 		});
 		view.setSynAlert(synAlert);
@@ -129,6 +135,22 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
 						actAccessRequirement = (ACTAccessRequirement) requirement;
+						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
+							FileHandleAssociation fha = new FileHandleAssociation();
+							// TODO: change to Access Requirement type when available.
+							fha.setAssociateObjectType(FileHandleAssociateType.TeamAttachment);
+							fha.setAssociateObjectId(actAccessRequirement.getId().toString());
+							fha.setFileHandleId(actAccessRequirement.getDucTemplateFileHandleId());
+							ducTemplateFileHandleWidget.configure(fha);	
+						}
+						view.setAreOtherAttachmentsRequired(actAccessRequirement.getAreOtherAttachmentsRequired());
+						view.setIsAnnualReviewRequired(actAccessRequirement.getIsAnnualReviewRequired());
+						view.setIsCertifiedUserRequired(actAccessRequirement.getIsCertifiedUserRequired());
+						view.setIsDUCRequired(actAccessRequirement.getIsDUCRequired());
+						view.setIsIDUPublic(actAccessRequirement.getIsIDUPublic());
+						view.setIsIRBApprovalRequired(actAccessRequirement.getIsIRBApprovalRequired());
+						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());
+						
 						actAccessRequirementWidget.setRequirement(actAccessRequirement);
 						view.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
 						view.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());

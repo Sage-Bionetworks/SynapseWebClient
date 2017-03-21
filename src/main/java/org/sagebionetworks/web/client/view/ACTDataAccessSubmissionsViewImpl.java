@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
@@ -64,6 +66,26 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	TableHeader irbColumn;
 	@UiField
 	TableHeader otherAttachmentsColumn;
+	@UiField
+	Panel accessRequirementUI;
+	
+	@UiField
+	CheckBox certifiedCheckbox;
+	@UiField
+	CheckBox validatedCheckbox;
+	@UiField
+	CheckBox ducCheckbox;
+	@UiField
+	Div ducTemplateFileContainer;
+	@UiField
+	CheckBox irbCheckbox;
+	@UiField
+	CheckBox otherAttachmentsCheckbox;
+	@UiField
+	CheckBox annualRenewalCheckbox;
+	@UiField
+	CheckBox intendedDataUsePublicCheckbox;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -119,6 +141,10 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
+	@Override
+	public void setAccessRequirementUIVisible(boolean visible) {
+		accessRequirementUI.setVisible(visible);
+	}
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -202,4 +228,40 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
 		otherAttachmentsColumn.setVisible(visible);
 	}
+
+	@Override
+	public void setAreOtherAttachmentsRequired(boolean value) {
+		otherAttachmentsCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsAnnualReviewRequired(boolean value) {
+		annualRenewalCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsCertifiedUserRequired(boolean value) {
+		certifiedCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsDUCRequired(boolean value) {
+		ducCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsIDUPublic(boolean value) {
+		intendedDataUsePublicCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsIRBApprovalRequired(boolean value) {
+		irbCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsValidatedProfileRequired(boolean value) {
+		validatedCheckbox.setValue(value);
+	}
+	
 }
