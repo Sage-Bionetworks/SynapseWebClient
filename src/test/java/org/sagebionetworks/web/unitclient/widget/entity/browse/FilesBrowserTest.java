@@ -120,7 +120,7 @@ public class FilesBrowserTest {
 		filesBrowser.deleteFolder(true);
 		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
-		verify(mockView, Mockito.never()).setNewFolderDialogVisible(false);
+		verify(mockView).setNewFolderDialogVisible(false);
 	}
 	
 	@SuppressWarnings("unchecked")
