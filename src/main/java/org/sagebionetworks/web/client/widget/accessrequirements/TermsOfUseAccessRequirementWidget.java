@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -53,20 +52,25 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	}
 	
 	
-	public void setRequirement(TermsOfUseAccessRequirement ar) {
+	public void setRequirement(final TermsOfUseAccessRequirement ar) {
 		this.ar = ar;
-		if (!DisplayUtils.isDefined(ar.getTermsOfUse())) {
- 			//get wiki terms
- 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
- 			wikiPageWidget.configure(wikiKey, false, null, false);
- 			view.showWikiTermsUI();
- 		} else {
- 			view.setTerms(ar.getTermsOfUse());
- 			view.showTermsUI();
- 		}
+		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setTerms(ar.getTermsOfUse());
+	 			view.showTermsUI();
+			}
+			@Override
+			public void onSuccess(String rootWikiId) {
+				//get wiki terms
+	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
+	 			wikiPageWidget.configure(wikiKey, false, null, false);
+	 			view.showWikiTermsUI();
+			}
+		});
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
-		subjectsWidget.configure(ar.getSubjectIds());
+		subjectsWidget.configure(ar.getSubjectIds(), true);
 	}
 	
 	public void refreshApprovalState() {

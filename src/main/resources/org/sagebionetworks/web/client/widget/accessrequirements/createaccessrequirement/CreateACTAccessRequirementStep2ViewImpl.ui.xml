@@ -8,7 +8,7 @@
 	<bh:Div>
 		<bh:Div>
 			<b:FormGroup ui:field="oldInstructionsUI">
-				<b:FormLabel>Legacy text-only instructions (will be cleared on save!)</b:FormLabel>
+				<b:FormLabel>Legacy text-only instructions</b:FormLabel>
 				<bh:Paragraph ui:field="oldInstructions" />
 			</b:FormGroup>
 			<b:FormGroup>

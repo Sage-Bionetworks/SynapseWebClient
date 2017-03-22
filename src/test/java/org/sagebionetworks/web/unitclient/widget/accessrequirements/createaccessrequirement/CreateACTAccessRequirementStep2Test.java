@@ -183,7 +183,6 @@ public class CreateACTAccessRequirementStep2Test {
 		
 		//on finish, it should clear out the old terms of use
 		widget.onPrimary();
-		verify(mockACTAccessRequirement).setActContactInfo(null);
 		verify(mockModalPresenter).setLoading(true);
 		verify(mockModalPresenter).setLoading(false);
 		verify(mockModalPresenter, never()).setErrorMessage(anyString());
@@ -200,7 +199,6 @@ public class CreateACTAccessRequirementStep2Test {
 		String error = "error message";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
 		widget.onPrimary();
-		verify(mockACTAccessRequirement).setActContactInfo(null);
 		verify(mockModalPresenter).setLoading(true);
 		verify(mockModalPresenter).setLoading(false);
 		verify(mockModalPresenter).setErrorMessage(error);

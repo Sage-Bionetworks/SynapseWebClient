@@ -103,7 +103,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	
 	private void setSubjects(List<RestrictableObjectDescriptor> initialSubjects) {
 		subjects = initialSubjects;
-		subjectsWidget.configure(subjects);
+		subjectsWidget.configure(subjects, false);
 		String subjectIds = getSubjectIds(subjects);
 		if (subjects.size() > 0) {
 			if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {
