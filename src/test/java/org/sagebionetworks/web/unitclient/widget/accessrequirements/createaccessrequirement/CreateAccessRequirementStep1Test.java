@@ -166,4 +166,18 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockTermsOfUseAccessRequirement),  any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
+	
+	@Test
+	public void testGetSubjectIds() {
+		RestrictableObjectDescriptor mockSubject1 = mock(RestrictableObjectDescriptor.class);
+		RestrictableObjectDescriptor mockSubject2 = mock(RestrictableObjectDescriptor.class);
+		when(mockSubject1.getId()).thenReturn(VIEW_ENTITY_ID1);
+		when(mockSubject2.getId()).thenReturn(VIEW_ENTITY_ID2);
+		List<RestrictableObjectDescriptor> testList = new ArrayList<RestrictableObjectDescriptor>();
+		assertEquals("", widget.getSubjectIds(testList));
+		testList.add(mockSubject1);
+		assertEquals(VIEW_ENTITY_ID1, widget.getSubjectIds(testList));
+		testList.add(mockSubject2);
+		assertEquals(VIEW_ENTITY_ID1 + ", " + VIEW_ENTITY_ID2, widget.getSubjectIds(testList));
+	}
 }

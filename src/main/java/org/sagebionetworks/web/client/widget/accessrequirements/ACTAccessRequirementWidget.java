@@ -26,6 +26,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	CreateAccessRequirementButton createAccessRequirementButton;
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
+	ManageAccessButton manageAccessButton;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -35,7 +36,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			PortalGinInjector ginInjector,
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
-			DeleteAccessRequirementButton deleteAccessRequirementButton) {
+			DeleteAccessRequirementButton deleteAccessRequirementButton,
+			ManageAccessButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -44,11 +46,13 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.subjectsWidget = subjectsWidget;
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
+		this.manageAccessButton = manageAccessButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
+		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 	}
 	
@@ -65,6 +69,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
  		}
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
+		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds());
 		refreshApprovalState();
 	}

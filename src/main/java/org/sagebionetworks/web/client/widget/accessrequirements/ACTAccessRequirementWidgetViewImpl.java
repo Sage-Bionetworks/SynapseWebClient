@@ -49,6 +49,9 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	Div deleteAccessRequirementContainer;
 	@UiField
+	Div manageAccessContainer;
+	
+	@UiField
 	Div subjectsWidgetContainer;
 	
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
@@ -180,5 +183,11 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@Override
 	public void setVisible(boolean visible) {
 		w.setVisible(visible);
+	}
+	
+	@Override
+	public void setManageAccessWidget(IsWidget w) {
+		manageAccessContainer.clear();
+		manageAccessContainer.add(w);
 	}
 }
