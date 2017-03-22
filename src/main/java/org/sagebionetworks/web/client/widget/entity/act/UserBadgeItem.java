@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
+import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -48,6 +49,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	
 	public UserBadgeItem configure(String ownerId) {
 		userId = ownerId;
+		
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 		userBadge.configure(userId);
 		userBadge.setSize(BadgeSize.SMALL);
@@ -61,6 +63,12 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 			}
 		});
 		userBadgeContainer.add(userBadge.asWidget());
+		
+		ProfileCertifiedValidatedWidget w = portalGinInjector.getProfileCertifiedValidatedWidget();
+		w.configure(Long.parseLong(ownerId));
+		w.asWidget().addStyleName("moveup-8 margin-left-5");
+		userBadgeContainer.add(w.asWidget());
+		
 		return this;
 	}
 	
