@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
@@ -68,7 +69,14 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	TableHeader otherAttachmentsColumn;
 	@UiField
 	Panel accessRequirementUI;
-	
+	@UiField
+	Anchor createdOnColumnHeader;
+	@UiField
+	TableHeader publicationsColumn;
+	@UiField
+	TableHeader summaryOfUseColumn;
+	@UiField
+	TableHeader isRenewalColumn;
 	@UiField
 	CheckBox certifiedCheckbox;
 	@UiField
@@ -125,6 +133,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			@Override
 			public void onChangeDate(ChangeDateEvent evt) {
 				presenter.onMaxDateSelected(maxDatePicker.getValue());;
+			}
+		});
+		createdOnColumnHeader.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCreatedOnClick();
 			}
 		});
 	}
@@ -228,7 +242,13 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
 		otherAttachmentsColumn.setVisible(visible);
 	}
-
+	@Override
+	public void setRenewalColumnsVisible(boolean visible) {
+		publicationsColumn.setVisible(visible);
+		summaryOfUseColumn.setVisible(visible);
+		isRenewalColumn.setVisible(visible);
+	}
+	
 	@Override
 	public void setAreOtherAttachmentsRequired(boolean value) {
 		otherAttachmentsCheckbox.setValue(value);

@@ -28,7 +28,7 @@
 					text="Intended Data Use statements will be publicly available." enabled="false" />
 			</b:Panel>
 			<b:Row>
-				<b:Column size="SM_6">
+				<b:Column size="SM_12">
 					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 						<b:PanelHeader>
 							<b:Heading size="H3" text="State filter" />
@@ -43,7 +43,7 @@
 						</b:PanelBody>
 					</b:Panel>
 				</b:Column>
-				<b:Column size="SM_6">
+				<b:Column size="SM_6" visible="false">
 					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 						<b:PanelHeader>
 							<b:Heading size="H3" text="Date range filter" />
@@ -67,6 +67,9 @@
 			<!-- table header -->
 			<t:Table width="100%" addStyleNames="margin-left-10 margin-right-10 table-layout-fixed">
 				<t:TableRow>
+					<t:TableHeader width="10%" >
+						<b:Anchor ui:field="createdOnColumnHeader" text="Created On"/>
+					</t:TableHeader>
 					<t:TableHeader width="10%" addStyleNames="hidden-xs">
 						<bh:Span text="State" />
 					</t:TableHeader>
@@ -89,7 +92,16 @@
 						<bh:Span text="IRB" />
 					</t:TableHeader>
 					<t:TableHeader ui:field="otherAttachmentsColumn" width="10%">
-						<bh:Span text="Other docs" />
+						<bh:Span text="Other Docs" />
+					</t:TableHeader>
+					<t:TableHeader ui:field="isRenewalColumn" width="5%">
+						<bh:Span text="Is Renewal" />
+					</t:TableHeader>
+					<t:TableHeader ui:field="publicationsColumn" width="10%">
+						<bh:Span text="Publications" />
+					</t:TableHeader>
+					<t:TableHeader ui:field="summaryOfUseColumn" width="10%">
+						<bh:Span text="Summary Of Use" />
 					</t:TableHeader>
 					<t:TableHeader width="10%">
 						<bh:Span text="Actions" />

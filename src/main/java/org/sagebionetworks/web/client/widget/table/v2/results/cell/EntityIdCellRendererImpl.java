@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
@@ -17,15 +18,19 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	EntityIdCellRendererView view;
 	LazyLoadHelper lazyLoadHelper;
 	EntityHeaderAsyncHandler entityHeaderAsyncHandler;
+	SynapseJSNIUtils jsniUtils;
 	String entityId, entityName;
 	ClickHandler customClickHandler;
+	boolean hideIfLoadError;
 	@Inject
 	public EntityIdCellRendererImpl(EntityIdCellRendererView view, 
 			LazyLoadHelper lazyLoadHelper,
-			EntityHeaderAsyncHandler entityHeaderAsyncHandler) {
+			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
+		this.jsniUtils = jsniUtils;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -55,8 +60,13 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorIcon(caught.getMessage());
-					view.setLinkText(entityId);
+					if (hideIfLoadError) {
+						jsniUtils.consoleError(caught.getMessage());
+						view.setVisible(false);
+					} else {
+						view.showErrorIcon(caught.getMessage());
+						view.setLinkText(entityId);
+					}
 				}
 			});
 		}
@@ -66,16 +76,20 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	public Widget asWidget() {
 		return this.view.asWidget();
 	}
-	
+
+	public void setValue(String value, boolean hideIfLoadError) {
+		setValue(value, null, hideIfLoadError);
+	}
 
 	@Override
 	public void setValue(String value) {
-		setValue(value, null);
+		setValue(value, null, false);
 	}
 	
-	public void setValue(String value, ClickHandler customClickHandler) {
+	public void setValue(String value, ClickHandler customClickHandler, boolean hideIfLoadError) {
 		view.hideAllIcons();
 		this.entityId = value;
+		this.hideIfLoadError = hideIfLoadError;
 		entityName = null;
 		this.customClickHandler = customClickHandler;
 		lazyLoadHelper.setIsConfigured();

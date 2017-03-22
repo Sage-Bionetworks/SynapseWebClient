@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -30,12 +31,12 @@ public class SubjectsWidget implements IsWidget {
 		return this.view.asWidget();
 	}
 
-	public void configure(List<RestrictableObjectDescriptor> subjects) {
+	public void configure(List<RestrictableObjectDescriptor> subjects, boolean hideIfLoadError) {
 		view.clear();
 		for (RestrictableObjectDescriptor rod : subjects) {
 			if (rod.getType().equals(RestrictableObjectType.ENTITY)) {
-				EntityIdCellRenderer entityRenderer = ginInjector.createEntityIdCellRenderer();
-				entityRenderer.setValue(rod.getId());
+				EntityIdCellRendererImpl entityRenderer = (EntityIdCellRendererImpl)ginInjector.createEntityIdCellRenderer();
+				entityRenderer.setValue(rod.getId(), hideIfLoadError);
 				view.add(entityRenderer);
 			} else if (rod.getType().equals(RestrictableObjectType.TEAM)) {
 				TeamBadge teamBadge = ginInjector.getTeamBadgeWidget();

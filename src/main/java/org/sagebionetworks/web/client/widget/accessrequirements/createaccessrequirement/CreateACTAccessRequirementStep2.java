@@ -120,7 +120,6 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	@Override
 	public void onPrimary() {
 		// update access requirement from view
-		accessRequirement.setActContactInfo(null);
 		accessRequirement.setAreOtherAttachmentsRequired(view.areOtherAttachmentsRequired());
 		accessRequirement.setIsAnnualReviewRequired(view.isAnnualReviewRequired());
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());

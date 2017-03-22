@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,7 +22,6 @@ public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, Create
 	CreateTermsOfUseAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
 	TermsOfUseAccessRequirement accessRequirement;
-	SynapseClientAsync synapseClient;
 	WikiMarkdownEditor wikiMarkdownEditor;
 	WikiPageWidget wikiPageRenderer;
 	WikiPageKey wikiKey;
@@ -33,13 +29,11 @@ public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, Create
 	@Inject
 	public CreateTermsOfUseAccessRequirementStep2(
 			CreateTermsOfUseAccessRequirementStep2View view,
-			SynapseClientAsync synapseClient,
 			WikiMarkdownEditor wikiMarkdownEditor,
 			WikiPageWidget wikiPageRenderer
 		) {
 		super();
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
 		this.wikiPageRenderer = wikiPageRenderer;
 		
@@ -78,25 +72,8 @@ public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, Create
 	
 	@Override
 	public void onPrimary() {
-		// create/update access requirement
-		if (accessRequirement.getTermsOfUse() != null) {
-			accessRequirement.setTermsOfUse(null);
-			modalPresenter.setLoading(true);
-			synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					modalPresenter.setLoading(false);
-					modalPresenter.setErrorMessage(caught.getMessage());
-				}
-				@Override
-				public void onSuccess(AccessRequirement result) {
-					modalPresenter.setLoading(false);
-					modalPresenter.onFinished();
-				}
-			});	
-		} else {
-			modalPresenter.onFinished();
-		}
+		//can update wiki only
+		modalPresenter.onFinished();
 	}
 
 	@Override

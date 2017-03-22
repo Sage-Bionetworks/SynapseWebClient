@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -56,21 +57,26 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setSubjectsWidget(subjectsWidget);
 	}
 	
-	public void setRequirement(ACTAccessRequirement ar) {
+	public void setRequirement(final ACTAccessRequirement ar) {
 		this.ar = ar;
-		if (!DisplayUtils.isDefined(ar.getActContactInfo())) {
- 			//get wiki terms
- 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
- 			wikiPageWidget.configure(wikiKey, false, null, false);
- 			view.showWikiTermsUI();
- 		} else {
- 			view.setTerms(ar.getActContactInfo());
- 			view.showTermsUI();
- 		}
+		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setTerms(ar.getActContactInfo());
+	 			view.showTermsUI();
+			}
+			@Override
+			public void onSuccess(String rootWikiId) {
+				//get wiki terms
+	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
+	 			wikiPageWidget.configure(wikiKey, false, null, false);
+	 			view.showWikiTermsUI();
+			}
+		});
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
 		manageAccessButton.configure(ar);
-		subjectsWidget.configure(ar.getSubjectIds());
+		subjectsWidget.configure(ar.getSubjectIds(), true);
 		refreshApprovalState();
 	}
 	

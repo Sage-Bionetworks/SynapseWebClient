@@ -22,7 +22,10 @@ import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccess
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TermsOfUseAccessRequirementWidgetTest {
@@ -48,12 +51,13 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
 	List<RestrictableObjectDescriptor> mockSubjectIds;
-	
+	public final static String ROOT_WIKI_ID = "777";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		widget = new TermsOfUseAccessRequirementWidget(mockView, mockAuthController, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
+		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -66,6 +70,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 
 	@Test
 	public void testSetRequirementWithContactInfoTerms() {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		String tou = "must do things before access is allowed";
 		when(mockTermsOfUseAccessRequirement.getTermsOfUse()).thenReturn(tou);
 		widget.setRequirement(mockTermsOfUseAccessRequirement);
@@ -73,7 +78,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		verify(mockView).showTermsUI();
 		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement);
 		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement);
-		verify(mockSubjectsWidget).configure(mockSubjectIds);
+		boolean isHideIfLoadError = true;
+		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {

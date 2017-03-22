@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -30,8 +30,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implements Presenter<ACTDataAccessSubmissionsPlace>, ACTDataAccessSubmissionsView.Presenter {
-	//TODO: replace with correct state filter type when available
-	private VerificationStateEnum stateFilter;
+	private DataAccessSubmissionState stateFilter;
 	private ACTDataAccessSubmissionsPlace place;
 	private ACTDataAccessSubmissionsView view;
 	private PortalGinInjector ginInjector;
@@ -50,6 +49,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	ACTAccessRequirement actAccessRequirement;
 	FileHandleWidget ducTemplateFileHandleWidget;
 	List<String> states;
+	boolean isSortedAsc;
 	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
@@ -72,8 +72,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		states = new ArrayList<String>();
-		//TODO: replace with correct state filter type when available
-		for (VerificationStateEnum state : VerificationStateEnum.values()) {
+		for (DataAccessSubmissionState state : DataAccessSubmissionState.values()) {
 			states.add(state.toString());
 		}
 		view.setStates(states);
@@ -113,6 +112,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public void setPlace(ACTDataAccessSubmissionsPlace place) {
 		this.place = place;
 		actAccessRequirement = null;
+		isSortedAsc = true;
 		String accessRequirementId = place.getParam(ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM);
 		String fromTime = place.getParam(ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM);
 		if (fromTime != null) {
@@ -155,6 +155,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
 						view.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 						view.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
+						view.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
 						loadData();
 					} else {
 						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
@@ -176,7 +177,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		synAlert.clear();
 		globalAppState.pushCurrentPlace(place);
 		// TODO: ask for data access submissions once call is available, and create a widget to render.
-//		synapseClient.getDataAccessSubmissions(accessRequirementId, stateFilter, fromDate, toDate, LIMIT, currentOffset, new AsyncCallback<List<DataAccessSubmission>>() {
+//		synapseClient.getDataAccessSubmissions(accessRequirementId, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, stateFilter, fromDate, toDate, LIMIT, currentOffset, new AsyncCallback<List<DataAccessSubmission>>() {
 //			@Override
 //			public void onFailure(Throwable caught) {
 //				synAlert.handleException(caught);
@@ -240,10 +241,15 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	@Override
 	public void onStateSelected(String selectedState) {
-		//TODO: replace with correct state filter type when available
-		stateFilter = VerificationStateEnum.valueOf(selectedState);
+		stateFilter = DataAccessSubmissionState.valueOf(selectedState);
 		place.putParam(ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM, selectedState);
 		view.setSelectedStateText(selectedState);
+		loadData();
+	}
+	
+	@Override
+	public void onCreatedOnClick() {
+		isSortedAsc = !isSortedAsc;
 		loadData();
 	}
 	

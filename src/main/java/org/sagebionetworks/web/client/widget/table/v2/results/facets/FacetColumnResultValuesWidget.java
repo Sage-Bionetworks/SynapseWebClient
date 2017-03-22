@@ -96,7 +96,8 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	
 	public Widget getEntityBadge(String entityId) {
 		EntityIdCellRendererImpl entityBadge = ginInjector.getEntityIdCellRenderer();
-		entityBadge.setValue(entityId, doNothingClickHandler);
+		boolean hideIfLoadError = true;
+		entityBadge.setValue(entityId, doNothingClickHandler, hideIfLoadError);
 		return entityBadge.asWidget();
 	}
 	
