@@ -29,7 +29,7 @@
 		     	<bh:Paragraph addStyleNames="margin-left-20">A Docker container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.</bh:Paragraph>
 			   <g:SimplePanel ui:field="synAlertPanel"/>
 			   <bh:Div addStyleNames="margin-left-10">
-					<b:Heading size="H5" text="These features can be added at any time by selecting 'Project Display Settings' in the Tools menu." addStyleNames="margin-top-20"/>
+					<b:Heading size="H5" text="These features can be added at any time by selecting 'Project Display Settings'." addStyleNames="margin-top-20"/>
 			   </bh:Div> 
 			</b:ModalBody>
 			<b:ModalFooter>
