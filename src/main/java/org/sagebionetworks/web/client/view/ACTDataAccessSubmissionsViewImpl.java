@@ -246,7 +246,7 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setRenewalColumnsVisible(boolean visible) {
 		publicationsColumn.setVisible(visible);
 		summaryOfUseColumn.setVisible(visible);
-		
+		isRenewalColumn.setVisible(visible);
 	}
 	
 	@Override
