@@ -30,6 +30,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setIrbColumnVisible(boolean visible);
 	void setOtherAttachmentsColumnVisible(boolean visible);
 	void setAccessRequirementUIVisible(boolean visible);
+	void setRenewalColumnsVisible(boolean visible);
 	
 	public interface Presenter {
 		void onClearDateFilter();
@@ -37,5 +38,8 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 		void onStateSelected(String state);
 		void onMinDateSelected(Date date);
 		void onMaxDateSelected(Date date);
+		void onCreatedOnClick();
 	}
+
+	
 }
