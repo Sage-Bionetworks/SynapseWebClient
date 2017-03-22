@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -103,13 +104,27 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	private void setSubjects(List<RestrictableObjectDescriptor> initialSubjects) {
 		subjects = initialSubjects;
 		subjectsWidget.configure(subjects);
+		String subjectIds = getSubjectIds(subjects);
 		if (subjects.size() > 0) {
 			if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {
 				currentAccessType = ACCESS_TYPE.DOWNLOAD;
+				view.setEntityIdsString(subjectIds);
 			} else {
 				currentAccessType = ACCESS_TYPE.PARTICIPATE;
+				view.setTeamIdsString(subjectIds);
 			}
 		}
+	}
+	public String getSubjectIds(List<RestrictableObjectDescriptor> subjects) {
+		StringBuilder sb = new StringBuilder();
+		for (Iterator iterator = subjects.iterator(); iterator.hasNext();) {
+			RestrictableObjectDescriptor subject = (RestrictableObjectDescriptor) iterator.next();
+			sb.append(subject.getId());
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
 	}
 	
 	@Override

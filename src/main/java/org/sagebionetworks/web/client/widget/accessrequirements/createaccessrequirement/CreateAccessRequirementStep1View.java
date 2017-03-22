@@ -15,7 +15,9 @@ public interface CreateAccessRequirementStep1View extends IsWidget {
 	boolean isTermsOfUseAccessRequirementType();
 	void setPresenter(Presenter p);
 	String getEntityIds();
+	void setEntityIdsString(String ids);
 	String getTeamIds();
+	void setTeamIdsString(String ids);
 	void setAccessRequirementTypeSelectionVisible(boolean visible);
 	
 	/**

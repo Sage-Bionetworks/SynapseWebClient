@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequire
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManageAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -46,6 +47,8 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 	@Mock
+	ManageAccessButton mockManageAccessButton;
+	@Mock
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
 	List<RestrictableObjectDescriptor> mockSubjectIds;
@@ -53,7 +56,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton);
+		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 	}
@@ -75,6 +78,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showTermsUI();
 		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement);
 		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement);
+		verify(mockManageAccessButton).configure(mockACTAccessRequirement);
 		verify(mockSubjectsWidget).configure(mockSubjectIds);
 	}
 	@Test
