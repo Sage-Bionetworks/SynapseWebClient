@@ -71,8 +71,16 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 		return entityIds.getText();
 	}
 	@Override
+	public void setEntityIdsString(String ids) {
+		entityIds.setText(ids);
+	}
+	@Override
 	public String getTeamIds() {
 		return teamIds.getText();
+	}
+	@Override
+	public void setTeamIdsString(String ids) {
+		teamIds.setText(ids);
 	}
 	
 	@Override
