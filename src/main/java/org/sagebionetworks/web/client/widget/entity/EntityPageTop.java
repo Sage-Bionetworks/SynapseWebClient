@@ -240,12 +240,19 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	// after all tab visilibity has been determined, then move on to configure the currently selected tab
     	tabVisibilityInitializedCount = 0;
     	visibleTabCount = 0;
-    	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
-    	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
-    	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
+    	// SWC-3137: show all tabs, until project display settings state persists.  Challenge is still dependent on content.
+    	getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab()).onSuccess(true);
+    	getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab()).onSuccess(true);
+    	getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()).onSuccess(true);
+    	getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()).onSuccess(true);
+    	getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
+    	
+//    	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
+//    	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
+//    	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
     	synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(CHALLENGE, EntityArea.ADMIN, adminTab.asTab()));
-    	synapseClient.isForum(projectHeader.getId(), getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()));
-    	synapseClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()));
+//    	synapseClient.isForum(projectHeader.getId(), getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()));
+//    	synapseClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()));
 	}
     
     public AsyncCallback<Boolean> getTabVisibilityCallback(final String displayArea, final EntityArea entityArea, final Tab tab) {

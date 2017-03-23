@@ -321,9 +321,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProjectDisplay() {
-		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);
-		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);	
-		actionMenu.setActionListener(Action.PROJECT_DISPLAY, this);
+		// SWC-3137: hide until project display settings state persists.  Probably change so that it's available to project administrators only when we re-enable.
+		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, false);
+//		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);
+//		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);	
+//		actionMenu.setActionListener(Action.PROJECT_DISPLAY, this);
 	}
 	
 	private void configureApproveUserAccess() {
