@@ -3,14 +3,16 @@ package org.sagebionetworks.web.unitclient.widget.display;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -59,17 +61,32 @@ public class ProjectDisplayTest {
 		ProjectDisplayBundle result = new ProjectDisplayBundle(false, false, false, false, false, false);
 		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
 		modal.show();
-		verify(mockView).setWiki(false);
-		verify(mockView).setFiles(false);
-		verify(mockView).setTables(false);
+		//verify default set (since all are hidden, and nothing in the cache)
+		InOrder order = inOrder(mockView);
+		order.verify(mockView).setWiki(false);
+		order.verify(mockView).setWiki(true);
+		
+		order = inOrder(mockView);
+		order.verify(mockView).setFiles(false);
+		order.verify(mockView).setFiles(true);
+		
+		order = inOrder(mockView);
+		order.verify(mockView).setTables(false);
+		order.verify(mockView).setTables(true);
+		
 		verify(mockView).setChallenge(false);
-		verify(mockView).setDiscussion(false);
+		verify(mockView, never()).setChallenge(true);
+		
+		order = inOrder(mockView);
+		order.verify(mockView).setDiscussion(false);
+		order.verify(mockView).setDiscussion(true);
+
 		verify(mockView).setDocker(false);
+		verify(mockView, never()).setDocker(true);
 	}
 	
 	@Test
 	public void testShowDialogError() {
-		ProjectDisplayBundle result = new ProjectDisplayBundle(false, false, false, false, false, false);
 		AsyncMockStubber.callFailureWith(new Throwable("error")).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
 		modal.show();
 		verify(mockView).showErrorMessage("error");
@@ -85,24 +102,53 @@ public class ProjectDisplayTest {
 	}
 	
 	@Test
-	public void asWidgetTest() {
+	public void testAsWidget() {
 		modal.asWidget();
 		verify(mockView).asWidget();
 	}
 	
 	@Test
-	public void onClearTest() {
+	public void testClear() {
 		modal.clear();
 		verify(mockView).clear();
 	}
 	
 	@Test
-	public void cancelTest() {
-		modal.cancel();
+	public void testOnCancel() {
+		modal.onCancel();
 		verify(mockSynAlert).clear();
 		verify(mockView).hide();
 		verify(mockPlaceChanger).goTo(new Synapse(projectId));
 	}
+	
+	@Test
+	public void testOnCancelSetDefaults() {
+		ProjectDisplayBundle result = new ProjectDisplayBundle(false, false, false, false, false, false);
+		AsyncMockStubber.callSuccessWith(result).when(mockSynapseClient).getProjectDisplay(anyString(), any(AsyncCallback.class));
+		modal.show();
+		
+		reset(mockView);
+		// mock defaults
+		when(mockView.getWiki()).thenReturn(true);
+		when(mockView.getFiles()).thenReturn(true);
+		when(mockView.getTables()).thenReturn(true);
+		when(mockView.getChallenge()).thenReturn(false);
+		when(mockView.getDiscussion()).thenReturn(true);
+		when(mockView.getDocker()).thenReturn(false);
+		
+		modal.onCancel();
+		// sets defaults on view, and saves
+		verify(mockView).setWiki(true);
+		verify(mockView).setFiles(true);
+		verify(mockView).setTables(true);
+		verify(mockView).setDiscussion(true);
+		verify(mockStorage, times(4)).put(anyString(), anyString(), anyLong());
+		
+		verify(mockSynAlert).clear();
+		verify(mockView).hide();
+		verify(mockPlaceChanger).goTo(new Synapse(projectId));
+	}
+
 	
 	@Test
 	public void testOnSave() {

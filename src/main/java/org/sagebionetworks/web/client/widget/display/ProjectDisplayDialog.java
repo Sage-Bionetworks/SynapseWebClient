@@ -31,7 +31,7 @@ public class ProjectDisplayDialog implements ProjectDisplayView.Presenter, IsWid
 	public static final String CHALLENGE = "Challenge";
 	public static final String DISCUSSION = "Discussion";
 	public static final String DOCKER = "Docker";
-	
+	boolean isNothingSelected;
 	@Inject
 	public ProjectDisplayDialog(ProjectDisplayView view,
 			SynapseClientAsync synapseClient, 
@@ -79,11 +79,22 @@ public class ProjectDisplayDialog implements ProjectDisplayView.Presenter, IsWid
 				view.setDiscussion(discussion);
 				boolean docker = Boolean.parseBoolean(storage.get(tag + DOCKER)) || result.dockerHasContent();
 				view.setDocker(docker);
+				isNothingSelected = !(wiki || files || tables || challenge || discussion || docker);
+				if (isNothingSelected) {
+					setToDefaultSelections();
+				}
 				view.show();
 			}
 			
 		});
 		
+	}
+	
+	public void setToDefaultSelections() {
+		view.setWiki(true);
+		view.setFiles(true);
+		view.setTables(true);
+		view.setDiscussion(true);
 	}
 	
 	public void hide() {
@@ -131,9 +142,15 @@ public class ProjectDisplayDialog implements ProjectDisplayView.Presenter, IsWid
 	}
 	
 	@Override
-	public void cancel() {
-		synAlert.clear();
-		hide();
+	public void onCancel() {
+		// if cancel but we have no content and nothing in the session storage, then save default view to the cache.
+		if (isNothingSelected) {
+			setToDefaultSelections();
+			onSave();
+		} else {
+			synAlert.clear();
+			hide();	
+		}
 	}
 
 }
