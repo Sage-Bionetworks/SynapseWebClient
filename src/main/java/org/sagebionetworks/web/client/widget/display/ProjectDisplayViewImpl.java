@@ -60,7 +60,7 @@ public class ProjectDisplayViewImpl implements ProjectDisplayView {
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.cancel();
+				presenter.onCancel();
 			}
 		});
 		
