@@ -1,15 +1,11 @@
 package org.sagebionetworks.web.client.widget.display;
 
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface ProjectDisplayView extends IsWidget {
 	public interface Presenter {
 		void onSave();
-		void cancel();
+		void onCancel();
 	}
 
 	void setSynAlertWidget(IsWidget asWidget);
