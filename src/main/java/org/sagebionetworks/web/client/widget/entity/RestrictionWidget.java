@@ -283,6 +283,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			view.showErrorMessage("You must make a selection before continuing.");
 		} else {
 			view.showLoading();
+			view.setImposeRestrictionModalVisible(false);
 			//the access requirement dialog knows how to impose the restriction
 			accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
 		}
