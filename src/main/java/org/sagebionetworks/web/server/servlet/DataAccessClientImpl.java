@@ -96,6 +96,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		}
 	}
 	
+	//TODO: return type AccessRequirementStatus (could be ACTAccessRequirementStatus or TermsOfUseAccessRequirementStatus)
 	@Override
 	public DataAccessSubmissionStatus getDataAccessSubmissionStatus(String accessRequirementId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

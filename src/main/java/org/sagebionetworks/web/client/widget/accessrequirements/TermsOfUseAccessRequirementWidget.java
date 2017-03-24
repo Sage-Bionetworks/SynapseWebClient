@@ -93,6 +93,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		lazyLoadHelper.setIsConfigured();
 	}
 	
+	//TODO: this will be of type TermsOfUseAccessRequirementStatus
 	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
 		// set up view based on DataAccessSubmission state
 		view.resetState();
