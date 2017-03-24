@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +48,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public static final String SHOW_AR_TEXT = "Show Access Requirement";
 	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
 	Date fromDate, toDate;
-	ACTAccessRequirement actAccessRequirement;
+	Long actAccessRequirementId;
 	FileHandleWidget ducTemplateFileHandleWidget;
 	List<String> states;
 	boolean isSortedAsc;
@@ -113,22 +114,23 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	@Override
 	public void setPlace(ACTDataAccessSubmissionsPlace place) {
 		this.place = place;
-		actAccessRequirement = null;
+		actAccessRequirementId = null;
 		isSortedAsc = true;
-		String accessRequirementId = place.getParam(ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM);
-		String fromTime = place.getParam(ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM);
+		String actAccessRequirementIdString = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
+		String fromTime = place.getParam(MIN_DATE_PARAM);
 		if (fromTime != null) {
 			fromDate = new Date(Long.parseLong(fromTime));
 			view.setSelectedMinDate(fromDate);
 		}
-		String toTime = place.getParam(ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM);
+		String toTime = place.getParam(MAX_DATE_PARAM);
 		if (toTime != null) {
 			toDate = new Date(Long.parseLong(toTime));
 			view.setSelectedMaxDate(toDate);
 		}
 		synAlert.clear();
-		if (accessRequirementId != null) {
-			dataAccessClient.getAccessRequirement(Long.parseLong(accessRequirementId), new AsyncCallback<AccessRequirement>() {
+		if (actAccessRequirementIdString != null) {
+			actAccessRequirementId = Long.parseLong(actAccessRequirementIdString);
+			dataAccessClient.getAccessRequirement(actAccessRequirementId, new AsyncCallback<AccessRequirement>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.showError(INVALID_AR_ID);
@@ -136,7 +138,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				@Override
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
-						actAccessRequirement = (ACTAccessRequirement) requirement;
+						ACTAccessRequirement actAccessRequirement = (ACTAccessRequirement) requirement;
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							// TODO: change to Access Requirement type when available.
@@ -158,12 +160,12 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 						view.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
 						view.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
-						loadData();
 					} else {
 						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
 					}
 				}
 			});
+			loadData();
 		} else {
 			synAlert.showError(INVALID_AR_ID);
 		}
@@ -178,8 +180,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public void loadMore() {
 		synAlert.clear();
 		globalAppState.pushCurrentPlace(place);
-		// TODO: ask for data access submissions once call is available, and create a widget to render.
-		dataAccessClient.getDataAccessSubmissions(actAccessRequirement.getId(), nextPageToken, stateFilter, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<DataAccessSubmissionPage>() {
+		// ask for data access submissions once call is available, and create a widget to render.
+		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<DataAccessSubmissionPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -203,17 +205,17 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public void onClearDateFilter() {
 		fromDate = null;
 		view.setSelectedMinDate(fromDate);
-		place.removeParam(ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM);
+		place.removeParam(MIN_DATE_PARAM);
 		toDate = null;
 		view.setSelectedMaxDate(toDate);
-		place.removeParam(ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM);
+		place.removeParam(MAX_DATE_PARAM);
 		loadData();
 	}
 	
 	@Override
 	public void onClearStateFilter() {
 		stateFilter = null;
-		place.removeParam(ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM);
+		place.removeParam(STATE_FILTER_PARAM);
 		view.setSelectedStateText("");
 		loadData();	
 	}
@@ -221,14 +223,14 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	@Override
 	public void onMaxDateSelected(Date date) {
 		toDate = date;
-		place.putParam(ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM, Long.toString(date.getTime()));
+		place.putParam(MAX_DATE_PARAM, Long.toString(date.getTime()));
 		loadData();
 	}
 	
 	@Override
 	public void onMinDateSelected(Date date) {
 		fromDate = date;
-		place.putParam(ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM, Long.toString(date.getTime()));
+		place.putParam(MIN_DATE_PARAM, Long.toString(date.getTime()));
 		loadData();
 	}
 	
@@ -244,7 +246,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	@Override
 	public void onStateSelected(String selectedState) {
 		stateFilter = DataAccessSubmissionState.valueOf(selectedState);
-		place.putParam(ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM, selectedState);
+		place.putParam(STATE_FILTER_PARAM, selectedState);
 		view.setSelectedStateText(selectedState);
 		loadData();
 	}
