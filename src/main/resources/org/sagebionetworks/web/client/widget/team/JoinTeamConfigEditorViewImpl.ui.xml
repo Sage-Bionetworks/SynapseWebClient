@@ -31,7 +31,7 @@
 				    <b:CheckBox ui:field="isChallengeCheckbox" text="Is this a challenge sign-up?" />
 				</b:FormGroup>	
 				<b:FormGroup>
-				<b:CheckBox ui:field="isSimpleRequestCheckbox" text="Prompt joining user for team request message?"/>
+				<b:CheckBox ui:field="isPromptForMessageCheckbox" text="Allow joining user to provide a message?"/>
 				</b:FormGroup>
 			</b:FormGroup>
 		</b:FieldSet>
