@@ -1,6 +1,15 @@
 package org.sagebionetworks.web.client;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusRequest;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusResults;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -13,4 +22,9 @@ public interface DataAccessClient extends RemoteService {
 	ResearchProject updateResearchProject(ResearchProject researchProject)  throws RestServiceException;
 	DataAccessRequestInterface getDataAccessRequest(Long id) throws RestServiceException;
 	void updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest, boolean isSubmit) throws RestServiceException;
+	AccessRequirement getAccessRequirement(Long requirementId) throws RestServiceException;
+	DataAccessSubmissionPage getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, DataAccessSubmissionState stateFilter,
+			DataAccessSubmissionOrder order, boolean isAsc) throws RestServiceException;
+	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset) throws RestServiceException;
+	AccessApprovalStatusResults getAccessApprovalStatus(AccessApprovalStatusRequest approvalStatusRequest);
 }

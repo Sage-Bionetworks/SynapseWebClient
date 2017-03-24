@@ -1038,26 +1038,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return allAccessRequirements;
 	}
 	
-	@Override
-	public List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getAccessRequirements(subject, limit, offset).getResults();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public AccessRequirement getAccessRequirement(Long requirementId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getAccessRequirement(requirementId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
 	private List<V2WikiHeader> getAllWikiHeaderTree(String ownerId,	ObjectType ownerType, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		List<V2WikiHeader> allHeaders = new ArrayList<V2WikiHeader>();
 		long offset = ZERO_OFFSET;

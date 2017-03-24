@@ -553,9 +553,6 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
-	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset)
-			throws RestServiceException;
-
 	boolean isWiki(String projectId) throws RestServiceException;
 
 	boolean isFileOrFolder(String projectId) throws RestServiceException;
@@ -571,6 +568,4 @@ public interface SynapseClient extends XsrfProtectedService {
 	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
-
-	AccessRequirement getAccessRequirement(Long requirementId) throws RestServiceException;
 }

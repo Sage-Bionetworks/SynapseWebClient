@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.dataaccess.ACTAccessApprovalStatusResult;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -20,6 +23,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	private ACTAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
+	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
 	ACTAccessRequirement ar;
@@ -28,6 +32,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	ManageAccessButton manageAccessButton;
+	String submissionId;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -38,7 +43,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			ManageAccessButton manageAccessButton) {
+			ManageAccessButton manageAccessButton,
+			DataAccessClientAsync dataAccessClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -48,6 +54,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.manageAccessButton = manageAccessButton;
+		this.dataAccessClient = dataAccessClient;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -55,6 +62,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setSynAlert(synAlert);
 	}
 	
 	public void setRequirement(final ACTAccessRequirement ar) {
@@ -77,36 +85,63 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		deleteAccessRequirementButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
-		refreshApprovalState();
+	}
+	
+	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
+		submissionId = status.getSubmissionId();
+		view.resetState();
+		switch (status.getState()) {
+			case SUBMITTED:
+				// TODO: request has been submitted on your behalf, or by you?
+				view.showUnapprovedHeading();
+				view.showRequestSubmittedMessage();
+				view.showCancelRequestButton();
+				break;
+			case APPROVED:
+				view.showApprovedHeading();
+				view.showRequestApprovedMessage();
+				view.showUpdateRequestButton();
+				break;
+			case REJECTED:
+				view.showUnapprovedHeading();
+				// TODO: need the reason
+//				view.showRequestRejectedMessage(status.);
+				view.showUpdateRequestButton();
+				break;
+			case CANCELLED:
+			default:
+				view.showUnapprovedHeading();
+				view.showRequestAccessButton();
+				break;
+		}
 	}
 	
 	public void refreshApprovalState() {
-		//TODO:  set up view based on DataAccessSubmission state
-		view.resetState();
-		// (for testing)
-		// if no request has been submitted:
-		view.showUnapprovedHeading();
-		view.showRequestAccessButton();
-		// else if a request has been submitted on your behalf
-//		view.showUnapprovedHeading();
-//		view.showRequestSubmittedMessage();
-		// else if you submitted a request
-//		view.showUnapprovedHeading();
-//		view.showRequestSubmittedMessage();
-//		view.showCancelRequestButton();
-		// else if your request submission has been approved
-//		view.showApprovedHeading();
-//		view.showRequestApprovedMessage();
-//		view.showUpdateRequestButton();
-		// else if your submitted request was rejected
-//		view.showUnapprovedHeading();
-//		view.showRequestRejectedMessage(reason);
-//		view.showUpdateRequestButton();
+		dataAccessClient.getDataAccessSubmissionStatus(ar.getId().toString(), new AsyncCallback<DataAccessSubmissionStatus>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(DataAccessSubmissionStatus status) {
+				setDataAccessSubmissionStatus(status);
+			}
+		});
 	}
 	
 	@Override
 	public void onCancelRequest() {
-		//TODO: cancel DataAccessSubmission
+		//cancel DataAccessSubmission
+		dataAccessClient.cancelDataAccessSubmission(submissionId, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(Void result) {
+				refreshApprovalState();
+			}
+		});
 	}
 	
 	@Override

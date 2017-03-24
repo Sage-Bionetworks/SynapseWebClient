@@ -30,6 +30,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget {
 	void setManageAccessWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);
 	void setVisible(boolean visible);
+	void setSynAlert(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

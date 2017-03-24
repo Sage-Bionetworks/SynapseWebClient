@@ -468,9 +468,6 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
-			AsyncCallback<List<AccessRequirement>> callback);
-
 	void isWiki(String id, AsyncCallback<Boolean> callback);
 
 	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
@@ -484,6 +481,4 @@ public interface SynapseClientAsync {
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
-
-	void getAccessRequirement(Long requirementId, AsyncCallback<AccessRequirement> callback);
 }

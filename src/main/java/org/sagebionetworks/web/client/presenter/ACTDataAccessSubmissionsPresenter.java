@@ -6,12 +6,15 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
@@ -35,11 +38,9 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private ACTDataAccessSubmissionsView view;
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
-	private SynapseClientAsync synapseClient;
+	DataAccessClientAsync dataAccessClient;
 	private GlobalApplicationState globalAppState;
 	LoadMoreWidgetContainer loadMoreContainer;
-	public static Long LIMIT = 30L;
-	Long currentOffset;
 	ACTAccessRequirementWidget actAccessRequirementWidget;
 	boolean isAccessRequirementVisible;
 	public static final String HIDE_AR_TEXT = "Hide Access Requirement";
@@ -50,23 +51,24 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	FileHandleWidget ducTemplateFileHandleWidget;
 	List<String> states;
 	boolean isSortedAsc;
+	String nextPageToken;
 	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
 			final ACTDataAccessSubmissionsView view,
-			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer,
 			ACTAccessRequirementWidget actAccessRequirementWidget,
 			final Button showHideAccessRequirementButton,
-			FileHandleWidget ducTemplateFileHandleWidget
+			FileHandleWidget ducTemplateFileHandleWidget,
+			DataAccessClientAsync dataAccessClient
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
+		this.dataAccessClient = dataAccessClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		this.globalAppState = globalAppState;
@@ -126,7 +128,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		}
 		synAlert.clear();
 		if (accessRequirementId != null) {
-			synapseClient.getAccessRequirement(Long.parseLong(accessRequirementId), new AsyncCallback<AccessRequirement>() {
+			dataAccessClient.getAccessRequirement(Long.parseLong(accessRequirementId), new AsyncCallback<AccessRequirement>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.showError(INVALID_AR_ID);
@@ -169,7 +171,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	
 	public void loadData() {
 		loadMoreContainer.clear();
-		currentOffset = 0L;
+		nextPageToken = null;
 		loadMore();
 	}
 
@@ -177,24 +179,24 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		synAlert.clear();
 		globalAppState.pushCurrentPlace(place);
 		// TODO: ask for data access submissions once call is available, and create a widget to render.
-//		synapseClient.getDataAccessSubmissions(accessRequirementId, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, stateFilter, fromDate, toDate, LIMIT, currentOffset, new AsyncCallback<List<DataAccessSubmission>>() {
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				synAlert.handleException(caught);
-//				loadMoreContainer.setIsMore(false);
-//			}
-//			
-//			public void onSuccess(List<DataAccessSubmission> dataSubmissions) {
-//				currentOffset += LIMIT;
-//				for (DataAccessSubmission submission : dataSubmissions) {
-//					// create a new row for each data access submission.
+		dataAccessClient.getDataAccessSubmissions(actAccessRequirement.getId(), nextPageToken, stateFilter, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<DataAccessSubmissionPage>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				loadMoreContainer.setIsMore(false);
+			}
+			
+			public void onSuccess(DataAccessSubmissionPage submissionPage) {
+				nextPageToken = submissionPage.getNextPageToken();
+				for (DataAccessSubmission submission : submissionPage.getResults()) {
+					// TODO: create a new row for each data access submission.
 //					DataAccessSubmissionWidget w = ginInjector.getDataAccessSubmissionWidget();
 //					w.configure(submission); 
 //					loadMoreContainer.add(w.asWidget());
-//				}
-//				loadMoreContainer.setIsMore(!dataSubmissions.isEmpty());
-//			};
-//		});
+				}
+				loadMoreContainer.setIsMore(!submissionPage.getResults().isEmpty());
+			};
+		});
 	}
 	
 	@Override
