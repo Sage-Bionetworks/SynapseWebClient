@@ -9,8 +9,10 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,6 +31,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	CreateAccessRequirementButton createAccessRequirementButton;
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
+	LazyLoadHelper lazyLoadHelper;
 	
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
@@ -39,7 +42,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			SynapseAlert synAlert,
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
-			DeleteAccessRequirementButton deleteAccessRequirementButton) {
+			DeleteAccessRequirementButton deleteAccessRequirementButton,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.dataAccessClient = dataAccessClient;
@@ -49,12 +53,21 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.subjectsWidget = subjectsWidget;
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
+		this.lazyLoadHelper = lazyLoadHelper;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
+		Callback loadDataCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshApprovalState();
+			}
+		};
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
 	
@@ -77,6 +90,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		lazyLoadHelper.setIsConfigured();
 	}
 	
 	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {

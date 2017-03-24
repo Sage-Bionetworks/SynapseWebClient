@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface ACTAccessRequirementWidgetView extends IsWidget {
+public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLoadInterface {
 
 	/**
 	 * Set the presenter.

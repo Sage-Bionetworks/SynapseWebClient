@@ -6,9 +6,11 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -31,6 +33,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	SubjectsWidget subjectsWidget;
 	ManageAccessButton manageAccessButton;
 	String submissionId;
+	LazyLoadHelper lazyLoadHelper;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -42,7 +45,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			ManageAccessButton manageAccessButton,
-			DataAccessClientAsync dataAccessClient) {
+			DataAccessClientAsync dataAccessClient,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -53,6 +57,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.manageAccessButton = manageAccessButton;
 		this.dataAccessClient = dataAccessClient;
+		this.lazyLoadHelper = lazyLoadHelper;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -61,6 +66,14 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
+		Callback loadDataCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshApprovalState();
+			}
+		};
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
 	public void setRequirement(final ACTAccessRequirement ar) {
@@ -83,8 +96,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		deleteAccessRequirementButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
-		// TODO: either get these in bulk, or lazy load
-		refreshApprovalState();
+		lazyLoadHelper.setIsConfigured();
 	}
 	
 	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
