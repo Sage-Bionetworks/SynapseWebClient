@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
@@ -36,6 +37,8 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
+	DataAccessClientAsync mockDataAccessClient;
+	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
 	SynapseAlert mockSynAlert;
@@ -59,7 +62,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton);
+		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton, mockDataAccessClient);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));

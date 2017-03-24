@@ -4,6 +4,9 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -18,6 +21,7 @@ import com.google.inject.Inject;
 public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequirementWidgetView.Presenter, IsWidget {
 	private TermsOfUseAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
+	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
 	TermsOfUseAccessRequirement ar;
@@ -29,6 +33,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
+			DataAccessClientAsync dataAccessClient,
 			SynapseClientAsync synapseClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
@@ -37,6 +42,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			DeleteAccessRequirementButton deleteAccessRequirementButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.dataAccessClient = dataAccessClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;
@@ -73,20 +79,31 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 	}
 	
-	public void refreshApprovalState() {
-		//TODO:  set up view based on DataAccessSubmission state
+	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
+		// set up view based on DataAccessSubmission state
 		view.resetState();
-		//if (not approved) {
-		view.showUnapprovedHeading();
-		view.showSignTermsButton();
-//		}
-//		else {
-		// if approved
-		view.showApprovedHeading();
-//		}
-		
-
+		if (DataAccessSubmissionState.APPROVED.equals(status.getState())) {
+			view.showApprovedHeading();	
+		} else {
+			view.showUnapprovedHeading();
+			view.showSignTermsButton();
+		}
 	}
+	
+
+	public void refreshApprovalState() {
+		dataAccessClient.getDataAccessSubmissionStatus(ar.getId().toString(), new AsyncCallback<DataAccessSubmissionStatus>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(DataAccessSubmissionStatus status) {
+				setDataAccessSubmissionStatus(status);
+			}
+		});
+	}
+	
 	@Override
 	public void onSignTerms() {
 		// create the self-signed access approval, then update this object

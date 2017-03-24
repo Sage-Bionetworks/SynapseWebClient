@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.dataaccess.ACTAccessApprovalStatusResult;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
@@ -85,6 +83,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		deleteAccessRequirementButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		// TODO: either get these in bulk, or lazy load
+		refreshApprovalState();
 	}
 	
 	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
@@ -104,8 +104,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();
-				// TODO: need the reason
-//				view.showRequestRejectedMessage(status.);
+				view.showRequestRejectedMessage(status.getRejectedReason());
 				view.showUpdateRequestButton();
 				break;
 			case CANCELLED:

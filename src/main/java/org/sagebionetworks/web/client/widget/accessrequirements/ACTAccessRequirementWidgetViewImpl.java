@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -53,6 +52,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	
 	@UiField
 	Div subjectsWidgetContainer;
+	@UiField
+	Div synAlertContainer;
 	
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
@@ -189,5 +190,10 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public void setManageAccessWidget(IsWidget w) {
 		manageAccessContainer.clear();
 		manageAccessContainer.add(w);
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

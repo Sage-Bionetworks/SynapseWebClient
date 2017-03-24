@@ -4,12 +4,11 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusRequest;
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusResults;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,6 +26,6 @@ public interface DataAccessClientAsync {
 
 	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
 			AsyncCallback<List<AccessRequirement>> callback);
-	void getAccessApprovalStatus(AccessApprovalStatusRequest approvalStatusRequest,
-			AsyncCallback<AccessApprovalStatusResults> asyncCallback);
+	void getDataAccessSubmissionStatus(String accessRequirementId, AsyncCallback<DataAccessSubmissionStatus> callback);
+	void cancelDataAccessSubmission(String submissionId, AsyncCallback<Void> asyncCallback);
 }

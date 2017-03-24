@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,18 +22,16 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
-import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -48,8 +45,6 @@ public class AccessRequirementsPresenterTest {
 	AccessRequirementsPresenter presenter;
 	@Mock
 	PlaceView mockView;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
 	@Mock
 	AccessRequirementsPlace place;
 	@Mock
@@ -78,6 +73,8 @@ public class AccessRequirementsPresenterTest {
 	TermsOfUseAccessRequirementWidget mockTermsOfUseAccessRequirementWidget;
 	@Mock
 	CreateAccessRequirementButton mockCreateARButton;
+	@Mock
+	DataAccessClientAsync mockDataAccessClient;
 	
 	public static final String ENTITY_ID = "syn239834";
 	public static final String TEAM_ID = "45678";
@@ -85,12 +82,11 @@ public class AccessRequirementsPresenterTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		presenter = new AccessRequirementsPresenter(mockView, mockSynapseClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton);
+		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
-		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockSynapseClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockGinInjector.getACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
 		when(mockGinInjector.getTermsOfUseAccessRequirementWidget()).thenReturn(mockTermsOfUseAccessRequirementWidget);
 	}	
@@ -107,7 +103,7 @@ public class AccessRequirementsPresenterTest {
 	public void testLoadDataEntity() {
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
-		verify(mockSynapseClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
 		RestrictableObjectDescriptor subject = subjectCaptor.getValue();
 		assertEquals(ENTITY_ID, subject.getId());
 		assertEquals(RestrictableObjectType.ENTITY, subject.getType());
@@ -119,14 +115,14 @@ public class AccessRequirementsPresenterTest {
 		
 		presenter.loadMore();
 		//load the next page
-		verify(mockSynapseClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), eq(AccessRequirementsPresenter.LIMIT), eq(AccessRequirementsPresenter.LIMIT), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), eq(AccessRequirementsPresenter.LIMIT), eq(AccessRequirementsPresenter.LIMIT), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);
 	}	
 	
 	@Test
 	public void testLoadDataEntityFailure() {
 		Exception ex = new Exception("failed");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
 		verify(mockSynAlert).handleException(ex);
@@ -137,7 +133,7 @@ public class AccessRequirementsPresenterTest {
 	public void testLoadDataTeam() {
 		when(mockPlace.getParam(AccessRequirementsPlace.TEAM_ID_PARAM)).thenReturn(TEAM_ID);
 		presenter.setPlace(mockPlace);
-		verify(mockSynapseClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
 		RestrictableObjectDescriptor subject = subjectCaptor.getValue();
 		assertEquals(TEAM_ID, subject.getId());
 		assertEquals(RestrictableObjectType.TEAM, subject.getType());

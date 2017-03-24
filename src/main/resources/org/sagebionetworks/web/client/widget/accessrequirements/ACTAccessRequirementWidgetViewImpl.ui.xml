@@ -52,7 +52,7 @@
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div ui:field="requestDataAccessWizardContainer" />
-			
+			<bh:Div ui:field="synAlertContainer" />
 		</b:PanelBody>
 	</b:Panel>
 </ui:UiBinder>

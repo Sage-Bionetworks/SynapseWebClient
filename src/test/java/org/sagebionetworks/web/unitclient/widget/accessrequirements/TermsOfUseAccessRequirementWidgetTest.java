@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
@@ -38,6 +39,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
+	DataAccessClientAsync mockDataAccessClient;
+	@Mock
 	WikiPageWidget mockWikiPageWidget;
 	@Mock
 	SynapseAlert mockSynAlert;
@@ -55,7 +58,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TermsOfUseAccessRequirementWidget(mockView, mockAuthController, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton);
+		widget = new TermsOfUseAccessRequirementWidget(mockView, mockAuthController, mockDataAccessClient, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 	}

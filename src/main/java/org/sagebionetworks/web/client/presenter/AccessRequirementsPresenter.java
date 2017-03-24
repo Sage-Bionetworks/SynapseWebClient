@@ -1,24 +1,15 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.ACTAccessApprovalStatusResult;
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusRequest;
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusResult;
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalStatusResults;
-import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessApprovalStatusResult;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
@@ -137,49 +128,19 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			
 			public void onSuccess(List<AccessRequirement> accessRequirements) {
 				currentOffset += LIMIT;
-				getApprovalStatuses(accessRequirements);
-			};
-		});
-	}
-	
-	public void getApprovalStatuses(final List<AccessRequirement> accessRequirements) {
-		List<String> arIds = new ArrayList<String>();
-		for (AccessRequirement ar : accessRequirements) {
-			arIds.add(ar.getId().toString());
-		}
-		AccessApprovalStatusRequest approvalStatusRequest = new AccessApprovalStatusRequest();
-		approvalStatusRequest.setAccessRequirementIdList(arIds);
-		
-		dataAccessClient.getAccessApprovalStatus(approvalStatusRequest, new AsyncCallback<AccessApprovalStatusResults>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				loadMoreContainer.setIsMore(false);
-			}
-			@Override
-			public void onSuccess(AccessApprovalStatusResults approvalStatuses) {
-				List<AccessApprovalStatusResult> approvalsList = approvalStatuses.getResults();
-				Map<String, AccessApprovalStatusResult> id2ApprovalStatus = new HashMap<String, AccessApprovalStatusResult>();
-				for (AccessApprovalStatusResult status : approvalsList) {
-					id2ApprovalStatus.put(status.getAccessRequirementId(), status);
-				}
 				boolean isNewAr = false;
 				for (AccessRequirement ar : accessRequirements) {
 					if (!allArs.contains(ar)) {
 						isNewAr = true;
 						allArs.add(ar);
 						// create a new row for each access requirement.
-						// need state of approval/submission.
-						AccessApprovalStatusResult status = id2ApprovalStatus.get(ar.getId().toString());
 						if( ar instanceof ACTAccessRequirement) {
 							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
 							w.setRequirement((ACTAccessRequirement)ar);
-							w.setApprovalStatus((ACTAccessApprovalStatusResult)status);
 							loadMoreContainer.add(w.asWidget());
 						} else if (ar instanceof TermsOfUseAccessRequirement) {
 							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
 							w.setRequirement((TermsOfUseAccessRequirement)ar);
-							w.setApprovalStatus((TermsOfUseAccessApprovalStatusResult)status);
 							loadMoreContainer.add(w.asWidget());						
 						} else {
 							synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
@@ -187,9 +148,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 					}
 				}
 				loadMoreContainer.setIsMore(isNewAr);
-			}
+			};
 		});
-		
 	}
 	
 	public AccessRequirementsPlace getPlace() {
