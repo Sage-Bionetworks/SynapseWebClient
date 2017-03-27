@@ -438,14 +438,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
 	/**
-	 * Execute a generic entity entity query.
-	 * @param query
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException;
-
-	/**
 	 * Get entity children
 	 * @param request
 	 * @return

@@ -2846,7 +2846,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} 
 	}
 
-	@Override
 	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
