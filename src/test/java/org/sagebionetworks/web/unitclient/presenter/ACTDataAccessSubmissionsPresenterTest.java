@@ -90,6 +90,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
+	public static final String NEXT_PAGE_TOKEN = "abc678";
 	
 	@Before
 	public void setup(){
@@ -98,6 +99,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));
+		when(mockDataAccessSubmissionPage.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 	}	
@@ -117,7 +119,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	}
 	
 	@Test
-	public void testSetPlace() {
+	public void testLoadData() {
 		String time1 = "8765";
 		String time2 = "5678";
 		when(mockPlace.getParam(MIN_DATE_PARAM)).thenReturn(time1);
@@ -157,5 +159,23 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setIrbColumnVisible(false);
 		verify(mockView).setOtherAttachmentsColumnVisible(true);
 		verify(mockView).setRenewalColumnsVisible(false);
+		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		//TODO: verify DataAccessSubmission widgets are created for each submission
+		verify(mockLoadMoreContainer).setIsMore(true);
+		
+		//verify final load of empty page
+		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.EMPTY_LIST);
+		presenter.loadMore();
+		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq(NEXT_PAGE_TOKEN), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockLoadMoreContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testLoadDataFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		presenter.loadData();
+		verify(mockSynAlert).handleException(ex);
+		verify(mockLoadMoreContainer).setIsMore(false);
 	}
 }
