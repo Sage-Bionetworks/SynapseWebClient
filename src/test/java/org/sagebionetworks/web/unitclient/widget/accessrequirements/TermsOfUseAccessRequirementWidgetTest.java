@@ -8,13 +8,18 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
@@ -57,6 +62,13 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	List<RestrictableObjectDescriptor> mockSubjectIds;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
+	@Mock
+	DataAccessSubmissionStatus mockDataAccessSubmissionStatus;
+	
+	Callback lazyLoadDataCallback;
+
 	public final static String ROOT_WIKI_ID = "777";
 	@Before
 	public void setUp() throws Exception {
@@ -64,6 +76,9 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		widget = new TermsOfUseAccessRequirementWidget(mockView, mockAuthController, mockDataAccessClient, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockLazyLoadHelper);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
+		lazyLoadDataCallback = callbackCaptor.getValue();
+		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getDataAccessSubmissionStatus(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -93,6 +108,25 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
-		
 	}
+	
+	@Test
+	public void testApprovedState() {
+		//TODO: will be changed once service changes to return different object for ToU type
+		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showApprovedHeading();
+	}
+	
+	@Test
+	public void testUnApprovedState() {
+		//TODO: will be changed once service changes to return different object for ToU type
+		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.SUBMITTED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showSignTermsButton();
+	}
+
 }
