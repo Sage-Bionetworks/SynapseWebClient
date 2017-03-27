@@ -136,10 +136,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	@Override
 	public void getChildren(final String parentId,
 			final EntityTreeItem parent, String nextPageToken) {
-		EntityChildrenRequest childrenQuery = createGetChildrenQuery(parentId, nextPageToken);
+		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
 		// ask for the folder children, then the files
-		
-		synapseClient.getEntityChildren(childrenQuery,
+		synapseClient.getEntityChildren(request,
 				new AsyncCallback<EntityChildrenResponse>() {
 					@Override
 					public void onSuccess(EntityChildrenResponse results) {
@@ -248,7 +247,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		}
 	}
 
-	public EntityChildrenRequest createGetChildrenQuery(String parentId, String nextPageToken) {
+	public EntityChildrenRequest createGetEntityChildrenRequest(String parentId, String nextPageToken) {
 		EntityChildrenRequest request = new EntityChildrenRequest();
 		request.setNextPageToken(nextPageToken);
 		request.setParentId(parentId);

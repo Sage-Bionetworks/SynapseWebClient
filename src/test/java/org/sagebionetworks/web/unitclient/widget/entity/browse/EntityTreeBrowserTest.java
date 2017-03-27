@@ -125,7 +125,7 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testCreateGetChildrenQuery() {
 		String parentId = "9";
-		EntityChildrenRequest query = entityTreeBrowser.createGetChildrenQuery(parentId, null);
+		EntityChildrenRequest query = entityTreeBrowser.createGetEntityChildrenRequest(parentId, null);
 
 		// verify sort
 		assertEquals(SortBy.NAME, query.getSortBy());
