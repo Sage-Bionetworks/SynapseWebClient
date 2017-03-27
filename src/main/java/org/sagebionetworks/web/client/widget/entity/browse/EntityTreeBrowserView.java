@@ -27,16 +27,14 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
 		void setSelection(String id);
 
-		int getMaxLimit();
-		
 		void expandTreeItemOnOpen(final EntityTreeItem target);
 		
 		void clearRecordsFetchedChildren();
 
 		void addMoreButton(MoreTreeItem moreItem, String parentId,
-				EntityTreeItem parent, long offset);
+				EntityTreeItem parent, String nextPageToken);
 
-		void getChildren(String parentId, EntityTreeItem parent, long offset);
+		void getChildren(String parentId, EntityTreeItem parent, String nextPageToken);
 	}
 
 	void appendRootEntityTreeItem(EntityTreeItem childToAdd);
@@ -47,10 +45,10 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void configureEntityTreeItem(EntityTreeItem childToAdd);
 
 	void placeChildMoreTreeItem(MoreTreeItem childToCreate,
-			EntityTreeItem parent, long offset);
+			EntityTreeItem parent, String nextPageToken);
 
 	void placeRootMoreTreeItem(MoreTreeItem childToCreate,
-			String parentId, long offset);
+			String parentId, String nextPageToken);
 
 
 	void showEmptyUI();

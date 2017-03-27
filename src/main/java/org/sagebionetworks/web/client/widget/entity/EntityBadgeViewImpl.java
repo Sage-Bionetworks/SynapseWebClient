@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -115,7 +115,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 	
 	@Override
-	public void setEntity(final EntityQueryResult entityHeader) {
+	public void setEntity(final EntityHeader entityHeader) {
 		clear();
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
@@ -204,7 +204,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void setModifiedOn(String modifiedOnString) {
 		modifiedOnField.setText(modifiedOnString);
 	}
-	private void entityClicked(EntityQueryResult entityHeader, ClickEvent event) {
+	private void entityClicked(EntityHeader entityHeader, ClickEvent event) {
 		if (nonDefaultClickHandler == null) {
 			presenter.entityClicked(entityHeader);
 		} else {
