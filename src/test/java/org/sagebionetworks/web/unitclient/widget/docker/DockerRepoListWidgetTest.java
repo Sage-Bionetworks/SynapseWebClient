@@ -69,8 +69,6 @@ public class DockerRepoListWidgetTest {
 	private UserEntityPermissions mockUserEntityPermissions;
 	@Mock
 	private LoadMoreWidgetContainer mockMembersContainer;
-	@Captor
-	ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
 	@Mock
 	EntityChildrenResponse mockResults;
 	List<EntityHeader> searchResults;

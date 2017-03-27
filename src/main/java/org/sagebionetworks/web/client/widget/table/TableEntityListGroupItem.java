@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.html.Br;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -34,11 +35,11 @@ public class TableEntityListGroupItem extends ListGroupItem {
 
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 	
-	TableEntityListGroupItem(HeadingSize size, EntityQueryResult header, UserBadge createdByUserBadge, UserBadge modifiedByUserBadge, ClickHandler clickHandler){
+	TableEntityListGroupItem(HeadingSize size, EntityHeader header, ClickHandler clickHandler){
 		addStyleName("padding-10");
 		Heading iconHeading = new Heading(HeadingSize.H3);
 		iconHeading.setPull(Pull.LEFT);
-		Icon icon = new Icon(EntityTypeUtils.getIconTypeForEntityType(header.getEntityType()));
+		Icon icon = new Icon(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
 		icon.addStyleName("lightGreyText margin-right-10 moveup-10");
 		iconHeading.add(icon);
 		
@@ -49,14 +50,14 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		heading.add(anchor);
 		heading.addStyleName("displayInline");
 		
-		LinkedGroupItemText createdOnDiv = new LinkedGroupItemText();
-		createdOnDiv.add(new Text(CREATED_ON+DATE_FORMAT.format(header.getCreatedOn())));
-		Span hiddenOnXs = new Span();
-		hiddenOnXs.addStyleName("hidden-xs");
-		createdOnDiv.add(hiddenOnXs);
-		hiddenOnXs.add(new Text(BY));
-		hiddenOnXs.add(createdByUserBadge);
-		createdByUserBadge.asWidget().addStyleName("movedown-9 margin-right-10");
+//		LinkedGroupItemText createdOnDiv = new LinkedGroupItemText();
+//		createdOnDiv.add(new Text(CREATED_ON+DATE_FORMAT.format(header.getCreatedOn())));
+//		Span hiddenOnXs = new Span();
+//		hiddenOnXs.addStyleName("hidden-xs");
+//		createdOnDiv.add(hiddenOnXs);
+//		hiddenOnXs.add(new Text(BY));
+//		hiddenOnXs.add(createdByUserBadge);
+//		createdByUserBadge.asWidget().addStyleName("movedown-9 margin-right-10");
 		
 		// Uncomment when PLFM-3054/PLFM-4220 have been fixed.
 //		hiddenOnXs.add(new Text(MODIFIED_ON+DATE_FORMAT.format(header.getModifiedOn())+BY));
@@ -72,7 +73,7 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		div.add(iconHeading);
 		div.add(heading);
 		div.add(anchor);
-		div.add(createdOnDiv);
+//		div.add(createdOnDiv);
 		this.add(div); 
 	}
 	

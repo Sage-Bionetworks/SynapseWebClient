@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.table;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -47,14 +45,11 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 * @param sortColumnName
 		 * @param sortDirection
 		 */
-		void onSort(String sortColumnName, SortDirection sortDirection);
+		void onSort(SortBy sortColumn, Direction sortDirection);
 	}
-
-	/**
-	 * Configure or reconfigure the view.
-	 * @param tables
-	 */
-	public void configure(List<EntityQueryResult> tables);
+	void clearTableWidgets();
+	void addTableListItem(EntityHeader header);
+	void setLoadMoreWidget(IsWidget w);
 	
 	/**
 	 * Show/hide the add table button.
@@ -81,18 +76,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void addCreateTableModal(IsWidget createTableModal);
 
-
-	/**
-	 * Add the pagination widget to the view.
-	 * @param paginationWidget
-	 */
-	public void addPaginationWidget(PaginationWidget paginationWidget);
-
-	/**
-	 * Show or hide the pagination widget.
-	 * @param b
-	 */
-	public void showPaginationVisible(boolean visible);
 
 	/**
 	 * Add the modal dialog to the view.
