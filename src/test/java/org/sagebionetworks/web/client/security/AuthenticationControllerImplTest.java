@@ -202,6 +202,7 @@ public class AuthenticationControllerImplTest {
 		authenticationController.logoutUser();
 		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		verify(mockSessionStorage).clear();
+		verify(mockClientCache).clear();
 	}
 	
 	
