@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
@@ -33,6 +33,10 @@ import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
@@ -43,13 +47,8 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -300,11 +299,15 @@ public class CrawlFilter implements Filter {
 		}
 		
 		//and ask for all children
-		try {
-			EntityQueryResults childList = synapseClient.executeEntityQuery(createGetChildrenQuery(entityId));
-			for (EntityQueryResult childId : childList.getEntities()) {
+		EntityChildrenRequest request = createGetChildrenQuery(entityId);
+		EntityChildrenResponse childList;
+		do {
+			childList = synapseClient.getEntityChildren(request);
+			for (EntityHeader childId : childList.getPage()) {
 				html.append("<a href=\"https://www.synapse.org/#!Synapse:"+childId.getId()+"\">"+childId.getName()+"</a><br />");
-			}} catch(Exception e) {};
+			}
+			request.setNextPageToken(childList.getNextPageToken());
+		} while (childList.getNextPageToken() != null);
 		html.append("</body></html>");
 		return html.toString();
 	}
@@ -481,13 +484,15 @@ public class CrawlFilter implements Filter {
 	}
 
 
-	public EntityQuery createGetChildrenQuery(String parentId) {
-		EntityQuery newQuery = new EntityQuery();
-		Condition condition = EntityQueryUtils.buildCondition(
-				EntityFieldName.parentId, Operator.EQUALS, parentId);
-		newQuery.setConditions(Arrays.asList(condition));
-		newQuery.setLimit(Long.MAX_VALUE);
-		newQuery.setOffset(0L);
+	public EntityChildrenRequest createGetChildrenQuery(String parentId) {
+		EntityChildrenRequest newQuery = new EntityChildrenRequest();
+		newQuery.setParentId(parentId);
+		List<EntityType> types = new ArrayList<EntityType>();
+		types.add(EntityType.file);
+		types.add(EntityType.folder);
+		newQuery.setIncludeTypes(types);
+		newQuery.setSortBy(SortBy.CREATED_ON);
+		newQuery.setSortDirection(Direction.DESC);
 		return newQuery;
 	}
 	
