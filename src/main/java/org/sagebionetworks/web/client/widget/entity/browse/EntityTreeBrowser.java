@@ -34,8 +34,6 @@ import com.google.inject.Inject;
 
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
-	public static final long OFFSET_ZERO = 0;
-
 	private EntityTreeBrowserView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;

@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Br;
+import org.gwtbootstrap3.client.ui.html.ClearFix;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -70,6 +71,7 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		anchor.addStyleName("margin-left-10 moveup-2");
 		
 		Div div = new Div();
+		div.add(new ClearFix());
 		div.add(iconHeading);
 		div.add(heading);
 		div.add(anchor);
