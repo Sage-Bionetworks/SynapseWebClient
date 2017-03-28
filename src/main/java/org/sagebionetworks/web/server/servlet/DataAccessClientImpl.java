@@ -23,7 +23,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public ResearchProject updateResearchProject(ResearchProject researchProject) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createOrUpdate(researchProject);
+			return synapseClient.createOrUpdateResearchProject(researchProject);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -33,7 +33,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public DataAccessRequestInterface getDataAccessRequest(Long id) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getRequestForUpdate(id.toString());
+			return synapseClient.getDataAccessRequestForUpdate(id.toString());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -45,7 +45,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.createOrUpdate(dataAccessRequest);
+			synapseClient.createOrUpdateDataAccessRequest(dataAccessRequest);
 			
 			//TODO: submit data access request, when available
 //			if (isSubmit){
