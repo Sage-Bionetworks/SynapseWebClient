@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.atlassian.httpclient.api.EntityBuilder.Entity;
@@ -296,6 +297,7 @@ public class EntityPageTopTest {
 		String areaToken = "1234";
 		Long versionNumber = null;
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), any(EntityUpdatedHandler.class));
 	}
 	
 	@Test
