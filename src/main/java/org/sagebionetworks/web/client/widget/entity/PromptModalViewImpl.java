@@ -125,6 +125,7 @@ public class PromptModalViewImpl implements PromptModalView {
 	public void configure(String title, String label, String buttonText, String name) {
 		this.modal.setTitle(title);
 		this.nameLabel.setText(label);
+		// TODO: SWC-3541: the primary button text is not being changed by this line.  We need to find out why.
 		this.primaryButton.setText(buttonText);
 		this.nameField.setText(name);
 	}
