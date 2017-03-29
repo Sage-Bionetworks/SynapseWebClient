@@ -222,8 +222,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void onSuccess(EntityBundle bundle) {
 				projectBundle = bundle;
 				projectMetadata.setEntityBundle(projectBundle, null);
-				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 				showSelectedTabs();
 			}
 
@@ -376,6 +374,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				break;
 			default:
+		}
+		
+		if (projectBundle != null) {
+			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+			controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 		}
 		
 		// set all content stale
