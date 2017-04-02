@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
+import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
@@ -36,8 +38,13 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
+import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -50,6 +57,7 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItem
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
@@ -159,6 +167,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
@@ -296,6 +305,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public EntityActionController createEntityActionController();
 	public ACTPresenter getACTPresenter();
+	public AccessRequirementsPresenter getAccessRequirementsPresenter();
+	public ACTDataAccessSubmissionsPresenter getACTDataAccessSubmissionsPresenter();
 	public SynapseForumPresenter getSynapseForumPresenter();
 	public SubscriptionPresenter getSubscriptionPresenter();
 	
@@ -506,7 +517,15 @@ public interface PortalGinInjector extends Ginjector {
 	public EvaluationEditorModal getEvaluationEditorModal();
 	public SelectTeamModal getSelectTeamModal();
 	public ApproveUserAccessModal getApproveUserAccessModal();
+	public ProjectDisplayDialog getProjectDisplayDialog();
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();
 	public EntityIdCellRendererImpl getEntityIdCellRenderer();
+	
+	public CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
+	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
+	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
+	public FileHandleWidget getFileHandleWidget();
+	public CreateAccessRequirementWizard getCreateAccessRequirementWizard();
+	public ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
 }

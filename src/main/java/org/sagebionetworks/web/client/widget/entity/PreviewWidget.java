@@ -195,6 +195,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			@Override
 			public void onFailure(Throwable caught) {
 				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(content);
+				if (escapedContent.length() > 500000) {
+					escapedContent = escapedContent.substring(0, 500000) + "\n...";
+				}
 				if (isFullSize) {
 					view.setTextPreviewFull(escapedContent);
 				} else {
@@ -252,7 +255,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.showLoading();
 				boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
 				String contentType = isGetPreviewFile ? handle.getContentType() : originalFileHandle.getContentType();
-				
+				final String fileCreatedBy = originalFileHandle.getCreatedBy();
 				//must be a text type of some kind
 				//try to load the text of the preview, if available
 				requestBuilder.configure(RequestBuilder.GET, 
@@ -272,7 +275,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 								String responseText = response.getText();
 								if (responseText != null && responseText.length() > 0) {
 									if (previewType == PreviewFileType.HTML) {
-										renderHTML(fileEntity.getModifiedBy(), responseText);
+										renderHTML(fileCreatedBy, responseText);
 									} else {
 										if (responseText.length() > MAX_LENGTH) {
 											responseText = responseText.substring(0, MAX_LENGTH) + "...";

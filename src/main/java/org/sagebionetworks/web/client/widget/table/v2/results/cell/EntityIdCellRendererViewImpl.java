@@ -112,4 +112,9 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 		errorIcon.setVisible(false);
 		loadingUI.setVisible(false);
 	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		w.setVisible(visible);
+	}
 }

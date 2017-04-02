@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -73,6 +74,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -181,7 +183,7 @@ public interface SynapseClientAsync {
 	
 	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
 	
-	void createAccessRequirement(AccessRequirement arEW,
+	void createOrUpdateAccessRequirement(AccessRequirement arEW,
 			AsyncCallback<AccessRequirement> callback);
 
 	void createLockAccessRequirement(String entityId,
@@ -271,6 +273,7 @@ public interface SynapseClientAsync {
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
+	void getTeamMemberCount(String teamId, AsyncCallback<Long> callback);
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<TeamMembershipStatus> callback);
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
@@ -452,8 +455,9 @@ public interface SynapseClientAsync {
 
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 	
+	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
 	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
-
+	
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);
 
 	void generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema,
@@ -463,4 +467,23 @@ public interface SynapseClientAsync {
 			AsyncCallback<ColumnModelPage> callback);
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
+	
+	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
+			AsyncCallback<List<AccessRequirement>> callback);
+
+	void isWiki(String id, AsyncCallback<Boolean> callback);
+
+	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
+
+	void isTable(String id, AsyncCallback<Boolean> callback);
+
+	void isForum(String id, AsyncCallback<Boolean> callback);
+
+	void isDocker(String id, AsyncCallback<Boolean> callback);
+
+	void isChallenge(String id, AsyncCallback<Boolean> callback);
+
+	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
+
+	void getAccessRequirement(Long requirementId, AsyncCallback<AccessRequirement> callback);
 }

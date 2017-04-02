@@ -110,8 +110,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void logoutUser() {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
-		localStorage.remove(USER_SESSION_DATA_CACHE_KEY);
-		localStorage.remove(XSRF_TOKEN_KEY);
+		localStorage.clear();
 		sessionStorage.clear();
 		currentUser = null;
 	}

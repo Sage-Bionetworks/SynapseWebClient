@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -74,6 +75,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -277,7 +279,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
-	AccessRequirement createAccessRequirement(AccessRequirement arEW) throws RestServiceException;
+	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
 			throws RestServiceException;
@@ -548,4 +550,27 @@ public interface SynapseClient extends XsrfProtectedService {
 			throws RestServiceException;
 
 	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
+
+	long getTeamMemberCount(String teamId) throws RestServiceException;
+	
+	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset)
+			throws RestServiceException;
+
+	boolean isWiki(String projectId) throws RestServiceException;
+
+	boolean isFileOrFolder(String projectId) throws RestServiceException;
+
+	boolean isTable(String projectId) throws RestServiceException;
+
+	boolean isForum(String projectId) throws RestServiceException;
+
+	boolean isDocker(String projectId) throws RestServiceException;
+
+	boolean isChallenge(String projectId) throws RestServiceException;
+
+	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
+
+	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
+
+	AccessRequirement getAccessRequirement(Long requirementId) throws RestServiceException;
 }

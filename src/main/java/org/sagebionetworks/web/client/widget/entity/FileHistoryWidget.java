@@ -13,9 +13,10 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -38,13 +39,13 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
 	
-	private DetailedPaginationWidget paginationWidget;
+	private BasicPaginationWidget paginationWidget;
 	private boolean canEdit;
 	private Long versionNumber;
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view,
 			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
-			 DetailedPaginationWidget paginationWidget,
+			 BasicPaginationWidget paginationWidget,
 			 PreflightController preflightController) {
 		super();
 		this.synapseClient = synapseClient;
@@ -66,7 +67,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
 		
 		//initialize versions
-		onPageChange(0L);
+		onPageChange(WebConstants.ZERO_OFFSET);
 	}
 
 	@Override
@@ -147,9 +148,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	@Override
 	public void onPageChange(final Long newOffset) {
 		view.clearVersions();
-		// TODO: If we ever change the offset api to actually take 0 as a valid
-		// offset, then we need to remove "+1"
-		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue() + 1, VERSION_LIMIT,
+		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue(), VERSION_LIMIT,
 			new AsyncCallback<PaginatedResults<VersionInfo>>() {
 				@Override
 				public void onSuccess(PaginatedResults<VersionInfo> result) {

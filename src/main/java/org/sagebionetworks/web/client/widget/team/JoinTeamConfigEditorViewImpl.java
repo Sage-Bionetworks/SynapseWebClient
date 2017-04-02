@@ -33,7 +33,7 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 	TextBox requestOpenInfoField;
 	
 	@UiField
-	CheckBox isSimpleRequestCheckbox;
+	CheckBox isPromptForMessageCheckbox;
 	
 	
 	Widget widget;
@@ -55,7 +55,7 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 
 	@Override
 	public void setIsSimpleRequest(boolean isSimpleRequest) {
-		isSimpleRequestCheckbox.setValue(isSimpleRequest);
+		isPromptForMessageCheckbox.setValue(!isSimpleRequest);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 
 	@Override
 	public boolean getIsSimpleRequest() {
-		return isSimpleRequestCheckbox.getValue();
+		return !isPromptForMessageCheckbox.getValue();
 	}
 
 	@Override

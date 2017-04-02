@@ -22,7 +22,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	private String teamName;
 	
 	@Inject
-	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
+	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authController = authController;
@@ -76,9 +76,16 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 		return view.asWidget();
 	}
 	
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
+	}
+	
 	@Override
 	public void setNotificationValue(String value) {
 		view.setRequestCount(value);
 	}
-
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
 }

@@ -195,8 +195,7 @@ public class AccessRequirementDialogTest {
 	@Test
 	public void testConfigureWikiTou() {
 		//wiki page widget should have been configured to not show created by, modified by, or wiki history in this context
-		verify(mockWikiPageWidget).setModifiedCreatedByVisible(false);
-		verify(mockWikiPageWidget).showWikiHistory(false);
+		verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
 		
 		touAR.setTermsOfUse(null);
 		widget.configure(touAR, 

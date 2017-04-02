@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -99,13 +100,40 @@ public class EntityFinderTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testLoadMultiEntity() throws Exception {
+	public void testLoadMultiEntityComma() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
 		entityFinder.configureMulti(true, mockHandler);
 		
 		String name = "name";
 		String id = "syn456";
 		String searchId = id + ", " + id;
+		
+		when(mockHeader.getId()).thenReturn(id);
+		when(mockHeader.getName()).thenReturn(name);
+		when(mockHeader.getType()).thenReturn(Folder.class.getName());
+		
+		when(mockHeader2.getId()).thenReturn(id);
+		when(mockHeader2.getName()).thenReturn(name);
+		when(mockHeader2.getType()).thenReturn(Folder.class.getName());
+		
+		pr.getResults().add(mockHeader2);
+		
+		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
+		entityFinder.lookupEntity(searchId, mockCallback);
+		
+		verify(mockCallback).onSuccess(pr.getResults());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadMultiEntitySpace() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configureMulti(true, mockHandler);
+		
+		String name = "name";
+		String id = "syn456";
+		String searchId = id + " " + id;
 		
 		when(mockHeader.getId()).thenReturn(id);
 		when(mockHeader.getName()).thenReturn(name);
@@ -157,7 +185,7 @@ public class EntityFinderTest {
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);	
 		
 		entityFinder.loadVersions(id);
-		
+		verify(mockSynapseClient).getEntityVersions(eq(id), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVersions(results);
 	}	
 	

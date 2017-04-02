@@ -20,9 +20,9 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class ChallengeParticipantsWidgetTest {
 	
 	UserListView mockView;
-	DetailedPaginationWidget mockPaginationWidget;
+	BasicPaginationWidget mockPaginationWidget;
 	ChallengeClientAsync mockChallengeClient;
 	ChallengeParticipantsWidget widget;
 	Map<String, String> descriptor;
@@ -45,7 +45,7 @@ public class ChallengeParticipantsWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(UserListView.class);
-		mockPaginationWidget = mock(DetailedPaginationWidget.class);
+		mockPaginationWidget = mock(BasicPaginationWidget.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		widget = new ChallengeParticipantsWidget(mockView, mockPaginationWidget, mockChallengeClient);
 		verify(mockView).setPresenter(widget);

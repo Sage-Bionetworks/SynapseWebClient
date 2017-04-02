@@ -139,7 +139,7 @@ public class FacetColumnResultValuesWidgetTest {
 		widget.configure(mockFacet, ColumnType.ENTITYID, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
 		verify(mockPortalGinInjector).getEntityIdCellRenderer();
-		verify(mockEntityIdCellRenderer).setValue(eq(VALUE), any(ClickHandler.class));
+		verify(mockEntityIdCellRenderer).setValue(eq(VALUE), any(ClickHandler.class), eq(true));
 		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(VALUE));
 		verify(mockView).setShowAllButtonVisible(false);
 	}

@@ -51,8 +51,7 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		this.synapseClient = synapseClient;
 		this.jiraURLHelper = jiraURLHelper;
 		this.wikiPageWidget = wikiPageWidget;
-		wikiPageWidget.setModifiedCreatedByVisible(false);
-		wikiPageWidget.showWikiHistory(false);
+		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 	}

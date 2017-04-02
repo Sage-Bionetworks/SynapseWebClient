@@ -89,8 +89,14 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
+import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -251,13 +257,17 @@ public class SynapseClientImplTest {
 	ExternalFileHandle mockExternalFileHandle;
 	List<FileHandleCopyResult> batchCopyResultsList;
 	
+	@Mock
+	EntityQueryResults mockEntityQueryResults;
+	List<EntityQueryResult> entityQueryResultsList;
+	@Mock
+	EntityQueryResult mockEntityQueryResult; 
 	
 	public static final String OLD_COLUMN_MODEL_ID = "4444";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
-	private static final String EVAL_ID_2 = "eval ID 2";
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private TeamMembershipStatus membershipStatus;
 	
@@ -312,10 +322,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_1)).thenReturn(
 				userEvaluationPermissions);
 
-		userEvaluationPermissions = new UserEvaluationPermissions();
-		userEvaluationPermissions.setCanChangePermissions(true);
-		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2)).thenReturn(
-				userEvaluationPermissions);
 		when(mockOldColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
 		when(mockNewColumnModelAfterCreate.getId()).thenReturn(NEW_COLUMN_MODEL_ID);
 		
@@ -536,6 +542,9 @@ public class SynapseClientImplTest {
 		userIp = "127.0.0.1";
 		when(mockThreadLocal.get()).thenReturn(mockRequest);
 		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+		entityQueryResultsList = new ArrayList<EntityQueryResult>();
+		when(mockEntityQueryResults.getEntities()).thenReturn(entityQueryResultsList);
+		when(mockSynapse.entityQuery(any(EntityQuery.class))).thenReturn(mockEntityQueryResults);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1505,14 +1514,8 @@ public class SynapseClientImplTest {
 	public void testGetTeamBundle() throws SynapseException,
 			RestServiceException, MalformedURLException,
 			JSONObjectAdapterException {
-		// set team member count
-		Long testMemberCount = 111L;
-		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
-		allMembers.setTotalNumberOfResults(testMemberCount);
-		when(
-				mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(),
-						anyLong())).thenReturn(allMembers);
-
+		//TODO: test team member count
+		
 		// set team
 		Team team = new Team();
 		team.setId("test team id");
@@ -1539,7 +1542,6 @@ public class SynapseClientImplTest {
 		assertEquals(team, bundle.getTeam());
 		assertEquals(membershipStatus, bundle.getTeamMembershipStatus());
 		assertEquals(isAdmin, bundle.isUserAdmin());
-		assertEquals(testMemberCount, bundle.getTotalMemberCount());
 	}
 
 	@Test
@@ -2563,5 +2565,70 @@ public class SynapseClientImplTest {
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("/root/" + name));
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://google.com/" + name));
 	}
+	
+	@Test
+	public void testIsWiki() throws RestServiceException, SynapseException {
+		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
+		key.setOwnerObjectId("2");
+		key.setOwnerObjectType(ObjectType.ENTITY);
+		key.setWikiPageId("456");
+		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenReturn(key);
 
+		assertTrue(synapseClient.isWiki("2"));
+		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenThrow(new SynapseNotFoundException());
+		assertFalse(synapseClient.isWiki("3"));
+	}
+	
+	@Test
+	public void testIsChallenge() throws RestServiceException, SynapseException {
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId(EVAL_ID_1);
+		e.setContentSource("syn123");
+		testResults.setTotalNumberOfResults(1);
+		testResults.setResults(Collections.singletonList(e));
+		
+		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(testResults);
+		
+		userEvaluationPermissions = new UserEvaluationPermissions();
+		userEvaluationPermissions.setCanChangePermissions(true);
+		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_1)).thenReturn(userEvaluationPermissions);
+		
+		//"Before" junit test setup configured so this user to have the ability to change permissions on eval 2, but not on eval 1
+		assertTrue(synapseClient.isChallenge("syn123"));
+		
+		testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+		testResults.setResults(Collections.EMPTY_LIST);
+		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(testResults);
+		
+		//and verify that no evaluations are returned for a different entity id
+		assertFalse(synapseClient.isChallenge("syn987"));
+	}
+	
+	@Test
+	public void testIsQueryResult() throws RestServiceException, SynapseException {
+		// empty results are returned by default.
+		// entity query is run for Files tab, Tables tab, and Docker tab.
+		assertFalse(synapseClient.isFileOrFolder("syn987"));
+		assertFalse(synapseClient.isTable("syn987"));
+		assertFalse(synapseClient.isDocker("syn987"));
+		
+		entityQueryResultsList.add(mockEntityQueryResult);
+		assertTrue(synapseClient.isFileOrFolder("syn987"));
+		assertTrue(synapseClient.isTable("syn987"));
+		assertTrue(synapseClient.isDocker("syn987"));
+	}
+	
+	@Test
+	public void testIsForum() throws RestServiceException, SynapseException {
+		Forum mockForum = mock(Forum.class);
+		when(mockSynapse.getForumByProjectId(anyString())).thenReturn(mockForum);
+		ThreadCount mockThreadCount = mock(ThreadCount.class);
+		when(mockThreadCount.getCount()).thenReturn(0L);
+		when(mockSynapse.getThreadCountForForum(anyString(), any(DiscussionFilter.class))).thenReturn(mockThreadCount);
+		assertFalse(synapseClient.isForum("65"));
+		
+		when(mockThreadCount.getCount()).thenReturn(1L);
+		assertTrue(synapseClient.isForum("65"));
+	}
 }

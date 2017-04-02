@@ -86,11 +86,7 @@ public class ModalWizardViewImpl implements ModalWizardView {
 
 	@Override
 	public void setLoading(boolean loading) {
-		if(!loading){
-			this.primaryButton.state().reset();
-		}else{
-			this.primaryButton.state().loading();
-		}
+		primaryButton.setEnabled(!loading);
 	}
 
 	@Override
