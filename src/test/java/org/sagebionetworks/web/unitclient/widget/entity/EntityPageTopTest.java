@@ -2,7 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -16,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -30,7 +32,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -55,11 +56,8 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.atlassian.httpclient.api.EntityBuilder.Entity;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -164,7 +162,6 @@ public class EntityPageTopTest {
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
 		
 		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
@@ -328,7 +325,6 @@ public class EntityPageTopTest {
 		verify(mockDockerTab, never()).configure(mockFileEntity, mockEntityUpdatedHandler, null);
 	}
 	
-
 	@Test
 	public void testConfigureWithFileAndFailureToLoadProject(){
 		Exception projectLoadError = new Exception("failed to load project");
@@ -485,23 +481,75 @@ public class EntityPageTopTest {
 	}
 	
 	@Test
-	public void testContentMixtureOfTabsShown() {
+	public void testContentMixtureOfTabsShownCanEdit() {
+		when(mockPermissions.getCanEdit()).thenReturn(true);
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
 		
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
-		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
-		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		
+		verify(mockSynapseClientAsync, never()).isWiki(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isTable(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isDocker(anyString(), any(AsyncCallback.class));
+		
+		verify(mockWikiInnerTab).setTabListItemVisible(true);
+		verify(mockFilesInnerTab).setTabListItemVisible(true);
+		verify(mockTablesInnerTab).setTabListItemVisible(true);
 		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
-		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
-		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, never()).setTabListItemVisible(true);
+		verify(mockDiscussionInnerTab).setTabListItemVisible(true);
+		verify(mockDockerInnerTab).setTabListItemVisible(true);
+	}
+	
+	@Test
+	public void testContentMixtureOfTabsShownCannotEdit() {
+		when(mockPermissions.getCanEdit()).thenReturn(false);
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		
+		verify(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		
+		InOrder order = Mockito.inOrder(mockWikiInnerTab);
+		order.verify(mockWikiInnerTab).setTabListItemVisible(false);
+		order.verify(mockWikiInnerTab).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockFilesInnerTab);
+		order.verify(mockFilesInnerTab).setTabListItemVisible(false);
+		order.verify(mockFilesInnerTab).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockTablesInnerTab);
+		order.verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockTablesInnerTab, never()).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockChallengeInnerTab);
+		order.verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockChallengeInnerTab, never()).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockDiscussionInnerTab);
+		order.verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockDiscussionInnerTab).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockDockerInnerTab);
+		order.verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockDockerInnerTab, never()).setTabListItemVisible(true);
 	}
 	
 	@Test
