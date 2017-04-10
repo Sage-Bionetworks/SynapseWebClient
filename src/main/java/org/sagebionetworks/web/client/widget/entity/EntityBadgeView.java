@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
@@ -17,7 +17,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 	 */
 	void setPresenter(Presenter presenter);
 	
-	void setEntity(EntityQueryResult header);
+	void setEntity(EntityHeader header);
 
 	void showLoadError(String entityId);
 	
@@ -48,7 +48,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void entityClicked(EntityQueryResult entityHeader);
+		void entityClicked(EntityHeader entityHeader);
 	}
 	String getFriendlySize(Long contentSize, boolean b);
 

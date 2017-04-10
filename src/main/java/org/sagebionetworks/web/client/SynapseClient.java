@@ -17,6 +17,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -436,13 +438,13 @@ public interface SynapseClient extends XsrfProtectedService {
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
 	/**
-	 * Execute a generic entity entity query.
-	 * @param query
+	 * Get entity children
+	 * @param request
 	 * @return
-	 * @throws RestServiceException 
+	 * @throws RestServiceException
 	 */
-	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException;
-
+	EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException;
+	
 	/**
 	 * Create or update an Entity.
 	 * @param entity
