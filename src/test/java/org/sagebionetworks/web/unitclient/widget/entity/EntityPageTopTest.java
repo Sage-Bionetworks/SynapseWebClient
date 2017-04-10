@@ -294,6 +294,7 @@ public class EntityPageTopTest {
 		String areaToken = "1234";
 		Long versionNumber = null;
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), any(EntityUpdatedHandler.class));
 	}
 	
 	@Test
