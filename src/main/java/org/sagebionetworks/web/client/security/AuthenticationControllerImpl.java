@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -11,6 +12,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -19,7 +21,6 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.rpc.XsrfToken;
 import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.inject.Inject;
@@ -38,7 +39,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
-	
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private SessionStorage sessionStorage;
@@ -111,10 +111,28 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		localStorage.clear();
+		initSynapsePropertiesFromServer();
 		sessionStorage.clear();
 		currentUser = null;
 	}
 
+	public void initSynapsePropertiesFromServer() {
+		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+			@Override
+			public void onSuccess(HashMap<String, String> properties) {
+				for (String key : properties.keySet()) {
+					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+				}
+				localStorage.put(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
+	}
+
+	
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
 			sessionStorage.clear();
