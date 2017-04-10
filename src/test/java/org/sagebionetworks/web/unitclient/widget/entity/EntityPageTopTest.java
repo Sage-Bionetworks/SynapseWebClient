@@ -498,6 +498,7 @@ public class EntityPageTopTest {
 		verify(mockSynapseClientAsync, never()).isTable(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync, never()).isDocker(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isForum(anyString(), any(AsyncCallback.class));
 		
 		verify(mockWikiInnerTab).setTabListItemVisible(true);
 		verify(mockFilesInnerTab).setTabListItemVisible(true);
@@ -518,6 +519,7 @@ public class EntityPageTopTest {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		
@@ -526,6 +528,7 @@ public class EntityPageTopTest {
 		verify(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isForum(anyString(), any(AsyncCallback.class));
 		
 		InOrder order = Mockito.inOrder(mockWikiInnerTab);
 		order.verify(mockWikiInnerTab).setTabListItemVisible(false);
