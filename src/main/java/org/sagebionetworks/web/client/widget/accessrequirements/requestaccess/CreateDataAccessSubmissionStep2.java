@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -216,6 +215,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				fha.setFileHandleId(fileHandleId);
 				otherDocuments.addFileLink(fha);
 			}
+			otherDocuments.refreshLinkUI();
 		}
 	}
 	
