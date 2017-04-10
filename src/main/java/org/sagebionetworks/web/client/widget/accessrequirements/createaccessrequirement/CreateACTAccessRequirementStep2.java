@@ -84,8 +84,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		view.setOldTerms(isExistOldTermsOfUse ? accessRequirement.getActContactInfo() : "");
 		if (accessRequirement.getDucTemplateFileHandleId() != null) {
 			FileHandleAssociation fha = new FileHandleAssociation();
-			//TODO: set to new FileHandleAssociateType (Access Requirement)
-			fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
+			fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
 			fha.setAssociateObjectId(accessRequirement.getId().toString());
 			fha.setFileHandleId(accessRequirement.getDucTemplateFileHandleId());
 			ducTemplateFileHandleWidget.configure(fha);

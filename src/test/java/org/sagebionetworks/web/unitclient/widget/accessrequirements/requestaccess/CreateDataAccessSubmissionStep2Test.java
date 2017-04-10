@@ -242,8 +242,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-		// TODO: should be data access request type
-		assertEquals(FileHandleAssociateType.FileEntity, fha.getAssociateObjectType());
+		assertEquals(FileHandleAssociateType.DataAccessRequestAttachment, fha.getAssociateObjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, fha.getAssociateObjectId());
 		verify(mockView).setDUCUploadedFileWidget(mockFileHandleWidget);
 	}
@@ -265,8 +264,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-		// TODO: should be data access request type
-		assertEquals(FileHandleAssociateType.FileEntity, fha.getAssociateObjectType());
+		assertEquals(FileHandleAssociateType.DataAccessRequestAttachment, fha.getAssociateObjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, fha.getAssociateObjectId());
 		verify(mockView).setIRBUploadedFileWidget(mockFileHandleWidget);
 	}
@@ -289,13 +287,11 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockOtherDocuments, times(2)).addFileLink(fhaCaptor.capture());
 		List<FileHandleAssociation> fhas = fhaCaptor.getAllValues();
 		assertEquals(FILE_HANDLE_ID, fhas.get(0).getFileHandleId());
-		//TODO: set to new FileHandleAssociateType (data access request)
-		assertEquals(FileHandleAssociateType.MessageAttachment, fhas.get(0).getAssociateObjectType());
+		assertEquals(FileHandleAssociateType.DataAccessRequestAttachment, fhas.get(0).getAssociateObjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, fhas.get(0).getAssociateObjectId());
 		
 		assertEquals(FILE_HANDLE_ID2, fhas.get(1).getFileHandleId());
-		//TODO: set to new FileHandleAssociateType (data access request)
-		assertEquals(FileHandleAssociateType.MessageAttachment, fhas.get(1).getAssociateObjectType());
+		assertEquals(FileHandleAssociateType.DataAccessRequestAttachment, fhas.get(1).getAssociateObjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, fhas.get(1).getAssociateObjectId());
 	}
 	

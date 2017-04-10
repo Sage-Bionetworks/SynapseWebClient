@@ -132,8 +132,7 @@ public class CreateACTAccessRequirementStep2Test {
 		//verify duc template file handle widget is configured properly (basd on act duc file handle id)
 		verify(mockDucTemplateFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
-		// TODO: change to Access Requirement once supported.
-		assertEquals(FileHandleAssociateType.VerificationSubmission, fha.getAssociateObjectType());
+		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
 		assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
 		verify(mockDucTemplateFileHandleWidget).setVisible(true);

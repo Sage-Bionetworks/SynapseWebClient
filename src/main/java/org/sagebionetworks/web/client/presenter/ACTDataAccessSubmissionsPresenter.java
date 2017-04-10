@@ -141,8 +141,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						ACTAccessRequirement actAccessRequirement = (ACTAccessRequirement) requirement;
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
-							// TODO: change to Access Requirement type when available.
-							fha.setAssociateObjectType(FileHandleAssociateType.TeamAttachment);
+							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
 							fha.setAssociateObjectId(actAccessRequirement.getId().toString());
 							fha.setFileHandleId(actAccessRequirement.getDucTemplateFileHandleId());
 							ducTemplateFileHandleWidget.configure(fha);	

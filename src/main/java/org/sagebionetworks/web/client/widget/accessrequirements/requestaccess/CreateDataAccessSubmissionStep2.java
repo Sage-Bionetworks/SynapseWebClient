@@ -183,13 +183,11 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 					view.setSummaryOfUse(((DataAccessRenewal)dataAccessRequest).getSummaryOfUse());
 				}
 				if (dataAccessRequest.getDucFileHandleId() != null) {
-					//TODO: set to new FileHandleAssociateType (data access request)
-					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.FileEntity, dataAccessRequest.getDucFileHandleId());
+					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.DataAccessRequestAttachment, dataAccessRequest.getDucFileHandleId());
 					view.setDUCUploadedFileWidget(fileHandleWidget);
 				}
 				if (dataAccessRequest.getIrbFileHandleId() != null) {
-					//TODO: set to new FileHandleAssociateType (data access request)
-					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.FileEntity, dataAccessRequest.getIrbFileHandleId());
+					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.DataAccessRequestAttachment, dataAccessRequest.getIrbFileHandleId());
 					view.setIRBUploadedFileWidget(fileHandleWidget);
 				}
 				
@@ -213,8 +211,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		if (dataAccessRequest.getAttachments() != null) {
 			for (String fileHandleId : dataAccessRequest.getAttachments()) {
 				FileHandleAssociation fha = new FileHandleAssociation();
-				//TODO: set to new FileHandleAssociateType (data access request)
-				fha.setAssociateObjectType(FileHandleAssociateType.MessageAttachment);
+				fha.setAssociateObjectType(FileHandleAssociateType.DataAccessRequestAttachment);
 				fha.setAssociateObjectId(dataAccessRequest.getId());
 				fha.setFileHandleId(fileHandleId);
 				otherDocuments.addFileLink(fha);
