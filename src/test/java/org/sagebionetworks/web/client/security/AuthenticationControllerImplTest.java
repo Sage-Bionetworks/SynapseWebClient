@@ -13,6 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -73,6 +75,7 @@ public class AuthenticationControllerImplTest {
 	
 	String xsrfToken = "12barbaz34";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	HashMap<String, String> serverProperties;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -91,6 +94,8 @@ public class AuthenticationControllerImplTest {
 		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
 		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
 		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT);
+		serverProperties = new HashMap<String, String>();
+		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -199,10 +204,15 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testLogout() {
+		String propKey = "foo";
+		String propValue = "bar";
+		serverProperties.put(propKey, propValue);
 		authenticationController.logoutUser();
 		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		verify(mockSessionStorage).clear();
 		verify(mockClientCache).clear();
+		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockClientCache).put(eq(propKey), eq(propValue), anyLong());
 	}
 	
 	
