@@ -4,8 +4,8 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -93,11 +93,10 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		lazyLoadHelper.setIsConfigured();
 	}
 	
-	//TODO: this will be of type TermsOfUseAccessRequirementStatus
-	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
+	public void setDataAccessSubmissionStatus(TermsOfUseAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
 		view.resetState();
-		if (DataAccessSubmissionState.APPROVED.equals(status.getState())) {
+		if (status.getIsApproved()) {
 			view.showApprovedHeading();	
 		} else {
 			view.showUnapprovedHeading();
@@ -107,14 +106,14 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	
 
 	public void refreshApprovalState() {
-		dataAccessClient.getDataAccessSubmissionStatus(ar.getId().toString(), new AsyncCallback<DataAccessSubmissionStatus>() {
+		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 			@Override
-			public void onSuccess(DataAccessSubmissionStatus status) {
-				setDataAccessSubmissionStatus(status);
+			public void onSuccess(AccessRequirementStatus status) {
+				setDataAccessSubmissionStatus((TermsOfUseAccessRequirementStatus)status);
 			}
 		});
 	}

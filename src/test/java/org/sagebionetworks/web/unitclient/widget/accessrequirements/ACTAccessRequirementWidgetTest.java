@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -13,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -69,7 +73,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
-	DataAccessSubmissionStatus mockDataAccessSubmissionStatus;
+	ACTAccessRequirementStatus mockDataAccessSubmissionStatus;
 	
 	Callback lazyLoadDataCallback;
 	
@@ -85,7 +89,7 @@ public class ACTAccessRequirementWidgetTest {
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
-		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getDataAccessSubmissionStatus(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionStatus.getSubmissionId()).thenReturn(SUBMISSION_ID);
 	}
 
@@ -164,7 +168,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Test
 	public void testGetSubmissionStatusError() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getDataAccessSubmissionStatus(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 		widget.setRequirement(mockACTAccessRequirement);
 		lazyLoadDataCallback.invoke();
 		verify(mockSynAlert).handleException(ex);
@@ -181,7 +185,7 @@ public class ACTAccessRequirementWidgetTest {
 		widget.onCancelRequest();
 		verify(mockDataAccessClient).cancelDataAccessSubmission(eq(SUBMISSION_ID), any(AsyncCallback.class));
 		//refreshes status after cancel
-		verify(mockDataAccessClient, times(2)).getDataAccessSubmissionStatus(anyString(), any(AsyncCallback.class));
+		verify(mockDataAccessClient, times(2)).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

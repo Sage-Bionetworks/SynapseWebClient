@@ -187,12 +187,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	 */
 	@Override
 	public void placeRootMoreTreeItem(final MoreTreeItem childToCreate,
-			final String parentId, final long offset) {
+			final String parentId, final String nextPageToken) {
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				setLoadingVisible(true);
-				presenter.getChildren(parentId, null, offset);
+				presenter.getChildren(parentId, null, nextPageToken);
 				childToCreate.setVisible(false);
 			}
 		});
@@ -209,12 +209,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	 */
 	@Override
 	public void placeChildMoreTreeItem(final MoreTreeItem childToCreate,
-			final EntityTreeItem parent, final long offset) {
+			final EntityTreeItem parent, final String nextPageToken) {
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				parent.showLoadingIcon();
-				presenter.getChildren(parent.getHeader().getId(), parent, offset);
+				presenter.getChildren(parent.getHeader().getId(), parent, nextPageToken);
 				childToCreate.setVisible(false);
 			}
 		});

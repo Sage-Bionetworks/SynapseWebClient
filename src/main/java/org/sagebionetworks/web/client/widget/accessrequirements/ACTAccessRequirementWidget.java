@@ -2,7 +2,8 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
+import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -99,7 +100,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		lazyLoadHelper.setIsConfigured();
 	}
 	
-	public void setDataAccessSubmissionStatus(DataAccessSubmissionStatus status) {
+	public void setDataAccessSubmissionStatus(ACTAccessRequirementStatus status) {
 		submissionId = status.getSubmissionId();
 		view.resetState();
 		switch (status.getState()) {
@@ -128,14 +129,14 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	}
 	
 	public void refreshApprovalState() {
-		dataAccessClient.getDataAccessSubmissionStatus(ar.getId().toString(), new AsyncCallback<DataAccessSubmissionStatus>() {
+		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 			@Override
-			public void onSuccess(DataAccessSubmissionStatus status) {
-				setDataAccessSubmissionStatus(status);
+			public void onSuccess(AccessRequirementStatus status) {
+				setDataAccessSubmissionStatus((ACTAccessRequirementStatus)status);
 			}
 		});
 	}

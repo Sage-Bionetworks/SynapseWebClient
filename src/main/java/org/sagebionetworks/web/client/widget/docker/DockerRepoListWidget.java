@@ -8,11 +8,18 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -36,18 +43,13 @@ import com.google.inject.Inject;
 
 public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter {
 
-	public static final Long PAGE_SIZE = 10L;
-	public static final Long OFFSET_ZERO = 0L;
-	
-	private Long offset;
-
 	private DockerRepoListWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private AddExternalRepoModal addExternalRepoModal;
 	private PreflightController preflightController;
 	private SynapseAlert synAlert;
 	private EntityBundle projectBundle;
-	private EntityQuery query;
+	private EntityChildrenRequest query;
 	private CallbackP<EntityBundle> onRepoClickCallback;
 	private LoadMoreWidgetContainer membersContainer;
 
@@ -118,35 +120,30 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	
 	private void performInitialLoad() {
 		view.clear();
-		offset = OFFSET_ZERO;
+		query.setNextPageToken(null);
 		loadMore();
 	}
 
 	public void loadMore() {
 		synAlert.clear();
-		this.query.setOffset(offset);
-		synapseClient.executeEntityQuery(this.query, new AsyncCallback<EntityQueryResults>() {
+		synapseClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+			public void onSuccess(EntityChildrenResponse results) {
+				query.setNextPageToken(results.getNextPageToken());
+				membersContainer.setIsMore(results.getNextPageToken() != null);
+				setResults(results.getPage());
+			};
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
 			
-			@Override
-			public void onSuccess(EntityQueryResults results) {
-				offset += PAGE_SIZE;
-				long numberOfMembers = results.getTotalEntityCount();
-				membersContainer.setIsMore(offset < numberOfMembers);
-				setResults(results);
-			}
-
-			@Override
-			public void onFailure(Throwable error) {
-				synAlert.handleException(error);
-			}
 		});
 	}
 	
-
-	private void setResults(EntityQueryResults results) {
+	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | DOI;
-		for (EntityQueryResult header: results.getEntities()) {
+		for (EntityHeader header: results) {
 			synapseClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
 				@Override
 				public void onSuccess(EntityBundle bundle) {
@@ -165,18 +162,14 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	 * @param parentId
 	 * @return
 	 */
-	public EntityQuery createDockerRepoEntityQuery(String projectId) {
-		EntityQuery newQuery = new EntityQuery();
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.createdOn.name());
-		sort.setDirection(SortDirection.DESC);
-		newQuery.setSort(sort);
-		Condition projectCondition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, projectId);
-		Condition typeCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.nodeType, Operator.IN, EntityType.dockerrepo.name());
-		newQuery.setConditions(Arrays.asList(projectCondition, typeCondition));
-		newQuery.setLimit(PAGE_SIZE);
-		newQuery.setOffset(OFFSET_ZERO);
+	public EntityChildrenRequest createDockerRepoEntityQuery(String projectId) {
+		EntityChildrenRequest newQuery = new EntityChildrenRequest();
+		newQuery.setParentId(projectId);
+		newQuery.setSortBy(SortBy.CREATED_ON);
+		newQuery.setSortDirection(Direction.DESC);
+		List<EntityType> types = new ArrayList<EntityType>();
+		types.add(EntityType.dockerrepo);
+		newQuery.setIncludeTypes(types);
 		return newQuery;
 	}
 

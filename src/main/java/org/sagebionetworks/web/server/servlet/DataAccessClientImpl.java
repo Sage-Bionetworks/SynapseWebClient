@@ -5,11 +5,11 @@ import java.util.List;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClient;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -31,7 +31,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public ResearchProject updateResearchProject(ResearchProject researchProject) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createOrUpdate(researchProject);
+			return synapseClient.createOrUpdateResearchProject(researchProject);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -41,7 +41,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public DataAccessRequestInterface getDataAccessRequest(Long id) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getRequestForUpdate(id.toString());
+			return synapseClient.getDataAccessRequestForUpdate(id.toString());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -53,11 +53,11 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			dataAccessRequest = synapseClient.createOrUpdate(dataAccessRequest);
+			synapseClient.createOrUpdateDataAccessRequest(dataAccessRequest);
 			
 			// submit data access request
 			if (isSubmit){
-				synapseClient.submit(dataAccessRequest.getId(), dataAccessRequest.getEtag());
+				synapseClient.submitDataAccessRequest(dataAccessRequest.getId(), dataAccessRequest.getEtag());
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -98,10 +98,10 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	
 	//TODO: return type AccessRequirementStatus (could be ACTAccessRequirementStatus or TermsOfUseAccessRequirementStatus)
 	@Override
-	public DataAccessSubmissionStatus getDataAccessSubmissionStatus(String accessRequirementId) throws RestServiceException {
+	public AccessRequirementStatus getAccessRequirementStatus(String accessRequirementId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getDataAccessSubmissionStatus(accessRequirementId);
+			return synapseClient.getAccessRequirementStatus(accessRequirementId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -111,7 +111,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public void cancelDataAccessSubmission(String submissionId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.cancel(submissionId);
+			synapseClient.cancelDataAccessSubmission(submissionId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

@@ -222,8 +222,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void onSuccess(EntityBundle bundle) {
 				projectBundle = bundle;
 				projectMetadata.setEntityBundle(projectBundle, null);
-				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-				controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 				showSelectedTabs();
 			}
 
@@ -241,18 +239,22 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	tabVisibilityInitializedCount = 0;
     	visibleTabCount = 0;
     	// SWC-3137: show all tabs, until project display settings state persists.  Challenge is still dependent on content.
-    	getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab()).onSuccess(true);
-    	getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab()).onSuccess(true);
-    	getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()).onSuccess(true);
+    	// always show the discussion tab
     	getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()).onSuccess(true);
-    	getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
-    	
-//    	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
-//    	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
-//    	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
+    	if (projectBundle == null || projectBundle.getPermissions() == null || projectBundle.getPermissions().getCanEdit()) {
+    		// if user can edit, then show other tabs
+	    	getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab()).onSuccess(true);
+	    	getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab()).onSuccess(true);
+	    	getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()).onSuccess(true);
+	    	getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
+    	} else {
+    		// otherwise only show the tabs only if content is present.
+        	synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(WIKI, EntityArea.WIKI, wikiTab.asTab())); 
+        	synapseClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(FILES, EntityArea.FILES, filesTab.asTab())); 
+        	synapseClient.isTable(projectHeader.getId(), getTabVisibilityCallback(TABLES, EntityArea.TABLES, tablesTab.asTab()));
+        	synapseClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()));
+    	}
     	synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(CHALLENGE, EntityArea.ADMIN, adminTab.asTab()));
-//    	synapseClient.isForum(projectHeader.getId(), getTabVisibilityCallback(DISCUSSION, EntityArea.DISCUSSION, discussionTab.asTab()));
-//    	synapseClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(DOCKER, EntityArea.DOCKER, dockerTab.asTab()));
 	}
     
     public AsyncCallback<Boolean> getTabVisibilityCallback(final String displayArea, final EntityArea entityArea, final Tab tab) {
@@ -376,6 +378,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				break;
 			default:
+		}
+		
+		if (projectBundle != null) {
+			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+			controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 		}
 		
 		// set all content stale

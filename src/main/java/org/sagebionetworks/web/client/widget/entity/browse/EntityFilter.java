@@ -18,20 +18,20 @@ public enum EntityFilter {
 	ALL_BUT_LINK(EntityType.project, EntityType.folder, EntityType.file);
 	
 	// when browsing (in the entity tree browser), only these types should be shown.
-	private String[] entityQueryValues;
 	private Set<String> entityTypeClassNamesSet;
+	private List<EntityType> entityTypes;
 	
 	private EntityFilter(EntityType... values) {
-		entityQueryValues = new String[values.length];
-		entityTypeClassNamesSet = new HashSet<String>(entityQueryValues.length);
+		entityTypes = new ArrayList<EntityType>();
+		entityTypeClassNamesSet = new HashSet<String>(values.length);
 		for (int i = 0; i < values.length; i++) {
-			entityQueryValues[i] = values[i].name();
-			entityTypeClassNamesSet.add(EntityTypeUtils.getEntityClassNameForEntityType(entityQueryValues[i]));
+			entityTypes.add(values[i]);
+			entityTypeClassNamesSet.add(EntityTypeUtils.getEntityClassNameForEntityType(values[i].name()));
 		}
 	}
 	
-	public String[] getEntityQueryValues() {
-		return entityQueryValues;
+	public List<EntityType> getEntityQueryValues() {
+		return entityTypes;
 	}
 	
 	public List<EntityHeader> filterForBrowsing(List<EntityHeader> headers) {

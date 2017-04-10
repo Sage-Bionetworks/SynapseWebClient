@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -14,8 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionStatus;
+import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -65,7 +67,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
-	DataAccessSubmissionStatus mockDataAccessSubmissionStatus;
+	TermsOfUseAccessRequirementStatus mockDataAccessSubmissionStatus;
 	
 	Callback lazyLoadDataCallback;
 
@@ -78,7 +80,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
-		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getDataAccessSubmissionStatus(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -112,18 +114,16 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	
 	@Test
 	public void testApprovedState() {
-		//TODO: will be changed once service changes to return different object for ToU type
 		widget.setRequirement(mockTermsOfUseAccessRequirement);
-		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
 	}
 	
 	@Test
 	public void testUnApprovedState() {
-		//TODO: will be changed once service changes to return different object for ToU type
 		widget.setRequirement(mockTermsOfUseAccessRequirement);
-		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.SUBMITTED);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView).showSignTermsButton();
