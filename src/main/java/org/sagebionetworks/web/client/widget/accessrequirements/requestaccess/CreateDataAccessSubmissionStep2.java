@@ -159,8 +159,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setDUCTemplateVisible(isDucTemplate);
 		if (isDucTemplate) {
 			FileHandleAssociation fha = new FileHandleAssociation();
-			//TODO: set to new FileHandleAssociateType (Access Requirement)
-			fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
+			fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
 			fha.setAssociateObjectId(ar.getId().toString());
 			fha.setFileHandleId(ar.getDucTemplateFileHandleId());
 			templateFileRenderer.configure(fha);

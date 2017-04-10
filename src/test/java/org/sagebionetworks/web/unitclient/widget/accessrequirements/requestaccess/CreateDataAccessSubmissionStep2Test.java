@@ -209,8 +209,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockTemplateFileRenderer).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-		// TODO: should be access requirement type
-		assertEquals(FileHandleAssociateType.VerificationSubmission, fha.getAssociateObjectType());
+		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
 		assertEquals(ACCESS_REQUIREMENT_ID.toString(), fha.getAssociateObjectId());
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 	}
