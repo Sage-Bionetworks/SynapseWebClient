@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -341,6 +342,13 @@ public class EntityFinderTest {
 		when(mockView.getCurrentArea()).thenReturn(EntityFinderArea.SEARCH);
 		entityFinder.hide();
 		verify(mockClientCache).put(EntityFinder.ENTITY_FINDER_AREA_KEY, EntityFinderArea.SEARCH.toString());
+	}
+	
+	@Test
+	public void testClearBeforeConfigure() {
+		// should not result in an exception
+		entityFinder.clearSelectedEntities();
+		assertTrue(entityFinder.getSelectedEntity().isEmpty());
 	}
 }
 

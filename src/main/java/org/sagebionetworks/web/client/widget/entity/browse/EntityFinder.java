@@ -48,6 +48,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.authenticationController = authenticationController;
 		this.cache = cache;
 		this.synAlert = synAlert;
+		this.selectedEntities = new ArrayList<Reference>();
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 	}	
@@ -66,7 +67,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
-		this.selectedEntities = new ArrayList<Reference>();
+		selectedEntities.clear();
 	}
 	
 	public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
@@ -78,7 +79,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedMultiHandler = handler;
-		this.selectedEntities = new ArrayList<Reference>();
+		selectedEntities.clear();
 	}
 	
 	@Override
