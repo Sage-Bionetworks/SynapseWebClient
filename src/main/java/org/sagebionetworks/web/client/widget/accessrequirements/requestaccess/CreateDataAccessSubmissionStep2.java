@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,7 +41,7 @@ import com.google.inject.Inject;
  *
  */
 public class CreateDataAccessSubmissionStep2 implements ModalPage {
-	public static final String SAVED_PROGRESS_MESSAGE = "Saved your progress...";
+	public static final String SAVED_PROGRESS_MESSAGE = "Saved your progress.";
 	public static final String SAVE_CHANGES_MESSAGE = "Would you want to save your recent changes?";
 	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your data access request has been successfully submitted for review.";
 	CreateDataAccessSubmissionWizardStep2View view;
@@ -234,6 +235,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		modalPresenter.setLoading(true);
 		dataAccessRequest.setAccessors(accessorsList.getUserIds());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
+		dataAccessRequest.setResearchProjectId(researchProject.getId());
 		client.updateDataAccessRequest(dataAccessRequest, isSubmit, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {

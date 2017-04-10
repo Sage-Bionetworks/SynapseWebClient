@@ -53,7 +53,7 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.createOrUpdateDataAccessRequest(dataAccessRequest);
+			dataAccessRequest = synapseClient.createOrUpdateDataAccessRequest(dataAccessRequest);
 			
 			// submit data access request
 			if (isSubmit){

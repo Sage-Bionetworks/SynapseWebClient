@@ -25,6 +25,8 @@ public class ModalWizardViewImpl implements ModalWizardView {
 	@UiField
 	Button primaryButton;
 	@UiField
+	Button defaultButton;
+	@UiField
 	Text instructions;
 	@UiField
 	SimplePanel bodyPanel;
@@ -49,7 +51,14 @@ public class ModalWizardViewImpl implements ModalWizardView {
 			public void onClick(ClickEvent event) {
 				presenter.onPrimary();
 			}
-		});	
+		});
+		defaultButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCancel();
+			}
+		});
 	}
 
 	@Override
