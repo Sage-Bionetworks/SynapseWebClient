@@ -76,14 +76,12 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	
 	@Override
 	public DataAccessSubmissionPage getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, DataAccessSubmissionState stateFilter, DataAccessSubmissionOrder order, boolean isAsc) throws RestServiceException {
-		// TODO: use rpc once available
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			return synapseClient.getDataAccessSubmissionStatus(accessRequirementId, nextPageToken, stateFilter, order, isAsc);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
-		return new DataAccessSubmissionPage();
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.listDataAccessSubmissions(accessRequirementId.toString(), nextPageToken, stateFilter, order, isAsc);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -96,7 +94,6 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		}
 	}
 	
-	//TODO: return type AccessRequirementStatus (could be ACTAccessRequirementStatus or TermsOfUseAccessRequirementStatus)
 	@Override
 	public AccessRequirementStatus getAccessRequirementStatus(String accessRequirementId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
