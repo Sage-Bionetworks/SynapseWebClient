@@ -126,6 +126,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.Cr
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1View;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1ViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
@@ -1436,5 +1438,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProfileCertifiedValidatedView.class).to(ProfileCertifiedValidatedViewImpl.class);
 		bind(ACTDataAccessSubmissionsView.class).to(ACTDataAccessSubmissionsViewImpl.class);
 		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
+		bind(ACTDataAccessSubmissionWidgetView.class).to(ACTDataAccessSubmissionWidgetViewImpl.class);
+		
 	}
 }

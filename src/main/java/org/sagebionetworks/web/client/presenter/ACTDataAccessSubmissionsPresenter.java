@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -53,6 +54,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	List<String> states;
 	boolean isSortedAsc;
 	String nextPageToken;
+	private ACTAccessRequirement actAccessRequirement;
 	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
@@ -138,7 +140,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				@Override
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
-						ACTAccessRequirement actAccessRequirement = (ACTAccessRequirement) requirement;
+						actAccessRequirement = (ACTAccessRequirement) requirement;
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -159,12 +161,12 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 						view.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
 						view.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
+						loadData();
 					} else {
 						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
 					}
 				}
 			});
-			loadData();
 		} else {
 			synAlert.showError(INVALID_AR_ID);
 		}
@@ -190,10 +192,14 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			public void onSuccess(DataAccessSubmissionPage submissionPage) {
 				nextPageToken = submissionPage.getNextPageToken();
 				for (DataAccessSubmission submission : submissionPage.getResults()) {
-					// TODO: create a new row for each data access submission.
-//					DataAccessSubmissionWidget w = ginInjector.getDataAccessSubmissionWidget();
-//					w.configure(submission); 
-//					loadMoreContainer.add(w.asWidget());
+					// create a new row for each data access submission.
+					ACTDataAccessSubmissionWidget w = ginInjector.getACTDataAccessSubmissionWidget();
+					w.configure(submission); 
+					w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
+					w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
+					w.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
+					w.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
+					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(!submissionPage.getResults().isEmpty());
 			};

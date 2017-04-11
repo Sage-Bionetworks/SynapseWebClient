@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
@@ -32,4 +33,6 @@ public interface DataAccessClientAsync {
 	void cancelDataAccessSubmission(String submissionId, AsyncCallback<Void> asyncCallback);
 	void getRestrictionInformation(String entityId, AsyncCallback<RestrictionInformation> callback);
 	void createLockAccessRequirement(String entityId, AsyncCallback<ACTAccessRequirement> callback);
+	void updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState, String reason,
+			AsyncCallback<DataAccessSubmission> callback);
 }
