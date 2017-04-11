@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -38,8 +37,6 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -469,9 +466,6 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset,
-			AsyncCallback<List<AccessRequirement>> callback);
-
 	void isWiki(String id, AsyncCallback<Boolean> callback);
 
 	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
@@ -485,6 +479,4 @@ public interface SynapseClientAsync {
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
-
-	void getAccessRequirement(Long requirementId, AsyncCallback<AccessRequirement> callback);
 }

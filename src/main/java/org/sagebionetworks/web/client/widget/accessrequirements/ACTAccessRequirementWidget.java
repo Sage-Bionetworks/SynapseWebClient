@@ -2,12 +2,16 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -20,6 +24,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	private ACTAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
+	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
 	ACTAccessRequirement ar;
@@ -28,6 +33,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	ManageAccessButton manageAccessButton;
+	String submissionId;
+	LazyLoadHelper lazyLoadHelper;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -38,7 +45,9 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			ManageAccessButton manageAccessButton) {
+			ManageAccessButton manageAccessButton,
+			DataAccessClientAsync dataAccessClient,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -48,6 +57,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.manageAccessButton = manageAccessButton;
+		this.dataAccessClient = dataAccessClient;
+		this.lazyLoadHelper = lazyLoadHelper;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -55,6 +66,15 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setSynAlert(synAlert);
+		Callback loadDataCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshApprovalState();
+			}
+		};
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
 	public void setRequirement(final ACTAccessRequirement ar) {
@@ -77,36 +97,63 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		deleteAccessRequirementButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
-		refreshApprovalState();
+		lazyLoadHelper.setIsConfigured();
+	}
+	
+	public void setDataAccessSubmissionStatus(ACTAccessRequirementStatus status) {
+		submissionId = status.getSubmissionId();
+		view.resetState();
+		switch (status.getState()) {
+			case SUBMITTED:
+				// TODO: request has been submitted on your behalf, or by you?
+				view.showUnapprovedHeading();
+				view.showRequestSubmittedMessage();
+				view.showCancelRequestButton();
+				break;
+			case APPROVED:
+				view.showApprovedHeading();
+				view.showRequestApprovedMessage();
+				view.showUpdateRequestButton();
+				break;
+			case REJECTED:
+				view.showUnapprovedHeading();
+				view.showRequestRejectedMessage(status.getRejectedReason());
+				view.showUpdateRequestButton();
+				break;
+			case CANCELLED:
+			default:
+				view.showUnapprovedHeading();
+				view.showRequestAccessButton();
+				break;
+		}
 	}
 	
 	public void refreshApprovalState() {
-		//TODO:  set up view based on DataAccessSubmission state
-		view.resetState();
-		// (for testing)
-		// if no request has been submitted:
-		view.showUnapprovedHeading();
-		view.showRequestAccessButton();
-		// else if a request has been submitted on your behalf
-//		view.showUnapprovedHeading();
-//		view.showRequestSubmittedMessage();
-		// else if you submitted a request
-//		view.showUnapprovedHeading();
-//		view.showRequestSubmittedMessage();
-//		view.showCancelRequestButton();
-		// else if your request submission has been approved
-//		view.showApprovedHeading();
-//		view.showRequestApprovedMessage();
-//		view.showUpdateRequestButton();
-		// else if your submitted request was rejected
-//		view.showUnapprovedHeading();
-//		view.showRequestRejectedMessage(reason);
-//		view.showUpdateRequestButton();
+		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(AccessRequirementStatus status) {
+				setDataAccessSubmissionStatus((ACTAccessRequirementStatus)status);
+			}
+		});
 	}
 	
 	@Override
 	public void onCancelRequest() {
-		//TODO: cancel DataAccessSubmission
+		//cancel DataAccessSubmission
+		dataAccessClient.cancelDataAccessSubmission(submissionId, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(Void result) {
+				refreshApprovalState();
+			}
+		});
 	}
 	
 	@Override

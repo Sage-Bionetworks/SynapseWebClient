@@ -63,10 +63,9 @@ public class TopicWidgetTest {
 	}
 
 	@Test
-	public void testConfigureAllTypesTest() {
-		for (SubscriptionObjectType type : SubscriptionObjectType.values()) {
-			widget.configure(type, TEST_OBJECT_ID);
-		}
+	public void testConfigureSupportedTypesTest() {
+		widget.configure(SubscriptionObjectType.FORUM, TEST_OBJECT_ID);
+		widget.configure(SubscriptionObjectType.THREAD, TEST_OBJECT_ID);
 		verify(mockSynAlert, never()).showError(anyString());
 	}
 	

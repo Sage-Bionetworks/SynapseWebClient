@@ -16,6 +16,7 @@ public interface ModalWizardView extends IsWidget {
 		 * Called when the primary button is pressed.
 		 */
 		void onPrimary();
+		void onCancel();
 
 	}
 

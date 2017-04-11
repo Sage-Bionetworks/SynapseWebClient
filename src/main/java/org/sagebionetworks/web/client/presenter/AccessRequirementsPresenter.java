@@ -8,8 +8,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PlaceView;
@@ -32,7 +32,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	private PlaceView view;
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
-	private SynapseClientAsync synapseClient;
+	private DataAccessClientAsync dataAccessClient;
 	LoadMoreWidgetContainer loadMoreContainer;
 	public static Long LIMIT = 30L;
 	Long currentOffset;
@@ -44,7 +44,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
-			SynapseClientAsync synapseClient,
+			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			LoadMoreWidgetContainer loadMoreContainer, 
@@ -54,7 +54,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
+		this.dataAccessClient = dataAccessClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
@@ -118,7 +118,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public void loadMore() {
 		synAlert.clear();
 		// TODO: call should also return the user state (approved, pending, ...) for each access requirement
-		synapseClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
+		dataAccessClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -134,10 +134,9 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 						isNewAr = true;
 						allArs.add(ar);
 						// create a new row for each access requirement.
-						// need state of approval/submission.
 						if( ar instanceof ACTAccessRequirement) {
 							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-							w.setRequirement((ACTAccessRequirement)ar); 
+							w.setRequirement((ACTAccessRequirement)ar);
 							loadMoreContainer.add(w.asWidget());
 						} else if (ar instanceof TermsOfUseAccessRequirement) {
 							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();

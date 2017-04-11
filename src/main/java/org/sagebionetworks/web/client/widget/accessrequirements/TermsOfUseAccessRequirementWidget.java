@@ -4,10 +4,15 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -18,6 +23,7 @@ import com.google.inject.Inject;
 public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequirementWidgetView.Presenter, IsWidget {
 	private TermsOfUseAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
+	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
 	TermsOfUseAccessRequirement ar;
@@ -25,30 +31,43 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	CreateAccessRequirementButton createAccessRequirementButton;
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
+	LazyLoadHelper lazyLoadHelper;
 	
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
+			DataAccessClientAsync dataAccessClient,
 			SynapseClientAsync synapseClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
-			DeleteAccessRequirementButton deleteAccessRequirementButton) {
+			DeleteAccessRequirementButton deleteAccessRequirementButton,
+			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.dataAccessClient = dataAccessClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;
 		this.subjectsWidget = subjectsWidget;
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
+		this.lazyLoadHelper = lazyLoadHelper;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
+		Callback loadDataCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshApprovalState();
+			}
+		};
+		
+		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
 	
@@ -71,22 +90,34 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		lazyLoadHelper.setIsConfigured();
 	}
 	
-	public void refreshApprovalState() {
-		//TODO:  set up view based on DataAccessSubmission state
+	public void setDataAccessSubmissionStatus(TermsOfUseAccessRequirementStatus status) {
+		// set up view based on DataAccessSubmission state
 		view.resetState();
-		//if (not approved) {
-		view.showUnapprovedHeading();
-		view.showSignTermsButton();
-//		}
-//		else {
-		// if approved
-		view.showApprovedHeading();
-//		}
-		
-
+		if (status.getIsApproved()) {
+			view.showApprovedHeading();	
+		} else {
+			view.showUnapprovedHeading();
+			view.showSignTermsButton();
+		}
 	}
+	
+
+	public void refreshApprovalState() {
+		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(AccessRequirementStatus status) {
+				setDataAccessSubmissionStatus((TermsOfUseAccessRequirementStatus)status);
+			}
+		});
+	}
+	
 	@Override
 	public void onSignTerms() {
 		// create the self-signed access approval, then update this object
