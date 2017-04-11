@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -74,6 +75,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.showFlagLink = showFlagLink;
 	}
 	
+	public void showFolderRestrictionUI() {
+		view.showFolderRestrictionUI();
+	}
+	
 	public String getJiraFlagUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
@@ -120,7 +125,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	public void configureUI(RestrictionInformation restrictionInformation) {
-		
 		boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
 		

@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -37,7 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
-import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -55,7 +56,9 @@ public class EntityMetadataTest {
 	@Mock
 	DoiWidget mockDoiWidget;
 	@Mock
-	RestrictionWidget mockRestrictionWidget;
+	org.sagebionetworks.web.client.widget.entity.RestrictionWidget mockRestrictionWidget;
+	@Mock
+	RestrictionWidget mockRestrictionWidgetV2;
 	@Mock
 	FileHistoryWidget mockFileHistoryWidget;
 	@Mock
@@ -64,7 +67,8 @@ public class EntityMetadataTest {
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	SynapseJSNIUtils mockJSNI;
-	
+	@Mock
+	CookieProvider mockCookies;
 	String entityId = "syn123";
 	String entityName = "testEntity";
 	Entity en = new Folder();
@@ -74,7 +78,7 @@ public class EntityMetadataTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget, 
-				mockFileHistoryWidget, mockSynapseClient, mockJSNI);
+				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
 		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
 	

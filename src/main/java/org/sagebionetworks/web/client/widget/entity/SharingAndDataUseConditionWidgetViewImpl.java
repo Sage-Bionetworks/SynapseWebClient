@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.WebConstants;
-
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,8 +36,8 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	IconsImageBundle iconsImageBundle;
 	FlowPanel container;
 	PublicPrivateBadge publicPrivateBadge;
-	RestrictionWidget restrictionWidget;
-	org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
+	org.sagebionetworks.web.client.widget.entity.RestrictionWidget restrictionWidget;
+	RestrictionWidget restrictionWidgetV2;
 	AccessControlListModalWidget accessControlListModalWidget;
 	CookieProvider cookies;
 	
@@ -47,9 +47,9 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			SageImageBundle sageImageBundle, 
 			IconsImageBundle iconsImageBundle, 
 			PublicPrivateBadge publicPrivateBadge, 
-			RestrictionWidget restrictionWidget,
+			org.sagebionetworks.web.client.widget.entity.RestrictionWidget restrictionWidget,
 			AccessControlListModalWidget accessControlListModalWidget,
-			org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2,
+			RestrictionWidget restrictionWidgetV2,
 			CookieProvider cookies) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
@@ -58,6 +58,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		this.publicPrivateBadge = publicPrivateBadge;
 		this.restrictionWidget = restrictionWidget;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
+		restrictionWidgetV2.showFolderRestrictionUI();
 		this.cookies = cookies;
 		restrictionWidgetV2.setShowIfProject(true);
 		restrictionWidgetV2.setShowFlagLink(false);
@@ -149,7 +150,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			restrictionWidgetV2.setShowChangeLink(showChangeLink);
 			restrictionWidgetV2.configure(bundle.getEntity(), bundle.getPermissions().getCanChangePermissions());
 			container.add(restrictionWidgetV2);
-			//TODO: add description (to v2 restriction widget?)
 		}
 	}
 	

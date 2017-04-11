@@ -40,7 +40,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	Boolean isNoHumanDataRadioSelected();
 	void setSynAlert(IsWidget w);
 	public void setImposeRestrictionModalVisible(boolean visible);
-
+	void showFolderRestrictionUI();
 	/**
 	 * Presenter interface
 	 */

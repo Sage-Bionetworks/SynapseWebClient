@@ -47,6 +47,11 @@
 			</b:Tooltip>
 		</bh:Span>
 		<bh:Span ui:field="synAlertContainer" />
+		<bh:Div ui:field="folderRestrictionUI" visible="false">
+			<bh:Paragraph ui:field="folderRestrictedMessage" text="Use of the content of this folder requires agreement to additional terms." />
+			<bh:Paragraph ui:field="folderUnrestrictedMessage" text="Use of the content of this folder does not require agreement to additional terms." />
+		</bh:Div>
+		
 		<!-- Modals associated with the restriction widget -->
 			
 		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" dataBackdrop="STATIC" dataKeyboard="false">

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
-
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -35,7 +35,7 @@ public class EntityMetadata implements Presenter {
 	private AnnotationsRendererWidget annotationsWidget;
 	private DoiWidget doiWidget;
 	private FileHistoryWidget fileHistoryWidget;
-	private RestrictionWidget restrictionWidget;
+	private org.sagebionetworks.web.client.widget.entity.RestrictionWidget restrictionWidget;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils jsni;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
@@ -44,11 +44,11 @@ public class EntityMetadata implements Presenter {
 	public EntityMetadata(EntityMetadataView view, 
 			DoiWidget doiWidget,
 			AnnotationsRendererWidget annotationsWidget,
-			RestrictionWidget restrictionWidget,
+			org.sagebionetworks.web.client.widget.entity.RestrictionWidget restrictionWidget,
 			FileHistoryWidget fileHistoryWidget, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils jsni,
-			org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2,
+			RestrictionWidget restrictionWidgetV2,
 			CookieProvider cookies) {
 		this.view = view;
 		this.doiWidget = doiWidget;

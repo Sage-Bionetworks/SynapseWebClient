@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -82,7 +83,12 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Modal anonymousFlagModal;
 	@UiField
 	Button anonymousFlagModalOkButton;
-	
+	@UiField
+	Div folderRestrictionUI;
+	@UiField
+	Paragraph folderRestrictedMessage;
+	@UiField
+	Paragraph folderUnrestrictedMessage;
 	Presenter presenter;
 	
 	//this UI widget
@@ -206,6 +212,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void showControlledUseUI() {
 		controlledUseUI.setVisible(true);
+		folderRestrictedMessage.setVisible(true);
+		folderUnrestrictedMessage.setVisible(false);
 	}
 	
 	@Override
@@ -247,6 +255,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void showNoRestrictionsUI() {
 		noneUI.setVisible(true);
+		folderRestrictedMessage.setVisible(false);
+		folderUnrestrictedMessage.setVisible(true);
 	}
 	
 	@Override
@@ -310,6 +320,11 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 			imposeRestrictionModal.hide();
 		}
 	}
+	@Override
+	public void showFolderRestrictionUI() {
+		folderRestrictionUI.setVisible(true);
+	}
+	
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();

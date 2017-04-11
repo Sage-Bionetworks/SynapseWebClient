@@ -46,7 +46,6 @@
 				<b:Anchor ui:field="anonymousReportIssueLink" text="report issue" />
 			</b:Tooltip>
 		</bh:Span>
-			
 		<!-- Modals associated with the restriction widget -->
 			
 		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
