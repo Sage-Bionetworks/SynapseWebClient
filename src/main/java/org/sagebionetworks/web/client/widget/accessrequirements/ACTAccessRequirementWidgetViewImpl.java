@@ -15,6 +15,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -61,7 +62,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	Div requestSubmittedByOther;
 	@UiField
-	Span submitterUserBadgeContainer;
+	Div submitterUserBadgeContainer;
 	
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
