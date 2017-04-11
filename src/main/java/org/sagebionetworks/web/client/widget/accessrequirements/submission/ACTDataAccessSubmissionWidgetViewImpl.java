@@ -12,6 +12,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,7 +22,7 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Label createdOnField;
+	Label submittedOnField;
 	@UiField
 	Label stateField;
 	@UiField
@@ -29,7 +30,7 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	Label projectLeadField;
 	@UiField
-	TextBox intendedDataUseField;
+	TextArea intendedDataUseField;
 	@UiField
 	Div accessorsContainer;
 	@UiField
@@ -41,9 +42,9 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	CheckBox renewalCheckbox; 
 	@UiField
-	TextBox publicationsField;
+	TextArea publicationsField;
 	@UiField
-	TextBox summaryOfUseField;
+	TextArea summaryOfUseField;
 	@UiField
 	Button rejectButton;
 	@UiField
@@ -118,9 +119,12 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	}
 	
 	@Override
-	public void setAccessors(IsWidget w) {
-		accessorsContainer.clear();
+	public void addAccessors(IsWidget w) {
 		accessorsContainer.add(w);
+	}
+	@Override
+	public void clearAccessors() {
+		accessorsContainer.clear();
 	}
 	@Override
 	public void setOtherAttachmentWidget(IsWidget w) {
@@ -196,5 +200,9 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	public void hideActions() {
 		rejectButton.setVisible(false);
 		approveButton.setVisible(false);
+	}
+	@Override
+	public void setSubmittedOn(String s) {
+		submittedOnField.setText(s);	
 	}
 }

@@ -17,13 +17,15 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void setInstitution(String s);
 	void setProjectLead(String s);
 	void setIntendedDataUse(String s);
-	void setAccessors(IsWidget w);
+	void clearAccessors();
+	void addAccessors(IsWidget w);
 	void setDucWidget(IsWidget w);
 	void setIrbWidget(IsWidget w);
 	void setOtherAttachmentWidget(IsWidget w);
 	void setIsRenewal(boolean b);
 	void setPublications(String s);
 	void setSummaryOfUse(String s);
+	void setSubmittedOn(String s);
 	void showRejectButton();
 	void showApproveButton();
 	

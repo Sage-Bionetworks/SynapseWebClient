@@ -5,11 +5,13 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
-import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -23,31 +25,38 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	SynapseAlert synAlert;
 	DataAccessSubmission submission;
 	PromptModalView promptDialog;
-	UserBadgeList accessors;
 	FileHandleList otherDocuments;
 	FileHandleWidget ducFileRenderer;
 	FileHandleWidget irbFileRenderer;
+	SynapseJSNIUtils jsniUtils;
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
 			SynapseAlert synAlert,
 			DataAccessClientAsync dataAccessClient,
 			final PromptModalView promptDialog,
-			UserBadgeList accessors,
 			FileHandleWidget ducFileRenderer,
 			FileHandleWidget irbFileRenderer,
-			FileHandleList otherDocuments) {
+			FileHandleList otherDocuments,
+			SynapseJSNIUtils jsniUtils,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
 		this.promptDialog = promptDialog;
-		this.accessors = accessors;
-		accessors.configure();
+		this.jsniUtils = jsniUtils;
+		this.ginInjector = ginInjector;
+		
+		otherDocuments.configure()
+			.setUploadButtonText("Browse...")
+			.setCanDelete(false)
+			.setCanUpload(false);
 		this.ducFileRenderer = ducFileRenderer;
 		this.irbFileRenderer = irbFileRenderer;
 		this.otherDocuments = otherDocuments;
 		view.setPresenter(this);
-		view.setAccessors(accessors.asWidget());
+		
 		view.setDucWidget(ducFileRenderer);
 		view.setIrbWidget(irbFileRenderer);
 		view.setPromptModal(promptDialog);
@@ -79,15 +88,21 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			case REJECTED:
 			default:
 		}
-		
-		accessors.clear();
-		for (String userId : submission.getAccessors()) {
-			accessors.addUserBadge(userId);
+		view.clearAccessors();
+		if (submission.getAccessors() != null) {
+			for (String userId : submission.getAccessors()) {
+				UserBadge badge = ginInjector.getUserBadgeWidget();
+				badge.configure(userId);
+				view.addAccessors(badge);
+			}
 		}
 		otherDocuments.clear();
-		for (String fileHandleId : submission.getAttachments()) {
-			otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
+		if (submission.getAttachments() != null) {
+			for (String fileHandleId : submission.getAttachments()) {
+				otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
+			}	
 		}
+		
 		
 		if (submission.getDucFileHandleId() != null) {
 			ducFileRenderer.configure(getFileHandleAssociation(submission.getDucFileHandleId()));
@@ -101,6 +116,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
 		view.setPublications(submission.getPublication());
 		view.setSummaryOfUse(submission.getSummaryOfUse());
+		view.setSubmittedOn(jsniUtils.convertDateToSmallString(submission.getSubmittedOn()));
 	}
 	
 	private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {
