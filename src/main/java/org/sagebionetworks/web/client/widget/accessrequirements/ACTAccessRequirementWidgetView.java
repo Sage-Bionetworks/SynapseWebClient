@@ -17,6 +17,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void setTerms(String arText);
 	void showWikiTermsUI();
 	void setWikiTermsWidget(Widget wikiWidget);
+	void showRequestSubmittedByOtherUser();
 	void showApprovedHeading();
 	void showUnapprovedHeading();
 	void showRequestSubmittedMessage();
@@ -29,6 +30,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void setDataAccessRequestWizard(IsWidget w);
 	void setEditAccessRequirementWidget(IsWidget w);
 	void setDeleteAccessRequirementWidget(IsWidget w);
+	void setSubmitterUserBadge(IsWidget w);
 	void setManageAccessWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);
 	void setVisible(boolean visible);
@@ -40,5 +42,4 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 		void onCancelRequest();
 		void onRequestAccess();
 	}
-
 }
