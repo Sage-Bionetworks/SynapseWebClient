@@ -27,11 +27,14 @@ public interface EntityMetadataView extends IsWidget {
 	public void setRestrictionPanelVisible(boolean visible);
 
 	void setRestrictionWidget(IsWidget restrictionWidget);
+	void setRestrictionWidgetV2(IsWidget restrictionWidget);
 
 	void setEntityId(String text);
 
 	void setUploadDestinationPanelVisible(boolean isVisible);
 
 	void setUploadDestinationText(String text);
+	void setRestrictionWidgetV2Visible(boolean visible);
+	void setRestrictionWidgetVisible(boolean visible);
 
 }

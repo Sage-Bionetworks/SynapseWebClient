@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
@@ -15,10 +15,10 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-@Deprecated
 public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	public interface Binder extends UiBinder<Widget, RestrictionWidgetViewImpl> {}
@@ -32,6 +32,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Image unmetRequirementsIcon;
 	@UiField
 	Image metRequirementsIcon;
+	@UiField
+	Span synAlertContainer;
 	
 	@UiField
 	Span noneUI;
@@ -81,16 +83,10 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@UiField
 	Button anonymousFlagModalOkButton;
 	
-	@UiField
-	Span accessRestrictionDialogContainer;
-	
 	Presenter presenter;
 	
 	//this UI widget
 	Widget widget;
-	
-	private ClickHandler changeLinkClickHandler, showLinkClickHandler;
-	
 	
 	@Inject
 	public RestrictionWidgetViewImpl(Binder binder) {
@@ -125,21 +121,21 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		changeLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				changeLinkClickHandler.onClick(event);
+				presenter.linkClicked();
 			}
 		});
 		
 		showLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				showLinkClickHandler.onClick(event);
+				presenter.linkClicked();
 			}
 		});
 		
 		showUnmetLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				showLinkClickHandler.onClick(event);
+				presenter.linkClicked();
 			}
 		});
 
@@ -233,23 +229,20 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void showChangeLink(ClickHandler changeLinkClickHandler) {
+	public void showChangeLink() {
 		linkUI.setVisible(true);
 		changeLink.setVisible(true);
-		this.changeLinkClickHandler = changeLinkClickHandler;
 	}
 	@Override
-	public void showShowLink(ClickHandler showLinkClickHandler) {
+	public void showShowLink() {
 		linkUI.setVisible(true);
 		showLink.setVisible(true);
-		this.showLinkClickHandler = showLinkClickHandler;
 	}
 	
 	@Override
-	public void showShowUnmetLink(ClickHandler showLinkClickHandler) {
+	public void showShowUnmetLink() {
 		linkUI.setVisible(true);
 		showUnmetLink.setVisible(true);
-		this.showLinkClickHandler = showLinkClickHandler;
 	}
 	@Override
 	public void showNoRestrictionsUI() {
@@ -267,8 +260,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		showLink.setVisible(false);
 		showUnmetLink.setVisible(false);
 		changeLink.setVisible(false);
-		showLinkClickHandler = null;
-		changeLinkClickHandler = null;
 		resetImposeRestrictionModal();
 		unmetRequirementsIcon.setVisible(false);
 		metRequirementsIcon.setVisible(false);
@@ -289,12 +280,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void showAnonymousFlagModal() {
 		anonymousFlagModal.show();
-	}
-	
-	@Override
-	public void setAccessRequirementDialog(Widget dialog) {
-		accessRestrictionDialogContainer.clear();
-		accessRestrictionDialogContainer.add(dialog);
 	}
 	
 	@Override
@@ -325,8 +310,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 			imposeRestrictionModal.hide();
 		}
 	}
-
-	/*
-	 * Private Methods
-	 */
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
 }

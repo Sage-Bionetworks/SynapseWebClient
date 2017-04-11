@@ -988,6 +988,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Deprecated
 	@Override
 	public ACTAccessRequirement createLockAccessRequirement(String entityId)
 			throws RestServiceException {

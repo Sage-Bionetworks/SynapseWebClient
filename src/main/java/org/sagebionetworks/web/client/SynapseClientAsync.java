@@ -185,6 +185,7 @@ public interface SynapseClientAsync {
 	void createOrUpdateAccessRequirement(AccessRequirement arEW,
 			AsyncCallback<AccessRequirement> callback);
 
+	@Deprecated
 	void createLockAccessRequirement(String entityId,
 			AsyncCallback<ACTAccessRequirement> callback);
 	

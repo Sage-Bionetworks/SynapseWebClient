@@ -1,12 +1,9 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
 import org.sagebionetworks.web.client.SynapseView;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
-@Deprecated
 public interface RestrictionWidgetView extends IsWidget, SynapseView {
 
 	/**
@@ -30,19 +27,18 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	void showNoRestrictionsUI();
 	void showFlagUI();
 	void showAnonymousFlagUI();
-	void showChangeLink(ClickHandler changeLinkClickHandler);
-	void showShowLink(ClickHandler showLinkClickHandler);
-	void showShowUnmetLink(ClickHandler showLinkClickHandler);
+	void showChangeLink();
+	void showShowLink();
+	void showShowUnmetLink();
 	
 	void showFlagModal();
 	void showAnonymousFlagModal();
-	void setAccessRequirementDialog(Widget dialog);
 	
 	void setImposeRestrictionOkButtonEnabled(boolean enable);
 	void setNotSensitiveHumanDataMessageVisible(boolean visible);
 	Boolean isYesHumanDataRadioSelected();
 	Boolean isNoHumanDataRadioSelected();
-	
+	void setSynAlert(IsWidget w);
 	public void setImposeRestrictionModalVisible(boolean visible);
 
 	/**
@@ -58,5 +54,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 
 		void yesHumanDataClicked();
 		void notHumanDataClicked();
+		void linkClicked();
 	}
 }
