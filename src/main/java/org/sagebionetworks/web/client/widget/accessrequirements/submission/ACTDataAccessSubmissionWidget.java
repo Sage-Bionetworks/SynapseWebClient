@@ -60,6 +60,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setDucWidget(ducFileRenderer);
 		view.setIrbWidget(irbFileRenderer);
 		view.setPromptModal(promptDialog);
+		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
 		promptDialog.configure("Reason", "Rejection reason:", "Send", "");
 		promptDialog.setPresenter(new PromptModalView.Presenter() {
@@ -100,7 +101,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		if (submission.getAttachments() != null) {
 			for (String fileHandleId : submission.getAttachments()) {
 				otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
-			}	
+			}
 		}
 		
 		

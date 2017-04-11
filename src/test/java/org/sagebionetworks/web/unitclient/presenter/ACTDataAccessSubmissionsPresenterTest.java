@@ -168,6 +168,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		
 		//verify final load of empty page
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.EMPTY_LIST);
+		when(mockDataAccessSubmissionPage.getNextPageToken()).thenReturn(null);
 		presenter.loadMore();
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq(NEXT_PAGE_TOKEN), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);

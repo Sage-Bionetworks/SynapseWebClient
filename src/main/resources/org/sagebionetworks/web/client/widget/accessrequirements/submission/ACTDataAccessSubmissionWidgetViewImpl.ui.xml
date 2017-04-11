@@ -6,51 +6,49 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	 <t:Table addStyleNames="margin-left-10 margin-right-10">
-	 	<bh:Div ui:field="synAlertContainer"/>
-	 	<bh:Span ui:field="promptModalContainer"/>
-		<t:TableRow>
-			<t:TableData width="160px" >
-				<g:Label ui:field="submittedOnField"/>
-			</t:TableData>
-			<t:TableData width="100px" addStyleNames="hidden-xs">
-				<g:Label ui:field="stateField"/>
-			</t:TableData>
-			<t:TableData width="220px">
-				<g:Label ui:field="institutionField"/>
-			</t:TableData>
-			<t:TableData width="220px" addStyleNames="hidden-xs">
-				<g:Label ui:field="projectLeadField"/>
-			</t:TableData>
-			<t:TableData width="200px" addStyleNames="hidden-xs">
-				<g:TextArea ui:field="intendedDataUseField" width="100%" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
-			</t:TableData>
-			<t:TableData addStyleNames="hidden-xs">
-				<bh:Div  width="300px" ui:field="accessorsContainer" />
-			</t:TableData>
-			<t:TableData ui:field="ducColumn" width="150px" addStyleNames="hidden-xs">
-				<bh:Div ui:field="ducContainer" />
-			</t:TableData>
-			<t:TableData ui:field="irbColumn" width="150px" addStyleNames="hidden-xs">
-				<bh:Div ui:field="irbContainer" />
-			</t:TableData>
-			<t:TableData ui:field="otherAttachmentsColumn" width="150px">
-				<bh:Div ui:field="otherAttachmentsContainer" />
-			</t:TableData>
-			<t:TableData ui:field="isRenewalColumn" width="20px">
-				<b:CheckBox ui:field="renewalCheckbox"/>
-			</t:TableData>
-			<t:TableData ui:field="publicationsColumn" width="150px">
-				<g:TextArea ui:field="publicationsField" width="100%" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
-			</t:TableData>
-			<t:TableData ui:field="summaryOfUseColumn" width="150px">
-				<g:TextArea ui:field="summaryOfUseField" width="100%" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
-			</t:TableData>
-			<t:TableData width="200px">
-				<b:Button ui:field="rejectButton" type="WARNING" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Reject" />
-				<b:Button ui:field="approveButton" type="SUCCESS" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Approve" />
-			</t:TableData>
-		</t:TableRow>
-		<bh:Hr />
-	</t:Table>
+	<t:TableRow>
+		<t:TableData width="160px" >
+			<g:Label ui:field="submittedOnField"/>
+		</t:TableData>
+		<t:TableData width="100px" addStyleNames="hidden-xs">
+			<g:Label ui:field="stateField"/>
+		</t:TableData>
+		<t:TableData width="220px">
+			<g:Label ui:field="institutionField"/>
+		</t:TableData>
+		<t:TableData width="220px" addStyleNames="hidden-xs">
+			<g:Label ui:field="projectLeadField"/>
+		</t:TableData>
+		<t:TableData width="200px" addStyleNames="hidden-xs">
+			<g:TextArea ui:field="intendedDataUseField" width="100%" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
+		</t:TableData>
+		<t:TableData addStyleNames="hidden-xs">
+			<bh:Div  width="300px" ui:field="accessorsContainer" />
+		</t:TableData>
+		<t:TableData ui:field="ducColumn" width="150px" addStyleNames="hidden-xs">
+			<bh:Div ui:field="ducContainer" />
+		</t:TableData>
+		<t:TableData ui:field="irbColumn" width="150px" addStyleNames="hidden-xs">
+			<bh:Div ui:field="irbContainer" />
+		</t:TableData>
+		<t:TableData ui:field="otherAttachmentsColumn" width="150px">
+			<bh:Div ui:field="otherAttachmentsContainer" />
+		</t:TableData>
+		<t:TableData ui:field="isRenewalColumn" width="20px">
+			<b:CheckBox ui:field="renewalCheckbox"/>
+		</t:TableData>
+		<t:TableData ui:field="publicationsColumn" width="150px">
+			<g:TextArea ui:field="publicationsField" width="100%" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
+		</t:TableData>
+		<t:TableData ui:field="summaryOfUseColumn" width="150px">
+			<g:TextArea ui:field="summaryOfUseField" width="100%" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
+		</t:TableData>
+		<t:TableData width="200px">
+			<b:Button ui:field="rejectButton" type="WARNING" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Reject" />
+			<b:Button ui:field="approveButton" type="SUCCESS" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Approve" />
+			<bh:Div ui:field="synAlertContainer"/>
+			<bh:Span ui:field="promptModalContainer"/>
+		</t:TableData>
+	</t:TableRow>
+	
 </ui:UiBinder>
