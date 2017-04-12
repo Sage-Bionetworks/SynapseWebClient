@@ -215,7 +215,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				fha.setFileHandleId(fileHandleId);
 				otherDocuments.addFileLink(fha);
 			}
-			otherDocuments.refreshLinkUI();
 		}
 	}
 	

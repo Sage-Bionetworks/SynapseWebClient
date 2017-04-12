@@ -497,6 +497,7 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 
+	@Deprecated
 	ACTAccessRequirement createLockAccessRequirement(String entityId) throws RestServiceException;
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;

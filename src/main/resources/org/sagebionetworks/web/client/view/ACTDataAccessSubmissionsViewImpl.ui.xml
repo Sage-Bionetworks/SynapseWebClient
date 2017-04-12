@@ -27,88 +27,89 @@
 				<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 					text="Intended Data Use statements will be publicly available." enabled="false" />
 			</b:Panel>
-			<b:Row>
-				<b:Column size="SM_12">
-					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-						<b:PanelHeader>
-							<b:Heading size="H3" text="State filter" />
-							<bh:Span ui:field="currentState"/>
-							<b:Button ui:field="clearStateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
-						</b:PanelHeader>
-						<b:PanelBody>
-							<b:ButtonGroup>
-								<b:Button dataToggle="DROPDOWN" text="Filter by submission state..."/>
-								<b:DropDownMenu ui:field="stateDropdownMenu" />
-							</b:ButtonGroup>
-						</b:PanelBody>
-					</b:Panel>
-				</b:Column>
-				<b:Column size="SM_6" visible="false">
-					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-						<b:PanelHeader>
-							<b:Heading size="H3" text="Date range filter" />
-							<b:Button ui:field="clearDateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
-						</b:PanelHeader>
-						<b:PanelBody>
-							<b:FormLabel>from</b:FormLabel>
-							<bd:DateTimePicker ui:field="minDatePicker"
-								autoClose="true" highlightToday="true" showTodayButton="true"
-								showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-								hasKeyboardNavigation="false" />
-							<b:FormLabel>to</b:FormLabel>
-							<bd:DateTimePicker ui:field="maxDatePicker"
-								autoClose="true" highlightToday="true" showTodayButton="true"
-								showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-								hasKeyboardNavigation="false" />
-						</b:PanelBody>
-					</b:Panel>
-				</b:Column>
-			</b:Row>
+			<bh:Div width="265px">
+				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+					<b:PanelHeader>
+						<b:Heading size="H3" text="State Filter" />
+						<bh:Span ui:field="currentState"/>
+						<b:Button ui:field="clearStateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
+					</b:PanelHeader>
+					<b:PanelBody>
+						<b:ButtonGroup>
+							<b:Button dataToggle="DROPDOWN" text="Filter by submission state..."/>
+							<b:DropDownMenu ui:field="stateDropdownMenu" />
+						</b:ButtonGroup>
+					</b:PanelBody>
+				</b:Panel>
+			</bh:Div>
+			<b:Column size="SM_6" visible="false">
+				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+					<b:PanelHeader>
+						<b:Heading size="H3" text="Date range filter" />
+						<b:Button ui:field="clearDateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
+					</b:PanelHeader>
+					<b:PanelBody>
+						<b:FormLabel>from</b:FormLabel>
+						<bd:DateTimePicker ui:field="minDatePicker"
+							autoClose="true" highlightToday="true" showTodayButton="true"
+							showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+							hasKeyboardNavigation="false" />
+						<b:FormLabel>to</b:FormLabel>
+						<bd:DateTimePicker ui:field="maxDatePicker"
+							autoClose="true" highlightToday="true" showTodayButton="true"
+							showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+							hasKeyboardNavigation="false" />
+					</b:PanelBody>
+				</b:Panel>
+			</b:Column>
+			
 			<!-- table header -->
-			<t:Table width="100%" addStyleNames="margin-left-10 margin-right-10 table-layout-fixed">
-				<t:TableRow>
-					<t:TableHeader width="10%" >
-						<b:Anchor ui:field="createdOnColumnHeader" text="Created On"/>
-					</t:TableHeader>
-					<t:TableHeader width="10%" addStyleNames="hidden-xs">
-						<bh:Span text="State" />
-					</t:TableHeader>
-					<t:TableHeader width="10%">
-						<bh:Span text="Institution" />
-					</t:TableHeader>
-					<t:TableHeader width="10%" addStyleNames="hidden-xs">
-						<bh:Span text="Project Lead" />
-					</t:TableHeader>
-					<t:TableHeader width="15%" addStyleNames="hidden-xs">
-						<bh:Span text="Intended Data Use Statement" />
-					</t:TableHeader>
-					<t:TableHeader width="15%" addStyleNames="hidden-xs">
-						<bh:Span text="Accessors" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="ducColumn" width="10%" addStyleNames="hidden-xs">
-						<bh:Span text="DUC" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="irbColumn" width="10%" addStyleNames="hidden-xs">
-						<bh:Span text="IRB" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="otherAttachmentsColumn" width="10%">
-						<bh:Span text="Other Docs" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="isRenewalColumn" width="5%">
-						<bh:Span text="Is Renewal" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="publicationsColumn" width="10%">
-						<bh:Span text="Publications" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="summaryOfUseColumn" width="10%">
-						<bh:Span text="Summary Of Use" />
-					</t:TableHeader>
-					<t:TableHeader width="10%">
-						<bh:Span text="Actions" />
-					</t:TableHeader>
-				</t:TableRow>
-			</t:Table>
-			<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
+			<g:ScrollPanel>
+				<t:Table addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20" width="3000px">
+					<t:TableRow>
+						<t:TableHeader addStyleNames="min-width-150">
+							<b:Anchor ui:field="createdOnColumnHeader" text="Created On"/>
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-150">
+							<bh:Span  text="State" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Institution" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Project Lead" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-300">
+							<bh:Span text="Intended Data Use Statement" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Accessors"/>
+						</t:TableHeader>
+						<t:TableHeader ui:field="ducColumn" addStyleNames="min-width-150">
+							<bh:Span text="DUC" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="irbColumn" addStyleNames="min-width-150">
+							<bh:Span text="IRB" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="otherAttachmentsColumn" addStyleNames="min-width-150" >
+							<bh:Span text="Other Docs" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="isRenewalColumn" addStyleNames="min-width-100">
+							<bh:Span text="Is Renewal" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="publicationsColumn" addStyleNames="min-width-150">
+							<bh:Span text="Publications" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="summaryOfUseColumn" addStyleNames="min-width-150">
+							<bh:Span text="Summary Of Use" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Actions" />
+						</t:TableHeader>
+					</t:TableRow>
+					<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
+				</t:Table>
+			</g:ScrollPanel>
 		</bh:Div>
 		<bh:Div addStyleNames="clear" />
 		<g:SimplePanel ui:field="footer" />

@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +23,11 @@ import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -37,11 +35,12 @@ import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
-import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 public class EntityMetadataTest {
 	@Mock
@@ -55,7 +54,9 @@ public class EntityMetadataTest {
 	@Mock
 	DoiWidget mockDoiWidget;
 	@Mock
-	RestrictionWidget mockRestrictionWidget;
+	org.sagebionetworks.web.client.widget.entity.RestrictionWidget mockRestrictionWidget;
+	@Mock
+	RestrictionWidget mockRestrictionWidgetV2;
 	@Mock
 	FileHistoryWidget mockFileHistoryWidget;
 	@Mock
@@ -64,7 +65,8 @@ public class EntityMetadataTest {
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	SynapseJSNIUtils mockJSNI;
-	
+	@Mock
+	CookieProvider mockCookies;
 	String entityId = "syn123";
 	String entityName = "testEntity";
 	Entity en = new Folder();
@@ -74,8 +76,21 @@ public class EntityMetadataTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget, 
-				mockFileHistoryWidget, mockSynapseClient, mockJSNI);
+				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
 		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockView).setDoiWidget(any(IsWidget.class));
+		verify(mockView).setAnnotationsRendererWidget(any(IsWidget.class));
+		verify(mockView).setFileHistoryWidget(any(IsWidget.class));
+		verify(mockView).setRestrictionWidget(any(IsWidget.class));
+		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
+		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
+		verify(mockRestrictionWidgetV2).setShowIfProject(false);
+		verify(mockRestrictionWidgetV2).setShowFlagLink(true);
+		verify(mockView).setRestrictionWidgetV2Visible(false);
 	}
 	
 	@Test
@@ -102,6 +117,23 @@ public class EntityMetadataTest {
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
+		verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
+		
+		verify(mockView).setRestrictionWidgetVisible(true);
+		verify(mockView, atLeastOnce()).setRestrictionWidgetV2Visible(false);
+	}
+	
+	@Test
+	public void testSetEntityBundleProjectAlphaMode() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(new Project());
+		bundle.setPermissions(permissions);
+		bundle.setDoi(mockDoi);
+		widget.setEntityBundle(bundle, null);
+		verify(mockView).setRestrictionWidgetVisible(false);
+		verify(mockView).setRestrictionWidgetV2Visible(true);
 	}
 
 	@Test
