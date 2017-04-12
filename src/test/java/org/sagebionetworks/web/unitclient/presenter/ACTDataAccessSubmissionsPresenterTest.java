@@ -163,7 +163,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setOtherAttachmentsColumnVisible(true);
 		verify(mockView).setRenewalColumnsVisible(false);
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
-		//TODO: verify DataAccessSubmission widgets are created for each submission
+
+		//verify DataAccessSubmission widget is created/configured for the submission (based on the mockACTAccessRequirement configuration)
+		verify(mockGinInjector).getACTDataAccessSubmissionWidget();
+		verify(mockACTDataAccessSubmissionWidget).setDucColumnVisible(false);
+		verify(mockACTDataAccessSubmissionWidget).setIrbColumnVisible(false);
+		verify(mockACTDataAccessSubmissionWidget).setOtherAttachmentsColumnVisible(true);
+		verify(mockACTDataAccessSubmissionWidget).setRenewalColumnsVisible(false);
 		verify(mockLoadMoreContainer).setIsMore(true);
 		
 		//verify final load of empty page

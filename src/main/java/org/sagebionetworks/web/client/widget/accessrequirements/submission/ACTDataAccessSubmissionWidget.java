@@ -49,7 +49,6 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		this.ginInjector = ginInjector;
 		
 		otherDocuments.configure()
-			.setUploadButtonText("Browse...")
 			.setCanDelete(false)
 			.setCanUpload(false);
 		this.ducFileRenderer = ducFileRenderer;
@@ -128,7 +127,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		return fha;
 	}
 	
-	private void updateDataAccessSubmissionState(DataAccessSubmissionState state, String reason) {
+	public void updateDataAccessSubmissionState(DataAccessSubmissionState state, String reason) {
 		dataAccessClient.updateDataAccessSubmissionState(submission.getId(), state, reason, new AsyncCallback<DataAccessSubmission>() {
 			@Override
 			public void onFailure(Throwable caught) {
