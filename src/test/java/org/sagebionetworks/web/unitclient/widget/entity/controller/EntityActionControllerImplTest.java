@@ -80,6 +80,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -167,6 +168,9 @@ public class EntityActionControllerImplTest {
 	Throwable mockThrowable;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -219,7 +223,8 @@ public class EntityActionControllerImplTest {
 				mockPreflightController,
 				mockPortalGinInjector,
 				mockAuthenticationController, 
-				mockCookies);
+				mockCookies,
+				mockIsACTMemberAsyncHandler);
 		
 		parentId = "syn456";
 		entityId = "syn123";

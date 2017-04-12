@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -60,6 +63,9 @@ public class CreateAccessRequirementButton implements IsWidget {
 	
 	public void configure(AccessRequirement ar) {
 		button.setText(EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
+		button.setSize(ButtonSize.DEFAULT);
+		button.setType(ButtonType.DEFAULT);
+		button.setIcon(IconType.EDIT);
 		this.subject = null;
 		this.ar = ar;
 		showIfACTMember();
@@ -67,6 +73,9 @@ public class CreateAccessRequirementButton implements IsWidget {
 	
 	public void configure(RestrictableObjectDescriptor subject) {
 		button.setText(CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
+		button.setSize(ButtonSize.LARGE);
+		button.setType(ButtonType.PRIMARY);
+		button.setIcon(IconType.PLUS);
 		this.subject = subject;
 		this.ar = null;
 		showIfACTMember();
