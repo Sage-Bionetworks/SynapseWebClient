@@ -185,7 +185,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		return widget;
 	}
 	
-	@Override
 	public void showVerifyDataSensitiveDialog() {
 		resetImposeRestrictionModal();
 		imposeRestrictionModal.show();

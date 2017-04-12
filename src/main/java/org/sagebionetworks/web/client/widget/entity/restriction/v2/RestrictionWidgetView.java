@@ -13,13 +13,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	public void setPresenter(Presenter presenter);
 	
 	public void open(String url);
-	
-	/**
-	 * If user indicates that data is sensitive, then view will invoke callback to lockdown the current entity 
-	 * @param imposeRestrictionsCallback
-	 */
-	public void showVerifyDataSensitiveDialog();
-	
 	void showControlledUseUI();
 	void showUnmetRequirementsIcon();
 	void showMetRequirementsIcon();

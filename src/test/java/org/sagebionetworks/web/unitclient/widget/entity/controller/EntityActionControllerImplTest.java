@@ -74,6 +74,7 @@ import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -170,7 +171,8 @@ public class EntityActionControllerImplTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	
+	@Captor
+	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
 	public static final String SELECTED_TEAM_ID = "987654";
 	@Before
 	public void before() {
@@ -1557,4 +1559,36 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
 	
+	@Test
+	public void testConfigureManageAccessRequirements(){
+		entityBundle.setEntity(new Folder());
+		entityBundle.setRootWikiId("7890");
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);
+		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
+		verify(mockActionMenu).setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
+		
+		verify(mockActionMenu, never()).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		CallbackP<Boolean> isACTCallback = callbackPCaptor.getValue();
+		isACTCallback.invoke(false);
+		verify(mockActionMenu, never()).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		
+		isACTCallback.invoke(true);
+		verify(mockActionMenu).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+	}
+	
+	@Test
+	public void testOnManageAccessRequirements(){
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
+		
+		controller.onAction(Action.MANAGE_ACCESS_REQUIREMENTS);
+		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
+	}
+
+
 }
