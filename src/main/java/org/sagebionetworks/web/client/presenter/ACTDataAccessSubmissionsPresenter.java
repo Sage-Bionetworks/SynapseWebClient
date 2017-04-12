@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
@@ -84,6 +85,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setStates(states);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
+		showHideAccessRequirementButton.setIcon(IconType.TOGGLE_RIGHT);
 		view.setAccessRequirementUIVisible(false);
 		showHideAccessRequirementButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -91,6 +93,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				isAccessRequirementVisible = !isAccessRequirementVisible;
 				String buttonText = isAccessRequirementVisible ? HIDE_AR_TEXT : SHOW_AR_TEXT;
 				showHideAccessRequirementButton.setText(buttonText);
+				showHideAccessRequirementButton.setIcon(isAccessRequirementVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
 				view.setAccessRequirementUIVisible(isAccessRequirementVisible);
 			}
 		});
