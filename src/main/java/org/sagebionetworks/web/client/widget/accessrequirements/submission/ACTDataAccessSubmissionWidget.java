@@ -103,12 +103,17 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			}
 		}
 		
-		
 		if (submission.getDucFileHandleId() != null) {
 			ducFileRenderer.configure(getFileHandleAssociation(submission.getDucFileHandleId()));
+			ducFileRenderer.setVisible(true);			
+		} else {
+			ducFileRenderer.setVisible(false);
 		}
 		if (submission.getIrbFileHandleId() != null) {
 			irbFileRenderer.configure(getFileHandleAssociation(submission.getIrbFileHandleId()));
+			irbFileRenderer.setVisible(true);
+		} else {
+			irbFileRenderer.setVisible(false);
 		}
 		view.setInstitution(submission.getResearchProjectSnapshot().getInstitution());
 		view.setIntendedDataUse(submission.getResearchProjectSnapshot().getIntendedDataUseStatement());
