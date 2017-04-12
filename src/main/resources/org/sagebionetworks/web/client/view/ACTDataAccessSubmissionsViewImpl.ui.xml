@@ -65,51 +65,52 @@
 				</b:Column>
 			</b:Row>
 			<!-- table header -->
-			<t:Table addStyleNames="margin-left-10 margin-right-10">
-				<t:TableRow>
-					<t:TableHeader width="160px">
-						<b:Anchor ui:field="createdOnColumnHeader" text="Created On"/>
-					</t:TableHeader>
-					<t:TableHeader width="100px" addStyleNames="hidden-xs">
-						<bh:Span text="State" />
-					</t:TableHeader>
-					<t:TableHeader width="220px">
-						<bh:Span text="Institution" />
-					</t:TableHeader>
-					<t:TableHeader width="220px" addStyleNames="hidden-xs">
-						<bh:Span text="Project Lead" />
-					</t:TableHeader>
-					<t:TableHeader width="200px" addStyleNames="hidden-xs">
-						<bh:Span text="Intended Data Use Statement" />
-					</t:TableHeader>
-					<t:TableHeader width="300px" addStyleNames="hidden-xs">
-						<bh:Span text="Accessors"/>
-					</t:TableHeader>
-					<t:TableHeader ui:field="ducColumn" width="150px" addStyleNames="hidden-xs">
-						<bh:Span text="DUC" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="irbColumn" width="150px" addStyleNames="hidden-xs">
-						<bh:Span text="IRB" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="otherAttachmentsColumn" width="150px" >
-						<bh:Span text="Other Docs" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="isRenewalColumn" width="20px">
-						<bh:Span text="Is Renewal" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="publicationsColumn" width="150px">
-						<bh:Span text="Publications" />
-					</t:TableHeader>
-					<t:TableHeader ui:field="summaryOfUseColumn" width="150px">
-						<bh:Span text="Summary Of Use" />
-					</t:TableHeader>
-					<t:TableHeader width="200px">
-						<bh:Span text="Actions" />
-					</t:TableHeader>
-				</t:TableRow>
-			</t:Table>
-			<bh:Hr />
-			<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
+			<g:ScrollPanel>
+				<t:Table addStyleNames="table-layout-fixed" width="3000px">
+					<t:TableRow>
+						<t:TableHeader addStyleNames="min-width-150">
+							<b:Anchor ui:field="createdOnColumnHeader" text="Created On"/>
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-150">
+							<bh:Span  text="State" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Institution" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Project Lead" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-300">
+							<bh:Span text="Intended Data Use Statement" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Accessors"/>
+						</t:TableHeader>
+						<t:TableHeader ui:field="ducColumn" addStyleNames="min-width-150">
+							<bh:Span text="DUC" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="irbColumn" addStyleNames="min-width-150">
+							<bh:Span text="IRB" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="otherAttachmentsColumn" addStyleNames="min-width-150" >
+							<bh:Span text="Other Docs" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="isRenewalColumn" addStyleNames="min-width-100">
+							<bh:Span text="Is Renewal" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="publicationsColumn" addStyleNames="min-width-150">
+							<bh:Span text="Publications" />
+						</t:TableHeader>
+						<t:TableHeader ui:field="summaryOfUseColumn" addStyleNames="min-width-150">
+							<bh:Span text="Summary Of Use" />
+						</t:TableHeader>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Actions" />
+						</t:TableHeader>
+					</t:TableRow>
+					<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
+				</t:Table>
+			</g:ScrollPanel>
 		</bh:Div>
 		<bh:Div addStyleNames="clear" />
 		<g:SimplePanel ui:field="footer" />

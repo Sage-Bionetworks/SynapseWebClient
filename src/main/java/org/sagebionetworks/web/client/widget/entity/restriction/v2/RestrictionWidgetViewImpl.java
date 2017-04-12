@@ -127,7 +127,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		changeLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.linkClicked();
+				showVerifyDataSensitiveDialog();
 			}
 		});
 		

@@ -12,7 +12,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,7 +29,7 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	Label projectLeadField;
 	@UiField
-	TextArea intendedDataUseField;
+	Span intendedDataUseField;
 	@UiField
 	Div accessorsContainer;
 	@UiField
@@ -42,9 +41,9 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	CheckBox renewalCheckbox; 
 	@UiField
-	TextArea publicationsField;
+	Span publicationsField;
 	@UiField
-	TextArea summaryOfUseField;
+	Span summaryOfUseField;
 	@UiField
 	Button rejectButton;
 	@UiField
