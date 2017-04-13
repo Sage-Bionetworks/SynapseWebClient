@@ -800,6 +800,7 @@ public class PortalGinModule extends AbstractGinModule {
 		 */
 		
 		// JSNI impls
+		bind(SynapseJSNIUtilsImpl.class).in(Singleton.class);
 		bind(SynapseJSNIUtils.class).to(SynapseJSNIUtilsImpl.class);
 		
 		/*
