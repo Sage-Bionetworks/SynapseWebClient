@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.util.Collections;
+
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
