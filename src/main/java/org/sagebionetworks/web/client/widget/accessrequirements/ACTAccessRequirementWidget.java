@@ -7,14 +7,17 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,6 +38,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	ManageAccessButton manageAccessButton;
 	String submissionId;
 	LazyLoadHelper lazyLoadHelper;
+	AuthenticationController authController;
+	UserBadge submitterUserBadge;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -47,7 +52,9 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			ManageAccessButton manageAccessButton,
 			DataAccessClientAsync dataAccessClient,
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			AuthenticationController authController,
+			UserBadge submitterUserBadge) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -59,7 +66,10 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.manageAccessButton = manageAccessButton;
 		this.dataAccessClient = dataAccessClient;
 		this.lazyLoadHelper = lazyLoadHelper;
+		this.authController = authController;
+		this.submitterUserBadge = submitterUserBadge;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
+		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
@@ -106,9 +116,16 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		switch (status.getState()) {
 			case SUBMITTED:
 				// TODO: request has been submitted on your behalf, or by you?
+				String submitterUserId = status.getSubmittedBy();
 				view.showUnapprovedHeading();
-				view.showRequestSubmittedMessage();
-				view.showCancelRequestButton();
+				if (authController.getCurrentUserPrincipalId().equals(submitterUserId)) {
+					view.showRequestSubmittedMessage();
+					view.showCancelRequestButton();
+				} else {
+					submitterUserBadge.configure(submitterUserId);
+					view.showRequestSubmittedByOtherUser();
+				}
+				
 				break;
 			case APPROVED:
 				view.showApprovedHeading();

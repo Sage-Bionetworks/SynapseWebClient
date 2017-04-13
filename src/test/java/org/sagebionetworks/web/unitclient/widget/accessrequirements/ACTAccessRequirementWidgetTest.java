@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.Cr
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -74,16 +76,21 @@ public class ACTAccessRequirementWidgetTest {
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
 	ACTAccessRequirementStatus mockDataAccessSubmissionStatus;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	UserBadge mockSubmitterUserBadge;
 	
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
 	public final static String SUBMISSION_ID = "442";
+	public final static String SUBMITTER_ID = "9";
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper);
+		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
@@ -91,6 +98,7 @@ public class ACTAccessRequirementWidgetTest {
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionStatus.getSubmissionId()).thenReturn(SUBMISSION_ID);
+		when(mockDataAccessSubmissionStatus.getSubmittedBy()).thenReturn(SUBMITTER_ID);
 	}
 
 	@Test
@@ -126,12 +134,26 @@ public class ACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testSubmittedState() {
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(SUBMITTER_ID);
 		widget.setRequirement(mockACTAccessRequirement);
 		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.SUBMITTED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView).showRequestSubmittedMessage();
 		verify(mockView).showCancelRequestButton();
+	}
+	
+
+	@Test
+	public void testSubmittedStateByAnotherUser() {
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("different id");
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.SUBMITTED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockSubmitterUserBadge).configure(SUBMITTER_ID);
+		verify(mockView).showRequestSubmittedByOtherUser();
+		verify(mockView, never()).showCancelRequestButton();
 	}
 	
 	@Test

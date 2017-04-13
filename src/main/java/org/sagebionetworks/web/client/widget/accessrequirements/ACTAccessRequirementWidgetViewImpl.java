@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -14,6 +15,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,6 +59,10 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div subjectsWidgetContainer;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Div requestSubmittedByOther;
+	@UiField
+	Div submitterUserBadgeContainer;
 	
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
@@ -167,6 +173,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		requestDataAccessWizardContainer.clear();
 		requestDataAccessWizardContainer.add(w);
 	}
+	
 	@Override
 	public void resetState() {
 		approvedHeading.setVisible(false);
@@ -177,6 +184,18 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		cancelRequestButton.setVisible(false);
 		updateRequestButton.setVisible(false);
 		requestAccessButton.setVisible(false);
+		requestSubmittedByOther.setVisible(false);
+	}
+	
+	@Override
+	public void setSubmitterUserBadge(IsWidget w) {
+		submitterUserBadgeContainer.clear();
+		submitterUserBadgeContainer.add(w);
+	}
+	
+	@Override
+	public void showRequestSubmittedByOtherUser() {
+		requestSubmittedByOther.setVisible(true);
 	}
 	
 	@Override
