@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.subscription;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -14,6 +15,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.subscription.Subscription;
@@ -22,6 +25,8 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
@@ -52,11 +57,15 @@ public class SubscriptionListWidgetTest {
 	TopicRowWidget mockTopicRowWidget;
 	@Mock
 	BasicPaginationWidget mockDetailedPaginationWidget;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	@Captor
+	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget);
+		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget, mockIsACTMemberAsyncHandler);
 		AsyncMockStubber.callSuccessWith(mockSubscriptionPagedResults).when(mockSubscriptionClient)
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -70,6 +79,24 @@ public class SubscriptionListWidgetTest {
 		verify(mockView).setPagination(any(Widget.class));
 	}
 
+	@Test
+	public void testIsACT() {
+		widget.configure();
+		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockView, never()).setSubmissionFilterVisible(anyBoolean());
+		callbackPCaptor.getValue().invoke(true);
+		verify(mockView).setSubmissionFilterVisible(true);
+	}
+	
+	@Test
+	public void testIsNotACT() {
+		widget.configure();
+		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockView, never()).setSubmissionFilterVisible(anyBoolean());
+		callbackPCaptor.getValue().invoke(false);
+		verify(mockView).setSubmissionFilterVisible(false);
+	}
+	
 	@Test
 	public void testConfigureAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
