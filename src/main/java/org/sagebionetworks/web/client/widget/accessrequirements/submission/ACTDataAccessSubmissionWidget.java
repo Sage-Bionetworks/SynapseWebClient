@@ -76,13 +76,11 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		// setup the view wrt submission state
 		view.setState(submission.getState().name());
 		switch (submission.getState()) {
-			case APPROVED:
-				view.showRejectButton();
-				break;
 			case SUBMITTED:
 				view.showApproveButton();
 				view.showRejectButton();
 				break;
+			case APPROVED:
 			case CANCELLED:
 			case NOT_SUBMITTED:
 			case REJECTED:

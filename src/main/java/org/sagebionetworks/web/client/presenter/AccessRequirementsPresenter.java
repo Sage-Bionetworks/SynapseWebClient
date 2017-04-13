@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
@@ -41,7 +42,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	TeamBadge teamBadge;
 	List<AccessRequirement> allArs;
 	CreateAccessRequirementButton createAccessRequirementButton;
-	
+	DivView noResultsDiv;
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
 			DataAccessClientAsync dataAccessClient,
@@ -50,7 +51,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			LoadMoreWidgetContainer loadMoreContainer, 
 			EntityIdCellRendererImpl entityIdRenderer, 
 			TeamBadge teamBadge,
-			CreateAccessRequirementButton createAccessRequirementButton) {
+			CreateAccessRequirementButton createAccessRequirementButton,
+			DivView noResultsDiv) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -59,13 +61,17 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
 		this.createAccessRequirementButton = createAccessRequirementButton;
+		this.noResultsDiv = noResultsDiv;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
 		view.add(loadMoreContainer.asWidget());
 		view.addTitle("All conditions for ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
-
+		noResultsDiv.setText("No access requirements found");
+		noResultsDiv.addStyleName("min-height-400");
+		noResultsDiv.setVisible(false);
+		view.add(noResultsDiv.asWidget());
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -119,7 +125,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		synAlert.clear();
 		// TODO: call should also return the user state (approved, pending, ...) for each access requirement
 		dataAccessClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -127,6 +132,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			}
 			
 			public void onSuccess(List<AccessRequirement> accessRequirements) {
+				noResultsDiv.setVisible(currentOffset == 0 && accessRequirements.isEmpty());
 				currentOffset += LIMIT;
 				boolean isNewAr = false;
 				for (AccessRequirement ar : accessRequirements) {

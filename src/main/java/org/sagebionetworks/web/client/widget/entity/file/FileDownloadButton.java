@@ -34,6 +34,8 @@ import com.google.inject.Inject;
 
 public class FileDownloadButton implements FileDownloadButtonView.Presenter, SynapseWidgetPresenter {
 	
+	public static final String ACCESS_REQUIREMENTS_LINK = "#!AccessRequirements:ID=";
+	public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
 	private FileDownloadButtonView view;
 	private EntityBundle entityBundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
@@ -104,12 +106,12 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		view.setClientsHelpVisible(false);
 		
 		if (!authController.isLoggedIn()) {
-			view.setDirectDownloadLink("#!LoginPlace:0");
+			view.setDirectDownloadLink(LOGIN_PLACE_LINK);
 			view.setDirectDownloadLinkVisible(true);
 		} else if (restrictionInformation.getHasUnmetAccessRequirement()) {
 			// if in alpha, send to access requirements
 			if (DisplayUtils.isInTestWebsite(cookies)) {
-				view.setDirectDownloadLink("#!AccessRequirements:ID="+bundle.getEntity().getId());
+				view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId());
 				view.setDirectDownloadLinkVisible(true);
 			} else {
 				// else, use licensed downloader
@@ -118,18 +120,20 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			}
 		} else {
 			String directDownloadUrl = getDirectDownloadUrl();
-			//special case, if this starts with sftp proxy, then handle
-			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
-			if (directDownloadUrl.startsWith(sftpProxy)) {
-				view.setAuthorizedDirectDownloadLinkVisible(true);
-				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-				FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
-				queryForSftpLoginInstructions(url);
-			} else {
-				view.setDirectDownloadLink(directDownloadUrl);
-				view.setDirectDownloadLinkVisible(true);
-				view.setClientsHelpVisible(true);
+			if (directDownloadUrl != null) {
+				//special case, if this starts with sftp proxy, then handle
+				String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+				if (directDownloadUrl.startsWith(sftpProxy)) {
+					view.setAuthorizedDirectDownloadLinkVisible(true);
+					loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+					String url = ((ExternalFileHandle) fileHandle).getExternalURL();
+					queryForSftpLoginInstructions(url);
+				} else {
+					view.setDirectDownloadLink(directDownloadUrl);
+					view.setDirectDownloadLinkVisible(true);
+					view.setClientsHelpVisible(true);
+				}
 			}
 		}
 		

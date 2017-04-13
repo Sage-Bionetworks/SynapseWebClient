@@ -151,12 +151,14 @@ public class ACTDataAccessSubmissionWidgetTest {
 		assertEquals(FileHandleAssociateType.DataAccessSubmissionAttachment, fha.getAssociateObjectType());
 		assertTrue(fileHandleId1.equals(fha.getFileHandleId()) || fileHandleId2.equals(fha.getFileHandleId()));
 		// verify duc
+		verify(mockDucFileRenderer).setVisible(true);
 		verify(mockDucFileRenderer).configure(fhaCaptor.capture());
 		fha = fhaCaptor.getValue();
 		assertEquals(SUBMISSION_ID, fha.getAssociateObjectId());
 		assertEquals(FileHandleAssociateType.DataAccessSubmissionAttachment, fha.getAssociateObjectType());
 		assertEquals(fileHandleId3, fha.getFileHandleId());
 		// verify irb
+		verify(mockIrbFileRenderer).setVisible(true);
 		verify(mockIrbFileRenderer).configure(fhaCaptor.capture());
 		fha = fhaCaptor.getValue();
 		assertEquals(SUBMISSION_ID, fha.getAssociateObjectId());
@@ -171,20 +173,17 @@ public class ACTDataAccessSubmissionWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureApproved() {
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
-		widget.configure(mockDataAccessSubmission);
-		verify(mockView).hideActions();
-		verify(mockView).showRejectButton();
-	}
-	
-	@Test
 	public void testConfigureSubmitted() {
 		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.SUBMITTED);
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView).hideActions();
 		verify(mockView).showApproveButton();
 		verify(mockView).showRejectButton();
+		
+
+		// no duc or irb, verify they are hidden
+		verify(mockIrbFileRenderer).setVisible(false);
+		verify(mockDucFileRenderer).setVisible(false);
 	}
 	
 	@Test
@@ -198,7 +197,10 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.REJECTED);
 		widget.configure(mockDataAccessSubmission);
 		
-		verify(mockView, times(3)).hideActions();
+		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
+		widget.configure(mockDataAccessSubmission);
+		
+		verify(mockView, times(4)).hideActions();
 		verify(mockView, never()).showApproveButton();
 		verify(mockView, never()).showRejectButton();
 	}
