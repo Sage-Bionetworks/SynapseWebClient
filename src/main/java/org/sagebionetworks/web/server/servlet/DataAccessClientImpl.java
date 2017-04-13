@@ -3,10 +3,13 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
@@ -113,4 +116,35 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+
+	@Override
+	public RestrictionInformation getRestrictionInformation(String entityId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getRestrictionInformation(entityId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public ACTAccessRequirement createLockAccessRequirement(String entityId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.createLockAccessRequirement(entityId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	@Override
+	public DataAccessSubmission updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState, String reason) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.updateDataAccessSubmissionState(submissionId, newState, reason);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}	
 }

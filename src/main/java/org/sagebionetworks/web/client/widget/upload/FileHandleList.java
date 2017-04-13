@@ -91,10 +91,12 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	
 	public void addFileLink(String fileName, String fileHandleId) {
 		createNewLink().configure(fileName, fileHandleId);
+		refreshLinkUI();
 	}
 	
 	public void addFileLink(FileHandleAssociation fha) {
 		createNewLink().configure(fha);
+		refreshLinkUI();
 	}
 	
 	private FileHandleLink createNewLink() {

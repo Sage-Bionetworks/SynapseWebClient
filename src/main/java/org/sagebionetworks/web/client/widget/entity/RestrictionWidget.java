@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+@Deprecated
 public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	
 	Callback entityUpdated;

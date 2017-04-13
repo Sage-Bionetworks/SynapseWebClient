@@ -23,6 +23,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+@Deprecated
 public class AccessRequirementDialog implements AccessRequirementDialogView.Presenter, SynapseWidgetPresenter {
 	
 	private AccessRequirement ar;

@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+@Deprecated
 public class AccessRequirementDialogViewImpl implements AccessRequirementDialogView {
 	
 	public interface Binder extends UiBinder<Widget, AccessRequirementDialogViewImpl> {}

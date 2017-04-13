@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
@@ -23,9 +24,11 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -53,6 +56,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	List<String> states;
 	boolean isSortedAsc;
 	String nextPageToken;
+	private ACTAccessRequirement actAccessRequirement;
 	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
@@ -81,6 +85,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setStates(states);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
+		showHideAccessRequirementButton.setIcon(IconType.TOGGLE_RIGHT);
 		view.setAccessRequirementUIVisible(false);
 		showHideAccessRequirementButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -88,6 +93,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				isAccessRequirementVisible = !isAccessRequirementVisible;
 				String buttonText = isAccessRequirementVisible ? HIDE_AR_TEXT : SHOW_AR_TEXT;
 				showHideAccessRequirementButton.setText(buttonText);
+				showHideAccessRequirementButton.setIcon(isAccessRequirementVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
 				view.setAccessRequirementUIVisible(isAccessRequirementVisible);
 			}
 		});
@@ -138,7 +144,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				@Override
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
-						ACTAccessRequirement actAccessRequirement = (ACTAccessRequirement) requirement;
+						actAccessRequirement = (ACTAccessRequirement) requirement;
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -159,12 +165,12 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 						view.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
 						view.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
+						loadData();
 					} else {
 						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
 					}
 				}
 			});
-			loadData();
 		} else {
 			synAlert.showError(INVALID_AR_ID);
 		}
@@ -190,12 +196,16 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			public void onSuccess(DataAccessSubmissionPage submissionPage) {
 				nextPageToken = submissionPage.getNextPageToken();
 				for (DataAccessSubmission submission : submissionPage.getResults()) {
-					// TODO: create a new row for each data access submission.
-//					DataAccessSubmissionWidget w = ginInjector.getDataAccessSubmissionWidget();
-//					w.configure(submission); 
-//					loadMoreContainer.add(w.asWidget());
+					// create a new row for each data access submission.
+					ACTDataAccessSubmissionWidget w = ginInjector.getACTDataAccessSubmissionWidget();
+					w.configure(submission); 
+					w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
+					w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
+					w.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
+					w.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
+					loadMoreContainer.add(w.asWidget());
 				}
-				loadMoreContainer.setIsMore(!submissionPage.getResults().isEmpty());
+				loadMoreContainer.setIsMore(nextPageToken != null);
 			};
 		});
 	}

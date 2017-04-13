@@ -691,11 +691,18 @@ a.shortBtn {
 .min-width-25 {
 	min-width: 25px;
 }
+.min-width-100 {
+	min-width: 100px;
+}
+
 .min-width-150 {
 	min-width: 150px;
 }
 .min-width-200 {
 	min-width: 200px;
+}
+.min-width-300 {
+	min-width: 300px;
 }
 
 .profile-image-40px {

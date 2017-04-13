@@ -21,7 +21,7 @@
 			<b:FormGroup>
 				<b:FormLabel>Intended Data Use Statement</b:FormLabel>
 				<bh:Italic ui:field="visibleToPublicNote" visible="false" text=" - this will be visible to the public" />
-				<b:TextArea ui:field="intendedDataUseStatementField" />
+				<b:TextArea ui:field="intendedDataUseStatementField" visibleLines="10"/>
 			</b:FormGroup>
 		</bh:Div>
 	</bh:Div>

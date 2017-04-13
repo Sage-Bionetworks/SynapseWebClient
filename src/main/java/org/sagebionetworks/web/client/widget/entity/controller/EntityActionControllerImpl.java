@@ -36,12 +36,14 @@ import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -127,20 +129,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ProjectDisplayDialog projectDisplay;
 	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
-
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
 			PortalGinInjector ginInjector,
 			AuthenticationController authenticationController,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		super();
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.preflightController = preflightController;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.actRequirements = new ArrayList<ACTAccessRequirement>();
 	}
 	
@@ -317,6 +321,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureCreateChallenge();
 			configureApproveUserAccess();
 			configureProjectDisplay();
+			configureManageAccessRequirements();
 		}
 	}
 	
@@ -329,6 +334,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureApproveUserAccess() {
+		// TODO: remove APPROVE_USER_ACCESS command (after new ACT feature is released, where the system supports the workflow)
 		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
 		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
@@ -354,6 +360,24 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 					view.showErrorMessage(caught.getMessage());
 				}
 			});	
+		}
+	}
+	
+
+	private void configureManageAccessRequirements() {
+		actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
+		actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);	
+		actionMenu.setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, this);
+		if (authenticationController.isLoggedIn()) {
+			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+				@Override
+				public void invoke(Boolean isACT) {
+					if (isACT) {
+						actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+						actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+					}
+				}
+			});
 		}
 	}
 	
@@ -789,6 +813,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case PROJECT_DISPLAY:
 			onProjectDisplay();
 			break;
+		case MANAGE_ACCESS_REQUIREMENTS:
+			onManageAccessRequirements();
+			break;
 		default:
 			break;
 		}
@@ -823,6 +850,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getEvaluationEditorModal().show();
 	}
 
+	private void onManageAccessRequirements() {
+		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ENTITY_ID_PARAM + "=" + entity.getId());
+		getGlobalApplicationState().getPlaceChanger().goTo(place);
+	}
+	
 	private void onChangeStorageLocation() {
 		getStorageLocationWidget().configure(this.entityBundle, entityUpdateHandler);
 		getStorageLocationWidget().show();
