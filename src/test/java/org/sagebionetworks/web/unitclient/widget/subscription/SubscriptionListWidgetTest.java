@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
@@ -52,11 +53,13 @@ public class SubscriptionListWidgetTest {
 	TopicRowWidget mockTopicRowWidget;
 	@Mock
 	BasicPaginationWidget mockDetailedPaginationWidget;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget);
+		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget, mockIsACTMemberAsyncHandler);
 		AsyncMockStubber.callSuccessWith(mockSubscriptionPagedResults).when(mockSubscriptionClient)
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
