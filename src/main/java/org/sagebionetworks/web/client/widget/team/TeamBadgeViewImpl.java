@@ -58,7 +58,6 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			
 			final Anchor anchor = new Anchor();
 			anchor.setText(name);
-			anchor.addStyleName("font-size-15");
 			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
 			
 			ClickHandler clickHandler = new ClickHandler() {

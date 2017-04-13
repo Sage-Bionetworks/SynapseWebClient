@@ -10,16 +10,15 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -27,6 +26,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -45,7 +45,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private SynapseClientAsync synapseClient;
 	private MarkdownWidget wikiPage;
 	private WizardProgressWidget progressWidget;
+	private SynapseAlert synAlert;
 	private GWTWrapper gwt;
+	private CookieProvider cookies;
 	private String teamId;
 	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
@@ -62,7 +64,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		"https://www.projectdatasphere.org/projectdatasphere/",
 		"https://mpmdev.ondemand.sas.com/projectdatasphere/"
 	};
-
+	String accessRequirementsUrl;
 	
 	@Inject
 	public JoinTeamWidget(JoinTeamWidgetView view, 
@@ -71,7 +73,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			AuthenticationController authenticationController,
 			GWTWrapper gwt,
 			MarkdownWidget wikiPage, 
-			WizardProgressWidget progressWidget
+			WizardProgressWidget progressWidget,
+			SynapseAlert synAlert,
+			CookieProvider cookies
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -81,7 +85,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.gwt = gwt;
 		this.wikiPage = wikiPage;
 		this.progressWidget = progressWidget;
+		this.synAlert = synAlert;
+		this.cookies = cookies;
 		view.setProgressWidget(progressWidget);
+		view.setSynAlert(synAlert);
 	}
 	
 	/**
@@ -112,6 +119,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
 		view.clear();
+		synAlert.clear();
+		accessRequirementsUrl = "#!AccessRequirements:"+AccessRequirementsPlace.TEAM_ID_PARAM+"="+teamId;
 		if (buttonText != null && !buttonText.isEmpty()) {
 			view.setJoinButtonsText(buttonText);
 		}
@@ -147,7 +156,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				view.setAcceptInviteButtonVisible(true);
 			} else {
 			    // illegal state
-				view.showErrorMessage("Unable to determine state");
+				synAlert.showError("Unable to determine state");
 			}
 		} else {
 			view.setUserPanelVisible(false);
@@ -190,6 +199,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private void refresh() {
 		boolean isLoggedIn = authenticationController.isLoggedIn();
 		if (isLoggedIn) {
+			synAlert.clear();
 			synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, isLoggedIn, new AsyncCallback<TeamBundle>() {
 				@Override
 				public void onSuccess(TeamBundle result) {
@@ -201,7 +211,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
+					view.hideJoinWizard();
+					synAlert.handleException(caught);
 				}
 			});
 		} else {
@@ -242,7 +253,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setButtonsEnabled(true);
-				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -267,7 +278,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			};
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 				callback.invoke(null);
 			}
 		});
@@ -317,9 +328,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			});
 			//pop up the requirement
 			progressWidget.configure(currentPage, getTotalPageCount());
-			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
+			
+			if (accessRequirement instanceof TermsOfUseAccessRequirement || accessRequirement instanceof ACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				view.setJoinWizardPrimaryButtonText("Accept");
 				if (text == null || text.trim().isEmpty()) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
 					boolean isIgnoreLoadingFailure=true;
@@ -331,32 +342,16 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					view.setAccessRequirementHTML(text);
 					view.setCurrentWizardPanelVisible(false);
 				}
-			} else if (accessRequirement instanceof ACTAccessRequirement) {
-				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				view.setAccessRequirementHTML(text);
-				view.setCurrentWizardPanelVisible(false);
-				view.setJoinWizardPrimaryButtonText("Continue");
-			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
-				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
-				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url));
-				view.setJoinWizardPrimaryButtonText("Continue");
+				boolean isACTAccessRequirement = accessRequirement instanceof ACTAccessRequirement;
+				String primaryButtonText = isACTAccessRequirement ? "Continue" : "Accept";
+				view.setJoinWizardPrimaryButtonText(primaryButtonText);
+				// TODO: remove check for alpha mode once released.
+				boolean isAlpha = DisplayUtils.isInTestWebsite(cookies);
+				view.setAccessRequirementsLinkVisible(isAlpha && isACTAccessRequirement);
 			} else {
-				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
+				synAlert.showError("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}
 		}
-	}
-	
-	public String enhancePostMessageUrl(String url) {
-		if (authenticationController.isLoggedIn() && isRecognizedSite(url)) {
-			//include other information from the profile
-			UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
-			return url + "?" + 
-					getEncodedParamValue(WebConstants.FIRST_NAME_PARAM, profile.getFirstName(), "&") + 
-					getEncodedParamValue(WebConstants.LAST_NAME_PARAM, profile.getLastName(), "&") + 
-					getEncodedParamValue(WebConstants.EMAIL_PARAM, profile.getEmails().get(0), "&") + 
-					getEncodedParamValue(WebConstants.USER_ID_PARAM, profile.getOwnerId(), ""); 
-		} else
-			return url;
 	}
 	
 	public String getEncodedParamValue(String paramKey, String value, String suffix) {
@@ -393,7 +388,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			}
 			@Override
 			public void onFailure(Throwable t) {
-				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + t.getMessage());
+				synAlert.handleException(t);
 			}
 		};
 		if (ar instanceof ACTAccessRequirement) {
@@ -430,7 +425,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -455,5 +450,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	
 	public boolean isChallengeSignup() {
 		return isChallengeSignup;
+	}
+	
+	@Override
+	public void onRequestAccess() {
+		view.open(accessRequirementsUrl);
 	}
 }
