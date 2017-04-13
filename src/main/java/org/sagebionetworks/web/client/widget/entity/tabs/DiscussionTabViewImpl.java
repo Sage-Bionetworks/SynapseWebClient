@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,7 +28,7 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 		learnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(TablesTabViewImpl.TABLES_LEARN_MORE_URL, "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "discussion.html", "", "");
 			}
 		});
 	}

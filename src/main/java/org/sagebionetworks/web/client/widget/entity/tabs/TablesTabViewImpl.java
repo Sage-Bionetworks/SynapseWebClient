@@ -14,10 +14,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TablesTabViewImpl implements TablesTabView {
-	
-	public static final String TABLES_API_DOCS_URL = "http://rest.synapse.org/#org.sagebionetworks.repo.web.controller.TableController";
-	public static final String TABLES_LEARN_MORE_URL = "#!Wiki:syn2305384/ENTITY/61139";
-
 	@UiField
 	Button tableLearnMoreButton;
 	@UiField
