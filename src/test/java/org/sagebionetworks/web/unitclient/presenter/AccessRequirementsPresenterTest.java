@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -114,11 +115,21 @@ public class AccessRequirementsPresenterTest {
 		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
 		verify(mockTermsOfUseAccessRequirementWidget).setRequirement(mockTermsOfUseAccessRequirement);
 		verify(mockLoadMoreContainer).setIsMore(true);
-		
+		verify(mockEmptyResultsDiv, never()).setVisible(true);
 		presenter.loadMore();
 		//load the next page
 		verify(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), eq(AccessRequirementsPresenter.LIMIT), eq(AccessRequirementsPresenter.LIMIT), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testLoadDataEntityEmptyResults() {
+		accessRequirements.clear();
+		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
+		presenter.setPlace(mockPlace);
+		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
+		verify(mockLoadMoreContainer).setIsMore(false);
+		verify(mockEmptyResultsDiv).setVisible(true);
 	}	
 	
 	@Test
