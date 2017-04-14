@@ -66,12 +66,12 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 			}
 			
 		});
-		lazyLoadHelper.setIsConfigured();
 	}
 
 	public void configure(OpenSubmission openSubmission) {
 		view.setNumberOfSubmissions(openSubmission.getNumberOfSubmittedSubmission());
 		accessRequirementId = Long.parseLong(openSubmission.getAccessRequirementId());
+		lazyLoadHelper.setIsConfigured();
 	}
 
 	@Override
