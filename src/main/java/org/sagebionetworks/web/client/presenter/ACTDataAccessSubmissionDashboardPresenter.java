@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
@@ -19,12 +20,14 @@ import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity implements Presenter<ACTDataAccessSubmissionDashboardPlace> {
 	private static final String TITLE = "Data Access Submission Dashboard";
+	private static final String NO_RESULTS = "There is no new Data Access Submissions.";
 	private ACTDataAccessSubmissionDashboardPlace place;
 	private PlaceView view;
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	private DataAccessClientAsync dataAccessClient;
-	LoadMoreWidgetContainer loadMoreContainer;
+	private LoadMoreWidgetContainer loadMoreContainer;
+	private DivView noResultsDiv;
 	String nextPageToken;
 
 	@Inject
@@ -33,17 +36,23 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			LoadMoreWidgetContainer loadMoreContainer
+			LoadMoreWidgetContainer loadMoreContainer,
+			DivView noResultsDiv
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
 		this.loadMoreContainer = loadMoreContainer;
+		this.noResultsDiv = noResultsDiv;
 
 		view.add(loadMoreContainer.asWidget());
 		view.add(synAlert.asWidget());
 		view.addTitle(TITLE);
+		noResultsDiv.setText(NO_RESULTS);
+		noResultsDiv.addStyleName("min-height-400");
+		noResultsDiv.setVisible(false);
+		view.add(noResultsDiv.asWidget());
 
 		loadMoreContainer.configure(new Callback() {
 			@Override
@@ -85,6 +94,7 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 
 			@Override
 			public void onSuccess(OpenSubmissionPage openSubmissionPage) {
+				noResultsDiv.setVisible(nextPageToken == null && openSubmissionPage.getOpenSubmissionList().isEmpty());
 				nextPageToken = openSubmissionPage.getNextPageToken();
 				for (OpenSubmission openSubmission : openSubmissionPage.getOpenSubmissionList()) {
 					OpenSubmissionWidget w = ginInjector.getOpenSubmissionWidget();

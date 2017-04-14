@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -13,6 +14,7 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClient;
@@ -152,9 +154,22 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getOpenSubmissions(nextPageToken);
+			//return synapseClient.getOpenSubmissions(nextPageToken);
+			return createOpenSubmissions();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
+	}
+	private OpenSubmissionPage createOpenSubmissions() throws SynapseException{
+		OpenSubmissionPage page = new OpenSubmissionPage();
+		ArrayList<OpenSubmission> list = new ArrayList<OpenSubmission>();
+		for (int i = 0; i< 20; i++) {
+			OpenSubmission os = new OpenSubmission();
+			os.setAccessRequirementId("1446658");
+			os.setNumberOfSubmittedSubmission(2L);
+			list.add(os);
+		}
+		page.setOpenSubmissionList(list);
+		return page;
 	}
 }

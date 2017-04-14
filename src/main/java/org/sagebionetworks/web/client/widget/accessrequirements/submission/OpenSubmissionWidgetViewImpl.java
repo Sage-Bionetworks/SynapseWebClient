@@ -45,7 +45,7 @@ public class OpenSubmissionWidgetViewImpl implements OpenSubmissionWidgetView{
 
 	@Override
 	public void setNumberOfSubmissions(long number) {
-		numberOfSubmissions.setText(number+"");
+		numberOfSubmissions.setText(number+" ");
 	}
 
 	@Override
