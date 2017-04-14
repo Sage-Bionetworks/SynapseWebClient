@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -34,4 +35,5 @@ public interface DataAccessClient extends RemoteService {
 	ACTAccessRequirement createLockAccessRequirement(String entityId) throws RestServiceException;
 	DataAccessSubmission updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState,
 			String reason) throws RestServiceException;
+	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;
 }
