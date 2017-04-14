@@ -5,8 +5,10 @@
 	<b:Panel>
 		<b:PanelBody>
 			<b:Badge addStyleNames="synapse-purple-bg movedown-9 margin-right-10" pull="RIGHT">
-				<bh:Span ui:field="numberOfSubmissions"></bh:Span>
-				<bh:Span> requests </bh:Span>
+				<bh:Span addStyleNames="font-size-24">
+					<bh:Span ui:field="numberOfSubmissions"></bh:Span>
+					<bh:Span> requests </bh:Span>
+				</bh:Span>
 			</b:Badge>
 			<bh:Div ui:field="accessRequirementContainer" />
 			<bh:Div ui:field="synAlertContainer" />
