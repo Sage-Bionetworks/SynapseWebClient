@@ -154,22 +154,9 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	public OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//return synapseClient.getOpenSubmissions(nextPageToken);
-			return createOpenSubmissions();
+			return synapseClient.getOpenSubmissions(nextPageToken);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
-	}
-	private OpenSubmissionPage createOpenSubmissions() throws SynapseException{
-		OpenSubmissionPage page = new OpenSubmissionPage();
-		ArrayList<OpenSubmission> list = new ArrayList<OpenSubmission>();
-		for (int i = 0; i< 20; i++) {
-			OpenSubmission os = new OpenSubmission();
-			os.setAccessRequirementId("1446658");
-			os.setNumberOfSubmittedSubmission(2L);
-			list.add(os);
-		}
-		page.setOpenSubmissionList(list);
-		return page;
 	}
 }
