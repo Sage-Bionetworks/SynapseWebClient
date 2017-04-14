@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
@@ -75,14 +77,15 @@ public class AccessRequirementsPresenterTest {
 	CreateAccessRequirementButton mockCreateARButton;
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
-	
+	@Mock
+	DivView mockEmptyResultsDiv;
 	public static final String ENTITY_ID = "syn239834";
 	public static final String TEAM_ID = "45678";
 	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton);
+		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockEmptyResultsDiv);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
@@ -93,7 +96,7 @@ public class AccessRequirementsPresenterTest {
 	
 	@Test
 	public void testConstruction() {
-		verify(mockView).add(any(Widget.class));
+		verify(mockView, atLeastOnce()).add(any(Widget.class));
 		verify(mockView, atLeastOnce()).addTitle(any(Widget.class));
 		verify(mockView, atLeastOnce()).addAboveBody(any(Widget.class));
 		verify(mockLoadMoreContainer).configure(any(Callback.class));
@@ -112,11 +115,21 @@ public class AccessRequirementsPresenterTest {
 		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
 		verify(mockTermsOfUseAccessRequirementWidget).setRequirement(mockTermsOfUseAccessRequirement);
 		verify(mockLoadMoreContainer).setIsMore(true);
-		
+		verify(mockEmptyResultsDiv, never()).setVisible(true);
 		presenter.loadMore();
 		//load the next page
 		verify(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), eq(AccessRequirementsPresenter.LIMIT), eq(AccessRequirementsPresenter.LIMIT), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testLoadDataEntityEmptyResults() {
+		accessRequirements.clear();
+		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
+		presenter.setPlace(mockPlace);
+		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
+		verify(mockLoadMoreContainer).setIsMore(false);
+		verify(mockEmptyResultsDiv).setVisible(true);
 	}	
 	
 	@Test
