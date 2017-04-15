@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,4 +36,5 @@ public interface DataAccessClientAsync {
 	void createLockAccessRequirement(String entityId, AsyncCallback<ACTAccessRequirement> callback);
 	void updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState, String reason,
 			AsyncCallback<DataAccessSubmission> callback);
+	void getOpenSubmissions(String nextPageToken, AsyncCallback<OpenSubmissionPage> callback);
 }

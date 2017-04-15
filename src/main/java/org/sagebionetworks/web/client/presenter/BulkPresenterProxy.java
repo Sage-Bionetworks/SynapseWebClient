@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -46,7 +47,6 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
@@ -250,6 +250,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					} else if (place instanceof LoginPlace) {
 						LoginPresenter presenter = ginjector.getLoginPresenter();
 						presenter.setPlace((LoginPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ACTDataAccessSubmissionDashboardPlace) {
+						ACTDataAccessSubmissionDashboardPresenter presenter = ginjector.getACTDataAccessSubmissionDashboardPresenter();
+						presenter.setPlace((ACTDataAccessSubmissionDashboardPlace) place);
 						presenter.start(panel, eventBus);
 					} else {
 						// Log that we have an unknown place but send the user to the default
