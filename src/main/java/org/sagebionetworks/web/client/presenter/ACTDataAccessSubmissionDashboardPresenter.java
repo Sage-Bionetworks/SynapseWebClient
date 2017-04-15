@@ -19,8 +19,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity implements Presenter<ACTDataAccessSubmissionDashboardPlace> {
-	private static final String TITLE = "Data Access Submission Dashboard";
-	private static final String NO_RESULTS = "There is no new Data Access Submissions.";
+	public static final String TITLE = "Data Access Submission Dashboard";
+	public static final String NO_RESULTS = "There is no new Data Access Submissions.";
 	private ACTDataAccessSubmissionDashboardPlace place;
 	private PlaceView view;
 	private PortalGinInjector ginInjector;
@@ -71,7 +71,6 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 	@Override
 	public void setPlace(ACTDataAccessSubmissionDashboardPlace place) {
 		this.place = place;
-		synAlert.clear();
 		view.initHeaderAndFooter();
 		loadData();
 	}

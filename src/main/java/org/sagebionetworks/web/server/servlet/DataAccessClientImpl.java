@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -14,7 +13,6 @@ import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
-import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClient;

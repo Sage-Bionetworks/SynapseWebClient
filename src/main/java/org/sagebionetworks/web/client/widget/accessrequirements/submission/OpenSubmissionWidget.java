@@ -49,6 +49,7 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 	}
 
 	public void loadAccessRequirement() {
+		synAlert.clear();
 		dataAccessClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>(){
 
 			@Override
