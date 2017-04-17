@@ -214,12 +214,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	@Override
 	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
-		_directUploadFile(contentType, index, fileFieldId, startByte, endByte, url, xhr);
+		JavaScriptObject blob = _getFileBlob(index, fileFieldId);
+		_directUploadBlob(contentType, blob, startByte, endByte, url, xhr);
 	}
 	
-	private final static native void _directUploadFile(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
+	private final static native JavaScriptObject _getFileBlob(int index, String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileToUpload = fileToUploadElement.files[index];
+		return fileToUploadElement.files[index];
+	}-*/;
+	
+	private final static native void _directUploadBlob(String contentType, JavaScriptObject fileToUpload, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
 		var start = parseInt(startByte) || 0;
 		var end = parseInt(endByte) || fileToUpload.size - 1;
 		var fileSliceToUpload;
