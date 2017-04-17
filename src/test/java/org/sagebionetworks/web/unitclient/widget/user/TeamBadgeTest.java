@@ -98,4 +98,15 @@ public class TeamBadgeTest {
 		verify(mockView).setRequestCount(eq(notificationValue));
 	}
 	
+	@Test
+	public void testNewWindow() throws Exception {
+		badge.setOpenNewWindow(true);
+		verify(mockView).setTarget("_blank");
+	}
+	@Test
+	public void testSameWindow() throws Exception {
+		badge.setOpenNewWindow(false);
+		verify(mockView).setTarget("");
+	}
+	
 }
