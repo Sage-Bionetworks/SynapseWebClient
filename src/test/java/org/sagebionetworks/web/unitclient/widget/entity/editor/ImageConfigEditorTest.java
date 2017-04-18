@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -31,7 +32,7 @@ public class ImageConfigEditorTest {
 	ImageConfigEditor editor;
 	ImageConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	FileHandleUploadWidget mockFileInputWidget;
+	ImageUploadWidget mockFileInputWidget;
 	DialogCallback mockCallback;
 	WikiAttachments mockAttachments;
 	CallbackP mockFinishedCallback;
@@ -46,7 +47,7 @@ public class ImageConfigEditorTest {
 	
 	@Before
 	public void setup(){
-		mockFileInputWidget = mock(FileHandleUploadWidget.class);
+		mockFileInputWidget = mock(ImageUploadWidget.class);
 		mockView = mock(ImageConfigView.class);
 		mockCallback = mock(DialogCallback.class);
 		mockAttachments = mock(WikiAttachments.class);
@@ -59,7 +60,7 @@ public class ImageConfigEditorTest {
 		editor.configure(wikiKey, descriptor, mockCallback);
 		when(mockAttachments.isValid()).thenReturn(true);
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, "image/png", fileSize)});
+		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata(testFileName, "image/png", fileSize));
 		when(mockView.isSynapseEntity()).thenReturn(false);
 		when(mockView.isFromAttachments()).thenReturn(false);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMeta);
@@ -68,7 +69,7 @@ public class ImageConfigEditorTest {
 		// will look at the file name if the content type is null
 		when(mockFileMeta.getContentType()).thenReturn(null);
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockFileInputWidget).configure(anyString(), captor.capture());
+		verify(mockFileInputWidget).configure(captor.capture());
 		mockFinishedCallback = captor.getValue();
 	}
 	
@@ -83,7 +84,7 @@ public class ImageConfigEditorTest {
 		verify(mockView).setPresenter(editor);
 		verify(mockView).setFileInputWidget(any(Widget.class));
 		verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
-		verify(mockFileInputWidget).configure(anyString(), any(CallbackP.class));
+		verify(mockFileInputWidget).configure(any(CallbackP.class));
 		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		verify(mockAttachments).configure(any(WikiPageKey.class));
 	}

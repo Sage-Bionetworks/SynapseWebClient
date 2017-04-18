@@ -5,15 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -25,13 +22,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	private ImageConfigView view;
 	private Map<String, String> descriptor;
 	private FileUpload file;
-	private FileHandleUploadWidget fileInputWidget;
+	private ImageUploadWidget fileInputWidget;
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
 	private List<String> fileHandleIds;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
+	public ImageConfigEditor(ImageConfigView view, ImageUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
 		view.setPresenter(this);
 		this.fileInputWidget = fileInputWidget;
@@ -48,7 +45,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		this.file = null;
 		view.initView();
 		fileInputWidget.reset();
-		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+		fileInputWidget.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				view.showUploadSuccessUI();
@@ -58,14 +55,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				fileHandleIds.add(file.getFileHandleId());
 			}
 		});	
-		ImageFileValidator validator = new ImageFileValidator();
-		validator.setInvalidFileCallback(new Callback() {
-			@Override
-			public void invoke() {
-				view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
-			}
-		});
-		fileInputWidget.setValidation(validator);
 		view.configure(wikiKey, dialogCallback);
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);

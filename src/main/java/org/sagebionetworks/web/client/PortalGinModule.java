@@ -705,6 +705,9 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileInputView;
 import org.sagebionetworks.web.client.widget.upload.FileInputViewImpl;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -1440,5 +1443,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
 		bind(ACTDataAccessSubmissionWidgetView.class).to(ACTDataAccessSubmissionWidgetViewImpl.class);
 		bind(OpenSubmissionWidgetView.class).to(OpenSubmissionWidgetViewImpl.class);
+		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);
 	}
 }
