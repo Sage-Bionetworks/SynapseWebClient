@@ -104,4 +104,15 @@ public class CreateAccessRequirementButtonTest {
 		verify(mockCreateAccessRequirementWizard).configure(mockSubject);
 		verify(mockCreateAccessRequirementWizard).showModal(any(ModalWizardWidget.WizardCallback.class));
 	}
+	
+
+	@Test
+	public void testOnCancelRefreshPage() {
+		widget.configure(mockAccessRequirement);
+		onButtonClickHandler.onClick(null);
+		verify(mockCreateAccessRequirementWizard).configure(mockAccessRequirement);
+		verify(mockCreateAccessRequirementWizard).showModal(wizardCallbackCallback.capture());
+		wizardCallbackCallback.getValue().onCanceled();
+		verify(mockGlobalApplicationState).refreshPage();
+	}
 }
