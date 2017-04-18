@@ -288,11 +288,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return _getFileSize(blob);
 	}
 	private final static native double _getFileSize(JavaScriptObject blob) /*-{
-		
-		var fileSize = 0;
-		if (fileToUploadElement && ('files' in fileToUploadElement))
-			fileSize = fileToUploadElement.files[index].size;
-		return fileSize;
+		return blob.size;
 	}-*/;
 	
 	@Override
