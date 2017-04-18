@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
@@ -147,6 +149,10 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 						} else if (ar instanceof TermsOfUseAccessRequirement) {
 							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
 							w.setRequirement((TermsOfUseAccessRequirement)ar);
+							loadMoreContainer.add(w.asWidget());						
+						} else if (ar instanceof LockAccessRequirement) {
+							LockAccessRequirementWidget w = ginInjector.getLockAccessRequirementWidget();
+							w.setRequirement((LockAccessRequirement)ar);
 							loadMoreContainer.add(w.asWidget());						
 						} else {
 							synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
