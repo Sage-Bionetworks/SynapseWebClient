@@ -31,7 +31,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
 	Long publicAclPrincipalId;
-	
+	Anchor anchor = new Anchor();
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
@@ -54,9 +54,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		if(team == null)  throw new IllegalArgumentException("Team is required");
 		
 		if(team != null) {
-			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength); 
-			
-			final Anchor anchor = new Anchor();
+			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
 			anchor.setText(name);
 			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
 			
@@ -80,7 +78,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			}
 			add(anchor);
 			add(notificationsPanel);
-		} 		
+		}
 	}
 	
 	@Override
@@ -134,8 +132,8 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		notificationsPanel.setWidget(DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP));
 	}
 
-	/*
-	 * Private Methods
-	 */
-
+	@Override
+	public void setTarget(String target) {
+		anchor.setTarget(target);
+	}
 }
