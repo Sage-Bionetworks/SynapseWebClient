@@ -33,7 +33,7 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, Pag
 		if(count == null || limit == null || offset == null || count < 1 || limit < 1){
 			setLoading();
 			view.setCurrentPage(1l);
-		}else{
+		} else {
 			this.limit = limit;
 			this.offset = offset;
 			long remainder = count%limit;
@@ -42,8 +42,8 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, Pag
 				totalNumberOfPages++;
 			}
 			long currentPageNumber = offset/limit + 1;
-			view.setNextEnabled(currentPageNumber < totalNumberOfPages);
-			view.setPreviousEnabled(currentPageNumber > 1);
+			view.setNextVisible(currentPageNumber < totalNumberOfPages);
+			view.setPreviousVisible(currentPageNumber > 1);
 			view.setCurrentPage(currentPageNumber);
 		}
 	}
@@ -66,8 +66,8 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, Pag
 	 */
 	private void setLoading() {
 		// Disabled both buttons
-		view.setNextEnabled(false);
-		view.setPreviousEnabled(false);
+		view.setNextVisible(false);
+		view.setPreviousVisible(false);
 	}
 
 	@Override
