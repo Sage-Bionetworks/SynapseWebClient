@@ -62,7 +62,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 	CanvasElement resizedCanvas;
 	@UiField
 	HTMLPanel loadingUI;
-	
+
 	@Inject
 	public ImageUploadViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -76,7 +76,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 				presenter.onFileSelected();
 			}
 		});
-		
+
 		this.uploadbutton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -89,7 +89,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 			isLoaded = true;
 		}
 	}
-	
+
 	@Override
 	public void processFile() {
 		// load into image
@@ -106,9 +106,9 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		if (fileToUploadElement && 'files' in fileToUploadElement) {
 			file = fileToUploadElement.files[0];
 			var ext = file.name.split('.').pop();
-			canResize = [ 'bmp', 'jpg', 'jpeg', 'png' ].indexOf(ext) === -1 && file.size > 3145728;
+			canResize = [ 'bmp', 'jpg', 'jpeg', 'png' ].indexOf(ext) > -1 && file.size > 3145728;
 		}
-		
+
 		var imgElement = $doc.createElement('img');
 		var onImageLoad = function() {
 			// Create an empty canvas element of the same dimensions as the original
@@ -117,56 +117,53 @@ public class ImageUploadViewImpl implements ImageUploadView {
 			// Copy the image contents to the canvas
 			var ctx = originalCanvas.getContext("2d");
 			ctx.drawImage(imgElement, 0, 0);
-			debugger;
-			var maxWidth = 2000;
-			var maxHeight = 2000;
-			if (canResize) {
-				if (imgElement.width > maxWidth) {
-					// continue resize based on width
-					var ratio = maxWidth / imgElement.width; // get ratio for scaling image
-					resizedCanvas.width = maxWidth;
-					resizedCanvas.height = imgElement.height * ratio;
-				} else {
-					// continue resize based on height
-					var ratio = maxHeight / imgElement.height; // get ratio for scaling image
-					resizedCanvas.height = maxHeight;
-					resizedCanvas.width = imgElement.width * ratio;
-				}
-				
-				// Resize & convert to blob
-				$wnd.resizer.resize(originalCanvas, resizedCanvas)
-				  .then (
-				  	function(result) {
-				  		$wnd.resizer.toBlob(result, 'image/jpeg', 90)
-				  			.then(
-					  			function(blob) {
-					  				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-					  			});
-					});
+			var maxWidth = 1632;
+			var maxHeight = 1632;
+			if (imgElement.width > maxWidth) {
+				// continue resize based on width
+				var ratio = maxWidth / imgElement.width; // get ratio for scaling image
+				resizedCanvas.width = maxWidth;
+				resizedCanvas.height = imgElement.height * ratio;
 			} else {
-				// send back original content
-				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(file);
+				// continue resize based on height
+				var ratio = maxHeight / imgElement.height; // get ratio for scaling image
+				resizedCanvas.height = maxHeight;
+				resizedCanvas.width = imgElement.width * ratio;
 			}
+
+			// Resize & convert to blob
+			$wnd.resizer.resize(originalCanvas, resizedCanvas)
+			  .then (
+			  	function(result) {
+			  		$wnd.resizer.toBlob(result, 'image/jpeg', 90)
+			  			.then(
+				  			function(blob) {
+				  				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+				  			});
+				});
 		};
 		imgElement.addEventListener('load', onImageLoad, false);
-		
-		if (file) {
+
+		if (file && canResize) {
 			imgElement.src = $wnd.URL.createObjectURL(file);
+		} else {
+			// send back original content
+			v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(file);
 		}
 	}-*/;
-	
+
 	private static native void _initResizer() /*-{
 		console.log('initializing pica resizer');
 		$wnd.resizer = $wnd.pica({ features: ['js', 'wasm', 'ww'] });
 		console.log('pica resizer initialized');	
 	}-*/;
-	
+
 
 	public void resizeComplete(JavaScriptObject blob) {
 		loadingUI.setVisible(false);
 		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob));
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
