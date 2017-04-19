@@ -79,7 +79,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@UiField
 	TabPane tab4;
 	
-	private ImageParamsPanel currentParamsPanel, uploadParamsPanel, synapseParamsPanel, wikiAttachmentsParamsPanel;
+	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel, wikiAttachmentsParamsPanel;
 	
 	@Inject
 	public ImageConfigViewImpl(
@@ -148,24 +148,34 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		wikiAttachmentsParamsPanel.clear();
 	}
 	
+	private ImageParamsPanel getCurrentParamsPanel() {
+		if (isSynapseEntity()) {
+			return synapseParamsPanel;
+		} else if (isFromAttachments()) {
+			return wikiAttachmentsParamsPanel;
+		} else {
+			return uploadParamsPanel;
+		}
+	}
+	
 	@Override
 	public String getAlignment() {
-		return currentParamsPanel.getAlignment();
+		return getCurrentParamsPanel().getAlignment();
 	}
 	
 	@Override
 	public void setAlignment(String alignment) {
-		currentParamsPanel.setAlignment(alignment);
+		getCurrentParamsPanel().setAlignment(alignment);
 	}
 	
 	@Override
 	public void setScale(Integer scale) {
-		currentParamsPanel.setScale(scale);
+		getCurrentParamsPanel().setScale(scale);
 	}
 	
 	@Override
 	public Integer getScale() {
-		return currentParamsPanel.getScale();
+		return getCurrentParamsPanel().getScale();
 	}
 	
 	@Override
@@ -258,13 +268,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void showSynapseTab() {
 		synapseTabListItem.setActive(true);
 		tab3.setActive(true);
-		currentParamsPanel = synapseParamsPanel;
 	}
 	@Override
 	public void showWikiAttachmentsTab() {
 		existingAttachmentListItem.setActive(true);
 		tab4.setActive(true);
-		currentParamsPanel = wikiAttachmentsParamsPanel;
 	}
 	@Override
 	public void setSynapseId(String synapseId) {
@@ -321,7 +329,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void showUploadTab() {
 		uploadTabListItem.setActive(true);
 		tab1.setActive(true);
-		currentParamsPanel = uploadParamsPanel;
 	}
 
 	/*

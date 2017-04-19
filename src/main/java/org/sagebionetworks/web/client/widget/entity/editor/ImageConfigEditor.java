@@ -101,6 +101,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 
 	@Override
 	public void updateDescriptorFromView() {
+		descriptor.clear();
 		view.checkParams();
 		if (!view.isExternal()) {
 			if (view.isSynapseEntity()) {
