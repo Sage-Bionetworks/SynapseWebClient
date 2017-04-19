@@ -85,4 +85,9 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	public void addStyleName(String style) {
 		view.addStyleName(style);
 	}
+	
+	public void setOpenNewWindow(boolean isNewWindow) {
+		String target = isNewWindow ? "_blank" : "";
+		view.setTarget(target);
+	}
 }

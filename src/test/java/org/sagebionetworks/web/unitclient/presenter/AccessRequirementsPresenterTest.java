@@ -19,6 +19,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
@@ -65,6 +67,8 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	TermsOfUseAccessRequirement mockTermsOfUseAccessRequirement;
 	@Mock
+	LockAccessRequirement mockLockAccessRequirement;
+	@Mock
 	AccessRequirementsPlace mockPlace;
 	List<AccessRequirement> accessRequirements;
 	@Captor
@@ -73,6 +77,8 @@ public class AccessRequirementsPresenterTest {
 	ACTAccessRequirementWidget mockACTAccessRequirementWidget;
 	@Mock
 	TermsOfUseAccessRequirementWidget mockTermsOfUseAccessRequirementWidget;
+	@Mock
+	LockAccessRequirementWidget mockLockAccessRequirementWidget;
 	@Mock
 	CreateAccessRequirementButton mockCreateARButton;
 	@Mock
@@ -89,9 +95,11 @@ public class AccessRequirementsPresenterTest {
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
+		accessRequirements.add(mockLockAccessRequirement);
 		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockGinInjector.getACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
 		when(mockGinInjector.getTermsOfUseAccessRequirementWidget()).thenReturn(mockTermsOfUseAccessRequirementWidget);
+		when(mockGinInjector.getLockAccessRequirementWidget()).thenReturn(mockLockAccessRequirementWidget);
 	}	
 	
 	@Test
@@ -114,6 +122,7 @@ public class AccessRequirementsPresenterTest {
 		
 		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
 		verify(mockTermsOfUseAccessRequirementWidget).setRequirement(mockTermsOfUseAccessRequirement);
+		verify(mockLockAccessRequirementWidget).setRequirement(mockLockAccessRequirement);
 		verify(mockLoadMoreContainer).setIsMore(true);
 		verify(mockEmptyResultsDiv, never()).setVisible(true);
 		presenter.loadMore();

@@ -34,18 +34,12 @@ public interface BasicPaginationView extends IsWidget{
 	 * 
 	 * @param enabled
 	 */
-	public void setNextEnabled(boolean enabled);
+	public void setNextVisible(boolean visible);
 	
 	/**
 	 * Enable/disable the previous button.
 	 * @param enabled
 	 */
-	public void setPreviousEnabled(boolean enabled);
-	
-	/**
-	 * Set the page numbers.
-	 * @param currentPageNumber
-	 */
+	public void setPreviousVisible(boolean visible);
 	public void setCurrentPage(long currentPageNumber);
-
 }

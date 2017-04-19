@@ -48,18 +48,13 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 	}
 
 	@Override
-	public void setNextEnabled(boolean enabled) {
-		nextButton.setEnabled(enabled);
+	public void setNextVisible(boolean visible) {
+		nextButton.setVisible(visible);
 	}
 
 	@Override
-	public void setPreviousEnabled(boolean enabled) {
-		previousButton.setEnabled(enabled);
-	}
-
-	@Override
-	public void setCurrentPage(long currentPageNumber) {
-//		this.currentPage.setText(""+currentPageNumber);
+	public void setPreviousVisible(boolean visible) {
+		previousButton.setVisible(visible);
 	}
 
 	@Override
@@ -67,4 +62,7 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 		return widget;
 	}
 
+	@Override
+	public void setCurrentPage(long currentPageNumber) {
+	}
 }

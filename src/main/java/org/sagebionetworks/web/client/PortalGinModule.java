@@ -114,6 +114,8 @@ import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2View;
@@ -1443,6 +1445,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
 		bind(ACTDataAccessSubmissionWidgetView.class).to(ACTDataAccessSubmissionWidgetViewImpl.class);
 		bind(OpenSubmissionWidgetView.class).to(OpenSubmissionWidgetViewImpl.class);
-		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);
-	}
+		bind(LockAccessRequirementWidgetView.class).to(LockAccessRequirementWidgetViewImpl.class);
+		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);	}
 }
