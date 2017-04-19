@@ -15,16 +15,12 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -61,8 +57,6 @@ public class ImageUploadViewImpl implements ImageUploadView {
 	Span uploadedFileNameField;
 	Presenter presenter;
 	@UiField
-	Image image;
-	@UiField
 	CanvasElement originalCanvas;
 	@UiField
 	CanvasElement resizedCanvas;
@@ -79,19 +73,10 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		this.fileInput.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				// load into image
-				loadingUI.setVisible(true);
-				_loadImage(image.getElement(), fileInput.getElement().getId());
+				presenter.onFileSelected();
 			}
 		});
 		
-		image.addLoadHandler(new LoadHandler() {
-			@Override
-			public void onLoad(LoadEvent event) {
-				_resize(ImageUploadViewImpl.this, image.getElement(), originalCanvas, resizedCanvas);
-			}
-		});
-
 		this.uploadbutton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -104,66 +89,82 @@ public class ImageUploadViewImpl implements ImageUploadView {
 			isLoaded = true;
 		}
 	}
+	
+	@Override
+	public void processFile() {
+		// load into image
+		loadingUI.setVisible(true);
+		_loadImage(fileInput.getElement().getId(), ImageUploadViewImpl.this, originalCanvas, resizedCanvas);
+	}
 
-	private static native void _loadImage(Element imgElement, String fileFieldId) /*-{
+	private static native void _loadImage(String fileFieldId, 
+			ImageUploadViewImpl v, CanvasElement originalCanvas,
+			CanvasElement resizedCanvas) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
+		var file;
+		var canResize = true;
 		if (fileToUploadElement && 'files' in fileToUploadElement) {
-			var fr = new FileReader();
-			fr.onload = function() {
-				imgElement.src = fr.result;
+			file = fileToUploadElement.files[0];
+			var ext = file.name.split('.').pop();
+			canResize = [ 'bmp', 'jpg', 'jpeg', 'png' ].indexOf(ext) === -1 && file.size > 3145728;
+		}
+		
+		var imgElement = $doc.createElement('img');
+		var onImageLoad = function() {
+			// Create an empty canvas element of the same dimensions as the original
+			originalCanvas.width = imgElement.width;
+			originalCanvas.height = imgElement.height;
+			// Copy the image contents to the canvas
+			var ctx = originalCanvas.getContext("2d");
+			ctx.drawImage(imgElement, 0, 0);
+			debugger;
+			var maxWidth = 2000;
+			var maxHeight = 2000;
+			if (canResize) {
+				if (imgElement.width > maxWidth) {
+					// continue resize based on width
+					var ratio = maxWidth / imgElement.width; // get ratio for scaling image
+					resizedCanvas.width = maxWidth;
+					resizedCanvas.height = imgElement.height * ratio;
+				} else {
+					// continue resize based on height
+					var ratio = maxHeight / imgElement.height; // get ratio for scaling image
+					resizedCanvas.height = maxHeight;
+					resizedCanvas.width = imgElement.width * ratio;
+				}
+				
+				// Resize & convert to blob
+				$wnd.resizer.resize(originalCanvas, resizedCanvas)
+				  .then (
+				  	function(result) {
+				  		$wnd.resizer.toBlob(result, 'image/jpeg', 90)
+				  			.then(
+					  			function(blob) {
+					  				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+					  			});
+					});
+			} else {
+				// send back original content
+				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(file);
 			}
-			fr.readAsDataURL(fileToUploadElement.files[0]);
+		};
+		imgElement.addEventListener('load', onImageLoad, false);
+		
+		if (file) {
+			imgElement.src = $wnd.URL.createObjectURL(file);
 		}
 	}-*/;
 	
 	private static native void _initResizer() /*-{
-		$wnd.resizer = $wnd.pica({ features: ['js', 'wasm', 'ww'] });	
+		console.log('initializing pica resizer');
+		$wnd.resizer = $wnd.pica({ features: ['js', 'wasm', 'ww'] });
+		console.log('pica resizer initialized');	
 	}-*/;
 	
-	private static native void _resize(ImageUploadViewImpl v, Element imgElement, CanvasElement originalCanvas,
-			CanvasElement resizedCanvas) /*-{
-		// Create an empty canvas element of the same dimensions as the original
-		originalCanvas.width = imgElement.width;
-		originalCanvas.height = imgElement.height;
-		// Copy the image contents to the canvas
-		var ctx = originalCanvas.getContext("2d");
-		ctx.drawImage(imgElement, 0, 0);
-		var maxWidth = 1600;
-		var maxHeight = 2200;
-		if (imgElement.width > maxWidth || imgElement.height > maxHeight) {
-			if (imgElement.width > maxWidth) {
-				// continue resize based on width
-				var ratio = maxWidth / imgElement.width; // get ratio for scaling image
-				resizedCanvas.width = maxWidth;
-				resizedCanvas.height = imgElement.height * ratio;
-			} else {
-				// continue resize based on height
-				var ratio = maxHeight / imgElement.height; // get ratio for scaling image
-				resizedCanvas.height = maxHeight;
-				resizedCanvas.width = imgElement.width * ratio;
-			}
-			
-			// Resize & convert to blob
-			$wnd.resizer.resize(originalCanvas, resizedCanvas)
-			  .then (
-			  	function(result) {
-			  		$wnd.resizer.toBlob(result, 'image/jpeg', 90)
-			  			.then(
-				  			function(blob) {
-				  				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-				  			});
-				});
-		} else {
-			// small enough, send back original content
-			originalCanvas.toBlob(function(blob) {
-				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-			});
-		}
-	}-*/;
 
 	public void resizeComplete(JavaScriptObject blob) {
 		loadingUI.setVisible(false);
-		presenter.resizeComplete(blob);
+		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob));
 	}
 	
 	@Override

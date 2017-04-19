@@ -16,7 +16,6 @@
 		</g:HTMLPanel>
 		
 		<g:HTMLPanel visible="false" >
-			<g:Image ui:field="image"/>
 			<canvas ui:field="originalCanvas" />
 			<canvas ui:field="resizedCanvas" />
 		</g:HTMLPanel> 

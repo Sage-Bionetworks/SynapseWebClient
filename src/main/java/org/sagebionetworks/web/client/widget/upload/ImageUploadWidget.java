@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -18,6 +17,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	private Callback startedUploadingCallback;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private FileMetadata fileMeta;
+	private ImageFileValidator validator = new ImageFileValidator();
 	@Inject
 	public ImageUploadWidget(ImageUploadView view, MultipartUploader multipartUploader,
 			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert) {
@@ -37,7 +37,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 
 	public void configure(CallbackP<FileUpload> finishedUploadingCallback) {
 		this.finishedUploadingCallback = finishedUploadingCallback;
-		view.showProgress(false);
+		reset();
 	}
 	
 	public void setUploadingCallback(Callback startedUploadingCallback) {
@@ -61,7 +61,31 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void resizeComplete(JavaScriptObject blob) {
+	public void onFileSelected() {
+		synAlert.clear();
+		FileMetadata fileMeta = getSelectedFileMetadata();
+		if (fileMeta != null) {
+			if (validator.isValid(fileMeta)) {
+				view.processFile();
+			} else {
+				Callback invalidFileCallback = validator.getInvalidFileCallback();
+				if (invalidFileCallback == null) {
+					String invalidMessage = validator.getInvalidMessage();
+					if (invalidMessage == null) {
+						synAlert.showError("Please select a valid filetype.");
+					}	
+					else {
+						synAlert.showError(invalidMessage);
+					}
+				} else {
+					invalidFileCallback.invoke();
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void onFileProcessed(JavaScriptObjectWrapper blob) {
 		synAlert.clear();
 		fileMeta = getSelectedFileMetadata();
 		if (fileMeta != null && blob != null) {
@@ -82,13 +106,14 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 		view.resetForm();
 	}
 	
-	private void doMultipartUpload(final FileMetadata fileMeta, JavaScriptObject blob) {
+	private void doMultipartUpload(final FileMetadata fileMeta, JavaScriptObjectWrapper blob) {
 		// The uploader does the real work
-		multipartUploader.uploadFile(fileMeta.getFileName(), "image/jpeg", blob,
+		multipartUploader.uploadFile(fileMeta.getFileName(), "image/jpeg", blob.get(),
 			new ProgressingFileUploadHandler() {
 				@Override
 				public void uploadSuccess(String fileHandleId) {
 					FileUpload uploadedFile = new FileUpload(fileMeta, fileHandleId);
+					view.updateProgress(100, "100%");
 					view.showProgress(false);
 					view.setInputEnabled(true);
 					finishedUploadingCallback.invoke(uploadedFile);
