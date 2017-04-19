@@ -125,6 +125,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void initView() {
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
+		fileInputWidgetContainer.setVisible(true);
+		
 		entityField.setValue("");
 		urlField.setValue("");
 		nameField.setValue("");

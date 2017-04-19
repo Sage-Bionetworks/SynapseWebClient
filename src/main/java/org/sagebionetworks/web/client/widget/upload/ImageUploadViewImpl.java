@@ -117,7 +117,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 	}-*/;
 	
 	private static native void _initResizer() /*-{
-		$wnd.resizer = $wnd.pica({ features: ['all'] });	
+		$wnd.resizer = $wnd.pica({ features: ['js', 'wasm', 'ww'] });	
 	}-*/;
 	
 	private static native void _resize(ImageUploadViewImpl v, Element imgElement, CanvasElement originalCanvas,
@@ -128,16 +128,18 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		// Copy the image contents to the canvas
 		var ctx = originalCanvas.getContext("2d");
 		ctx.drawImage(imgElement, 0, 0);
-		if (imgElement.width > 1600 || imgElement.height > 2200) {
-			if (imgElement.width > 1600) {
+		var maxWidth = 1600;
+		var maxHeight = 2200;
+		if (imgElement.width > maxWidth || imgElement.height > maxHeight) {
+			if (imgElement.width > maxWidth) {
 				// continue resize based on width
-				var ratio = 1600 / imgElement.width; // get ratio for scaling image
-				resizedCanvas.width = 1600;
+				var ratio = maxWidth / imgElement.width; // get ratio for scaling image
+				resizedCanvas.width = maxWidth;
 				resizedCanvas.height = imgElement.height * ratio;
 			} else {
 				// continue resize based on height
-				var ratio = 2200 / imgElement.height; // get ratio for scaling image
-				resizedCanvas.height = 2200;
+				var ratio = maxHeight / imgElement.height; // get ratio for scaling image
+				resizedCanvas.height = maxHeight;
 				resizedCanvas.width = imgElement.width * ratio;
 			}
 			

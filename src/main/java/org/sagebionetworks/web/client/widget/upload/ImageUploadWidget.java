@@ -89,6 +89,8 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 				@Override
 				public void uploadSuccess(String fileHandleId) {
 					FileUpload uploadedFile = new FileUpload(fileMeta, fileHandleId);
+					view.showProgress(false);
+					view.setInputEnabled(true);
 					finishedUploadingCallback.invoke(uploadedFile);
 				}
 
