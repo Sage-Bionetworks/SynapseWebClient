@@ -60,7 +60,11 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			selectedFilename = null;
 		} else {
 			view.addFileHandles(workingSet);
-			selectedFilename = workingSet.get(0).getFileName();
+		}
+		
+		if (selectedFilename != null) {
+			//try to select the filename
+			view.setSelectedFilename(selectedFilename);
 		}
 	}
 	
@@ -87,6 +91,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	@Override
 	public void setSelectedFilename(String fileName) {
 		selectedFilename = fileName;
+		view.setSelectedFilename(fileName);
 	}
 	
 	public String getSelectedFilename() {

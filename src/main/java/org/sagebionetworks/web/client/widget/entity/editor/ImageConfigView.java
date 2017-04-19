@@ -29,10 +29,9 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	void showUploadFailureUI(String error);
 	void showUploadSuccessUI();
 	public String getAlignment();
+	public Integer getScale();
+	public void setScale(Integer scale);
 	public String getSynapseId();
-	public void setExternalVisible(boolean visible);
-	
-	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback);
 	
 	public void setSynapseId(String synapseId);
 	public void setAlignment(String alignment);
@@ -43,11 +42,13 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public interface Presenter {
 	}
 
-	public void setUploadTabVisible(boolean visible);
-
-	public void setExistingAttachementTabVisible(boolean visible);
-
-	public void showExternalTab();
-
-	public void showUploadTab();
+	void setUploadTabVisible(boolean visible);
+	void setExternalTabVisible(boolean visible);
+	void setSynapseTabVisible(boolean visible);
+	void setWikiAttachmentsTabVisible(boolean visible);
+	
+	void showUploadTab();
+	void showExternalTab();
+	void showSynapseTab();
+	void showWikiAttachmentsTab();
 }

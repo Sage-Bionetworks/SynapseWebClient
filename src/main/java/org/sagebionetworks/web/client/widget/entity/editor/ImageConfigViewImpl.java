@@ -15,10 +15,7 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -53,7 +50,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	SimplePanel uploadParamsPanelContainer;
 	@UiField
 	SimplePanel wikiAttachmentsContainer;
-
+	@UiField
+	SimplePanel wikiAttachmentsParamsPanelContainer;
 	
 	@UiField
 	SimplePanel synapseParamsPanelContainer;
@@ -81,14 +79,15 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@UiField
 	TabPane tab4;
 	
-	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
+	private ImageParamsPanel currentParamsPanel, uploadParamsPanel, synapseParamsPanel, wikiAttachmentsParamsPanel;
 	
 	@Inject
 	public ImageConfigViewImpl(
 			ImageConfigViewImplUiBinder binder,
 			SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils,
 			ImageParamsPanel synapseParamsPanel,
-			ImageParamsPanel uploadParamsPanel
+			ImageParamsPanel uploadParamsPanel,
+			ImageParamsPanel wikiAttachmentsParamsPanel
 			) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
@@ -97,9 +96,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseParamsPanel = synapseParamsPanel;
 		this.uploadParamsPanel = uploadParamsPanel;
+		this.wikiAttachmentsParamsPanel = wikiAttachmentsParamsPanel;
 		
 		uploadParamsPanelContainer.add(uploadParamsPanel.asWidget());
 		synapseParamsPanelContainer.add(synapseParamsPanel.asWidget());
+		wikiAttachmentsParamsPanelContainer.add(wikiAttachmentsParamsPanel.asWidget());
 		
 		initClickHandlers();
 	}
@@ -129,36 +130,42 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		nameField.setValue("");
 
 		setUploadTabVisible(true);
-		setExistingAttachementTabVisible(true);
+		setExternalTabVisible(true);
+		setSynapseTabVisible(true);
+		setWikiAttachmentsTabVisible(true);
+		
+		existingAttachmentListItem.setActive(false);
+		tab4.setActive(false);
 		synapseTabListItem.setActive(false);
 		tab3.setActive(false);
 		externalTabListItem.setActive(false);
 		tab2.setActive(false);
 		uploadTabListItem.setActive(false);
 		tab1.setActive(false);
-
+		
+		uploadParamsPanel.clear();
+		synapseParamsPanel.clear();
+		wikiAttachmentsParamsPanel.clear();
 	}
 	
 	@Override
 	public String getAlignment() {
-		if (isSynapseEntity())
-			return synapseParamsPanel.getAlignment();
-		else
-			return uploadParamsPanel.getAlignment();
+		return currentParamsPanel.getAlignment();
 	}
 	
 	@Override
 	public void setAlignment(String alignment) {
-		if (isSynapseEntity())
-			synapseParamsPanel.setAlignment(alignment);
-		else
-			uploadParamsPanel.setAlignment(alignment);
-		
+		currentParamsPanel.setAlignment(alignment);
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
-		fileInputWidgetContainer.setVisible(true);
+	public void setScale(Integer scale) {
+		currentParamsPanel.setScale(scale);
+	}
+	
+	@Override
+	public Integer getScale() {
+		return currentParamsPanel.getScale();
 	}
 	
 	@Override
@@ -248,10 +255,20 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	
 	@Override
-	public void setSynapseId(String synapseId) {
-		entityField.setValue(synapseId);
+	public void showSynapseTab() {
 		synapseTabListItem.setActive(true);
 		tab3.setActive(true);
+		currentParamsPanel = synapseParamsPanel;
+	}
+	@Override
+	public void showWikiAttachmentsTab() {
+		existingAttachmentListItem.setActive(true);
+		tab4.setActive(true);
+		currentParamsPanel = wikiAttachmentsParamsPanel;
+	}
+	@Override
+	public void setSynapseId(String synapseId) {
+		entityField.setValue(synapseId);
 	}
 	
 	@Override
@@ -271,7 +288,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	
 	@Override
-	public void setExternalVisible(boolean visible) {
+	public void setExternalTabVisible(boolean visible) {
 		externalTabListItem.setEnabled(visible);
 	}
 
@@ -280,9 +297,16 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		uploadTabListItem.setVisible(visible);
 		tab1.setVisible(visible);
 	}
+	
+	@Override
+	public void setSynapseTabVisible(boolean visible) {
+		synapseTabListItem.setVisible(visible);
+		tab3.setVisible(visible);
+	}
+
 
 	@Override
-	public void setExistingAttachementTabVisible(boolean visible) {
+	public void setWikiAttachmentsTabVisible(boolean visible) {
 		existingAttachmentListItem.setVisible(visible);
 		tab4.setVisible(visible);
 	}
@@ -297,6 +321,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void showUploadTab() {
 		uploadTabListItem.setActive(true);
 		tab1.setActive(true);
+		currentParamsPanel = uploadParamsPanel;
 	}
 
 	/*

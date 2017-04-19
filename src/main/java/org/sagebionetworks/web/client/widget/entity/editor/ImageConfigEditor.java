@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -54,39 +55,39 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				file = fileUpload;
 				fileHandleIds.add(file.getFileHandleId());
 			}
-		});	
-		view.configure(wikiKey, dialogCallback);
+		});
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);
 		}
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			configureWithSynapseId();
+		
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
+			// existing attachment
+			view.setUploadTabVisible(false);
+			view.showWikiAttachmentsTab();
+			wikiAttachments.setSelectedFilename(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+		} else if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			// existing synapse id
+			view.setUploadTabVisible(false);
+			view.showSynapseTab();
+			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 		} else {
 			view.showUploadTab();
 		}
-	}
-
-	public void configureWithSynapseId() {
-		view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+		
 		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
 			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		}
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)) {
+			view.setScale(Integer.parseInt(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)));
 		}
 	}
 
 	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
 			DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;
-		this.dialogCallback = dialogCallback;
-		view.initView();
-		view.configure(wikiKey, dialogCallback);
+		configure(wikiKey, widgetDescriptor, dialogCallback);
 		view.setUploadTabVisible(false);
-		view.setExistingAttachementTabVisible(false);
-
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			configureWithSynapseId();
-		} else {
-			view.showExternalTab();
-		}
+		view.setWikiAttachmentsTabVisible(false);
+		view.showExternalTab();
 	}
 
 	public void clearState() {
@@ -117,6 +118,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			}
 				
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 		}
 	}
