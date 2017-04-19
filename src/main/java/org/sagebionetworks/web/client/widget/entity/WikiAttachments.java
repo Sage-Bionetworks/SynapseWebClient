@@ -60,6 +60,9 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			selectedFilename = null;
 		} else {
 			view.addFileHandles(workingSet);
+			if (selectedFilename == null) {
+				selectedFilename = workingSet.get(0).getFileName(); 
+			}
 		}
 		
 		if (selectedFilename != null) {
