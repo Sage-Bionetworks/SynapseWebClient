@@ -106,6 +106,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		if (fileToUploadElement && 'files' in fileToUploadElement) {
 			file = fileToUploadElement.files[0];
 			var ext = file.name.split('.').pop();
+			// resize if it is a supported file type, and the file size > 3MB
 			canResize = [ 'bmp', 'jpg', 'jpeg', 'png' ].indexOf(ext) > -1 && file.size > 3145728;
 		}
 

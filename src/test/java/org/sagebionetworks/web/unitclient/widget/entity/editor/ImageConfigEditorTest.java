@@ -96,7 +96,37 @@ public class ImageConfigEditorTest {
 		editor.configure(wikiKey, descriptor, mockCallback);
 		verify(mockView).setAlignment(alignment);
 	}
+	
+	@Test
+	public void testScale() {
+		String scale = "70";
+		reset(mockView);
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, scale);
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).setScale(70);
+	}
 
+	@Test
+	public void testEditAttachmentBased() {
+		String fileName = "test.png";
+		reset(mockView);
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).setUploadTabVisible(false);
+		verify(mockView).showWikiAttachmentsTab();
+		verify(mockAttachments).setSelectedFilename(fileName);
+	}
+	
+	@Test
+	public void testSynapseIdBased() {
+		String synId = "syn9876";
+		reset(mockView);
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).setUploadTabVisible(false);
+		verify(mockView).showSynapseTab();
+		verify(mockView).setSynapseId(synId);
+	}
 
 	@Test
 	public void testUploadFileClickedSuccess() {
