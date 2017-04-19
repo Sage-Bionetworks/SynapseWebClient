@@ -87,7 +87,9 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		configure(wikiKey, widgetDescriptor, dialogCallback);
 		view.setUploadTabVisible(false);
 		view.setWikiAttachmentsTabVisible(false);
-		view.showExternalTab();
+		if (!descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			view.showExternalTab();
+		}
 	}
 
 	public void clearState() {

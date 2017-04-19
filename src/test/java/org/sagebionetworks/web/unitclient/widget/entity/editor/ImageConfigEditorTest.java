@@ -85,7 +85,6 @@ public class ImageConfigEditorTest {
 		verify(mockView).setFileInputWidget(any(Widget.class));
 		verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
 		verify(mockFileInputWidget).configure(any(CallbackP.class));
-		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		verify(mockAttachments).configure(any(WikiPageKey.class));
 	}
 
@@ -115,11 +114,10 @@ public class ImageConfigEditorTest {
 		descriptor.clear();
 		editor.configureWithoutUpload(wikiKey, descriptor, mockCallback);
 		verify(mockView).initView();
-		verify(mockView).configure(wikiKey, mockCallback);
 		verify(mockView).setUploadTabVisible(false);
-		verify(mockView).setExistingAttachementTabVisible(false);
+		verify(mockView).setWikiAttachmentsTabVisible(false);
 		verify(mockView).showExternalTab();
-		verify(mockFileInputWidget, never()).reset();
+		verify(mockFileInputWidget).reset();
 	}
 
 	@Test
@@ -128,17 +126,15 @@ public class ImageConfigEditorTest {
 		reset(mockFileInputWidget);
 		editor.configureWithoutUpload(wikiKey, descriptor, mockCallback);
 		verify(mockView).initView();
-		verify(mockView).configure(wikiKey, mockCallback);
-		verify(mockView).setUploadTabVisible(false);
-		verify(mockView).setExistingAttachementTabVisible(false);
+		verify(mockView, atLeastOnce()).setUploadTabVisible(false);
+		verify(mockView).setWikiAttachmentsTabVisible(false);
 		verify(mockView, never()).showExternalTab();
 		verify(mockView).setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
-		verify(mockFileInputWidget, never()).reset();
+		verify(mockFileInputWidget).reset();
 	}
 	
 	@Test
 	public void testConfigure() {
-		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		when(mockView.isExternal()).thenReturn(false);
 		mockFinishedCallback.invoke(mockFileUpload);
 		editor.updateDescriptorFromView();
