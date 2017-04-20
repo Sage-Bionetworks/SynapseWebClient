@@ -76,6 +76,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.dataAccessClient = dataAccessClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
+		actAccessRequirementWidget.setManageAccessVisible(false);
 		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		states = new ArrayList<String>();
