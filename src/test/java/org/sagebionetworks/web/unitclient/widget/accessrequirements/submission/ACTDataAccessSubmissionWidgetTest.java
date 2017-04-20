@@ -208,12 +208,14 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Test
 	public void testUpdateDataAccessSubmissionState() {
 		widget.configure(mockDataAccessSubmission);
-		
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.REJECTED);
 		String rejectionReason = "missing info";
-		widget.updateDataAccessSubmissionState(DataAccessSubmissionState.REJECTED, rejectionReason);
-		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(DataAccessSubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
+		when(mockPromptModalView.getValue()).thenReturn(rejectionReason);
+		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.REJECTED);
 		
+		confirmRejectionCallback.onPrimary();
+		
+		verify(mockPromptModalView).hide();
+		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(DataAccessSubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
 		verify(mockView).setState(DataAccessSubmissionState.REJECTED.name());
 	}
 	
