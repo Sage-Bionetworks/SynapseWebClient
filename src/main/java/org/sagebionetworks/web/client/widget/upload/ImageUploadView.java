@@ -7,7 +7,7 @@ public interface ImageUploadView extends IsWidget, HasAttachHandlers {
 	
 	public interface Presenter{
 		void onFileSelected();
-		void onFileProcessed(JavaScriptObjectWrapper blob);
+		void onFileProcessed(JavaScriptObjectWrapper blob, String contentType);
 	}
 	void setPresenter(Presenter presenter);
 	void showProgress(boolean b);

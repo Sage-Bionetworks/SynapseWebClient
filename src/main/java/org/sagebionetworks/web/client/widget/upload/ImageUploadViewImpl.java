@@ -149,7 +149,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 			imgElement.src = $wnd.URL.createObjectURL(file);
 		} else {
 			// send back original content
-			v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(file);
+			v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::noResizeNecessary(Lcom/google/gwt/core/client/JavaScriptObject;)(file);
 		}
 	}-*/;
 
@@ -159,11 +159,16 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		console.log('pica resizer initialized');	
 	}-*/;
 
-
 	public void resizeComplete(JavaScriptObject blob) {
 		loadingUI.setVisible(false);
-		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob));
+		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/jpeg");
 	}
+
+	public void noResizeNecessary(JavaScriptObject blob) {
+		loadingUI.setVisible(false);
+		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), null);
+	}
+
 
 	@Override
 	public Widget asWidget() {

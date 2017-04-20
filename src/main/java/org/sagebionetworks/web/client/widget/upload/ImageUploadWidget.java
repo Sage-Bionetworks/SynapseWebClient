@@ -85,7 +85,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void onFileProcessed(JavaScriptObjectWrapper blob) {
+	public void onFileProcessed(JavaScriptObjectWrapper blob, String forcedContentType) {
 		synAlert.clear();
 		fileMeta = getSelectedFileMetadata();
 		if (fileMeta != null && blob != null) {
@@ -95,6 +95,9 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 			view.updateProgress(1, "1%");
 			view.showProgress(true);
 			view.setInputEnabled(false);
+			if (forcedContentType != null) {
+				fileMeta.setContentType(forcedContentType);
+			}
 			doMultipartUpload(fileMeta, blob);
 		}
 	}
@@ -108,7 +111,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	
 	private void doMultipartUpload(final FileMetadata fileMeta, JavaScriptObjectWrapper blob) {
 		// The uploader does the real work
-		multipartUploader.uploadFile(fileMeta.getFileName(), "image/jpeg", blob.get(),
+		multipartUploader.uploadFile(fileMeta.getFileName(), fileMeta.getContentType(), blob.get(),
 			new ProgressingFileUploadHandler() {
 				@Override
 				public void uploadSuccess(String fileHandleId) {

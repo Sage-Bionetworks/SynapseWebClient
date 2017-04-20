@@ -70,8 +70,8 @@ public class ImageUploadWidgetImplTest {
 
 		//The metadata returned should correspond to testFileName
 		when(mockView.getInputId()).thenReturn(inputId);
-		when(mockJSNIUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName.jpg"});
-		when(mockJSNIUtils.getContentType(anyString(), anyInt())).thenReturn("image/jpg");
+		when(mockJSNIUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName.png"});
+		when(mockJSNIUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
 		
 	}
 	
@@ -92,13 +92,13 @@ public class ImageUploadWidgetImplTest {
 		widget.configure(mockCallback);
 		
 		// method under test.
-		widget.onFileProcessed(mockBlob);
+		widget.onFileProcessed(mockBlob, null);
 		verify(mockView).updateProgress(1, "1%");
 		verify(mockView).showProgress(true);
 		verify(mockView).setInputEnabled(false);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		
-		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
+		verify(mockMultipartUploader).uploadFile(anyString(), eq("image/png"), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
 		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
 		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
 		handleCaptor.getValue().uploadSuccess(successFileHandle);
@@ -113,6 +113,13 @@ public class ImageUploadWidgetImplTest {
 		verify(mockView).updateProgress(100, "100%");
 		verify(mockView, times(2)).setInputEnabled(true);
 		verify(mockView, times(2)).showProgress(false);
+	}
+	
+	@Test
+	public void testFileSelectedForceContentType(){
+		widget.configure(mockCallback);
+		widget.onFileProcessed(mockBlob, "image/jpeg");
+		verify(mockMultipartUploader).uploadFile(anyString(), eq("image/jpeg"), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
 	}
 	
 	@Test
