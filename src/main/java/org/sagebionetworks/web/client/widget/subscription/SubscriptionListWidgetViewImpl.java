@@ -20,8 +20,6 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	RadioButton projectFilter;
 	@UiField
 	RadioButton threadFilter;
-	@UiField
-	RadioButton submissionsFilter;
 	
 	@UiField
 	Div synAlertContainer;
@@ -54,17 +52,6 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 				presenter.onFilter(SubscriptionObjectType.THREAD);
 			}
 		});
-		submissionsFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFilter(SubscriptionObjectType.DATA_ACCESS_SUBMISSION);
-			}
-		});
-	}
-	
-	@Override
-	public void setSubmissionFilterVisible(boolean visible) {
-		submissionsFilter.setVisible(visible);	
 	}
 	
 	@Override

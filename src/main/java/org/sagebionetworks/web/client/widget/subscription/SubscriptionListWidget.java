@@ -6,9 +6,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
@@ -27,7 +25,6 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	AuthenticationController authController;
 	public static final Long LIMIT = 10L;
 	BasicPaginationWidget paginationWidget;
-	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	
 	@Inject
 	public SubscriptionListWidget(SubscriptionListWidgetView view, 
@@ -35,15 +32,13 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 			PortalGinInjector ginInjector,
 			SynapseAlert synAlert,
 			AuthenticationController authController,
-			BasicPaginationWidget paginationWidget,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			BasicPaginationWidget paginationWidget) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.subscribeClient = subscribeClient;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
-		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPagination(paginationWidget.asWidget());
 		view.setPresenter(this);
@@ -56,12 +51,6 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		if (authController.isLoggedIn()) {
 			onPageChange(0L);
 		}
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean isACT) {
-				view.setSubmissionFilterVisible(isACT);
-			}
-		});
 	}
 	
 	@Override

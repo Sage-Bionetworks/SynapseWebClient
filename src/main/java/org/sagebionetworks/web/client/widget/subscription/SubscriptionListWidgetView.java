@@ -15,7 +15,7 @@ public interface SubscriptionListWidgetView extends IsWidget {
 	void setNoItemsMessageVisible(boolean visible);
 	void setPagination(Widget w);
 	void setLoadingVisible(boolean visible);
-	void setSubmissionFilterVisible(boolean visible);
+	
 	/**
 	 * Presenter interface
 	 */
