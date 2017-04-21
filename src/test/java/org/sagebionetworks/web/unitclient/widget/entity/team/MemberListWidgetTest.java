@@ -150,13 +150,14 @@ public class MemberListWidgetTest {
 	
 	@Test
 	public void testSetIsAdminFailure() throws Exception {
+		String message = "unhandled exception";
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		Exception ex = new Exception("unhandled exception");
+		Exception ex = new Exception(message);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showErrorMessage(message);;
 		//called twice.  once during configuration, and once to refresh members to get correct admin state
 		verify(mockSynapseClient, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
