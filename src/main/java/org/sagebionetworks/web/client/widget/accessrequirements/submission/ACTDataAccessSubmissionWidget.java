@@ -66,6 +66,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			@Override
 			public void onPrimary() {
 				updateDataAccessSubmissionState(DataAccessSubmissionState.REJECTED, promptDialog.getValue());
+				promptDialog.hide();
 			}
 		});
 	}
