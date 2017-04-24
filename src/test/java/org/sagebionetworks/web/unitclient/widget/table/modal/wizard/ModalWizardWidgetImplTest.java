@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.wizard;
 
 import static org.mockito.Mockito.verify;
-
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -37,6 +37,13 @@ public class ModalWizardWidgetImplTest {
 		widget.showModal(mockWizardCallback);
 		verify(mockUploadCSVFileWidget).setModalPresenter(widget);
 		verify(mockView).showModal();
+		assertEquals(1, widget.getCallbacks().size());
+		assertEquals(mockWizardCallback, widget.getCallbacks().get(0));
+		
+		// verify callbacks are cleared when showModal is called
+		widget.showModal(mockWizardCallback);
+		assertEquals(1, widget.getCallbacks().size());
+		assertEquals(mockWizardCallback, widget.getCallbacks().get(0));
 	}
 	
 	@Test

@@ -240,4 +240,9 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public boolean isAttached() {
 		return w.isAttached();
 	}
+	
+	@Override
+	public void setManageAccessWidgetContainerVisible(boolean visible) {
+		manageAccessContainer.setVisible(visible);
+	}
 }

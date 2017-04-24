@@ -8,6 +8,12 @@
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
  	<t:Table addStyleNames="table-layout-fixed border-top-1" width="3000px">
 		<t:TableRow>
+			<t:TableData addStyleNames="min-width-200">
+				<b:Button ui:field="rejectButton" type="WARNING" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Reject" />
+				<b:Button ui:field="approveButton" type="SUCCESS" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Approve" />
+				<bh:Div ui:field="synAlertContainer"/>
+				<bh:Span ui:field="promptModalContainer"/>
+			</t:TableData>
 			<t:TableData addStyleNames="min-width-150" >
 				<g:Label ui:field="submittedOnField"/>
 			</t:TableData>
@@ -51,12 +57,6 @@
 				<g:ScrollPanel height="100px">
 					<bh:Span ui:field="summaryOfUseField" />
 				</g:ScrollPanel>
-			</t:TableData>
-			<t:TableData addStyleNames="min-width-200">
-				<b:Button ui:field="rejectButton" type="WARNING" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Reject" />
-				<b:Button ui:field="approveButton" type="SUCCESS" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2" visible="false" text="Approve" />
-				<bh:Div ui:field="synAlertContainer"/>
-				<bh:Span ui:field="promptModalContainer"/>
 			</t:TableData>
 		</t:TableRow>
 	</t:Table>

@@ -67,6 +67,10 @@
 			<g:ScrollPanel>
 				<t:Table addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20" width="3000px">
 					<t:TableRow>
+						<t:TableHeader addStyleNames="min-width-200">
+							<bh:Span text="Actions" />
+						</t:TableHeader>
+					
 						<t:TableHeader addStyleNames="min-width-150">
 							<b:Anchor ui:field="createdOnColumnHeader" text="Created On"/>
 						</t:TableHeader>
@@ -102,9 +106,6 @@
 						</t:TableHeader>
 						<t:TableHeader ui:field="summaryOfUseColumn" addStyleNames="min-width-150">
 							<bh:Span text="Summary Of Use" />
-						</t:TableHeader>
-						<t:TableHeader addStyleNames="min-width-200">
-							<bh:Span text="Actions" />
 						</t:TableHeader>
 					</t:TableRow>
 					<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />

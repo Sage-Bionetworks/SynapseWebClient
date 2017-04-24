@@ -205,4 +205,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	public void setVisible(boolean visible) {
 		view.setVisible(visible);
 	}
+	
+	public void setManageAccessVisible(boolean visible) {
+		view.setManageAccessWidgetContainerVisible(visible);
+	}
 }
