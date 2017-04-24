@@ -47,6 +47,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	
 	public void configure(List<String> entityContainerIds, boolean canEdit) {
 		view.clear();
+		entityIds.clear();
 		this.canEdit = canEdit;
 		view.setAddButtonVisible(canEdit);
 		view.setNoContainers(entityContainerIds.isEmpty());

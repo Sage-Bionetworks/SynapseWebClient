@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -81,6 +81,20 @@ public class EntityContainerListWidgetTest {
 		assertTrue(widget.getEntityIds().contains(headerId));
 		widget.onRemoveProject(headerId);
 		assertTrue(widget.getEntityIds().isEmpty());
+	}
+	
+	@Test
+	public void testMultipleConfigure() {
+		// SWC-3562: old ids should be cleared when widget is re-configured
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		boolean canEdit = true;
+		widget.configure(Collections.singletonList(headerId), canEdit);
+		assertTrue(widget.getEntityIds().contains(headerId));
+		assertEquals(1, widget.getEntityIds().size());
+		
+		widget.configure(Collections.singletonList(headerId), canEdit);
+		assertTrue(widget.getEntityIds().contains(headerId));
+		assertEquals(1, widget.getEntityIds().size());
 	}
 	
 	@Test
