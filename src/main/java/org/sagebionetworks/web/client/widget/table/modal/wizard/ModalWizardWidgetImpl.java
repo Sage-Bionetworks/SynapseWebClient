@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -103,6 +102,7 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 
 	@Override
 	public void showModal(WizardCallback callback) {
+		callbacks.clear();
 		setNextActivePage(this.firstPage);
 		addCallback(callback);
 		this.view.showModal();
@@ -118,12 +118,15 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	@Override
 	public void configure(ModalPage firstPage) {
 		this.firstPage = firstPage;
-		callbacks.clear();
 	}
 	
 	@Override
 	public void setHelp(String helpMarkdown, String helpUrl) {
 		view.setHelp(helpMarkdown, helpUrl);
+	}
+	
+	public List<WizardCallback> getCallbacks() {
+		return callbacks;
 	}
 
 }
