@@ -211,15 +211,28 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}
 	
+	
+	
 	@Override
-	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+	public void uploadFileChunk(String contentType, JavaScriptObject blob, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
-		_directUploadFile(contentType, index, fileFieldId, startByte, endByte, url, xhr);
+		_directUploadBlob(contentType, blob, startByte, endByte, url, xhr);
 	}
 	
-	private final static native void _directUploadFile(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
+	@Override
+	public JavaScriptObject getFileBlob(int index, String fileFieldId) {
+		return _getFileBlob(index, fileFieldId);
+	}
+	
+	private final static native JavaScriptObject _getFileBlob(int index, String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileToUpload = fileToUploadElement.files[index];
+		if (fileToUploadElement && 'files' in fileToUploadElement) {
+			return fileToUploadElement.files[index];
+		}
+		return null;
+	}-*/;
+	
+	private final static native void _directUploadBlob(String contentType, JavaScriptObject fileToUpload, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
 		var start = parseInt(startByte) || 0;
 		var end = parseInt(endByte) || fileToUpload.size - 1;
 		var fileSliceToUpload;
@@ -271,15 +284,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public double getFileSize(String fileFieldId, int index) {
-		return _getFileSize(fileFieldId, index);
+	public double getFileSize(JavaScriptObject blob) {
+		return _getFileSize(blob);
 	}
-	private final static native double _getFileSize(String fileFieldId, int index) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileSize = 0;
-		if (fileToUploadElement && ('files' in fileToUploadElement))
-			fileSize = fileToUploadElement.files[index].size;
-		return fileSize;
+	private final static native double _getFileSize(JavaScriptObject blob) /*-{
+		return blob.size;
 	}-*/;
 	
 	@Override
@@ -310,12 +319,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
 	 */
 	@Override
-	public void getFileMd5(String fileFieldId, int index, MD5Callback md5Callback) {
-		_getFileMd5(fileFieldId, index, md5Callback);
+	public void getFileMd5(JavaScriptObject blob, MD5Callback md5Callback) {
+		_getFileMd5(blob, md5Callback);
 	}
-	private final static native void _getFileMd5(String fileFieldId, int index, MD5Callback md5Callback) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var file = fileToUploadElement.files[index];
+	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		chunkSize = 2097152; // read in chunks of 2MB
         chunks = Math.ceil(file.size / chunkSize);
@@ -357,12 +364,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
 	 */
 	@Override
-	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback) {
-		_getFilePartMd5(fileFieldId, currentChunk, chunkSize.doubleValue(), fileIndex, md5Callback);
+	public void getFilePartMd5(JavaScriptObject blob, int currentChunk, Long chunkSize, MD5Callback md5Callback) {
+		_getFilePartMd5(blob, currentChunk, chunkSize.doubleValue(), md5Callback);
 	}
-	private final static native void _getFilePartMd5(String fileFieldId, int currentChunk, double chunkSize, int fileIndex, MD5Callback md5Callback) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var file = fileToUploadElement.files[fileIndex];
+	private final static native void _getFilePartMd5(JavaScriptObject file, int currentChunk, double chunkSize, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		spark = new $wnd.SparkMD5.ArrayBuffer();
         $wnd.frOnload = function(e) {

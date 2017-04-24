@@ -74,7 +74,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			for(int i=0; i<fileNames.length; i++){
 				String name = fileNames[i];
 				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
-				double fileSize = synapseJsniUtils.getFileSize(inputId, i);
+				double fileSize = synapseJsniUtils.getFileSize(synapseJsniUtils.getFileBlob(i, inputId));
 				results[i] = new FileMetadata(name, contentType, fileSize);
 			}
 		}
@@ -163,9 +163,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		// The uploader does the real work
 		
 		String fileInputId = view.getInputId();
-		String name = fileMeta.getFileName();
-
-		multipartUploader.uploadFile(name, fileInputId, count,
+		
+		multipartUploader.uploadFile(fileInputId, count,
 			new ProgressingFileUploadHandler() {
 				@Override
 				public void uploadSuccess(String fileHandleId) {
@@ -187,7 +186,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 					int totalProgress = count * 100 / fileMetaArr.length + (int)(currentProgress * 100 / fileMetaArr.length);
 					view.updateProgress(totalProgress, totalProgress + "%");
 				}
-		}, null);
+		}, null, view);
 	}
 
 }

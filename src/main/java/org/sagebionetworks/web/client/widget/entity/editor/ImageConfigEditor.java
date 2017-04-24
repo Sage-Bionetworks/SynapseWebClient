@@ -5,18 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,13 +23,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	private ImageConfigView view;
 	private Map<String, String> descriptor;
 	private FileUpload file;
-	private FileHandleUploadWidget fileInputWidget;
+	private ImageUploadWidget fileInputWidget;
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
 	private List<String> fileHandleIds;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
+	public ImageConfigEditor(ImageConfigView view, ImageUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
 		view.setPresenter(this);
 		this.fileInputWidget = fileInputWidget;
@@ -48,7 +46,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		this.file = null;
 		view.initView();
 		fileInputWidget.reset();
-		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+		fileInputWidget.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				view.showUploadSuccessUI();
@@ -57,45 +55,39 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				file = fileUpload;
 				fileHandleIds.add(file.getFileHandleId());
 			}
-		});	
-		ImageFileValidator validator = new ImageFileValidator();
-		validator.setInvalidFileCallback(new Callback() {
-			@Override
-			public void invoke() {
-				view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
-			}
 		});
-		fileInputWidget.setValidation(validator);
-		view.configure(wikiKey, dialogCallback);
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);
 		}
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			configureWithSynapseId();
+		
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
+			// existing attachment
+			view.setUploadTabVisible(false);
+			view.showWikiAttachmentsTab();
+			wikiAttachments.setSelectedFilename(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+		} else if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+			// existing synapse id
+			view.setUploadTabVisible(false);
+			view.showSynapseTab();
+			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 		} else {
 			view.showUploadTab();
 		}
-	}
-
-	public void configureWithSynapseId() {
-		view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+		
 		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
 			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		}
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)) {
+			view.setScale(Integer.parseInt(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)));
 		}
 	}
 
 	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
 			DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;
-		this.dialogCallback = dialogCallback;
-		view.initView();
-		view.configure(wikiKey, dialogCallback);
+		configure(wikiKey, widgetDescriptor, dialogCallback);
 		view.setUploadTabVisible(false);
-		view.setExistingAttachementTabVisible(false);
-
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			configureWithSynapseId();
-		} else {
+		view.setWikiAttachmentsTabVisible(false);
+		if (!descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
 			view.showExternalTab();
 		}
 	}
@@ -111,6 +103,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 
 	@Override
 	public void updateDescriptorFromView() {
+		descriptor.clear();
 		view.checkParams();
 		if (!view.isExternal()) {
 			if (view.isSynapseEntity()) {
@@ -128,6 +121,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			}
 				
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 		}
 	}

@@ -68,6 +68,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -149,7 +150,7 @@ public class UploaderTest {
 		// Simulate success.
 		multipartUploader.setFileHandle("99999");
 		
-		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(1.0);
+		when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(1.0);
 		when(synapseJsniUtils.isFileAPISupported()).thenReturn(true);
 		storageLocationId = 9090L;
 		
@@ -161,7 +162,7 @@ public class UploaderTest {
                 ((MD5Callback) args[args.length - 1]).setMD5(md5);
 				return null;
 			}
-		}).when(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
+		}).when(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
 	}
 	
 	@Test

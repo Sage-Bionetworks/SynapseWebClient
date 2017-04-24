@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface FileHandleUploadView extends IsWidget {
+public interface FileHandleUploadView extends IsWidget, HasAttachHandlers {
 	
 	public interface Presenter{
 		/**

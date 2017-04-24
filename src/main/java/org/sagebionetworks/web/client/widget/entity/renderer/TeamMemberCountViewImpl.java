@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -16,7 +15,7 @@ public class TeamMemberCountViewImpl implements TeamMemberCountView {
 	@UiField
 	Span countContainer;
 	@UiField
-	Div synAlertContainer;
+	Span synAlertContainer;
 	Widget widget;
 	
 	@Inject
