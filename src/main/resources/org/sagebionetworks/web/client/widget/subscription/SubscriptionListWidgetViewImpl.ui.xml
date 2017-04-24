@@ -10,7 +10,6 @@
 			<b:ButtonGroup dataToggle="BUTTONS">
 				<b:RadioButton name="filters" ui:field="projectFilter">Project Forums</b:RadioButton>
 				<b:RadioButton name="filters" ui:field="threadFilter">Threads</b:RadioButton>
-				<b:RadioButton name="filters" ui:field="submissionsFilter" visible="false">(ACT) Data Access Submissions</b:RadioButton>
 			</b:ButtonGroup>
 		</bh:Div>
 		<bh:Span ui:field="loadingUI" visible="false">
