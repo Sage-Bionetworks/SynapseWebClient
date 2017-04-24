@@ -22,6 +22,7 @@ public interface MemberListWidgetView extends IsWidget {
 	void clearMembers();
 	void setSynAlert(IsWidget widget);
 	void showInfo(String message);
+	void showErrorMessage(String message);
 	public interface Presenter {
 		//used for the user profile links
 		void goTo(Place place);
