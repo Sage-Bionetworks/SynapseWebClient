@@ -17,7 +17,7 @@
 							<b:TextBox ui:field="entityIds" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
 								autoComplete="false" />
 							<b:InputGroupButton>
-								<b:Button ui:field="synapseMultiIdButton" text="Set Subjects)" />
+								<b:Button ui:field="synapseMultiIdButton" text="Set Subjects" />
 							</b:InputGroupButton>
 						</b:InputGroup>
 					</b:Column>

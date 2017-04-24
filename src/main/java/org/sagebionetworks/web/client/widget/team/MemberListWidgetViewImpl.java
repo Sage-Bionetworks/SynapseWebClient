@@ -200,4 +200,9 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message, "");
 	}
+	
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
 }

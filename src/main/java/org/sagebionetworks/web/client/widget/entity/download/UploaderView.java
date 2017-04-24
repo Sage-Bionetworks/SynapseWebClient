@@ -3,9 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface UploaderView extends IsWidget, SynapseView {
+public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 
 	/**
 	 * Set the presenter.

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
@@ -38,7 +39,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 	Heading noAttachmentsUI;
 	@UiField
 	Alert alert;
-	
+	List<InlineRadio> radioButtons = new ArrayList<InlineRadio>();
 	@Inject
 	public WikiAttachmentsViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
@@ -57,6 +58,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 	
 	@Override
 	public void addFileHandles(List<FileHandle> attachments) {
+		radioButtons.clear();
 		for (int i = 0; i < attachments.size(); i++) {
 			FlowPanel row = new FlowPanel();
 			attachmentsPanel.add(row);
@@ -64,6 +66,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 			FileHandle data = attachments.get(i);
 			final String fileName = data.getFileName();
 			InlineRadio attachmentLink = new InlineRadio(FILENAMES, data.getFileName());
+			radioButtons.add(attachmentLink);
 			attachmentLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -89,6 +92,13 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 		}
 	}
 
+	@Override
+	public void setSelectedFilename(String fileName) {
+		for (InlineRadio radio : radioButtons) {
+			String text = radio.getText();
+			radio.setValue(text.equals(fileName), false);
+		}
+	}
 
 	@Override
 	public Widget asWidget() {

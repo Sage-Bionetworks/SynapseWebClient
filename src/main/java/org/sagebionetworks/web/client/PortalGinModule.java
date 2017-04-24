@@ -114,6 +114,8 @@ import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2View;
@@ -705,8 +707,9 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileInputView;
 import org.sagebionetworks.web.client.widget.upload.FileInputViewImpl;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidgetImpl;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -1004,7 +1007,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
 		
 		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
-		bind(FileInputWidget.class).to(FileInputWidgetImpl.class);
 		bind(FileInputView.class).to(FileInputViewImpl.class);
 		
 		bind(FileHandleUploadView.class).to(FileHandleUploadViewImpl.class);
@@ -1443,5 +1445,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
 		bind(ACTDataAccessSubmissionWidgetView.class).to(ACTDataAccessSubmissionWidgetViewImpl.class);
 		bind(OpenSubmissionWidgetView.class).to(OpenSubmissionWidgetViewImpl.class);
-	}
+		bind(LockAccessRequirementWidgetView.class).to(LockAccessRequirementWidgetViewImpl.class);
+		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);	}
 }

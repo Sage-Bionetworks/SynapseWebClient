@@ -122,7 +122,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				view.showErrorMessage(caught.getMessage());
 				refresh();
 			}
 		});

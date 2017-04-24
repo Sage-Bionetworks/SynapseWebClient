@@ -55,6 +55,7 @@ public class CreateAccessRequirementButton implements IsWidget {
 					
 					@Override
 					public void onCanceled() {
+						globalAppState.refreshPage();
 					}
 				});
 			}
