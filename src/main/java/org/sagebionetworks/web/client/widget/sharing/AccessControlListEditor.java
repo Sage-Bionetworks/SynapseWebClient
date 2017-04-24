@@ -120,7 +120,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 	}
 	
-	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_MODERATE, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
 	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
 	
 	public PermissionLevel[] getPermList() {
@@ -133,7 +133,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
 		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
-		permissionDisplay.put(PermissionLevel.CAN_MODERATE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_MODERATE);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		

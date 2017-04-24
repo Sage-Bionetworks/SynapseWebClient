@@ -41,9 +41,8 @@ public class DisplayConstants {
 	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
 	
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
-	public static final String MENU_PERMISSION_LEVEL_CAN_MODERATE = "Can moderate";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
-	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
+	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Can edit & delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String MENU_PERMISSION_LEVEL_CAN_SUBMIT = "Can submit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_SCORE = "Can score";
