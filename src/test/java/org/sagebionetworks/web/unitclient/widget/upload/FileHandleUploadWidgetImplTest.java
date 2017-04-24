@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -28,6 +28,8 @@ import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
 
 public class FileHandleUploadWidgetImplTest {
 	
@@ -88,7 +90,7 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).setInputEnabled(false);
 		verify(mockView).hideError();
 		
-		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		verify(mockMultipartUploader).uploadFile(anyString(), anyInt(), handleCaptor.capture(), any(Long.class), eq(mockView));
 		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
 		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
 		handleCaptor.getValue().uploadSuccess(successFileHandle);
@@ -121,7 +123,7 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).hideError();
 		
 		// The progress should be updated with scaled values based on the presence of two files to upload
-		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		verify(mockMultipartUploader).uploadFile(anyString(), anyInt(), handleCaptor.capture(), any(Long.class), eq(mockView));
 		verify(mockView).showProgress(true);
 		verify(mockView).setInputEnabled(false);
 		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
@@ -154,7 +156,7 @@ public class FileHandleUploadWidgetImplTest {
 				handler.uploadFailed(error);
 				return null;
 			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
+		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class), any(HasAttachHandlers.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		AbstractFileValidator validator = new AbstractFileValidator() {
@@ -200,7 +202,7 @@ public class FileHandleUploadWidgetImplTest {
 				handler.uploadFailed(error);
 				return null;
 			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
+		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class), any(HasAttachHandlers.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		AbstractFileValidator validator = new AbstractFileValidator () {

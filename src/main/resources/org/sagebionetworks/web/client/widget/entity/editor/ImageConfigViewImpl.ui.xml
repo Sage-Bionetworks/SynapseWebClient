@@ -62,6 +62,7 @@
 			</b:TabPane>
 			<b:TabPane b:id="tab4" addStyleNames="margin-top-15" ui:field="tab4">
 				<g:SimplePanel ui:field="wikiAttachmentsContainer" />
+				<g:SimplePanel ui:field="wikiAttachmentsParamsPanelContainer" />
 			</b:TabPane>
 			
 		</b:TabContent>

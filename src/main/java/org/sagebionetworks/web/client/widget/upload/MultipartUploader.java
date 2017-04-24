@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
+
 /**
  * Abstraction for a muti-part file uploader.
  * 
@@ -16,7 +19,9 @@ public interface MultipartUploader {
 	 * @param fileIndex
 	 * @param handler
 	 */
-	void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId);
+	void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view);
+	
+	void uploadFile(String fileInputId, int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view);
 	
 	/**
 	 * Upload a single file using multi-part upload.
@@ -25,6 +30,5 @@ public interface MultipartUploader {
 	 * @param inputFile
 	 * @param handler
 	 */
-	void uploadFile(String fileName, String fileInputId, int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId);
-
+	void uploadFile(String fileName, String contentType, JavaScriptObject blob, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view);
 }
