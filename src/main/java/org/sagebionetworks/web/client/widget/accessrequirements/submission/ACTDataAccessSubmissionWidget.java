@@ -9,9 +9,9 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -89,9 +89,13 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		}
 		view.clearAccessors();
 		if (submission.getAccessors() != null) {
-			for (String userId : submission.getAccessors()) {
-				UserBadge badge = ginInjector.getUserBadgeWidget();
+			for (int i = 0; i < submission.getAccessors().size(); i++) {
+				String userId = submission.getAccessors().get(i);
+				UserBadgeItem badge = ginInjector.getUserBadgeItem();
 				badge.configure(userId);
+				badge.setSelectVisible(false);
+				// TODO: set access requirement approval icon visibility 
+//				badge.setMetRequirementIconVisible(isMet);
 				view.addAccessors(badge);
 			}
 		}

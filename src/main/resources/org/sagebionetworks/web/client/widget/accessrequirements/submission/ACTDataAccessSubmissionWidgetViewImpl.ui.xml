@@ -33,7 +33,7 @@
 			</t:TableData>
 			<t:TableData addStyleNames="min-width-200">
 				<g:ScrollPanel height="100px">
-					<bh:Div ui:field="accessorsContainer" />
+					<t:Table ui:field="accessorsContainer" width="400px" /> 
 				</g:ScrollPanel>
 			</t:TableData>
 			<t:TableData ui:field="ducColumn" addStyleNames="min-width-150">
