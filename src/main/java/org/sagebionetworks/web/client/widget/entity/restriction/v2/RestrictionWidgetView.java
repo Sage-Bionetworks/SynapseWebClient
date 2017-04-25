@@ -26,6 +26,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	void showFlagModal();
 	void showAnonymousFlagModal();
+	void showVerifyDataSensitiveDialog();
 	
 	void setImposeRestrictionOkButtonEnabled(boolean enable);
 	void setNotSensitiveHumanDataMessageVisible(boolean visible);
@@ -38,6 +39,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void changeClicked();
 		void flagData();
 		void anonymousFlagModalOkClicked();
 		void reportIssueClicked();

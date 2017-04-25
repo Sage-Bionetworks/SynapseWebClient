@@ -8,31 +8,26 @@
 	<bh:Div>
 		<bh:Div>
 			<b:FormGroup>
-				<b:FormLabel>Subjects</b:FormLabel>
+				<b:FormLabel>Resources/Teams</b:FormLabel>
 				<bh:Div ui:field="subjectsContainer"/>
-				
-				<b:Row>
-					<b:Column size="SM_6">
-						<b:InputGroup >
-							<b:TextBox ui:field="entityIds" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
-								autoComplete="false" />
-							<b:InputGroupButton>
-								<b:Button ui:field="synapseMultiIdButton" text="Set Subjects" />
-							</b:InputGroupButton>
-						</b:InputGroup>
-					</b:Column>
-					<b:Column size="SM_6">
-						<b:InputGroup >
-							<b:TextBox ui:field="teamIds" placeholder="Enter Team IDs (i.e. '123, 456')"
-								autoComplete="false" />
-							<b:InputGroupButton>
-								<b:Button ui:field="teamMultiIdButton" text="Set Subjects" />
-							</b:InputGroupButton>
-						</b:InputGroup>
-							
-					</b:Column>
-				</b:Row>
-
+				<b:ButtonGroup>
+					<b:Radio name="resourcetype" ui:field="entityButton" text="Entities" value="true" />
+					<b:Radio name="resourcetype" ui:field="teamButton" text="Teams" />
+				</b:ButtonGroup>
+				<b:InputGroup ui:field="entityUI">
+					<b:TextBox ui:field="entityIds" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
+						autoComplete="false" />
+					<b:InputGroupButton>
+						<b:Button ui:field="synapseMultiIdButton" text="Set Resources" />
+					</b:InputGroupButton>
+				</b:InputGroup>
+				<b:InputGroup ui:field="teamUI">
+					<b:TextBox ui:field="teamIds" placeholder="Enter Team IDs (i.e. '123, 456')"
+						autoComplete="false" />
+					<b:InputGroupButton>
+						<b:Button ui:field="teamMultiIdButton" text="Set Teams" />
+					</b:InputGroupButton>
+				</b:InputGroup>
 			</b:FormGroup>
 			<b:FormGroup ui:field="arTypeUI">
 				<b:FormLabel>Access requirement type</b:FormLabel>

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -64,6 +65,9 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 				synapseClient.submitDataAccessRequest(dataAccessRequest.getId(), dataAccessRequest.getEtag());
 			}
 		} catch (SynapseException e) {
+			if (e instanceof SynapseServerException) {
+				System.out.println("status code: " + ((SynapseServerException)e).getStatusCode());
+			}
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
