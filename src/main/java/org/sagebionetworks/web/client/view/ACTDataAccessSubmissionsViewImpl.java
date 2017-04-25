@@ -62,21 +62,9 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	Span currentState;
 	@UiField
-	TableHeader ducColumn;
-	@UiField
-	TableHeader irbColumn;
-	@UiField
-	TableHeader otherAttachmentsColumn;
-	@UiField
 	Panel accessRequirementUI;
 	@UiField
 	Anchor createdOnColumnHeader;
-	@UiField
-	TableHeader publicationsColumn;
-	@UiField
-	TableHeader summaryOfUseColumn;
-	@UiField
-	TableHeader isRenewalColumn;
 	@UiField
 	CheckBox certifiedCheckbox;
 	@UiField
@@ -229,24 +217,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setShowHideButton(IsWidget button) {
 		showHideAccessRequirementButtonContainer.clear();
 		showHideAccessRequirementButtonContainer.add(button);
-	}
-	@Override
-	public void setDucColumnVisible(boolean visible) {
-		ducColumn.setVisible(visible);
-	}
-	@Override
-	public void setIrbColumnVisible(boolean visible) {
-		irbColumn.setVisible(visible);
-	}
-	@Override
-	public void setOtherAttachmentsColumnVisible(boolean visible) {
-		otherAttachmentsColumn.setVisible(visible);
-	}
-	@Override
-	public void setRenewalColumnsVisible(boolean visible) {
-		publicationsColumn.setVisible(visible);
-		summaryOfUseColumn.setVisible(visible);
-		isRenewalColumn.setVisible(visible);
 	}
 	
 	@Override

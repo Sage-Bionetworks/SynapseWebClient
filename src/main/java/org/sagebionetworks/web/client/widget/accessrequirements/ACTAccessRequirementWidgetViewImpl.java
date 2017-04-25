@@ -63,6 +63,12 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div requestSubmittedByOther;
 	@UiField
 	Div submitterUserBadgeContainer;
+	@UiField
+	Div cancelRequestButtonContainer;
+	@UiField
+	Div updateRequestButtonContainer;
+	@UiField
+	Div requestAccessButtonContainer;
 	
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
@@ -244,5 +250,15 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@Override
 	public void setManageAccessWidgetContainerVisible(boolean visible) {
 		manageAccessContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void hideButtonContainers() {
+		manageAccessContainer.setVisible(false);
+		editAccessRequirementContainer.setVisible(false);
+		deleteAccessRequirementContainer.setVisible(false);
+		cancelRequestButtonContainer.setVisible(false);
+		updateRequestButtonContainer.setVisible(false);
+		requestAccessButtonContainer.setVisible(false);
 	}
 }
