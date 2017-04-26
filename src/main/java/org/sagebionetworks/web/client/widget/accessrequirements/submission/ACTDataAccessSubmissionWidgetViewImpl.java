@@ -224,6 +224,7 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	}
 	@Override
 	public void hideActions() {
+		dialog.hide();
 		rejectButton.setVisible(false);
 		approveButton.setVisible(false);
 	}
