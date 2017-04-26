@@ -19,11 +19,11 @@
 				</b:FormGroup>
 				<b:FormGroup ui:field="projectLeadUI">
 					<b:FormLabel>Project Lead</b:FormLabel>
-					<g:Label ui:field="institutionField"/>
+					<g:Label ui:field="projectLeadField"/>
 				</b:FormGroup>
 				<b:FormGroup ui:field="institutionUI">
 					<b:FormLabel>Institution</b:FormLabel>
-					<g:Label ui:field="projectLeadField"/>
+					<g:Label ui:field="institutionField2"/>
 				</b:FormGroup>
 				<b:FormGroup ui:field="intendedDataUseUI">
 					<b:FormLabel>Intended Data Use</b:FormLabel>
@@ -77,8 +77,11 @@
 				<t:TableData width="175px" >
 					<g:Label ui:field="submittedOnField"/>
 				</t:TableData>
-				<t:TableData width="90%" >
+				<t:TableData width="50%" >
 					<bh:Div ui:field="submittedByContainer" />
+				</t:TableData>
+				<t:TableData width="50%" >
+					<g:Label ui:field="institutionField" />
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>

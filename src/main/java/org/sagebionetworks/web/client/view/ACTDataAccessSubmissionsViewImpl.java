@@ -81,6 +81,8 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	CheckBox annualRenewalCheckbox;
 	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
+	@UiField
+	Div subjectsContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -253,5 +255,9 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setIsValidatedProfileRequired(boolean value) {
 		validatedCheckbox.setValue(value);
 	}
-	
+	@Override
+	public void setSubjectsWidget(IsWidget w) {
+		subjectsContainer.clear();
+		subjectsContainer.add(w);
+	}
 }

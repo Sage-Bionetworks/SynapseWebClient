@@ -29,10 +29,11 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -52,7 +53,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	DataAccessClientAsync mockClient;
 	@Mock
-	PromptModalView mockPromptModalView;
+	BigPromptModalView mockPromptModalView;
 	@Mock
 	FileHandleWidget mockDucFileRenderer;
 	@Mock
@@ -68,8 +69,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	ResearchProject mockResearchProjectSnapshot;
 	@Captor
-	ArgumentCaptor<PromptModalView.Presenter> promptModalPresenterCaptor;
-	PromptModalView.Presenter confirmRejectionCallback;
+	ArgumentCaptor<Callback> promptModalPresenterCaptor;
+	Callback confirmRejectionCallback;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	@Mock
@@ -103,7 +104,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		
 		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalView, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(DataAccessSubmissionState.class), anyString(), any(AsyncCallback.class));
-		verify(mockPromptModalView).setPresenter(promptModalPresenterCaptor.capture());
+		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 	}
 
@@ -217,7 +218,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockPromptModalView.getValue()).thenReturn(rejectionReason);
 		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.REJECTED);
 		
-		confirmRejectionCallback.onPrimary();
+		confirmRejectionCallback.invoke();
 		
 		verify(mockPromptModalView).hide();
 		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(DataAccessSubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));

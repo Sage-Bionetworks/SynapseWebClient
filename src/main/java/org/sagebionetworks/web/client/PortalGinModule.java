@@ -194,6 +194,8 @@ import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalVi
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
+import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
+import org.sagebionetworks.web.client.widget.entity.BigPromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -991,6 +993,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
 		bind(PromptModalView.class).to(PromptModalViewImpl.class);
+		bind(BigPromptModalView.class).to(BigPromptModalViewImpl.class);
 		bind(PromptTwoValuesModalView.class).to(PromptTwoValuesModalViewImpl.class);
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 		

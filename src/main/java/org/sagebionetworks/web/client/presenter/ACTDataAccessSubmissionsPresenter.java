@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -60,7 +61,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	boolean isSortedAsc;
 	String nextPageToken;
 	private ACTAccessRequirement actAccessRequirement;
-	
+	private SubjectsWidget subjectsWidget;
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
 			final ACTDataAccessSubmissionsView view,
@@ -71,7 +72,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			ACTAccessRequirementWidget actAccessRequirementWidget,
 			final Button showHideAccessRequirementButton,
 			FileHandleWidget ducTemplateFileHandleWidget,
-			DataAccessClientAsync dataAccessClient
+			DataAccessClientAsync dataAccessClient,
+			SubjectsWidget subjectsWidget
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -80,6 +82,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		actAccessRequirementWidget.setManageAccessVisible(false);
+		this.subjectsWidget = subjectsWidget;
 		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		states = new ArrayList<String>();
@@ -105,6 +108,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setAccessRequirementWidget(actAccessRequirementWidget);
 		view.setLoadMoreContainer(loadMoreContainer);
 		view.setShowHideButton(showHideAccessRequirementButton);
+		view.setSubjectsWidget(subjectsWidget);
 		view.setPresenter(this);
 		
 		loadMoreContainer.configure(new Callback() {
@@ -165,6 +169,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());
 						
 						actAccessRequirementWidget.setRequirement(actAccessRequirement);
+						subjectsWidget.configure(actAccessRequirement.getSubjectIds(), true);
+						
 						loadData();
 					} else {
 						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
