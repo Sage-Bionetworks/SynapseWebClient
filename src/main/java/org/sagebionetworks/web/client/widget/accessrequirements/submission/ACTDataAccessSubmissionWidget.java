@@ -7,8 +7,9 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -25,7 +26,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	DataAccessSubmission submission;
-	PromptModalView promptDialog;
+	BigPromptModalView promptDialog;
 	FileHandleList otherDocuments;
 	FileHandleWidget ducFileRenderer;
 	FileHandleWidget irbFileRenderer;
@@ -36,7 +37,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
 			SynapseAlert synAlert,
 			DataAccessClientAsync dataAccessClient,
-			final PromptModalView promptDialog,
+			final BigPromptModalView promptDialog,
 			FileHandleWidget ducFileRenderer,
 			FileHandleWidget irbFileRenderer,
 			FileHandleList otherDocuments,
@@ -62,10 +63,9 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPromptModal(promptDialog);
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
-		promptDialog.configure("Reason", "Rejection reason:", "Send", "");
-		promptDialog.setPresenter(new PromptModalView.Presenter() {
+		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
 			@Override
-			public void onPrimary() {
+			public void invoke() {
 				updateDataAccessSubmissionState(DataAccessSubmissionState.REJECTED, promptDialog.getValue());
 				promptDialog.hide();
 			}

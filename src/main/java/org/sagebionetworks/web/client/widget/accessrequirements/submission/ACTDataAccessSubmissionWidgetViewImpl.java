@@ -33,6 +33,8 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	Label institutionField;
 	@UiField
+	Label institutionField2;
+	@UiField
 	Label projectLeadField;
 	@UiField
 	TextArea intendedDataUseField;
@@ -168,6 +170,7 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@Override
 	public void setInstitution(String s) {
 		institutionField.setText(s);
+		institutionField2.setText(s);
 	}
 	@Override
 	public void setIntendedDataUse(String s) {

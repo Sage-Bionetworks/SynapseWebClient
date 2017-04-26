@@ -6,29 +6,37 @@
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
-		<b:Heading ui:field="title" size="H2" text="ACT Access Requirement Data Access Submissions" addStyleNames="margin-top-30 margin-left-35 margin-right-10" />
+		<bh:Div addStyleNames="margin-left-35 margin-right-10 margin-top-5">
+			<b:Anchor text="ACT data access dashboard" href="#!ACTDataAccessSubmissionDashboard:default"/>
+			<g:HTML addStyleNames="displayInlineBlock margin-left-5 margin-right-5">&gt;</g:HTML>
+			<bh:Text>Access requirement data access submissions</bh:Text>
+		</bh:Div>
+		<bh:Div ui:field="showHideAccessRequirementButtonContainer" pull="RIGHT"/>
+		<b:Heading ui:field="title" size="H3" addStyleNames="margin-top-30 margin-left-35 margin-right-10">
+			<bh:Text>Submissions to access: </bh:Text>
+			<bh:Div ui:field="subjectsContainer" />	 
+		</b:Heading>
 		<bh:Div ui:field="synAlertContainer" />
+		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-top-30 margin-left-35 margin-right-10 light-border padding-10">
+			<bh:Div ui:field="accessRequirementContainer" />
+			<b:FormGroup>
+				<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." enabled="false"/>
+				<b:CheckBox ui:field="validatedCheckbox"
+					text="Accessors must have a validated profile." enabled="false"/>
+			</b:FormGroup>
+			<b:FormGroup>
+				<b:CheckBox ui:field="ducCheckbox" text="DUC is required." enabled="false" />
+				<bh:Div ui:field="ducTemplateFileContainer" />
+			</b:FormGroup>
+			<b:CheckBox ui:field="irbCheckbox" text="IRB approval is required." enabled="false" />
+			<b:CheckBox ui:field="otherAttachmentsCheckbox" text="Other documents are required." enabled="false" />
+			<b:CheckBox ui:field="annualRenewalCheckbox" text="Annual renewal is required." enabled="false" />
+			<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
+				text="Intended Data Use statements will be publicly available." enabled="false" />
+		</b:Panel>
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
-			<bh:Div ui:field="showHideAccessRequirementButtonContainer" addStyleNames="margin-left-10 margin-bottom-20"/>
-			<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-10 padding-10">
-				<bh:Div ui:field="accessRequirementContainer" />
-				<b:FormGroup>
-					<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." enabled="false"/>
-					<b:CheckBox ui:field="validatedCheckbox"
-						text="Accessors must have a validated profile." enabled="false"/>
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:CheckBox ui:field="ducCheckbox" text="DUC is required." enabled="false" />
-					<bh:Div ui:field="ducTemplateFileContainer" />
-				</b:FormGroup>
-				<b:CheckBox ui:field="irbCheckbox" text="IRB approval is required." enabled="false" />
-				<b:CheckBox ui:field="otherAttachmentsCheckbox" text="Other documents are required." enabled="false" />
-				<b:CheckBox ui:field="annualRenewalCheckbox" text="Annual renewal is required." enabled="false" />
-				<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
-					text="Intended Data Use statements will be publicly available." enabled="false" />
-			</b:Panel>
 			<bh:Div width="265px">
-				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20 margin-top-10">
 					<b:PanelHeader>
 						<b:Heading size="H3" text="State Filter" />
 						<bh:Span ui:field="currentState"/>
@@ -73,8 +81,11 @@
 					<t:TableHeader width="175px">
 						<b:Anchor ui:field="createdOnColumnHeader" text="Submitted On"/>
 					</t:TableHeader>
-					<t:TableHeader width="90%">
+					<t:TableHeader width="50%">
 						<bh:Span text="Submitted By" />
+					</t:TableHeader>
+					<t:TableHeader width="50%">
+						<bh:Span text="Institution" />
 					</t:TableHeader>
 				</t:TableRow>
 			</t:Table>
