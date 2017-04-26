@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -34,6 +36,8 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
@@ -67,11 +71,15 @@ public class RestrictionWidgetTest {
 	RestrictionInformation mockRestrictionInformation;
 	@Mock
 	Entity mockEntity;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	@Captor
+	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
 	public static final String ENTITY_ID = "762";
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockDataAccessClient, mockSynAlert);
+		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockDataAccessClient, mockSynAlert, mockIsACTMemberAsyncHandler);
 		
 		UserSessionData usd = new UserSessionData();
 		List<String> emailAddresses = new ArrayList<String>();
@@ -85,6 +93,11 @@ public class RestrictionWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockDataAccessClient).getRestrictionInformation(anyString(), any(AsyncCallback.class));
 		when(mockEntity.getId()).thenReturn(ENTITY_ID);
+	}
+	
+	private void verifyIsACTMember(boolean isACT) {
+		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(isACT);
 	}
 	
 	@Test
