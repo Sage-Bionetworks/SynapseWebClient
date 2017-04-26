@@ -19,7 +19,7 @@
 					<b:TextBox ui:field="entityIds" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
 						autoComplete="false" />
 					<b:InputGroupButton>
-						<b:Button ui:field="synapseMultiIdButton" text="Set Resources" />
+						<b:Button ui:field="synapseMultiIdButton" text="Set Entities" />
 					</b:InputGroupButton>
 					<w:HelpWidget helpMarkdown="Enter Synapse IDs (i.e. `syn123, syn456`)" 
 								 addStyleNames="margin-left-5 moveup-10" placement="LEFT"/>
