@@ -234,32 +234,43 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		dataAccessRequest.setAccessors(accessorsList.getUserIds());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		dataAccessRequest.setResearchProjectId(researchProject.getId());
-		client.updateDataAccessRequest(dataAccessRequest, isSubmit, new AsyncCallback<Void>() {
+		client.updateDataAccessRequest(dataAccessRequest, new AsyncCallback<DataAccessRequestInterface>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				modalPresenter.setErrorMessage(caught.getMessage());
+			}
+			
+			@Override
+			public void onSuccess(DataAccessRequestInterface result) {
+				dataAccessRequest = result;
 				if (isSubmit) {
-					modalPresenter.setErrorMessage(caught.getMessage());
+					submitDataAccessRequest();
 				} else {
-					view.showInfo(caught.getMessage());
+					view.showInfo(SAVED_PROGRESS_MESSAGE);
+					modalPresenter.setLoading(false);
+					modalPresenter.onFinished();
 				}
+			}
+		});
+	}
+
+	public void submitDataAccessRequest() {
+		client.submitDataAccessRequest(dataAccessRequest, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				modalPresenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
 			public void onSuccess(Void result) {
-				if (isSubmit) {
-					view.showInfo(SUCCESSFULLY_SUBMITTED_MESSAGE);
-				} else {
-					view.showInfo(SAVED_PROGRESS_MESSAGE);
-				}
+				view.showInfo(SUCCESSFULLY_SUBMITTED_MESSAGE);
 				modalPresenter.setLoading(false);
 				modalPresenter.onFinished();
 			}
 		});
 	}
-
 	@Override
 	public void onPrimary() {
-		// TODO: validate values from the view
 		updateDataAccessRequest(true);
 	}
 

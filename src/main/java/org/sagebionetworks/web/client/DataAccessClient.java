@@ -24,7 +24,7 @@ public interface DataAccessClient extends RemoteService {
 	ResearchProject getResearchProject(Long id) throws RestServiceException;
 	ResearchProject updateResearchProject(ResearchProject researchProject)  throws RestServiceException;
 	DataAccessRequestInterface getDataAccessRequest(Long id) throws RestServiceException;
-	void updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest, boolean isSubmit) throws RestServiceException;
+	DataAccessRequestInterface updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest) throws RestServiceException;
 	AccessRequirement getAccessRequirement(Long requirementId) throws RestServiceException;
 	DataAccessSubmissionPage getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, DataAccessSubmissionState stateFilter,
 			DataAccessSubmissionOrder order, boolean isAsc) throws RestServiceException;
@@ -36,4 +36,5 @@ public interface DataAccessClient extends RemoteService {
 	DataAccessSubmission updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState,
 			String reason) throws RestServiceException;
 	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;
+	void submitDataAccessRequest(DataAccessRequestInterface dataAccessRequest) throws RestServiceException;
 }
