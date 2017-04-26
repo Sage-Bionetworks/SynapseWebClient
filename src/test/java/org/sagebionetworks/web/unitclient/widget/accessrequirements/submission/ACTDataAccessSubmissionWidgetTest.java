@@ -74,6 +74,9 @@ public class ACTDataAccessSubmissionWidgetTest {
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	@Mock
 	UserBadgeItem mockUserBadge;
+	@Mock
+	UserBadge mockModifiedByBadge;
+	
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "Univerisity of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -91,6 +94,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
+		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockModifiedByBadge);
 		when(mockDataAccessSubmission.getId()).thenReturn(SUBMISSION_ID);
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);

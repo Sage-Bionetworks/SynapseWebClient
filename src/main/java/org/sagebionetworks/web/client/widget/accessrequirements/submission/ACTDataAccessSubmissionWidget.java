@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -125,6 +126,9 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPublications(submission.getPublication());
 		view.setSummaryOfUse(submission.getSummaryOfUse());
 		view.setSubmittedOn(jsniUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		UserBadge badge = ginInjector.getUserBadgeWidget();
+		badge.configure(submission.getSubmittedBy());
+		view.setSubmittedBy(badge);
 	}
 	
 	private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {

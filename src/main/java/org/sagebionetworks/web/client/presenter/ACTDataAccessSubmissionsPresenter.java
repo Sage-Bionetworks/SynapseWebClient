@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.*;
+import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM;
+import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM;
+import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
+import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,7 +32,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDa
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -162,10 +165,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());
 						
 						actAccessRequirementWidget.setRequirement(actAccessRequirement);
-						view.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
-						view.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
-						view.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
-						view.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
 						loadData();
 					} else {
 						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
