@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -12,7 +14,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -23,13 +24,18 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	Label submittedOnField;
 	@UiField
+	Label submittedOnField2;
+	@UiField
 	Label stateField;
+	@UiField
+	Label stateField2;
+	
 	@UiField
 	Label institutionField;
 	@UiField
 	Label projectLeadField;
 	@UiField
-	Span intendedDataUseField;
+	TextArea intendedDataUseField;
 	@UiField
 	Div accessorsContainer;
 	@UiField
@@ -41,9 +47,9 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	CheckBox renewalCheckbox; 
 	@UiField
-	Span publicationsField;
+	TextArea publicationsField;
 	@UiField
-	Span summaryOfUseField;
+	TextArea summaryOfUseField;
 	@UiField
 	Button rejectButton;
 	@UiField
@@ -51,17 +57,25 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@UiField
 	Span promptModalContainer;
 	@UiField
-	TableData ducColumn;
+	FormGroup ducUI;
 	@UiField
-	TableData irbColumn;
+	FormGroup irbUI;
 	@UiField
-	TableData otherAttachmentsColumn;
+	FormGroup otherAttachmentsUI;
 	@UiField
-	TableData isRenewalColumn;
+	FormGroup isRenewalUI;
 	@UiField
-	TableData publicationsColumn;
+	FormGroup publicationsUI;
 	@UiField
-	TableData summaryOfUseColumn;
+	FormGroup summaryOfUseUI;
+	@UiField
+	Button closeButton;
+	@UiField
+	Modal dialog;
+	@UiField
+	Div submittedByContainer;
+	@UiField
+	Button moreInfoButton;
 	public interface Binder extends UiBinder<Widget, ACTDataAccessSubmissionWidgetViewImpl> {
 	}
 	
@@ -81,6 +95,18 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onApprove();
+			}
+		});
+		closeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+			}
+		});
+		moreInfoButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dialog.show();
 			}
 		});
 	}
@@ -171,6 +197,7 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	@Override
 	public void setState(String s) {
 		stateField.setText(s);
+		stateField2.setText(s);
 	}
 	@Override
 	public void setSummaryOfUse(String s) {
@@ -179,29 +206,36 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	
 	@Override
 	public void setDucColumnVisible(boolean visible) {
-		ducColumn.setVisible(visible);
+		ducUI.setVisible(visible);
 	}
 	@Override
 	public void setIrbColumnVisible(boolean visible) {
-		irbColumn.setVisible(visible);
+		irbUI.setVisible(visible);
 	}
 	@Override
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
-		otherAttachmentsColumn.setVisible(visible);
+		otherAttachmentsUI.setVisible(visible);
 	}
 	@Override
 	public void setRenewalColumnsVisible(boolean visible) {
-		isRenewalColumn.setVisible(visible);
-		publicationsColumn.setVisible(visible);
-		summaryOfUseColumn.setVisible(visible);
+		isRenewalUI.setVisible(visible);
+		publicationsUI.setVisible(visible);
+		summaryOfUseUI.setVisible(visible);
 	}
 	@Override
 	public void hideActions() {
+		dialog.hide();
 		rejectButton.setVisible(false);
 		approveButton.setVisible(false);
 	}
 	@Override
 	public void setSubmittedOn(String s) {
-		submittedOnField.setText(s);	
+		submittedOnField.setText(s);
+		submittedOnField2.setText(s);
+	}
+	@Override
+	public void setSubmittedBy(IsWidget w) {
+		submittedByContainer.clear();
+		submittedByContainer.add(w);
 	}
 }

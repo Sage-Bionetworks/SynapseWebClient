@@ -13,7 +13,7 @@
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div>
-				<b:FormLabel text="Subjects:" pull="LEFT"/>
+				<b:FormLabel text="Resources:" pull="LEFT"/>
 				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
 			</bh:Div>

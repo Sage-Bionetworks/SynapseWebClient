@@ -26,12 +26,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setIsIRBApprovalRequired(boolean value);
 	void setIsValidatedProfileRequired(boolean value);
 	
-	void setDucColumnVisible(boolean visible);
-	void setIrbColumnVisible(boolean visible);
-	void setOtherAttachmentsColumnVisible(boolean visible);
 	void setAccessRequirementUIVisible(boolean visible);
-	void setRenewalColumnsVisible(boolean visible);
-	
 	public interface Presenter {
 		void onClearDateFilter();
 		void onClearStateFilter();

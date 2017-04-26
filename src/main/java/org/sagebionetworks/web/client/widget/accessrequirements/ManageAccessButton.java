@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -32,6 +33,7 @@ public class ManageAccessButton implements IsWidget {
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
+		button.setType(ButtonType.PRIMARY);
 		button.setText(MANAGE_ACCESS_BUTTON_TEXT);
 		button.addClickHandler(new ClickHandler() {
 			@Override

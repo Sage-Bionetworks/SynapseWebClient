@@ -91,7 +91,9 @@ public class OpenSubmissionWidgetTest {
 		inOrder.verify(mockSynapseAlert).handleException(captor.capture());
 		Exception exception = captor.getValue();
 		assertTrue(exception instanceof IllegalStateException);
-		verifyZeroInteractions(mockAccessRequirementWidget);
+		verify(mockAccessRequirementWidget).hideButtons();
+		verify(mockAccessRequirementWidget).setManageAccessVisible(true);
+		verifyNoMoreInteractions(mockAccessRequirementWidget);
 	}
 
 	@Test

@@ -28,6 +28,7 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void setSubmittedOn(String s);
 	void showRejectButton();
 	void showApproveButton();
+	void setSubmittedBy(IsWidget w);
 	
 	void setDucColumnVisible(boolean visible);
 	void setIrbColumnVisible(boolean visible);

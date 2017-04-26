@@ -17,12 +17,12 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,7 +39,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private boolean canChangePermissions;
 	private DataAccessClientAsync dataAccessClient;
 	private SynapseAlert synAlert;
-	
+	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	@Inject
 	public RestrictionWidget(
 			RestrictionWidgetView view,
@@ -47,13 +47,15 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			GlobalApplicationState globalApplicationState,
 			JiraURLHelper jiraURLHelper,
 			DataAccessClientAsync dataAccessClient,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jiraURLHelper = jiraURLHelper;
 		this.dataAccessClient = dataAccessClient;
 		this.synAlert = synAlert;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
@@ -251,5 +253,20 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void linkClicked() {
 		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ENTITY_ID_PARAM + "=" + entity.getId());
 		globalApplicationState.getPlaceChanger().goTo(place);
+	}
+	
+	@Override
+	public void changeClicked() {
+		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACT) {
+				if (isACT) {
+					// go to access requirements place where they can modify access requirements
+					linkClicked();
+				} else {
+					view.showVerifyDataSensitiveDialog();
+				}
+			}
+		});
 	}
 }

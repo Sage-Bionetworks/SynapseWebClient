@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.createaccessreq
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -38,6 +39,14 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	Radio termsOfUseButton;
 	Presenter presenter;
 	
+	@UiField
+	Radio entityButton;
+	@UiField
+	Radio teamButton;
+	@UiField
+	InputGroup teamUI;
+	@UiField
+	InputGroup entityUI;
 	@Inject
 	public CreateAccessRequirementStep1ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -54,7 +63,36 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 				presenter.onSetTeams();
 			}
 		});
+		
+		entityButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showEntityUI();
+			}
+		});
+		
+		teamButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showTeamUI();
+			}
+		});
 	}
+	
+	private void showEntityUI() {
+		entityUI.setVisible(true);
+		teamUI.setVisible(false);
+		entityButton.setValue(true, false);
+		teamButton.setValue(false, false);
+	}
+	
+	private void showTeamUI() {
+		entityUI.setVisible(false);
+		teamUI.setVisible(true);
+		entityButton.setValue(false, false);
+		teamButton.setValue(true, false);
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -73,6 +111,7 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	@Override
 	public void setEntityIdsString(String ids) {
 		entityIds.setText(ids);
+		showEntityUI();
 	}
 	@Override
 	public String getTeamIds() {
@@ -81,6 +120,7 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	@Override
 	public void setTeamIdsString(String ids) {
 		teamIds.setText(ids);
+		showTeamUI();
 	}
 	
 	@Override
