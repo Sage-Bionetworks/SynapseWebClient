@@ -329,5 +329,24 @@ public class RestrictionWidgetTest {
 		verify(mockView).setImposeRestrictionOkButtonEnabled(true);
 		verify(mockView).setNotSensitiveHumanDataMessageVisible(false);
 	}
-	
+	@Test
+	public void testChangeLinkNotACT() {
+		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.OPEN);
+		boolean canChangePermissions = true;
+		widget.configure(mockEntity, canChangePermissions);
+		
+		widget.changeClicked();
+		verifyIsACTMember(false);
+		verify(mockView).showVerifyDataSensitiveDialog();
+	}
+	@Test
+	public void testChangeLinkIsACT() {
+		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.OPEN);
+		boolean canChangePermissions = true;
+		widget.configure(mockEntity, canChangePermissions);
+		
+		widget.changeClicked();
+		verifyIsACTMember(true);
+		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
+	}
 }
