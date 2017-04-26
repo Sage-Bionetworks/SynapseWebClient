@@ -15,6 +15,7 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter.SHOW_AR_TEXT;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
@@ -87,6 +89,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	ACTDataAccessSubmissionWidget mockACTDataAccessSubmissionWidget;
 	@Mock
 	SubjectsWidget mockSubjectsWidget;
+	@Mock
+	List<RestrictableObjectDescriptor> mockSubjects;
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
@@ -102,6 +106,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
+		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
 	}	
 	
 	@Test
@@ -144,7 +149,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
 		assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-				
+		verify(mockSubjectsWidget).configure(mockSubjects, true);
 		verify(mockView).setAreOtherAttachmentsRequired(true);
 		verify(mockView).setIsAnnualReviewRequired(false);
 		verify(mockView).setIsCertifiedUserRequired(true);
