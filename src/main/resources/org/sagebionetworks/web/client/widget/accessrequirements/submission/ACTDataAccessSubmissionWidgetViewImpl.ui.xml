@@ -68,17 +68,17 @@
 		<bh:Div ui:field="synAlertContainer"/>
 		<t:Table addStyleNames="table-layout-fixed border-top-1 margin-left-10" width="100%">
 			<t:TableRow>
-				<t:TableData width="25%">
+				<t:TableData width="100px" >
+					<b:Button ui:field="moreInfoButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Show" />
+				</t:TableData>
+				<t:TableData width="115px">
 					<g:Label ui:field="stateField"/>
 				</t:TableData>
-				<t:TableData width="25%" >
+				<t:TableData width="175px" >
 					<g:Label ui:field="submittedOnField"/>
 				</t:TableData>
-				<t:TableData width="25%" >
+				<t:TableData width="90%" >
 					<bh:Div ui:field="submittedByContainer" />
-				</t:TableData>
-				<t:TableData width="25%" >
-					<b:Button ui:field="moreInfoButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="More Info" />
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>
