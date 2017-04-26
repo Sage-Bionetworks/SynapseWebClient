@@ -21,8 +21,9 @@ public interface DataAccessClientAsync {
 	void getResearchProject(Long id, AsyncCallback<ResearchProject> asyncCallback);
 	void updateResearchProject(ResearchProject researchProject, AsyncCallback<ResearchProject> asyncCallback);
 	void getDataAccessRequest(Long id, AsyncCallback<DataAccessRequestInterface> asyncCallback);
-	void updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest, boolean isSubmit,
-			AsyncCallback<Void> asyncCallback);
+	void updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest,
+			AsyncCallback<DataAccessRequestInterface> asyncCallback);
+	void submitDataAccessRequest(DataAccessRequestInterface dataAccessRequest, AsyncCallback<Void> asyncCallback); 
 
 	void getAccessRequirement(Long requirementId, AsyncCallback<AccessRequirement> callback);
 	void getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, DataAccessSubmissionState stateFilter,

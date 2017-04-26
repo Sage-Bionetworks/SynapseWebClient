@@ -139,7 +139,8 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockDataAccessRequest.getId()).thenReturn(DATA_ACCESS_REQUEST_ID);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockClient).submitDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -313,10 +314,13 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockAccessorsList.getUserIds()).thenReturn(mockAccessorUserIds);
 		when(mockOtherDocuments.getFileHandleIds()).thenReturn(mockOtherFileHandleIds);
 		widget.onPrimary();
-		boolean isSubmit = true;
+		
 		verify(mockDataAccessRequest).setAccessors(mockAccessorUserIds);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
-		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), eq(isSubmit), any(AsyncCallback.class));
+		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		
+		//submitted (primary button was clicked)
+		verify(mockClient).submitDataAccessRequest(eq(mockDataAccessRequest), any(AsyncCallback.class));
 		
 		verify(mockView).showInfo(CreateDataAccessSubmissionStep2.SUCCESSFULLY_SUBMITTED_MESSAGE);
 		InOrder order = inOrder(mockModalPresenter);
@@ -331,10 +335,9 @@ public class CreateDataAccessSubmissionStep2Test {
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		String error = "error submitting data access request";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
 		widget.onPrimary();
-		boolean isSubmit = true;
-		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), eq(isSubmit), any(AsyncCallback.class));
+		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
 	
@@ -352,10 +355,10 @@ public class CreateDataAccessSubmissionStep2Test {
 		//simulate user clicks Yes to save
 		callbackCaptor.getValue().invoke();
 		
-		boolean isSubmit = false;
 		verify(mockDataAccessRequest).setAccessors(mockAccessorUserIds);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
-		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), eq(isSubmit), any(AsyncCallback.class));
+		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		verify(mockClient, never()).submitDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
 		
 		verify(mockView).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE);
 		InOrder order = inOrder(mockModalPresenter);

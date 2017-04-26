@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -72,7 +73,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	@Mock
-	UserBadge mockUserBadge;
+	UserBadgeItem mockUserBadge;
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "Univerisity of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -89,7 +90,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
-		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
 		when(mockDataAccessSubmission.getId()).thenReturn(SUBMISSION_ID);
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);
@@ -138,7 +139,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).hideActions();
 		// verify accessors
 		verify(mockView).clearAccessors();
-		verify(mockGinInjector, times(2)).getUserBadgeWidget();
+		verify(mockGinInjector, times(2)).getUserBadgeItem();
 		verify(mockUserBadge).configure(userId1);
 		verify(mockUserBadge).configure(userId2);
 		verify(mockView, times(2)).addAccessors(any(IsWidget.class));

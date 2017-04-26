@@ -52,17 +52,22 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	}
 	
 	@Override
-	public void updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest, boolean isSubmit)
+	public DataAccessRequestInterface updateDataAccessRequest(DataAccessRequestInterface dataAccessRequest)
 			throws RestServiceException {
 		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			dataAccessRequest = synapseClient.createOrUpdateDataAccessRequest(dataAccessRequest);
-			
-			// submit data access request
-			if (isSubmit){
-				synapseClient.submitDataAccessRequest(dataAccessRequest.getId(), dataAccessRequest.getEtag());
-			}
+			return synapseClient.createOrUpdateDataAccessRequest(dataAccessRequest);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void submitDataAccessRequest(DataAccessRequestInterface dataAccessRequest) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.submitDataAccessRequest(dataAccessRequest.getId(), dataAccessRequest.getEtag());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

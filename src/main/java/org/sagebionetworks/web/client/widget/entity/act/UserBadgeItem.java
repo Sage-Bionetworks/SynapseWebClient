@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
@@ -13,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -24,7 +26,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	@UiField
 	CheckBox select;
 	@UiField
-	Div userBadgeContainer;
+	Span userBadgeContainer;
+	@UiField
+	Image metRequirementIcon;
 	
 	Widget widget;
 	
@@ -102,5 +106,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+	
+	public void setMetRequirementIconVisible(boolean visible) {
+		metRequirementIcon.setVisible(visible);
 	}
 }
