@@ -87,8 +87,9 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		states = new ArrayList<String>();
 		for (DataAccessSubmissionState state : DataAccessSubmissionState.values()) {
-			states.add(state.toString());
+			states.add(state.toString());	
 		}
+		states.remove(DataAccessSubmissionState.NOT_SUBMITTED.toString());
 		view.setStates(states);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
