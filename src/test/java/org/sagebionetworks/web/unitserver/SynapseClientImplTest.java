@@ -57,6 +57,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -258,10 +260,10 @@ public class SynapseClientImplTest {
 	List<FileHandleCopyResult> batchCopyResultsList;
 	
 	@Mock
-	EntityQueryResults mockEntityQueryResults;
-	List<EntityQueryResult> entityQueryResultsList;
+	EntityChildrenResponse mockEntityChildrenResponse;
 	@Mock
-	EntityQueryResult mockEntityQueryResult; 
+	EntityHeader mockEntityHeader;
+	List<EntityHeader> entityChildrenPage;
 	
 	public static final String OLD_COLUMN_MODEL_ID = "4444";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
@@ -542,9 +544,9 @@ public class SynapseClientImplTest {
 		userIp = "127.0.0.1";
 		when(mockThreadLocal.get()).thenReturn(mockRequest);
 		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
-		entityQueryResultsList = new ArrayList<EntityQueryResult>();
-		when(mockEntityQueryResults.getEntities()).thenReturn(entityQueryResultsList);
-		when(mockSynapse.entityQuery(any(EntityQuery.class))).thenReturn(mockEntityQueryResults);
+		entityChildrenPage = new ArrayList<EntityHeader>();
+		when(mockEntityChildrenResponse.getPage()).thenReturn(entityChildrenPage);
+		when(mockSynapse.getEntityChildren(any(EntityChildrenRequest.class))).thenReturn(mockEntityChildrenResponse);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -2613,7 +2615,7 @@ public class SynapseClientImplTest {
 		assertFalse(synapseClient.isTable("syn987"));
 		assertFalse(synapseClient.isDocker("syn987"));
 		
-		entityQueryResultsList.add(mockEntityQueryResult);
+		entityChildrenPage.add(mockEntityHeader);
 		assertTrue(synapseClient.isFileOrFolder("syn987"));
 		assertTrue(synapseClient.isTable("syn987"));
 		assertTrue(synapseClient.isDocker("syn987"));
