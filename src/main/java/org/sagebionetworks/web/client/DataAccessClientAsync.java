@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
@@ -38,4 +40,6 @@ public interface DataAccessClientAsync {
 	void updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState, String reason,
 			AsyncCallback<DataAccessSubmission> callback);
 	void getOpenSubmissions(String nextPageToken, AsyncCallback<OpenSubmissionPage> callback);
+	void getAccessApprovalInfo(BatchAccessApprovalRequest batchRequest,
+			AsyncCallback<BatchAccessApprovalResult> callback);
 }

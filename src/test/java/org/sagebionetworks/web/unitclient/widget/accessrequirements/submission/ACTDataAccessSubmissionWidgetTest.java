@@ -21,6 +21,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalResult;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -76,7 +79,14 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	UserBadgeItem mockUserBadge;
 	@Mock
+	BatchAccessApprovalResult mockBatchAccessApprovalResult;
+	@Mock
 	UserBadge mockModifiedByBadge;
+	@Mock
+	AccessApprovalResult mockAccessApprovalResult1;
+	@Mock
+	AccessApprovalResult mockAccessApprovalResult2;
+	List<AccessApprovalResult> accessApprovalResults;
 	
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "Univerisity of Washington";
@@ -94,7 +104,6 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
-		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockModifiedByBadge);
 		when(mockDataAccessSubmission.getId()).thenReturn(SUBMISSION_ID);
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
@@ -106,6 +115,9 @@ public class ACTDataAccessSubmissionWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(DataAccessSubmissionState.class), anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
+		accessApprovalResults = new ArrayList<>();
+		when(mockBatchAccessApprovalResult.getResults()).thenReturn(accessApprovalResults);
+		AsyncMockStubber.callSuccessWith(mockBatchAccessApprovalResult).when(mockClient).getAccessApprovalInfo(any(BatchAccessApprovalRequest.class), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -118,7 +130,10 @@ public class ACTDataAccessSubmissionWidgetTest {
 	
 	@Test
 	public void testConfigure() {
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
 		// set up accessors
+		boolean user1HasApproval = true;
+		boolean user2HasApproval = false;
 		String userId1 = "12";
 		String userId2 = "34";
 		List<String> userIds = new ArrayList<String>();
@@ -132,6 +147,12 @@ public class ACTDataAccessSubmissionWidgetTest {
 		fileHandleIds.add(fileHandleId1);
 		fileHandleIds.add(fileHandleId2);
 		when(mockDataAccessSubmission.getAttachments()).thenReturn(fileHandleIds);
+		when(mockAccessApprovalResult1.getUserId()).thenReturn(userId1);
+		when(mockAccessApprovalResult1.getHasApproval()).thenReturn(user1HasApproval);
+		accessApprovalResults.add(mockAccessApprovalResult1);
+		when(mockAccessApprovalResult2.getUserId()).thenReturn(userId2);
+		when(mockAccessApprovalResult2.getHasApproval()).thenReturn(user2HasApproval);
+		accessApprovalResults.add(mockAccessApprovalResult2);
 		
 		when(mockDataAccessSubmission.getIsRenewalSubmission()).thenReturn(false);
 		String fileHandleId3 = "565499";
@@ -145,8 +166,13 @@ public class ACTDataAccessSubmissionWidgetTest {
 		// verify accessors
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector, times(2)).getUserBadgeItem();
+		
 		verify(mockUserBadge).configure(userId1);
+		verify(mockUserBadge).setMetRequirementIconVisible(user1HasApproval);
+		
 		verify(mockUserBadge).configure(userId2);
+		verify(mockUserBadge).setMetRequirementIconVisible(user2HasApproval);
+		
 		verify(mockView, times(2)).addAccessors(any(IsWidget.class));
 		// verify other documents
 		verify(mockFileHandleList).clear();

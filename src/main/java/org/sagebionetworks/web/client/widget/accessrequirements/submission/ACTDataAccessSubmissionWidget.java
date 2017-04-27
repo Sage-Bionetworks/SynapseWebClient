@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalResult;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
@@ -90,15 +95,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		}
 		view.clearAccessors();
 		if (submission.getAccessors() != null) {
-			for (int i = 0; i < submission.getAccessors().size(); i++) {
-				String userId = submission.getAccessors().get(i);
-				UserBadgeItem badge = ginInjector.getUserBadgeItem();
-				badge.configure(userId);
-				badge.setSelectVisible(false);
-				// TODO: set access requirement approval icon visibility 
-//				badge.setMetRequirementIconVisible(isMet);
-				view.addAccessors(badge);
-			}
+			getApprovalState(submission.getAccessors());
 		}
 		otherDocuments.clear();
 		if (submission.getAttachments() != null) {
@@ -129,6 +126,30 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
+	}
+	
+	public void getApprovalState(List<String> accessorIds) {
+		BatchAccessApprovalRequest request = new BatchAccessApprovalRequest();
+		request.setAccessRequirementId(submission.getAccessRequirementId());
+		request.setUserIds(accessorIds);
+		dataAccessClient.getAccessApprovalInfo(request, new AsyncCallback<BatchAccessApprovalResult>() {
+			@Override
+			public void onSuccess(BatchAccessApprovalResult result) {
+				for (AccessApprovalResult approvalResult : result.getResults()) {
+					UserBadgeItem badge = ginInjector.getUserBadgeItem();
+					badge.configure(approvalResult.getUserId());
+					badge.setSelectVisible(false);
+					//set access requirement approval icon visibility 
+					badge.setMetRequirementIconVisible(approvalResult.getHasApproval());
+					view.addAccessors(badge);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 	
 	private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {
