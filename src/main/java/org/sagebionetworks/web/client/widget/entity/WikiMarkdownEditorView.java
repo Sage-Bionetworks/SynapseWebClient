@@ -23,7 +23,7 @@ public interface WikiMarkdownEditorView extends IsWidget,SynapseView {
 	
 	void showEditorModal();
 	void hideEditorModal();
-	
+	void setDeleteButtonVisible(boolean visible);
 	/**
 	 * Presenter interface
 	 */

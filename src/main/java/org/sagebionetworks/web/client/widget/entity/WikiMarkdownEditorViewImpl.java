@@ -149,4 +149,8 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 		markdownEditorContainer.clear();
 		markdownEditorContainer.add(markdownEditorWidget);
 	}
+	@Override
+	public void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisible(visible);
+	}
 }

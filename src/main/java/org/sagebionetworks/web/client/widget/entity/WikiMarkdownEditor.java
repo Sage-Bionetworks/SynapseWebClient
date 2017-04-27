@@ -198,4 +198,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		});	
 	}
 	
+	public void setDeleteButtonVisible(boolean visible) {
+		view.setDeleteButtonVisible(visible);
+	}
 }
