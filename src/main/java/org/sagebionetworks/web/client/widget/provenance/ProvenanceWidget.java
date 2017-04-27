@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -76,7 +74,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	Stack<ProcessItem> toProcess;
 	ProcessCallback doneCallback;
 	Set<Reference> noExpandNode;
-	Stack<String> lookupVersion;
+	List<String> lookupVersion;
 	ProvGraph currentGraph;
 	ClientCache clientCache;
 	
@@ -111,7 +109,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		descriptor = widgetDescriptor;		
 
 		// parse referenced entities and put into start refs
-		lookupVersion = new Stack<String>();
+		lookupVersion = new ArrayList<String>();
 		startRefs = new HashSet<Reference>();		
 		String entityListStr = null;
 		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY)) entityListStr = descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY);
@@ -152,7 +150,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			public void onSuccess(Void result) {
 				// load stack with starting nodes at depth 0
 				toProcess = new Stack<ProvenanceWidget.ProcessItem>();
-				for(Reference ref : startRefs) {			
+				for(Reference ref : startRefs) {
 					toProcess.push(new ReferenceProcessItem(ref, 0));
 				}
 				
@@ -200,7 +198,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		maxDepth = 1;
 		Reference ref = new Reference();
 		ref.setTargetId(node.getEntityId());
-		ref.setTargetVersionNumber(node.getVersionNumber());		
+		ref.setTargetVersionNumber(node.getVersionNumber());
 		toProcess.push(new ReferenceProcessItem(ref, 0));
 		processNext();		
 	}
@@ -215,26 +213,23 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	 * @param doneCallback
 	 */
 	private void lookupVersion(final AsyncCallback<Void> doneCallback) {
-		if(lookupVersion.size() == 0) {
-			doneCallback.onSuccess(null);
-			return;
-		}
-		String nextEntityId = lookupVersion.pop();
-		synapseClient.getEntity(nextEntityId, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				Entity entity = result;
-				Reference ref = new Reference();
-				ref.setTargetId(entity.getId());
-				if(entity instanceof Versionable) {
-					ref.setTargetVersionNumber(((Versionable) entity).getVersionNumber());
-				}
-				startRefs.add(ref);
-				lookupVersion(doneCallback);			
-			}
+		// single call to look up the latest version
+		synapseClient.getEntityHeaderBatch(lookupVersion, new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				doneCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(ArrayList<EntityHeader> headers) {
+				for (EntityHeader header : headers) {
+					Reference ref = new Reference();
+					ref.setTargetId(header.getId());
+					if (header.getVersionNumber() != null) {
+						ref.setTargetVersionNumber(header.getVersionNumber());
+					}
+					startRefs.add(ref);
+				}
+				doneCallback.onSuccess(null);
 			}
 		});
 	}
@@ -242,7 +237,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	/**
 	 * Process the next ProcessItem in the stack until we're done
 	 */
-	private void processNext() {	
+	private void processNext() {
 		if(toProcess.size() == 0) {
 			doneCallback.onComplete();
 			return;
@@ -250,7 +245,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		ProcessItem next = toProcess.pop();
 		if(next instanceof ReferenceProcessItem) {
-			processUsed((ReferenceProcessItem) next);
+			processUsed((ReferenceProcessItem) next);	
 		} else if(next instanceof ActivityProcessItem) {
 			processActivity((ActivityProcessItem) next);
 		}
@@ -309,6 +304,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			return;
 		}
 		
+		cleanupCycles(item, references);
+		
 		// add activity to processedActivites
 		processedActivities.put(item.getActivity().getId(), item.getActivity());
 		
@@ -327,7 +324,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				if(generated != null && generated.getResults() != null) {
 					for(Reference ref : generated.getResults()) {
 						generatedByActivityId.put(ref, item.getActivity().getId());
-						references.add(ref);
+						references.add(ref);	
 					}
 				} 		
 				addUsedToStack();
@@ -356,7 +353,25 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 		});
 	}
-		
+	
+	public void cleanupCycles(ActivityProcessItem item, Set<Reference> references) {
+		if (item.getActivity().getUsed() != null) {
+			// SWC-3568 : avoid cycle that results in stack overflow during the creation of the graph.
+			List<Used> previouslyProcessed = new ArrayList<Used>();
+			Set<Used> used = item.getActivity().getUsed();
+			for(Used u : used) {
+				if(u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
+					UsedEntity ue = (UsedEntity) u;
+					if(ue.getReference() != null && references.contains(ue.getReference())) {
+						previouslyProcessed.add(u);
+					}
+				}
+			}
+			// remove from used (to avoid cycle)
+			used.removeAll(previouslyProcessed);
+		}
+	}
+	
 	private void lookupReferencesThenBuildGraph() {			
 		ReferenceList list = new ReferenceList();
 		list.setReferences(new ArrayList<Reference>(references));		
@@ -388,7 +403,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
-
 		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, startRefs, noExpandNode);					
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
@@ -431,7 +445,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 	}
 	
-	private class ReferenceProcessItem extends ProcessItem {
+	public class ReferenceProcessItem extends ProcessItem {
 		Reference reference;
 
 		public ReferenceProcessItem(Reference reference, int depth) {
@@ -449,7 +463,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 	}
 
-	private class ActivityProcessItem extends ProcessItem {
+	public class ActivityProcessItem extends ProcessItem {
 		Activity activity;
 
 		public ActivityProcessItem(Activity activity, int depth) {
