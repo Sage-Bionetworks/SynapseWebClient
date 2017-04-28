@@ -49,6 +49,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
+		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		this.wikiPageRenderer = wikiPageRenderer;
 		this.ducTemplateUploader = ducTemplateUploader;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;

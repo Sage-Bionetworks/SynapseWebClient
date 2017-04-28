@@ -37,6 +37,7 @@ public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, Create
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
 		this.wikiPageRenderer = wikiPageRenderer;
 		
+		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		view.setWikiPageRenderer(wikiPageRenderer.asWidget());
 		view.setPresenter(this);
 		wikiPageRenderer.setModifiedCreatedByHistoryVisible(false);

@@ -54,6 +54,7 @@ public class CreateTermsOfUseAccessRequirementStep2Test {
 		verify(mockView).setWikiPageRenderer(any(IsWidget.class));
 		verify(mockView).setPresenter(widget);
 		verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
+		verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);
 	}
 	
 	@Test
