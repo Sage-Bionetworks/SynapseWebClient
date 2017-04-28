@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.provenance;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
+import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -44,6 +45,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.ActivityProcessItem;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -128,9 +130,11 @@ public class ProvenanceWidgetTest {
 		
 		PaginatedResults<Reference> generatedBy = new PaginatedResults<Reference>();
 		generatedBy.setResults(Arrays.asList(new Reference[] { ref123 }));		
-		
+		ArrayList<EntityHeader> outputEntityList = new ArrayList<EntityHeader>();
+		outputEntityList.add(header123);
 		AsyncMockStubber.callSuccessWith(outputEntity).when(mockSynapseClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(outputEntityList).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(referenceHeaders).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(generatedBy).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
 		
@@ -139,7 +143,7 @@ public class ProvenanceWidgetTest {
 		String showExpand = "true";
 		String displayHeight = "500";
 		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, depth);
-		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, outputEntity.getId());
+		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entity456Id);
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
 		descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, displayHeight);		
 		descriptor.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
@@ -318,6 +322,35 @@ public class ProvenanceWidgetTest {
 		return graph;
 	}
 
+	@Test
+	public void testCleanupCycles() {
+		ActivityProcessItem item = provenanceWidget.new ActivityProcessItem(act, 1);
+		item.getActivity().setUsed(null);
+		Set<Reference> references = new HashSet<Reference>();
+		// verify no error when used is not set, or is empty
+		provenanceWidget.cleanupCycles(item, references);
+		Set<Used> usedSet = new HashSet<Used>();
+		item.getActivity().setUsed(usedSet);
+		provenanceWidget.cleanupCycles(item, references);
+		
+		//verify that if in references, then should be removed from the used set.
+		Reference ref = new Reference();
+		UsedEntity usedEntity = new UsedEntity();
+		usedEntity.setReference(ref);
+		usedSet.add(usedEntity);
+		
+		provenanceWidget.cleanupCycles(item, references);
+		assertTrue(usedSet.contains(usedEntity));
+		references.add(ref);
+		provenanceWidget.cleanupCycles(item, references);
+		assertFalse(usedSet.contains(usedEntity));
+		
+		// used urls are ignored
+		UsedURL usedURL = new UsedURL();
+		usedSet.add(usedURL);
+		provenanceWidget.cleanupCycles(item, references);
+		assertTrue(usedSet.contains(usedURL));
+	}
 }
 
 
