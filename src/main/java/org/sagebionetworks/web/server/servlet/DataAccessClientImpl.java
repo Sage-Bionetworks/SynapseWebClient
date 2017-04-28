@@ -8,6 +8,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
+import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
@@ -158,6 +160,16 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getOpenSubmissions(nextPageToken);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	
+	@Override
+	public BatchAccessApprovalResult getAccessApprovalInfo(BatchAccessApprovalRequest batchRequest) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getAccessApprovalInfo(batchRequest);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
