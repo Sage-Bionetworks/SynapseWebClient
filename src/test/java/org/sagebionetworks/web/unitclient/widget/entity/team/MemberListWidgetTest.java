@@ -5,7 +5,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,7 +23,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
@@ -45,8 +43,6 @@ public class MemberListWidgetTest {
 	Callback mockTeamUpdatedCallback;
 	boolean isAdmin;
 	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
 	LoadMoreWidgetContainer mockMembersContainer;
 	
 	@Before
@@ -57,7 +53,7 @@ public class MemberListWidgetTest {
 		mockView = mock(MemberListWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer, mockSynAlert);
+		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer);
 		isAdmin = true;
 		
 		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
@@ -97,12 +93,12 @@ public class MemberListWidgetTest {
 	}
 	@Test
 	public void testConfigureFailure() {
-		Exception ex = new Exception("unhandled exception");
+		String error = "unhandled exception";
+		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showErrorMessage(error);
 	}
 
 	
@@ -118,12 +114,12 @@ public class MemberListWidgetTest {
 	@Test
 	public void testRemoveMemberFailure() throws Exception {
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		Exception ex = new Exception("unhandled exception");
+		String error = "unhandled exception";
+		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		widget.removeMember("a user id");
-		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showErrorMessage(error);
 	}
 	@Test
 	public void testRemoveMemberBadRequestFailure() throws Exception {
@@ -131,10 +127,9 @@ public class MemberListWidgetTest {
 		String badRequestMessage = "Team must have at least one administrator.";
 		Exception ex = new BadRequestException(badRequestMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).clear();
 		widget.removeMember("a user id");
 		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showErrorMessage(badRequestMessage);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -142,7 +137,6 @@ public class MemberListWidgetTest {
 	public void testSetIsAdmin() throws Exception {
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		widget.setIsAdmin("a user id", true);
-		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 		verify(mockTeamUpdatedCallback).invoke();
@@ -155,7 +149,6 @@ public class MemberListWidgetTest {
 		Exception ex = new Exception(message);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		widget.setIsAdmin("a user id", true);
-		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(message);;
 		//called twice.  once during configuration, and once to refresh members to get correct admin state

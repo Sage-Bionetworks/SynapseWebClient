@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -20,7 +18,6 @@ public interface MemberListWidgetView extends IsWidget {
 	void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget);
 	void addMembers(List<TeamMemberBundle> members, boolean isAdmin);
 	void clearMembers();
-	void setSynAlert(IsWidget widget);
 	void showInfo(String message);
 	void showErrorMessage(String message);
 	public interface Presenter {
