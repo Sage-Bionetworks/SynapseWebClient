@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -49,6 +52,7 @@ public class RequestRevokeUserAccessButton implements IsWidget {
 		button.setText(REVOKE_BUTTON_TEXT);
 		button.setType(ButtonType.DEFAULT);
 		button.setSize(ButtonSize.EXTRA_SMALL);
+		button.setIcon(IconType.USER_TIMES);
 		button.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -57,9 +61,12 @@ public class RequestRevokeUserAccessButton implements IsWidget {
 		});
 	}	
 	
-	public void configure(ACTAccessRequirement ar) {
+	public void configure(ACTAccessRequirement ar, DataAccessSubmissionState state) {
 		this.ar = ar;
-		showIfNotACTMember();
+		button.setVisible(false);
+		if (DataAccessSubmissionState.APPROVED.equals(state)) {
+			showIfNotACTMember();	
+		}
 	}
 	
 	private void showIfNotACTMember() {

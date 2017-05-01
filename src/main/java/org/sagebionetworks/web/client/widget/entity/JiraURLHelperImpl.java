@@ -61,7 +61,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	
 	private static final String DEFAULT_REVOKE_ACCESS_DESCRIPTION = "By creating this issue, I request that the Synapse Access "+
 			"and Compliance Team revoke access to this dataset.\n"
-			+ "Please provide the list of Synapse users who should no longer have access:\n\n";
+			+ "Please provide the list of Synapse users who should no longer have access:\n\n\n\n\n\n\n\n";
 	
 	/**
 	 * properties used in the interface to Jira for Governance
@@ -243,7 +243,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 				flag_issue_type, 
 				ACCESS_REQUEST_REVOKE_ISSUE_SUMMARY, 
 				default_issue_reporter, 
-				DEFAULT_REVOKE_ACCESS_DESCRIPTION + URL.encodeQueryString("\n\n\n\n\n(https://www.synapse.org/#!ACTDataAccessSubmissions:AR_ID=" + accessRequirementId + ")"),
+				URL.encodeQueryString(DEFAULT_REVOKE_ACCESS_DESCRIPTION + "(https://www.synapse.org/#!ACTDataAccessSubmissions:AR_ID=" + accessRequirementId + ")"),
 				principalId, 
 				userDisplayName, 
 				userEmailAddress,

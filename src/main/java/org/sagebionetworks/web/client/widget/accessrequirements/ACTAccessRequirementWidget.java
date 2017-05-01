@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
@@ -72,6 +73,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.submitterUserBadge = submitterUserBadge;
 		this.revokeUserAccessButton = revokeUserAccessButton;
 		this.requestRevokeUserAccessButton = requestRevokeUserAccessButton;
+		requestRevokeUserAccessButton.setSize(ButtonSize.SMALL);
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -118,6 +120,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	}
 	
 	public void setDataAccessSubmissionStatus(ACTAccessRequirementStatus status) {
+		requestRevokeUserAccessButton.configure(ar, status.getState());
 		submissionId = status.getSubmissionId();
 		view.resetState();
 		switch (status.getState()) {
@@ -138,7 +141,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				view.showApprovedHeading();
 				view.showRequestApprovedMessage();
 				view.showUpdateRequestButton();
-				view.showRequestRevokeAccessButton();
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();

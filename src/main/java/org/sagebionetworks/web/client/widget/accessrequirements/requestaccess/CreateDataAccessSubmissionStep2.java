@@ -8,6 +8,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -171,7 +172,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
 		view.setDUCTemplateVisible(isDucTemplate);
-		requestRevokeAccessButton.configure(ar);
 		if (isDucTemplate) {
 			FileHandleAssociation fha = new FileHandleAssociation();
 			fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -196,6 +196,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				if (isRenewal) {
 					view.setPublications(((DataAccessRenewal)dataAccessRequest).getPublication());
 					view.setSummaryOfUse(((DataAccessRenewal)dataAccessRequest).getSummaryOfUse());
+					requestRevokeAccessButton.configure(CreateDataAccessSubmissionStep2.this.ar, DataAccessSubmissionState.APPROVED);
 				}
 				if (dataAccessRequest.getDucFileHandleId() != null) {
 					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.DataAccessRequestAttachment, dataAccessRequest.getDucFileHandleId());
