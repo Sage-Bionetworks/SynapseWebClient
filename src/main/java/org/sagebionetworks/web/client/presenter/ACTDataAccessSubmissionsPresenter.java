@@ -154,8 +154,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
 						actAccessRequirement = (ACTAccessRequirement) requirement;
-						//TODO: include when model has new field
-//						view.setHasRequestUIVisible(actAccessRequirement.getAcceptDataAccessRequest());
+						view.setHasRequestUIVisible(actAccessRequirement.getAcceptDataAccessRequest());
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);

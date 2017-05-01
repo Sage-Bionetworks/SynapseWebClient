@@ -101,9 +101,8 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
 		view.setIsIRBApprovalRequired(accessRequirement.getIsIRBApprovalRequired());
 		view.setIsValidatedProfileRequired(accessRequirement.getIsValidatedProfileRequired());
-		//TODO: include when model has new field
-//		boolean isAcceptDataAccessRequest = accessRequirement.getAcceptDataAccessRequest() != null && accessRequirement.getAcceptDataAccessRequest();
-//		view.showHasRequestUI(isAcceptDataAccessRequest);
+		boolean isAcceptDataAccessRequest = accessRequirement.getAcceptDataAccessRequest() != null && accessRequirement.getAcceptDataAccessRequest();
+		view.showHasRequestUI(isAcceptDataAccessRequest);
 	}
 	
 	@Override

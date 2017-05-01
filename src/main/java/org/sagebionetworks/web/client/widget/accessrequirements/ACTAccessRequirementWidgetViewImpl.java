@@ -272,6 +272,15 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		revokeAccessButtonContainer.setVisible(false);
 		requestRevokeAccessButtonContainer.setVisible(false);
 	}
+	
+	@Override
+	public void hideRequestButtonContainers() {
+		cancelRequestButtonContainer.setVisible(false);
+		updateRequestButtonContainer.setVisible(false);
+		requestAccessButtonContainer.setVisible(false);
+		requestRevokeAccessButtonContainer.setVisible(false);
+	}
+	
 	@Override
 	public void setRequestRevokeUserAccessWidget(IsWidget w) {
 		requestRevokeAccessButtonContainer.clear();

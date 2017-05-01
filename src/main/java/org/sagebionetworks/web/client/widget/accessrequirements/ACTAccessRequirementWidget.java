@@ -117,6 +117,10 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		lazyLoadHelper.setIsConfigured();
+		boolean isAcceptDataAccessRequest = ar.getAcceptDataAccessRequest() != null && ar.getAcceptDataAccessRequest();
+		if (!isAcceptDataAccessRequest) {
+			view.hideRequestButtonContainers();
+		}
 	}
 	
 	public void setDataAccessSubmissionStatus(ACTAccessRequirementStatus status) {
