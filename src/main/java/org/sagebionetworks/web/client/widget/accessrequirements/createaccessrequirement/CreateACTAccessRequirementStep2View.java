@@ -25,11 +25,12 @@ public interface CreateACTAccessRequirementStep2View extends IsWidget {
 	boolean isIDUPublic();
 	boolean isIRBApprovalRequired();
 	boolean isValidatedProfileRequired();
+	boolean getHasRequests();
 	
 	void setWikiPageRenderer(IsWidget w);
 	void setDUCTemplateUploadWidget(IsWidget w);
 	void setDUCTemplateWidget(IsWidget w);
-	
+	public void showHasRequestUI(boolean hasRequest);
 	public void setPresenter(Presenter p);
 	/*
 	 * Presenter interface

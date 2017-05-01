@@ -101,6 +101,9 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
 		view.setIsIRBApprovalRequired(accessRequirement.getIsIRBApprovalRequired());
 		view.setIsValidatedProfileRequired(accessRequirement.getIsValidatedProfileRequired());
+		//TODO: include when model has new field
+//		boolean isAcceptDataAccessRequest = accessRequirement.getAcceptDataAccessRequest() != null && accessRequirement.getAcceptDataAccessRequest();
+//		view.showHasRequestUI(isAcceptDataAccessRequest);
 	}
 	
 	@Override
@@ -127,7 +130,8 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());
 		accessRequirement.setIsIRBApprovalRequired(view.isIRBApprovalRequired());
 		accessRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
-		
+		//TODO: include when model has new field
+//		accessRequirement.setAcceptDataAccessRequest(view.getHasRequests());
 		// create/update access requirement
 		modalPresenter.setLoading(true);
 		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
