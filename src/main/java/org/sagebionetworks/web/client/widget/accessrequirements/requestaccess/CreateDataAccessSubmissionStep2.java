@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -13,6 +14,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
@@ -20,6 +22,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
@@ -39,7 +42,7 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class CreateDataAccessSubmissionStep2 implements ModalPage {
+public class CreateDataAccessSubmissionStep2 implements ModalPage, CreateDataAccessSubmissionWizardStep2View.Presenter {
 	public static final String SAVED_PROGRESS_MESSAGE = "Saved your progress.";
 	public static final String SAVE_CHANGES_MESSAGE = "Would you want to save your recent changes?";
 	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your data access request has been successfully submitted for review.";
@@ -57,7 +60,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	UserBadgeList accessorsList;
 	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
-	
+	JiraURLHelper jiraUrlHelper;
 	@Inject
 	public CreateDataAccessSubmissionStep2(
 			CreateDataAccessSubmissionWizardStep2View view,
@@ -71,7 +74,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			UserBadgeList accessorsList,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			FileHandleList otherDocuments) {
+			FileHandleList otherDocuments,
+			JiraURLHelper jiraUrlHelper) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -81,10 +85,12 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.authController = authController;
 		this.accessorsList = accessorsList;
 		this.otherDocuments = otherDocuments;
+		this.jiraUrlHelper = jiraUrlHelper;
 		otherDocuments.configure()
 			.setUploadButtonText("Browse...")
 			.setCanDelete(true)
 			.setCanUpload(true);
+		view.setPresenter(this);
 		view.setAccessorListWidget(accessorsList);
 		view.setDUCTemplateFileWidget(templateFileRenderer.asWidget());
 		view.setDUCUploadWidget(ducUploader.asWidget());
@@ -114,6 +120,15 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				peopleSuggestWidget.clear();
 				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(suggestion.getId());
 			};
+		});
+		accessorsList.setUserIdsDeletedCallback(new CallbackP<List<String>>() {
+			@Override
+			public void invoke(List<String> param) {
+				if (dataAccessRequest instanceof DataAccessRenewal) {
+					// notify user that removing a user does not revoke access, with link to inform ACT
+					CreateDataAccessSubmissionStep2.this.view.setRevokeNoteVisible(true);
+				}
+			}
 		});
 	}
 	
@@ -152,6 +167,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		accessorsList.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
+		view.setRevokeNoteVisible(false);
 		peopleSuggestWidget.clear();
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
@@ -301,5 +317,16 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				});
 			}
 		});
+	}
+	
+	@Override
+	public void onRevokeAccess() {
+		UserProfile profile = authController.getCurrentUserSessionData().getProfile();
+		String jiraUrl = jiraUrlHelper.createRevokeAccessIssue(
+				authController.getCurrentUserPrincipalId(), 
+				DisplayUtils.getDisplayName(profile), 
+				DisplayUtils.getPrimaryEmail(profile), 
+				ar.getId().toString());
+		view.open(jiraUrl);
 	}
 }

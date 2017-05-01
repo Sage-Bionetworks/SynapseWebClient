@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.RevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
@@ -82,6 +83,8 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	CreateAccessRequirementButton mockCreateARButton;
 	@Mock
+	RevokeUserAccessButton mockRevokeUserAccessButton; 
+	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
 	DivView mockEmptyResultsDiv;
@@ -91,7 +94,7 @@ public class AccessRequirementsPresenterTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockEmptyResultsDiv);
+		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockRevokeUserAccessButton, mockEmptyResultsDiv);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);

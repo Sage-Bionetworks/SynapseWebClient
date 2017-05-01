@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.base.HasDataTarget;
 import org.gwtbootstrap3.client.ui.base.HasHref;
 import org.gwtbootstrap3.client.ui.base.HasIcon;
 import org.gwtbootstrap3.client.ui.base.HasIconPosition;
+import org.gwtbootstrap3.client.ui.base.HasPull;
 import org.gwtbootstrap3.client.ui.base.HasSize;
 import org.gwtbootstrap3.client.ui.base.HasTargetHistoryToken;
 import org.gwtbootstrap3.client.ui.base.HasType;
@@ -25,7 +26,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface Button extends HasEnabled, HasActive, HasType<ButtonType>, HasSize<ButtonSize>, HasDataTarget, HasClickHandlers,
-	Focusable, HasAllMouseHandlers, HasTargetHistoryToken, HasHref, HasText, HasIcon, HasIconPosition, HasBadge, IsWidget {
+	Focusable, HasAllMouseHandlers, HasTargetHistoryToken, HasHref, HasText, HasIcon, HasIconPosition, HasBadge, IsWidget, HasPull {
 	void setVisible(boolean visible);
 	void addStyleName(String style);
 }

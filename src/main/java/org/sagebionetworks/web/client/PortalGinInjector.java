@@ -85,6 +85,7 @@ import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
+import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -520,6 +521,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EvaluationEditorModal getEvaluationEditorModal();
 	public SelectTeamModal getSelectTeamModal();
 	public ApproveUserAccessModal getApproveUserAccessModal();
+	public RevokeUserAccessModal getRevokeUserAccessModal();
 	public ProjectDisplayDialog getProjectDisplayDialog();
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();

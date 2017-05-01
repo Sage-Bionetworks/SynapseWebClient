@@ -21,6 +21,11 @@ public interface JiraURLHelper {
 			Throwable t,
 			String errorMessage,
 			AsyncCallback<String> callback);
-
+	
+	public String createRevokeAccessIssue(String principalId,
+			String userDisplayName,
+			String userEmailAddress,
+			String accessRequirementId);
+	
 	
 }
