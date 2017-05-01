@@ -39,7 +39,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
-	RevokeUserAccessButton revokeUserAccessButton;
+	ACTRevokeUserAccessButton revokeUserAccessButton;
+	RequestRevokeUserAccessButton requestRevokeUserAccessButton;
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
@@ -49,12 +50,13 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			RevokeUserAccessButton revokeUserAccessButton,
+			ACTRevokeUserAccessButton revokeUserAccessButton,
 			ManageAccessButton manageAccessButton,
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
-			UserBadge submitterUserBadge) {
+			UserBadge submitterUserBadge,
+			RequestRevokeUserAccessButton requestRevokeUserAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -69,6 +71,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
 		this.revokeUserAccessButton = revokeUserAccessButton;
+		this.requestRevokeUserAccessButton = requestRevokeUserAccessButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -76,6 +79,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setRevokeUserAccessWidget(revokeUserAccessButton);
+		view.setRequestRevokeUserAccessWidget(requestRevokeUserAccessButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
@@ -134,6 +138,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				view.showApprovedHeading();
 				view.showRequestApprovedMessage();
 				view.showUpdateRequestButton();
+				view.showRequestRevokeAccessButton();
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -11,7 +10,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModal;
+import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,7 +18,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RevokeUserAccessButton implements IsWidget {
+public class ACTRevokeUserAccessButton implements IsWidget {
 	public static final String REVOKE_BUTTON_TEXT = "Revoke User Access";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -28,7 +27,7 @@ public class RevokeUserAccessButton implements IsWidget {
 	ACTAccessRequirement ar;
 	
 	@Inject
-	public RevokeUserAccessButton(Button button, 
+	public ACTRevokeUserAccessButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			final PortalGinInjector ginInjector,
 			final GlobalApplicationState globalAppState) {
@@ -43,7 +42,7 @@ public class RevokeUserAccessButton implements IsWidget {
 		button.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				RevokeUserAccessModal modal = ginInjector.getRevokeUserAccessModal();
+				ACTRevokeUserAccessModal modal = ginInjector.getACTRevokeUserAccessModal();
 				modal.configure(ar);
 			}
 		});

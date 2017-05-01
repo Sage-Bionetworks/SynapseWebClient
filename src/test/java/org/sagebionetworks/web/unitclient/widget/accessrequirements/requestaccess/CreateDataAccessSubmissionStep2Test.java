@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.RequestRevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -90,7 +91,8 @@ public class CreateDataAccessSubmissionStep2Test {
 	SynapseSuggestion mockSynapseSuggestion;
 	@Captor
 	ArgumentCaptor<CallbackP<SynapseSuggestion>> callbackPUserSuggestionCaptor;
-	
+	@Mock
+	RequestRevokeUserAccessButton mockRequestRevokeUserAccessButton;
 	@Mock
 	FileHandleWidget mockFileHandleWidget;
 	@Mock
@@ -102,8 +104,6 @@ public class CreateDataAccessSubmissionStep2Test {
 	List<String> mockAccessorUserIds;
 	@Mock
 	List<String> mockOtherFileHandleIds;
-	@Mock
-	JiraURLHelper mockJiraURLHelper;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	
@@ -129,7 +129,19 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockOtherDocuments.setCanDelete(anyBoolean())).thenReturn(mockOtherDocuments);
 		when(mockOtherDocuments.setCanUpload(anyBoolean())).thenReturn(mockOtherDocuments);
 		
-		widget = new CreateDataAccessSubmissionStep2(mockView, mockClient, mockTemplateFileRenderer, mockDucUploader, mockIrbUploader, mockJsniUtils, mockAuthController, mockGinInjector, mockAccessorsList, mockPeopleSuggestBox, mockProvider, mockOtherDocuments, mockJiraURLHelper);
+		widget = new CreateDataAccessSubmissionStep2(mockView, 
+				mockClient, 
+				mockTemplateFileRenderer, 
+				mockDucUploader, 
+				mockIrbUploader, 
+				mockJsniUtils, 
+				mockAuthController, 
+				mockGinInjector, 
+				mockAccessorsList, 
+				mockPeopleSuggestBox, 
+				mockProvider, 
+				mockOtherDocuments, 
+				mockRequestRevokeUserAccessButton);
 		widget.setModalPresenter(mockModalPresenter);
 		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);

@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -58,22 +55,11 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@UiField
 	Alert revokeAccessNote;
 	@UiField
-	Button revokeAccessButton;
-	Presenter presenter;
+	Span revokeAccessButtonContainer;
 	
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		revokeAccessButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRevokeAccess();
-			}
-		});
-	}
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 	@Override
 	public Widget asWidget() {
@@ -178,9 +164,9 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	public void setRevokeNoteVisible(boolean visible) {
 		revokeAccessNote.setVisible(visible);	
 	}
-	
 	@Override
-	public void open(String url) {
-		Window.open(url, "_blank", "");	
+	public void setRequestRevokeAccessButton(IsWidget w) {
+		revokeAccessButtonContainer.clear();
+		revokeAccessButtonContainer.add(w);
 	}
 }

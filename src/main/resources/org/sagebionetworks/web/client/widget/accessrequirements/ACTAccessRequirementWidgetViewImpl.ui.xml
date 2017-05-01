@@ -44,7 +44,7 @@
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="revokeAccessButtonContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				
+				<bh:Div ui:field="requestRevokeAccessButtonContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="cancelRequestButtonContainer" pull="RIGHT">
 					<b:Button ui:field="cancelRequestButton" type="DEFAULT" size="SMALL" text="Cancel Request" visible="false" addStyleNames="margin-right-5 margin-top-5" />
 				</bh:Div>

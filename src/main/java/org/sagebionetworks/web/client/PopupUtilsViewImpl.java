@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.user.client.Window;
+
 public class PopupUtilsViewImpl implements PopupUtilsView {
 
 	@Override
@@ -45,5 +47,8 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
 	}
 	
-
+	@Override
+	public void openInNewWindow(String url) {
+		Window.open(url, "_blank", "");	
+	}
 }

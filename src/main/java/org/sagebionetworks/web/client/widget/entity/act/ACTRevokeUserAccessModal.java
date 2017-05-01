@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RevokeUserAccessModal implements RevokeUserAccessModalView.Presenter, IsWidget {
+public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Presenter, IsWidget {
 	
 	public static final String REVOKED_USER = "Successfully revoked user access";
 	public static final String NO_APPROVAL_FOUND = "There was no approval found for the specified user and requirement";
@@ -26,7 +26,7 @@ public class RevokeUserAccessModal implements RevokeUserAccessModalView.Presente
 	private SynapseClientAsync synapseClient;
 	private ACTAccessRequirement ar;
 	@Inject
-	public RevokeUserAccessModal(RevokeUserAccessModalView view,
+	public ACTRevokeUserAccessModal(RevokeUserAccessModalView view,
 			SynapseAlert synAlert,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider, 
