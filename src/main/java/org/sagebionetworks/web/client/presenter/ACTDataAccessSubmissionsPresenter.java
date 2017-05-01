@@ -154,7 +154,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
 						actAccessRequirement = (ACTAccessRequirement) requirement;
-						view.setHasRequestUIVisible(actAccessRequirement.getAcceptDataAccessRequest());
+						view.setHasRequestUIVisible(ACTAccessRequirementWidget.isAcceptDataAccessRequest(actAccessRequirement.getAcceptDataAccessRequest()));
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
