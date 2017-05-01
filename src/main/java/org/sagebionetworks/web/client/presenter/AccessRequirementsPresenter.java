@@ -3,13 +3,12 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.RevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
@@ -46,7 +44,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	TeamBadge teamBadge;
 	List<AccessRequirement> allArs;
 	CreateAccessRequirementButton createAccessRequirementButton;
-	RevokeUserAccessButton revokeUserAccessButton;
 	DivView noResultsDiv;
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -57,7 +54,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			EntityIdCellRendererImpl entityIdRenderer, 
 			TeamBadge teamBadge,
 			CreateAccessRequirementButton createAccessRequirementButton,
-			RevokeUserAccessButton revokeUserAccessButton,
 			DivView noResultsDiv) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -67,11 +63,9 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
 		this.createAccessRequirementButton = createAccessRequirementButton;
-		this.revokeUserAccessButton = revokeUserAccessButton;
 		this.noResultsDiv = noResultsDiv;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
-		view.addAboveBody(revokeUserAccessButton);
 		view.add(loadMoreContainer.asWidget());
 		view.addTitle("All conditions for ");
 		view.addTitle(entityIdRenderer.asWidget());
@@ -80,7 +74,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		noResultsDiv.addStyleName("min-height-400");
 		noResultsDiv.setVisible(false);
 		view.add(noResultsDiv.asWidget());
-		revokeUserAccessButton.setPull(Pull.RIGHT);
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {

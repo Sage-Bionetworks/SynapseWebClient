@@ -46,12 +46,6 @@ public class RevokeUserAccessModalViewImpl implements RevokeUserAccessModalView 
 				presenter.onRevoke();
 			}
 		});
-		revokeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRevoke();
-			}
-		});
 	}
 	
 	@Override

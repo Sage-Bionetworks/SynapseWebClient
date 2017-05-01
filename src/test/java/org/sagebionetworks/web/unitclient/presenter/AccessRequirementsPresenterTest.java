@@ -83,8 +83,6 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	CreateAccessRequirementButton mockCreateARButton;
 	@Mock
-	RevokeUserAccessButton mockRevokeUserAccessButton; 
-	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
 	DivView mockEmptyResultsDiv;
@@ -94,7 +92,7 @@ public class AccessRequirementsPresenterTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockRevokeUserAccessButton, mockEmptyResultsDiv);
+		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockEmptyResultsDiv);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);

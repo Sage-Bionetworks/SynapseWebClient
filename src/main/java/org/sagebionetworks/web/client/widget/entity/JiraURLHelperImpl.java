@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -9,6 +10,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -241,7 +243,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 				flag_issue_type, 
 				ACCESS_REQUEST_REVOKE_ISSUE_SUMMARY, 
 				default_issue_reporter, 
-				DEFAULT_REVOKE_ACCESS_DESCRIPTION,
+				DEFAULT_REVOKE_ACCESS_DESCRIPTION + URL.encodeQueryString("\n\n\n\n\n(https://www.synapse.org/#!ACTDataAccessSubmissions:AR_ID=" + accessRequirementId + ")"),
 				principalId, 
 				userDisplayName, 
 				userEmailAddress,

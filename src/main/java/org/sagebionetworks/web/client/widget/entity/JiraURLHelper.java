@@ -26,6 +26,4 @@ public interface JiraURLHelper {
 			String userDisplayName,
 			String userEmailAddress,
 			String accessRequirementId);
-	
-	
 }

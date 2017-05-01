@@ -38,12 +38,9 @@ public class RevokeUserAccessButton implements IsWidget {
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setText(REVOKE_BUTTON_TEXT);
-		button.setSize(ButtonSize.LARGE);
 		button.setType(ButtonType.DEFAULT);
-		button.setIcon(IconType.REMOVE);
+		button.setIcon(IconType.USER_TIMES);
 		button.addClickHandler(new ClickHandler() {
-			
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				RevokeUserAccessModal modal = ginInjector.getRevokeUserAccessModal();
