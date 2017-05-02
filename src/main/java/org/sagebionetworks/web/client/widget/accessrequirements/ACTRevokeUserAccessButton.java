@@ -29,8 +29,7 @@ public class ACTRevokeUserAccessButton implements IsWidget {
 	@Inject
 	public ACTRevokeUserAccessButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			final PortalGinInjector ginInjector,
-			final GlobalApplicationState globalAppState) {
+			final PortalGinInjector ginInjector) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.ginInjector = ginInjector;
