@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequest;
 import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
+import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -111,6 +112,9 @@ public class CreateDataAccessSubmissionStep2Test {
 	ArgumentCaptor<ModalWizardWidget.WizardCallback> wizardCallbackCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Captor
+	ArgumentCaptor<CallbackP<List<String>>> callbackPStringListCaptor;
+	
 	
 	public static final String FILE_HANDLE_ID = "543345";
 	public static final String FILE_HANDLE_ID2 = "2";
@@ -237,6 +241,35 @@ public class CreateDataAccessSubmissionStep2Test {
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
+	}
+	
+	@Test
+	public void testUserIdsDeleted() {
+		verify(mockAccessorsList).setUserIdsDeletedCallback(callbackPStringListCaptor.capture());
+		CallbackP<List<String>> userIdsDeletedCallback = callbackPStringListCaptor.getValue();
+		
+		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		
+		userIdsDeletedCallback.invoke(null);
+		verify(mockView, never()).setRevokeNoteVisible(true);
+	}
+	
+	@Test
+	public void testConfigureWithRenewal() {
+		verify(mockAccessorsList).setUserIdsDeletedCallback(callbackPStringListCaptor.capture());
+		CallbackP<List<String>> userIdsDeletedCallback = callbackPStringListCaptor.getValue();
+		
+		AsyncMockStubber.callSuccessWith(mockDataAccessRenewal).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		
+		userIdsDeletedCallback.invoke(null);
+		verify(mockView).setRevokeNoteVisible(true);
+		
+		verify(mockView).setPublicationsVisible(true);
+		verify(mockView).setSummaryOfUseVisible(true);
+		verify(mockView).setPublications(anyString());
+		verify(mockView).setSummaryOfUse(anyString());
+		verify(mockRequestRevokeUserAccessButton).configure(mockACTAccessRequirement, DataAccessSubmissionState.APPROVED);
 	}
 	
 	@Test
