@@ -18,11 +18,6 @@ import com.google.inject.Inject;
 public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 
 	private Presenter presenter;
-	
-	@UiField
-	Anchor licensedDownloadLink;
-	@UiField
-	Anchor licensedDownloadLink2;
 	@UiField
 	Anchor directDownloadLink;
 	@UiField
@@ -39,8 +34,6 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	ButtonElement directDownloadButton;
 	@UiField
 	ButtonElement authorizedDownloadButton;
-	@UiField
-	ButtonElement licensedDownloadButton;
 	boolean isExtraSmall;
 	interface FileDownloadButtonViewImplUiBinder extends UiBinder<Widget, FileDownloadButtonViewImpl> {}
 
@@ -49,17 +42,6 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	@Inject
 	public FileDownloadButtonViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
-		ClickHandler licensedDownloadClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				//if there is an href, ignore it
-				event.preventDefault();
-				presenter.onLicensedDownloadClick();
-			}
-		};
-		licensedDownloadLink.addClickHandler(licensedDownloadClickHandler);
-		licensedDownloadLink2.addClickHandler(licensedDownloadClickHandler);
-		
 		ClickHandler authorizedDirectDownloadClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -73,10 +55,8 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	
 	@Override
 	public void clear() {
-		licensedDownloadLink.setVisible(false);
 		directDownloadLink.setVisible(false);
 		authorizedDirectDownloadLink.setVisible(false);
-		licensedDownloadLink2.setVisible(false);
 		directDownloadLink2.setVisible(false);
 		authorizedDirectDownloadLink2.setVisible(false);
 	}
@@ -102,11 +82,6 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	public void setDirectDownloadLinkVisible(boolean visible) {
 		directDownloadLink.setVisible(visible && !isExtraSmall);
 		directDownloadLink2.setVisible(visible && isExtraSmall);
-	}
-	@Override
-	public void setLicensedDownloadLinkVisible(boolean visible) {
-		licensedDownloadLink.setVisible(visible && !isExtraSmall);
-		licensedDownloadLink2.setVisible(visible && isExtraSmall);
 	}
 	@Override
 	public void setSynAlert(IsWidget w) {
@@ -143,9 +118,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		isExtraSmall = size.equals(ButtonSize.EXTRA_SMALL);
 		removeButtonSizeStyles(directDownloadButton);
 		removeButtonSizeStyles(authorizedDownloadButton);
-		removeButtonSizeStyles(licensedDownloadButton);
 		directDownloadButton.addClassName(size.getCssName());
 		authorizedDownloadButton.addClassName(size.getCssName());
-		licensedDownloadButton.addClassName(size.getCssName());
 	}
 }

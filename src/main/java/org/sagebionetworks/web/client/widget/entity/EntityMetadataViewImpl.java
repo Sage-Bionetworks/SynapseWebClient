@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
@@ -39,8 +38,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Collapse annotationsContent;
 	@UiField
 	SimplePanel annotationsContainer;
-	@UiField
-	Span restrictionPanel;
 	@UiField
 	Span restrictionPanelV2;
 	@UiField
@@ -87,12 +84,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setUploadDestinationText(String text) {
 		uploadDestinationField.setText(text);
-	}
-
-	@Override
-	public void setRestrictionWidget(IsWidget restrictionWidget) {
-		restrictionPanel.clear();
-		restrictionPanel.add(restrictionWidget);
 	}
 
 	@Override
@@ -150,9 +141,5 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setRestrictionWidgetV2Visible(boolean visible) {
 		restrictionPanelV2.setVisible(visible);
-	}
-	@Override
-	public void setRestrictionWidgetVisible(boolean visible) {
-		restrictionPanel.setVisible(visible);
 	}
 }

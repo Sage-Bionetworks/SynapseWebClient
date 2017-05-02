@@ -17,7 +17,6 @@
    				<bh:Span ui:field="doiPanel"/><bh:Br addStyleNames="visible-xs visible-sm"/>
 		    	<bh:Span ui:field="dataUseContainer" addStyleNames="margin-right-5">
 		    	    <bh:Span addStyleNames="margin-right-5 boldText">Conditions for use:</bh:Span>
-		    	    <bh:Span ui:field="restrictionPanel"/>
 		    	    <bh:Span ui:field="restrictionPanelV2"/>
 		    	</bh:Span>
 		    	<bh:Br addStyleNames="visible-xs visible-sm"/>

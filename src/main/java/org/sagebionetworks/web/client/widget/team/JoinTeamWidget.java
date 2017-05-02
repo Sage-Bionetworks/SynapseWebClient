@@ -345,9 +345,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				boolean isACTAccessRequirement = accessRequirement instanceof ACTAccessRequirement;
 				String primaryButtonText = isACTAccessRequirement ? "Continue" : "Accept";
 				view.setJoinWizardPrimaryButtonText(primaryButtonText);
-				// TODO: remove check for alpha mode once released.
-				boolean isAlpha = DisplayUtils.isInTestWebsite(cookies);
-				view.setAccessRequirementsLinkVisible(isAlpha && isACTAccessRequirement);
+				view.setAccessRequirementsLinkVisible(isACTAccessRequirement);
 			} else {
 				synAlert.showError("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}

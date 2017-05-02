@@ -9,9 +9,6 @@ public interface EntityMetadataView extends IsWidget {
 	void setAnnotationsVisible(boolean visible);
 	
 	public interface Presenter {
-		
-		void fireEntityUpdatedEvent();
-		
 	}
 	
 	void setFileHistoryVisible(boolean visible);
@@ -25,8 +22,6 @@ public interface EntityMetadataView extends IsWidget {
 	void clear();
 
 	public void setRestrictionPanelVisible(boolean visible);
-
-	void setRestrictionWidget(IsWidget restrictionWidget);
 	void setRestrictionWidgetV2(IsWidget restrictionWidget);
 
 	void setEntityId(String text);
@@ -35,6 +30,4 @@ public interface EntityMetadataView extends IsWidget {
 
 	void setUploadDestinationText(String text);
 	void setRestrictionWidgetV2Visible(boolean visible);
-	void setRestrictionWidgetVisible(boolean visible);
-
 }
