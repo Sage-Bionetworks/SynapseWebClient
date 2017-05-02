@@ -2,6 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity.act;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -12,6 +14,7 @@ import java.util.List;
 
 
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListView;
@@ -27,7 +30,10 @@ public class UserBadgeListTest {
 	UserBadgeListView mockView;
 	@Mock
 	PortalGinInjector mockGinInjector;
-	
+	@Mock
+	CallbackP<List<String>> mockUserIdsDeletedCallback; 
+	@Captor
+	ArgumentCaptor<List<String>> listCaptor;
 	String userId;
 	String userId2;
 	
@@ -124,6 +130,22 @@ public class UserBadgeListTest {
 		list.deleteSelected();
 		verify(mockView).clearUserBadges();
 		verify(mockView, times(1)).addUserBadge(any(Widget.class)); 
+	}
+	
+	@Test
+	public void testDeleteSelectedCallback() {
+		list.configure();
+		list.setUserIdsDeletedCallback(mockUserIdsDeletedCallback);
+		when(mockUserBadgeItem.isSelected()).thenReturn(true);
+		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
+		list.addUserBadge(userId);
+		list.addUserBadge(userId2);
+		list.deleteSelected();
+		verify(mockUserIdsDeletedCallback).invoke(listCaptor.capture());
+		List<String> deletedUserIds = listCaptor.getValue();
+		assertEquals(1, deletedUserIds.size());
+		assertEquals(userId, deletedUserIds.get(0));
 	}
 	
 	@Test
