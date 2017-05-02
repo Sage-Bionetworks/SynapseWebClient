@@ -37,8 +37,8 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		peopleSuggestWidget.setSuggestionProvider(provider);
-		this.view.setPresenter(this);
-		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		view.setPresenter(this);
+		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setSynAlert(synAlert.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
