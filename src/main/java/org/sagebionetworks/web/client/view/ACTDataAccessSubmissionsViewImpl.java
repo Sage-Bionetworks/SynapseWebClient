@@ -84,6 +84,9 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Div subjectsContainer;
 	@UiField
 	Div hasRequestUI;
+	@UiField
+	AnchorListItem backLink;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -100,7 +103,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		
+		backLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onBack();
+			}
+		});
 		clearStateFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

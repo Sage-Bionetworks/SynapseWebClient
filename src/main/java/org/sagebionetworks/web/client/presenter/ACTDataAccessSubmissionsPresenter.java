@@ -192,7 +192,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	public void loadMore() {
 		synAlert.clear();
-		globalAppState.pushCurrentPlace(place);
 		// ask for data access submissions once call is available, and create a widget to render.
 		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<DataAccessSubmissionPage>() {
 			@Override
@@ -273,5 +272,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		isSortedAsc = !isSortedAsc;
 		loadData();
 	}
-	
+	@Override
+	public void onBack() {
+		globalAppState.gotoLastPlace();
+	}
 }
