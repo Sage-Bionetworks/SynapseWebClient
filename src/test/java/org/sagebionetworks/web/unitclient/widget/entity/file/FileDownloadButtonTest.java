@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +23,6 @@ import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,7 +40,6 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonView;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -52,8 +54,6 @@ public class FileDownloadButtonTest {
 	FileDownloadButtonView mockView;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
-	LicensedDownloader mockLicensedDownloader; 
 	@Mock
 	LoginModalWidget mockLoginModalWidget;
 	@Mock
@@ -99,7 +99,7 @@ public class FileDownloadButtonTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLicensedDownloader, mockLoginModalWidget, mockGlobalAppState, mockSynAlert, mockGinInjector,
+		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockGlobalAppState, mockSynAlert, mockGinInjector,
 				mockDataAccessClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies);
 		when(mockGlobalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
@@ -117,7 +117,6 @@ public class FileDownloadButtonTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSynAlert(any(IsWidget.class));
-		verify(mockLicensedDownloader).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockLoginModalWidget).setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
 	}
 
@@ -210,17 +209,6 @@ public class FileDownloadButtonTest {
 	}
 	
 	@Test
-	public void testLicensedDownloadLink() {
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(true);
-		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView).setClientsHelpVisible(false);
-		verify(mockView).setLicensedDownloadLinkVisible(true);
-		verify(mockFileClientsHelp).configure(ENTITY_ID);
-	}
-	
-
-	@Test
 	public void testLicensedDownloadLinkAlpha() {
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
@@ -237,12 +225,6 @@ public class FileDownloadButtonTest {
 		widget.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		widget.fireEntityUpdatedEvent(mockEntityUpdatedEvent);
 		verify(mockEntityUpdatedHandler).onPersistSuccess(mockEntityUpdatedEvent);
-	}
-
-	@Test
-	public void testOnLicensedDownloadClick() {
-		widget.onLicensedDownloadClick();
-		verify(mockLicensedDownloader).onDownloadButtonClicked();
 	}
 
 	@Test

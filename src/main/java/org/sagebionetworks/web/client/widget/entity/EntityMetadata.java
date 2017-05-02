@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
-import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -14,15 +14,13 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,7 +33,6 @@ public class EntityMetadata implements Presenter {
 	private AnnotationsRendererWidget annotationsWidget;
 	private DoiWidget doiWidget;
 	private FileHistoryWidget fileHistoryWidget;
-	private org.sagebionetworks.web.client.widget.entity.RestrictionWidget restrictionWidget;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils jsni;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
@@ -44,7 +41,6 @@ public class EntityMetadata implements Presenter {
 	public EntityMetadata(EntityMetadataView view, 
 			DoiWidget doiWidget,
 			AnnotationsRendererWidget annotationsWidget,
-			org.sagebionetworks.web.client.widget.entity.RestrictionWidget restrictionWidget,
 			FileHistoryWidget fileHistoryWidget, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils jsni,
@@ -54,7 +50,6 @@ public class EntityMetadata implements Presenter {
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
-		this.restrictionWidget = restrictionWidget;
 		this.synapseClient = synapseClient;
 		this.jsni = jsni;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
@@ -62,7 +57,6 @@ public class EntityMetadata implements Presenter {
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
-		this.view.setRestrictionWidget(restrictionWidget);
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
 		restrictionWidgetV2.setShowChangeLink(true);
 		restrictionWidgetV2.setShowIfProject(false);
@@ -90,29 +84,13 @@ public class EntityMetadata implements Presenter {
 					|| en instanceof Folder || en instanceof DockerRepository);
 		}
 		configureStorageLocation(en);
-		restrictionWidget.configure(bundle, true, false, true, new Callback() {
-			@Override
-			public void invoke() {
-				fireEntityUpdatedEvent();
-			}
-		});
 		doiWidget.configure(bundle.getDoi(), en.getId());
 		boolean isCurrentVersion = versionNumber == null;
 		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
 		view.setDetailedMetadataVisible(showDetailedMetadata);
-		
 		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
-		
-		boolean isAlpha = DisplayUtils.isInTestWebsite(cookies);
-		view.setRestrictionWidgetVisible(!isAlpha);
-		view.setRestrictionWidgetV2Visible(isAlpha);
+		view.setRestrictionWidgetV2Visible(true);
 	}	
-
-	@Override
-	public void fireEntityUpdatedEvent() {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
-	}
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
