@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -228,9 +229,9 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	
 	public void imposeRestriction(String entityId, final Callback entityUpdated) {
 		view.hideModal();
-		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<ACTAccessRequirement>(){
+		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<Void>(){
 			@Override
-			public void onSuccess(ACTAccessRequirement result) {
+			public void onSuccess(Void result) {
 				if (entityUpdated != null)
 					entityUpdated.invoke();
 			}

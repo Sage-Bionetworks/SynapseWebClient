@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.RestrictionLevel;
@@ -198,9 +199,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			view.showLoading();
 			view.setImposeRestrictionModalVisible(false);
 			
-			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<ACTAccessRequirement>(){
+			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<Void>(){
 				@Override
-				public void onSuccess(ACTAccessRequirement result) {
+				public void onSuccess(Void result) {
 					view.showInfo("Successfully imposed restriction", "");
 					loadRestrictionInformation();
 				}
