@@ -16,6 +16,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -82,11 +83,11 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void addAclEntry(AclEntry aclEntry) {
+	public void addAclEntry(AclEntry aclEntry, boolean isDropdownVisible) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
+			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true, isDropdownVisible); // insert groups first
 		} else {
 			permissionsGrid.add(aclEntry, permList, permissionDisplay);
 		}

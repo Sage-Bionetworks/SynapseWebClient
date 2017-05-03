@@ -245,7 +245,9 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			if (header != null) {
 				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
 					header.getUserName();
-				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), title, "", header.getIsIndividual()));
+				// if public, hide dropdown
+				boolean isDropdownVisible = !PublicPrivateBadge.isPublic(acl, publicPrincipalIds);
+				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), title, "", header.getIsIndividual()), isDropdownVisible);
 			} else {
 				showErrorMessage("Could not find user " + principalId);
 			}

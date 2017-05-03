@@ -56,8 +56,8 @@ public class SharingPermissionsGridTest {
 		for (AclEntry entry : entries) {
 			grid.add(entry, null, null);
 		}
-		verify(mockView, times(2)).add(any(AclEntry.class), eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null), eq(true));
-		verify(mockView, times(1)).add(any(AclEntry.class), eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null), eq(false));
+		verify(mockView, times(2)).add(any(AclEntry.class), eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null), eq(true), eq(true));
+		verify(mockView, times(1)).add(any(AclEntry.class), eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null), eq(false), eq(true));
 	}
 	
 	
@@ -77,9 +77,10 @@ public class SharingPermissionsGridTest {
 		grid.add(entry3, null, null);
 		
 		boolean deleteButtonVisible = true;
-		grid.insert(entry2, 1, null, null, deleteButtonVisible);
+		boolean isDropdownMenu = false;
+		grid.insert(entry2, 1, null, null, deleteButtonVisible, isDropdownMenu);
 		
-		verify(mockView).insert(entry2, 1,(PermissionLevel[]) null, (Map<PermissionLevel,String>) null, deleteButtonVisible);
+		verify(mockView).insert(entry2, 1,(PermissionLevel[]) null, (Map<PermissionLevel,String>) null, deleteButtonVisible, isDropdownMenu);
 		
 		assertTrue(grid.getAt(1) == entry2);
 	}

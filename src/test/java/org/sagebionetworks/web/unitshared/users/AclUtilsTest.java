@@ -63,11 +63,14 @@ public class AclUtilsTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetPermissionLevels() {		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
 				PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION,
 				PermissionLevel.CAN_MESSAGE_TEAM, PermissionLevel.CAN_ADMINISTER_TEAM})), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.READ));
-		
+
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER })), 
+				AclUtils.getPermisionLevels(ACCESS_TYPE.DOWNLOAD));
+
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_ADMINISTER })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.MODERATE));
 		
@@ -121,7 +124,6 @@ public class AclUtilsTest {
 	private Set<ACCESS_TYPE> getParticipateAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
-		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.SUBMIT);
 		return set;
 	}
@@ -129,7 +131,6 @@ public class AclUtilsTest {
 	private Set<ACCESS_TYPE> getScoreAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
-		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.READ_PRIVATE_SUBMISSION);
 		set.add(ACCESS_TYPE.UPDATE_SUBMISSION);
 		return set;
@@ -172,7 +173,6 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
-		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.SUBMIT);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.READ_PRIVATE_SUBMISSION);
