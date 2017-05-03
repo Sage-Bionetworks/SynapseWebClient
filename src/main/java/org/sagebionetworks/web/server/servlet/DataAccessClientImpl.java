@@ -3,7 +3,6 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictionInformation;
@@ -137,11 +136,11 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	}
 	
 	@Override
-	public ACTAccessRequirement createLockAccessRequirement(String entityId)
+	public void createLockAccessRequirement(String entityId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createLockAccessRequirement(entityId);
+			synapseClient.createLockAccessRequirement(entityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -22,6 +21,7 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -498,7 +498,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 
 	@Deprecated
-	ACTAccessRequirement createLockAccessRequirement(String entityId) throws RestServiceException;
+	void createLockAccessRequirement(String entityId) throws RestServiceException;
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
