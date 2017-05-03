@@ -182,12 +182,25 @@ public class ACTAccessRequirementWidgetTest {
 	@Test
 	public void testApprovedState() {
 		widget.setRequirement(mockACTAccessRequirement);
+		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(true);
 		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
 		verify(mockView).showRequestApprovedMessage();
 		verify(mockView).showUpdateRequestButton();
 	}
+	
+	@Test
+	public void testApprovedStateNoDataAccessRequest() {
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(false);
+		when(mockDataAccessSubmissionStatus.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showApprovedHeading();
+		verify(mockView).showRequestApprovedMessage();
+		verify(mockView, never()).showUpdateRequestButton();
+	}
+
 	
 	@Test
 	public void testRejectedState() {

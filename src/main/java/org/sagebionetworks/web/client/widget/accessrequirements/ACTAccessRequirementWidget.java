@@ -140,7 +140,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.resetState();
 		switch (status.getState()) {
 			case SUBMITTED:
-				// TODO: request has been submitted on your behalf, or by you?
+				// request has been submitted on your behalf, or by you?
 				String submitterUserId = status.getSubmittedBy();
 				view.showUnapprovedHeading();
 				if (authController.getCurrentUserPrincipalId().equals(submitterUserId)) {
@@ -155,7 +155,9 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			case APPROVED:
 				view.showApprovedHeading();
 				view.showRequestApprovedMessage();
-				view.showUpdateRequestButton();
+				if (ar.getAcceptDataAccessRequest()) {
+					view.showUpdateRequestButton();	
+				}
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();
