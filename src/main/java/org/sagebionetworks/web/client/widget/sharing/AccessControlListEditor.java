@@ -120,8 +120,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 	}
 	
-	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
-	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
 	
 	public PermissionLevel[] getPermList() {
 		if (entity instanceof Project) {
