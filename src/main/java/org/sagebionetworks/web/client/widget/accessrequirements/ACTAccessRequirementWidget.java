@@ -155,7 +155,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			case APPROVED:
 				view.showApprovedHeading();
 				view.showRequestApprovedMessage();
-				if (ar.getAcceptDataAccessRequest()) {
+				if (isAcceptDataAccessRequest(ar.getAcceptDataAccessRequest())) {
 					view.showUpdateRequestButton();	
 				}
 				break;
