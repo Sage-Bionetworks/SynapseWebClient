@@ -40,7 +40,6 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -984,14 +983,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Deprecated
 	@Override
-	public ACTAccessRequirement createLockAccessRequirement(String entityId)
+	public void createLockAccessRequirement(String entityId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createLockAccessRequirement(entityId);
+			synapseClient.createLockAccessRequirement(entityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
@@ -34,7 +35,7 @@ public interface DataAccessClient extends RemoteService {
 	AccessRequirementStatus getAccessRequirementStatus(String accessRequirementId) throws RestServiceException;
 	void cancelDataAccessSubmission(String submissionId) throws RestServiceException;
 	RestrictionInformation getRestrictionInformation(String entityId) throws RestServiceException;
-	ACTAccessRequirement createLockAccessRequirement(String entityId) throws RestServiceException;
+	void createLockAccessRequirement(String entityId) throws RestServiceException;
 	DataAccessSubmission updateDataAccessSubmissionState(String submissionId, DataAccessSubmissionState newState,
 			String reason) throws RestServiceException;
 	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;

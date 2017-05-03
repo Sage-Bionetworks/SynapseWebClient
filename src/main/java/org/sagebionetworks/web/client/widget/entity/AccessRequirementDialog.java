@@ -228,9 +228,9 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	
 	public void imposeRestriction(String entityId, final Callback entityUpdated) {
 		view.hideModal();
-		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<ACTAccessRequirement>(){
+		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<Void>(){
 			@Override
-			public void onSuccess(ACTAccessRequirement result) {
+			public void onSuccess(Void result) {
 				if (entityUpdated != null)
 					entityUpdated.invoke();
 			}
