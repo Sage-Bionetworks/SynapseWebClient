@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -50,6 +52,11 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	FormGroup otherUploadUI;
 	@UiField
 	FormGroup ducTemplateUI;
+	@UiField
+	Alert revokeAccessNote;
+	@UiField
+	Span revokeAccessButtonContainer;
+	
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -152,5 +159,14 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@Override
 	public void setDUCTemplateVisible(boolean visible) {
 		ducTemplateUI.setVisible(visible);
+	}
+	@Override
+	public void setRevokeNoteVisible(boolean visible) {
+		revokeAccessNote.setVisible(visible);	
+	}
+	@Override
+	public void setRequestRevokeAccessButton(IsWidget w) {
+		revokeAccessButtonContainer.clear();
+		revokeAccessButtonContainer.add(w);
 	}
 }

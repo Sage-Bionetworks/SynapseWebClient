@@ -111,6 +111,27 @@ public class CreateACTAccessRequirementStep2Test {
 	}
 	
 	@Test
+	public void testHasRequestUI() {
+		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(true);
+		widget.configure(mockACTAccessRequirement);
+		verify(mockView).showHasRequestUI(true);
+	}
+	
+	@Test
+	public void testNoRequestUI() {
+		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(false);
+		widget.configure(mockACTAccessRequirement);
+		verify(mockView).showHasRequestUI(false);
+	}
+
+	@Test
+	public void testNullRequest() {
+		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(null);
+		widget.configure(mockACTAccessRequirement);
+		verify(mockView).showHasRequestUI(false);
+	}
+	
+	@Test
 	public void testConfigureWithWiki() {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		
@@ -150,6 +171,7 @@ public class CreateACTAccessRequirementStep2Test {
 		// on edit of wiki
 		widget.onEditWiki();
 		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
+		when(mockView.getHasRequests()).thenReturn(true);
 		
 		//on finish
 		widget.onPrimary();
@@ -162,6 +184,7 @@ public class CreateACTAccessRequirementStep2Test {
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
 		verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
 		verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
+		verify(mockACTAccessRequirement).setAcceptDataAccessRequest(true);
 		verify(mockModalPresenter).onFinished();
 	}
 	

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictionInformation;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
