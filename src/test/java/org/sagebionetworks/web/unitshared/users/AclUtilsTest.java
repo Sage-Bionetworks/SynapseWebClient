@@ -37,6 +37,7 @@ public class AclUtilsTest {
 	@Test
 	public void testGetPermissionLevel() {
 		assertEquals(PermissionLevel.CAN_VIEW, AclUtils.getPermissionLevel(getReadAccessTypeSet()));
+		assertEquals(PermissionLevel.CAN_DOWNLOAD, AclUtils.getPermissionLevel(getDownloadAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SUBMIT_EVALUATION, AclUtils.getPermissionLevel(getParticipateAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SCORE_EVALUATION, AclUtils.getPermissionLevel(getScoreAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_EDIT, AclUtils.getPermissionLevel(getEditAccessTypeSet()));
@@ -50,6 +51,7 @@ public class AclUtilsTest {
 	@Test
 	public void testGetACCESS_TYPEs() {
 		assertEquals(getReadAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
+		assertEquals(getDownloadAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_DOWNLOAD));
 		assertEquals(getParticipateAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_SUBMIT_EVALUATION));
 		assertEquals(getScoreAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_SCORE_EVALUATION));
 		assertEquals(getEditAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT));
@@ -108,10 +110,18 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.READ);
 		return set;
 	}
+	private Set<ACCESS_TYPE> getDownloadAccessTypeSet() {
+		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
+		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
+		return set;
+	}
+
 	
 	private Set<ACCESS_TYPE> getParticipateAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.SUBMIT);
 		return set;
 	}
@@ -119,6 +129,7 @@ public class AclUtilsTest {
 	private Set<ACCESS_TYPE> getScoreAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.READ_PRIVATE_SUBMISSION);
 		set.add(ACCESS_TYPE.UPDATE_SUBMISSION);
 		return set;
@@ -129,6 +140,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.UPDATE);
 		return set;
 	}
@@ -137,6 +149,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.DELETE);
 		return set;
@@ -146,6 +159,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
@@ -158,6 +172,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.SUBMIT);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.READ_PRIVATE_SUBMISSION);

@@ -29,18 +29,21 @@ public class AclUtils {
 		
 		permToACCESS_TYPE.put(PermissionLevel.CAN_VIEW, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				READ)));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_DOWNLOAD, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				READ, DOWNLOAD)));
+		
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				CREATE, READ, UPDATE)));
+				CREATE, READ, DOWNLOAD, UPDATE)));
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				CREATE, READ, UPDATE, DELETE)));		
+				CREATE, READ, DOWNLOAD, UPDATE, DELETE)));		
 
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS);
 
 		// Note, PARTICIPATE is no longer used, but to removed it would require updating all existing Evaluation ACLs
 		permToACCESS_TYPE.put(PermissionLevel.CAN_SUBMIT_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				READ, SUBMIT))); 
+				READ, DOWNLOAD, SUBMIT))); 
 		permToACCESS_TYPE.put(PermissionLevel.CAN_SCORE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				READ, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION)));
+				READ, DOWNLOAD, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION)));
 		
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION,
 				ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS);
