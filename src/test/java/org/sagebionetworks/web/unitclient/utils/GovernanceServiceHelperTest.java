@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -103,6 +104,8 @@ public class GovernanceServiceHelperTest {
 				GovernanceServiceHelper.accessRequirementApprovalType(new TermsOfUseAccessRequirement()));
 		assertEquals(APPROVAL_TYPE.ACT_APPROVAL, 
 				GovernanceServiceHelper.accessRequirementApprovalType(new ACTAccessRequirement()));
+		assertEquals(APPROVAL_TYPE.ACT_APPROVAL, 
+				GovernanceServiceHelper.accessRequirementApprovalType(new LockAccessRequirement()));
 		assertEquals(APPROVAL_TYPE.POST_MESSAGE, 
 				GovernanceServiceHelper.accessRequirementApprovalType(new PostMessageContentAccessRequirement()));
 	}
@@ -123,5 +126,19 @@ public class GovernanceServiceHelperTest {
 		ars.add(new TermsOfUseAccessRequirement());
 		assertEquals(RESTRICTION_LEVEL.CONTROLLED, 
 				GovernanceServiceHelper.entityRestrictionLevel(ars));
+	}
+	
+	@Test 
+	public void testLockEntityRestrictionLevel() throws Exception {
+		Collection<AccessRequirement> ars = new ArrayList<AccessRequirement>();
+		ars.add(new LockAccessRequirement());
+		assertEquals(RESTRICTION_LEVEL.CONTROLLED, 
+				GovernanceServiceHelper.entityRestrictionLevel(ars));
+	}
+	
+	@Test 
+	public void testLockAccessRequirementText() throws Exception {
+		assertEquals(GovernanceServiceHelper.LOCK_ACCESS_REQUIREMENT_TEXT, 
+				GovernanceServiceHelper.getAccessRequirementText(new LockAccessRequirement()));
 	}
 }

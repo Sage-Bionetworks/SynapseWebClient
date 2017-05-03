@@ -17,6 +17,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GovernanceServiceHelper {
 	
+	public static final String LOCK_ACCESS_REQUIREMENT_TEXT = "Access restricted pending review by Synapse Access and Compliance Team.";
+
 	public static AccessApproval getAccessApproval(
 			String principalId, 
 			AccessRequirement ar) {
@@ -120,7 +122,7 @@ public class GovernanceServiceHelper {
 		} else if (ar instanceof ACTAccessRequirement) {
 			return ((ACTAccessRequirement)ar).getActContactInfo();
 		} else if (ar instanceof LockAccessRequirement) {
-			return "Access restricted pending review by Synapse Access and Compliance Team.";
+			return LOCK_ACCESS_REQUIREMENT_TEXT;
 		} else {
 			throw new RuntimeException("Unexpected class "+ar.getClass().getName());
 		}
