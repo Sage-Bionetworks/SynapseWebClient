@@ -154,6 +154,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
 						actAccessRequirement = (ACTAccessRequirement) requirement;
+						view.setHasRequestUIVisible(ACTAccessRequirementWidget.isAcceptDataAccessRequest(actAccessRequirement.getAcceptDataAccessRequest()));
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -191,7 +192,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	public void loadMore() {
 		synAlert.clear();
-		globalAppState.pushCurrentPlace(place);
 		// ask for data access submissions once call is available, and create a widget to render.
 		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<DataAccessSubmissionPage>() {
 			@Override
@@ -272,5 +272,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		isSortedAsc = !isSortedAsc;
 		loadData();
 	}
-	
+	@Override
+	public void onBack() {
+		globalAppState.gotoLastPlace();
+	}
 }

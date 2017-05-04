@@ -25,4 +25,5 @@ public interface PopupUtilsView {
 			String message,
 			Callback yesCallback
 			);
+	void openInNewWindow(String url);
 }

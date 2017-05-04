@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.createaccessreq
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 
@@ -45,6 +46,12 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	CheckBox annualRenewalCheckbox;
 	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
+	@UiField
+	Div hasRequestUI;
+	@UiField
+	Radio hasRequestButton;
+	@UiField
+	Radio hasNoRequestButton;
 	
 	Presenter presenter;
 	
@@ -57,7 +64,29 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 				presenter.onEditWiki();
 			}
 		});
-		
+		hasRequestButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showHasRequestUI(true);
+			}
+		});
+		hasNoRequestButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showHasRequestUI(false);
+			}
+		});
+	}
+	
+	@Override
+	public void showHasRequestUI(boolean hasRequest) {
+		hasRequestUI.setVisible(hasRequest);
+		hasRequestButton.setValue(hasRequest, false);
+		hasNoRequestButton.setValue(!hasRequest, false);
+	}
+	@Override
+	public boolean getHasRequests() {
+		return hasRequestButton.getValue();
 	}
 	@Override
 	public Widget asWidget() {

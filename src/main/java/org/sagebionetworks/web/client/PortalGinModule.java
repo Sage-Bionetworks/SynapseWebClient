@@ -263,6 +263,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalViewImpl;
+import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalView;
+import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
@@ -711,7 +713,6 @@ import org.sagebionetworks.web.client.widget.upload.FileInputView;
 import org.sagebionetworks.web.client.widget.upload.FileInputViewImpl;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl;
-import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -1449,5 +1450,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ACTDataAccessSubmissionWidgetView.class).to(ACTDataAccessSubmissionWidgetViewImpl.class);
 		bind(OpenSubmissionWidgetView.class).to(OpenSubmissionWidgetViewImpl.class);
 		bind(LockAccessRequirementWidgetView.class).to(LockAccessRequirementWidgetViewImpl.class);
-		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);	}
+		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);
+		bind(RevokeUserAccessModalView.class).to(RevokeUserAccessModalViewImpl.class);
+	}
 }

@@ -16,23 +16,36 @@
 				<bh:Div ui:field="wikiPageContainer" />
 				<b:Button ui:field="editWikiButton" text="Edit Instructions" />
 			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Accessor requirements</b:FormLabel>
-				<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." />
-				<b:CheckBox ui:field="validatedCheckbox"
-					text="Accessors must have a validated profile." />
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>DUC</b:FormLabel>
-				<b:CheckBox ui:field="ducCheckbox" text="DUC is required." />
-				<bh:Div ui:field="ducTemplateFileContainer" />
-				<bh:Div ui:field="ducTemplateFileUploadContainer" />
-			</b:FormGroup>
-			<b:CheckBox ui:field="irbCheckbox" text="IRB approval is required." />
-			<b:CheckBox ui:field="otherAttachmentsCheckbox" text="Other documents are required." />
-			<b:CheckBox ui:field="annualRenewalCheckbox" text="Annual renewal is required." />
-			<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
-				text="Intended Data Use statements will be publicly available." />
+			<b:ButtonGroup>
+				<b:Radio name="hasrequest" ui:field="hasNoRequestButton" text="Requests are handled outside of Synapse (Jira/email/spreadsheets, legacy requirement)" />
+				<b:Radio name="hasrequest" ui:field="hasRequestButton" text="Requests are in Synapse" value="true" />
+			</b:ButtonGroup>
+			<bh:Div ui:field="hasRequestUI">
+				<b:Panel>
+					<b:PanelHeader>
+						<b:Heading size="H5" text="Data Access Request Parameters" />
+					</b:PanelHeader>
+					<b:PanelBody>
+						<b:FormGroup>
+							<b:FormLabel>Accessor requirements</b:FormLabel>
+							<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." />
+							<b:CheckBox ui:field="validatedCheckbox"
+								text="Accessors must have a validated profile." />
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel>DUC</b:FormLabel>
+							<b:CheckBox ui:field="ducCheckbox" text="DUC is required." />
+							<bh:Div ui:field="ducTemplateFileContainer" />
+							<bh:Div ui:field="ducTemplateFileUploadContainer" />
+						</b:FormGroup>
+						<b:CheckBox ui:field="irbCheckbox" text="IRB approval is required." />
+						<b:CheckBox ui:field="otherAttachmentsCheckbox" text="Other documents are required." />
+						<b:CheckBox ui:field="annualRenewalCheckbox" text="Annual renewal is required." />
+						<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
+							text="Intended Data Use statements will be publicly available." />					
+					</b:PanelBody>
+				</b:Panel>
+			</bh:Div>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>

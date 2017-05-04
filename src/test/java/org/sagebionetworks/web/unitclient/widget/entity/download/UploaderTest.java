@@ -135,7 +135,6 @@ public class UploaderTest {
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
