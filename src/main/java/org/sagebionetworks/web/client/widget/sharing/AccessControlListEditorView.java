@@ -30,11 +30,11 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * 
 	 * @param entry
 	 */
-	public void addAclEntry(AclEntry entry, boolean isDropdownVisible);
+	public void addAclEntry(AclEntry entry);
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
-	
+	public void setAuthenticatedAclPrinciapalId(Long authenticatedPrincipalId);
 	/**
 	 * Set the view to a loading state while async loads
 	 */
