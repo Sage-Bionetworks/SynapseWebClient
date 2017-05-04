@@ -237,7 +237,10 @@ public class SynapseClientImplTest {
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
 	@Mock
-	ColumnModel mockOldColumnModel;
+	ColumnModel mockOldColumnModel1;
+	@Mock
+	ColumnModel mockOldColumnModel2;
+	
 	@Mock
 	ColumnModel mockNewColumnModel;
 	@Mock
@@ -265,7 +268,8 @@ public class SynapseClientImplTest {
 	EntityHeader mockEntityHeader;
 	List<EntityHeader> entityChildrenPage;
 	
-	public static final String OLD_COLUMN_MODEL_ID = "4444";
+	public static final String OLD_COLUMN_MODEL_ID1 = "4444";
+	public static final String OLD_COLUMN_MODEL_ID2 = "4445";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
 	private static final String testUserId = "myUserId";
 
@@ -324,7 +328,8 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_1)).thenReturn(
 				userEvaluationPermissions);
 
-		when(mockOldColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
+		when(mockOldColumnModel1.getId()).thenReturn(OLD_COLUMN_MODEL_ID1);
+		when(mockOldColumnModel2.getId()).thenReturn(OLD_COLUMN_MODEL_ID2);
 		when(mockNewColumnModelAfterCreate.getId()).thenReturn(NEW_COLUMN_MODEL_ID);
 		
 		// Setup the path
@@ -2400,10 +2405,25 @@ public class SynapseClientImplTest {
 	public void testGetTableUpdateTransactionRequestNoChange()  throws RestServiceException, SynapseException {
 		String tableId = "syn93939";
 		
-		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
-		when(mockSynapse.createColumnModels(anyList())).thenReturn(oldColumnModels);
+		// test reordering, with no other changes
+		List<ColumnModel> oldColumnModels = new ArrayList<>();
+		oldColumnModels.add(mockOldColumnModel1);
+		oldColumnModels.add(mockOldColumnModel2);
+		
+		List<ColumnModel> newColumnModels = new ArrayList<>();
+		newColumnModels.add(mockOldColumnModel2);
+		newColumnModels.add(mockOldColumnModel1);
+		
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(newColumnModels);
 		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
-		assertEquals(0, synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, oldColumnModels).getChanges().size());
+		
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, newColumnModels);
+		assertEquals(1, request.getChanges().size());
+		TableSchemaChangeRequest tableUpdateRequest = (TableSchemaChangeRequest) request.getChanges().get(0);
+		List<String> orderColumnIds = tableUpdateRequest.getOrderedColumnIds();
+		assertEquals(OLD_COLUMN_MODEL_ID2, orderColumnIds.get(0));
+		assertEquals(OLD_COLUMN_MODEL_ID1, orderColumnIds.get(1));
+		assertTrue(tableUpdateRequest.getChanges().isEmpty());
 	}
 	
 	@Test
