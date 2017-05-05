@@ -210,6 +210,7 @@ public class EntityBadgeTest {
 		verify(mockView).showHasWikiIcon();
 		verify(mockView).setDiscussionThreadIconVisible(true);
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
+		verify(mockFileDownloadButton).hideClientHelp();
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}
 	
