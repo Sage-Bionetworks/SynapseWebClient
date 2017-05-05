@@ -149,6 +149,7 @@ public class EntityListRowBadgeTest {
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setDescription(description);
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
+		verify(mockFileDownloadButton).hideClientHelp();
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 		verify(mockView).setVersion(version.toString());
 	}

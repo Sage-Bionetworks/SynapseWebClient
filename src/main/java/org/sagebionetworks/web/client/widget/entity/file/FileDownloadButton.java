@@ -50,7 +50,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	SynapseJSNIUtils jsniUtils;
 	GWTWrapper gwt;
 	CookieProvider cookies;
-	
+	boolean isHidingClientHelp = false;
 	@Inject
 	public FileDownloadButton(FileDownloadButtonView view, 
 			SynapseClientAsync synapseClient, 
@@ -132,7 +132,9 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 				} else {
 					view.setDirectDownloadLink(directDownloadUrl);
 					view.setDirectDownloadLinkVisible(true);
-					view.setClientsHelpVisible(true);
+					if (!isHidingClientHelp) {
+						view.setClientsHelpVisible(true);	
+					}
 				}
 			}
 		}
@@ -178,8 +180,9 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		return directDownloadURL;
 	}
 	
-	public void setClientsHelpVisible(boolean visible) {
-		view.setClientsHelpVisible(visible);
+	public void hideClientHelp() {
+		isHidingClientHelp = true;
+		view.setClientsHelpVisible(false);
 	}
 	@Override
 	public Widget asWidget() {

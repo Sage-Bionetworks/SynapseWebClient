@@ -140,7 +140,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		
 		if (eb.getEntity() instanceof FileEntity) {
 			fileDownloadButton.configure(eb);
-			fileDownloadButton.setClientsHelpVisible(false);
+			fileDownloadButton.hideClientHelp();
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 		
