@@ -62,7 +62,6 @@ public class ImageConfigEditorTest {
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata(testFileName, "image/png", fileSize));
 		when(mockView.isSynapseEntity()).thenReturn(false);
-		when(mockView.isFromAttachments()).thenReturn(false);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMeta);
 		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
 		when(mockFileMeta.getFileName()).thenReturn(testFileName);
@@ -112,8 +111,8 @@ public class ImageConfigEditorTest {
 		reset(mockView);
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
 		editor.configure(wikiKey, descriptor, mockCallback);
-		verify(mockView).setUploadTabVisible(false);
-		verify(mockView).showWikiAttachmentsTab();
+		verify(mockView).setWikiFilesTabVisible(true);
+		verify(mockView).setWikiAttachmentsWidgetVisible(true);
 		verify(mockAttachments).setSelectedFilename(fileName);
 	}
 	
@@ -123,7 +122,7 @@ public class ImageConfigEditorTest {
 		reset(mockView);
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
 		editor.configure(wikiKey, descriptor, mockCallback);
-		verify(mockView).setUploadTabVisible(false);
+		verify(mockView).setWikiFilesTabVisible(false);
 		verify(mockView).showSynapseTab();
 		verify(mockView).setSynapseId(synId);
 	}
@@ -132,7 +131,7 @@ public class ImageConfigEditorTest {
 	public void testUploadFileClickedSuccess() {
 		verify(mockView).initView();
 		mockFinishedCallback.invoke(mockFileUpload);
-		verify(mockView).showUploadSuccessUI();
+		verify(mockView).showUploadSuccessUI(testFileName);
 		verify(mockCallback).setPrimaryEnabled(true);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));
 	}
@@ -144,8 +143,7 @@ public class ImageConfigEditorTest {
 		descriptor.clear();
 		editor.configureWithoutUpload(wikiKey, descriptor, mockCallback);
 		verify(mockView).initView();
-		verify(mockView).setUploadTabVisible(false);
-		verify(mockView).setWikiAttachmentsTabVisible(false);
+		verify(mockView).setWikiFilesTabVisible(false);
 		verify(mockView).showExternalTab();
 		verify(mockFileInputWidget).reset();
 	}
@@ -156,8 +154,7 @@ public class ImageConfigEditorTest {
 		reset(mockFileInputWidget);
 		editor.configureWithoutUpload(wikiKey, descriptor, mockCallback);
 		verify(mockView).initView();
-		verify(mockView, atLeastOnce()).setUploadTabVisible(false);
-		verify(mockView).setWikiAttachmentsTabVisible(false);
+		verify(mockView, atLeastOnce()).setWikiFilesTabVisible(false);
 		verify(mockView, never()).showExternalTab();
 		verify(mockView).setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 		verify(mockFileInputWidget).reset();
@@ -173,6 +170,7 @@ public class ImageConfigEditorTest {
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testConfigureFileNotUploaded() {
+		when(mockAttachments.isValid()).thenReturn(false);
 		editor.configure(wikiKey, new HashMap<String, String>(), mockCallback);
 		editor.updateDescriptorFromView();
 	}
@@ -196,7 +194,6 @@ public class ImageConfigEditorTest {
 	@Test
 	public void testIsFromAttachments() {
 	        when(mockView.isSynapseEntity()).thenReturn(false);
-	        when(mockView.isFromAttachments()).thenReturn(true);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
 	        mockFinishedCallback.invoke(mockFileUpload);
@@ -210,7 +207,6 @@ public class ImageConfigEditorTest {
 	@Test (expected=IllegalArgumentException.class)
 	public void testIsFromAttachmentsFailure() {
 	        when(mockView.isSynapseEntity()).thenReturn(false);
-	        when(mockView.isFromAttachments()).thenReturn(true);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
 	        mockFinishedCallback.invoke(mockFileUpload);

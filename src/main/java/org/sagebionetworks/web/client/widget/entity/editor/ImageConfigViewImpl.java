@@ -50,8 +50,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	SimplePanel uploadParamsPanelContainer;
 	@UiField
 	SimplePanel wikiAttachmentsContainer;
-	@UiField
-	SimplePanel wikiAttachmentsParamsPanelContainer;
 	
 	@UiField
 	SimplePanel synapseParamsPanelContainer;
@@ -62,8 +60,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	TabListItem externalTabListItem;
 	@UiField
 	TabListItem synapseTabListItem;
-	@UiField
-	TabListItem existingAttachmentListItem;
 	@UiField
 	FlowPanel uploadSuccessUI;
 	@UiField
@@ -77,17 +73,16 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@UiField
 	TabPane tab3;
 	@UiField
-	TabPane tab4;
+	Text fileNameText;
 	
-	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel, wikiAttachmentsParamsPanel;
+	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 	
 	@Inject
 	public ImageConfigViewImpl(
 			ImageConfigViewImplUiBinder binder,
 			SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils,
 			ImageParamsPanel synapseParamsPanel,
-			ImageParamsPanel uploadParamsPanel,
-			ImageParamsPanel wikiAttachmentsParamsPanel
+			ImageParamsPanel uploadParamsPanel
 			) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
@@ -96,11 +91,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseParamsPanel = synapseParamsPanel;
 		this.uploadParamsPanel = uploadParamsPanel;
-		this.wikiAttachmentsParamsPanel = wikiAttachmentsParamsPanel;
 		
 		uploadParamsPanelContainer.add(uploadParamsPanel.asWidget());
 		synapseParamsPanelContainer.add(synapseParamsPanel.asWidget());
-		wikiAttachmentsParamsPanelContainer.add(wikiAttachmentsParamsPanel.asWidget());
 		
 		initClickHandlers();
 	}
@@ -131,13 +124,10 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		urlField.setValue("");
 		nameField.setValue("");
 
-		setUploadTabVisible(true);
+		setWikiFilesTabVisible(true);
 		setExternalTabVisible(true);
 		setSynapseTabVisible(true);
-		setWikiAttachmentsTabVisible(true);
 		
-		existingAttachmentListItem.setActive(false);
-		tab4.setActive(false);
 		synapseTabListItem.setActive(false);
 		tab3.setActive(false);
 		externalTabListItem.setActive(false);
@@ -147,14 +137,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		
 		uploadParamsPanel.clear();
 		synapseParamsPanel.clear();
-		wikiAttachmentsParamsPanel.clear();
 	}
 	
 	private ImageParamsPanel getCurrentParamsPanel() {
 		if (isSynapseEntity()) {
 			return synapseParamsPanel;
-		} else if (isFromAttachments()) {
-			return wikiAttachmentsParamsPanel;
 		} else {
 			return uploadParamsPanel;
 		}
@@ -188,11 +175,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	
 	@Override
-	public void showUploadSuccessUI() {
+	public void showUploadSuccessUI(String fileName) {
 		fileInputWidgetContainer.setVisible(false);
 
 		uploadFailureUI.setVisible(false);
 		uploadSuccessUI.setVisible(true);
+		fileNameText.setText(fileName);
 	}
 	
 	@Override
@@ -206,6 +194,10 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		wikiAttachmentsContainer.add(widget);
 	}
 	
+	@Override
+	public void setWikiAttachmentsWidgetVisible(boolean visible) {
+		wikiAttachmentsContainer.setVisible(visible);
+	}
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
@@ -272,11 +264,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		tab3.setActive(true);
 	}
 	@Override
-	public void showWikiAttachmentsTab() {
-		existingAttachmentListItem.setActive(true);
-		tab4.setActive(true);
-	}
-	@Override
 	public void setSynapseId(String synapseId) {
 		entityField.setValue(synapseId);
 	}
@@ -293,17 +280,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	
 	@Override
-	public boolean isFromAttachments() {
-		return existingAttachmentListItem.isActive();
-	}
-	
-	@Override
 	public void setExternalTabVisible(boolean visible) {
 		externalTabListItem.setEnabled(visible);
 	}
 
 	@Override
-	public void setUploadTabVisible(boolean visible) {
+	public void setWikiFilesTabVisible(boolean visible) {
 		uploadTabListItem.setVisible(visible);
 		tab1.setVisible(visible);
 	}
@@ -314,13 +296,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		tab3.setVisible(visible);
 	}
 
-
-	@Override
-	public void setWikiAttachmentsTabVisible(boolean visible) {
-		existingAttachmentListItem.setVisible(visible);
-		tab4.setVisible(visible);
-	}
-
 	@Override
 	public void showExternalTab() {
 		externalTabListItem.setActive(true);
@@ -328,7 +303,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 
 	@Override
-	public void showUploadTab() {
+	public void showWikiFilesTab() {
 		uploadTabListItem.setActive(true);
 		tab1.setActive(true);
 	}
