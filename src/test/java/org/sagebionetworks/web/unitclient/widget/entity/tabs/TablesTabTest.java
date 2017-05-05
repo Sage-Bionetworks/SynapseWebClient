@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +54,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -76,7 +78,8 @@ public class TablesTabTest {
 	Breadcrumb mockBreadcrumb;
 	@Mock
 	EntityMetadata mockEntityMetadata;
-	
+	@Mock
+	ProvenanceWidget mockProvenanceWidget;
 	@Mock
 	StuAlert mockSynapseAlert;
 	@Mock
@@ -133,7 +136,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
 		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
-		
+		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
@@ -221,7 +224,8 @@ public class TablesTabTest {
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		
+		verify(mockProvenanceWidget).configure(any(Map.class));
+		verify(mockView).setProvenanceVisible(true);
 		verify(mockView).setEntityMetadataVisible(true);
 		verify(mockView).setBreadcrumbVisible(true);
 		verify(mockView).setTableListVisible(false);
@@ -265,7 +269,8 @@ public class TablesTabTest {
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockModifiedCreatedBy).setVisible(false);
-
+		verify(mockView).setProvenanceVisible(false);
+		verify(mockView, never()).setProvenanceVisible(true);
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
 		
@@ -379,6 +384,7 @@ public class TablesTabTest {
 		verify(mockView).clearActionMenuContainer();
 		verify(mockProjectInfoCallback).invoke(false);
 		verify(mockModifiedCreatedBy).setVisible(false);
+		verify(mockView).setProvenanceVisible(false);
 	}
 
 	@Test

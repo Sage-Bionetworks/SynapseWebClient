@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -37,6 +39,10 @@ public class TablesTabViewImpl implements TablesTabView {
 	SimplePanel tableListWidgetContainer;
 	@UiField
 	SimplePanel synapseAlertContainer;
+	@UiField
+	Column provenanceContainer;
+	@UiField
+	Div provenanceContainerHighlightBox;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {}
 	
@@ -130,6 +136,15 @@ public class TablesTabViewImpl implements TablesTabView {
 	@Override
 	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
 		tableModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);		
+	}
+	@Override
+	public void setProvenanceVisible(boolean visible) {
+		provenanceContainer.setVisible(visible);
+	}
+	@Override
+	public void setProvenance(IsWidget w) {
+		provenanceContainerHighlightBox.clear();
+		provenanceContainerHighlightBox.add(w);		
 	}
 }
 

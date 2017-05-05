@@ -10,11 +10,14 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -31,11 +34,13 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -65,6 +70,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	CallbackP<Boolean> showProjectInfoCallack;
 	TableEntityWidget v2TableWidget;
+	Map<String,String> configMap;
 	
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
@@ -106,6 +112,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				}
 			});
 			initBreadcrumbLinkClickedHandler();
+			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
 		}
 	}
 	
@@ -182,6 +189,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
+		view.setProvenanceVisible(false);
 	}
 	
 	public void showError(Throwable error) {
@@ -201,16 +209,21 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
+		view.setProvenanceVisible(isTable);
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			ActionMenuWidget actionMenu = initActionMenu(bundle);
-			
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), this, actionMenu);
+			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+			configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
+			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entity.getId(), null));
+			view.setProvenance(provWidget);
+			provWidget.configure(configMap);
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
