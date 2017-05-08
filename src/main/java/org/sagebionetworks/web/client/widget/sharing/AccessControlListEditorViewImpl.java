@@ -37,7 +37,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
-	private Long publicAclPrincipalId;
+	private Long publicAclPrincipalId, authenticatedPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
 	private PermissionLevel defaultPermissionLevel;
@@ -83,11 +83,11 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void addAclEntry(AclEntry aclEntry, boolean isDropdownVisible) {
+	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true, isDropdownVisible); // insert groups first
+			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
 		} else {
 			permissionsGrid.add(aclEntry, permList, permissionDisplay);
 		}
@@ -96,6 +96,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId) {
 		this.publicAclPrincipalId = publicAclPrincipalId;
+	}
+	@Override
+	public void setAuthenticatedAclPrinciapalId(Long authenticatedPrincipalId) {
+		this.authenticatedPrincipalId = authenticatedPrincipalId;
 	}
 	@Override
 	public void setPublicPrivateButtonVisible(boolean isVisible) {
@@ -188,6 +192,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 						} else {
 							if (publicAclPrincipalId != null) {
 								presenter.setAccess(publicAclPrincipalId, PermissionLevel.CAN_VIEW);
+								presenter.setAccess(authenticatedPrincipalId, PermissionLevel.CAN_DOWNLOAD);
 							}
 						}
 					}

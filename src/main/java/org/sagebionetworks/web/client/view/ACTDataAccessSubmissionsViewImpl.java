@@ -15,7 +15,6 @@ import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -83,6 +82,10 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	CheckBox intendedDataUsePublicCheckbox;
 	@UiField
 	Div subjectsContainer;
+	@UiField
+	Div hasRequestUI;
+	@UiField
+	AnchorListItem backLink;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -100,7 +103,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		
+		backLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onBack();
+			}
+		});
 		clearStateFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -259,5 +267,9 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setSubjectsWidget(IsWidget w) {
 		subjectsContainer.clear();
 		subjectsContainer.add(w);
+	}
+	@Override
+	public void setHasRequestUIVisible(boolean visible) {
+		hasRequestUI.setVisible(visible);
 	}
 }

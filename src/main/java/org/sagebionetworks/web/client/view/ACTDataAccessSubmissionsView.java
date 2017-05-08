@@ -18,6 +18,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setShowHideButton(IsWidget button);
 	void setAccessRequirementWidget(IsWidget w);
 	
+	void setHasRequestUIVisible(boolean visible);
 	void setAreOtherAttachmentsRequired(boolean value);
 	void setIsAnnualReviewRequired(boolean value);
 	void setIsCertifiedUserRequired(boolean value);
@@ -34,6 +35,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 		void onMinDateSelected(Date date);
 		void onMaxDateSelected(Date date);
 		void onCreatedOnClick();
+		void onBack();
 	}
 
 	

@@ -1,15 +1,20 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -39,6 +44,10 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
+	ACTRevokeUserAccessButton revokeUserAccessButton;
+	RequestRevokeUserAccessButton requestRevokeUserAccessButton;
+	JiraURLHelper jiraURLHelper;
+	PopupUtilsView popupUtils;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -49,11 +58,15 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
+			ACTRevokeUserAccessButton revokeUserAccessButton,
 			ManageAccessButton manageAccessButton,
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
-			UserBadge submitterUserBadge) {
+			UserBadge submitterUserBadge,
+			RequestRevokeUserAccessButton requestRevokeUserAccessButton,
+			JiraURLHelper jiraURLHelper,
+			PopupUtilsView popupUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -67,12 +80,19 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
+		this.revokeUserAccessButton = revokeUserAccessButton;
+		this.requestRevokeUserAccessButton = requestRevokeUserAccessButton;
+		this.jiraURLHelper = jiraURLHelper;
+		this.popupUtils = popupUtils;
+		requestRevokeUserAccessButton.setSize(ButtonSize.SMALL);
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
+		view.setRevokeUserAccessWidget(revokeUserAccessButton);
+		view.setRequestRevokeUserAccessWidget(requestRevokeUserAccessButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
@@ -104,17 +124,23 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		});
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
+		revokeUserAccessButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		lazyLoadHelper.setIsConfigured();
 	}
 	
+	public static boolean isAcceptDataAccessRequest(Boolean isAcceptDataAccessRequest) {
+		return isAcceptDataAccessRequest != null && isAcceptDataAccessRequest;
+	}
+	
 	public void setDataAccessSubmissionStatus(ACTAccessRequirementStatus status) {
+		requestRevokeUserAccessButton.configure(ar, status.getState());
 		submissionId = status.getSubmissionId();
 		view.resetState();
 		switch (status.getState()) {
 			case SUBMITTED:
-				// TODO: request has been submitted on your behalf, or by you?
+				// request has been submitted on your behalf, or by you?
 				String submitterUserId = status.getSubmittedBy();
 				view.showUnapprovedHeading();
 				if (authController.getCurrentUserPrincipalId().equals(submitterUserId)) {
@@ -129,7 +155,9 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			case APPROVED:
 				view.showApprovedHeading();
 				view.showRequestApprovedMessage();
-				view.showUpdateRequestButton();
+				if (isAcceptDataAccessRequest(ar.getAcceptDataAccessRequest())) {
+					view.showUpdateRequestButton();	
+				}
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();
@@ -174,23 +202,37 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	@Override
 	public void onRequestAccess() {
-		//pop up DataAccessRequest dialog
-		CreateDataAccessRequestWizard wizard = ginInjector.getCreateDataAccessRequestWizard();
-		view.setDataAccessRequestWizard(wizard);
-		wizard.configure(ar);
-		wizard.showModal(new WizardCallback() {
-			//In any case, the state may have changed, so refresh this AR
-			
-			@Override
-			public void onFinished() {
-				refreshApprovalState();
-			}
-			
-			@Override
-			public void onCanceled() {
-				refreshApprovalState();
-			}
-		});
+		if (ACTAccessRequirementWidget.isAcceptDataAccessRequest(ar.getAcceptDataAccessRequest())) {
+			//pop up DataAccessRequest dialog
+			CreateDataAccessRequestWizard wizard = ginInjector.getCreateDataAccessRequestWizard();
+			view.setDataAccessRequestWizard(wizard);
+			wizard.configure(ar);
+			wizard.showModal(new WizardCallback() {
+				//In any case, the state may have changed, so refresh this AR
+				
+				@Override
+				public void onFinished() {
+					refreshApprovalState();
+				}
+				
+				@Override
+				public void onCanceled() {
+					refreshApprovalState();
+				}
+			});
+		} else {
+			// request access via Jira
+			UserProfile userProfile = authController.getCurrentUserSessionData().getProfile();
+			if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+			String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
+			String createJiraIssueURL = jiraURLHelper.createRequestAccessIssue(
+					userProfile.getOwnerId(), 
+					DisplayUtils.getDisplayName(userProfile), 
+					primaryEmail, 
+					ar.getSubjectIds().get(0).getId(), 
+					ar.getId().toString());
+			popupUtils.openInNewWindow(createJiraIssueURL);
+		}
 	}
 	
 	public void addStyleNames(String styleNames) {

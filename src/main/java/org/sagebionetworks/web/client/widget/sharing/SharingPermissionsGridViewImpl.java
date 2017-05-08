@@ -54,8 +54,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible, boolean isDropdownVisible) {
-		tableBody.insert(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplays, deleteButtonVisible, isDropdownVisible), beforeIndex);
+	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible) {
+		tableBody.insert(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplays, deleteButtonVisible), beforeIndex);
 	}
 	
 	@Override
@@ -65,11 +65,11 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible, boolean isDropdownVisible) {
-		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay, deleteButtonVisible, isDropdownVisible));
+	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {
+		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay, deleteButtonVisible));
 	}
 	
-	private TableRow createAclEntryTableRow(final AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible, boolean isDropdownVisible) {
+	private TableRow createAclEntryTableRow(final AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {
 		final TableRow row = new TableRow();
 		
 		// People label
@@ -96,7 +96,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		permListBox.addStyleName("input-xs");
 		data.add(permListBox);
 		row.add(data);
-		permListBox.setVisible(isDropdownVisible);
 		if (!deleteButtonVisible || deleteButtonCallback == null) {
 			// Don't allow editing the permissions and don't add delete button.
 			permListBox.setEnabled(false);

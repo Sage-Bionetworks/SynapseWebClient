@@ -13,8 +13,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface SharingPermissionsGridView extends IsWidget, SynapseView {
 
-	void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible, boolean isDropdownVisible);
-	void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible, boolean isDropdownVisible);
+	void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible);
+	void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays, boolean deleteButtonVisible);
 	void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback);
 	public interface Presenter{}
 	

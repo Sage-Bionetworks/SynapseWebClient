@@ -16,6 +16,11 @@
 					<b:PanelBody>
 						<bh:Div ui:field="accessorsContainer" />
 						<bh:Div ui:field="peopleSuggestContainer" />
+						<b:Alert ui:field="revokeAccessNote" type="WARNING" addStyleNames="margin-top-10">
+							<bh:Strong text="Note &nbsp;" />
+							<bh:Text text=" Removing a user from this request does not automatically revoke access for that user.  To revoke access, please send a request to the Access and Compliance Team (ACT) by clicking: "/>
+							<bh:Span ui:field="revokeAccessButtonContainer" />
+						</b:Alert>
 					</b:PanelBody>
 				</b:Panel>
 			</b:FormGroup>

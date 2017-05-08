@@ -44,15 +44,15 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 		return aclEntries.get(index);
 	}
 	
-	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible, boolean isDropdownVisible) {
+	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay, boolean deleteButtonVisible) {
 		aclEntries.add(beforeIndex, aclEntry);
-		view.insert(aclEntry, beforeIndex, permissionLevels, permissionDisplay, deleteButtonVisible, isDropdownVisible);
+		view.insert(aclEntry, beforeIndex, permissionLevels, permissionDisplay, deleteButtonVisible);
 	}
 	
 	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
 		aclEntries.add(aclEntry);
 		boolean deleteButtonVisible = !aclEntry.getOwnerId().equals(authController.getCurrentUserPrincipalId());
-		view.add(aclEntry, permissionLevels, permissionDisplay, deleteButtonVisible, true);
+		view.add(aclEntry, permissionLevels, permissionDisplay, deleteButtonVisible);
 	}
 	
 	public int getCount() {
