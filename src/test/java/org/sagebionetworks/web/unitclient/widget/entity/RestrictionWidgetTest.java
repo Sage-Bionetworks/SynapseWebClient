@@ -306,6 +306,7 @@ public class RestrictionWidgetTest {
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
 		widget.imposeRestrictionOkClicked();
 		verify(mockView).showLoading();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 		verify(mockAccessRequirementDialog).imposeRestriction(anyString(), any(Callback.class));
 	}
 

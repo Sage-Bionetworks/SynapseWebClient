@@ -170,6 +170,16 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void setErrorMessageVisible(boolean visible) {
 		errorAlert.setVisible(visible);
 	}
+	
+	@Override
+	public void setAddRowButtonVisible(boolean visible) {
+		addRowButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setButtonToolbarVisible(boolean visible) {
+		buttonToolbar.setVisible(visible);
+	}
 
 	@Override
 	public void setProgressWidget(IsWidget progress) {
@@ -218,7 +228,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	
 	@Override
 	public void showErrorDialog(String message) {
-		DisplayUtils.showErrorMessage(message);
+		Bootbox.alert(message);
 	}
 	@Override
 	public void showMessage(String title, String message) {

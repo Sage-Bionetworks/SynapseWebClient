@@ -9,11 +9,13 @@ import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.dom.client.InputElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -59,6 +61,15 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+	
+	@Override
+	public HandlerRegistration addAttachHandler(Handler handler) {
+		return widget.addAttachHandler(handler);
+	}
+	@Override
+	public boolean isAttached() {
+		return widget.isAttached();
 	}
 
 	@Override
@@ -136,6 +147,11 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 		} else {
 			this.fileInput.getElement().removeAttribute("multiple");
 		}
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
+		widget.fireEvent(event);
 	}
 
 }

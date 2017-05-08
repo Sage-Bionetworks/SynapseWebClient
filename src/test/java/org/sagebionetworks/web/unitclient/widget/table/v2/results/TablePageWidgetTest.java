@@ -40,7 +40,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
@@ -73,7 +73,7 @@ public class TablePageWidgetTest {
 	PortalGinInjector mockGinInjector;
 	RowSelectionListener mockListner;
 	PagingAndSortingListener mockPageChangeListner;
-	DetailedPaginationWidget mockPaginationWidget;
+	BasicPaginationWidget mockPaginationWidget;
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	TablePageWidget widget;
 	List<ColumnModel> schema;
@@ -94,8 +94,9 @@ public class TablePageWidgetTest {
 	FacetColumnResult mockFacetColumnResult;
 	@Mock
 	FileViewDefaultColumns mockFileViewDefaultColumns;
+	
 	List<ColumnModel> defaultColumnModels;
-
+	public static final String ENTITY_ID = "syn123";
 	List<FacetColumnResult> facets;
 
 	@Before
@@ -107,7 +108,7 @@ public class TablePageWidgetTest {
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockCellFactory = Mockito.mock(CellFactory.class);
 		mockListner = Mockito.mock(RowSelectionListener.class);
-		mockPaginationWidget = Mockito.mock(DetailedPaginationWidget.class);
+		mockPaginationWidget = Mockito.mock(BasicPaginationWidget.class);
 		mockPageChangeListner = Mockito.mock(PagingAndSortingListener.class);
 		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
 		cellStubs = new LinkedList<CellStub>();
@@ -171,6 +172,7 @@ public class TablePageWidgetTest {
 		RowSet set = new RowSet();
 		set.setHeaders(headers);
 		set.setRows(rows);
+		set.setTableId(ENTITY_ID);
 		bundle = new QueryResultBundle();
 		QueryResult qr = new QueryResult();
 		qr.setQueryResults(set);
@@ -183,7 +185,7 @@ public class TablePageWidgetTest {
 		query.setIsConsistent(true);
 		query.setLimit(100L);
 		query.setOffset(0L);
-		query.setSql("select * from syn123");
+		query.setSql("select * from " + ENTITY_ID);
 		bundle.setFacets(facets);
 		when(mockFacetsWidget.isShowingFacets()).thenReturn(true);
 		isView = false;

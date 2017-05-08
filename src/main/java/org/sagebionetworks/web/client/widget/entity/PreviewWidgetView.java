@@ -12,10 +12,16 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setPresenter(Presenter presenter);
 
 	public void setImagePreview(String fullFileUrl, String previewUrl);
+	public void setImagePreviewFull(String fullFileUrl);
 	public void setCodePreview(String text);
+	public void setCodePreviewFull(String text);
 	public void setTextPreview(String text);
+	public void setTextPreviewFull(String text);
 	public void setPreviewWidget(Widget w);
 	void addStyleName(String style);
+	public void setHTML(String html);
+	public void setHTMLFull(String html);
+	void showLoading();
 	
 	/**
 	 * text must not be escaped (a regular expression will be used to split it into cells)
@@ -23,6 +29,7 @@ public interface PreviewWidgetView extends IsWidget{
 	 * @param delimiter
 	 */
 	public void setTablePreview(String text, String delimiter);
+	public void setTablePreviewFull(String text, String delimiter);
 	
 	void addSynapseAlertWidget(Widget w);
 	public void clear();

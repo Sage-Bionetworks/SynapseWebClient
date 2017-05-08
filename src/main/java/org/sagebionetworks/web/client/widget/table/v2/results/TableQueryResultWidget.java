@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_LIMIT;
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +13,10 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -31,6 +36,9 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
+	public static final int ETAG_CHECK_DELAY_MS = 5000;
+	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
+	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -47,18 +55,23 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
 	CallbackP<FacetColumnRequest> facetChangedHandler;
-	
+	ClientCache clientCache;
+	GWTWrapper gwt;
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
 			SynapseClientAsync synapseClient, 
 			PortalGinInjector ginInjector, 
-			SynapseAlert synapseAlert) {
+			SynapseAlert synapseAlert,
+			ClientCache clientCache,
+			GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.synapseAlert = synapseAlert;
+		this.clientCache = clientCache;
+		this.gwt = gwt;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
@@ -103,13 +116,54 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		fireStartEvent();
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
-		// run the job
+		String entityId = QueryBundleUtils.getTableId(this.startingQuery);
+		String viewEtag = clientCache.get(entityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+		if (viewEtag == null) {
+			// run the job
+			QueryBundleRequest qbr = new QueryBundleRequest();
+			qbr.setPartMask(ALL_PARTS_MASK);
+			qbr.setQuery(this.startingQuery);
+			qbr.setEntityId(entityId);
+			this.progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+				
+				@Override
+				public void onFailure(Throwable failure) {
+					showError(failure);
+				}
+				
+				@Override
+				public void onComplete(AsynchronousResponseBody response) {
+					setQueryResults((QueryResultBundle) response);
+				}
+				
+				@Override
+				public void onCancel() {
+					showError(QUERY_CANCELED);
+				}
+			});
+		} else {
+			verifyOldEtagIsNotInView(entityId, viewEtag);
+		}
+	}
+	
+	/**
+	 * Look for the given etag in the given file view.  If it is still there, wait a few seconds and try again.  
+	 * If the etag is not in the view, then remove the clientCache key and run the query (since this indicates that the user change was propagated to the replicated layer)
+	 * @param fileViewEntityId
+	 * @param oldEtag
+	 */
+	public void verifyOldEtagIsNotInView(final String fileViewEntityId, String oldEtag) {
+		//check to see if etag exists in view
 		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
-		qbr.setQuery(this.startingQuery);
-		qbr.setEntityId(QueryBundleUtils.getTableId(this.startingQuery));
-		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
-			
+		Query query = new Query();
+		query.setSql("select etag from " + fileViewEntityId + " where etag='"+oldEtag+"'");
+		query.setOffset(DEFAULT_OFFSET);
+		query.setLimit(DEFAULT_LIMIT);
+		query.setIsConsistent(true);
+		qbr.setQuery(query);
+		qbr.setEntityId(fileViewEntityId);
+		this.progressWidget.startAndTrackJob(VERIFYING_ETAG_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				showError(failure);
@@ -117,7 +171,20 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				setQueryResults((QueryResultBundle) response);
+				QueryResultBundle resultBundle = (QueryResultBundle) response;
+				if (resultBundle.getQueryCount() > 0) {
+					// retry after waiting a few seconds
+					gwt.scheduleExecution(new Callback() {
+						@Override
+						public void invoke() {
+							runQuery();
+						}
+					}, ETAG_CHECK_DELAY_MS);
+				} else {
+					// clear cache value and run the actual query
+					clientCache.remove(fileViewEntityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
+					runQuery();
+				}
 			}
 			
 			@Override
@@ -125,9 +192,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				showError(QUERY_CANCELED);
 			}
 		});
-
 	}
-	
 	/**
 	 * Called after a successful query.
 	 * @param bundle
@@ -232,7 +297,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, new Callback() {
+		this.queryResultEditor.showEditor(bundle, isView, new Callback() {
 			@Override
 			public void invoke() {
 				runQuery();

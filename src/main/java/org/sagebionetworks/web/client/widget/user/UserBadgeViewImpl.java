@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,6 +41,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	Strong defaultUserPictureLetter;
 	@UiField
 	Icon squareIcon;
+	@UiField
+	Table userBadgeTable;
 	
 	private Presenter presenter;
 	Widget widget;
@@ -201,6 +204,14 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		usernameLink.setTarget(target);
 	}
 	
+	@Override
+	public void setStyleNames(String style) {
+		userBadgeTable.setStyleName(style);
+	}
+	@Override
+	public void setHeight(String height) {
+		widget.setHeight(height);
+	}
 	/*
 	 * Private Methods
 	 */

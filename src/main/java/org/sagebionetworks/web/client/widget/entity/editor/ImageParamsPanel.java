@@ -53,8 +53,21 @@ public class ImageParamsPanel implements ImageParamsPanelView.Presenter {
 		setAlignment(WidgetConstants.FLOAT_RIGHT);		
 	}
 	
+	public void setScale(Integer scale) {
+		view.setScale(scale);
+	}
+	
+	public Integer getScale() {
+		return view.getScale();
+	}
+	
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public void clear() {
+		setAlignment(WidgetConstants.FLOAT_NONE);
+		setScale(100);
 	}
 }
 

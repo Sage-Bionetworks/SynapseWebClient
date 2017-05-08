@@ -25,7 +25,6 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 	private Challenge currentChallenge;
 	private SelectTeamModal selectTeamModal;
 	boolean isCreatingChallenge;
-	Callback isChallengeCallback;
 	
 	@Inject
 	public ChallengeWidget(
@@ -62,9 +61,6 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 				teamBadge.configure(challenge.getParticipantTeamId());
 				view.setChallengeVisible(true);
 				view.setChallengeId(currentChallenge.getId());
-				if (isChallengeCallback != null) {
-					isChallengeCallback.invoke();
-				}
 			}
 			
 			@Override
@@ -78,12 +74,11 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 		};
 	}
 
-	public void configure(String entityId, Callback isChallengeCallback) {
+	public void configure(String entityId) {
 		this.entityId = entityId;
 		synAlert.clear();
 		view.setChallengeVisible(false);
 		view.setCreateChallengeVisible(false);
-		this.isChallengeCallback = isChallengeCallback;
 		challengeClient.getChallengeForProject(entityId, callback);
 	}
 

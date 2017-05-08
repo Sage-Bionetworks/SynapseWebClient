@@ -5,15 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -25,13 +22,12 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	private ImageConfigView view;
 	private Map<String, String> descriptor;
 	private FileUpload file;
-	private FileHandleUploadWidget fileInputWidget;
-	private DialogCallback dialogCallback;
+	private ImageUploadWidget fileInputWidget;
 	private WikiAttachments wikiAttachments;
 	private List<String> fileHandleIds;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
+	public ImageConfigEditor(ImageConfigView view, ImageUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
 		view.setPresenter(this);
 		this.fileInputWidget = fileInputWidget;
@@ -44,58 +40,51 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
 		fileHandleIds = new ArrayList<String>();
 		descriptor = widgetDescriptor;
-		this.dialogCallback = dialogCallback;
 		this.file = null;
 		view.initView();
+		view.setWikiAttachmentsWidgetVisible(true);
 		fileInputWidget.reset();
-		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+		fileInputWidget.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
-				view.showUploadSuccessUI();
+				view.showUploadSuccessUI(fileUpload.getFileMeta().getFileName());
 				//enable the ok button
 				dialogCallback.setPrimaryEnabled(true);
 				file = fileUpload;
 				fileHandleIds.add(file.getFileHandleId());
-			}
-		});	
-		ImageFileValidator validator = new ImageFileValidator();
-		validator.setInvalidFileCallback(new Callback() {
-			@Override
-			public void invoke() {
-				view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
+				view.setWikiAttachmentsWidgetVisible(false);
 			}
 		});
-		fileInputWidget.setValidation(validator);
-		view.configure(wikiKey, dialogCallback);
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);
 		}
+		
 		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			configureWithSynapseId();
+			// existing synapse id
+			view.setWikiFilesTabVisible(false);
+			view.showSynapseTab();
+			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 		} else {
-			view.showUploadTab();
+			view.showWikiFilesTab();
+			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
+				// existing attachment
+				wikiAttachments.setSelectedFilename(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+			}
 		}
-	}
-
-	public void configureWithSynapseId() {
-		view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+		
 		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
 			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		}
+		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)) {
+			view.setScale(Integer.parseInt(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)));
 		}
 	}
 
 	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
 			DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;
-		this.dialogCallback = dialogCallback;
-		view.initView();
-		view.configure(wikiKey, dialogCallback);
-		view.setUploadTabVisible(false);
-		view.setExistingAttachementTabVisible(false);
-
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
-			configureWithSynapseId();
-		} else {
+		configure(wikiKey, widgetDescriptor, dialogCallback);
+		view.setWikiFilesTabVisible(false);
+		if (!descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
 			view.showExternalTab();
 		}
 	}
@@ -111,23 +100,22 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 
 	@Override
 	public void updateDescriptorFromView() {
+		descriptor.clear();
 		view.checkParams();
 		if (!view.isExternal()) {
 			if (view.isSynapseEntity()) {
 				descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, view.getSynapseId());
-			} else if (view.isFromAttachments()) {
+			} else if (!fileHandleIds.isEmpty()) {
+				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, file.getFileMeta().getFileName());
+			} else {
 				if (!wikiAttachments.isValid()) {
 					throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_ATTACHMENT_MESSAGE);
 				}
 				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
-			} else {
-				if (file == null) {
-					throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
-				}
-				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, file.getFileMeta().getFileName());	
 			}
 				
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 		}
 	}
@@ -141,11 +129,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 
 	@Override
 	public List<String> getDeletedFileHandleIds() {
-		if (view.isFromAttachments()) {
-			return wikiAttachments.getFilesHandlesToDelete();
-		} else {
-			return null;
-		}
+		return wikiAttachments.getFilesHandlesToDelete();
 	}
 
 	@Override

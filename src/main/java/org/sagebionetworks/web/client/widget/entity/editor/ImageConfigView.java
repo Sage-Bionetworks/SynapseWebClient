@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
-import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -20,19 +18,18 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 */
 	public boolean isExternal();
 	public boolean isSynapseEntity();
-	boolean isFromAttachments();
 	public String getImageUrl();
 	public String getAltText();
 	public void setImageUrl(String url);
 	void setFileInputWidget(Widget fileInputWidget);
 	void setWikiAttachmentsWidget(Widget widget);
+	void setWikiAttachmentsWidgetVisible(boolean visible);
 	void showUploadFailureUI(String error);
-	void showUploadSuccessUI();
+	void showUploadSuccessUI(String fileName);
 	public String getAlignment();
+	public Integer getScale();
+	public void setScale(Integer scale);
 	public String getSynapseId();
-	public void setExternalVisible(boolean visible);
-	
-	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback);
 	
 	public void setSynapseId(String synapseId);
 	public void setAlignment(String alignment);
@@ -43,11 +40,11 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public interface Presenter {
 	}
 
-	public void setUploadTabVisible(boolean visible);
-
-	public void setExistingAttachementTabVisible(boolean visible);
-
-	public void showExternalTab();
-
-	public void showUploadTab();
+	void setWikiFilesTabVisible(boolean visible);
+	void setExternalTabVisible(boolean visible);
+	void setSynapseTabVisible(boolean visible);
+	
+	void showWikiFilesTab();
+	void showExternalTab();
+	void showSynapseTab();
 }

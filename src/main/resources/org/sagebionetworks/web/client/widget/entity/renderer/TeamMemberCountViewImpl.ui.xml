@@ -5,6 +5,6 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Span>
 		<bh:Span ui:field="countContainer" />
-		<bh:Div ui:field="synAlertContainer" />
+		<bh:Span ui:field="synAlertContainer" />
 	</bh:Span>
 </ui:UiBinder>

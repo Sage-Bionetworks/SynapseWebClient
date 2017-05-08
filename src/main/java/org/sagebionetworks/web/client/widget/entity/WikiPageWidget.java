@@ -31,7 +31,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -71,7 +70,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private SessionStorage sessionStorage;
 	private AuthenticationController authController;
 	private AdapterFactory adapterFactory;
-	
+	private boolean isModifiedCreatedByHistoryVisible = true;
 	public interface Callback{
 		public void pageUpdated();
 		public void noWikiFound();
@@ -126,10 +125,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.addStyleName(style);
 	}
 
-	public void showWikiHistory(boolean isVisible) {
-		view.setWikiHistoryVisible(isVisible);
-	}
-	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
 			final Callback callback, final boolean showSubpages) {
 		clear();
@@ -199,7 +194,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void setWikiPage(WikiPage result) {
 		try {
 			view.setDiffVersionAlertVisible(false);
-			view.setModifiedCreatedByHistoryPanelVisible(true);
+			view.setModifiedCreatedByHistoryPanelVisible(isModifiedCreatedByHistoryVisible);
 			isCurrentVersion = true;
 			final boolean isRootWiki = result.getParentWikiId() == null;
 			updateCurrentPage(result);
@@ -330,7 +325,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
 				public void onSuccess(PaginatedResults<EntityHeader> headers) {
-					if (headers.getTotalNumberOfResults() == 1) {
+					if (headers.getResults() != null && !headers.getResults().isEmpty()) {
 						EntityHeader theHeader = headers.getResults().get(0);
 						String ownerObjectName = theHeader.getName();
 						callback.invoke(ownerObjectName);
@@ -496,8 +491,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.canEdit = canEdit;
 	}
 
-	public void setModifiedCreatedByVisible(boolean isVisible) {
-		modifiedCreatedBy.setVisible(isVisible);
+	public void setModifiedCreatedByHistoryVisible(boolean isVisible) {
+		isModifiedCreatedByHistoryVisible = isVisible;
 	}
 	
 }

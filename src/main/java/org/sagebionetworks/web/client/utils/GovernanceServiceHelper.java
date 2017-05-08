@@ -5,23 +5,23 @@ import java.util.Collection;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.SelfSignAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GovernanceServiceHelper {
 	
+	public static final String LOCK_ACCESS_REQUIREMENT_TEXT = "Access restricted pending review by Synapse Access and Compliance Team.";
+
 	public static AccessApproval getAccessApproval(
 			String principalId, 
-			AccessRequirement ar, 
-			JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException {
+			AccessRequirement ar) {
 		SelfSignAccessApproval approval;
 		
 		if (ar instanceof TermsOfUseAccessRequirement) {
@@ -42,28 +42,12 @@ public class GovernanceServiceHelper {
 	public static void signTermsOfUse(
 			final String principalId,
 			final AccessRequirement ar,
-			final Callback onSuccess,
-			final CallbackP<Throwable> onFailure,
 			final SynapseClientAsync synapseClient,
-			final JSONObjectAdapter jsonObjectAdapter
+			AsyncCallback<AccessApproval> callback
 			) {
 		AccessApproval ew;
-		try {
-			ew = getAccessApproval(principalId, ar, jsonObjectAdapter);
-		} catch (JSONObjectAdapterException e) {
-			onFailure.invoke(e);
-			return;
-		}
-		synapseClient.createAccessApproval(ew, new AsyncCallback<AccessApproval>(){
-			@Override
-			public void onSuccess(AccessApproval result) {
-				onSuccess.invoke();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				onFailure.invoke(caught);
-			}			
-		});
+		ew = getAccessApproval(principalId, ar);
+		synapseClient.createAccessApproval(ew, callback);
 	}
 	
 	/**
@@ -95,7 +79,7 @@ public class GovernanceServiceHelper {
 	public static APPROVAL_TYPE accessRequirementApprovalType(AccessRequirement ar) {
 		if (ar==null) return APPROVAL_TYPE.NONE;
 		if (ar instanceof TermsOfUseAccessRequirement) return APPROVAL_TYPE.USER_AGREEMENT;
-		if (ar instanceof ACTAccessRequirement) return APPROVAL_TYPE.ACT_APPROVAL;
+		if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) return APPROVAL_TYPE.ACT_APPROVAL;
 		if (ar instanceof PostMessageContentAccessRequirement) return APPROVAL_TYPE.POST_MESSAGE;
 		throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
 	}
@@ -114,7 +98,7 @@ public class GovernanceServiceHelper {
 		for (AccessRequirement ar : allARs) {
 			if (ar instanceof TermsOfUseAccessRequirement) {
 				if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
-			} else if (ar instanceof ACTAccessRequirement) {
+			} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
 				ans=RESTRICTION_LEVEL.CONTROLLED;
 			} 
 		}
@@ -125,7 +109,7 @@ public class GovernanceServiceHelper {
 		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
-		} else if (ar instanceof ACTAccessRequirement) {
+		} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
 			ans=RESTRICTION_LEVEL.CONTROLLED;
 		}
 		return ans;
@@ -137,6 +121,8 @@ public class GovernanceServiceHelper {
 			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
 		} else if (ar instanceof ACTAccessRequirement) {
 			return ((ACTAccessRequirement)ar).getActContactInfo();
+		} else if (ar instanceof LockAccessRequirement) {
+			return LOCK_ACCESS_REQUIREMENT_TEXT;
 		} else {
 			throw new RuntimeException("Unexpected class "+ar.getClass().getName());
 		}

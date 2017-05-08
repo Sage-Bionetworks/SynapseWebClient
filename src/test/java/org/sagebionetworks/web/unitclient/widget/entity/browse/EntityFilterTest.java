@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +16,6 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-
-import com.amazonaws.services.autoscaling.model.Filter;
 
 public class EntityFilterTest {
 	List<EntityHeader> headers;
@@ -43,14 +40,12 @@ public class EntityFilterTest {
 	@Test
 	public void testFilterAllAllowed() {
 		EntityFilter filter = EntityFilter.ALL;
-		String[] queryValues = filter.getEntityQueryValues();
-		Set<String> queryValuesSet = new HashSet<String>();
-		Collections.addAll(queryValuesSet, queryValues);
+		List<EntityType> queryValues = filter.getEntityQueryValues();
 		
-		assertTrue(queryValuesSet.contains(EntityType.project.name()));
-		assertTrue(queryValuesSet.contains(EntityType.folder.name()));
-		assertTrue(queryValuesSet.contains(EntityType.file.name()));
-		assertTrue(queryValuesSet.contains(EntityType.link.name()));
+		assertTrue(queryValues.contains(EntityType.project));
+		assertTrue(queryValues.contains(EntityType.folder));
+		assertTrue(queryValues.contains(EntityType.file));
+		assertTrue(queryValues.contains(EntityType.link));
 		
 		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 		
@@ -60,14 +55,12 @@ public class EntityFilterTest {
 	@Test
 	public void testFilterContainersOnly() {
 		EntityFilter filter = EntityFilter.CONTAINER;
-		String[] queryValues = filter.getEntityQueryValues();
-		Set<String> queryValuesSet = new HashSet<String>();
-		Collections.addAll(queryValuesSet, queryValues);
+		List<EntityType> queryValues = filter.getEntityQueryValues();
 		
-		assertTrue(queryValuesSet.contains(EntityType.project.name()));
-		assertTrue(queryValuesSet.contains(EntityType.folder.name()));
-		assertFalse(queryValuesSet.contains(EntityType.file.name()));
-		assertFalse(queryValuesSet.contains(EntityType.link.name()));
+		assertTrue(queryValues.contains(EntityType.project));
+		assertTrue(queryValues.contains(EntityType.folder));
+		assertFalse(queryValues.contains(EntityType.file));
+		assertFalse(queryValues.contains(EntityType.link));
 		
 		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 		assertTrue(filteredHeaders.contains(projectHeader));
@@ -79,14 +72,12 @@ public class EntityFilterTest {
 	@Test
 	public void testFilterProjectsOnly() {
 		EntityFilter filter = EntityFilter.PROJECT;
-		String[] queryValues = filter.getEntityQueryValues();
-		Set<String> queryValuesSet = new HashSet<String>();
-		Collections.addAll(queryValuesSet, queryValues);
+		List<EntityType> queryValues = filter.getEntityQueryValues();
 		
-		assertTrue(queryValuesSet.contains(EntityType.project.name()));
-		assertFalse(queryValuesSet.contains(EntityType.folder.name()));
-		assertFalse(queryValuesSet.contains(EntityType.file.name()));
-		assertFalse(queryValuesSet.contains(EntityType.link.name()));
+		assertTrue(queryValues.contains(EntityType.project));
+		assertFalse(queryValues.contains(EntityType.folder));
+		assertFalse(queryValues.contains(EntityType.file));
+		assertFalse(queryValues.contains(EntityType.link));
 		
 		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 		assertTrue(filteredHeaders.contains(projectHeader));
@@ -97,15 +88,13 @@ public class EntityFilterTest {
 	
 	@Test
 	public void testFilterFolders() {
-		EntityFilter filter = EntityFilter.FOLDER;
-		String[] queryValues = filter.getEntityQueryValues();
-		Set<String> queryValuesSet = new HashSet<String>();
-		Collections.addAll(queryValuesSet, queryValues);
+		EntityFilter filter = EntityFilter.CONTAINER;
+		List<EntityType> queryValues = filter.getEntityQueryValues();
 		
-		assertTrue(queryValuesSet.contains(EntityType.project.name()));
-		assertTrue(queryValuesSet.contains(EntityType.folder.name()));
-		assertFalse(queryValuesSet.contains(EntityType.file.name()));
-		assertFalse(queryValuesSet.contains(EntityType.link.name()));
+		assertTrue(queryValues.contains(EntityType.project));
+		assertTrue(queryValues.contains(EntityType.folder));
+		assertFalse(queryValues.contains(EntityType.file));
+		assertFalse(queryValues.contains(EntityType.link));
 		
 		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 		assertTrue(filteredHeaders.contains(projectHeader));
@@ -116,15 +105,13 @@ public class EntityFilterTest {
 
 	@Test
 	public void testFilterFiles() {
-		EntityFilter filter = EntityFilter.FILE;
-		String[] queryValues = filter.getEntityQueryValues();
-		Set<String> queryValuesSet = new HashSet<String>();
-		Collections.addAll(queryValuesSet, queryValues);
+		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
+		List<EntityType> queryValues = filter.getEntityQueryValues();
 		
-		assertTrue(queryValuesSet.contains(EntityType.project.name()));
-		assertTrue(queryValuesSet.contains(EntityType.folder.name()));
-		assertTrue(queryValuesSet.contains(EntityType.file.name()));
-		assertFalse(queryValuesSet.contains(EntityType.link.name()));
+		assertTrue(queryValues.contains(EntityType.project));
+		assertTrue(queryValues.contains(EntityType.folder));
+		assertTrue(queryValues.contains(EntityType.file));
+		assertFalse(queryValues.contains(EntityType.link));
 		
 		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
 		assertTrue(filteredHeaders.contains(projectHeader));

@@ -40,15 +40,17 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -79,9 +81,11 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
+import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -130,7 +134,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -144,7 +147,6 @@ import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
@@ -155,6 +157,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -177,13 +180,17 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
 	private static final Integer MAX_LIMIT = 300;
-	private static final Integer ZERO_OFFSET = 0;
+	public static final Integer ZERO_OFFSET = 0;
 
 	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
+	public static final String HTML_TEAM_ID_PROPERTY_KEY = "org.sagebionetworks.portal.html_team_id";
+	
 	public static final String SYN_PREFIX = "syn";
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
@@ -192,6 +199,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final ContentType PLAIN_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/plain", MESSAGE_CHARSET);
 
+	public static final long LIMIT_50 = 50;
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 
 	private static StackTraceDeobfuscator deobfuscator = null;
@@ -219,6 +227,37 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					}
 				}
 			});
+	
+    private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
+
+    public Set<String> getHtmlTeamMembers() {
+        return htmlTeamMembersCache.get();
+    }
+
+    private Supplier<Set<String>> teamMembersSupplier() {
+        return new Supplier<Set<String>>() {
+            public Set<String> get() {
+            	Set<String> userIdSet = new HashSet<String>();
+				try {
+					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+					long currentOffset = 0;
+					List<TeamMember> teamMembers = null;
+					do {
+						org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> teamMembersPaginatedResults = synapseClient.getTeamMembers(htmlTeamId, null, LIMIT_50, currentOffset);
+						teamMembers = teamMembersPaginatedResults.getResults();
+						for (TeamMember teamMember : teamMembers) {
+							userIdSet.add(teamMember.getMember().getOwnerId());
+						}
+						currentOffset += LIMIT_50;
+					} while (teamMembers != null && !teamMembers.isEmpty());
+				} catch (SynapseException e) {
+					logError(e.getMessage());
+					
+				}
+				return userIdSet;
+            }
+        };
+    }
 
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
@@ -293,7 +332,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			Entity en = synapseClient.getEntityById(entityId);
 			if (en instanceof Versionable) {
 				// Get the correct version, now that we now it's Versionable
-				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, 1, 1)
+				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, ZERO_OFFSET, 1)
 						.getResults().get(0).getVersionNumber();
 				if (versionNumber == null || latestVersionNumber.equals(versionNumber)) {
 					versionNumber = latestVersionNumber;
@@ -391,7 +430,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void logError(String message) throws RestServiceException {
+	public void logError(String message) {
 		log.error(message);
 	}
 
@@ -928,25 +967,30 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public AccessRequirement createAccessRequirement(AccessRequirement ar)
+	public AccessRequirement createOrUpdateAccessRequirement(AccessRequirement ar)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createAccessRequirement(ar);
+			if (ar.getId() == null) {
+				return synapseClient.createAccessRequirement(ar);	
+			} else {
+				return synapseClient.updateAccessRequirement(ar);
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
+	@Deprecated
 	@Override
-	public ACTAccessRequirement createLockAccessRequirement(String entityId)
+	public void createLockAccessRequirement(String entityId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createLockAccessRequirement(entityId);
+			synapseClient.createLockAccessRequirement(entityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override
@@ -957,13 +1001,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
 			subjectId.setId(entityId);
 			subjectId.setType(RestrictableObjectType.ENTITY);
-
-			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> accessRequirements = synapseClient
-					.getUnmetAccessRequirements(subjectId, accessType);
+			boolean unmetOnly = true;
+			List<AccessRequirement> accessRequirements = getAllAccessRequirements(unmetOnly, subjectId, accessType, synapseClient);
 			AccessRequirementsTransport transport = new AccessRequirementsTransport();
 			transport.setAccessRequirements(new PaginatedResults<AccessRequirement>(
-							accessRequirements.getResults(), accessRequirements
-									.getTotalNumberOfResults()));
+					accessRequirements, accessRequirements.size()));
 			Entity e = synapseClient.getEntityById(entityId);
 			transport.setEntity(e);
 			UserProfile profile = getUserProfile();
@@ -972,6 +1014,37 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	private List<AccessRequirement> getAllAccessRequirements(boolean unmetOnly, RestrictableObjectDescriptor subjectId, ACCESS_TYPE accessType, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		List<AccessRequirement> allAccessRequirements = new ArrayList<AccessRequirement>();
+		long offset = ZERO_OFFSET;
+		boolean isDone = false;
+		while (!isDone) {
+			List<AccessRequirement> accessRequirments;
+			if (unmetOnly) {
+				accessRequirments = synapseClient.getUnmetAccessRequirements(subjectId, accessType, LIMIT_50, offset).getResults();
+			} else {
+				accessRequirments = synapseClient.getAccessRequirements(subjectId, LIMIT_50, offset).getResults();
+			}
+			isDone = accessRequirments.size() < LIMIT_50;
+			allAccessRequirements.addAll(accessRequirments);
+			offset += LIMIT_50;
+		}
+		return allAccessRequirements;
+	}
+	
+	private List<V2WikiHeader> getAllWikiHeaderTree(String ownerId,	ObjectType ownerType, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		List<V2WikiHeader> allHeaders = new ArrayList<V2WikiHeader>();
+		long offset = ZERO_OFFSET;
+		boolean isDone = false;
+		while (!isDone) {
+			List<V2WikiHeader> headers = synapseClient.getV2WikiHeaderTree(ownerId, ownerType, LIMIT_50, offset).getResults();
+			isDone = headers.size() < LIMIT_50;
+			allHeaders.addAll(headers);
+			offset += LIMIT_50;
+		}
+		return allHeaders;
 	}
 
 	@Override
@@ -987,14 +1060,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
 			subjectId.setId(teamId);
 			subjectId.setType(RestrictableObjectType.TEAM);
-			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> accessRequirements;
-			if (unmetOnly)
-				accessRequirements = synapseClient
-						.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE);
-			else
-				accessRequirements = synapseClient
-						.getAccessRequirements(subjectId);
-			return accessRequirements.getResults();
+			List<AccessRequirement> accessRequirements = getAllAccessRequirements(unmetOnly, subjectId, ACCESS_TYPE.PARTICIPATE, synapseClient);
+				
+			return accessRequirements;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1014,23 +1082,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
 			subjectId.setId(entityId);
 			subjectId.setType(RestrictableObjectType.ENTITY);
-			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> accessRequirements;
-			if (unmetOnly)
-				accessRequirements = synapseClient
-						.getUnmetAccessRequirements(subjectId, targetAccessType);
-			else
-				accessRequirements = synapseClient
-						.getAccessRequirements(subjectId);
+			List<AccessRequirement> accessRequirements = getAllAccessRequirements(unmetOnly, subjectId, targetAccessType, synapseClient);
+			
 			// filter to the targetAccessType
 			if (targetAccessType != null) {
-				List<AccessRequirement> filteredResults = AccessRequirementUtils.filterAccessRequirements(
-						accessRequirements.getResults(), targetAccessType);
-				accessRequirements.setResults(filteredResults);
-				accessRequirements.setTotalNumberOfResults(filteredResults
-						.size());
+				accessRequirements = AccessRequirementUtils.filterAccessRequirements(
+						accessRequirements, targetAccessType);
 			}
 
-			return new PaginatedResults<AccessRequirement>(accessRequirements.getResults(), accessRequirements.getTotalNumberOfResults());
+			return new PaginatedResults<AccessRequirement>(accessRequirements, accessRequirements.size());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
@@ -1069,17 +1129,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) 
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient.getEntityAccessApproval(entityId));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	@Override
 	public Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1249,25 +1298,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	
-	@Override
-	public PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, String ownerType)
-			throws RestServiceException {
-		return getWikiHeaderTree(ownerId,
-				ObjectType.valueOf(ownerType));
-	}
-
-	private PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId,
-			ObjectType ownerType) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient
-					.getWikiHeaderTree(ownerId, ownerType));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	private String getRootWikiId(
 			org.sagebionetworks.client.SynapseClient synapseClient,
 			String ownerId, ObjectType ownerType) throws RestServiceException {
@@ -1421,12 +1451,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public PaginatedResults<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType)
+	public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return convertPaginated(synapseClient
-					.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType)));
+			return getAllWikiHeaderTree(ownerId, ObjectType.valueOf(ownerType), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1716,6 +1745,16 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
+	public long getTeamMemberCount(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.countTeamMembers(teamId, null);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1959,9 +1998,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			boolean isLoggedIn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> allMembers = synapseClient
-					.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
-			long memberCount = allMembers.getTotalNumberOfResults();
+			long memberCount = synapseClient.countTeamMembers(teamId, null);
 			boolean isAdmin = false;
 			Team team = synapseClient.getTeam(teamId);
 			TeamMembershipStatus membershipStatus = null;
@@ -2020,9 +2057,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			// must be an admin to the team open requests. To get admin status,
 			// must be a member
+			// get's membership request count
 			if (isTeamAdmin(currentUserId, teamId, synapseClient)) {
 				org.sagebionetworks.reflection.model.PaginatedResults<MembershipRequest> requests = synapseClient
 						.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
+				// need open request count.
 				return requests.getTotalNumberOfResults();
 			} else {
 				return null;
@@ -2251,9 +2290,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
 			subjectId.setId(entityId);
 			subjectId.setType(RestrictableObjectType.ENTITY);
-
-			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(subjectId);
-			if (currentARs.getTotalNumberOfResults()==0L) {
+			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(subjectId, 1L, ZERO_OFFSET.longValue());
+			if (currentARs.getResults().isEmpty()) {
 				client.createLockAccessRequirement(entityId);
 			}
 		}
@@ -2336,6 +2374,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	public static Long defaultStorageLocation = Long.parseLong(PortalPropertiesHolder.getProperty(DEFAULT_STORAGE_ID_PROPERTY_KEY));
+	public static String htmlTeamId = PortalPropertiesHolder.getProperty(HTML_TEAM_ID_PROPERTY_KEY);
+	
 	
 	@Override
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
@@ -2703,12 +2743,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
 			request.setEntityId(tableId);
 			List<TableUpdateRequest> requestChangeList = new ArrayList<TableUpdateRequest>();
-			if (!changes.isEmpty()) {
-				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
-				newTableSchemaChangeRequest.setEntityId(tableId);
-				newTableSchemaChangeRequest.setChanges(changes);
-				requestChangeList.add(newTableSchemaChangeRequest);
-			} 
+			TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
+			newTableSchemaChangeRequest.setEntityId(tableId);
+			newTableSchemaChangeRequest.setChanges(changes);
+			List<String> orderedColumnIds = new ArrayList<>();
+			for (ColumnModel cm : newSchema) {
+				orderedColumnIds.add(cm.getId());
+			}
+			newTableSchemaChangeRequest.setOrderedColumnIds(orderedColumnIds);
+			requestChangeList.add(newTableSchemaChangeRequest);
 			request.setChanges(requestChangeList);
 			return request;
 		} catch (SynapseException e) {
@@ -2779,12 +2822,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-
+	
 	@Override
-	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException {
+	public EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			return synapseClient.entityQuery(query);
+			return synapseClient.getEntityChildren(request);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -3099,5 +3142,144 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException {
+		return getHtmlTeamMembers().contains(userId);
+	}
+	
+	@Override
+	public ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			boolean isWiki = isWiki(projectId, synapseClient);
+			boolean isChallenge = isChallenge(projectId, synapseClient);
+			boolean isFile = isFileOrFolder(projectId, synapseClient);
+			boolean isTable = isTable(projectId, synapseClient);
+			boolean isDocker = isDocker(projectId, synapseClient);
+			boolean isForum = isForum(projectId, synapseClient);
+			return new ProjectDisplayBundle(isWiki, isFile, isTable, isChallenge, isForum, isDocker);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isChallenge(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isChallenge(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isForum(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isForum(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isDocker(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isDocker(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isFileOrFolder(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isFileOrFolder(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isTable(String projectId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return isTable(projectId, synapseClient);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isWiki(String projectId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		return isWiki(projectId, synapseClient);
+	}
+	
+	private boolean isForum(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		Forum forum = synapseClient.getForumByProjectId(projectId);
+		return synapseClient.getThreadCountForForum(forum.getId(), DiscussionFilter.EXCLUDE_DELETED).getCount() > 0;
+	}
+	public EntityChildrenRequest createGetEntityChildrenRequest(String parentId, EntityType... types) {
+		EntityChildrenRequest request = new EntityChildrenRequest();
+		request.setNextPageToken(null);
+		request.setParentId(parentId);
+		request.setSortBy(SortBy.NAME);
+		request.setSortDirection(Direction.ASC);
+		List<EntityType> includeTypes = new ArrayList<EntityType>();
+		for (int i = 0; i < types.length; i++) {
+			includeTypes.add(types[i]);
+		}
+		request.setIncludeTypes(includeTypes);
+		return request;
+	}
+
+	private boolean isDocker(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		EntityChildrenRequest request = createGetEntityChildrenRequest(projectId, EntityType.dockerrepo);
+		EntityChildrenResponse results = synapseClient.getEntityChildren(request);
+		return !results.getPage().isEmpty();
+	}
+	
+	private boolean isFileOrFolder(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		EntityChildrenRequest request = createGetEntityChildrenRequest(projectId, EntityType.file, EntityType.folder);
+		EntityChildrenResponse results = synapseClient.getEntityChildren(request);
+		return !results.getPage().isEmpty();
+	}
+	
+	private boolean isTable(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		EntityChildrenRequest request = createGetEntityChildrenRequest(projectId, EntityType.table);
+		EntityChildrenResponse results = synapseClient.getEntityChildren(request);
+		return !results.getPage().isEmpty();
+	}
+	
+	private boolean isWiki(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws RestServiceException {
+		try {
+			getRootWikiId(synapseClient, projectId, ObjectType.ENTITY); 
+			return true;
+		} catch (NotFoundException ex) {
+			return false;
+		}
+	}
+	
+	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		// are there any evaluations that the current user can edit?
+		return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
+	}
+	
+	@Override
+	public void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.deleteAccessRequirement(accessRequirementId);
+			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
 	}
 }

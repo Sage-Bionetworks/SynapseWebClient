@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -64,13 +64,13 @@ public class FileHistoryWidgetTest {
 	String entityId = "syn123";
 	EntityBundle bundle;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	DetailedPaginationWidget mockPaginationWidget;
+	BasicPaginationWidget mockPaginationWidget;
 	public static final Long DEFAULT_MOCK_VERSION_COUNT = 2L;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockPaginationWidget = mock(DetailedPaginationWidget.class);
+		mockPaginationWidget = mock(BasicPaginationWidget.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FileHistoryWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
@@ -135,6 +135,9 @@ public class FileHistoryWidgetTest {
 		
 		//verify current version is set when offset is 0
 		assertEquals(CURRENT_FILE_VERSION, fileHistoryWidget.getVersionNumber());
+		
+		int zeroOffset = 0;
+		verify(mockSynapseClient).getEntityVersions(anyString(), eq(zeroOffset), anyInt(), any(AsyncCallback.class));
 	}
 
 	@Test

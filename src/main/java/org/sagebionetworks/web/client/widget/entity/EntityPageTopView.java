@@ -17,7 +17,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	void setTabs(Widget w);
 	void setActionMenu(Widget w);
 	void setProjectInformationVisible(boolean isVisible);
-	
+	void setLoadingVisible(boolean visible);
 	/**
 	 * Presenter interface
 	 */

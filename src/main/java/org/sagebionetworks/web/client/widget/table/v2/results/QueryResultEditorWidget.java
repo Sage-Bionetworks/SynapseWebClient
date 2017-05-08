@@ -1,12 +1,18 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
+import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
@@ -14,12 +20,12 @@ import org.sagebionetworks.repo.model.table.TableUpdateResponse;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -33,25 +39,28 @@ import com.google.inject.Inject;
 public class QueryResultEditorWidget implements
 		QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
 
-	public static final String CHANGES_SUBMITTED_MESSAGE = "It may take a few minutes these changes to propagate through the system.";
-	public static final String CHANGES_SUBMITTED_TITLE = "Your changes have been successfully submitted.";
+	public static final String VIEW_RECENTLY_CHANGED_KEY = "_view_recently_changed_etag";
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
-
+	public static final long MESSAGE_EXPIRE_TIME = 1000*60*10;  //10 minutes
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
 	QueryResultBundle startingBundle;
+	ClientCache clientCache;
 	JobTrackingWidget editJobTrackingWidget;
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
+	boolean isView;
+	String etagColumnId;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
 			TablePageWidget pageWidget,
 			JobTrackingWidget editJobTrackingWidget,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState, 
+			ClientCache clientCache) {
 		this.view = view;
 		this.pageWidget = pageWidget;
 		this.editJobTrackingWidget = editJobTrackingWidget;
@@ -59,6 +68,7 @@ public class QueryResultEditorWidget implements
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(editJobTrackingWidget);
 		this.globalApplicationState = globalApplicationState;
+		this.clientCache = clientCache;
 	}
 
 	@Override
@@ -71,17 +81,21 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(QueryResultBundle bundle, Callback callback) {
+	public void showEditor(QueryResultBundle bundle, boolean isView, Callback callback) {
 		this.callback = callback;
 		this.startingBundle = bundle;
+		this.isView = isView;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, null, true, false, this, null, null);
+		pageWidget.configure(bundle, null, null, true, isView, this, null, null);
 		setJobRunning(false);
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);
+		view.setAddRowButtonVisible(!isView);
+		view.setButtonToolbarVisible(!isView);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
+		this.etagColumnId = getEtagColumnId();
 	}
 
 	@Override
@@ -123,9 +137,13 @@ public class QueryResultEditorWidget implements
 	 * @return
 	 */
 	private PartialRowSet extractDelta() {
-		return RowSetUtils.buildDelta(startingBundle.getQueryResult()
+		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult()
 				.getQueryResults(), pageWidget.extractRowSet(), pageWidget
 				.extractHeaders());
+		if (isView) {
+			removeEtagOnlyRows(etagColumnId, prs);
+		}
+		return prs;
 	}
 
 	/**
@@ -195,16 +213,56 @@ public class QueryResultEditorWidget implements
 		if (results != null) {
 			for (EntityUpdateResult result : results.getUpdateResults()) {
 				if (result.getFailureCode() != null) {
+					sb.append("<p>");
 					sb.append(result.getEntityId());
 					sb.append(" (");
 					sb.append(result.getFailureCode());
 					sb.append("): ");
-					sb.append(result.getFailureMessage());
-					sb.append("\n");
+					if (result.getFailureMessage() != null) {
+						sb.append(result.getFailureMessage());	
+					}
+					sb.append("</p>");
 				}
 			}
 		}
 		return sb.toString();
+	}
+	
+	/**
+	 * @param response
+	 * @return first index in EntityUpdateResult list that does not contain a failure code.  -1 if not found
+	 */
+	public static int getFirstIndexOfEntityUpdateResultSuccess(AsynchronousResponseBody response) {
+		EntityUpdateResults results = getEntityUpdateResults(response);
+		if (results != null) {
+			List<EntityUpdateResult> resultList = results.getUpdateResults();
+			for (int i = 0; i < resultList.size(); i++) {
+				if (resultList.get(i).getFailureCode() == null) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	public String getEtagColumnId() {
+		List<ColumnModel> columnModels = pageWidget.extractHeaders();
+		for (ColumnModel columnModel : columnModels) {
+			if (ETAG_COLUMN_NAME.equals(columnModel.getName())) {
+				return columnModel.getId();
+			}
+		}
+		return null;
+	}
+	
+	public void removeEtagOnlyRows(String etagColumnId, PartialRowSet prs) {
+		List<PartialRow> changes = new ArrayList<PartialRow>();
+		for (PartialRow pr : prs.getRows()) {
+			if (pr.getValues().size() > 1 || !pr.getValues().containsKey(etagColumnId)) {
+				changes.add(pr);
+			}
+		}
+		prs.setRows(changes);
 	}
 	
 	@Override
@@ -213,7 +271,7 @@ public class QueryResultEditorWidget implements
 		view.setSaveButtonLoading(true);
 
 		// Are there any changes?
-		PartialRowSet prs = extractDelta();
+		final PartialRowSet prs = extractDelta();
 		if (!hasUnsavedChanges(prs)) {
 			// There is nothing to save so hide the editor
 			doHideEditor();
@@ -248,9 +306,17 @@ public class QueryResultEditorWidget implements
 					public void onComplete(AsynchronousResponseBody response) {
 						String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
 						if (!errors.isEmpty()){
-							view.showErrorDialog(errors);
+							view.showErrorDialog("<h4>Unable to update the following files</h4>" + errors);
 						}
-						view.showMessage(CHANGES_SUBMITTED_TITLE, CHANGES_SUBMITTED_MESSAGE);
+						if (isView) {
+							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
+							if (successIndex > -1) {
+								Map<String, String> values = prs.getRows().get(successIndex).getValues();
+								String etag = values.get(etagColumnId);
+								Date now = new Date();
+								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
+							}
+						}
 						doHideEditor();
 						callback.invoke();
 					}
@@ -264,7 +330,7 @@ public class QueryResultEditorWidget implements
 					}
 				});
 	}
-
+	
 	@Override
 	public void onCancel() {
 		// Are there changes?

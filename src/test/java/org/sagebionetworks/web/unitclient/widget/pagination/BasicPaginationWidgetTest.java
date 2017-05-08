@@ -27,11 +27,10 @@ public class BasicPaginationWidgetTest {
 		long offset = 0;
 		long count = 0;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(false);
-		verify(mockView).setPreviousEnabled(false);
+		verify(mockView).setNextVisible(false);
+		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
-		long totalNumberOfPages = 1;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -40,11 +39,10 @@ public class BasicPaginationWidgetTest {
 		long offset = 0;
 		long count = 10;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(false);
-		verify(mockView).setPreviousEnabled(false);
+		verify(mockView).setNextVisible(false);
+		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
-		long totalNumberOfPages = 1;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -53,11 +51,10 @@ public class BasicPaginationWidgetTest {
 		long offset = limit*0;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(true);
-		verify(mockView).setPreviousEnabled(false);
+		verify(mockView).setNextVisible(true);
+		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
-		long totalNumberOfPages = 3;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 
 	@Test
@@ -66,11 +63,10 @@ public class BasicPaginationWidgetTest {
 		long offset = limit*1;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(true);
-		verify(mockView).setPreviousEnabled(true);
+		verify(mockView).setNextVisible(true);
+		verify(mockView).setPreviousVisible(true);
 		long currentPageNumber = 2;
-		long totalNumberOfPages = 3;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -79,11 +75,10 @@ public class BasicPaginationWidgetTest {
 		long offset = limit*2;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(false);
-		verify(mockView).setPreviousEnabled(true);
+		verify(mockView).setNextVisible(false);
+		verify(mockView).setPreviousVisible(true);
 		long currentPageNumber = 3;
-		long totalNumberOfPages = 3;
-		verify(mockView).setPageNumbers(currentPageNumber, totalNumberOfPages);
+		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
@@ -92,13 +87,13 @@ public class BasicPaginationWidgetTest {
 		long offset = limit*1;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(true);
-		verify(mockView).setPreviousEnabled(true);
+		verify(mockView).setNextVisible(true);
+		verify(mockView).setPreviousVisible(true);
 		reset(mockView);
 		// on next
 		widget.onNext();
-		verify(mockView).setNextEnabled(false);
-		verify(mockView).setPreviousEnabled(false);
+		verify(mockView).setNextVisible(false);
+		verify(mockView).setPreviousVisible(false);
 		verify(mockPageChangeListener).onPageChange(20L);
 	}
 	
@@ -108,13 +103,13 @@ public class BasicPaginationWidgetTest {
 		long offset = limit*1;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextEnabled(true);
-		verify(mockView).setPreviousEnabled(true);
+		verify(mockView).setNextVisible(true);
+		verify(mockView).setPreviousVisible(true);
 		reset(mockView);
 		// on previous
 		widget.onPrevious();
-		verify(mockView).setNextEnabled(false);
-		verify(mockView).setPreviousEnabled(false);
+		verify(mockView).setNextVisible(false);
+		verify(mockView).setPreviousVisible(false);
 		verify(mockPageChangeListener).onPageChange(0L);
 	}
 }

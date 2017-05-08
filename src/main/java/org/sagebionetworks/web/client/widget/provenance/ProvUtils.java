@@ -47,7 +47,6 @@ public class ProvUtils {
 			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
 			Set<Reference> startRefs, Set<Reference> noExpandNode) {
 		ProvGraph graph = new ProvGraph();
-		Integer sequence = 0;
 		Set<ProvGraphNode> nodeHasExpandNode = new HashSet<ProvGraphNode>();
 		
 		// maps for local building retrieval

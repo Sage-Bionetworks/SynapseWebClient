@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -29,7 +30,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	Text selectedItemText;
 	SageImageBundle sageImageBundle;
 	SynapseAlert synAlert;
-	
+	int originalScrollTop = -1;
 	@Inject
 	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle, SynapseAlert synAlert) {
 		this.sageImageBundle = sageImageBundle;
@@ -112,8 +113,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		nextBtn.setEnabled(moreResults);
 		
 		String resultsLabel = "Displaying " + (offset + 1) + " - "
-								+ (moreResults ? offset + SynapseSuggestBox.PAGE_SIZE : numResults)
-								+ " of " + numResults;
+								+ (moreResults ? offset + SynapseSuggestBox.PAGE_SIZE : numResults);
 		resultsLbl.setText(resultsLabel);
 	}
 	
@@ -133,10 +133,14 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		selectedItem.setVisible(true);
 		suggestBox.setVisible(false);
 		presenter.setSelectedSuggestion(suggestion);
+		if (originalScrollTop > -1) {
+			Window.scrollTo(0, originalScrollTop);	
+		}
 	}
 	
 	@Override
 	public void showLoading() {
+		originalScrollTop = Window.getScrollTop();
 		((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).showLoading(this);
 	}
 	

@@ -16,6 +16,9 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
+import org.sagebionetworks.repo.model.subscription.SubscriberCount;
+import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 
@@ -84,4 +87,8 @@ public interface DiscussionForumClientAsync{
 	void restoreThread(String threadId, AsyncCallback<Void> callback);
 
 	void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback);
+
+	void getSubscribers(Topic topic, String nextPageToken, AsyncCallback<SubscriberPagedResults> callback);
+
+	void getSubscribersCount(Topic topic, AsyncCallback<Long> asyncCallback);
 }

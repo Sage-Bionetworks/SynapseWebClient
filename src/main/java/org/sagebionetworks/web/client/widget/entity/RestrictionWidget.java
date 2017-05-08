@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+@Deprecated
 public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	
 	Callback entityUpdated;
@@ -283,6 +284,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			view.showErrorMessage("You must make a selection before continuing.");
 		} else {
 			view.showLoading();
+			view.setImposeRestrictionModalVisible(false);
 			//the access requirement dialog knows how to impose the restriction
 			accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
 		}

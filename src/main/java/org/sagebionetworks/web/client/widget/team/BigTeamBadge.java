@@ -72,4 +72,12 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	public void setNotificationValue(String value) {
 		view.setRequestCount(value);
 	}
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
+	
+	public void setHeight(String height) {
+		view.setHeight(height);
+	}
 }

@@ -91,7 +91,7 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	@Override
 	public void onRename(Entity toRename, Callback handler) {
 		this.handler = handler;
-		String typeName = typeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(toRename.getClass()));
+		String typeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(toRename.getClass()));
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();

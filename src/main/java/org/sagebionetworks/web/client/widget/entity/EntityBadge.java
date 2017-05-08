@@ -1,19 +1,22 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -41,7 +44,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
-	private EntityQueryResult entityHeader;
+	private EntityHeader entityHeader;
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -99,23 +102,10 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		});
 	}
 	
-	public void configure(EntityQueryResult header) {
+	public void configure(EntityHeader header) {
 		entityHeader = header;
 		view.setEntity(header);
-		view.setIcon(EntityTypeUtils.getIconTypeForEntityType(header.getEntityType()));
-		if (header.getModifiedByPrincipalId() != null) {
-			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
-			view.setModifiedByWidgetVisible(true);
-		} else {
-			view.setModifiedByWidgetVisible(false);
-		}
-		
-		if (header.getModifiedOn() != null) {
-			String modifiedOnString = synapseJSNIUtils.convertDateToSmallString(header.getModifiedOn());
-			view.setModifiedOn(modifiedOnString);
-		} else {
-			view.setModifiedOn("");
-		}
+		view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
 		lazyLoadHelper.setIsConfigured();
 	}
 	
@@ -155,11 +145,25 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		
 		if (eb.getEntity() instanceof FileEntity) {
 			fileDownloadButton.configure(eb);
-			fileDownloadButton.setClientsHelpVisible(false);
+			fileDownloadButton.hideClientHelp();
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 		
 		view.setDiscussionThreadIconVisible(eb.getThreadCount() > 0);
+		
+		if (eb.getEntity().getModifiedBy() != null) {
+			modifiedByUserBadge.configure(eb.getEntity().getModifiedBy());
+			view.setModifiedByWidgetVisible(true);
+		} else {
+			view.setModifiedByWidgetVisible(false);
+		}
+		
+		if (eb.getEntity().getModifiedOn() != null) {
+			String modifiedOnString = synapseJSNIUtils.convertDateToSmallString(eb.getEntity().getModifiedOn());
+			view.setModifiedOn(modifiedOnString);
+		} else {
+			view.setModifiedOn("");
+		}
 	}
 	
 	public String getContentSize(List<FileHandle> handles) {
@@ -212,7 +216,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	@Override
-	public void entityClicked(EntityQueryResult entityHeader) {
+	public void entityClicked(EntityHeader entityHeader) {
 		showLoadingIcon();
 		if (customEntityClickHandler == null) {
 			globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));	
@@ -229,7 +233,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		view.showLoadingIcon();
 	}
 	
-	public EntityQueryResult getHeader() {
+	public EntityHeader getHeader() {
 		return entityHeader;
 	}
 	

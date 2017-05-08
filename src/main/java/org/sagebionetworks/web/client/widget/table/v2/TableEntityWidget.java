@@ -436,7 +436,8 @@ public class TableEntityWidget implements IsWidget,
 		this.uploadTableModalWidget.showModal(new WizardCallback() {
 			@Override
 			public void onFinished() {
-				onPersistSuccess(new EntityUpdatedEvent());
+				// SWC-3488: successfully uploaded data to table/view.  The current query may be invalid, so rerun with default query.
+				setQuery(getDefaultQuery(), false);
 			}
 			@Override
 			public void onCanceled() {			

@@ -63,13 +63,20 @@ public class TopicWidgetTest {
 	}
 
 	@Test
-	public void testConfigureAllTypesTest() {
-		for (SubscriptionObjectType type : SubscriptionObjectType.values()) {
-			widget.configure(type, TEST_OBJECT_ID);
-		}
+	public void testConfigureSupportedTypesTest() {
+		widget.configure(SubscriptionObjectType.FORUM, TEST_OBJECT_ID);
+		widget.configure(SubscriptionObjectType.THREAD, TEST_OBJECT_ID);
+		widget.configure(SubscriptionObjectType.DATA_ACCESS_SUBMISSION, TEST_OBJECT_ID);
 		verify(mockSynAlert, never()).showError(anyString());
 	}
 	
+	@Test
+	public void testConfigureDataAccessSubmission() {
+		widget.configure(SubscriptionObjectType.DATA_ACCESS_SUBMISSION, TEST_OBJECT_ID);
+		verify(mockView).setTopicText(TopicWidget.DATA_ACCESS_SUBMISSION_TOPIC_TEXT);
+		verify(mockView).setTopicHref("");
+		verify(mockView).setIcon(IconType.MAIL_FORWARD);
+	}
 	@Test
 	public void testConfigureDiscussionThread() {
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockForumClient)

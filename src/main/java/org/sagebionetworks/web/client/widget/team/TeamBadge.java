@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,7 +19,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	private String teamName;
 	
 	@Inject
-	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
+	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authController = authController;
@@ -38,7 +36,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 			synapseClient.getTeam(teamId, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team team) {
-						configure(team);
+					configure(team);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -75,9 +73,21 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 		return view.asWidget();
 	}
 	
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
+	}
+	
 	@Override
 	public void setNotificationValue(String value) {
 		view.setRequestCount(value);
 	}
-
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
+	
+	public void setOpenNewWindow(boolean isNewWindow) {
+		String target = isNewWindow ? "_blank" : "";
+		view.setTarget(target);
+	}
 }

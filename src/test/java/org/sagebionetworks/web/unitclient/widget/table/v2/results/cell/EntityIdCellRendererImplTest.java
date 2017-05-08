@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -39,12 +40,14 @@ public class EntityIdCellRendererImplTest {
 	EntityHeader mockProjectHeader;
 	@Mock
 	ClickHandler mockClickHandler;
+	@Mock
+	SynapseJSNIUtils mockJSNIUtils;
 	private static final String PROJECT_NAME = "Project Win";
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		renderer = new EntityIdCellRendererImpl(mockView, mockLazyLoadHelper, mockEntityHeaderAsyncHandler);
+		renderer = new EntityIdCellRendererImpl(mockView, mockLazyLoadHelper, mockEntityHeaderAsyncHandler, mockJSNIUtils);
 		AsyncMockStubber.callSuccessWith(mockProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
 	}
@@ -85,7 +88,7 @@ public class EntityIdCellRendererImplTest {
 	@Test
 	public void testSetValueAndCallback(){
 		String entityId = "987654";
-		renderer.setValue(entityId, mockClickHandler);
+		renderer.setValue(entityId, mockClickHandler, true);
 		verify(mockLazyLoadHelper).setIsConfigured();
 		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
 		
@@ -112,5 +115,20 @@ public class EntityIdCellRendererImplTest {
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorIcon(errorMessage);
 		verify(mockView).setLinkText(entityId);
+	}
+	
+	@Test
+	public void testSetValueRpcFailureHideIfLoadError(){
+		String errorMessage = "error";
+		boolean hideIfLoadError = true;
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
+		String entityId = "syn987654";
+		renderer.setValue(entityId, hideIfLoadError);
+		
+		simulateInView();
+		verify(mockView).showLoadingIcon();
+		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
+		verify(mockJSNIUtils).consoleError(errorMessage);
+		verify(mockView).setVisible(false);
 	}
 }

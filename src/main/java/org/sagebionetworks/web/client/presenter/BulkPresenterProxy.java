@@ -11,7 +11,10 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
+import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -19,6 +22,7 @@ import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.ErrorPlace;
+import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -175,6 +179,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 						TeamPresenter presenter = ginjector.getTeamPresenter();
 						presenter.setPlace((Team) place);
 						presenter.start(panel, eventBus);
+					} else if (place instanceof MapPlace) {
+						MapPresenter presenter = ginjector.getMapPresenter();
+						presenter.setPlace((MapPlace) place);
+						presenter.start(panel, eventBus);
 					} else if (place instanceof TeamSearch) {
 						TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
 						presenter.setPlace((TeamSearch) place);
@@ -223,6 +231,14 @@ public class BulkPresenterProxy extends AbstractActivity {
 						ACTPresenter presenter = ginjector.getACTPresenter();
 						presenter.setPlace((ACTPlace) place);
 						presenter.start(panel, eventBus);
+					} else if (place instanceof AccessRequirementsPlace) {
+						AccessRequirementsPresenter presenter = ginjector.getAccessRequirementsPresenter();
+						presenter.setPlace((AccessRequirementsPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ACTDataAccessSubmissionsPlace) {
+						ACTDataAccessSubmissionsPresenter presenter = ginjector.getACTDataAccessSubmissionsPresenter();
+						presenter.setPlace((ACTDataAccessSubmissionsPlace) place);
+						presenter.start(panel, eventBus);
 					} else if (place instanceof SynapseForumPlace) {
 						SynapseForumPresenter presenter = ginjector.getSynapseForumPresenter();
 						presenter.setPlace((SynapseForumPlace) place);
@@ -234,6 +250,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					} else if (place instanceof LoginPlace) {
 						LoginPresenter presenter = ginjector.getLoginPresenter();
 						presenter.setPlace((LoginPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ACTDataAccessSubmissionDashboardPlace) {
+						ACTDataAccessSubmissionDashboardPresenter presenter = ginjector.getACTDataAccessSubmissionDashboardPresenter();
+						presenter.setPlace((ACTDataAccessSubmissionDashboardPlace) place);
 						presenter.start(panel, eventBus);
 					} else {
 						// Log that we have an unknown place but send the user to the default

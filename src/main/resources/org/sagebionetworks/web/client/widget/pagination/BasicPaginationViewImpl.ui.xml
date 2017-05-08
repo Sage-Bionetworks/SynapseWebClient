@@ -6,12 +6,15 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<b:Button icon="ANGLE_LEFT" ui:field="previousButton"/>
-		<bh:Text>&nbsp;</bh:Text>
-		<b:Badge ui:field="currentPage" />
-		<bh:Text>&nbsp; of &nbsp;</bh:Text>
-		<b:Badge ui:field="totalPages" />
-		<bh:Text>&nbsp;</bh:Text>
-		<b:Button icon="ANGLE_RIGHT" ui:field="nextButton"/>
+		<bh:ClearFix />
+		<bh:UnorderedList addStyleNames="pager padding-left-0-imp margin-top-5" pull="LEFT">
+			<b:ListItem addStyleNames="margin-right-5">
+				<b:Anchor ui:field="previousButton" text="Previous" width="90px"/>
+			</b:ListItem>
+			<b:ListItem>
+				<b:Anchor ui:field="nextButton" text="Next" width="90px"/>
+			</b:ListItem>
+		</bh:UnorderedList>
+		<bh:ClearFix />
 	</bh:Div>
 </ui:UiBinder>

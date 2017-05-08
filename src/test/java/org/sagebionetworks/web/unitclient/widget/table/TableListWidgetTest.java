@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -10,29 +9,29 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
@@ -50,7 +49,6 @@ public class TableListWidgetTest {
 	private PreflightController mockPreflightController;
 	private TableListWidgetView mockView;
 	private SynapseClientAsync mockSynapseClient;
-	private PaginationWidget mockpaginationWidget;
 	private CreateTableModalWidget mockcreateTableModalWidget;
 	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
@@ -60,6 +58,13 @@ public class TableListWidgetTest {
 	CreateTableViewWizard mockCreateTableViewWizard;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
+	@Mock
+	EntityChildrenResponse mockResults;
+	List<EntityHeader> searchResults;
+	
+	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -72,59 +77,43 @@ public class TableListWidgetTest {
 		parentBundle.setPermissions(permissions);
 		mockView = Mockito.mock(TableListWidgetView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockpaginationWidget = Mockito.mock(PaginationWidget.class);
 		mockcreateTableModalWidget = Mockito.mock(CreateTableModalWidget.class);
 		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
-		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard);
+		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer);
+		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		searchResults = new ArrayList<EntityHeader>();
+		when(mockResults.getPage()).thenReturn(searchResults);
 	}
 	
 	@Test
 	public void testCreateQuery(){
 		String parentId = ENTITY_ID;
-		EntityQuery query = widget.createQuery(parentId, EntityFieldName.name.name(), SortDirection.ASC);
-		assertNotNull(query);
-		assertNotNull(query.getConditions());
-		assertEquals(2, (query.getConditions().size()));
-		EntityFieldCondition expectedCondition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
-		assertEquals(expectedCondition, query.getConditions().get(0));
-		EntityFieldCondition expectedTypeCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.nodeType, Operator.IN, EntityType.table.name(), EntityType.entityview.name());
-		assertEquals(expectedTypeCondition, query.getConditions().get(1));
-		assertNull(query.getFilterByType());
-		assertEquals(TableListWidget.OFFSET_ZERO, query.getOffset());
-		assertEquals(TableListWidget.PAGE_SIZE, query.getLimit());
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
-		assertEquals(sort, query.getSort());
+		EntityChildrenRequest query = widget.createQuery(parentId);
+		assertEquals(parentId, query.getParentId());
+		assertTrue(query.getIncludeTypes().contains(EntityType.entityview));
+		assertTrue(query.getIncludeTypes().contains(EntityType.table));
+		assertEquals(SortBy.CREATED_ON, query.getSortBy());
+		assertEquals(Direction.DESC, query.getSortDirection());
 	}
 	
 	@Test
 	public void testConfigureUnderPageSize(){
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE-1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockView).resetSortUI();
-		verify(mockView).showPaginationVisible(false);
+		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
 	
 	@Test
 	public void testConfigureOverPageSize(){
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		when(mockResults.getNextPageToken()).thenReturn("ismore");
 		widget.configure(parentBundle);
-		verify(mockView).showPaginationVisible(true);
+		verify(mockView).resetSortUI();
+		verify(mockLoadMoreWidgetContainer).setIsMore(true);
 	}
 	
 	@Test
 	public void testConfigureCanEdit(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(true);
 		verify(mockView).setUploadTableVisible(true);
@@ -134,9 +123,6 @@ public class TableListWidgetTest {
 	@Test
 	public void testConfigureCannotEdit(){
 		parentBundle.getPermissions().setCanEdit(false);
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
@@ -147,7 +133,7 @@ public class TableListWidgetTest {
 	public void testConfigureFailure(){
 		parentBundle.getPermissions().setCanEdit(false);
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockView).showErrorMessage(error);
 	}

@@ -1,16 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface TeamSearchView extends IsWidget, SynapseView {
+public interface TeamSearchView extends IsWidget {
 	
 	/**
 	 * Set this view's presenter
@@ -18,15 +12,11 @@ public interface TeamSearchView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(List<Team> teams, String searchTerm);
-	public void showEmptyTeams();
+	public void setSearchTerm(String searchTerm);
 	public interface Presenter {
 		void goTo(Place place);
-		int getOffset();
-		void search(String searchTerm, Integer offset);
-		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 	}
 	public void setSynAlertWidget(Widget asWidget);
 
-	void setMainContainerVisible(boolean isVisible);
+	void setLoadMoreContainer(Widget w);
 }

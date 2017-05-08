@@ -28,5 +28,6 @@ public interface WikiAttachmentsView extends IsWidget, SynapseView {
 	void addFileHandles(List<FileHandle> list);
 	void showNoAttachmentRow();
 	void reset();
+	void setSelectedFilename(String fileName);
 	
 }

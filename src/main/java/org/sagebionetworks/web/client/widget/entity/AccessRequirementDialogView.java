@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
+@Deprecated
 public interface AccessRequirementDialogView extends IsWidget, SynapseView {
 
 	/**

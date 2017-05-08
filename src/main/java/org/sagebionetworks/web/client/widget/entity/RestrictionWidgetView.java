@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
+@Deprecated
 public interface RestrictionWidgetView extends IsWidget, SynapseView {
 
 	/**

@@ -22,6 +22,9 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -35,12 +38,12 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MyEntitiesBrowserTest {
-	EntityQueryResults searchResults;
 	MyEntitiesBrowser widget;
 	MyEntitiesBrowserView mockView;
 	AuthenticationController mockAuthenticationController;
@@ -55,6 +58,7 @@ public class MyEntitiesBrowserTest {
 	EntityTreeBrowser mockCurrentContextTreeBrowser;
 	
 	String currentUserId = "100042";
+	ProjectPagedResults projects;
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -71,31 +75,31 @@ public class MyEntitiesBrowserTest {
 		when(mockView.getCurrentContextTreeBrowser()).thenReturn(mockCurrentContextTreeBrowser);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		searchResults = new EntityQueryResults();
-		List<EntityQueryResult> entities = new ArrayList<EntityQueryResult>();
-		searchResults.setEntities(entities);
-		searchResults.setTotalEntityCount(new Long(entities.size()));
-
-		AsyncMockStubber
-			.callSuccessWith(searchResults).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		
+		List<ProjectHeader> entities = new ArrayList<ProjectHeader>();
+		projects = new ProjectPagedResults();
+		ProjectHeader projectHeader1 = new ProjectHeader();
+		projectHeader1.setId("syn1");
+		ProjectHeader projectHeader2 = new ProjectHeader();
+		projectHeader2.setId("syn2");
+		projects.setResults(entities);
+		projects.setTotalNumberOfResults(entities.size());
+		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testLoadUserUpdateable() {
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		verify(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
 		verify(mockView).setIsMoreUpdatableEntities(false);
 	}
 	
 	@Test
 	public void testLoadUserUpdateableWithMore() {
-		searchResults.setTotalEntityCount(MyEntitiesBrowser.PROJECT_LIMIT*2);
+		projects.setTotalNumberOfResults(MyEntitiesBrowser.PROJECT_LIMIT*2);
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		verify(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
 		verify(mockView).setIsMoreUpdatableEntities(true);
 	}
@@ -110,28 +114,10 @@ public class MyEntitiesBrowserTest {
 	@Test
 	public void testLoadUserUpdateableFailure() {
 		String errorMessage = "An error occurred.";
-		AsyncMockStubber
-		.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-			any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		widget.loadMoreUserUpdateable();
 		verify(mockView, never()).addUpdatableEntities(anyList());
 		verify(mockView).showErrorMessage(errorMessage);
-	}
-
-	@Test
-	public void testCreateGetMyProjectQuery() {
-		Long offset = 40L;
-		EntityQuery query = widget.createMyProjectQuery(offset);
-
-		// verify sort
-		assertEquals(EntityFieldName.name.name(), query.getSort()
-				.getColumnName());
-		assertEquals(SortDirection.ASC, query.getSort().getDirection());
-		List<Condition> conditions = query.getConditions();
-		assertEquals(1, conditions.size());
-		assertEquals(EntityType.project, query.getFilterByType());
-		assertEquals(MyEntitiesBrowser.PROJECT_LIMIT, query.getLimit());
-		assertEquals(offset, query.getOffset());
 	}
 	
 	@Test
@@ -175,8 +161,7 @@ public class MyEntitiesBrowserTest {
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockView).setIsMoreUpdatableEntities(true);
 		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, widget.getUserUpdatableOffset());
-		verify(mockSynapseClient, never()).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		
 		//test clearState() when context has changed
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));
@@ -234,7 +219,7 @@ public class MyEntitiesBrowserTest {
 		userId = "54321";
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		EntityFilter filter = EntityFilter.FILE;
+		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
 		widget.setEntityFilter(filter);
 		verify(mockEntityTreeBrowser).setEntityFilter(filter);
 		verify(mockFavoritesTreeBrowser).setEntityFilter(filter);

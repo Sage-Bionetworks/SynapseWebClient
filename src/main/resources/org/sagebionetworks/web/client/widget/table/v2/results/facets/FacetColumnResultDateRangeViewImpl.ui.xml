@@ -9,14 +9,14 @@
 			<bh:Strong ui:field="columnName"/>
 		</bh:Div>
 		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
-			<bd:DateTimePicker ui:field="minDateTimePicker"
+			<bd:DateTimePicker ui:field="minDateTimePicker" width="105px"
 				autoClose="true" highlightToday="true" showTodayButton="true"
-				showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+				showMeridian="false" format="mm/dd/yyyy" minView="MONTH"
 				hasKeyboardNavigation="false" />
 			<bh:Span text="to" addStyleNames="margin-left-5 margin-right-5"/>
-			<bd:DateTimePicker ui:field="maxDateTimePicker"
+			<bd:DateTimePicker ui:field="maxDateTimePicker" width="105px"
 				autoClose="true" highlightToday="true" showTodayButton="true"
-				showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+				showMeridian="false" format="mm/dd/yyyy" minView="MONTH"
 				hasKeyboardNavigation="false" />
 			<b:Button ui:field="applyButton" text="Apply" type="PRIMARY" addStyleNames="margin-left-5" icon="FILTER" />
 		</g:HorizontalPanel>

@@ -88,8 +88,8 @@ public class BiodallianceSourceEditorTest {
 	@Test
 	public void testConstructorAndUpdateViewFromSource() {
 		verify(mockView).setPresenter(editor);
-		verify(mockEntityFinder).configure(eq(EntityFilter.FILE), eq(true), any(SelectedHandler.class));
-		verify(mockIndexEntityFinder).configure(eq(EntityFilter.FILE), eq(true), any(SelectedHandler.class));
+		verify(mockEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(SelectedHandler.class));
+		verify(mockIndexEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(SelectedHandler.class));
 		
 		verify(mockView).setSourceName(sourceName);
 		verify(mockView).setEntityFinderText(entityId+"." + version);

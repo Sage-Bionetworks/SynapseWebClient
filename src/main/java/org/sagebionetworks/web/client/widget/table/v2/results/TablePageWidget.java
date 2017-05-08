@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -19,7 +17,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
@@ -40,7 +38,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
 	RowSelectionListener rowSelectionListener;
-	DetailedPaginationWidget paginationWidget;
+	BasicPaginationWidget paginationWidget;
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
@@ -53,13 +51,17 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget, FacetsWidget facetsWidget){
+	public TablePageWidget(TablePageView view, 
+			PortalGinInjector ginInjector, 
+			BasicPaginationWidget paginationWidget, 
+			FacetsWidget facetsWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
 		view.setFacetsWidget(facetsWidget.asWidget());
+		view.setPresenter(this);
 	}
 	
 	/**
@@ -150,7 +152,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			addRow(row, isEditable);
 		}
 	}
-
+	
 	/**
 	 * @param types
 	 * @param isSelectable

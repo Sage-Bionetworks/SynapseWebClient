@@ -10,16 +10,18 @@ import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -37,8 +39,6 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -66,7 +66,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -75,6 +74,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -278,7 +278,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
-	AccessRequirement createAccessRequirement(AccessRequirement arEW) throws RestServiceException;
+	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
 			throws RestServiceException;
@@ -297,9 +297,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public String getJSONEntity(String repoUri) throws RestServiceException;
 	
 	public String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
-	//wiki crud
-	public PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
-	
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
@@ -309,7 +306,7 @@ public interface SynapseClient extends XsrfProtectedService {
     public V2WikiPage updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag) throws RestServiceException;
     public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
-    public PaginatedResults<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+    public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	public V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
 	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
     public FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
@@ -438,13 +435,13 @@ public interface SynapseClient extends XsrfProtectedService {
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
 	/**
-	 * Execute a generic entity entity query.
-	 * @param query
+	 * Get entity children
+	 * @param request
 	 * @return
-	 * @throws RestServiceException 
+	 * @throws RestServiceException
 	 */
-	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException;
-
+	EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException;
+	
 	/**
 	 * Create or update an Entity.
 	 * @param entity
@@ -500,7 +497,8 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 
-	ACTAccessRequirement createLockAccessRequirement(String entityId) throws RestServiceException;
+	@Deprecated
+	void createLockAccessRequirement(String entityId) throws RestServiceException;
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
@@ -544,11 +542,30 @@ public interface SynapseClient extends XsrfProtectedService {
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 	
 	void deleteAccessApproval(Long approvalId) throws RestServiceException;
-	PaginatedResults<AccessApproval> getEntityAccessApproval(String entityId) throws RestServiceException;
 	void deleteAccessApprovals(String accessRequirement, String accessorId) throws RestServiceException;
 
 	String generateSqlWithFacets(String basicSql, List<org.sagebionetworks.repo.model.table.FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException;
 
 	ColumnModelPage getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken)
 			throws RestServiceException;
+
+	Boolean isUserAllowedToRenderHTML(String userId) throws RestServiceException;
+
+	long getTeamMemberCount(String teamId) throws RestServiceException;
+	
+	boolean isWiki(String projectId) throws RestServiceException;
+
+	boolean isFileOrFolder(String projectId) throws RestServiceException;
+
+	boolean isTable(String projectId) throws RestServiceException;
+
+	boolean isForum(String projectId) throws RestServiceException;
+
+	boolean isDocker(String projectId) throws RestServiceException;
+
+	boolean isChallenge(String projectId) throws RestServiceException;
+
+	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
+
+	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
 }

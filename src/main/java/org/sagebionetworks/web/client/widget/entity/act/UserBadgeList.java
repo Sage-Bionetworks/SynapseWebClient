@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,7 +20,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	boolean isToolbarVisible, changingSelection;
 	List<UserBadgeItem> users;	
 	Callback selectionChangedCallback;
-	
+	CallbackP<List<String>> userIdsDeletedCallback;
 	@Inject
 	public UserBadgeList (
 			UserBadgeListView view, 
@@ -80,15 +81,20 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	
 	@Override
 	public void deleteSelected() {
+		List<String> userIdsDeleted = new ArrayList<String>();
 		//remove all selected users
 		Iterator<UserBadgeItem> it = users.iterator();
 		while(it.hasNext()){
 			UserBadgeItem row = it.next();
 			if(row.isSelected()){
+				userIdsDeleted.add(row.getUserId());
 				it.remove();
 			}
 		}
 		refreshListUI();
+		if (userIdsDeletedCallback != null) {
+			userIdsDeletedCallback.invoke(userIdsDeleted);
+		}
 	}
 	
 	/**
@@ -109,7 +115,11 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		checkSelectionState();
 	}
 	
-
+	public void clear() {
+		changeAllSelection(true);
+		deleteSelected();
+	}
+	
 	/**
 	 * The current selection state determines which buttons are enabled.
 	 */
@@ -145,5 +155,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			userIds.add(item.getUserId());
 		}
 		return userIds;
+	}
+	
+	public void setUserIdsDeletedCallback(CallbackP<List<String>> userIdsDeletedCallback) {
+		this.userIdsDeletedCallback = userIdsDeletedCallback;
 	}
 }

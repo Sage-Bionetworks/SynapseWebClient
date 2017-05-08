@@ -16,8 +16,7 @@
 			</b:ButtonGroup>
 			<b:ButtonGroup>
 				<b:Button ui:field="moveUpButton" icon="ARROW_UP" enabled="false" />
-				<b:Button ui:field="moveDownButton" icon="ARROW_DOWN"
-					enabled="false" />
+				<b:Button ui:field="moveDownButton" icon="ARROW_DOWN" enabled="false" />
 			</b:ButtonGroup>
 			<b:ButtonGroup>
 				<b:Button ui:field="deleteSelectedButton" icon="TRASH_O"

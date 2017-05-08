@@ -4,10 +4,11 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import java.util.Map;
-import org.sagebionetworks.repo.model.Reference;
+
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -42,7 +44,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML
 	}
 
 	
@@ -53,7 +55,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	SynapseClientAsync synapseClient;
 	AuthenticationController authController;
 	VideoWidget videoWidget;
-	
+	EntityBundle bundle;
+	boolean isFullSize = false;
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
@@ -75,8 +78,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		PreviewFileType previewFileType = PreviewFileType.NONE;
 		if (previewHandle == null && originalFileHandle != null) {
 			String contentType = originalFileHandle.getContentType();
-			if (contentType != null && DisplayUtils.isRecognizedImageContentType(contentType)) {
-				previewFileType = PreviewFileType.IMAGE;
+			if (contentType != null) {
+				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
+					previewFileType = PreviewFileType.IMAGE;	
+				} else if (DisplayUtils.isHTML(contentType)) {
+					previewFileType = PreviewFileType.HTML;	
+				}
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
@@ -86,7 +93,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 				else if (DisplayUtils.isTextType(contentType)) {
 					//some kind of text
-					if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
+					if (DisplayUtils.isHTML(originalFileHandle.getContentType())) {
+						 previewFileType = PreviewFileType.HTML;
+					}
+					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
 						previewFileType = PreviewFileType.CODE;
 					}
 					else if (DisplayUtils.isCSV(contentType)) {
@@ -119,6 +129,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		isFullSize = true;
 		configure(entityId, version);
 	}
 	
@@ -154,6 +165,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	}
 	
 	public void configure(EntityBundle bundle) {
+		this.bundle = bundle;
 		view.clear();
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
 		if (!synapseAlert.isUserLoggedIn()) {
@@ -178,24 +190,78 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		}
 	}
 	
+	public void renderHTML(String modifiedBy, final String content) {
+		synapseClient.isUserAllowedToRenderHTML(modifiedBy, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(content);
+				if (escapedContent.length() > 500000) {
+					escapedContent = escapedContent.substring(0, 500000) + "\n...";
+				}
+				if (isFullSize) {
+					view.setTextPreviewFull(escapedContent);
+				} else {
+					view.setTextPreview(escapedContent);
+				}
+			}
+			
+			@Override
+			public void onSuccess(Boolean trustedUser) {
+				if (trustedUser) {
+					if (isFullSize) {
+						view.setHTMLFull(content);
+					} else {
+						view.setHTML(content);
+					}
+				} else {
+					// is the sanitized version the same as the original??
+					String newHtml = synapseJSNIUtils.sanitizeHtml(content);
+					if (content.equals(newHtml)) {
+						if (isFullSize) {
+							view.setHTMLFull(content);	
+						} else {
+							view.setHTML(content);
+						}
+						
+					} else {
+						onFailure(new Exception());	
+					}
+				}
+			}
+		});
+	}
+	
 	private void renderFilePreview(EntityBundle bundle) {
 		PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
 		String xsrfToken = authController.getCurrentXsrfToken();
 		if (previewType != PreviewFileType.NONE) {
-			FileEntity fileEntity = (FileEntity)bundle.getEntity();
+			final FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
 				boolean hasPreviewFileHandle = handle != null;
-				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken), 
-									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken));
-			}
-			else { //must be a text type of some kind
+				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken);
+				String previewFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken);
+				if (isFullSize) {
+					view.setImagePreviewFull(fullFileUrl);
+				} else {
+					view.setImagePreview(fullFileUrl, previewFileUrl);	
+				}
+				
+			} else {
+				// if HTML, get the full file contents
+				view.showLoading();
+				boolean isGetPreviewFile = PreviewFileType.HTML != previewType;
+				String contentType = isGetPreviewFile ? handle.getContentType() : originalFileHandle.getContentType();
+				final String fileCreatedBy = originalFileHandle.getCreatedBy();
+				//must be a text type of some kind
 				//try to load the text of the preview, if available
-				//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
-				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true, xsrfToken));
+				requestBuilder.configure(RequestBuilder.GET, 
+						DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, false, xsrfToken));
+				requestBuilder.setHeader(WebConstants.CONTENT_TYPE, contentType);
+				
 				try {
 					requestBuilder.sendRequest(null, new RequestCallback() {
 						public void onError(final Request request, final Throwable e) {
@@ -208,19 +274,44 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 							if (statusCode == Response.SC_OK) {
 								String responseText = response.getText();
 								if (responseText != null && responseText.length() > 0) {
-									if (responseText.length() > MAX_LENGTH) {
-										responseText = responseText.substring(0, MAX_LENGTH) + "...";
-									}
-									
-									if (PreviewFileType.CODE == previewType) {
-										view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-									} 
-									else if (PreviewFileType.CSV == previewType)
-										view.setTablePreview(responseText, ",");
-									else if (PreviewFileType.TAB == previewType)
-										view.setTablePreview(responseText, "\\t");
-									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
-										view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+									if (previewType == PreviewFileType.HTML) {
+										renderHTML(fileCreatedBy, responseText);
+									} else {
+										if (responseText.length() > MAX_LENGTH) {
+											responseText = responseText.substring(0, MAX_LENGTH) + "...";
+										}
+										
+										if (PreviewFileType.CODE == previewType) {
+											String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
+											if (isFullSize) {
+												view.setCodePreviewFull(codePreview);	
+											} else {
+												view.setCodePreview(codePreview);
+											}
+										} 
+										else if (PreviewFileType.CSV == previewType) {
+											if (isFullSize) {
+												view.setTablePreviewFull(responseText, ",");	
+											} else {
+												view.setTablePreview(responseText, ",");
+											}
+										}
+											
+										else if (PreviewFileType.TAB == previewType) {
+											if (isFullSize) {
+												view.setTablePreviewFull(responseText, "\\t");
+											} else {
+												view.setTablePreview(responseText, "\\t");
+											}
+										}
+											
+										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType) {
+											if (isFullSize) {
+												view.setTextPreviewFull(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));	
+											} else {
+												view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+											}
+										}
 									}
 								}
 							}
@@ -237,6 +328,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			view.setPreviewWidget(videoWidget.asWidget());
 		}
 	}
+	
 	
 	
 	public Widget asWidget() {

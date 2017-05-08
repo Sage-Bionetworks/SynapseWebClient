@@ -28,8 +28,8 @@
 				    <b:AnchorListItem ui:field="referenceLink" text="Reference"/>
 				    <b:AnchorListItem ui:field="submitToEvaluationLink" text="Submit to Evaluation"/>
 				    <b:AnchorListItem ui:field="tableLink" text="Table: Paste tabular data"/>
-				    <b:AnchorListItem ui:field="synapseTableLink" text="Table: Query on a Synapse Table"/>
-				    <b:AnchorListItem ui:field="queryLink" text="Table: Query on Files/Folders"/>
+				    <b:AnchorListItem ui:field="synapseTableLink" text="Table: Query on a Synapse Table/View"/>
+				    <b:AnchorListItem ui:field="queryLink" text="Table: Query on Files/Folders" visible="false"/>
 				    <b:AnchorListItem ui:field="tableOfContentsLink" text="Table of Contents"/>
 				    <b:AnchorListItem ui:field="teamLink" text="Team Badge"/>
 				    <b:AnchorListItem ui:field="teamMemberCountLink" text="Team Member Count" />

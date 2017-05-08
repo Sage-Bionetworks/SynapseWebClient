@@ -1,31 +1,19 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.PeopleSearch;
-import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,8 +21,6 @@ import com.google.inject.Inject;
 
 public class PeopleSearchViewImpl extends Composite implements PeopleSearchView {
 	public interface PeopleSearchViewImplUiBinder extends UiBinder<Widget, PeopleSearchViewImpl> {}
-	
-	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	
 	@UiField
 	SimplePanel header;
@@ -45,8 +31,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	@UiField
 	SimplePanel peopleListPanel;
 	@UiField
-	SimplePanel paginationPanel;
-	@UiField
 	SimplePanel synAlertPanel;
 	@UiField
 	Button searchButton;
@@ -56,52 +40,20 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	
 	private Header headerWidget;
 	private Footer footerWidget;
-	private SageImageBundle sageImageBundle;
-	private SynapseJSNIUtils synapseJsniUtils;
-	private UserGroupListWidget userGroupListWidget;
-	
 	private Presenter presenter;
 	
 	
 	@Inject
 	public PeopleSearchViewImpl(PeopleSearchViewImplUiBinder binder,
 			Header headerWidget, 
-			Footer footerWidget, 
-			SageImageBundle sageImageBundle,
-			SynapseJSNIUtils synapseJsniUtils,
-			UserGroupListWidget userGroupListWidget) {
+			Footer footerWidget) {
 		initWidget(binder.createAndBindUi(this));
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.synapseJsniUtils = synapseJsniUtils;
-		this.userGroupListWidget = userGroupListWidget;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		configureSearchBox();
-	}
-
-	@Override
-	public void showLoading() {
-		peopleListPanel.clear();
-		peopleListPanel.add(DisplayUtils.getLoadingWidget(sageImageBundle));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void clear() {
-		userGroupListWidget.clear();
-		paginationPanel.clear();
 	}
 
 	@Override
@@ -117,16 +69,13 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	}
 	
 	@Override
-	public void configure(List<UserGroupHeader> users, String searchTerm) {
-		clear();
-		userGroupListWidget.configure(users, true);
-		peopleListPanel.setWidget(userGroupListWidget.asWidget());
+	public void setLoadMoreContainer(Widget w) {
+		peopleListPanel.setWidget(w);
+	}
+	
+	@Override
+	public void setSearchTerm(String searchTerm) {
 		searchField.setValue(searchTerm);
-		int start = presenter.getOffset();
-		String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : "";
-		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? " '"+searchTerm + "' " : "";
-		synapseJsniUtils.setPageTitle("People Search" + pageTitleSearchTerm + pageTitleStartNumber);
-		createPagination(searchTerm);
 	}
 	
 	private void configureSearchBox() {
@@ -145,31 +94,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	            }					
 			}
 		});				
-	}
-
-	private void createPagination(String searchTerm) {
-		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.setStyleName("pagination pagination-lg");
-		
-		List<PaginationEntry> entries = presenter.getPaginationEntries(TeamSearchPresenter.SEARCH_TEAM_LIMIT, MAX_PAGES_IN_PAGINATION);
-		if(entries != null) {
-			for(PaginationEntry pe : entries) {
-				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()), "active");
-				else
-					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()));
-			}
-		}
-		
-		if (entries.size() > 1)
-			paginationPanel.add(ul);
-	}
-	
-	private Anchor createPaginationAnchor(String anchorName, String searchTerm, final int newStart) {
-		Anchor a = new Anchor();
-		a.setHTML(SimpleHtmlSanitizer.sanitizeHtml(anchorName));
-		a.setHref(DisplayUtils.getPeopleSearchHistoryToken(searchTerm, newStart));
-		return a;
 	}
 
 	@Override

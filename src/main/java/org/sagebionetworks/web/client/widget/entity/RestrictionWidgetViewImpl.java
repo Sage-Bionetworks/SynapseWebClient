@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+@Deprecated
 public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	public interface Binder extends UiBinder<Widget, RestrictionWidgetViewImpl> {}

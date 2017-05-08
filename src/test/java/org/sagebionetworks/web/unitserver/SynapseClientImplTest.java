@@ -1,21 +1,8 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
@@ -70,6 +57,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -102,8 +91,14 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
+import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -242,7 +237,10 @@ public class SynapseClientImplTest {
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
 	@Mock
-	ColumnModel mockOldColumnModel;
+	ColumnModel mockOldColumnModel1;
+	@Mock
+	ColumnModel mockOldColumnModel2;
+	
 	@Mock
 	ColumnModel mockNewColumnModel;
 	@Mock
@@ -264,13 +262,18 @@ public class SynapseClientImplTest {
 	ExternalFileHandle mockExternalFileHandle;
 	List<FileHandleCopyResult> batchCopyResultsList;
 	
+	@Mock
+	EntityChildrenResponse mockEntityChildrenResponse;
+	@Mock
+	EntityHeader mockEntityHeader;
+	List<EntityHeader> entityChildrenPage;
 	
-	public static final String OLD_COLUMN_MODEL_ID = "4444";
+	public static final String OLD_COLUMN_MODEL_ID1 = "4444";
+	public static final String OLD_COLUMN_MODEL_ID2 = "4445";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
 	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
-	private static final String EVAL_ID_2 = "eval ID 2";
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private TeamMembershipStatus membershipStatus;
 	
@@ -325,11 +328,8 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_1)).thenReturn(
 				userEvaluationPermissions);
 
-		userEvaluationPermissions = new UserEvaluationPermissions();
-		userEvaluationPermissions.setCanChangePermissions(true);
-		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2)).thenReturn(
-				userEvaluationPermissions);
-		when(mockOldColumnModel.getId()).thenReturn(OLD_COLUMN_MODEL_ID);
+		when(mockOldColumnModel1.getId()).thenReturn(OLD_COLUMN_MODEL_ID1);
+		when(mockOldColumnModel2.getId()).thenReturn(OLD_COLUMN_MODEL_ID2);
 		when(mockNewColumnModelAfterCreate.getId()).thenReturn(NEW_COLUMN_MODEL_ID);
 		
 		// Setup the path
@@ -448,12 +448,13 @@ public class SynapseClientImplTest {
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(
 				mockSynapse
-						.getAccessRequirements(any(RestrictableObjectDescriptor.class)))
+						.getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong()))
 				.thenReturn(ars);
 		when(
 				mockSynapse.getUnmetAccessRequirements(
 						any(RestrictableObjectDescriptor.class),
-						any(ACCESS_TYPE.class))).thenReturn(ars);
+						any(ACCESS_TYPE.class), anyLong(), anyLong())).thenReturn(ars);
+
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -548,6 +549,9 @@ public class SynapseClientImplTest {
 		userIp = "127.0.0.1";
 		when(mockThreadLocal.get()).thenReturn(mockRequest);
 		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+		entityChildrenPage = new ArrayList<EntityHeader>();
+		when(mockEntityChildrenResponse.getPage()).thenReturn(entityChildrenPage);
+		when(mockSynapse.getEntityChildren(any(EntityChildrenRequest.class))).thenReturn(mockEntityChildrenResponse);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -828,16 +832,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetWikiHeaderTree() throws Exception {
-		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
-		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class)))
-				.thenReturn(headerTreeResults);
-		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
-		verify(mockSynapse).getWikiHeaderTree(anyString(),
-				eq(ObjectType.ENTITY));
-	}
-	
-	@Test
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();
 		Mockito.when(
@@ -905,19 +899,40 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).restoreV2WikiPage(anyString(),
 				any(ObjectType.class), any(String.class), anyLong());
 	}
-
 	@Test
 	public void testGetV2WikiHeaderTree() throws Exception {
 		PaginatedResults<V2WikiHeader> headerTreeResults = new PaginatedResults<V2WikiHeader>();
+		headerTreeResults.setResults(new ArrayList<V2WikiHeader>());
 		when(
 				mockSynapse.getV2WikiHeaderTree(anyString(),
-						any(ObjectType.class))).thenReturn(headerTreeResults);
+						any(ObjectType.class),
+						anyLong(), anyLong())).thenReturn(headerTreeResults);
 		synapseClient.getV2WikiHeaderTree("testId",
 				ObjectType.ENTITY.toString());
 		verify(mockSynapse).getV2WikiHeaderTree(anyString(),
-				any(ObjectType.class));
+				any(ObjectType.class),anyLong(), anyLong());
 	}
 
+	@Test
+	public void testGetV2WikiHeaderTreeTwoPage() throws Exception {
+		PaginatedResults<V2WikiHeader> headerTreePage1 = Mockito.mock(PaginatedResults.class);
+		PaginatedResults<V2WikiHeader> headerTreePage2 = Mockito.mock(PaginatedResults.class);
+		when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class), anyLong(), anyLong()))
+				.thenReturn(headerTreePage1, headerTreePage2);
+		List<V2WikiHeader> page1Results = new ArrayList<V2WikiHeader>();
+		for (int i = 0; i < SynapseClientImpl.LIMIT_50; i++) {
+			page1Results.add(Mockito.mock(V2WikiHeader.class));
+		}
+		when(headerTreePage1.getResults()).thenReturn(page1Results);
+		//second page has a single page
+		V2WikiHeader singleHeader = Mockito.mock(V2WikiHeader.class);
+		when(headerTreePage2.getResults()).thenReturn(Collections.singletonList(singleHeader));
+		List<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
+		//1 full page of results, and 1 result on second page
+		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.size());
+		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
+		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
+	}
 	@Test
 	public void testGetV2WikiOrderHint() throws Exception {
 		V2WikiOrderHint orderHint = new V2WikiOrderHint();
@@ -1070,6 +1085,33 @@ public class SynapseClientImplTest {
 		verify(mockSynapse, Mockito.times(1)).getWikiPageForVersion(
 				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
 				any(Long.class));
+	}
+	
+	
+	@Test
+	public void testHtmlTeamMembersCache() throws Exception {
+		PaginatedResults<TeamMember> teamMembersPage1 = new PaginatedResults<TeamMember>();
+		String trustedUserId = "876543";
+		UserGroupHeader mockHeader = mock(UserGroupHeader.class);
+		when(mockHeader.getOwnerId()).thenReturn(trustedUserId);
+		TeamMember mockTeamMember = mock(TeamMember.class);
+		when(mockTeamMember.getMember()).thenReturn(mockHeader);
+		teamMembersPage1.setResults(Collections.singletonList(mockTeamMember));
+		PaginatedResults<TeamMember> teamMembersPage2 = new PaginatedResults<TeamMember>();
+		teamMembersPage2.setResults(new ArrayList());
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyInt(), anyInt()))
+				.thenReturn(teamMembersPage1, teamMembersPage2);
+		
+		assertFalse(synapseClient.isUserAllowedToRenderHTML("untrustedId"));
+		
+		//get both pages
+		verify(mockSynapse, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
+		
+		// the cache should be ready, it should not ask for the team members from the synapse client again for an hour
+		assertTrue(synapseClient.isUserAllowedToRenderHTML(trustedUserId));
+		
+		//only the original 2 calls
+		verify(mockSynapse, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt());
 	}
 
 	private void resetUpdateExternalFileHandleMocks(String testId,
@@ -1479,14 +1521,8 @@ public class SynapseClientImplTest {
 	public void testGetTeamBundle() throws SynapseException,
 			RestServiceException, MalformedURLException,
 			JSONObjectAdapterException {
-		// set team member count
-		Long testMemberCount = 111L;
-		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
-		allMembers.setTotalNumberOfResults(testMemberCount);
-		when(
-				mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(),
-						anyLong())).thenReturn(allMembers);
-
+		//TODO: test team member count
+		
 		// set team
 		Team team = new Team();
 		team.setId("test team id");
@@ -1513,7 +1549,6 @@ public class SynapseClientImplTest {
 		assertEquals(team, bundle.getTeam());
 		assertEquals(membershipStatus, bundle.getTeamMembershipStatus());
 		assertEquals(isAdmin, bundle.isUserAdmin());
-		assertEquals(testMemberCount, bundle.getTotalMemberCount());
 	}
 
 	@Test
@@ -1771,7 +1806,9 @@ public class SynapseClientImplTest {
 		verify(mockSynapse)
 				.getUnmetAccessRequirements(
 						any(RestrictableObjectDescriptor.class),
-						any(ACCESS_TYPE.class));
+						any(ACCESS_TYPE.class),
+						anyLong(),
+						anyLong());
 	}
 
 	@Test
@@ -1779,9 +1816,33 @@ public class SynapseClientImplTest {
 		// verify it calls getAccessRequirements when unmet is false
 		synapseClient.getEntityAccessRequirements(entityId, false, null);
 		verify(mockSynapse).getAccessRequirements(
-				any(RestrictableObjectDescriptor.class));
+				any(RestrictableObjectDescriptor.class),
+				anyLong(),
+				anyLong());
 	}
 
+	@Test
+	public void testGetAllEntityAccessRequirementsTwoPage() throws Exception {
+		PaginatedResults<AccessRequirement> page1 = Mockito.mock(PaginatedResults.class);
+		PaginatedResults<AccessRequirement> page2 = Mockito.mock(PaginatedResults.class);
+		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), anyLong(), anyLong()))
+				.thenReturn(page1, page2);
+		List<AccessRequirement> page1Results = new ArrayList<AccessRequirement>();
+		for (int i = 0; i < SynapseClientImpl.LIMIT_50; i++) {
+			page1Results.add(Mockito.mock(AccessRequirement.class));
+		}
+		when(page1.getResults()).thenReturn(page1Results);
+		// second page has a single result
+		AccessRequirement singleAccessRequirement = Mockito.mock(AccessRequirement.class);
+		when(page2.getResults()).thenReturn(Collections.singletonList(singleAccessRequirement));
+		boolean unmetOnly = true;
+		org.sagebionetworks.web.shared.PaginatedResults<AccessRequirement> results = synapseClient.getEntityAccessRequirements(entityId, unmetOnly, null);
+		//1 full page of results
+		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.getResults().size());
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
+	}
+	
 	// pass through tests for email validation
 
 	@Test
@@ -2344,10 +2405,25 @@ public class SynapseClientImplTest {
 	public void testGetTableUpdateTransactionRequestNoChange()  throws RestServiceException, SynapseException {
 		String tableId = "syn93939";
 		
-		List<ColumnModel> oldColumnModels = Collections.singletonList(mockOldColumnModel);
-		when(mockSynapse.createColumnModels(anyList())).thenReturn(oldColumnModels);
+		// test reordering, with no other changes
+		List<ColumnModel> oldColumnModels = new ArrayList<>();
+		oldColumnModels.add(mockOldColumnModel1);
+		oldColumnModels.add(mockOldColumnModel2);
+		
+		List<ColumnModel> newColumnModels = new ArrayList<>();
+		newColumnModels.add(mockOldColumnModel2);
+		newColumnModels.add(mockOldColumnModel1);
+		
+		when(mockSynapse.createColumnModels(anyList())).thenReturn(newColumnModels);
 		when(mockSynapse.getColumnModelsForTableEntity(tableId)).thenReturn(oldColumnModels);
-		assertEquals(0, synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, oldColumnModels).getChanges().size());
+		
+		TableUpdateTransactionRequest request = synapseClient.getTableUpdateTransactionRequest(tableId, oldColumnModels, newColumnModels);
+		assertEquals(1, request.getChanges().size());
+		TableSchemaChangeRequest tableUpdateRequest = (TableSchemaChangeRequest) request.getChanges().get(0);
+		List<String> orderColumnIds = tableUpdateRequest.getOrderedColumnIds();
+		assertEquals(OLD_COLUMN_MODEL_ID2, orderColumnIds.get(0));
+		assertEquals(OLD_COLUMN_MODEL_ID1, orderColumnIds.get(1));
+		assertTrue(tableUpdateRequest.getChanges().isEmpty());
 	}
 	
 	@Test
@@ -2512,4 +2588,69 @@ public class SynapseClientImplTest {
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://google.com/" + name));
 	}
 	
+	@Test
+	public void testIsWiki() throws RestServiceException, SynapseException {
+		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
+		key.setOwnerObjectId("2");
+		key.setOwnerObjectType(ObjectType.ENTITY);
+		key.setWikiPageId("456");
+		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenReturn(key);
+
+		assertTrue(synapseClient.isWiki("2"));
+		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenThrow(new SynapseNotFoundException());
+		assertFalse(synapseClient.isWiki("3"));
+	}
+	
+	@Test
+	public void testIsChallenge() throws RestServiceException, SynapseException {
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+		Evaluation e = new Evaluation();
+		e.setId(EVAL_ID_1);
+		e.setContentSource("syn123");
+		testResults.setTotalNumberOfResults(1);
+		testResults.setResults(Collections.singletonList(e));
+		
+		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(testResults);
+		
+		userEvaluationPermissions = new UserEvaluationPermissions();
+		userEvaluationPermissions.setCanChangePermissions(true);
+		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_1)).thenReturn(userEvaluationPermissions);
+		
+		//"Before" junit test setup configured so this user to have the ability to change permissions on eval 2, but not on eval 1
+		assertTrue(synapseClient.isChallenge("syn123"));
+		
+		testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
+		testResults.setResults(Collections.EMPTY_LIST);
+		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(testResults);
+		
+		//and verify that no evaluations are returned for a different entity id
+		assertFalse(synapseClient.isChallenge("syn987"));
+	}
+	
+	@Test
+	public void testIsQueryResult() throws RestServiceException, SynapseException {
+		// empty results are returned by default.
+		// entity query is run for Files tab, Tables tab, and Docker tab.
+		assertFalse(synapseClient.isFileOrFolder("syn987"));
+		assertFalse(synapseClient.isTable("syn987"));
+		assertFalse(synapseClient.isDocker("syn987"));
+		
+		entityChildrenPage.add(mockEntityHeader);
+		assertTrue(synapseClient.isFileOrFolder("syn987"));
+		assertTrue(synapseClient.isTable("syn987"));
+		assertTrue(synapseClient.isDocker("syn987"));
+	}
+	
+	@Test
+	public void testIsForum() throws RestServiceException, SynapseException {
+		Forum mockForum = mock(Forum.class);
+		when(mockSynapse.getForumByProjectId(anyString())).thenReturn(mockForum);
+		ThreadCount mockThreadCount = mock(ThreadCount.class);
+		when(mockThreadCount.getCount()).thenReturn(0L);
+		when(mockSynapse.getThreadCountForForum(anyString(), any(DiscussionFilter.class))).thenReturn(mockThreadCount);
+		assertFalse(synapseClient.isForum("65"));
+		
+		when(mockThreadCount.getCount()).thenReturn(1L);
+		assertTrue(synapseClient.isForum("65"));
+	}
 }

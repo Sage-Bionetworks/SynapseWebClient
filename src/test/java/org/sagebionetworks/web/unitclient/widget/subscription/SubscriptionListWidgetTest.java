@@ -1,33 +1,36 @@
 package org.sagebionetworks.web.unitclient.widget.subscription;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.TopicUtils;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
-import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
+import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
-import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.springframework.mock.web.MockPageContext;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,7 +54,9 @@ public class SubscriptionListWidgetTest {
 	@Mock
 	TopicRowWidget mockTopicRowWidget;
 	@Mock
-	DetailedPaginationWidget mockDetailedPaginationWidget;
+	BasicPaginationWidget mockDetailedPaginationWidget;
+	@Captor
+	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -69,7 +74,7 @@ public class SubscriptionListWidgetTest {
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPagination(any(Widget.class));
 	}
-
+	
 	@Test
 	public void testConfigureAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);

@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.DockerClientImpl;
@@ -37,7 +38,6 @@ import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
-import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
@@ -89,6 +89,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
+		
+		// Setup the Challenge service
+		bind(DataAccessClientImpl.class).in(Singleton.class);
+		serve("/Portal/dataaccessclient").with(DataAccessClientImpl.class);
 		
 		// Subscription service
 		bind(SubscriptionClientImpl.class).in(Singleton.class);
@@ -192,10 +196,6 @@ public class PortalServletModule extends ServletModule {
 		
 		// JSONObjectAdapter
 		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
-		
-		//search by public project name
-		bind(ProjectSearchRedirectFilter.class).in(Singleton.class);
-		filter(ProjectSearchRedirectFilter.PROJECT+"*").through(ProjectSearchRedirectFilter.class);
 		
 		handleGWTPlaces();
 		

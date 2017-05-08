@@ -11,12 +11,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -34,16 +32,12 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCount;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -142,8 +136,8 @@ public class EntityBadgeTest {
 		return bundle;
 	}
 	
-	private EntityQueryResult configure() {
-		EntityQueryResult header = new EntityQueryResult();
+	private EntityHeader configure() {
+		EntityHeader header = new EntityHeader();
 		header.setId(entityId);
 		widget.configure(header);
 		return header;
@@ -151,32 +145,8 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testConfigure() throws Exception {
-		EntityQueryResult header = configure();
+		EntityHeader header = configure();
 		verify(mockView).setEntity(header);
-		
-		//in this case, "modified by" and "modified on" are not set.
-		verify(mockView).setModifiedByWidgetVisible(false);
-		verify(mockView).setModifiedOn("");
-	}
-	
-	@Test
-	public void testConfigureWithModificationData() throws Exception {
-		EntityQueryResult header = new EntityQueryResult();
-		header.setId("syn008");
-		Long modifiedByPrincipalId = 12345L;
-		Date modifiedOn = new Date();
-		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockSynapseJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
-		header.setModifiedByPrincipalId(modifiedByPrincipalId);
-		header.setModifiedOn(modifiedOn);
-		widget.configure(header);
-		verify(mockView).setEntity(header);
-		
-		//in this case, "modified by" and "modified on" are not set.
-		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
-		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockSynapseJSNIUtils).convertDateToSmallString(modifiedOn);
-		verify(mockView).setModifiedOn(smallDateString);
 	}
 
 	/**
@@ -187,8 +157,6 @@ public class EntityBadgeTest {
 		//set up entity
 		String entityId = "syn12345";
 		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
-		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
 		testProject.setId(entityId);
 		entityThreadCount = 0L;
 		setupEntity(testProject);
@@ -216,14 +184,25 @@ public class EntityBadgeTest {
 		//verify download button is configured and shown
 		String entityId = "syn12345";
 		FileEntity testFile = new FileEntity();
-		testFile.setModifiedBy("4444");
 		testFile.setId(entityId);
+		Long modifiedByPrincipalId = 12345L;
+		testFile.setModifiedBy(modifiedByPrincipalId.toString());
+		Date modifiedOn = new Date();
+		String smallDateString="10/02/2000 01:26:45PM";
+		when(mockSynapseJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
+		testFile.setModifiedOn(modifiedOn);
+		
 		entityThreadCount = 1L;
 		setupEntity(testFile);
 		configure();
 		widget.getEntityBundle();
 		
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
+		verify(mockView).setModifiedByWidgetVisible(true);
+		verify(mockSynapseJSNIUtils).convertDateToSmallString(modifiedOn);
+		verify(mockView).setModifiedOn(smallDateString);
+				
 		verify(mockView).showPublicIcon();
 		verify(mockView).showAnnotationsIcon();
 		verify(mockView).setAnnotations(anyString());
@@ -231,6 +210,7 @@ public class EntityBadgeTest {
 		verify(mockView).showHasWikiIcon();
 		verify(mockView).setDiscussionThreadIconVisible(true);
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
+		verify(mockFileDownloadButton).hideClientHelp();
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}
 	
@@ -250,7 +230,7 @@ public class EntityBadgeTest {
 	@Test
 	public void testEntityClicked() throws Exception {
 		//check the passthrough
-		EntityQueryResult header = new EntityQueryResult();
+		EntityHeader header = new EntityHeader();
 		header.setId("syn93847");
 		widget.entityClicked(header);
 		verify(mockPlaceChanger).goTo(isA(Synapse.class));
@@ -261,7 +241,7 @@ public class EntityBadgeTest {
 		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
 		widget.setEntityClickedHandler(mockEntityClicked);
 		String id = "syn77";
-		EntityQueryResult header = new EntityQueryResult();
+		EntityHeader header = new EntityHeader();
 		header.setId(id);
 		widget.entityClicked(header);
 		verify(mockEntityClicked).invoke(id);
@@ -285,7 +265,7 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testGetEntity() {
-		EntityQueryResult header = new EntityQueryResult();
+		EntityHeader header = new EntityHeader();
 		header.setId("syn12345");
 		widget.configure(header);
 		assertTrue(header == widget.getHeader());

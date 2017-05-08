@@ -16,6 +16,7 @@ public interface ModalWizardView extends IsWidget {
 		 * Called when the primary button is pressed.
 		 */
 		void onPrimary();
+		void onCancel();
 
 	}
 
@@ -89,4 +90,6 @@ public interface ModalWizardView extends IsWidget {
 	 * @param size
 	 */
 	public void setSize(ModalSize size);
+
+	void setHelp(String helpMarkdown, String helpUrl);
 }

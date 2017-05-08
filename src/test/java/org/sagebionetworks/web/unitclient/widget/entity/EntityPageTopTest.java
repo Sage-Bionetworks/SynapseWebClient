@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -16,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -29,12 +31,15 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -75,6 +80,8 @@ public class EntityPageTopTest {
 	@Mock
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
 	Tabs mockTabs;
 	@Mock
 	EntityMetadata mockEntityMetadata;
@@ -114,6 +121,8 @@ public class EntityPageTopTest {
 	AccessControlList mockACL;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	ClientCache mockStorage;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
@@ -121,6 +130,7 @@ public class EntityPageTopTest {
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
 	String projectWikiId = "31415926666";
+	String userId = "1234567";
 	boolean canEdit = true;
 	boolean canModerate = false;
 	@Before
@@ -132,9 +142,9 @@ public class EntityPageTopTest {
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
-		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
+		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockAuthController, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab,
-				mockEntityActionController, mockActionMenuWidget, mockCookies);
+				mockEntityActionController, mockActionMenuWidget, mockCookies, mockStorage);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -148,12 +158,28 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
 		
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockFilesInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockTablesInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockChallengeInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockDiscussionInnerTab.isTabListItemVisible()).thenReturn(true);
+		when(mockDockerInnerTab.isTabListItemVisible()).thenReturn(true);
+		
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
+		
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
 		when(mockFilesInnerTab.isContentStale()).thenReturn(true);
 		when(mockTablesInnerTab.isContentStale()).thenReturn(true);
 		when(mockDiscussionInnerTab.isContentStale()).thenReturn(true);
 		when(mockDockerInnerTab.isContentStale()).thenReturn(true);
 		when(mockChallengeInnerTab.isContentStale()).thenReturn(true);
+		when(mockTabs.getTabCount()).thenReturn(6);
 	}
 	
 	@Test
@@ -222,7 +248,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab, never()).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab, never()).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, areaToken, canModerate);
 		verify(mockDockerTab, never()).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 		
@@ -232,7 +258,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate);
 		verify(mockDockerTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 	}
@@ -268,6 +294,7 @@ public class EntityPageTopTest {
 		String areaToken = "1234";
 		Long versionNumber = null;
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), any(EntityUpdatedHandler.class));
 	}
 	
 	@Test
@@ -293,12 +320,11 @@ public class EntityPageTopTest {
 		verify(mockWikiTab, never()).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab, never()).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, null, canModerate);
 		verify(mockDockerTab, never()).configure(mockFileEntity, mockEntityUpdatedHandler, null);
 	}
 	
-
 	@Test
 	public void testConfigureWithFileAndFailureToLoadProject(){
 		Exception projectLoadError = new Exception("failed to load project");
@@ -318,7 +344,7 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq((String)null), eq(false), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
 		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, false);
 		verify(mockDockerTab).configure(mockFileEntity, mockEntityUpdatedHandler, null);
 	}
@@ -335,12 +361,12 @@ public class EntityPageTopTest {
 		
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
+		
 		clickAllTabs();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockTableEntity, mockEntityUpdatedHandler, versionNumber);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
 		verify(mockDockerTab).configure(mockTableEntity, mockEntityUpdatedHandler, null);
 	}
@@ -356,7 +382,6 @@ public class EntityPageTopTest {
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
 		verify(mockDockerTab).configure(mockDockerEntity, mockEntityUpdatedHandler, areaToken);
-		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		
 		clickAllTabs();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
@@ -364,7 +389,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).configure(mockDockerEntity, mockEntityUpdatedHandler, versionNumber);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockDockerEntity, mockEntityUpdatedHandler, null);
-		verify(mockChallengeTab, times(2)).configure(projectEntityId, projectName);
+		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate);
 	}
 
@@ -425,21 +450,153 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testConfigureProjectNoWiki() {
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(false);
 		// we are asking for an invalid wiki id for a project that contains no wiki.
 		Synapse.EntityArea area = null;
 		String invalidWikiId = "1234";
 		Long versionNumber = null;
 		when(mockProjectBundle.getRootWikiId()).thenReturn(null);
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, invalidWikiId);
-		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(invalidWikiId), eq(canEdit), wikiCallbackCaptor.capture());
+		verify(mockWikiTab, never()).configure(anyString(), anyString(), anyString(), anyBoolean(), any(WikiPageWidget.Callback.class));
 		
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
-		//simulate not found
-		wikiCallbackCaptor.getValue().noWikiFound();
 		//since the project does not have a root wiki id, it should go to the files tab
-		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
+	}
+	
+	@Test
+	public void testContentMultipleTabsShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(true);
+	}
+	
+	@Test
+	public void testContentMixtureOfTabsShownCanEdit() {
+		when(mockPermissions.getCanEdit()).thenReturn(true);
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		
+		verify(mockSynapseClientAsync, never()).isWiki(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isTable(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isDocker(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isForum(anyString(), any(AsyncCallback.class));
+		
+		verify(mockWikiInnerTab).setTabListItemVisible(true);
+		verify(mockFilesInnerTab).setTabListItemVisible(true);
+		verify(mockTablesInnerTab).setTabListItemVisible(true);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, never()).setTabListItemVisible(true);
+		verify(mockDiscussionInnerTab).setTabListItemVisible(true);
+		verify(mockDockerInnerTab).setTabListItemVisible(true);
+	}
+	
+	@Test
+	public void testContentMixtureOfTabsShownCannotEdit() {
+		when(mockPermissions.getCanEdit()).thenReturn(false);
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		
+		verify(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClientAsync, never()).isForum(anyString(), any(AsyncCallback.class));
+		
+		InOrder order = Mockito.inOrder(mockWikiInnerTab);
+		order.verify(mockWikiInnerTab).setTabListItemVisible(false);
+		order.verify(mockWikiInnerTab).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockFilesInnerTab);
+		order.verify(mockFilesInnerTab).setTabListItemVisible(false);
+		order.verify(mockFilesInnerTab).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockTablesInnerTab);
+		order.verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockTablesInnerTab, never()).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockChallengeInnerTab);
+		order.verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockChallengeInnerTab, never()).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockDiscussionInnerTab);
+		order.verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockDiscussionInnerTab).setTabListItemVisible(true);
+		
+		order = Mockito.inOrder(mockDockerInnerTab);
+		order.verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		order.verify(mockDockerInnerTab, never()).setTabListItemVisible(true);
+	}
+	
+	@Test
+	public void testContentOneTabShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		//should hide all tabs when only one will be shown
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+	}
+
+	@Test
+	public void testCachedTabShown() {
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		String storageKey = userId + "_" + projectEntityId + "_" + ProjectDisplayDialog.FILES;
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isFileOrFolder(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isTable(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isForum(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isDocker(anyString(), any(AsyncCallback.class));
+
+		when(mockStorage.get(storageKey)).thenReturn(Boolean.TRUE.toString());
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockWikiInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockFilesInnerTab, atLeastOnce()).setTabListItemVisible(true);
+		verify(mockTablesInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
+		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
 	}
 	
 }

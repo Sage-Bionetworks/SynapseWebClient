@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.view.ACTView;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -65,6 +66,8 @@ public class ACTPresenterTest {
 	UserGroupSuggestion mockSuggestion;
 	@Mock
 	UserGroupHeader mockUserGroupHeader;
+	@Mock
+	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 	private static final String OWNER_ID = "12345858";
 	ACTPresenter widget;
 	@Before
@@ -72,7 +75,7 @@ public class ACTPresenterTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
 		
-		widget = new ACTPresenter(mockView, mockUserProfileClient, mockSynapseAlert, mockPeopleSuggestBox, mockUserGroupSuggestionProvider, mockGinInjector, mockGlobalApplicationState, mockUserBadge);
+		widget = new ACTPresenter(mockView, mockUserProfileClient, mockSynapseAlert, mockPeopleSuggestBox, mockUserGroupSuggestionProvider, mockGinInjector, mockGlobalApplicationState, mockUserBadge, mockLoadMoreWidgetContainer);
 		AsyncMockStubber.callSuccessWith(mockVerificationPagedResults).when(mockUserProfileClient).listVerificationSubmissions(any(VerificationStateEnum.class), anyLong(), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockVerificationPagedResults.getResults()).thenReturn(Collections.singletonList(mockVerificationSubmission));
 		when(mockGinInjector.getVerificationSubmissionWidget()).thenReturn(mockVerificationSubmissionWidget);
@@ -91,16 +94,15 @@ public class ACTPresenterTest {
 	@Test
 	public void testLoadData() {
 		widget.loadData();
-		verify(mockView).clearRows();
+		verify(mockLoadMoreWidgetContainer).clear();
 		verify(mockSynapseAlert).clear();
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
 		verify(mockGinInjector).getVerificationSubmissionWidget();
 		boolean isACTMember = true;
 		boolean isModal = false;
 		verify(mockVerificationSubmissionWidget).configure(mockVerificationSubmission, isACTMember, isModal);
-		verify(mockView).addRow(any(Widget.class));
+		verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
 		verify(mockVerificationSubmissionWidget).show();
-		verify(mockView).updatePagination(anyList());
 	}
 	
 	@Test

@@ -21,9 +21,6 @@
 			<b:Row>
 	       		<g:SimplePanel ui:field="peopleListPanel" addStyleNames="margin-top-15"/>
 	       	</b:Row>
-	       	<b:Row>
-				<g:SimplePanel ui:field="paginationPanel"/>
-			</b:Row>
 			<b:Row>
 				<b:Container addStyleNames="clear"></b:Container>
 			</b:Row>

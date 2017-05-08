@@ -21,18 +21,14 @@
 				<b:ButtonToolBar>
 					<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
 					<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
-					<b:Button ui:field="addFileView" icon="PLUS" visible="false">Add View</b:Button>
+					<b:Button ui:field="addFileView" visible="false" />
 			</b:ButtonToolBar>
 			</b:Column>
 		</b:Row>
 		
 		<b:ListGroup ui:field="tablesList" />
-		<b:Row >
-			<b:Column size="XS_2" offset="XS_5">
-				<g:SimplePanel ui:field="paginationPanel" visible="false"/>
-			</b:Column>
-		</b:Row>
-		
+		<bh:Div ui:field="loadMoreWidgetContainer"/>
+				
 		<!-- Slot for the create table model dialog -->
 		<g:SimplePanel ui:field="createTableModalPanel" />
 		<!-- Slot for the upload table model dialog -->

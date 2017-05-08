@@ -40,6 +40,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -387,7 +388,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void checkFileSize() throws IllegalArgumentException{
-		long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+		JavaScriptObject blob = synapseJsniUtils.getFileBlob(this.currIndex, UploaderViewImpl.FILE_FIELD_ID);
+		long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 		//check
 		if (fileSize > OLD_BROWSER_MAX_SIZE) {
 			throw new IllegalArgumentException(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
@@ -444,7 +446,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void directUploadStep2(String fileName) {
-		this.multiPartUploader.uploadFile(fileName, UploaderViewImpl.FILE_FIELD_ID, this.currIndex, this, storageLocationId);
+		this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
 	}
 
 	private void handleCancelledFileUpload() {
@@ -503,26 +505,30 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
-			updateExternalFileEntity(entityId, path, name, null, null, storageLocationId);
+			updateExternalFileEntity(entityId, path, name, null, null, null, storageLocationId);
 		} else {
 			//new data, use the appropriate synapse call
-			createNewExternalFileEntity(path, name, null, null, storageLocationId);
+			createNewExternalFileEntity(path, name, null, null, null, storageLocationId);
 		}		
 	}
 	
 	public void setSftpExternalFilePath(final String path, final Long storageLocationId) {
-		synapseJsniUtils.getFileMd5(UploaderViewImpl.FILE_FIELD_ID, currIndex, new MD5Callback() {
+		final JavaScriptObject blob = synapseJsniUtils.getFileBlob(currIndex, UploaderViewImpl.FILE_FIELD_ID);
+		
+		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String hexValue) {
 				boolean isUpdating = entityId != null || entity != null;
-				long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 				String fileName = fileNames[currIndex];
+				String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+				contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, fileName);
 				if (isUpdating) {
 					//existing entity
-					updateExternalFileEntity(entityId, path, fileName, fileSize, hexValue, storageLocationId);
+					updateExternalFileEntity(entityId, path, fileName, fileSize, contentType, hexValue, storageLocationId);
 				} else {
 					//new data, use the appropriate synapse call
-					createNewExternalFileEntity(path, fileName, fileSize, hexValue, storageLocationId);
+					createNewExternalFileEntity(path, fileName, fileSize, contentType, hexValue, storageLocationId);
 				}		
 			}
 		});
@@ -543,19 +549,15 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		};
 	}
 	
-	public void updateExternalFileEntity(String entityId, String path, String name, Long fileSize, String md5, Long storageLocationId) {
+	public void updateExternalFileEntity(String entityId, String path, String name, Long fileSize, String contentType, String md5, Long storageLocationId) {
 		try {
-			String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
-			contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, name);
 			synapseClient.updateExternalFile(entityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (Throwable t) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 		}
 	}
-	public void createNewExternalFileEntity(final String path, final String name, Long fileSize, String md5, final Long storageLocationId) {
+	public void createNewExternalFileEntity(final String path, final String name, Long fileSize, String contentType, String md5, final Long storageLocationId) {
 		try {
-			String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
-			contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, name);
 			synapseClient.createExternalFile(parentEntityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
