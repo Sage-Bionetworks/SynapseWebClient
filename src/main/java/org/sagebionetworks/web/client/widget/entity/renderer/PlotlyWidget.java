@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -21,7 +23,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -41,6 +42,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	private SynapseAlert synAlert;
 	private String sql, title, xTitle, yTitle;
 	GraphType graphType;
+	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -74,11 +76,18 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		clear();
 		graphData = null;
 		xAxisColumnName = null;
-		sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
-		title = descriptor.get(WidgetConstants.TITLE);
-		xTitle = descriptor.get(WidgetConstants.X_AXIS_TITLE);
-		yTitle = descriptor.get(WidgetConstants.Y_AXIS_TITLE);
-		graphType = GraphType.valueOf(descriptor.get(WidgetConstants.TYPE));
+		sql = descriptor.get(TABLE_QUERY_KEY);
+		title = descriptor.get(TITLE);
+		xTitle = descriptor.get(X_AXIS_TITLE);
+		yTitle = descriptor.get(Y_AXIS_TITLE);
+		graphType = GraphType.valueOf(descriptor.get(TYPE));
+		
+		if (descriptor.containsKey(BAR_MODE)) {
+			barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
+		} else {
+			barMode = BarMode.GROUP;
+		}
+		
 		//gather the data, and then show the chart
 		view.setLoadingVisible(true);
 		view.setLoadingMessage("Loading...");
@@ -173,7 +182,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			plotlyGraphData[i].setName(columnName);
 			i++;
 		}
-		view.showChart(title, xTitle, yTitle, plotlyGraphData);
+		view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
 	}
 	
 	public double[] getDoubleArray(List<String> l) {

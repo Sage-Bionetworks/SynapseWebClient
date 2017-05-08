@@ -51,12 +51,12 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData) {
+	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), title, xTitle, yTitle, xyData);
+		_showChart(chartContainer.getElement(), title, xTitle, yTitle, xyData, barMode);
 	}
 	
-	private static native void _showChart(Element el, String graphTitle, String xTitle, String yTitle, PlotlyTrace[] xyData) /*-{
+	private static native void _showChart(Element el, String graphTitle, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) /*-{
 		var layout = {
 		  title: graphTitle,
 		  xaxis: {
@@ -65,7 +65,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		  yaxis: {
 		    title: yTitle,
 		  },
-		  barmode: 'group',
+		  barmode: barMode,
 		  margin: { t: 0 },
 		  autosize: true
 		};

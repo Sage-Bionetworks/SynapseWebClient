@@ -225,4 +225,5 @@ public class WidgetConstants {
 	public static final String X_AXIS_TITLE = "xtitle";
 	public static final String Y_AXIS_TITLE = "ytitle";
 	public static final String TYPE = "type";
+	public static final String BAR_MODE = "barmode";
 }
