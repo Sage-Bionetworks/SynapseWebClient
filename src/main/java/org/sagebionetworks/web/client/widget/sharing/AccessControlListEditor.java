@@ -117,11 +117,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void initViewPrincipalIds(){
 		if (publicPrincipalIds != null) {
 			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
+			view.setAuthenticatedAclPrinciapalId(publicPrincipalIds.getAuthenticatedAclPrincipalId());
 		}
 	}
 	
-	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
-	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
 	
 	public PermissionLevel[] getPermList() {
 		if (entity instanceof Project) {
@@ -133,6 +134,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
 		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
+		permissionDisplay.put(PermissionLevel.CAN_DOWNLOAD, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_DOWNLOAD);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		

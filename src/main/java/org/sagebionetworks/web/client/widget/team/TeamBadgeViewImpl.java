@@ -30,7 +30,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
-	Long publicAclPrincipalId;
+	Long publicAclPrincipalId, authenticatedAclPrincipalId;
 	Anchor anchor = new Anchor();
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -45,6 +45,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		notificationsPanel.addStyleName("displayInline");
 		
 		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
+		authenticatedAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 	}
 	
 	@Override
@@ -91,6 +92,11 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		Icon profilePicture;
 		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
 			profilePicture = new Icon(IconType.GLOBE);
+			nameLabel.setText("Public");
+		} else if (authenticatedAclPrincipalId != null && Long.parseLong(teamId) == authenticatedAclPrincipalId) {
+			profilePicture = new Icon();
+			profilePicture.addStyleName("fa fa-user-circle");
+			nameLabel.setText("All Synapse users");
 		} else {
 			profilePicture = new Icon(IconType.USERS);
 		}
