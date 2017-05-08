@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.plotly.GraphType;
-import org.sagebionetworks.web.client.plotly.XYData;
+import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -71,7 +71,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
 				if (event.isAttached()) {
-					XYData xyData = new XYData();
+					PlotlyTrace xyData = new PlotlyTrace();
 					xyData.setX(new String[]{"1", "2", "3", "4", "5"});
 					xyData.setY(new double[]{1, 2, 4, 8, 16});
 					xyData.setType(GraphType.BAR);
@@ -97,11 +97,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
-	public void showChart(Element el, XYData xyData) {
+	public void showChart(Element el, PlotlyTrace xyData) {
 		_showChart(el, xyData);
 	}
 
-	private static native void _showChart(Element el, XYData xyData) /*-{
+	private static native void _showChart(Element el, PlotlyTrace xyData) /*-{
 		$wnd.Plotly.plot(el, 
 			[xyData], 
 			{

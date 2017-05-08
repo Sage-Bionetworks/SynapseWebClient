@@ -13,7 +13,7 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.plotly.GraphType;
-import org.sagebionetworks.web.client.plotly.XYData;
+import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -162,10 +162,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	
 	public void showGraph() {
 		String[] xData = getStringArray(graphData.remove(xAxisColumnName));
-		XYData[] plotlyGraphData = new XYData[graphData.size()];
+		PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
 		int i = 0;
 		for (String columnName : graphData.keySet()) {
-			plotlyGraphData[i] = new XYData();
+			plotlyGraphData[i] = new PlotlyTrace();
 			plotlyGraphData[i].setX(xData);
 			double[] yData = getDoubleArray(graphData.get(columnName));
 			plotlyGraphData[i].setY(yData);

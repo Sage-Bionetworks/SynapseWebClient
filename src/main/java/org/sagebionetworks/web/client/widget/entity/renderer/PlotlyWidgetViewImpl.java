@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.plotly.XYData;
+import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -51,12 +51,12 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, XYData[] xyData) {
+	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData) {
 		chartContainer.clear();
 		_showChart(chartContainer.getElement(), title, xTitle, yTitle, xyData);
 	}
 	
-	private static native void _showChart(Element el, String graphTitle, String xTitle, String yTitle, XYData[] xyData) /*-{
+	private static native void _showChart(Element el, String graphTitle, String xTitle, String yTitle, PlotlyTrace[] xyData) /*-{
 		var layout = {
 		  title: graphTitle,
 		  xaxis: {

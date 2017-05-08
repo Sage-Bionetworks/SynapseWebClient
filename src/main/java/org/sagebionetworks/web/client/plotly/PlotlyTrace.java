@@ -5,7 +5,7 @@ import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 
 @JsType
-public class XYData {
+public class PlotlyTrace {
 	
 	@JsProperty
 	String x[];
