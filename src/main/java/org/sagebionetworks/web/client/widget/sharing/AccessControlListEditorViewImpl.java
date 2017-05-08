@@ -16,6 +16,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -36,7 +37,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
-	private Long publicAclPrincipalId;
+	private Long publicAclPrincipalId, authenticatedPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
 	private PermissionLevel defaultPermissionLevel;
@@ -95,6 +96,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId) {
 		this.publicAclPrincipalId = publicAclPrincipalId;
+	}
+	@Override
+	public void setAuthenticatedAclPrinciapalId(Long authenticatedPrincipalId) {
+		this.authenticatedPrincipalId = authenticatedPrincipalId;
 	}
 	@Override
 	public void setPublicPrivateButtonVisible(boolean isVisible) {
@@ -187,6 +192,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 						} else {
 							if (publicAclPrincipalId != null) {
 								presenter.setAccess(publicAclPrincipalId, PermissionLevel.CAN_VIEW);
+								presenter.setAccess(authenticatedPrincipalId, PermissionLevel.CAN_DOWNLOAD);
 							}
 						}
 					}

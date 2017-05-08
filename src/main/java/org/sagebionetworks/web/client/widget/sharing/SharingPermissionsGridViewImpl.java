@@ -96,7 +96,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		permListBox.addStyleName("input-xs");
 		data.add(permListBox);
 		row.add(data);
-		
 		if (!deleteButtonVisible || deleteButtonCallback == null) {
 			// Don't allow editing the permissions and don't add delete button.
 			permListBox.setEnabled(false);
