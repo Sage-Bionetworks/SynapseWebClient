@@ -84,7 +84,7 @@ public class FilesTab {
 	boolean annotationsShown, fileHistoryShown;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
-	private static int WIDGET_HEIGHT_PX = 270;
+	public static int WIDGET_HEIGHT_PX = 270;
 	Map<String,String> configMap;
 	
 	CallbackP<Boolean> showProjectInfoCallack;

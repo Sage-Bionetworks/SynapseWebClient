@@ -169,6 +169,25 @@ public class FileDownloadButtonTest {
 		verify(mockFileClientsHelp).configure(ENTITY_ID);
 	}
 	
+	@Test
+	public void testHideClientHelp() throws RestServiceException {
+		widget.hideClientHelp();
+		verify(mockView).setClientsHelpVisible(false);
+		
+		//verify that once we tell the widget to hide client help, it is not shown after getting the restriction information
+		String fileHandleId = "22";
+		S3FileHandle fileHandle = new S3FileHandle();
+		fileHandle.setId(fileHandleId);
+		List fileHandles = new ArrayList<FileHandle>();
+		fileHandles.add(fileHandle);
+		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
+		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		
+		widget.configure(mockEntityBundle, mockRestrictionInformation);
+		verify(mockView, never()).setClientsHelpVisible(true);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadFileDownloadUrlExternal() throws RestServiceException {

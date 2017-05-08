@@ -20,4 +20,6 @@ public interface TablesTabView extends IsWidget {
 	void setSynapseAlert(Widget w);
 	void clearActionMenuContainer();
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
+	void setProvenance(IsWidget w);
+	void setProvenanceVisible(boolean visible);
 }
