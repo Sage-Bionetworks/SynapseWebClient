@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
@@ -15,6 +16,11 @@ import com.google.inject.Inject;
 
 public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	private Presenter presenter;
+	@UiField
+	DropDownMenu typeDropdownMenu;
+	@UiField
+	DropDownMenu barModeDropdownMenu;
+	
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
 	
