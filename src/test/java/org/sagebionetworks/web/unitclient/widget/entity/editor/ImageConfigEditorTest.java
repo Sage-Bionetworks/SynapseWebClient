@@ -109,9 +109,11 @@ public class ImageConfigEditorTest {
 	public void testEditAttachmentBased() {
 		String fileName = "test.png";
 		reset(mockView);
+		descriptor.clear();
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
 		editor.configure(wikiKey, descriptor, mockCallback);
-		verify(mockView).setWikiFilesTabVisible(true);
+		verify(mockView, never()).setWikiFilesTabVisible(anyBoolean());
+		verify(mockView).showWikiFilesTab();
 		verify(mockView).setWikiAttachmentsWidgetVisible(true);
 		verify(mockAttachments).setSelectedFilename(fileName);
 	}
@@ -132,6 +134,7 @@ public class ImageConfigEditorTest {
 		verify(mockView).initView();
 		mockFinishedCallback.invoke(mockFileUpload);
 		verify(mockView).showUploadSuccessUI(testFileName);
+		verify(mockView).setWikiAttachmentsWidgetVisible(false);
 		verify(mockCallback).setPrimaryEnabled(true);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));
 	}
@@ -196,7 +199,6 @@ public class ImageConfigEditorTest {
 	        when(mockView.isSynapseEntity()).thenReturn(false);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
-	        mockFinishedCallback.invoke(mockFileUpload);
 	        editor.updateDescriptorFromView();
 	        verify(mockView).checkParams();
 	        verify(mockAttachments).isValid();
@@ -209,7 +211,6 @@ public class ImageConfigEditorTest {
 	        when(mockView.isSynapseEntity()).thenReturn(false);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
-	        mockFinishedCallback.invoke(mockFileUpload);
 	        when(mockAttachments.isValid()).thenReturn(false);
 	        editor.updateDescriptorFromView();
 	}
