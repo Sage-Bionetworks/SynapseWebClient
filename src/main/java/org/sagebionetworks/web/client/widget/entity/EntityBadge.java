@@ -145,7 +145,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		
 		if (eb.getEntity() instanceof FileEntity) {
 			fileDownloadButton.configure(eb);
-			fileDownloadButton.setClientsHelpVisible(false);
+			fileDownloadButton.hideClientHelp();
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 		

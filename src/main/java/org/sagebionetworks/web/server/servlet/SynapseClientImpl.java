@@ -2743,12 +2743,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
 			request.setEntityId(tableId);
 			List<TableUpdateRequest> requestChangeList = new ArrayList<TableUpdateRequest>();
-			if (!changes.isEmpty()) {
-				TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
-				newTableSchemaChangeRequest.setEntityId(tableId);
-				newTableSchemaChangeRequest.setChanges(changes);
-				requestChangeList.add(newTableSchemaChangeRequest);
-			} 
+			TableSchemaChangeRequest newTableSchemaChangeRequest = new TableSchemaChangeRequest();
+			newTableSchemaChangeRequest.setEntityId(tableId);
+			newTableSchemaChangeRequest.setChanges(changes);
+			List<String> orderedColumnIds = new ArrayList<>();
+			for (ColumnModel cm : newSchema) {
+				orderedColumnIds.add(cm.getId());
+			}
+			newTableSchemaChangeRequest.setOrderedColumnIds(orderedColumnIds);
+			requestChangeList.add(newTableSchemaChangeRequest);
 			request.setChanges(requestChangeList);
 			return request;
 		} catch (SynapseException e) {
