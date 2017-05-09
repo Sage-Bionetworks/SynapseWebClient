@@ -21,9 +21,9 @@
 					<g:SimplePanel ui:field="editorPopupBuffer">
 						<bh:Div styleName="margin-top-300" />
 					</g:SimplePanel>
+					<g:SimplePanel ui:field="paginationPanel" />
 				</bh:Div>
 			</g:ScrollPanel>
-			<g:SimplePanel ui:field="paginationPanel" />
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>
