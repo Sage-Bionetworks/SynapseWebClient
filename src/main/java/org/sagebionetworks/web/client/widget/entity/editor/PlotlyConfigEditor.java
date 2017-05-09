@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.regexp.shared.MatchResult;
@@ -54,11 +54,13 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		descriptor = widgetDescriptor;
 		if (descriptor.containsKey(TABLE_QUERY_KEY)) {
 			String sql = descriptor.get(TABLE_QUERY_KEY);
+			view.setTableSynId(QueryBundleUtils.getTableIdFromSql(sql));
 			view.setXAxisColumnName(getXColumnFromSql(sql));
 			String[] yColumns = getYColumnsFromSql(sql);
 			for (int i = 0; i < yColumns.length; i++) {
 				yColumnsList.add(yColumns[i]);
 			}
+			
 		}
 		if (descriptor.containsKey(TITLE)) {
 			view.setTitle(descriptor.get(TITLE));
@@ -92,7 +94,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		if(query == null){
 			return null;
 		}
-		MatchResult matcher = X_COLUMN_PATTERN.exec(query.toLowerCase());
+		MatchResult matcher = X_COLUMN_PATTERN.exec(query);
 		if(matcher != null){
 			if (matcher.getGroupCount() > 0) {
 				return matcher.getGroup(1);
@@ -110,7 +112,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		if(query == null){
 			return null;
 		}
-		MatchResult matcher = Y_COLUMNS_PATTERN.exec(query.toLowerCase());
+		MatchResult matcher = Y_COLUMNS_PATTERN.exec(query);
 		if(matcher != null){
 			if (matcher.getGroupCount() > 1) {
 				return matcher.getGroup(2).split(",");
@@ -131,13 +133,16 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	@Override
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
+		descriptor.clear();
 		String sql = getSql();
 		descriptor.put(TABLE_QUERY_KEY, sql);
 		descriptor.put(TITLE, view.getTitle());
 		descriptor.put(X_AXIS_TITLE, view.getXAxisLabel());
 		descriptor.put(Y_AXIS_TITLE, view.getYAxisLabel());
 		descriptor.put(TYPE, view.getGraphType().toString());
-		descriptor.put(TYPE, view.getBarMode().toString());
+		if (GraphType.BAR.equals(view.getGraphType())) {
+			descriptor.put(BAR_MODE, view.getBarMode().toString());	
+		}
 	}
 	
 	public String getSql() {
