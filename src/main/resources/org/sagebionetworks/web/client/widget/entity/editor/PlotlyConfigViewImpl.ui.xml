@@ -9,14 +9,14 @@
 				<b:FormLabel>Plot Type</b:FormLabel>
 				<b:ButtonGroup>
 					<b:Button dataToggle="DROPDOWN" text="Plot type..." />
-					<b:DropDownMenu ui:field="typeDropdownMenu" />
+					<b:ListBox ui:field="typeDropdownMenu"/>
 				</b:ButtonGroup>
 			</b:FormGroup>
-			<b:FormGroup>
+			<b:FormGroup ui:field="barChartModeUI">
 				<b:FormLabel>Bar Chart Mode</b:FormLabel>
 				<b:ButtonGroup>
 					<b:Button dataToggle="DROPDOWN" text="Bar chart mode..." />
-					<b:DropDownMenu ui:field="barModeDropdownMenu" />
+					<b:ListBox ui:field="barModeDropdownMenu"/>
 				</b:ButtonGroup>
 			</b:FormGroup>
 			<b:FormGroup>
@@ -72,6 +72,8 @@
 				</b:FormGroup>
 			</bh:Div>
 		</b:FieldSet>
+		<bh:Div ui:field="synAlertContainer" />
+		<bh:Div ui:field="extraWidgets"/>
 	</bh:Div>
 
 </ui:UiBinder>

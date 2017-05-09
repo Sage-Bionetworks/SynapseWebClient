@@ -7,11 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -31,15 +34,18 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "gi");
 
 	EntityFinder finder;
-	String selectedSynapseId;
-	String xColumn;
 	List<String> yColumnsList = new ArrayList<>();
+	SynapseAlert synAlert;
 	
 	@Inject
 	public PlotlyConfigEditor(PlotlyConfigView view, 
-			EntityFinder finder) {
+			EntityFinder finder,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.finder = finder;
+		this.synAlert = synAlert;
+		view.add(finder);
+		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 	}		
 	@Override
@@ -48,7 +54,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		descriptor = widgetDescriptor;
 		if (descriptor.containsKey(TABLE_QUERY_KEY)) {
 			String sql = descriptor.get(TABLE_QUERY_KEY);
-			xColumn = getXColumnFromSql(sql);
+			view.setXAxisColumnName(getXColumnFromSql(sql));
 			String[] yColumns = getYColumnsFromSql(sql);
 			for (int i = 0; i < yColumns.length; i++) {
 				yColumnsList.add(yColumns[i]);
@@ -68,12 +74,12 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 						
 		if (descriptor.containsKey(TYPE)) {
 			GraphType graphType = GraphType.valueOf(descriptor.get(TYPE));
-			view.setGraphType(graphType.toString());
+			view.setGraphType(graphType);
 		}
 
 		if (descriptor.containsKey(BAR_MODE)) {
 			BarMode barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
-			view.setBarMode(barMode.toString());
+			view.setBarMode(barMode);
 		}
 	}
 	
@@ -130,14 +136,14 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		descriptor.put(TITLE, view.getTitle());
 		descriptor.put(X_AXIS_TITLE, view.getXAxisLabel());
 		descriptor.put(Y_AXIS_TITLE, view.getYAxisLabel());
-		descriptor.put(TYPE, GraphType.valueOf(view.getGraphType()).toString());
-		descriptor.put(TYPE, BAR_MODE.valueOf(view.getBarMode()).toString());
+		descriptor.put(TYPE, view.getGraphType().toString());
+		descriptor.put(TYPE, view.getBarMode().toString());
 	}
 	
 	public String getSql() {
 		StringBuilder sql = new StringBuilder();
 		sql.append("select ");
-		sql.append(xColumn);
+		sql.append(view.getXAxisColumnName());
 		sql.append(",");
 		for (Iterator iterator = yColumnsList.iterator(); iterator.hasNext();) {
 			String col = (String) iterator.next();
@@ -147,7 +153,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			}
 		}
 		sql.append(" from ");
-		sql.append(selectedSynapseId);
+		sql.append(view.getTableSynId());
 		String whereClause = view.getWhereClause();
 		if (DisplayUtils.isDefined(whereClause)) {
 			sql.append(" where ");
@@ -177,7 +183,32 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		return null;
 	}
 	
-	/*
-	 * Private Methods
-	 */
+	@Override
+	public void onFindTable() {
+		finder.configure(EntityFilter.TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
+			@Override
+			public void onSelected(Reference selected) {
+				view.setTableSynId(selected.getTargetId());
+			}
+		});
+		finder.show();
+	}
+	@Override
+	public void onAddYColumn(String yColumnName) {
+		// clear y axis column name
+		view.setYAxisColumnName("");
+		// add to list
+		yColumnsList.add(yColumnName);
+		//TODO: create and add y column widget to view
+//		view.addYAxisColumn(w);
+	}
+	@Override
+	public void onFindXColumn() {
+		//TODO: show column selector for selected table id (or error if not yet filled in).
+	}
+	@Override
+	public void onFindYColumn() {
+		//TODO: show column selector for selected table id (or error if not yet filled in).
+	}
+	
 }

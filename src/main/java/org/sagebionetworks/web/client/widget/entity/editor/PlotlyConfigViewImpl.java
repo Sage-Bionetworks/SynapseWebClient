@@ -1,25 +1,63 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import java.util.Map;
-
-import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.ValidationUtils;
-import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.plotly.BarMode;
+import org.sagebionetworks.web.client.plotly.GraphType;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	private Presenter presenter;
 	@UiField
-	DropDownMenu typeDropdownMenu;
+	ListBox typeDropdownMenu;
 	@UiField
-	DropDownMenu barModeDropdownMenu;
+	ListBox barModeDropdownMenu;
+	@UiField
+	TextBox titleField;
+	@UiField
+	TextBox xAxisLabel;
+	@UiField
+	TextBox yAxisLabel;
+	@UiField
+	TextBox tableViewSynId;
+	@UiField
+	TextBox xAxisColumnName;
+	@UiField
+	Div yAxisColumnsContainer;
+	@UiField
+	Button entityPickerButton;
+	@UiField
+	Button xAxisButton;
+	@UiField
+	Button addYAxisButton;
+	@UiField
+	Button findYAxisButton;
+	@UiField
+	TextBox yAxisColumnName;
+	@UiField
+	TextBox whereClause;
+	@UiField
+	TextBox groupByClause;
+	@UiField
+	Div showHideAdvancedButtonContainer;
+	@UiField
+	Div advancedUI;
+	@UiField
+	FormGroup barChartModeUI;
+	@UiField
+	Div synAlertContainer;
+	@UiField
+	Div extraWidgets;
 	
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
@@ -27,6 +65,38 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	@Inject
 	public PlotlyConfigViewImpl(PlotlyConfigViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
+		entityPickerButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onFindTable();
+			}
+		});
+		xAxisButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onFindXColumn();
+			}
+		});
+		addYAxisButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddYColumn(yAxisColumnName.getValue());
+			}
+		});
+		findYAxisButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onFindYColumn();
+			}
+		});
+		
+		for (GraphType type : GraphType.values()) {
+			typeDropdownMenu.addItem(type.name());
+		}
+		
+		for (BarMode mode : BarMode.values()) {
+			barModeDropdownMenu.addItem(mode.name());
+		}
 	}
 	
 	
@@ -38,5 +108,148 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	@Override 
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+
+
+	@Override
+	public String getTitle() {
+		return titleField.getValue();
+	}
+
+	@Override
+	public void setTitle(String title) {
+		titleField.setValue(title);
+	}
+
+	@Override
+	public BarMode getBarMode() {
+		return BarMode.valueOf(barModeDropdownMenu.getSelectedValue());
+	}
+	
+	@Override
+	public void setBarMode(BarMode barMode) {
+		for (int i = 0; i < barModeDropdownMenu.getItemCount(); i++) {
+			if (barMode.name().equals(barModeDropdownMenu.getValue(i))) {
+				//found
+				barModeDropdownMenu.setSelectedIndex(i);
+				break;
+			}
+		}
+	}
+	
+	@Override
+	public GraphType getGraphType() {
+		return GraphType.valueOf(typeDropdownMenu.getSelectedValue());
+	}
+	
+	@Override
+	public void setGraphType(GraphType graphType) {
+		for (int i = 0; i < typeDropdownMenu.getItemCount(); i++) {
+			if (graphType.name().equals(typeDropdownMenu.getValue(i))) {
+				//found
+				typeDropdownMenu.setSelectedIndex(i);
+				break;
+			}
+		}	
+	}
+	@Override
+	public String getXAxisLabel() {
+		return xAxisLabel.getValue();
+	}
+
+
+	@Override
+	public void setXAxisLabel(String label) {
+		xAxisLabel.setValue(label);
+	}
+
+
+	@Override
+	public String getYAxisLabel() {
+		return yAxisLabel.getValue();
+	}
+
+
+	@Override
+	public void setYAxisLabel(String label) {
+		yAxisLabel.setValue(label);
+	}
+
+
+	@Override
+	public String getWhereClause() {
+		return whereClause.getValue();
+	}
+
+
+	@Override
+	public void setWhereClause(String v) {
+		whereClause.setValue(v);
+	}
+
+
+	@Override
+	public String getGroupByClause() {
+		return groupByClause.getValue();
+	}
+
+
+	@Override
+	public void setGroupByClause(String v) {
+		groupByClause.setValue(v);
+	}
+
+	@Override
+	public void clearYAxisColumns() {
+		yAxisColumnsContainer.clear();
+	}
+
+
+	@Override
+	public void addYAxisColumn(IsWidget w) {
+		yAxisColumnsContainer.add(w);
+	}
+
+	@Override
+	public void setTableSynId(String value) {
+		tableViewSynId.setValue(value);
+	}
+
+	@Override
+	public String getTableSynId() {
+		return tableViewSynId.getValue();
+	}
+	
+	@Override
+	public void setXAxisColumnName(String value) {
+		xAxisColumnName.setValue(value);
+	}
+
+	@Override
+	public void setYAxisColumnName(String value) {
+		yAxisColumnName.setValue(value);
+	}
+
+	@Override
+	public void setAdvancedUIVisible(boolean visible) {
+		advancedUI.setVisible(visible);
+	}
+	@Override
+	public void setBarModeVisible(boolean visible) {
+		barChartModeUI.setVisible(visible);
+	}
+	
+	@Override
+	public String getXAxisColumnName() {
+		return xAxisColumnName.getValue();
+	}
+	@Override
+	public void add(IsWidget w) {
+		extraWidgets.add(w);
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }
