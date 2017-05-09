@@ -55,6 +55,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
 	CallbackP<FacetColumnRequest> facetChangedHandler;
+	Callback resetFacetsHandler;
 	ClientCache clientCache;
 	GWTWrapper gwt;
 	@Inject
@@ -76,6 +77,13 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
 		this.view.setSynapseAlertWidget(synapseAlert.asWidget());
+		resetFacetsHandler = new Callback() {
+			@Override
+			public void invoke() {
+				startingQuery.setSelectedFacets(null);
+				runQuery();
+			}
+		};
 		facetChangedHandler = new CallbackP<FacetColumnRequest>() {
 			@Override
 			public void invoke(FacetColumnRequest request) {
@@ -219,7 +227,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler, resetFacetsHandler);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
