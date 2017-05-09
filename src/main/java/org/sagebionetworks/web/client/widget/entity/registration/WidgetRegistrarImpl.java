@@ -96,6 +96,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getBiodallianceEditor();
 		} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
 			presenter = ginInjector.getCytoscapeConfigEditor();
+		} else if(contentTypeKey.equals(GRAPH_CONTENT_TYPE)) {
+			presenter = ginInjector.getPlotlyConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);

@@ -112,6 +112,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
@@ -344,6 +345,7 @@ public interface PortalGinInjector extends Ginjector {
 	public BiodallianceEditor getBiodallianceEditor();
 	public BiodallianceSourceEditor getBiodallianceSourceEditor();
 	public CytoscapeConfigEditor getCytoscapeConfigEditor();
+	public PlotlyConfigEditor getPlotlyConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
