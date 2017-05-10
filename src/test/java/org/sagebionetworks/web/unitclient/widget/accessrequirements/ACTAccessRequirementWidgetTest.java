@@ -230,6 +230,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Test
 	public void testCancelledState() {
 		widget.setRequirement(mockACTAccessRequirement);
+		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.CANCELLED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
