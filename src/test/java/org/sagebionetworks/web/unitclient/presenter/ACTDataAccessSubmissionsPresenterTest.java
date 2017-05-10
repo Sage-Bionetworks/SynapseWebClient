@@ -25,10 +25,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -80,9 +80,9 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Mock
 	ACTAccessRequirement mockACTAccessRequirement;
 	@Mock
-	DataAccessSubmissionPage mockDataAccessSubmissionPage;
+	SubmissionPage mockDataAccessSubmissionPage;
 	@Mock
-	DataAccessSubmission mockDataAccessSubmission;
+	Submission mockDataAccessSubmission;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	@Mock
@@ -100,7 +100,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		MockitoAnnotations.initMocks(this);
 		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));
 		when(mockDataAccessSubmissionPage.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
@@ -159,7 +159,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setIsValidatedProfileRequired(true);
 		
 		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
-		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 
 		//verify DataAccessSubmission widget is created/configured for the submission (based on the mockACTAccessRequirement configuration)
 		verify(mockGinInjector).getACTDataAccessSubmissionWidget();
@@ -173,14 +173,14 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.EMPTY_LIST);
 		when(mockDataAccessSubmissionPage.getNextPageToken()).thenReturn(null);
 		presenter.loadMore();
-		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq(NEXT_PAGE_TOKEN), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq(NEXT_PAGE_TOKEN), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);
 	}
 	
 	@Test
 	public void testLoadDataFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(DataAccessSubmissionState.class), any(DataAccessSubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		presenter.loadData();
 		verify(mockSynAlert).handleException(ex);
 		verify(mockLoadMoreContainer).setIsMore(false);

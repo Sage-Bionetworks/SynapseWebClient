@@ -87,7 +87,7 @@ public class QueryResultEditorWidget implements
 		this.isView = isView;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, null, true, isView, this, null, null);
+		pageWidget.configure(bundle, null, null, true, isView, this, null, null, null);
 		setJobRunning(false);
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);

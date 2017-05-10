@@ -1,26 +1,31 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.requestaccess;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.sagebionetworks.web.client.utils.Callback;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.util.MockUtil;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessRequest;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.Renewal;
+import org.sagebionetworks.repo.model.dataaccess.Request;
+import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -28,17 +33,15 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.RequestRevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -79,9 +82,9 @@ public class CreateDataAccessSubmissionStep2Test {
 	@Mock
 	FileHandleList mockOtherDocuments;
 	@Mock
-	DataAccessRequest mockDataAccessRequest;
+	Request mockDataAccessRequest;
 	@Mock
-	DataAccessRenewal mockDataAccessRenewal;
+	Renewal mockDataAccessRenewal;
 	@Mock
 	FileUpload mockFileUpload;
 	@Mock
@@ -92,8 +95,6 @@ public class CreateDataAccessSubmissionStep2Test {
 	SynapseSuggestion mockSynapseSuggestion;
 	@Captor
 	ArgumentCaptor<CallbackP<SynapseSuggestion>> callbackPUserSuggestionCaptor;
-	@Mock
-	RequestRevokeUserAccessButton mockRequestRevokeUserAccessButton;
 	@Mock
 	FileHandleWidget mockFileHandleWidget;
 	@Mock
@@ -144,8 +145,7 @@ public class CreateDataAccessSubmissionStep2Test {
 				mockAccessorsList, 
 				mockPeopleSuggestBox, 
 				mockProvider, 
-				mockOtherDocuments, 
-				mockRequestRevokeUserAccessButton);
+				mockOtherDocuments);
 		widget.setModalPresenter(mockModalPresenter);
 		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
@@ -157,8 +157,8 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockDataAccessRequest.getId()).thenReturn(DATA_ACCESS_REQUEST_ID);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 		
-		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockClient).submitDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockClient).submitDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -269,7 +269,6 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView).setSummaryOfUseVisible(true);
 		verify(mockView).setPublications(anyString());
 		verify(mockView).setSummaryOfUse(anyString());
-		verify(mockRequestRevokeUserAccessButton).configure(mockACTAccessRequirement, DataAccessSubmissionState.APPROVED);
 	}
 	
 	@Test
@@ -364,7 +363,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		
 		verify(mockDataAccessRequest).setAccessors(mockAccessorUserIds);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
-		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		
 		//submitted (primary button was clicked)
 		verify(mockClient).submitDataAccessRequest(eq(mockDataAccessRequest), any(AsyncCallback.class));
@@ -382,9 +381,9 @@ public class CreateDataAccessSubmissionStep2Test {
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		String error = "error submitting data access request";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		widget.onPrimary();
-		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
 	
@@ -404,8 +403,8 @@ public class CreateDataAccessSubmissionStep2Test {
 		
 		verify(mockDataAccessRequest).setAccessors(mockAccessorUserIds);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
-		verify(mockClient).updateDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
-		verify(mockClient, never()).submitDataAccessRequest(any(DataAccessRequestInterface.class), any(AsyncCallback.class));
+		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
+		verify(mockClient, never()).submitDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		
 		verify(mockView).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE);
 		InOrder order = inOrder(mockModalPresenter);

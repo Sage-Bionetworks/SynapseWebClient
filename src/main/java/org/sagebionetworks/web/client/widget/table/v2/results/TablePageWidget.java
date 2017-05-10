@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -44,7 +45,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	String tableId;
 	boolean isView;
 	FacetsWidget facetsWidget;
-	
+	Callback resetFacetsHandler;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -79,9 +80,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			boolean isView, 
 			RowSelectionListener rowSelectionListener, 
 			final PagingAndSortingListener pageChangeListener,
-			CallbackP<FacetColumnRequest> facetChangedHandler){
+			CallbackP<FacetColumnRequest> facetChangedHandler,
+			Callback resetFacetsHandler){
 		this.isView = isView;
 		this.rowSelectionListener = rowSelectionListener;
+		this.resetFacetsHandler = resetFacetsHandler;
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null){
 			this.paginationWidget.configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), pageChangeListener);
@@ -139,10 +142,10 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				facets != null && 
 				!facets.isEmpty();
 		
+		view.setFacetsVisible(isFacetsSupported);
+		
 		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
-		} else {
-			view.setFacetsVisible(false);	
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
@@ -306,5 +309,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	
 	public void setFacetsVisible(boolean visible) {
 		view.setFacetsVisible(visible);
+	}
+	@Override
+	public void onClearFacets() {
+		if (resetFacetsHandler != null) {
+			resetFacetsHandler.invoke();
+		}
 	}
 }

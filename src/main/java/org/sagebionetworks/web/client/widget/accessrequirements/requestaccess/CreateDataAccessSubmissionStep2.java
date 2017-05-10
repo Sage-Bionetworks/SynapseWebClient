@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessRenewal;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessRequestInterface;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.Renewal;
+import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.RequestRevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
@@ -55,11 +53,10 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	FileHandleUploadWidget ducUploader, irbUploader, otherUploader;
 	SynapseJSNIUtils jsniUtils;
 	AuthenticationController authController;
-	DataAccessRequestInterface dataAccessRequest;
+	RequestInterface dataAccessRequest;
 	UserBadgeList accessorsList;
 	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
-	RequestRevokeUserAccessButton requestRevokeAccessButton;
 	
 	@Inject
 	public CreateDataAccessSubmissionStep2(
@@ -74,8 +71,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			UserBadgeList accessorsList,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			FileHandleList otherDocuments,
-			RequestRevokeUserAccessButton requestRevokeAccessButton) {
+			FileHandleList otherDocuments) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -85,12 +81,10 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.authController = authController;
 		this.accessorsList = accessorsList;
 		this.otherDocuments = otherDocuments;
-		this.requestRevokeAccessButton = requestRevokeAccessButton;
 		otherDocuments.configure()
 			.setUploadButtonText("Browse...")
 			.setCanDelete(true)
 			.setCanUpload(true);
-		view.setRequestRevokeAccessButton(requestRevokeAccessButton);
 		view.setAccessorListWidget(accessorsList);
 		view.setDUCTemplateFileWidget(templateFileRenderer.asWidget());
 		view.setDUCUploadWidget(ducUploader.asWidget());
@@ -124,7 +118,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		accessorsList.setUserIdsDeletedCallback(new CallbackP<List<String>>() {
 			@Override
 			public void invoke(List<String> param) {
-				if (dataAccessRequest instanceof DataAccessRenewal) {
+				if (dataAccessRequest instanceof Renewal) {
 					// notify user that removing a user does not revoke access, with link to inform ACT
 					CreateDataAccessSubmissionStep2.this.view.setRevokeNoteVisible(true);
 				}
@@ -181,22 +175,21 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		}
 
 		// retrieve a suitable request object to start with
-		client.getDataAccessRequest(ar.getId(), new AsyncCallback<DataAccessRequestInterface>() {
+		client.getDataAccessRequest(ar.getId(), new AsyncCallback<RequestInterface>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				modalPresenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
-			public void onSuccess(DataAccessRequestInterface dataAccessRequest) {
+			public void onSuccess(RequestInterface dataAccessRequest) {
 				CreateDataAccessSubmissionStep2.this.dataAccessRequest = dataAccessRequest;
-				boolean isRenewal = dataAccessRequest instanceof DataAccessRenewal;
+				boolean isRenewal = dataAccessRequest instanceof Renewal;
 				view.setPublicationsVisible(isRenewal);
 				view.setSummaryOfUseVisible(isRenewal);
 				if (isRenewal) {
-					view.setPublications(((DataAccessRenewal)dataAccessRequest).getPublication());
-					view.setSummaryOfUse(((DataAccessRenewal)dataAccessRequest).getSummaryOfUse());
-					requestRevokeAccessButton.configure(CreateDataAccessSubmissionStep2.this.ar, DataAccessSubmissionState.APPROVED);
+					view.setPublications(((Renewal)dataAccessRequest).getPublication());
+					view.setSummaryOfUse(((Renewal)dataAccessRequest).getSummaryOfUse());
 				}
 				if (dataAccessRequest.getDucFileHandleId() != null) {
 					FileHandleWidget fileHandleWidget = getFileHandleWidget(dataAccessRequest.getId(), FileHandleAssociateType.DataAccessRequestAttachment, dataAccessRequest.getDucFileHandleId());
@@ -251,14 +244,14 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		dataAccessRequest.setAccessors(accessorsList.getUserIds());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		dataAccessRequest.setResearchProjectId(researchProject.getId());
-		client.updateDataAccessRequest(dataAccessRequest, new AsyncCallback<DataAccessRequestInterface>() {
+		client.updateDataAccessRequest(dataAccessRequest, new AsyncCallback<RequestInterface>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				modalPresenter.setErrorMessage(caught.getMessage());
 			}
 			
 			@Override
-			public void onSuccess(DataAccessRequestInterface result) {
+			public void onSuccess(RequestInterface result) {
 				dataAccessRequest = result;
 				if (isSubmit) {
 					submitDataAccessRequest();

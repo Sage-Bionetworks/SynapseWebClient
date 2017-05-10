@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface TablePageView extends IsWidget {
 	
 	public interface Presenter {
+		void onClearFacets();
 	}
 	
 	/**
