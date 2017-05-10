@@ -32,5 +32,4 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setSummaryOfUse(String text);
 	String getSummaryOfUse();
 	void showInfo(String message);
-	void setRequestRevokeAccessButton(IsWidget w);
 }

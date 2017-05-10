@@ -24,9 +24,9 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalResult;
 import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
 import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -68,7 +68,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	DataAccessSubmission mockDataAccessSubmission;
+	Submission mockDataAccessSubmission;
 	@Mock
 	ResearchProject mockResearchProjectSnapshot;
 	@Captor
@@ -103,7 +103,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockFileHandleList.configure()).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockModifiedByBadge);
 		when(mockDataAccessSubmission.getId()).thenReturn(SUBMISSION_ID);
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
@@ -112,7 +112,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
 		
 		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalView, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector);
-		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(DataAccessSubmissionState.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		accessApprovalResults = new ArrayList<>();
@@ -206,7 +206,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	
 	@Test
 	public void testConfigureSubmitted() {
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.SUBMITTED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.SUBMITTED);
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView).hideActions();
 		verify(mockView).showApproveButton();
@@ -220,16 +220,16 @@ public class ACTDataAccessSubmissionWidgetTest {
 	
 	@Test
 	public void testConfigureOtherStates() {
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.CANCELLED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.CANCELLED);
 		widget.configure(mockDataAccessSubmission);
 		
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.NOT_SUBMITTED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.NOT_SUBMITTED);
 		widget.configure(mockDataAccessSubmission);
 		
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.REJECTED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		widget.configure(mockDataAccessSubmission);
 		
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.APPROVED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		widget.configure(mockDataAccessSubmission);
 		
 		verify(mockView, times(4)).hideActions();
@@ -242,22 +242,22 @@ public class ACTDataAccessSubmissionWidgetTest {
 		widget.configure(mockDataAccessSubmission);
 		String rejectionReason = "missing info";
 		when(mockPromptModalView.getValue()).thenReturn(rejectionReason);
-		when(mockDataAccessSubmission.getState()).thenReturn(DataAccessSubmissionState.REJECTED);
+		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		
 		confirmRejectionCallback.invoke();
 		
 		verify(mockPromptModalView).hide();
-		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(DataAccessSubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
-		verify(mockView).setState(DataAccessSubmissionState.REJECTED.name());
+		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(SubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
+		verify(mockView).setState(SubmissionState.REJECTED.name());
 	}
 	
 	@Test
 	public void testUpdateDataAccessSubmissionStateFailure() {
 		widget.configure(mockDataAccessSubmission);
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessSubmissionState(anyString(), any(DataAccessSubmissionState.class), anyString(), any(AsyncCallback.class));
-		widget.updateDataAccessSubmissionState(DataAccessSubmissionState.APPROVED, "");
-		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(DataAccessSubmissionState.APPROVED), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
+		widget.updateDataAccessSubmissionState(SubmissionState.APPROVED, "");
+		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(SubmissionState.APPROVED), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).handleException(ex);
 	}
 }

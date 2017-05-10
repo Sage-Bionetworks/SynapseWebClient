@@ -112,21 +112,21 @@ public class CreateACTAccessRequirementStep2Test {
 	
 	@Test
 	public void testHasRequestUI() {
-		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(true);
+		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
 		widget.configure(mockACTAccessRequirement);
 		verify(mockView).showHasRequestUI(true);
 	}
 	
 	@Test
 	public void testNoRequestUI() {
-		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(false);
+		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
 		widget.configure(mockACTAccessRequirement);
 		verify(mockView).showHasRequestUI(false);
 	}
 
 	@Test
 	public void testNullRequest() {
-		when(mockACTAccessRequirement.getAcceptDataAccessRequest()).thenReturn(null);
+		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(null);
 		widget.configure(mockACTAccessRequirement);
 		verify(mockView).showHasRequestUI(false);
 	}
@@ -184,7 +184,7 @@ public class CreateACTAccessRequirementStep2Test {
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
 		verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
 		verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
-		verify(mockACTAccessRequirement).setAcceptDataAccessRequest(true);
+		verify(mockACTAccessRequirement).setAcceptRequest(true);
 		verify(mockModalPresenter).onFinished();
 	}
 	
