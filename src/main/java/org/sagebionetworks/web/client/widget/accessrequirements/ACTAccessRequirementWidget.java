@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -157,9 +156,15 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				break;
 			case CANCELLED:
 			default:
-				view.showUnapprovedHeading();
-				view.showRequestAccessButton();
+				showUnapproved();
 				break;
+		}
+	}
+	
+	public void showUnapproved() {
+		view.showUnapprovedHeading();
+		if (isAcceptDataAccessRequest(ar.getAcceptRequest())) {
+			view.showRequestAccessButton();
 		}
 	}
 	
@@ -179,8 +184,12 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			}
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				if (status.getIsApproved()) {
-					showApproved();
+				if (((ACTAccessRequirementStatus)status).getCurrentSubmissionStatus() == null) {
+					if (status.getIsApproved()) {
+						showApproved();
+					} else {
+						showUnapproved();
+					}
 				} else {
 					setDataAccessSubmissionStatus(((ACTAccessRequirementStatus)status).getCurrentSubmissionStatus());	
 				}
