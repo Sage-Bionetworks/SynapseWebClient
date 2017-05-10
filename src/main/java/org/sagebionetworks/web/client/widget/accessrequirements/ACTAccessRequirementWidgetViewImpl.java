@@ -69,8 +69,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div requestAccessButtonContainer;
 	@UiField
 	Div revokeAccessButtonContainer;
-	@UiField
-	Div requestRevokeAccessButtonContainer;
 	
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
@@ -268,12 +266,5 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		updateRequestButtonContainer.setVisible(false);
 		requestAccessButtonContainer.setVisible(false);
 		revokeAccessButtonContainer.setVisible(false);
-		requestRevokeAccessButtonContainer.setVisible(false);
-	}
-	
-	@Override
-	public void setRequestRevokeUserAccessWidget(IsWidget w) {
-		requestRevokeAccessButtonContainer.clear();
-		requestRevokeAccessButtonContainer.add(w);
 	}
 }

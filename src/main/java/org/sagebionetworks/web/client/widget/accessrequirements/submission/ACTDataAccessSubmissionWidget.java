@@ -5,8 +5,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.dataaccess.AccessApprovalResult;
 import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
 import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -30,7 +30,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	private ACTDataAccessSubmissionWidgetView view;
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
-	DataAccessSubmission submission;
+	Submission submission;
 	BigPromptModalView promptDialog;
 	FileHandleList otherDocuments;
 	FileHandleWidget ducFileRenderer;
@@ -71,13 +71,13 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
 			@Override
 			public void invoke() {
-				updateDataAccessSubmissionState(DataAccessSubmissionState.REJECTED, promptDialog.getValue());
+				updateDataAccessSubmissionState(SubmissionState.REJECTED, promptDialog.getValue());
 				promptDialog.hide();
 			}
 		});
 	}
 	
-	public void configure(DataAccessSubmission submission) {
+	public void configure(Submission submission) {
 		this.submission = submission;
 		view.hideActions();
 		// setup the view wrt submission state
@@ -160,14 +160,14 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		return fha;
 	}
 	
-	public void updateDataAccessSubmissionState(DataAccessSubmissionState state, String reason) {
-		dataAccessClient.updateDataAccessSubmissionState(submission.getId(), state, reason, new AsyncCallback<DataAccessSubmission>() {
+	public void updateDataAccessSubmissionState(SubmissionState state, String reason) {
+		dataAccessClient.updateDataAccessSubmissionState(submission.getId(), state, reason, new AsyncCallback<Submission>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 			@Override
-			public void onSuccess(DataAccessSubmission result) {
+			public void onSuccess(Submission result) {
 				configure(result);
 			}
 		});
@@ -175,7 +175,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	
 	@Override
 	public void onApprove() {
-		updateDataAccessSubmissionState(DataAccessSubmissionState.APPROVED, null);
+		updateDataAccessSubmissionState(SubmissionState.APPROVED, null);
 	}
 	@Override
 	public void onReject() {

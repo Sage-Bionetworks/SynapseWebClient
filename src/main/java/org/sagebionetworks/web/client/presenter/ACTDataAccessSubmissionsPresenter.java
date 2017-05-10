@@ -12,10 +12,10 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmission;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionOrder;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionPage;
-import org.sagebionetworks.repo.model.dataaccess.DataAccessSubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.Submission;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -41,7 +41,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implements Presenter<ACTDataAccessSubmissionsPlace>, ACTDataAccessSubmissionsView.Presenter {
-	private DataAccessSubmissionState stateFilter;
+	private SubmissionState stateFilter;
 	private ACTDataAccessSubmissionsPlace place;
 	private ACTDataAccessSubmissionsView view;
 	private PortalGinInjector ginInjector;
@@ -86,10 +86,10 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		states = new ArrayList<String>();
-		for (DataAccessSubmissionState state : DataAccessSubmissionState.values()) {
+		for (SubmissionState state : SubmissionState.values()) {
 			states.add(state.toString());	
 		}
-		states.remove(DataAccessSubmissionState.NOT_SUBMITTED.toString());
+		states.remove(SubmissionState.NOT_SUBMITTED.toString());
 		view.setStates(states);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
@@ -154,7 +154,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ACTAccessRequirement) {
 						actAccessRequirement = (ACTAccessRequirement) requirement;
-						view.setHasRequestUIVisible(ACTAccessRequirementWidget.isAcceptDataAccessRequest(actAccessRequirement.getAcceptDataAccessRequest()));
+						view.setHasRequestUIVisible(ACTAccessRequirementWidget.isAcceptDataAccessRequest(actAccessRequirement.getAcceptRequest()));
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -193,16 +193,16 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public void loadMore() {
 		synAlert.clear();
 		// ask for data access submissions once call is available, and create a widget to render.
-		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, DataAccessSubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<DataAccessSubmissionPage>() {
+		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				loadMoreContainer.setIsMore(false);
 			}
 			
-			public void onSuccess(DataAccessSubmissionPage submissionPage) {
+			public void onSuccess(SubmissionPage submissionPage) {
 				nextPageToken = submissionPage.getNextPageToken();
-				for (DataAccessSubmission submission : submissionPage.getResults()) {
+				for (Submission submission : submissionPage.getResults()) {
 					// create a new row for each data access submission.
 					ACTDataAccessSubmissionWidget w = ginInjector.getACTDataAccessSubmissionWidget();
 					w.configure(submission); 
@@ -261,7 +261,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	@Override
 	public void onStateSelected(String selectedState) {
-		stateFilter = DataAccessSubmissionState.valueOf(selectedState);
+		stateFilter = SubmissionState.valueOf(selectedState);
 		place.putParam(STATE_FILTER_PARAM, selectedState);
 		view.setSelectedStateText(selectedState);
 		loadData();

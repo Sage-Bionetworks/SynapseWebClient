@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -45,7 +46,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
 	ACTRevokeUserAccessButton revokeUserAccessButton;
-	RequestRevokeUserAccessButton requestRevokeUserAccessButton;
 	JiraURLHelper jiraURLHelper;
 	PopupUtilsView popupUtils;
 	
@@ -64,7 +64,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
 			UserBadge submitterUserBadge,
-			RequestRevokeUserAccessButton requestRevokeUserAccessButton,
 			JiraURLHelper jiraURLHelper,
 			PopupUtilsView popupUtils) {
 		this.view = view;
@@ -81,10 +80,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
 		this.revokeUserAccessButton = revokeUserAccessButton;
-		this.requestRevokeUserAccessButton = requestRevokeUserAccessButton;
 		this.jiraURLHelper = jiraURLHelper;
 		this.popupUtils = popupUtils;
-		requestRevokeUserAccessButton.setSize(ButtonSize.SMALL);
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -92,7 +89,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setRevokeUserAccessWidget(revokeUserAccessButton);
-		view.setRequestRevokeUserAccessWidget(requestRevokeUserAccessButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
@@ -134,8 +130,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		return isAcceptDataAccessRequest != null && isAcceptDataAccessRequest;
 	}
 	
-	public void setDataAccessSubmissionStatus(ACTAccessRequirementStatus status) {
-		requestRevokeUserAccessButton.configure(ar, status.getState());
+	public void setDataAccessSubmissionStatus(SubmissionStatus status) {
 		submissionId = status.getSubmissionId();
 		view.resetState();
 		switch (status.getState()) {
@@ -153,11 +148,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				
 				break;
 			case APPROVED:
-				view.showApprovedHeading();
-				view.showRequestApprovedMessage();
-				if (isAcceptDataAccessRequest(ar.getAcceptDataAccessRequest())) {
-					view.showUpdateRequestButton();	
-				}
+				showApproved();
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();
@@ -172,6 +163,14 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		}
 	}
 	
+	public void showApproved() {
+		view.showApprovedHeading();
+		view.showRequestApprovedMessage();
+		if (isAcceptDataAccessRequest(ar.getAcceptRequest())) {
+			view.showUpdateRequestButton();	
+		}
+	}
+	
 	public void refreshApprovalState() {
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
@@ -180,7 +179,11 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			}
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				setDataAccessSubmissionStatus((ACTAccessRequirementStatus)status);
+				if (status.getIsApproved()) {
+					showApproved();
+				} else {
+					setDataAccessSubmissionStatus(((ACTAccessRequirementStatus)status).getCurrentSubmissionStatus());	
+				}
 			}
 		});
 	}
@@ -202,7 +205,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	@Override
 	public void onRequestAccess() {
-		if (ACTAccessRequirementWidget.isAcceptDataAccessRequest(ar.getAcceptDataAccessRequest())) {
+		if (ACTAccessRequirementWidget.isAcceptDataAccessRequest(ar.getAcceptRequest())) {
 			//pop up DataAccessRequest dialog
 			CreateDataAccessRequestWizard wizard = ginInjector.getCreateDataAccessRequestWizard();
 			view.setDataAccessRequestWizard(wizard);
