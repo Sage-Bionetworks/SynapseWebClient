@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.constants.Alignment;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
@@ -22,6 +24,8 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	Div loadingUI;
 	@UiField
 	Text loadingMessage;
+	@UiField
+	Heading plotTitle;
 	
 	Widget w;
 	Presenter presenter;
@@ -51,14 +55,13 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
+	public void showChart(String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), title, xTitle, yTitle, xyData, barMode);
+		_showChart(chartContainer.getElement(), xTitle, yTitle, xyData, barMode);
 	}
 	
-	private static native void _showChart(Element el, String graphTitle, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) /*-{
+	private static native void _showChart(Element el, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) /*-{
 		var layout = {
-		  title: graphTitle,
 		  xaxis: {
 		    title: xTitle,
 		  },
@@ -89,5 +92,9 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public boolean isAttached() {
 		return w.isAttached();
+	}
+	@Override
+	public void setTitle(String title) {
+		plotTitle.setText(title);
 	}
 }

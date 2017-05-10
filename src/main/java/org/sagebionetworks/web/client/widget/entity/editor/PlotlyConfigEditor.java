@@ -190,7 +190,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	
 	@Override
 	public void onFindTable() {
-		finder.configure(EntityFilter.TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
+		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
 			@Override
 			public void onSelected(Reference selected) {
 				view.setTableSynId(selected.getTargetId());
