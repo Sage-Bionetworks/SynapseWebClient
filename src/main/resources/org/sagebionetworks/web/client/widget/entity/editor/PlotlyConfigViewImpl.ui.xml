@@ -7,15 +7,19 @@
 		<b:FieldSet>
 			<b:FormGroup>
 				<b:FormLabel>Plot Type</b:FormLabel>
-				<b:ButtonGroup>
-					<b:ListBox ui:field="typeDropdownMenu"/>
-				</b:ButtonGroup>
+				<bh:Div>
+					<b:ButtonGroup>
+						<b:ListBox ui:field="typeDropdownMenu" width="150px"/>
+					</b:ButtonGroup>
+				</bh:Div>
 			</b:FormGroup>
 			<b:FormGroup ui:field="barChartModeUI">
 				<b:FormLabel>Bar Chart Mode</b:FormLabel>
-				<b:ButtonGroup>
-					<b:ListBox ui:field="barModeDropdownMenu"/>
-				</b:ButtonGroup>
+				<bh:Div>
+					<b:ButtonGroup>
+						<b:ListBox ui:field="barModeDropdownMenu" width="150px"/>
+					</b:ButtonGroup>
+				</bh:Div>
 			</b:FormGroup>
 			<b:FormGroup>
 				<b:FormLabel>Title</b:FormLabel>

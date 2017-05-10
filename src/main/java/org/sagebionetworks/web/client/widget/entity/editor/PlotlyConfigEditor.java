@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,9 +34,9 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private PlotlyConfigView view;
 	
 	private static final String QUERY_FIRST_COLUMN_REG_EX = "select[\\s]+(\\w+)[,]";
-	private static final RegExp X_COLUMN_PATTERN = RegExp.compile(QUERY_FIRST_COLUMN_REG_EX, "gi");
+	private static final RegExp X_COLUMN_PATTERN = RegExp.compile(QUERY_FIRST_COLUMN_REG_EX, "i");
 	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select[\\s]+(\\w+)[,]{1}(.+)from";
-	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "gi");
+	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "i");
 
 	EntityFinder finder;
 	List<String> yColumnsList = new ArrayList<>();
@@ -47,7 +52,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		view.add(finder);
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
-	}		
+	}
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		yColumnsList.clear();
@@ -57,10 +62,11 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			view.setTableSynId(QueryBundleUtils.getTableIdFromSql(sql));
 			view.setXAxisColumnName(getXColumnFromSql(sql));
 			String[] yColumns = getYColumnsFromSql(sql);
-			for (int i = 0; i < yColumns.length; i++) {
-				yColumnsList.add(yColumns[i]);
+			if (yColumns != null) {
+				for (int i = 0; i < yColumns.length; i++) {
+					yColumnsList.add(yColumns[i]);
+				}
 			}
-			
 		}
 		if (descriptor.containsKey(TITLE)) {
 			view.setTitle(descriptor.get(TITLE));

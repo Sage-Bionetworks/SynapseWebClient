@@ -8,6 +8,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -91,14 +93,23 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		});
 		
 		for (GraphType type : GraphType.values()) {
-			typeDropdownMenu.addItem(type.name());
+			typeDropdownMenu.addItem(type.name().toLowerCase(), type.name());
 		}
 		
 		for (BarMode mode : BarMode.values()) {
-			barModeDropdownMenu.addItem(mode.name());
+			barModeDropdownMenu.addItem(mode.name().toLowerCase(), mode.name());
 		}
+		
+		typeDropdownMenu.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				updateBarModeVisibility();
+			}
+		});
 	}
-	
+	private void updateBarModeVisibility() {
+		setBarModeVisible(GraphType.BAR.equals(getGraphType()));
+	}
 	
 	@Override
 	public Widget asWidget() {
@@ -150,8 +161,10 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 				typeDropdownMenu.setSelectedIndex(i);
 				break;
 			}
-		}	
+		}
+		updateBarModeVisibility();
 	}
+	
 	@Override
 	public String getXAxisLabel() {
 		return xAxisLabel.getValue();
