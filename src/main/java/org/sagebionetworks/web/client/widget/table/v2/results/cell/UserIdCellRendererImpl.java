@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -19,17 +20,25 @@ public class UserIdCellRendererImpl implements UserIdCellRenderer{
 	DivView view;
 	PortalGinInjector ginInjector;
 	UserGroupHeaderAsyncHandler userGroupHeaderAsyncHandler;
+	ClickHandler customClickHandler = null;
 	
 	@Inject
 	public UserIdCellRendererImpl(DivView view, UserGroupHeaderAsyncHandler userGroupHeaderAsyncHandler, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.userGroupHeaderAsyncHandler = userGroupHeaderAsyncHandler;
 		this.ginInjector = ginInjector;
+		view.addStyleName("displayInlineBlock");
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+
+	public void setValue(String value, ClickHandler customClickHandler) {
+		this.customClickHandler = customClickHandler;
+		setValue(value);
 	}
 	
 	@Override
@@ -43,10 +52,11 @@ public class UserIdCellRendererImpl implements UserIdCellRenderer{
 					if (result.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
 						badge.configure(principalId);
+						badge.setCustomClickHandler(customClickHandler);
 						view.add(badge);
 					} else {
 						TeamBadge badge = ginInjector.getTeamBadgeWidget();
-						badge.configure(principalId);
+						badge.configure(principalId, customClickHandler);
 						view.add(badge);
 					}
 				}

@@ -13,7 +13,8 @@ import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -88,9 +89,8 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	}
 	
 	public Widget getUserBadge(String userId) {
-		UserBadge userBadge = ginInjector.getUserBadgeWidget();
-		userBadge.configure(userId);
-		userBadge.setCustomClickHandler(doNothingClickHandler);
+		UserIdCellRendererImpl userBadge = ginInjector.getUserIdCellRenderer();
+		userBadge.setValue(userId, doNothingClickHandler);
 		return userBadge.asWidget();
 	}
 	

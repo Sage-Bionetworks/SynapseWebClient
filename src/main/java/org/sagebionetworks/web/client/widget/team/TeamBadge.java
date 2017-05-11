@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,6 +19,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	private Integer maxNameLength;
 	private AuthenticationController authController;
 	private String teamName;
+	private ClickHandler customClickHandler = null;
 	
 	@Inject
 	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
@@ -29,6 +31,10 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void setMaxNameLength(Integer maxLength) {
 		this.maxNameLength = maxLength;
+	}
+	public void configure(String teamId, ClickHandler customClickHandler) {
+		this.customClickHandler = customClickHandler;
+		configure(teamId);
 	}
 	
 	public void configure(final String teamId) {
@@ -53,7 +59,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public void configure(Team team) {
-		view.setTeam(team, maxNameLength, authController.getCurrentXsrfToken());
+		view.setTeam(team, maxNameLength, authController.getCurrentXsrfToken(), customClickHandler);
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -49,7 +50,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 	
 	@Override
-	public void setTeam(final Team team, Integer maxNameLength, String xsrfToken) {
+	public void setTeam(final Team team, Integer maxNameLength, String xsrfToken, ClickHandler customClickHandler) {
 		clear();
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
@@ -57,7 +58,11 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		if(team != null) {
 			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
 			anchor.setText(name);
-			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
+			if (customClickHandler == null) {
+				anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
+			} else {
+				anchor.addClickHandler(customClickHandler);
+			}
 			
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
@@ -137,7 +142,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
 		notificationsPanel.setWidget(DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP));
 	}
-
+	
 	@Override
 	public void setTarget(String target) {
 		anchor.setTarget(target);
