@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -8,15 +7,12 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -63,7 +59,6 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	ListBox xColumnNamesMenu;
 	@UiField
 	ListBox yColumnNamesMenu;
-	List<String> columnNames;
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
 	
@@ -95,6 +90,12 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 			@Override
 			public void onChange(ChangeEvent event) {
 				presenter.onAddYColumn(yColumnNamesMenu.getSelectedValue());
+			}
+		});
+		xColumnNamesMenu.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.onXColumnChanged();
 			}
 		});
 	}
@@ -238,29 +239,39 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	}
 	
 	@Override
-	public void setAvailableXColumns(List<String> names) {
+	public void setAvailableColumns(List<String> names) {
 		xColumnNamesMenu.clear();
-		this.columnNames = new ArrayList<>(names);
+		yColumnNamesMenu.clear();
+		yColumnNamesMenu.addItem(" ");
 		for (String name : names) {
 			xColumnNamesMenu.addItem(name);
+			yColumnNamesMenu.addItem(name);
 		}
 	}
 	
 	@Override
-	public void setAvailableYColumns(List<String> names) {
-		yColumnNamesMenu.clear();
-		yColumnNamesMenu.addItem(" ");
-		for (String name : names) {
-			yColumnNamesMenu.addItem(name);
-		}
-	}
-	@Override
 	public void resetSelectedYColumn() {
 		yColumnNamesMenu.setSelectedIndex(0);
 	}
+	
+	@Override
+	public String getXAxisColumnName() {
+		return xColumnNamesMenu.getSelectedValue();
+	}
 	@Override
 	public void setXAxisColumnName(String value) {
-		xColumnNamesMenu.setSelectedIndex(columnNames.indexOf(value));
+		boolean found = false;
+		for (int i = 0; i < xColumnNamesMenu.getItemCount(); i++) {
+			if (xColumnNamesMenu.getItemText(i).equals(value)) {
+				found = true;
+				xColumnNamesMenu.setSelectedIndex(i);
+				break;
+			}
+		}
+		if (!found) {
+			xColumnNamesMenu.addItem(value);
+			xColumnNamesMenu.setSelectedIndex(xColumnNamesMenu.getItemCount() - 1);
+		}
 	}
 
 	@Override
@@ -272,10 +283,6 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		barChartModeUI.setVisible(visible);
 	}
 	
-	@Override
-	public String getXAxisColumnName() {
-		return xColumnNamesMenu.getSelectedValue();
-	}
 	@Override
 	public void add(IsWidget w) {
 		extraWidgets.add(w);

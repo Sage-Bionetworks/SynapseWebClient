@@ -42,6 +42,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "i");
 
 	EntityFinder finder;
+	String xColumnName;
 	List<String> yColumnsList = new ArrayList<>();
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
@@ -157,7 +158,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	public String getSql() {
 		StringBuilder sql = new StringBuilder();
 		sql.append("select \'");
-		sql.append(view.getXAxisColumnName());
+		sql.append(xColumnName);
 		sql.append("\',");
 		for (Iterator iterator = yColumnsList.iterator(); iterator.hasNext();) {
 			String col = (String) iterator.next();
@@ -210,11 +211,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				for (ColumnModel cm : columnModels) {
 					allAvailableColumnNames.add(cm.getName());
 				}
-				view.setAvailableXColumns(allAvailableColumnNames);
-				String xColumnName = getXColumnFromSql(sql);
-				if (allAvailableColumnNames.contains(xColumnName)) {
-					view.setXAxisColumnName(xColumnName);	
-				}
+				xColumnName = getXColumnFromSql(sql);
 				yColumnsList.clear();
 				view.clearYAxisColumns();
 				String[] yColumns = getYColumnsFromSql(sql);
@@ -223,7 +220,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 						onAddYColumn(yColumns[i]);
 					}
 				}
-				refreshAvailableYColumnNames();
+				refreshAvailableColumnNames();
 			}
 			
 			@Override
@@ -233,10 +230,20 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		});
 	}
 	
-	public void refreshAvailableYColumnNames() {
+	public void refreshAvailableColumnNames() {
+		xColumnName = view.getXAxisColumnName();
+		if (allAvailableColumnNames.size() > 0) {
+			if (!DisplayUtils.isDefined(xColumnName) || !allAvailableColumnNames.contains(xColumnName)) {
+				xColumnName = allAvailableColumnNames.get(0);
+			}
+		}
+		
 		List<String> availableYColumnNames = new ArrayList<String>(allAvailableColumnNames);
 		availableYColumnNames.removeAll(yColumnsList);
-		view.setAvailableYColumns(availableYColumnNames);
+		availableYColumnNames.remove(xColumnName);
+		view.setAvailableColumns(availableYColumnNames);
+		view.resetSelectedYColumn();
+		view.setXAxisColumnName(xColumnName);
 	}
 	
 	@Override
@@ -259,7 +266,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			yColumnsList.add(yColumnName);
 			//add y column to view
 			view.addYAxisColumn(yColumnName);
-			refreshAvailableYColumnNames();
+			refreshAvailableColumnNames();
 			view.resetSelectedYColumn();
 		}
 	}
@@ -267,6 +274,11 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	@Override
 	public void onRemoveYColumn(String yColumnName) {
 		yColumnsList.remove(yColumnName);
-		refreshAvailableYColumnNames();
+		refreshAvailableColumnNames();
+	}
+	
+	@Override
+	public void onXColumnChanged() {
+		refreshAvailableColumnNames();
 	}
 }

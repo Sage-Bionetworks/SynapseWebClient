@@ -34,11 +34,11 @@ public interface PlotlyConfigView extends IsWidget {
 	void setBarModeVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void add(IsWidget w);
-	void setAvailableXColumns(List<String> names);
-	void setAvailableYColumns(List<String> names);
+	void setAvailableColumns(List<String> names);
 	void resetSelectedYColumn();
 	public interface Presenter {
 		void onFindTable();
+		void onXColumnChanged();
 		void onAddYColumn(String yColumnName);
 		void onRemoveYColumn(String yColumnName);
 	}
