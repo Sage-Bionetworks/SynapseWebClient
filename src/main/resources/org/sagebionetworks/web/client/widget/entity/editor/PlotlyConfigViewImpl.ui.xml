@@ -9,7 +9,7 @@
 				<b:FormLabel>Plot Type</b:FormLabel>
 				<bh:Div>
 					<b:ButtonGroup>
-						<b:ListBox ui:field="typeDropdownMenu" width="150px"/>
+						<b:ListBox ui:field="typeDropdownMenu" width="350px"/>
 					</b:ButtonGroup>
 				</bh:Div>
 			</b:FormGroup>
@@ -17,7 +17,7 @@
 				<b:FormLabel>Bar Chart Mode</b:FormLabel>
 				<bh:Div>
 					<b:ButtonGroup>
-						<b:ListBox ui:field="barModeDropdownMenu" width="150px"/>
+						<b:ListBox ui:field="barModeDropdownMenu" width="350px"/>
 					</b:ButtonGroup>
 				</bh:Div>
 			</b:FormGroup>
@@ -47,7 +47,7 @@
 				<b:InputGroup>
 				<bh:Div>
 					<b:ButtonGroup>
-						<b:ListBox ui:field="xColumnNamesMenu" width="150px"/>
+						<b:ListBox ui:field="xColumnNamesMenu" width="350px"/>
 					</b:ButtonGroup>
 				</bh:Div>
 
@@ -59,10 +59,7 @@
 					<bh:Div ui:field="yAxisColumnsContainer"/>
 					<bh:Div>
 						<b:ButtonGroup>
-							<b:ListBox ui:field="yColumnNamesMenu" width="150px"/>
-							<b:InputGroupButton>
-									<b:Button ui:field="addYAxisButton" icon="PLUS" />
-							</b:InputGroupButton>
+							<b:ListBox ui:field="yColumnNamesMenu" width="350px"/>
 						</b:ButtonGroup>
 					</bh:Div>
 				</b:InputGroup>

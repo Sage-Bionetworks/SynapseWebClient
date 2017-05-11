@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -45,8 +46,6 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	@UiField
 	Button entityPickerButton;
 	@UiField
-	Button addYAxisButton;
-	@UiField
 	TextBox whereClause;
 	@UiField
 	TextBox groupByClause;
@@ -78,13 +77,6 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 			}
 		});
 		
-		addYAxisButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddYColumn(yColumnNamesMenu.getSelectedValue());
-			}
-		});
-		
 		for (GraphType type : GraphType.values()) {
 			typeDropdownMenu.addItem(type.name().toLowerCase(), type.name());
 		}
@@ -97,6 +89,12 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 			@Override
 			public void onChange(ChangeEvent event) {
 				updateBarModeVisibility();
+			}
+		});
+		yColumnNamesMenu.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.onAddYColumn(yColumnNamesMenu.getSelectedValue());
 			}
 		});
 	}
@@ -240,12 +238,25 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	}
 	
 	@Override
-	public void setColumnNames(List<String> names) {
-		this.columnNames = names;
+	public void setAvailableXColumns(List<String> names) {
+		xColumnNamesMenu.clear();
+		this.columnNames = new ArrayList<>(names);
 		for (String name : names) {
 			xColumnNamesMenu.addItem(name);
+		}
+	}
+	
+	@Override
+	public void setAvailableYColumns(List<String> names) {
+		yColumnNamesMenu.clear();
+		yColumnNamesMenu.addItem(" ");
+		for (String name : names) {
 			yColumnNamesMenu.addItem(name);
 		}
+	}
+	@Override
+	public void resetSelectedYColumn() {
+		yColumnNamesMenu.setSelectedIndex(0);
 	}
 	@Override
 	public void setXAxisColumnName(String value) {

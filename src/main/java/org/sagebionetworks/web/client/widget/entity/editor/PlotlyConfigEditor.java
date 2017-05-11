@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -37,9 +36,9 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private Map<String, String> descriptor;
 	private PlotlyConfigView view;
 	
-	private static final String QUERY_FIRST_COLUMN_REG_EX = "select[\\s]+[']?(\\w+)[']?[,]";
+	private static final String QUERY_FIRST_COLUMN_REG_EX = "select\\s+[']?([a-zA-Z0-9_ ]+)[']?[,]{1}";
 	private static final RegExp X_COLUMN_PATTERN = RegExp.compile(QUERY_FIRST_COLUMN_REG_EX, "i");
-	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select[\\s]+[']?(\\w+)[']?[,]{1}(.+)from";
+	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select\\s+[']?([a-zA-Z0-9_ ]+)[']?[,]{1}(.+)from";
 	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "i");
 
 	EntityFinder finder;
@@ -47,6 +46,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
 	String sql;
+	List<String> allAvailableColumnNames;
 	@Inject
 	public PlotlyConfigEditor(PlotlyConfigView view, 
 			EntityFinder finder,
@@ -67,12 +67,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		if (descriptor.containsKey(TABLE_QUERY_KEY)) {
 			sql = descriptor.get(TABLE_QUERY_KEY);
 			setTableId(QueryBundleUtils.getTableIdFromSql(sql));
-			String[] yColumns = getYColumnsFromSql(sql);
-			if (yColumns != null) {
-				for (int i = 0; i < yColumns.length; i++) {
-					onAddYColumn(yColumns[i]);
-				}
-			}
 		}
 		if (descriptor.containsKey(TITLE)) {
 			view.setTitle(descriptor.get(TITLE));
@@ -210,19 +204,26 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		view.setTableSynId(synId);
 		// get the columns
 		synapseClient.getColumnModelsForTableEntity(synId, new AsyncCallback<List<ColumnModel>>() {
-			
 			@Override
 			public void onSuccess(List<ColumnModel> columnModels) {
-				GWT.debugger();
-				List<String> columnNames = new ArrayList<String>();
+				allAvailableColumnNames = new ArrayList<String>();
 				for (ColumnModel cm : columnModels) {
-					columnNames.add(cm.getName());
+					allAvailableColumnNames.add(cm.getName());
 				}
-				view.setColumnNames(columnNames);
+				view.setAvailableXColumns(allAvailableColumnNames);
 				String xColumnName = getXColumnFromSql(sql);
-				if (columnNames.contains(xColumnName)) {
+				if (allAvailableColumnNames.contains(xColumnName)) {
 					view.setXAxisColumnName(xColumnName);	
 				}
+				yColumnsList.clear();
+				view.clearYAxisColumns();
+				String[] yColumns = getYColumnsFromSql(sql);
+				if (yColumns != null) {
+					for (int i = 0; i < yColumns.length; i++) {
+						onAddYColumn(yColumns[i]);
+					}
+				}
+				refreshAvailableYColumnNames();
 			}
 			
 			@Override
@@ -230,6 +231,12 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	public void refreshAvailableYColumnNames() {
+		List<String> availableYColumnNames = new ArrayList<String>(allAvailableColumnNames);
+		availableYColumnNames.removeAll(yColumnsList);
+		view.setAvailableYColumns(availableYColumnNames);
 	}
 	
 	@Override
@@ -247,16 +254,19 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	@Override
 	public void onAddYColumn(String yColumnName) {
 		yColumnName = unquote(yColumnName);
-		if (DisplayUtils.isDefined(yColumnName)) {
+		if (DisplayUtils.isDefined(yColumnName) && allAvailableColumnNames.contains(yColumnName)) {
 			// add to list
 			yColumnsList.add(yColumnName);
 			//add y column to view
 			view.addYAxisColumn(yColumnName);
+			refreshAvailableYColumnNames();
+			view.resetSelectedYColumn();
 		}
 	}
 	
 	@Override
 	public void onRemoveYColumn(String yColumnName) {
 		yColumnsList.remove(yColumnName);
+		refreshAvailableYColumnNames();
 	}
 }

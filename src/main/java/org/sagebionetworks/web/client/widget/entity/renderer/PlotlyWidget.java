@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -134,7 +136,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 					initializeGraphData(result);
 				}
 				List<Row> rows = result.getQueryResult().getQueryResults().getRows();
-				addRowData(result.getColumnModels(), rows);
+				addRowData(result.getSelectColumns(), rows);
 				currentOffset += LIMIT;
 				if (rows.size() > 0 && currentOffset < result.getQueryCount()) {
 					//get more results
@@ -154,15 +156,16 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	
 	public void initializeGraphData(QueryResultBundle result) {
 		graphData = new HashMap<String, List<String>>();
-		xAxisColumnName = result.getColumnModels().get(0).getName();
-		for (ColumnModel column : result.getColumnModels()) {
+		
+		xAxisColumnName = result.getSelectColumns().get(0).getName();
+		for (SelectColumn column : result.getSelectColumns()) {
 			graphData.put(column.getName(), new ArrayList<String>());
 		}
 	}
 	
-	public void addRowData(List<ColumnModel> columns, List<Row> rows) {
+	public void addRowData(List<SelectColumn> columns, List<Row> rows) {
 		for (int i = 0; i < columns.size(); i++) {
-			ColumnModel column = columns.get(i);
+			SelectColumn column = columns.get(i);
 			List<String> colData = graphData.get(column.getName());
 			for (Row row : rows) {
 				colData.add(row.getValues().get(i));
