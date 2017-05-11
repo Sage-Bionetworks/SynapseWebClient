@@ -18,10 +18,8 @@ public interface PlotlyConfigView extends IsWidget {
 	void setXAxisLabel(String label);
 	String getYAxisLabel();
 	void setYAxisLabel(String label);
-	String getWhereClause();
-	void setWhereClause(String v);
-	String getGroupByClause();
-	void setGroupByClause(String v);
+	String getAdvancedClause();
+	void setAdvancedClause(String v);
 	void setBarMode(BarMode barMode);
 	BarMode getBarMode();
 	void clearYAxisColumns();
@@ -30,12 +28,14 @@ public interface PlotlyConfigView extends IsWidget {
 	String getTableSynId();
 	void setXAxisColumnName(String value);
 	String getXAxisColumnName();
-	void setAdvancedUIVisible(boolean visible);
 	void setBarModeVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void add(IsWidget w);
 	void setAvailableColumns(List<String> names);
 	void resetSelectedYColumn();
+	void setShowHideButton(IsWidget w);
+	void setAdvancedUIVisible(boolean visible);
+	
 	public interface Presenter {
 		void onFindTable();
 		void onXColumnChanged();

@@ -12,12 +12,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
+import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -26,6 +29,8 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,11 +41,11 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private Map<String, String> descriptor;
 	private PlotlyConfigView view;
 	
-	private static final String QUERY_FIRST_COLUMN_REG_EX = "select\\s+[']?([a-zA-Z0-9_ ]+)[']?[,]{1}";
+	private static final String QUERY_FIRST_COLUMN_REG_EX = "select\\s+[\"']?([a-zA-Z0-9_ ]+)[\"']?[,]{1}";
 	private static final RegExp X_COLUMN_PATTERN = RegExp.compile(QUERY_FIRST_COLUMN_REG_EX, "i");
-	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select\\s+[']?([a-zA-Z0-9_ ]+)[']?[,]{1}(.+)from";
+	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select\\s+[\"']?([a-zA-Z0-9_ ]+)[\"']?[,]{1}(.+)from";
 	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "i");
-
+	
 	EntityFinder finder;
 	String xColumnName;
 	List<String> yColumnsList = new ArrayList<>();
@@ -48,11 +53,15 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	SynapseClientAsync synapseClient;
 	String sql;
 	List<String> allAvailableColumnNames;
+	boolean isAdvancedVisible;
+	public static final String SHOW = "Show Advanced";
+	public static final String HIDE = "Hide Advanced";
 	@Inject
-	public PlotlyConfigEditor(PlotlyConfigView view, 
+	public PlotlyConfigEditor(final PlotlyConfigView view, 
 			EntityFinder finder,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			final Button showHideAdvancedButton) {
 		this.view = view;
 		this.finder = finder;
 		this.synAlert = synAlert;
@@ -60,6 +69,23 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		view.add(finder);
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
+		view.setShowHideButton(showHideAdvancedButton);
+		
+		isAdvancedVisible = false;
+		showHideAdvancedButton.setSize(ButtonSize.EXTRA_SMALL);
+		showHideAdvancedButton.setText(SHOW);
+		showHideAdvancedButton.setIcon(IconType.TOGGLE_RIGHT);
+		view.setAdvancedUIVisible(false);
+		showHideAdvancedButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				isAdvancedVisible = !isAdvancedVisible;
+				String buttonText = isAdvancedVisible ? HIDE : SHOW;
+				showHideAdvancedButton.setText(buttonText);
+				showHideAdvancedButton.setIcon(isAdvancedVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
+				view.setAdvancedUIVisible(isAdvancedVisible);
+			}
+		});
 	}
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
@@ -68,6 +94,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		if (descriptor.containsKey(TABLE_QUERY_KEY)) {
 			sql = descriptor.get(TABLE_QUERY_KEY);
 			setTableId(QueryBundleUtils.getTableIdFromSql(sql));
+			view.setAdvancedClause(getAdvancedClauseFromQuery(sql));
 		}
 		if (descriptor.containsKey(TITLE)) {
 			view.setTitle(descriptor.get(TITLE));
@@ -110,6 +137,22 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		return null;
 	}
 	
+	public static String getAdvancedClauseFromQuery(String query) {
+		if(query == null){
+			return null;
+		}
+		String lowercaseQuery = query.toLowerCase();
+		int whereIndex = lowercaseQuery.indexOf("where");
+		if (whereIndex > -1) {
+			return query.substring(whereIndex);
+		} 
+		int groupByIndex = lowercaseQuery.indexOf("group by");
+		if (groupByIndex > -1) {
+			return query.substring(groupByIndex);	
+		}
+		return "";
+	}
+	
 	/**
 	 * Get the y columns from a query string
 	 * @param query
@@ -129,7 +172,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	}
 	
 	public static String unquote(String s) {
-		return s.replace('\'', ' ').trim();
+		return s.replace('\'', ' ').replace('\"', ' ').trim();
 	}
 	
 	public void clearState() {
@@ -157,30 +200,24 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	
 	public String getSql() {
 		StringBuilder sql = new StringBuilder();
-		sql.append("select \'");
+		sql.append("select \"");
 		sql.append(xColumnName);
-		sql.append("\',");
+		sql.append("\",");
 		for (Iterator iterator = yColumnsList.iterator(); iterator.hasNext();) {
 			String col = (String) iterator.next();
-			sql.append("\'");
+			sql.append("\"");
 			sql.append(col);
-			sql.append("\'");
+			sql.append("\"");
 			if (iterator.hasNext()) {
 				sql.append(",");
 			}
 		}
 		sql.append(" from ");
 		sql.append(view.getTableSynId());
-		String whereClause = view.getWhereClause();
-		if (DisplayUtils.isDefined(whereClause)) {
-			sql.append(" where ");
-			sql.append(whereClause);
-		}
-		
-		String groupByClause = view.getGroupByClause();
-		if (DisplayUtils.isDefined(groupByClause)) {
-			sql.append(" group by ");
-			sql.append(groupByClause);
+		String advancedClause = view.getAdvancedClause();
+		if (DisplayUtils.isDefined(advancedClause)) {
+			sql.append(" ");
+			sql.append(advancedClause);
 		}
 		
 		return sql.toString();

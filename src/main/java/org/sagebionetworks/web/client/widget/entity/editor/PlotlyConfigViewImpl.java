@@ -42,9 +42,7 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	@UiField
 	Button entityPickerButton;
 	@UiField
-	TextBox whereClause;
-	@UiField
-	TextBox groupByClause;
+	TextBox advancedClause;
 	@UiField
 	Div showHideAdvancedButtonContainer;
 	@UiField
@@ -182,26 +180,14 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 
 
 	@Override
-	public String getWhereClause() {
-		return whereClause.getValue();
+	public String getAdvancedClause() {
+		return advancedClause.getValue();
 	}
 
 
 	@Override
-	public void setWhereClause(String v) {
-		whereClause.setValue(v);
-	}
-
-
-	@Override
-	public String getGroupByClause() {
-		return groupByClause.getValue();
-	}
-
-
-	@Override
-	public void setGroupByClause(String v) {
-		groupByClause.setValue(v);
+	public void setAdvancedClause(String v) {
+		advancedClause.setValue(v);
 	}
 
 	@Override
@@ -291,5 +277,10 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	@Override
+	public void setShowHideButton(IsWidget w) {
+		showHideAdvancedButtonContainer.clear();
+		showHideAdvancedButtonContainer.add(w);
 	}
 }

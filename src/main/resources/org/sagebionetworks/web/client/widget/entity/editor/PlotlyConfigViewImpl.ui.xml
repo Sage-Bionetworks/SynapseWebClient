@@ -36,7 +36,7 @@
 			<b:FormGroup>
 				<b:FormLabel>Table/View</b:FormLabel>
 				<b:InputGroup>
-					<b:TextBox placeholder="syn123" autoComplete="false" ui:field="tableViewSynId" />
+					<b:TextBox placeholder="syn123" autoComplete="false" ui:field="tableViewSynId" enabled="false"/>
 					<b:InputGroupButton>
 						<b:Button ui:field="entityPickerButton" icon="SEARCH" text="" height="30px"/>
 					</b:InputGroupButton>
@@ -67,12 +67,8 @@
 			<bh:Div ui:field="showHideAdvancedButtonContainer" />
 			<bh:Div ui:field="advancedUI" visible="false">
 				<b:FormGroup>
-					<b:FormLabel>Where Clause</b:FormLabel>
-					<b:TextBox placeholder="x>2" ui:field="whereClause" />
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel>Group By Clause</b:FormLabel>
-					<b:TextBox ui:field="groupByClause" />
+					<b:FormLabel>WHERE/GROUP BY clause</b:FormLabel>
+					<b:TextBox placeholder="where x>2 group by y" ui:field="advancedClause" />
 				</b:FormGroup>
 			</bh:Div>
 		</b:FieldSet>
