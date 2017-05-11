@@ -78,11 +78,11 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		});
 		
 		for (GraphType type : GraphType.values()) {
-			typeDropdownMenu.addItem(type.name().toLowerCase(), type.name());
+			typeDropdownMenu.addItem(type.getDisplayName(), type.name());
 		}
 		
 		for (BarMode mode : BarMode.values()) {
-			barModeDropdownMenu.addItem(mode.name().toLowerCase(), mode.name());
+			barModeDropdownMenu.addItem(mode.getDisplayName(), mode.name());
 		}
 		
 		typeDropdownMenu.addChangeHandler(new ChangeHandler() {
