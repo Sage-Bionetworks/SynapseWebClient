@@ -1,6 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +14,6 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -27,7 +32,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
