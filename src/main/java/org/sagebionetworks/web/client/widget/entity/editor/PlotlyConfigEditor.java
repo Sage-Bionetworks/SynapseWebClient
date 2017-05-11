@@ -33,9 +33,9 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private Map<String, String> descriptor;
 	private PlotlyConfigView view;
 	
-	private static final String QUERY_FIRST_COLUMN_REG_EX = "select[\\s]+(\\w+)[,]";
+	private static final String QUERY_FIRST_COLUMN_REG_EX = "select[\\s]+[']?(\\w+)[']?[,]";
 	private static final RegExp X_COLUMN_PATTERN = RegExp.compile(QUERY_FIRST_COLUMN_REG_EX, "i");
-	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select[\\s]+(\\w+)[,]{1}(.+)from";
+	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select[\\s]+[']?(\\w+)[']?[,]{1}(.+)from";
 	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "i");
 
 	EntityFinder finder;
@@ -103,7 +103,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		MatchResult matcher = X_COLUMN_PATTERN.exec(query);
 		if(matcher != null){
 			if (matcher.getGroupCount() > 0) {
-				return matcher.getGroup(1);
+				return unquote(matcher.getGroup(1));
 			}
 		}
 		return null;
@@ -126,7 +126,10 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		}
 		return null;
 	}
-
+	
+	public static String unquote(String s) {
+		return s.replace('\'', ' ').trim();
+	}
 	
 	public void clearState() {
 	}
@@ -153,12 +156,14 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	
 	public String getSql() {
 		StringBuilder sql = new StringBuilder();
-		sql.append("select ");
+		sql.append("select \'");
 		sql.append(view.getXAxisColumnName());
-		sql.append(",");
+		sql.append("\',");
 		for (Iterator iterator = yColumnsList.iterator(); iterator.hasNext();) {
 			String col = (String) iterator.next();
+			sql.append("\'");
 			sql.append(col);
+			sql.append("\'");
 			if (iterator.hasNext()) {
 				sql.append(",");
 			}
@@ -200,18 +205,23 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			@Override
 			public void onSelected(Reference selected) {
 				view.setTableSynId(selected.getTargetId());
+				finder.hide();
 			}
 		});
 		finder.show();
 	}
+	
 	@Override
 	public void onAddYColumn(String yColumnName) {
-		// clear y axis column name
-		view.setYAxisColumnName("");
-		// add to list
-		yColumnsList.add(yColumnName);
-		//TODO: create and add y column widget to view
-		view.addYAxisColumn(yColumnName);
+		yColumnName = unquote(yColumnName);
+		if (DisplayUtils.isDefined(yColumnName)) {
+			// clear y axis column name
+			view.setYAxisColumnName("");
+			// add to list
+			yColumnsList.add(yColumnName);
+			//TODO: create and add y column widget to view
+			view.addYAxisColumn(yColumnName);
+		}
 	}
 	
 	@Override
