@@ -11,6 +11,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.view.DivView;
+import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -18,12 +21,18 @@ public class UserIdCellRendererImplTest {
 	
 	@Mock
 	UserBadge mockUserBadge;
+	@Mock
+	DivView mockView;
+	@Mock
+	UserGroupHeaderAsyncHandler mockUserGroupHeaderAsyncHandler;
+	@Mock
+	PortalGinInjector mockGinInjector;
 	UserIdCellRendererImpl renderer;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		renderer = new UserIdCellRendererImpl(mockUserBadge);
+		renderer = new UserIdCellRendererImpl(mockView, mockUserGroupHeaderAsyncHandler, mockGinInjector);
 	}
 	
 	@Test
