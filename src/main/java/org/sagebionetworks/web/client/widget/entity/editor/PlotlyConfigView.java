@@ -23,7 +23,7 @@ public interface PlotlyConfigView extends IsWidget {
 	void setBarMode(BarMode barMode);
 	BarMode getBarMode();
 	void clearYAxisColumns();
-	void addYAxisColumn(IsWidget w);
+	void addYAxisColumn(String yColumnName);
 	void setTableSynId(String value);
 	String getTableSynId();
 	void setXAxisColumnName(String value);
@@ -38,5 +38,6 @@ public interface PlotlyConfigView extends IsWidget {
 		void onFindXColumn();
 		void onFindYColumn();
 		void onAddYColumn(String yColumnName);
+		void onRemoveYColumn(String yColumnName);
 	}
 }

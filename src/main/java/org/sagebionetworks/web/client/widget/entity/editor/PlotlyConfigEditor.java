@@ -64,7 +64,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			String[] yColumns = getYColumnsFromSql(sql);
 			if (yColumns != null) {
 				for (int i = 0; i < yColumns.length; i++) {
-					yColumnsList.add(yColumns[i]);
+					onAddYColumn(yColumns[i]);
 				}
 			}
 		}
@@ -211,8 +211,14 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		// add to list
 		yColumnsList.add(yColumnName);
 		//TODO: create and add y column widget to view
-//		view.addYAxisColumn(w);
+		view.addYAxisColumn(yColumnName);
 	}
+	
+	@Override
+	public void onRemoveYColumn(String yColumnName) {
+		yColumnsList.remove(yColumnName);
+	}
+	
 	@Override
 	public void onFindXColumn() {
 		//TODO: show column selector for selected table id (or error if not yet filled in).

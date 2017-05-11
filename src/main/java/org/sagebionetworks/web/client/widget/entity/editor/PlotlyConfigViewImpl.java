@@ -2,12 +2,18 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -219,10 +225,23 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 
 
 	@Override
-	public void addYAxisColumn(IsWidget w) {
-		yAxisColumnsContainer.add(w);
+	public void addYAxisColumn(final String yColumnName) {
+		final Div yColumnContainer = new Div();
+		yColumnContainer.addStyleName("margin-bottom-5");
+		yColumnContainer.add(new Text(yColumnName));
+		Icon deleteButton = new Icon(IconType.TIMES);
+		deleteButton.addStyleName("imageButton text-danger margin-left-5");
+		yColumnContainer.add(deleteButton);
+		deleteButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onRemoveYColumn(yColumnName);
+				yAxisColumnsContainer.remove(yColumnContainer);
+			}
+		});
+		yAxisColumnsContainer.add(yColumnContainer);
 	}
-
+	
 	@Override
 	public void setTableSynId(String value) {
 		tableViewSynId.setValue(value);
