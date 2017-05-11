@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -39,19 +41,11 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	@UiField
 	TextBox tableViewSynId;
 	@UiField
-	TextBox xAxisColumnName;
-	@UiField
 	Div yAxisColumnsContainer;
 	@UiField
 	Button entityPickerButton;
 	@UiField
-	Button xAxisButton;
-	@UiField
 	Button addYAxisButton;
-	@UiField
-	Button findYAxisButton;
-	@UiField
-	TextBox yAxisColumnName;
 	@UiField
 	TextBox whereClause;
 	@UiField
@@ -66,7 +60,11 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	Div synAlertContainer;
 	@UiField
 	Div extraWidgets;
-	
+	@UiField
+	ListBox xColumnNamesMenu;
+	@UiField
+	ListBox yColumnNamesMenu;
+	List<String> columnNames;
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
 	
@@ -79,22 +77,11 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 				presenter.onFindTable();
 			}
 		});
-		xAxisButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFindXColumn();
-			}
-		});
+		
 		addYAxisButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onAddYColumn(yAxisColumnName.getValue());
-			}
-		});
-		findYAxisButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFindYColumn();
+				presenter.onAddYColumn(yColumnNamesMenu.getSelectedValue());
 			}
 		});
 		
@@ -253,13 +240,16 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	}
 	
 	@Override
-	public void setXAxisColumnName(String value) {
-		xAxisColumnName.setValue(value);
+	public void setColumnNames(List<String> names) {
+		this.columnNames = names;
+		for (String name : names) {
+			xColumnNamesMenu.addItem(name);
+			yColumnNamesMenu.addItem(name);
+		}
 	}
-
 	@Override
-	public void setYAxisColumnName(String value) {
-		yAxisColumnName.setValue(value);
+	public void setXAxisColumnName(String value) {
+		xColumnNamesMenu.setSelectedIndex(columnNames.indexOf(value));
 	}
 
 	@Override
@@ -273,7 +263,7 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	
 	@Override
 	public String getXAxisColumnName() {
-		return xAxisColumnName.getValue();
+		return xColumnNamesMenu.getSelectedValue();
 	}
 	@Override
 	public void add(IsWidget w) {

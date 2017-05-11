@@ -45,21 +45,26 @@
 			<b:FormGroup>
 				<b:FormLabel>Select X Axis Column</b:FormLabel>
 				<b:InputGroup>
-					<b:TextBox placeholder="x" autoComplete="false" ui:field="xAxisColumnName" />
-					<b:InputGroupButton>
-						<b:Button ui:field="xAxisButton" text="Find Column" height="30px"/>
-					</b:InputGroupButton>
+				<bh:Div>
+					<b:ButtonGroup>
+						<b:ListBox ui:field="xColumnNamesMenu" width="150px"/>
+					</b:ButtonGroup>
+				</bh:Div>
+
 				</b:InputGroup>
 			</b:FormGroup>
 			<b:FormGroup>
 				<b:FormLabel>Select Y Axis Column(s)</b:FormLabel>
 				<b:InputGroup>
 					<bh:Div ui:field="yAxisColumnsContainer"/>
-					<b:TextBox placeholder="y1" autoComplete="false" ui:field="yAxisColumnName" />
-					<b:InputGroupButton>
-						<b:Button ui:field="addYAxisButton" icon="PLUS" />
-					</b:InputGroupButton>
-					<b:Button ui:field="findYAxisButton" text="Find Column" height="30px"/>
+					<bh:Div>
+						<b:ButtonGroup>
+							<b:ListBox ui:field="yColumnNamesMenu" width="150px"/>
+							<b:InputGroupButton>
+									<b:Button ui:field="addYAxisButton" icon="PLUS" />
+							</b:InputGroupButton>
+						</b:ButtonGroup>
+					</bh:Div>
 				</b:InputGroup>
 			</b:FormGroup>
 			<bh:Div ui:field="showHideAdvancedButtonContainer" />

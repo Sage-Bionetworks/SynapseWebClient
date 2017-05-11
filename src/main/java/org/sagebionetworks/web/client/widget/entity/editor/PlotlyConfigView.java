@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
+
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 
@@ -28,15 +30,13 @@ public interface PlotlyConfigView extends IsWidget {
 	String getTableSynId();
 	void setXAxisColumnName(String value);
 	String getXAxisColumnName();
-	void setYAxisColumnName(String value);
 	void setAdvancedUIVisible(boolean visible);
 	void setBarModeVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void add(IsWidget w);
+	void setColumnNames(List<String> names);
 	public interface Presenter {
 		void onFindTable();
-		void onFindXColumn();
-		void onFindYColumn();
 		void onAddYColumn(String yColumnName);
 		void onRemoveYColumn(String yColumnName);
 	}

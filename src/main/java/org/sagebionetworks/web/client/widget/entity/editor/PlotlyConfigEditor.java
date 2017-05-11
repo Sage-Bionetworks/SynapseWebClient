@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -24,8 +26,10 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -41,14 +45,17 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	EntityFinder finder;
 	List<String> yColumnsList = new ArrayList<>();
 	SynapseAlert synAlert;
-	
+	SynapseClientAsync synapseClient;
+	String sql;
 	@Inject
 	public PlotlyConfigEditor(PlotlyConfigView view, 
 			EntityFinder finder,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.finder = finder;
 		this.synAlert = synAlert;
+		this.synapseClient = synapseClient;
 		view.add(finder);
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
@@ -58,9 +65,8 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		yColumnsList.clear();
 		descriptor = widgetDescriptor;
 		if (descriptor.containsKey(TABLE_QUERY_KEY)) {
-			String sql = descriptor.get(TABLE_QUERY_KEY);
-			view.setTableSynId(QueryBundleUtils.getTableIdFromSql(sql));
-			view.setXAxisColumnName(getXColumnFromSql(sql));
+			sql = descriptor.get(TABLE_QUERY_KEY);
+			setTableId(QueryBundleUtils.getTableIdFromSql(sql));
 			String[] yColumns = getYColumnsFromSql(sql);
 			if (yColumns != null) {
 				for (int i = 0; i < yColumns.length; i++) {
@@ -199,12 +205,39 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		return null;
 	}
 	
+	public void setTableId(String synId) {
+		synAlert.clear();
+		view.setTableSynId(synId);
+		// get the columns
+		synapseClient.getColumnModelsForTableEntity(synId, new AsyncCallback<List<ColumnModel>>() {
+			
+			@Override
+			public void onSuccess(List<ColumnModel> columnModels) {
+				GWT.debugger();
+				List<String> columnNames = new ArrayList<String>();
+				for (ColumnModel cm : columnModels) {
+					columnNames.add(cm.getName());
+				}
+				view.setColumnNames(columnNames);
+				String xColumnName = getXColumnFromSql(sql);
+				if (columnNames.contains(xColumnName)) {
+					view.setXAxisColumnName(xColumnName);	
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
+	
 	@Override
 	public void onFindTable() {
 		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
 			@Override
 			public void onSelected(Reference selected) {
-				view.setTableSynId(selected.getTargetId());
+				setTableId(selected.getTargetId());
 				finder.hide();
 			}
 		});
@@ -215,11 +248,9 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	public void onAddYColumn(String yColumnName) {
 		yColumnName = unquote(yColumnName);
 		if (DisplayUtils.isDefined(yColumnName)) {
-			// clear y axis column name
-			view.setYAxisColumnName("");
 			// add to list
 			yColumnsList.add(yColumnName);
-			//TODO: create and add y column widget to view
+			//add y column to view
 			view.addYAxisColumn(yColumnName);
 		}
 	}
@@ -228,14 +259,4 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	public void onRemoveYColumn(String yColumnName) {
 		yColumnsList.remove(yColumnName);
 	}
-	
-	@Override
-	public void onFindXColumn() {
-		//TODO: show column selector for selected table id (or error if not yet filled in).
-	}
-	@Override
-	public void onFindYColumn() {
-		//TODO: show column selector for selected table id (or error if not yet filled in).
-	}
-	
 }
