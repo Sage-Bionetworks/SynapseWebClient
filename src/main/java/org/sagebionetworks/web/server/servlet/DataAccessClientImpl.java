@@ -5,7 +5,9 @@ import java.util.List;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.RestrictionInformation;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationRequest;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
 import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
@@ -126,10 +128,13 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	
 
 	@Override
-	public RestrictionInformation getRestrictionInformation(String entityId) throws RestServiceException {
+	public RestrictionInformationResponse getRestrictionInformation(String subjectId, RestrictableObjectType type) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getRestrictionInformation(entityId);
+			RestrictionInformationRequest request = new RestrictionInformationRequest();
+			request.setObjectId(subjectId);
+			request.setRestrictableObjectType(type);
+			return synapseClient.getRestrictionInformation(request);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
