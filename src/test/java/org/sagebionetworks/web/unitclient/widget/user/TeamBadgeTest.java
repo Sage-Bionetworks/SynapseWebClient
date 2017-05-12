@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -37,6 +38,9 @@ public class TeamBadgeTest {
 	int max = 10;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	ClickHandler mockClickHandler;
+	
 	String xsrfToken = "98208";
 	@Before
 	public void before() {
@@ -53,7 +57,16 @@ public class TeamBadgeTest {
 	@Test
 	public void testConfigure(){
 		badge.configure(team);		
-		verify(mockView).setTeam(team, null, xsrfToken);
+		verify(mockView).setTeam(team, null, xsrfToken, null);
+	}
+	
+
+	@Test
+	public void testConfigureAsyncCustomClickHandler() throws Exception {
+		AsyncMockStubber.callSuccessWith(team).when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));
+		badge.setMaxNameLength(max);
+		badge.configure(principalId, mockClickHandler);
+		verify(mockView).setTeam(team, max, xsrfToken, mockClickHandler);
 	}
 	
 	@Test
@@ -61,7 +74,7 @@ public class TeamBadgeTest {
 		AsyncMockStubber.callSuccessWith(team).when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(team);
-		verify(mockView).setTeam(team, max, xsrfToken);
+		verify(mockView).setTeam(team, max, xsrfToken, null);
 	}
 	
 	@Test
@@ -75,19 +88,19 @@ public class TeamBadgeTest {
 	public void testSetNameLength() {
 		badge.setMaxNameLength(max);
 		badge.configure(team);		
-		verify(mockView).setTeam(team, max, xsrfToken);		
+		verify(mockView).setTeam(team, max, xsrfToken, null);		
 	}
 	
 	@Test
 	public void testConfigureNullPrincipalId() throws Exception {
 		badge.configure((String)null);
-		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString());
+		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString(), any(ClickHandler.class));
 	}
 	
 	@Test
 	public void testConfigureEmptyPrincipalId() throws Exception {
 		badge.configure("");
-		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString());
+		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString(), any(ClickHandler.class));
 	}
 	
 	@Test
