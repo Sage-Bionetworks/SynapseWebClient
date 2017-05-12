@@ -89,7 +89,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		for (SubmissionState state : SubmissionState.values()) {
 			states.add(state.toString());	
 		}
-		states.remove(SubmissionState.NOT_SUBMITTED.toString());
 		view.setStates(states);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);

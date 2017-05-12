@@ -223,16 +223,13 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.CANCELLED);
 		widget.configure(mockDataAccessSubmission);
 		
-		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.NOT_SUBMITTED);
-		widget.configure(mockDataAccessSubmission);
-		
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		widget.configure(mockDataAccessSubmission);
 		
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		widget.configure(mockDataAccessSubmission);
 		
-		verify(mockView, times(4)).hideActions();
+		verify(mockView, times(3)).hideActions();
 		verify(mockView, never()).showApproveButton();
 		verify(mockView, never()).showRejectButton();
 	}

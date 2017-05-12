@@ -3,7 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.file;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.RestrictionInformation;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -89,18 +90,18 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	public void configure(final EntityBundle bundle) {
 		view.clear();
-		dataAccessClient.getRestrictionInformation(bundle.getEntity().getId(), new AsyncCallback<RestrictionInformation>() {
+		dataAccessClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
-			public void onSuccess(RestrictionInformation restrictionInformation) {
+			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
 				configure(bundle, restrictionInformation);
 			};
 		});
 	}
 	
-	public void configure(EntityBundle bundle, RestrictionInformation restrictionInformation) {
+	public void configure(EntityBundle bundle, RestrictionInformationResponse restrictionInformation) {
 		view.clear();
 		this.entityBundle = bundle;
 		view.setClientsHelpVisible(false);

@@ -276,9 +276,9 @@ public class ACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testRequestAccess() {
+		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
 		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
 		widget.setRequirement(mockACTAccessRequirement);
-		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.NOT_SUBMITTED);
 		lazyLoadDataCallback.invoke();
 		
 		widget.onRequestAccess();
@@ -288,9 +288,9 @@ public class ACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testRequestAccessNoDataAccessRequest() {
+		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
 		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
 		widget.setRequirement(mockACTAccessRequirement);
-		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.NOT_SUBMITTED);
 		lazyLoadDataCallback.invoke();
 		String requestAccessURLString = "requestAccessURLString";
 		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
