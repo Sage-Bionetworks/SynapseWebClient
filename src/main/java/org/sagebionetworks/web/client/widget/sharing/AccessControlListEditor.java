@@ -241,6 +241,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
+		ids.add(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
+		ids.add(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
+		ids.add(publicPrincipalIds.getPublicAclPrincipalId().toString());
 		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage response) {
