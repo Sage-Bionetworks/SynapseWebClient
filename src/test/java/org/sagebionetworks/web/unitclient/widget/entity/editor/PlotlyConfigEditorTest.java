@@ -19,11 +19,14 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -60,6 +63,8 @@ public class PlotlyConfigEditorTest {
 	ColumnModel mockY2ColumnModel;
 	@Captor
 	ArgumentCaptor<List<String>> availableColumnNamesCaptor;
+	@Captor
+	ArgumentCaptor<DisplayUtils.SelectedHandler<Reference>> finderCallbackCaptor;
 	public static String X_COLUMN_NAME = "x Column";
 	public static String Y_COLUMN_NAME = "y column";
 	public static String Y2_COLUMN_NAME = "y2 column";
@@ -259,5 +264,19 @@ public class PlotlyConfigEditorTest {
 	public void testAsWidget() {
 		editor.asWidget();
 		verify(mockView).asWidget();
+	}
+	
+	@Test
+	public void testOnFindTable() {
+		editor.onFindTable();
+		verify(mockFinder).configure(eq(EntityFilter.PROJECT_OR_TABLE), eq(false), finderCallbackCaptor.capture());
+		verify(mockFinder).show();
+		DisplayUtils.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
+		String newTableId = "syn222";
+		Reference r = new Reference();
+		r.setTargetId(newTableId);
+		callback.onSelected(r);
+		verify(mockFinder).hide();
+		verify(mockView).setTableSynId(newTableId);
 	}
 }
