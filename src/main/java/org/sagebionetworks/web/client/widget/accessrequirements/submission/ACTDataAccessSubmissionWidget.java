@@ -89,7 +89,6 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 				break;
 			case APPROVED:
 			case CANCELLED:
-			case NOT_SUBMITTED:
 			case REJECTED:
 			default:
 		}

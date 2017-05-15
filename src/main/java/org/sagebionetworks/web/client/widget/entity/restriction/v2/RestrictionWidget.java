@@ -4,7 +4,8 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.RestrictionInformation;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -112,9 +113,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void loadRestrictionInformation() {
 		view.clear();
 		synAlert.clear();
-		dataAccessClient.getRestrictionInformation(entity.getId(), new AsyncCallback<RestrictionInformation>() {
+		dataAccessClient.getRestrictionInformation(entity.getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
 			@Override
-			public void onSuccess(RestrictionInformation restrictionInformation) {
+			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
 				configureUI(restrictionInformation);
 			}
 			
@@ -126,7 +127,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 
 	}
 	
-	public void configureUI(RestrictionInformation restrictionInformation) {
+	public void configureUI(RestrictionInformationResponse restrictionInformation) {
 		boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
 		

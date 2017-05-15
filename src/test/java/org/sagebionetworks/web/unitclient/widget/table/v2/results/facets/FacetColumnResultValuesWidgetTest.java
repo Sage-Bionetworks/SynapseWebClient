@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -54,7 +55,8 @@ public class FacetColumnResultValuesWidgetTest {
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
-	UserBadge mockUserBadge;
+	UserIdCellRendererImpl mockUserBadge;
+	
 	@Mock
 	EntityIdCellRendererImpl mockEntityIdCellRenderer;
 	public static final String VALUE = "column value";
@@ -84,7 +86,7 @@ public class FacetColumnResultValuesWidgetTest {
 		when(valueCount.getValue()).thenReturn(VALUE);
 		when(valueCount.getCount()).thenReturn(DEFAULT_COUNT);
 		when(valueCount.getIsSelected()).thenReturn(DEFAULT_SELECTED);
-		when(mockPortalGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+		when(mockPortalGinInjector.getUserIdCellRenderer()).thenReturn(mockUserBadge);
 		when(mockPortalGinInjector.getEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
 	}
 
@@ -126,8 +128,8 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(valueCount);
 		widget.configure(mockFacet, ColumnType.USERID, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockPortalGinInjector).getUserBadgeWidget();
-		verify(mockUserBadge).configure(VALUE);
+		verify(mockPortalGinInjector).getUserIdCellRenderer();
+		verify(mockUserBadge).setValue(eq(VALUE), any(ClickHandler.class));
 		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(VALUE));
 		verify(mockView).setShowAllButtonVisible(false);
 	}

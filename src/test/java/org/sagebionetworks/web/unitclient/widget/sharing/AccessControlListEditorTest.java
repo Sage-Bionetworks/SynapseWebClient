@@ -24,8 +24,10 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Folder;
@@ -79,10 +81,13 @@ public class AccessControlListEditorTest {
 	private static Project project;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
 	GlobalApplicationState mockGlobalApplicationState;
+	@Captor
+	ArgumentCaptor<ArrayList<String>> listCaptor;
 	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		// set up test Synapse objects
 		project = createProject();
 		localACL = createACL(ENTITY_ID);
@@ -345,6 +350,12 @@ public class AccessControlListEditorTest {
 		
 		// update
 		acle.refresh();
+		
+		// SWC-3602: verify that it asked for the public user group headers
+		verify(mockSynapseClient).getUserGroupHeadersById(listCaptor.capture(), any(AsyncCallback.class));
+		ArrayList<String> ids = listCaptor.getValue();
+		assertTrue(ids.contains(TEST_PUBLIC_PRINCIPAL_ID.toString()));
+		
 		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
