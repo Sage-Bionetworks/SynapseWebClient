@@ -3,10 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface PlotlyWidgetView extends IsWidget {
-	void setSynAlertWidget(Widget w);
+	void setSynAlertWidget(IsWidget w);
 	void setPresenter(Presenter p);
 	void setTitle(String title);
 	void showChart(String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode);

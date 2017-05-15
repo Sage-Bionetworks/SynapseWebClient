@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -44,7 +45,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}
 	
 	@Override
-	public void setSynAlertWidget(Widget w) {
+	public void setSynAlertWidget(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}

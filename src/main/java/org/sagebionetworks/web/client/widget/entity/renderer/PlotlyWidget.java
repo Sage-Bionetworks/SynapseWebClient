@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -53,7 +52,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
 	// Mask to get all parts of a query.
-	private static final Long ALL_PARTS_MASK = new Long(255);
+	public static final Long ALL_PARTS_MASK = new Long(255);
 	Query query;
 	Long currentOffset;
 	QueryBundleRequest qbr;
@@ -68,7 +67,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jobTracker = jobTracker;
-		view.setSynAlertWidget(synAlert.asWidget());
+		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
 	
@@ -131,7 +130,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 
 			@Override
 			public void onUpdate(AsynchronousJobStatus status) {
-				view.setLoadingMessage("Loaded "+currentOffset+" rows: "+status.getProgressMessage());
+				if (currentOffset > 0) {
+					String progressMessage = status.getProgressMessage() == null ? "" : status.getProgressMessage();
+					view.setLoadingMessage("Loaded " + currentOffset+" rows. " + progressMessage);	
+				}
 			}
 
 			@Override
@@ -149,7 +151,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 					getMoreResults();
 				} else {
 					//we're done! send all of the results to the graph
-					showGraph();
+					showChart();
 				}
 			}
 
@@ -162,6 +164,9 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	
 	public void initializeGraphData(QueryResultBundle result) {
 		graphData = new HashMap<String, List<String>>();
+		if (result == null || result.getSelectColumns() == null || result.getSelectColumns().size() < 2) {
+			return;
+		}
 		
 		xAxisColumnName = result.getSelectColumns().get(0).getName();
 		for (SelectColumn column : result.getSelectColumns()) {
@@ -179,20 +184,25 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		}
 	}
 	
-	public void showGraph() {
-		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
-		PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
-		int i = 0;
-		for (String columnName : graphData.keySet()) {
-			plotlyGraphData[i] = new PlotlyTrace();
-			plotlyGraphData[i].setX(xData);
-			double[] yData = ArrayUtils.getDoubleArray(graphData.get(columnName));
-			plotlyGraphData[i].setY(yData);
-			plotlyGraphData[i].setType(graphType);
-			plotlyGraphData[i].setName(columnName);
-			i++;
+	public void showChart() {
+		try {
+			String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
+			PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
+			int i = 0;
+			for (String columnName : graphData.keySet()) {
+				plotlyGraphData[i] = new PlotlyTrace();
+				plotlyGraphData[i].setX(xData);
+				double[] yData = ArrayUtils.getDoubleArray(graphData.get(columnName));
+				plotlyGraphData[i].setY(yData);
+				plotlyGraphData[i].setType(graphType);
+				plotlyGraphData[i].setName(columnName);
+				i++;
+			}
+			view.showChart(xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
+		} catch (Throwable ex) {
+			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
-		view.showChart(xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
+		
 	}
 	
 	@Override
